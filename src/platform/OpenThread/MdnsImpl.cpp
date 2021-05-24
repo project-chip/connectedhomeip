@@ -18,6 +18,8 @@
 #include "lib/mdns/platform/Mdns.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <support/CodeUtils.h>
 
 using namespace ::chip::DeviceLayer;
 
@@ -42,14 +44,24 @@ const char * GetProtocolString(MdnsServiceProtocol protocol)
 
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
-    if (service == nullptr)
-        return CHIP_ERROR_INVALID_ARGUMENT;
+    CHIP_ERROR result = CHIP_NO_ERROR;
 
-    char serviceType[kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1];
+    VerifyOrExit(service, result = CHIP_ERROR_INVALID_ARGUMENT);
+
+    char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
     snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
 
-    return ThreadStackMgr().AddSrpService(service->mName, serviceType, service->mPort, service->mTextEntries,
-                                          service->mTextEntrySize);
+    // Try to remove service before adding it, as SRP doesn't allow to update existing services.
+    result = ThreadStackMgr().RemoveSrpService(service->mName, serviceType);
+
+    // Service should be successfully removed or not found (not exists).
+    VerifyOrExit((result == CHIP_NO_ERROR) || (result == Internal::MapOpenThreadError(OT_ERROR_NOT_FOUND)), );
+
+    result =
+        ThreadStackMgr().AddSrpService(service->mName, serviceType, service->mPort, service->mTextEntries, service->mTextEntrySize);
+
+exit:
+    return result;
 }
 
 CHIP_ERROR ChipMdnsStopPublish()
@@ -62,7 +74,7 @@ CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
     if (service == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    char serviceType[kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1];
+    char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
     snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
 
     return ThreadStackMgr().RemoveSrpService(service->mName, serviceType);

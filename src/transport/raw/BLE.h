@@ -82,8 +82,7 @@ public:
      */
     CHIP_ERROR Init(const BleListenParameters & param);
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
-                           System::PacketBufferHandle msgBuf) override;
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {
@@ -103,7 +102,7 @@ private:
      * Ownership of msg is taken over and will be freed at some unspecified time
      * in the future (once connection succeeds/fails).
      */
-    CHIP_ERROR SendAfterConnect(System::PacketBufferHandle msg);
+    CHIP_ERROR SendAfterConnect(System::PacketBufferHandle && msg);
 
     // Those functions are BLEConnectionDelegate callbacks used when the connection
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.
@@ -113,7 +112,7 @@ private:
     void ClearPendingPackets();
 
     // Those functions are BLEEndPoint callbacks
-    void OnEndPointMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBufferHandle buffer) override;
+    void OnEndPointMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBufferHandle && buffer) override;
     void OnEndPointConnectComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err) override;
     void OnEndPointConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err) override;
 

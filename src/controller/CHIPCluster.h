@@ -36,7 +36,7 @@ class DLL_EXPORT ClusterBase
 public:
     virtual ~ClusterBase() {}
 
-    CHIP_ERROR Associate(Device * device, EndpointId endpoint);
+    CHIP_ERROR Associate(Device * device, EndpointId endpoint, app::CommandSender * commandSender = nullptr);
 
     void Dissociate();
 
@@ -55,7 +55,7 @@ protected:
      * @param[in] successHandler    The handler function that's called on receiving command response success
      * @param[in] failureHandler    The handler function that's called on receiving command response failure
      */
-    CHIP_ERROR SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle payload, Callback::Cancelable * successHandler,
+    CHIP_ERROR SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle && payload, Callback::Cancelable * successHandler,
                            Callback::Cancelable * failureHandler);
 
     /**
@@ -73,6 +73,7 @@ protected:
 
     const ClusterId mClusterId;
     Device * mDevice;
+    app::CommandSender * mpCommandSender = nullptr;
     EndpointId mEndpoint;
 };
 

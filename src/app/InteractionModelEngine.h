@@ -47,8 +47,9 @@
 #include <app/reporting/Engine.h>
 #include <app/util/basic-types.h>
 
-#define CHIP_MAX_NUM_COMMAND_HANDLER 1
-#define CHIP_MAX_NUM_COMMAND_SENDER 1
+// TODO: Make number of command handler and command sender configurable
+#define CHIP_MAX_NUM_COMMAND_HANDLER 4
+#define CHIP_MAX_NUM_COMMAND_SENDER 4
 #define CHIP_MAX_NUM_READ_CLIENT 1
 #define CHIP_MAX_NUM_READ_HANDLER 1
 #define CHIP_MAX_REPORTS_IN_FLIGHT 1
@@ -58,7 +59,7 @@ namespace chip {
 namespace app {
 
 constexpr size_t kMaxSecureSduLengthBytes = 1024;
-constexpr uint32_t kImMessageTimeoutMsec  = 3000;
+constexpr uint32_t kImMessageTimeoutMsec  = 6000;
 constexpr FieldId kRootFieldId            = 0;
 /**
  * @class InteractionModelEngine
@@ -131,16 +132,16 @@ public:
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
     void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
-    CHIP_ERROR PushFront(ClusterInfo *& aClusterInfo, AttributePathParams & aAttributePathParams);
+    CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoLisst, ClusterInfo & aClusterInfo);
 
 private:
     friend class reporting::Engine;
     void OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
+                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
     void OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
+                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
     void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
+                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
     /**
@@ -148,7 +149,7 @@ private:
      * the Read Request are handled entirely within this function.
      */
     void OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload);
+                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
@@ -163,7 +164,7 @@ private:
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj);
-CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter);
-CHIP_ERROR WriteSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVReader & aReader);
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter);
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader);
 } // namespace app
 } // namespace chip

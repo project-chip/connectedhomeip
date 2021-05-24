@@ -21,14 +21,14 @@
 #include "gen/af-structs.h"
 
 #include <core/CHIPError.h>
-#include <list>
 #include <string>
+#include <vector>
 
 class MediaInputManager
 {
 public:
     CHIP_ERROR Init();
-    std::list<EmberAfMediaInputInfo> proxyGetInputList();
+    std::vector<EmberAfMediaInputInfo> proxyGetInputList();
     bool proxySelectInputRequest(uint8_t input);
     bool proxyShowInputStatusRequest();
     bool proxyHideInputStatusRequest();

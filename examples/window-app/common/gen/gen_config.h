@@ -29,9 +29,27 @@
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
+#define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
+
+// Use this macro to check if the server side of the Basic cluster is included
+#define ZCL_USING_BASIC_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_BASIC_SERVER
+#define EMBER_AF_PLUGIN_BASIC
+
+// Use this macro to check if the server side of the Network Commissioning cluster is included
+#define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
+#define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING
+
+// Use this macro to check if the server side of the Thread Network Diagnostics cluster is included
+#define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_SERVER
+#define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS
 
 // Use this macro to check if the server side of the Window Covering cluster is included
 #define ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER

@@ -20,7 +20,7 @@
  *   This file implements the handler for data model messages.
  */
 
-#include <app/server/DataModelHandler.h>
+#include <app/util/DataModelHandler.h>
 
 #if __has_include("gen/endpoint_config.h")
 #define USE_ZAP_CONFIG 1
@@ -41,12 +41,12 @@ void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status);
 
 using namespace ::chip;
 
-void InitDataModelHandler()
+void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
 {
 #ifdef USE_ZAP_CONFIG
     ChipLogProgress(Zcl, "Using ZAP configuration...");
     emberAfEndpointConfigure();
-    emberAfInit();
+    emberAfInit(exchangeManager);
 
 #if defined(EMBER_AF_PLUGIN_REPORTING_SERVER) || defined(EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER) ||                        \
     defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
@@ -65,7 +65,7 @@ void InitDataModelHandler()
 #endif
 }
 
-void HandleDataModelMessage(NodeId nodeId, System::PacketBufferHandle buffer)
+void HandleDataModelMessage(Messaging::ExchangeContext * exchange, System::PacketBufferHandle && buffer)
 {
 #ifdef USE_ZAP_CONFIG
     EmberApsFrame frame;
@@ -85,7 +85,7 @@ void HandleDataModelMessage(NodeId nodeId, System::PacketBufferHandle buffer)
     ok                  = emberAfProcessMessage(&frame,
                                0, // type
                                message, messageLen,
-                               nodeId, // source identifier
+                               exchange, // source identifier
                                NULL);
 
     if (ok)

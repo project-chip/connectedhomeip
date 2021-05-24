@@ -47,10 +47,11 @@ namespace SecureMessageCodec {
  * @param msgBuf        The message buffer that contains the unencrypted message. If
  *                      the operation is successuful, this buffer will contain the
  *                      encrypted message.
+ * @param counter       The local counter object to be used
  * @ return CHIP_ERROR  The result of the encode operation
  */
 CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
-                  PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf);
+                  PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, MessageCounter & counter);
 
 /**
  * @brief

@@ -23,6 +23,8 @@
 #include "gen/CHIPClientCallbacks.h"
 #include "gen/CHIPClusters.h"
 
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+
 enum class PairingMode
 {
     None,
@@ -97,7 +99,7 @@ public:
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
     /////////// DevicePairingDelegate Interface /////////
-    void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
+    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
 
@@ -144,4 +146,5 @@ private:
     ChipDevice * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 };

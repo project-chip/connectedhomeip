@@ -1,0 +1,35 @@
+{
+    "name": "Framework templates",
+    "version": "chip-v1",
+    "helpers": [
+        "../../../../../src/app/zap-templates/partials/helper.js",
+        "../../../../../src/app/zap-templates/common/StringHelper.js",
+        "../../../../../src/app/zap-templates/templates/app/helper.js",
+        "../../../../../src/app/zap-templates/templates/chip/helper.js",
+        "helper.js"
+    ],
+    "override": "../../../../../src/app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../../../src/app/zap-templates/partials/header.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "CHIPClustersObjc.zapt",
+            "name": "Objc ZCL API Header",
+            "output": "src/darwin/Framework/CHIP/gen/CHIPClustersObjc.h"
+        },
+        {
+            "path": "CHIPClustersObjc-src.zapt",
+            "name": "Objc ZCL API",
+            "output": "src/darwin/Framework/CHIP/gen/CHIPClustersObjc.mm"
+        },
+        {
+            "path": "clusters-tests.zapt",
+            "name": "Cluster Tests",
+            "output": "src/darwin/Framework/CHIPTests/CHIPClustersTests.m"
+        }
+    ]
+}

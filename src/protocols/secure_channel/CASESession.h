@@ -28,6 +28,9 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/secure_channel/Constants.h>
@@ -90,8 +93,8 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
-                                           SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR ListenForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                             SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -116,13 +119,12 @@ public:
      *   Derive a secure session from the established session. The API will return error
      *   if called before session is established.
      *
-     * @param info        Information string used for key derivation
-     * @param info_len    Length of info string
      * @param session     Reference to the secure session that will be
      *                    initialized once session establishment is complete
+     * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override;
+    virtual CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override;
 
     /**
      * @brief
@@ -178,7 +180,7 @@ public:
 
     //// ExchangeDelegate Implementation ////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
@@ -226,8 +228,6 @@ private:
 
     // TODO: Remove this and replace with system method to retrieve current time
     CHIP_ERROR SetEffectiveTime(void);
-
-    CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
 
     void Clear();
 

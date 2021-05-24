@@ -30,7 +30,7 @@
 using namespace chip;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     ChipLogProgress(Zcl, "Cluster callback: %d", clusterId);
 
@@ -47,7 +47,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
     else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
     {
-        if (attributeId != ZCL_MOVE_TO_LEVEL_COMMAND_ID)
+        if (attributeId != ZCL_CURRENT_LEVEL_ATTRIBUTE_ID)
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
             return;

@@ -37,7 +37,6 @@
 
 #include "AppConfig.h"
 #include "init_efrPlatform.h"
-#include <app/server/DataModelHandler.h>
 #include <app/server/Server.h>
 
 #if DISPLAY_ENABLED

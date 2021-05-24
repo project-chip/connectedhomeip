@@ -133,6 +133,10 @@ int AppTask::Init()
 
     K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
 
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+    PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
+#endif
+
     return err;
 }
 
@@ -237,6 +241,12 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     else if (pin_no == BLE_BUTTON)
     {
         button_event.Handler = BleHandler;
+#if !(defined OM15082)
+        if (button_action == RESET_BUTTON_PUSH)
+        {
+            button_event.Handler = ResetActionEventHandler;
+        }
+#endif
     }
 
     sAppTask.PostEvent(&button_event);
@@ -267,8 +277,13 @@ void AppTask::HandleKeyboard(void)
         switch (keyEvent)
         {
         case gKBD_EventPB1_c:
+#if (defined OM15082)
             ButtonEventHandler(RESET_BUTTON, RESET_BUTTON_PUSH);
             break;
+#else
+            ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
+            break;
+#endif
         case gKBD_EventPB2_c:
             ButtonEventHandler(LIGHT_BUTTON, LIGHT_BUTTON_PUSH);
             break;
@@ -278,6 +293,11 @@ void AppTask::HandleKeyboard(void)
         case gKBD_EventPB4_c:
             ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
+#if !(defined OM15082)
+        case gKBD_EventLongPB1_c:
+            ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
+            break;
+#endif
         default:
             break;
         }
@@ -306,7 +326,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
 void AppTask::ResetActionEventHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.PinNo != RESET_BUTTON)
+    if (aEvent->ButtonEvent.PinNo != RESET_BUTTON && aEvent->ButtonEvent.PinNo != BLE_BUTTON)
         return;
 
     if (sAppTask.mResetTimerActive)
@@ -465,6 +485,37 @@ void AppTask::BleHandler(AppEvent * aEvent)
     }
 }
 
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
+{
+    if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+    {
+        if (!NFCMgr().IsTagEmulationStarted())
+        {
+            K32W_LOG("NFC Tag emulation is already stopped!");
+        }
+        else
+        {
+            NFCMgr().StopTagEmulation();
+            K32W_LOG("Stopped NFC Tag Emulation!");
+        }
+    }
+    else if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange &&
+             event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+    {
+        if (NFCMgr().IsTagEmulationStarted())
+        {
+            K32W_LOG("NFC Tag emulation is already started!");
+        }
+        else
+        {
+            ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+            K32W_LOG("Started NFC Tag Emulation!");
+        }
+    }
+}
+#endif
+
 void AppTask::CancelTimer()
 {
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
@@ -565,7 +616,7 @@ void AppTask::UpdateClusterState(void)
     uint8_t newValue = !LightingMgr().IsTurnedOff();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+    EmberAfStatus status = emberAfWriteAttribute(0, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {

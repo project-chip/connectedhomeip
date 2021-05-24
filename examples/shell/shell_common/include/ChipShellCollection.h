@@ -19,9 +19,6 @@
 
 extern "C" {
 // A list of shell commands provided by ChipShell
-void cmd_base64_init(void);
-void cmd_btp_init(void);
-void cmd_device_init(void);
 void cmd_misc_init(void);
 void cmd_otcli_init(void);
 void cmd_ping_init(void);

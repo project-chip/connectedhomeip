@@ -55,6 +55,8 @@
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
+#include <messaging/ExchangeContext.h>
+
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
 #endif
@@ -95,19 +97,23 @@ typedef void (*EmberAfGenericClusterFunction)(void);
  * or a pointer to the value itself, if attribute type is longer than
  * 2 bytes.
  */
-typedef union
+union EmberAfDefaultAttributeValue
 {
+    constexpr EmberAfDefaultAttributeValue(uint8_t * ptr) : ptrToDefaultValue(ptr) {}
+    constexpr EmberAfDefaultAttributeValue(uint16_t val) : defaultValue(val) {}
+
     /**
      * Points to data if size is more than 2 bytes.
      * If size is more than 2 bytes, and this value is NULL,
      * then the default value is all zeroes.
      */
     uint8_t * ptrToDefaultValue;
+
     /**
      * Actual default value if the attribute size is 2 bytes or less.
      */
     uint16_t defaultValue;
-} EmberAfDefaultAttributeValue;
+};
 
 /**
  * @brief Type describing the attribute default, min and max values.
@@ -134,8 +140,11 @@ typedef struct
 /**
  * @brief Union describing the attribute default/min/max values.
  */
-typedef union
+union EmberAfDefaultOrMinMaxAttributeValue
 {
+    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint8_t * ptr) : ptrToDefaultValue(ptr) {}
+    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint16_t val) : defaultValue(val) {}
+
     /**
      * Points to data if size is more than 2 bytes.
      * If size is more than 2 bytes, and this value is NULL,
@@ -151,7 +160,7 @@ typedef union
      * supported for this attribute.
      */
     EmberAfAttributeMinMaxValue * ptrToMinMaxValue;
-} EmberAfDefaultOrMinMaxAttributeValue;
+};
 
 /**
  * @brief Each attribute has it's metadata stored in such struct.
@@ -171,7 +180,7 @@ typedef struct
     /**
      * Size of this attribute in bytes.
      */
-    uint8_t size;
+    uint16_t size;
     /**
      * Attribute mask, tagging attribute with specific
      * functionality. See ATTRIBUTE_MASK_ macros defined
@@ -423,14 +432,16 @@ typedef struct
  *   and pass a pointer to that location around during
  *   command processing
  */
-typedef struct
+struct EmberAfClusterCommand
 {
+    chip::NodeId SourceNodeId() const { return source->GetSecureSession().GetPeerNodeId(); }
+
     /**
      * APS frame for the incoming message
      */
     EmberApsFrame * apsFrame;
     EmberIncomingMessageType type;
-    chip::NodeId source;
+    chip::Messaging::ExchangeContext * source;
     uint8_t * buffer;
     uint16_t bufLen;
     bool clusterSpecific;
@@ -442,7 +453,7 @@ typedef struct
     uint8_t direction;
     EmberAfInterpanHeader * interPanHeader;
     uint8_t networkIndex;
-} EmberAfClusterCommand;
+};
 
 /**
  * @brief Endpoint type struct describes clusters that are on the endpoint.
@@ -719,9 +730,9 @@ typedef enum
 typedef enum
 {
     EMBER_AF_OK_TO_SLEEP,
-    /** @deprecated. */
+    /** deprecated. */
     EMBER_AF_OK_TO_HIBERNATE = EMBER_AF_OK_TO_SLEEP,
-    /** @deprecated. */
+    /** deprecated. */
     EMBER_AF_OK_TO_NAP,
     EMBER_AF_STAY_AWAKE,
 } EmberAfEventSleepControl;
@@ -1228,7 +1239,7 @@ typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(chip:
  * This function is called before an attribute changes.
  */
 typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint8_t size,
+                                                                   EmberAfAttributeType attributeType, uint16_t size,
                                                                    uint8_t * value);
 
 /**
@@ -1239,13 +1250,38 @@ typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(chip::Endpoin
  */
 typedef void (*EmberAfDefaultResponseFunction)(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 
+namespace chip {
+/**
+ * @brief a type that represents where we are trying to send a message.  This
+ *        must always be paired with an EmberOutgoingMessageType that identifies
+ *        which arm of the union is in use.
+ */
+union MessageSendDestination
+{
+    explicit constexpr MessageSendDestination(uint8_t aBindingIndex) : mBindingIndex(aBindingIndex) {}
+    explicit constexpr MessageSendDestination(NodeId aNodeId) : mNodeId(aNodeId) {}
+    explicit constexpr MessageSendDestination(GroupId aGroupId) : mGroupId(aGroupId) {}
+    explicit constexpr MessageSendDestination(Messaging::ExchangeContext * aExchangeContext) : mExchangeContext(aExchangeContext) {}
+
+    // Used when the type is EMBER_OUTGOING_VIA_BINDING
+    uint8_t mBindingIndex;
+    // Used when the type is EMBER_OUTGOING_DIRECT
+    NodeId mNodeId;
+    // Used when the type is EMBER_OUTGOING_MULTICAST or
+    // EMBER_OUTGOING_MULTICAST_WITH_ALIAS
+    GroupId mGroupId;
+    // Used when the type is EMBER_OUTGOING_VIA_EXCHANGE
+    Messaging::ExchangeContext * mExchangeContext;
+};
+} // namespace chip
+
 /**
  * @brief Type for referring to the message sent callback function.
  *
  * This function is called when a message is sent.
  */
-typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                                           uint16_t msgLen, uint8_t * message, EmberStatus status);
+typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
+                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /**
  * @brief The EmberAfMessageStruct is a struct wrapper that
@@ -1257,7 +1293,7 @@ typedef struct
     EmberAfMessageSentFunction callback;
     EmberApsFrame * apsFrame;
     uint8_t * message;
-    uint64_t indexOrDestination;
+    chip::MessageSendDestination destination;
     uint16_t messageLength;
     EmberOutgoingMessageType type;
     bool broadcast;

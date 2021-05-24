@@ -17,8 +17,10 @@
 
 #include "MediaInputManager.h"
 #include <app/util/af.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <map>
 #include <string>
+#include <support/CodeUtils.h>
 
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
@@ -32,11 +34,6 @@ CHIP_ERROR MediaInputManager::Init()
     // TODO: Store feature map once it is supported
     std::map<std::string, bool> featureMap;
     featureMap["NU"] = true;
-
-    // TODO: Update once storing a list attribute is supported
-    // std::list<EmberAfMediaInputInfo> mediaInputList = MediaInputManager().proxyGetInputList();
-    // emberAfWriteServerAttribute(endpoint, ZCL_MEDIA_INPUT_CLUSTER_ID, ZCL_MEDIA_INPUT_CURRENT_INPUT_ATTRIBUTE_ID,
-    //                             (uint8_t *) &mediaInputList, ZCL_STRUCT_ATTRIBUTE_TYPE);
     SuccessOrExit(err);
 exit:
     return err;
@@ -66,10 +63,24 @@ bool MediaInputManager::proxyRenameInputRequest(uint8_t input, std::string name)
     return true;
 }
 
-std::list<EmberAfMediaInputInfo> MediaInputManager::proxyGetInputList()
+std::vector<EmberAfMediaInputInfo> MediaInputManager::proxyGetInputList()
 {
     // TODO: Insert code here
-    std::list<EmberAfMediaInputInfo> mediaInputList;
+    std::vector<EmberAfMediaInputInfo> mediaInputList;
+    int maximumVectorSize = 2;
+    char description[]    = "exampleDescription";
+    char name[]           = "exampleName";
+
+    for (int i = 0; i < maximumVectorSize; ++i)
+    {
+        EmberAfMediaInputInfo mediaInput;
+        mediaInput.description = chip::ByteSpan(chip::Uint8::from_char(description), sizeof(description));
+        mediaInput.name        = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
+        mediaInput.inputType   = EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI;
+        mediaInput.index       = static_cast<uint8_t>(1 + i);
+        mediaInputList.push_back(mediaInput);
+    }
+
     return mediaInputList;
 }
 

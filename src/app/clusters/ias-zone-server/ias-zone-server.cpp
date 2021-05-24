@@ -211,7 +211,7 @@ static void enrollWithClient(EndpointId endpoint)
 }
 
 EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint8_t size,
+                                                                     EmberAfAttributeType attributeType, uint16_t size,
                                                                      uint8_t * value)
 {
     uint8_t i;
@@ -410,7 +410,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     newBufferEntry.status      = newStatus;
     newBufferEntry.eventTimeMs = System::Layer::GetClock_MonotonicMS();
 #endif
-    EmberStatus sendStatus;
+    EmberStatus sendStatus = EMBER_SUCCESS;
 
     emberAfWriteServerAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_STATUS_ATTRIBUTE_ID, (uint8_t *) &newStatus,
                                 ZCL_INT16U_ATTRIBUTE_TYPE);
@@ -762,7 +762,7 @@ void emberAfPluginIasZoneServerPrintQueueConfig(void)
 // destination when the destination is the only router the node is joined to.
 // In that case, the command will never have been sent, as the device will have
 // had no router by which to send the command.
-void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, MessageSendDestination destination,
                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                     EmberStatus status)
 {

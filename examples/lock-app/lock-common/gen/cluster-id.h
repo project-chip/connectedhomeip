@@ -98,11 +98,29 @@
 // Definitions for cluster: Network Commissioning
 #define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0x0031)
 
+// Definitions for cluster: General Diagnostics
+#define ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID (0x0033)
+
+// Definitions for cluster: Software Diagnostics
+#define ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID (0x0034)
+
+// Definitions for cluster: Thread Network Diagnostics
+#define ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID (0x0035)
+
+// Definitions for cluster: WiFi Network Diagnostics
+#define ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID (0x0036)
+
+// Definitions for cluster: Ethernet Network Diagnostics
+#define ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID (0x0037)
+
 // Definitions for cluster: Switch
 #define ZCL_SWITCH_CLUSTER_ID (0x003B)
 
 // Definitions for cluster: Operational Credentials
 #define ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID (0x003E)
+
+// Definitions for cluster: Trusted Root Certificates
+#define ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID (0x003F)
 
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
@@ -292,6 +310,9 @@
 
 // Definitions for cluster: Account Login
 #define ZCL_ACCOUNT_LOGIN_CLUSTER_ID (0x050E)
+
+// Definitions for cluster: Test Cluster
+#define ZCL_TEST_CLUSTER_ID (0x050F)
 
 // Definitions for cluster: Generic Tunnel
 #define ZCL_GENERIC_TUNNEL_CLUSTER_ID (0x0600)

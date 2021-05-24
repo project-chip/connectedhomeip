@@ -41,7 +41,7 @@ Command * currentCommandObject;
 
 void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId commandId, EndpointId endpointId)
 {
-    const Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
+    Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
 
     imCompatibilityEmberApsFrame.clusterId           = clusterId;
     imCompatibilityEmberApsFrame.destinationEndpoint = endpointId;
@@ -51,8 +51,7 @@ void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId comma
     imCompatibilityEmberAfCluster.commandId      = commandId;
     imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
     imCompatibilityEmberAfCluster.interPanHeader = &imCompatibilityInterpanHeader;
-    imCompatibilityEmberAfCluster.source =
-        (commandExchangeCtx != nullptr ? commandExchangeCtx->GetSecureSessionHandle().GetPeerNodeId() : 0); // 0 is "Any" NodeId.
+    imCompatibilityEmberAfCluster.source         = commandExchangeCtx;
 
     emAfCurrentCommand   = &imCompatibilityEmberAfCluster;
     currentCommandObject = command;

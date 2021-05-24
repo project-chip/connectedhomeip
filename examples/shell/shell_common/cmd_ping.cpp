@@ -20,12 +20,13 @@
 #include <stdlib.h>
 
 #include <lib/core/CHIPCore.h>
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
@@ -202,8 +203,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
-                                     SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
+    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator,
+                                     gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -219,7 +220,7 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload)
+void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
 {
     uint32_t respTime    = System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gPingArguments.GetLastEchoTime();
@@ -269,7 +270,8 @@ void StartPinging(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
 
-        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        err =
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -280,12 +282,16 @@ void StartPinging(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
 
-        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        err =
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
         SuccessOrExit(err);
     }
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
+    SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP echo responder.
     err = EstablishSecureSession(stream, peerAddress);

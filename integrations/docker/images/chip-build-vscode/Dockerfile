@@ -5,17 +5,25 @@ FROM connectedhomeip/chip-build-android:${VERSION} AS android
 FROM connectedhomeip/chip-build-esp32-qemu:${VERSION} as esp32
 FROM connectedhomeip/chip-build-mbed-os:${VERSION} AS mbedos
 FROM connectedhomeip/chip-build:${VERSION}
+
+# qemu-src copied over because qemu directory contains symlinks to the src
+# folder (notably pc-bios are required to run qemu)
 COPY --from=esp32 /opt/espressif/esp-idf /opt/espressif/esp-idf
 COPY --from=esp32 /opt/espressif/tools /opt/espressif/tools
 COPY --from=esp32 /opt/espressif/qemu /opt/espressif/qemu
+COPY --from=esp32 /opt/espressif/qemu-src /opt/espressif/qemu-src
+
 COPY --from=nrf /opt/NordicSemiconductor/nRF5_tools /opt/NordicSemiconductor/nRF5_tools
 COPY --from=nrf /opt/NordicSemiconductor/nrfconnect /opt/NordicSemiconductor/nrfconnect
 COPY --from=nrf /opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major /opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major
+
 COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r21b /opt/android/android-ndk-r21b
+
 COPY --from=mbedos /opt/mbed-os /opt/mbed-os
 COPY --from=mbedos /opt/mbed-os-toolchain/ /opt/mbed-os-toolchain/
 COPY --from=mbedos /opt/openocd/ /opt/openocd/
+
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu

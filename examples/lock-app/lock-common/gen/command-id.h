@@ -265,11 +265,32 @@
 #define ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID (0x0F)
 #define ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID (0x10)
 
+// Commands for cluster: Software Diagnostics
+#define ZCL_RESET_WATERMARKS_COMMAND_ID (0x00)
+
+// Commands for cluster: Thread Network Diagnostics
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
+
+// Commands for cluster: WiFi Network Diagnostics
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
+
+// Commands for cluster: Ethernet Network Diagnostics
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
+
 // Commands for cluster: Operational Credentials
-#define ZCL_GET_FABRIC_ID_COMMAND_ID (0x00)
-#define ZCL_GET_FABRIC_ID_RESPONSE_COMMAND_ID (0x01)
+#define ZCL_SET_FABRIC_COMMAND_ID (0x00)
+#define ZCL_SET_FABRIC_RESPONSE_COMMAND_ID (0x01)
+#define ZCL_OP_CSR_REQUEST_COMMAND_ID (0x04)
+#define ZCL_OP_CSR_RESPONSE_COMMAND_ID (0x05)
+#define ZCL_ADD_OP_CERT_COMMAND_ID (0x06)
+#define ZCL_OP_CERT_RESPONSE_COMMAND_ID (0x08)
 #define ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID (0x09)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
+#define ZCL_REMOVE_ALL_FABRICS_COMMAND_ID (0x0B)
+
+// Commands for cluster: Trusted Root Certificates
+#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x00)
+#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x01)
 
 // Commands for cluster: Door Lock
 #define ZCL_LOCK_DOOR_COMMAND_ID (0x00)
@@ -469,6 +490,12 @@
 #define ZCL_GET_SETUP_PIN_COMMAND_ID (0x00)
 #define ZCL_GET_SETUP_PIN_RESPONSE_COMMAND_ID (0x00)
 #define ZCL_LOGIN_COMMAND_ID (0x01)
+
+// Commands for cluster: Test Cluster
+#define ZCL_TEST_COMMAND_ID (0x00)
+#define ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID (0x00)
+#define ZCL_TEST_NOT_HANDLED_COMMAND_ID (0x01)
+#define ZCL_TEST_SPECIFIC_COMMAND_ID (0x02)
 
 // Commands for cluster: Generic Tunnel
 #define ZCL_MATCH_PROTOCOL_ADDRESS_COMMAND_ID (0x00)

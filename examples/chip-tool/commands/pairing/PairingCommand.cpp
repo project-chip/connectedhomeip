@@ -32,10 +32,14 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::Controller::CommissionerInitParams params;
-
     params.storageDelegate              = &storage;
     params.mDeviceAddressUpdateDelegate = this;
     params.pairingDelegate              = this;
+
+    err = mOpCredsIssuer.Initialize(storage);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", ErrorStr(err)));
+
+    params.operationalCredentialsDelegate = &mOpCredsIssuer;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
@@ -108,14 +112,14 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
     return mCommissioner.UnpairDevice(remoteId);
 }
 
-void PairingCommand::OnStatusUpdate(RendezvousSessionDelegate::Status status)
+void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     switch (status)
     {
-    case RendezvousSessionDelegate::Status::SecurePairingSuccess:
+    case DevicePairingDelegate::Status::SecurePairingSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         break;
-    case RendezvousSessionDelegate::Status::SecurePairingFailed:
+    case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         break;
     }

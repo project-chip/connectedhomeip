@@ -39,7 +39,10 @@ shared_library("jni") {
     "JniTypeWrappers.h",
   ]
 
-  deps = [ "//src/lib" ]
+  deps = [
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/lib",
+  ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 }
@@ -54,12 +57,10 @@ android_library("java") {
 
   sources = [
     "src/chip/devicecontroller/AndroidChipStack.java",
-    "src/chip/devicecontroller/AndroidPersistentStorageDelegate.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
     "src/chip/devicecontroller/KeyValueStoreManager.java",
-    "src/chip/devicecontroller/PersistentStorage.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

@@ -224,7 +224,7 @@ public:
      **/
     virtual CHIP_ERROR ECDH_derive_secret(const PK & remote_public_key, Secret & out_secret) const = 0;
 
-    virtual const PK & Pubkey() = 0;
+    virtual const PK & Pubkey() const = 0;
 };
 
 struct alignas(size_t) P256KeypairContext
@@ -240,22 +240,26 @@ public:
     P256Keypair() {}
     ~P256Keypair();
 
-    /** @brief Initialize the keypair.
+    /**
+     * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR Initialize();
 
-    /** @brief Serialize the keypair.
+    /**
+     * @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output);
+    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const;
 
-    /** @brief Deserialize the keypair.
+    /**
+     * @brief Deserialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input);
 
-    /** @brief Generate a new Certificate Signing Request (CSR).
+    /**
+     * @brief Generate a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
      *CSR.
@@ -294,7 +298,7 @@ public:
 
     /** @brief Return public key for the keypair.
      **/
-    const P256PublicKey & Pubkey() override { return mPublicKey; }
+    const P256PublicKey & Pubkey() const override { return mPublicKey; }
 
 private:
     P256PublicKey mPublicKey;
@@ -342,6 +346,15 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
                            size_t iv_length, uint8_t * plaintext);
 
 /**
+ * @brief Verify the Certificate Signing Request (CSR). If successfully verified, it outputs the public key from the CSR.
+ * @param csr CSR in DER format
+ * @param csr_length The length of the CSR
+ * @param pubkey The public key from the verified CSR
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr, size_t csr_length, P256PublicKey & pubkey);
+
+/**
  * @brief A function that implements SHA-256 hash
  * @param data The data to hash
  * @param data_length Length of the data
@@ -350,6 +363,16 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
  **/
 
 CHIP_ERROR Hash_SHA256(const uint8_t * data, size_t data_length, uint8_t * out_buffer);
+
+/**
+ * @brief A function that implements SHA-1 hash
+ * @param data The data to hash
+ * @param data_length Length of the data
+ * @param out_buffer Pointer to buffer to write output into
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+
+CHIP_ERROR Hash_SHA1(const uint8_t * data, size_t data_length, uint8_t * out_buffer);
 
 /**
  * @brief A class that defines stream based implementation of SHA-256 hash
@@ -377,21 +400,28 @@ private:
     HashSHA256OpaqueContext mContext;
 };
 
-/**
- * @brief A function that implements SHA-256 based HKDF
- * @param secret The secret to use as the key to the HKDF
- * @param secret_length Length of the secret
- * @param salt Optional salt to use as input to the HKDF
- * @param salt_length Length of the salt
- * @param info Optional info to use as input to the HKDF
- * @param info_length Length of the info
- * @param out_buffer Pointer to buffer to write output into.
- * @param out_length Resulting length of out_buffer
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
+class HKDF_sha
+{
+public:
+    HKDF_sha() {}
+    virtual ~HKDF_sha() {}
 
-CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,
-                       size_t info_length, uint8_t * out_buffer, size_t out_length);
+    /**
+     * @brief A function that implements SHA-256 based HKDF
+     * @param secret The secret to use as the key to the HKDF
+     * @param secret_length Length of the secret
+     * @param salt Optional salt to use as input to the HKDF
+     * @param salt_length Length of the salt
+     * @param info Optional info to use as input to the HKDF
+     * @param info_length Length of the info
+     * @param out_buffer Pointer to buffer to write output into.
+     * @param out_length Resulting length of out_buffer
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+
+    virtual CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
+                                   const uint8_t * info, size_t info_length, uint8_t * out_buffer, size_t out_length);
+};
 
 /**
  * @brief A cryptographically secure random number generator based on NIST SP800-90A
@@ -418,18 +448,25 @@ typedef int (*entropy_source)(void * data, uint8_t * output, size_t len, size_t 
  **/
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold);
 
-/** @brief Function to derive key using password. SHA256 hashing algorithm is used for calculating hmac.
- * @param password password used for key derivation
- * @param plen length of buffer containing password
- * @param salt salt to use as input to the KDF
- * @param slen length of salt
- * @param iteration_count number of iterations to run
- * @param key_length length of output key
- * @param output output buffer where the key will be written
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
-CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
-                         uint32_t key_length, uint8_t * output);
+class PBKDF2_sha256
+{
+public:
+    PBKDF2_sha256() {}
+    virtual ~PBKDF2_sha256() {}
+
+    /** @brief Function to derive key using password. SHA256 hashing algorithm is used for calculating hmac.
+     * @param password password used for key derivation
+     * @param plen length of buffer containing password
+     * @param salt salt to use as input to the KDF
+     * @param slen length of salt
+     * @param iteration_count number of iterations to run
+     * @param key_length length of output key
+     * @param output output buffer where the key will be written
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
+                                     unsigned int iteration_count, uint32_t key_length, uint8_t * output);
+};
 
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as

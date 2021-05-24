@@ -25,6 +25,7 @@
 #pragma once
 
 #include <app/ClusterInfo.h>
+#include <app/EventManagement.h>
 #include <app/InteractionModelDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -82,7 +83,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle aPayload);
+    CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
     /**
      *  Send ReportData to initiator
@@ -93,42 +94,60 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR SendReportData(System::PacketBufferHandle aPayload);
+    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
     bool IsReportable() const { return mState == HandlerState::Reportable; }
 
     virtual ~ReadHandler() = default;
 
-    ClusterInfo * GetCluterInfolist() { return mpClusterInfoList; };
+    ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
+    ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
+    EventNumber * GetVendedEventNumberList() { return mSelfProcessedEvents; }
+    PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
+
+    // if current priority is in the middle, it has valid snapshoted last event number, it check cleaness via comparing
+    // with snapshotted last event number. if current priority  is in the end, no valid
+    // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
+    bool CheckEventClean(EventManagement & aEventManager);
+
+    // Move to the next dirty priority where last schedule event number is larger than current self vended event number
+    void MoveToNextScheduledDirtyPriority();
 
 private:
     enum class HandlerState
     {
-        Uninitialized = 0, //< The handler has not been initialized
-        Initialized,       //< The handler has been initialized and is ready
-        Reportable,        //< The handler has received read request and is waiting for the data to send to be available
+        Uninitialized = 0, ///< The handler has not been initialized
+        Initialized,       ///< The handler has been initialized and is ready
+        Reportable,        ///< The handler has received read request and is waiting for the data to send to be available
     };
 
-    CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle aPayload);
+    CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
+    CHIP_ERROR ProcessEventPathList(EventPathList::Parser & aEventPathListParser);
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
-    CHIP_ERROR ClearExistingExchangeContext();
+    CHIP_ERROR AbortExistingExchangeContext();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
 
     // Don't need the response for report data if true
-    bool mSuppressResponse;
-
-    // Retrieve all events
-    bool mGetToAllEvents;
+    bool mSuppressResponse = false;
 
     // Current Handler state
-    HandlerState mState;
-    ClusterInfo * mpClusterInfoList = nullptr;
+    HandlerState mState                      = HandlerState::Uninitialized;
+    ClusterInfo * mpAttributeClusterInfoList = nullptr;
+    ClusterInfo * mpEventClusterInfoList     = nullptr;
+
+    PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
+
+    // The event number of the last processed event for each priority level
+    EventNumber mSelfProcessedEvents[kNumPriorityLevel];
+
+    // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
+    EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
 };
 } // namespace app
 } // namespace chip

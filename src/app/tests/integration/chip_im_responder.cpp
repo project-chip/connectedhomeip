@@ -24,8 +24,10 @@
  *
  */
 
+#include "MockEvents.h"
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <core/CHIPCore.h>
@@ -33,6 +35,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -95,18 +98,18 @@ exit:
     return;
 }
 
-CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter)
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(aAttributePathParams.mClusterId == kTestClusterId && aAttributePathParams.mEndpointId == kTestEndpointId,
+    VerifyOrExit(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (aAttributePathParams.mFieldId == kRootFieldId || aAttributePathParams.mFieldId == 1)
+    if (aClusterInfo.mFieldId == kRootFieldId || aClusterInfo.mFieldId == 1)
     {
         err = aWriter.Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
         SuccessOrExit(err);
     }
-    if (aAttributePathParams.mFieldId == kRootFieldId || aAttributePathParams.mFieldId == 2)
+    if (aClusterInfo.mFieldId == kRootFieldId || aClusterInfo.mFieldId == 2)
     {
         err = aWriter.Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
         SuccessOrExit(err);
@@ -123,7 +126,25 @@ namespace {
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
+chip::secure_channel::MessageCounterManager gMessageCounterManager;
+LivenessEventGenerator gLivenessGenerator;
 
+uint8_t gDebugEventBuffer[2048];
+uint8_t gInfoEventBuffer[2048];
+uint8_t gCritEventBuffer[2048];
+chip::app::CircularEventBuffer gCircularEventBuffer[3];
+
+void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
+{
+    chip::app::LogStorageResources logStorageResources[] = {
+        { &gCritEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
+        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Info },
+        { &gDebugEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
+    };
+
+    chip::app::EventManagement::CreateEventManagement(apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]),
+                                                      gCircularEventBuffer, logStorageResources);
+}
 } // namespace
 
 int main(int argc, char * argv[])
@@ -143,24 +164,33 @@ int main(int argc, char * argv[])
         chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins,
+                               &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
+    err = gMessageCounterManager.Init(&gExchangeManager);
+    SuccessOrExit(err);
+
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
-                                     chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
+    InitializeEventLogging(&gExchangeManager);
+
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
+                                     gAdminId);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");
 
+    MockEventGenerator::GetInstance()->Init(&gExchangeManager, &gLivenessGenerator, 1000, true);
+
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
+    MockEventGenerator::GetInstance()->SetEventGeneratorStop();
 
     if (err != CHIP_NO_ERROR)
     {

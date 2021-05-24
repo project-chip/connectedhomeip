@@ -33,6 +33,7 @@
 #include <core/CHIPCore.h>
 #include <mutex>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -49,15 +50,12 @@ constexpr size_t kMaxReadMessageCount       = 3;
 constexpr int32_t gMessageIntervalSeconds   = 1;
 constexpr chip::Transport::AdminId gAdminId = 0;
 
-// The CommandSender object.
-chip::app::CommandSender * gpCommandSender = nullptr;
-
 // The ReadClient object.
 chip::app::ReadClient * gpReadClient = nullptr;
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-
 chip::SecureSessionMgr gSessionManager;
+chip::secure_channel::MessageCounterManager gMessageCounterManager;
 
 chip::Inet::IPAddress gDestAddr;
 
@@ -78,9 +76,11 @@ uint64_t gReadRespCount = 0;
 
 std::condition_variable gCond;
 
-CHIP_ERROR SendCommandRequest(void)
+CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     gLastMessageTime = chip::System::Timer::GetCurrentEpoch();
 
@@ -98,20 +98,20 @@ CHIP_ERROR SendCommandRequest(void)
     uint8_t effectVariant    = 1;
     chip::TLV::TLVWriter * writer;
 
-    err = gpCommandSender->PrepareCommand(&commandPathParams);
+    err = commandSender->PrepareCommand(&commandPathParams);
     SuccessOrExit(err);
 
-    writer = gpCommandSender->GetCommandDataElementTLVWriter();
+    writer = commandSender->GetCommandDataElementTLVWriter();
     err    = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
     SuccessOrExit(err);
 
     err = writer->Put(chip::TLV::ContextTag(2), effectVariant);
     SuccessOrExit(err);
 
-    err = gpCommandSender->FinishCommand();
+    err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = gpCommandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);
+    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);
     SuccessOrExit(err);
 
     if (err == CHIP_NO_ERROR)
@@ -128,13 +128,17 @@ exit:
 
 CHIP_ERROR SendReadRequest(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    chip::EventNumber number = 0;
+    chip::app::EventPathParams eventPathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, kLivenessChangeEvent,
+                                               false /*not urgent*/);
+
     chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, 1, 0,
                                                        chip::app::AttributePathFlags::kFieldIdValid);
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, nullptr, 0, &attributePathParams, 1);
+    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, &eventPathParams, 1, &attributePathParams, 1, number);
     SuccessOrExit(err);
 
     if (err == CHIP_NO_ERROR)
@@ -159,8 +163,8 @@ CHIP_ERROR EstablishSecureSession()
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
                                          chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-                                     chip::kTestDeviceNodeId, testSecurePairingSecret,
-                                     chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
+                                     chip::kTestDeviceNodeId, testSecurePairingSecret, chip::SecureSession::SessionRole::kInitiator,
+                                     gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -265,9 +269,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     }
 }
 
-CHIP_ERROR WriteSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVReader & aReader)
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader)
 {
-    if (aAttributePathParams.mClusterId != kTestClusterId || aAttributePathParams.mEndpointId != kTestEndpointId)
+    if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -313,10 +317,14 @@ int main(int argc, char * argv[])
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
+    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins,
+                               &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
+    SuccessOrExit(err);
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
@@ -326,16 +334,16 @@ int main(int argc, char * argv[])
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&gpCommandSender);
-    SuccessOrExit(err);
-
     err = chip::app::InteractionModelEngine::GetInstance()->NewReadClient(&gpReadClient);
     SuccessOrExit(err);
 
     // Connection has been established. Now send the CommandRequests.
     for (unsigned int i = 0; i < kMaxCommandMessageCount; i++)
     {
-        err = SendCommandRequest();
+        chip::app::CommandSender * commandSender;
+        err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&commandSender);
+        SuccessOrExit(err);
+        err = SendCommandRequest(commandSender);
         if (err != CHIP_NO_ERROR)
         {
             printf("Send command request failed: %s\n", chip::ErrorStr(err));
@@ -364,7 +372,7 @@ int main(int argc, char * argv[])
         }
     }
 
-    gpCommandSender->Shutdown();
+    gpReadClient->Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     ShutdownChip();
 

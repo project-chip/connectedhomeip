@@ -42,7 +42,6 @@ qpg6100_executable("lock_app") {
   output_name = "chip-qpg6100-lock-example.out"
 
   sources = [
-    "${examples_plat_dir}/app/Service.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
@@ -56,8 +55,8 @@ qpg6100_executable("lock_app") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
   ]
 
   include_dirs = [

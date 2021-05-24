@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "platform/internal/DeviceNetworkInfo.h"
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
 #include <platform/Linux/PosixConfig.h>
@@ -56,6 +57,11 @@ private:
     void _InitiateFactoryReset();
     CHIP_ERROR _ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     CHIP_ERROR _WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    CHIP_ERROR GetWiFiStationSecurityType(Internal::WiFiAuthSecurityType & secType);
+    CHIP_ERROR UpdateWiFiStationSecurityType(Internal::WiFiAuthSecurityType secType);
+#endif
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 

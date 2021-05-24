@@ -65,6 +65,14 @@ static void OnInt64uAttributeResponse(void * context, uint64_t value)
     command->SetCommandExitStatus(true);
 }
 
+static void OnInt8sAttributeResponse(void * context, int8_t value)
+{
+    ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
 static void OnInt16sAttributeResponse(void * context, int16_t value)
 {
     ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
@@ -73,27 +81,37 @@ static void OnInt16sAttributeResponse(void * context, int16_t value)
     command->SetCommandExitStatus(true);
 }
 
-static void OnStringAttributeResponse(void * context, const chip::ByteSpan value)
+static void OnInt32sAttributeResponse(void * context, int32_t value)
 {
-    char * str = (char *)malloc(value.size() * sizeof(char));
-    memmove(str, value.data(), value.size());
-    str[value.size()] = '\0';
-    free(str);
-
-    ChipLogProgress(chipTool, "String attribute Response: %s (%" PRIu16 ")", str, strlen(str));
+    ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
 }
 
-{{#all_user_clusters}}
-{{#if (isClient side) }}
+static void OnInt64sAttributeResponse(void * context, int64_t value)
+{
+    ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnStringAttributeResponse(void * context, const chip::ByteSpan value)
+{
+    ChipLogProgress(chipTool, "String attribute Response: %zu", value.size());
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+{{#chip_client_clusters}}
 {{#if (user_cluster_has_enabled_command name side)}}
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
 {{#if (isStrEndsWith name "Response")}}
-static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
+static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
 {
     ChipLogProgress(chipTool, "{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}");
 
@@ -106,8 +124,7 @@ static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false
 {{/if}}
 {{/all_user_cluster_commands}}
 {{/if}}
-{{/if}}
-{{/all_user_clusters}}
+{{/chip_client_clusters}}
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
@@ -121,10 +138,23 @@ static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListA
         {{#if isStruct}}
         ChipLogProgress(chipTool, "{{type}}[%lu]:", i);
         {{#chip_attribute_list_entryTypes}}
+        {{#if (isOctetString type)}}
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entries[i].{{name}}.size());
+        {{else if (isCharString type)}}
+        // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
+        // ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", entries[i].{{name}}.size(), entries[i].{{name}}.data());
+        {{else}}
         ChipLogProgress(chipTool, "  {{name}}: {{asPrintFormat type}}", entries[i].{{name}});
+        {{/if}}
         {{/chip_attribute_list_entryTypes}}
         {{else}}
+        {{#if (isOctetString type)}}
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entries[i].size());
+        {{else if (isCharString type)}}
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", entries[i].size(), entries[i].data());
+        {{else}}
         ChipLogProgress(chipTool, "{{type}}[%lu]: {{asPrintFormat type}}", i, entries[i]);
+        {{/if}}
         {{/if}}
     }
 
@@ -179,8 +209,8 @@ public:
     }
 
 private:
-    {{#if (hasSpecificResponse name)}}
-    chip::Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallback>(On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Response, this);
+    {{#if hasSpecificResponse}}
+    chip::Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback>(On{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}, this);
     {{else}}
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     {{/if}}

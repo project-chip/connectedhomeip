@@ -45,7 +45,7 @@ public:
         return ExchangeMessageDispatch::Init(reliableMessageMgr);
     }
 
-    CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle message,
+    CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
                              EncryptedPacketBufferHandle * retainedMessage) const override;
 
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }

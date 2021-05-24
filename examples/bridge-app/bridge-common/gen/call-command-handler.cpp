@@ -29,10 +29,15 @@
 using namespace chip;
 
 EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfEthernetNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGeneralCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfGeneralDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfSoftwareDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfThreadNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfWiFiNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
@@ -77,8 +82,16 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             // No commands are enabled for cluster Basic
             result = status(false, true, cmd->mfgSpecific);
             break;
+        case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster Ethernet Network Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
+            break;
         case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
             result = emberAfGeneralCommissioningClusterServerCommandParse(cmd);
+            break;
+        case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster General Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_LEVEL_CONTROL_CLUSTER_ID:
             result = emberAfLevelControlClusterServerCommandParse(cmd);
@@ -88,6 +101,18 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_ON_OFF_CLUSTER_ID:
             result = emberAfOnOffClusterServerCommandParse(cmd);
+            break;
+        case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster Software Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster Thread Network Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster WiFi Network Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
             break;
         default:
             // Unrecognized cluster ID, error status will apply.

@@ -57,7 +57,7 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         HandleMessageReceived(header, address, std::move(msgBuf));
         return CHIP_NO_ERROR;
@@ -72,7 +72,7 @@ class MockAppDelegate : public ExchangeDelegate
 {
 public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle buffer) override
+                           System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
     }
@@ -121,13 +121,11 @@ void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = channelHandle.NewExchange(&mockAppDelegate);
 
     // send a malicious packet
-    ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kNone));
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     // send a good packet
-    ec1->SendMessage(0x0001, 0x0001, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kNone));
+    ec1->SendMessage(0x0001, 0x0001, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     ec1->Close();

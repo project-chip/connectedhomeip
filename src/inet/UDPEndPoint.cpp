@@ -520,7 +520,7 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceI
  *      over the specified interface.  If \c pktInfo contains a source address, the
  *      given address will be used as the source of the UDP message.
  */
-INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBufferHandle msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg, uint16_t sendFlags)
 {
     INET_ERROR res             = INET_NO_ERROR;
     const IPAddress & destAddr = pktInfo->DestAddress;

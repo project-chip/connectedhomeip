@@ -61,7 +61,7 @@ void TestSerializableIntegerSet(nlTestSuite * inSuite, void * inContext)
     }
 
     set.Remove(8);
-    NL_TEST_ASSERT(inSuite, set.SerializedSize() == CHIP_MAX_SERIALIZED_SIZE_U64(0));
+    NL_TEST_ASSERT(inSuite, set.SerializedSize() == 0);
 }
 
 void TestSerializableIntegerSetNonZero(nlTestSuite * inSuite, void * inContext)
@@ -107,7 +107,7 @@ void TestSerializableIntegerSetNonZero(nlTestSuite * inSuite, void * inContext)
     }
 
     set.Remove(7);
-    NL_TEST_ASSERT(inSuite, set.SerializedSize() == CHIP_MAX_SERIALIZED_SIZE_U64(0));
+    NL_TEST_ASSERT(inSuite, set.SerializedSize() == 0);
 }
 
 void TestSerializableIntegerSetSerialize(nlTestSuite * inSuite, void * inContext)
@@ -119,29 +119,30 @@ void TestSerializableIntegerSetSerialize(nlTestSuite * inSuite, void * inContext
         NL_TEST_ASSERT(inSuite, set.Insert(i) == CHIP_NO_ERROR);
     }
 
-    char * buf    = nullptr;
-    uint16_t size = 0;
-
-    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf, size) == nullptr);
-    NL_TEST_ASSERT(inSuite, size != 0);
-
-    chip::Platform::ScopedMemoryString buf1("", size);
-    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf1.Get(), size) == buf1.Get());
-    NL_TEST_ASSERT(inSuite, size != 0);
-
-    uint16_t size2 = static_cast<uint16_t>(2 * size);
-    chip::Platform::ScopedMemoryString buf2("", size2);
-    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf2.Get(), size2) == buf2.Get());
-    NL_TEST_ASSERT(inSuite, size2 == size);
-
-    chip::SerializableU64Set<8> set2;
-    NL_TEST_ASSERT(inSuite, set2.DeserializeBase64(buf2.Get(), size2) == CHIP_NO_ERROR);
-
+    NL_TEST_ASSERT(inSuite, !set.Contains(0));
     for (uint64_t i = 1; i <= 6; i++)
     {
         NL_TEST_ASSERT(inSuite, set.Contains(i));
     }
     NL_TEST_ASSERT(inSuite, !set.Contains(7));
+
+    NL_TEST_ASSERT(inSuite, set.Serialize([&](chip::ByteSpan serialized) -> CHIP_ERROR {
+        NL_TEST_ASSERT(inSuite, serialized.size() == 48);
+        return CHIP_NO_ERROR;
+    }) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, set.Serialize([&](chip::ByteSpan serialized) -> CHIP_ERROR {
+        chip::SerializableU64Set<8> set2;
+        NL_TEST_ASSERT(inSuite, set2.Deserialize(serialized) == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, !set2.Contains(0));
+        for (uint64_t i = 1; i <= 6; i++)
+        {
+            NL_TEST_ASSERT(inSuite, set2.Contains(i));
+        }
+        NL_TEST_ASSERT(inSuite, !set2.Contains(7));
+        return CHIP_NO_ERROR;
+    }) == CHIP_NO_ERROR);
 }
 
 int Setup(void * inContext)

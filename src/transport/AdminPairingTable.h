@@ -21,8 +21,13 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
 #include <core/CHIPPersistentStorageDelegate.h>
+#include <credentials/CHIPOperationalCredentials.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
+#include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -36,10 +41,7 @@ static constexpr AdminId kUndefinedAdminId = UINT16_MAX;
 constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
 constexpr char kAdminTableCountKey[]  = "CHIPAdminNextId";
 
-struct OperationalCredentials
-{
-    uint32_t placeholder;
-};
+constexpr uint16_t kMaxChipCertSize = 600;
 
 struct AccessControlList
 {
@@ -54,6 +56,8 @@ struct AccessControlList
  * Information contained within the state:
  *   - Admin identification
  *   - Node Id assigned by the admin to the device
+ *   - Vendor Id
+ *   - Fabric Id
  *   - Device operational credentials
  *   - Access control list
  */
@@ -62,15 +66,57 @@ class DLL_EXPORT AdminPairingInfo
 public:
     AdminPairingInfo() { Reset(); }
 
+    ~AdminPairingInfo()
+    {
+        if (mOperationalKey != nullptr)
+        {
+            chip::Platform::Delete(mOperationalKey);
+        }
+        ReleaseRootCert();
+        ReleaseOperationalCert();
+    }
+
     NodeId GetNodeId() const { return mNodeId; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
+
+    FabricId GetFabricId() const { return mFabricId; }
+    void SetFabricId(FabricId fabricId) { mFabricId = fabricId; }
 
     AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(AdminId adminId) { mAdmin = adminId; }
 
-    const OperationalCredentials & GetOperationalCreds() const { return mOpCred; }
-    OperationalCredentials & GetOperationalCreds() { return mOpCred; }
-    void SetOperationalCreds(const OperationalCredentials & creds) { mOpCred = creds; }
+    uint16_t GetVendorId() const { return mVendorId; }
+    void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
+
+    Crypto::P256Keypair * GetOperationalKey()
+    {
+        if (mOperationalKey == nullptr)
+        {
+            mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+            mOperationalKey->Initialize();
+        }
+        return mOperationalKey;
+    }
+    CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair & key);
+
+    bool AreCredentialsAvailable() const
+    {
+        return (mRootCert != nullptr && mOperationalCert != nullptr && mRootCertLen != 0 && mOpCertLen != 0);
+    }
+
+    CHIP_ERROR GetCredentials(Credentials::OperationalCredentialSet & credentials, Credentials::ChipCertificateSet & certSet,
+                              Credentials::CertificateKeyId & rootKeyId);
+
+    const uint8_t * GetTrustedRoot(uint16_t & size)
+    {
+        size = mRootCertLen;
+        return mRootCert;
+    }
+
+    // TODO - Update these APIs to take ownership of the buffer, instead of copying
+    //        internally.
+    CHIP_ERROR SetOperationalCert(const chip::ByteSpan & cert);
+    CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 
     const AccessControlList & GetACL() const { return mACL; }
     AccessControlList & GetACL() { return mACL; }
@@ -83,32 +129,86 @@ public:
      */
     void Reset()
     {
-        mNodeId = kUndefinedNodeId;
-        mAdmin  = kUndefinedAdminId;
+        mNodeId   = kUndefinedNodeId;
+        mAdmin    = kUndefinedAdminId;
+        mFabricId = kUndefinedFabricId;
+        mVendorId = kUndefinedVendorId;
+
+        if (mOperationalKey != nullptr)
+        {
+            mOperationalKey->Initialize();
+        }
+        ReleaseRootCert();
+        ReleaseOperationalCert();
     }
 
-    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs);
-
-    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs);
-
-    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id);
+    friend class AdminPairingTable;
 
 private:
-    AdminId mAdmin = kUndefinedAdminId;
-    NodeId mNodeId = kUndefinedNodeId;
+    NodeId mNodeId     = kUndefinedNodeId;
+    FabricId mFabricId = kUndefinedFabricId;
+    AdminId mAdmin     = kUndefinedAdminId;
+    uint16_t mVendorId = kUndefinedVendorId;
 
-    OperationalCredentials mOpCred;
     AccessControlList mACL;
+
+    Crypto::P256Keypair * mOperationalKey = nullptr;
+
+    uint8_t * mRootCert            = nullptr;
+    uint16_t mRootCertLen          = 0;
+    uint16_t mRootCertAllocatedLen = 0;
+    uint8_t * mOperationalCert     = nullptr;
+    uint16_t mOpCertLen            = 0;
+    uint16_t mOpCertAllocatedLen   = 0;
 
     static constexpr size_t KeySize();
 
     static CHIP_ERROR GenerateKey(AdminId id, char * key, size_t len);
 
+    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate * kvs);
+    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
+    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, AdminId id);
+
+    void ReleaseOperationalCert();
+    void ReleaseRootCert();
+
     struct StorableAdminPairingInfo
     {
-        uint16_t mAdmin;  /* This field is serialized in LittleEndian byte order */
-        uint64_t mNodeId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mAdmin;    /* This field is serialized in LittleEndian byte order */
+        uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
+        uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
+
+        uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
+        uint16_t mOpCertLen;   /* This field is serialized in LittleEndian byte order */
+
+        Crypto::P256SerializedKeypair mOperationalKey;
+        uint8_t mRootCert[kMaxChipCertSize];
+        uint8_t mOperationalCert[kMaxChipCertSize];
     };
+};
+
+// Once attribute store has persistence implemented, AdminPairingTable shoud be backed using
+// attribute store so no need for this Delegate API anymore
+// TODO: Reimplement AdminPairingTable to only have one backing store.
+class DLL_EXPORT AdminPairingTableDelegate
+{
+public:
+    virtual ~AdminPairingTableDelegate() {}
+    /**
+     * Gets called when an admin is deleted from KVS store.
+     **/
+    virtual void OnAdminDeletedFromStorage(AdminId adminId) = 0;
+
+    /**
+     * Gets called when an admin is loaded into Admin Pairing Table from KVS store.
+     **/
+    virtual void OnAdminRetrievedFromStorage(AdminPairingInfo * adminInfo) = 0;
+
+    /**
+     * Gets called when an admin in Admin Pairing Table is persisted to KVS store.
+     **/
+    virtual void OnAdminPersistedToStorage(AdminPairingInfo * adminInfo) = 0;
 };
 
 /**
@@ -182,15 +282,25 @@ private:
 class DLL_EXPORT AdminPairingTable
 {
 public:
+    CHIP_ERROR Store(AdminId id);
+    CHIP_ERROR LoadFromStorage(AdminId id);
+    CHIP_ERROR Delete(AdminId id);
+
     AdminPairingInfo * AssignAdminId(AdminId adminId);
 
     AdminPairingInfo * AssignAdminId(AdminId adminId, NodeId nodeId);
 
     void ReleaseAdminId(AdminId adminId);
 
-    AdminPairingInfo * FindAdmin(AdminId adminId);
+    AdminPairingInfo * FindAdminWithId(AdminId adminId);
+
+    AdminPairingInfo * FindAdminForNode(FabricId fabricId, NodeId nodeId = kUndefinedNodeId,
+                                        uint16_t vendorId = kUndefinedVendorId);
 
     void Reset();
+
+    CHIP_ERROR Init(PersistentStorageDelegate * storage);
+    CHIP_ERROR SetAdminPairingDelegate(AdminPairingTableDelegate * delegate);
 
     ConstAdminIterator cbegin() const { return ConstAdminIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
     ConstAdminIterator cend() const
@@ -202,6 +312,10 @@ public:
 
 private:
     AdminPairingInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
+    PersistentStorageDelegate * mStorage = nullptr;
+
+    // TODO: Admin Pairing table should be backed by a single backing store (attribute store), remove delegate callbacks #6419
+    AdminPairingTableDelegate * mDelegate = nullptr;
 };
 
 } // namespace Transport

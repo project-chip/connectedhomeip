@@ -21,6 +21,7 @@ arm_platform_config = "${qpg6100_sdk_build_root}/qpg6100_arm.gni"
 mbedtls_target = "${qpg6100_sdk_build_root}:qpg6100_sdk"
 
 chip_device_platform = "qpg6100"
+chip_mdns = "platform"
 
 lwip_platform = "qpg6100"
 lwip_ipv6 = true
@@ -35,6 +36,9 @@ chip_inet_config_enable_raw_endpoint = false
 # Size opt's
 #chip_progress_logging = false
 chip_detail_logging = false
+
+# Use -Os
+is_debug = false
 
 chip_build_tests = false
 

@@ -40,7 +40,7 @@ declare_args() {
 show_qr_code = true
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
-if (efr32_board == "BRD4166A") {
+if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
 
@@ -60,7 +60,7 @@ efr32_sdk("sdk") {
   defines = [
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "SL_HEAP_SIZE=(10 * 1024)",
+    "SL_HEAP_SIZE=(12 * 1024)",
   ]
 }
 

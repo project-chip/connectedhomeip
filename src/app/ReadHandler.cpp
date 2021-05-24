@@ -35,11 +35,12 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
     // Error if already initialized.
     VerifyOrExit(apDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx     = nullptr;
-    mpDelegate        = apDelegate;
-    mSuppressResponse = true;
-    mGetToAllEvents   = true;
-    mpClusterInfoList = nullptr;
+    mpExchangeCtx              = nullptr;
+    mpDelegate                 = apDelegate;
+    mSuppressResponse          = true;
+    mpAttributeClusterInfoList = nullptr;
+    mpEventClusterInfoList     = nullptr;
+    mCurrentPriority           = PriorityLevel::Invalid;
     MoveToState(HandlerState::Initialized);
 
 exit:
@@ -49,13 +50,17 @@ exit:
 
 void ReadHandler::Shutdown()
 {
-    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpClusterInfoList);
-    ClearExistingExchangeContext();
+    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
+    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
+    AbortExistingExchangeContext();
     MoveToState(HandlerState::Uninitialized);
-    mpDelegate = nullptr;
+    mpDelegate                 = nullptr;
+    mpAttributeClusterInfoList = nullptr;
+    mpEventClusterInfoList     = nullptr;
+    mCurrentPriority           = PriorityLevel::Invalid;
 }
 
-CHIP_ERROR ReadHandler::ClearExistingExchangeContext()
+CHIP_ERROR ReadHandler::AbortExistingExchangeContext()
 {
     if (mpExchangeCtx != nullptr)
     {
@@ -66,14 +71,13 @@ CHIP_ERROR ReadHandler::ClearExistingExchangeContext()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle aPayload)
+CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
 
     mpExchangeCtx = apExchangeContext;
-
-    err = ProcessReadRequest(std::move(aPayload));
+    err           = ProcessReadRequest(std::move(aPayload));
     SuccessOrExit(err);
 
 exit:
@@ -86,20 +90,19 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle aPayload)
+CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload));
 exit:
     ChipLogFunctError(err);
     Shutdown();
     return err;
 }
 
-CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
+CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
@@ -107,7 +110,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
     ReadRequest::Parser readRequestParser;
     EventPathList::Parser eventPathListParser;
     AttributePathList::Parser attributePathListParser;
-    TLV::TLVReader eventPathListReader;
 
     reader.Init(std::move(aPayload));
 
@@ -116,7 +118,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
 
     err = readRequestParser.Init(reader);
     SuccessOrExit(err);
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = readRequestParser.CheckSchemaValidity();
     SuccessOrExit(err);
@@ -130,9 +131,9 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
     else
     {
         SuccessOrExit(err);
-        ProcessAttributePathList(attributePathListParser);
+        err = ProcessAttributePathList(attributePathListParser);
     }
-
+    SuccessOrExit(err);
     err = readRequestParser.GetEventPathList(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -141,19 +142,9 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
     else
     {
         SuccessOrExit(err);
-        eventPathListParser.GetReader(&eventPathListReader);
-
-        while (CHIP_NO_ERROR == (err = eventPathListReader.Next()))
-        {
-            VerifyOrExit(TLV::AnonymousTag == eventPathListReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-
-            EventPath::Parser eventPath;
-
-            err = eventPath.Init(eventPathListReader);
-            SuccessOrExit(err);
-            // TODO: Pass event path to report engine to generate report with interested events
-        }
+        err = ProcessEventPathList(eventPathListParser);
     }
+    SuccessOrExit(err);
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -180,22 +171,70 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
     {
         VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
         VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-        AttributePathParams attributePathParams;
+        ClusterInfo clusterInfo;
         AttributePath::Parser path;
         err = path.Init(reader);
         SuccessOrExit(err);
-        err = path.GetNodeId(&(attributePathParams.mNodeId));
+        err = path.GetNodeId(&(clusterInfo.mNodeId));
         SuccessOrExit(err);
-        err = path.GetEndpointId(&(attributePathParams.mEndpointId));
+        err = path.GetEndpointId(&(clusterInfo.mEndpointId));
         SuccessOrExit(err);
-        err = path.GetClusterId(&(attributePathParams.mClusterId));
+        err = path.GetClusterId(&(clusterInfo.mClusterId));
         SuccessOrExit(err);
-        err = path.GetFieldId(&(attributePathParams.mFieldId));
+        err = path.GetFieldId(&(clusterInfo.mFieldId));
+        if (CHIP_NO_ERROR == err)
+        {
+            clusterInfo.mType = ClusterInfo::Type::kFieldIdValid;
+        }
+        else if (CHIP_END_OF_TLV == err)
+        {
+            err = path.GetListIndex(&(clusterInfo.mListIndex));
+            SuccessOrExit(err);
+            clusterInfo.mType = ClusterInfo::Type::kListIndexValid;
+        }
         SuccessOrExit(err);
-        err = InteractionModelEngine::GetInstance()->PushFront(mpClusterInfoList, attributePathParams);
+        err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
         SuccessOrExit(err);
-        mpClusterInfoList->SetDirty();
+        mpAttributeClusterInfoList->SetDirty();
     }
+    // if we have exhausted this container
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
+
+CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathListParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    aEventPathListParser.GetReader(&reader);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        ClusterInfo clusterInfo;
+        EventPath::Parser path;
+        err = path.Init(reader);
+        SuccessOrExit(err);
+        err = path.GetNodeId(&(clusterInfo.mNodeId));
+        SuccessOrExit(err);
+        err = path.GetEndpointId(&(clusterInfo.mEndpointId));
+        SuccessOrExit(err);
+        err = path.GetClusterId(&(clusterInfo.mClusterId));
+        SuccessOrExit(err);
+        err = path.GetEventId(&(clusterInfo.mEventId));
+        SuccessOrExit(err);
+        clusterInfo.mType = ClusterInfo::Type::kEventIdValid;
+        err               = InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo);
+        SuccessOrExit(err);
+    }
+
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
@@ -231,5 +270,46 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     ChipLogDetail(DataManagement, "IM RH moving to [%s]", GetStateStr());
 }
 
+bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
+{
+    if (mCurrentPriority == PriorityLevel::Invalid)
+    {
+        // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events, and set a checkpoint
+        for (size_t index = 0; index < ArraySize(mSelfProcessedEvents); index++)
+        {
+            EventNumber lastEventNumber = aEventManager.GetLastEventNumber(static_cast<PriorityLevel>(index));
+            if ((lastEventNumber != 0) && (lastEventNumber >= mSelfProcessedEvents[index]))
+            {
+                // We have more events. snapshot last event IDs
+                aEventManager.SetScheduledEventEndpoint(&(mLastScheduledEventNumber[0]));
+                // initialize the next priority level to transfer
+                MoveToNextScheduledDirtyPriority();
+                return false;
+            }
+        }
+        return true;
+    }
+    else
+    {
+        // Upload is in middle, previous mLastScheduledEventNumber is still valid, recheck via MoveToNextScheduledDirtyPriority,
+        // if finally mCurrentPriority is invalid, it means no more event
+        MoveToNextScheduledDirtyPriority();
+        return mCurrentPriority == PriorityLevel::Invalid;
+    }
+}
+
+void ReadHandler::MoveToNextScheduledDirtyPriority()
+{
+    for (uint8_t i = 0; i < ArraySize(mSelfProcessedEvents); i++)
+    {
+        if ((mLastScheduledEventNumber[i] != 0) && mSelfProcessedEvents[i] <= mLastScheduledEventNumber[i])
+        {
+            mCurrentPriority = static_cast<PriorityLevel>(i);
+            return;
+        }
+    }
+
+    mCurrentPriority = PriorityLevel::Invalid;
+}
 } // namespace app
 } // namespace chip

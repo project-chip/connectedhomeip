@@ -65,7 +65,6 @@ class DCState(enum.IntEnum):
     RENDEZVOUS_ONGOING = 3
     RENDEZVOUS_CONNECTED = 4
 
-
 @_singleton
 class ChipDeviceController(object):
     def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=None):
@@ -180,6 +179,31 @@ class ChipDeviceController(object):
         )
 
         return (address.value.decode(), port.value) if error == 0 else None
+    def DiscoverCommissioningLongDiscriminator(self, long_discriminator):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator(self.devCtrl, long_discriminator)
+        )
+
+    def PrintDiscoveredDevices(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_PrintDiscoveredDevices(self.devCtrl)
+        )
+
+    def ParseQRCode(self, qrCode, output):
+        print(output)
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_ParseQRCode(qrCode, output)
+        )
+
+    def GetIPForDiscoveredDevice(self, idx, addrStr, length):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice(self.devCtrl, idx, addrStr, length)
+        )
+
+    def DiscoverAllCommissioning(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverAllCommissioning(self.devCtrl)
+        )
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = c_void_p(None)
@@ -188,10 +212,9 @@ class ChipDeviceController(object):
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
-        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
-        im.ClearCommandStatus(commandSenderHandle)
+        commandSenderHandle = im.GetCommandSenderHandle()
         self._Cluster.SendCommand(
-            device, cluster, command, endpoint, groupid, args, commandSenderHandle != 0)
+            device, commandSenderHandle, cluster, command, endpoint, groupid, args, True)
         if blocking:
             # We only send 1 command by this function, so index is always 0
             return im.WaitCommandIndexStatus(commandSenderHandle, 1)
@@ -268,6 +291,18 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64]
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissioning.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissioning.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [c_void_p]
+
+            self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice.argtypes = [c_void_p, c_int, c_char_p, c_uint32]
+            self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice.restype = c_bool
+
+            self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [c_void_p, c_char_p, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
@@ -295,4 +330,3 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
             self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
-

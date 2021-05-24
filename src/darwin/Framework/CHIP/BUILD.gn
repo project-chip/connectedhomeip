@@ -14,8 +14,6 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/app/chip_data_model.gni")
-
 config("darwin_config") {
   include_dirs = [
     ".",
@@ -44,6 +42,8 @@ static_library("framework") {
     "CHIPLogging.h",
     "CHIPManualSetupPayloadParser.h",
     "CHIPManualSetupPayloadParser.mm",
+    "CHIPOnboardingPayloadParser.m",
+    "CHIPOperationalCredentialsDelegate.mm",
     "CHIPPersistentStorageDelegate.h",
     "CHIPPersistentStorageDelegateBridge.h",
     "CHIPPersistentStorageDelegateBridge.mm",
@@ -51,34 +51,22 @@ static_library("framework") {
     "CHIPQRCodeSetupPayloadParser.mm",
     "CHIPSetupPayload.h",
     "CHIPSetupPayload.mm",
-    "gen/CHIPClusters.cpp",
-    "gen/CHIPClusters.h",
     "gen/CHIPClustersObjc.h",
     "gen/CHIPClustersObjc.mm",
   ]
 
   public_deps = [
     "${chip_root}/src/controller",
+    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
 
-  public_configs = [ ":darwin_config" ]
-}
-
-chip_data_model("darwin_data_model") {
-  zap_file = "chip-tool.zap"
-
-  zap_pregenerated_dir = "gen"
-
-  use_default_client_callbacks = true
+  frameworks = [ "Security.framework" ]
 
   public_configs = [ ":darwin_config" ]
 }
 
 group("CHIP") {
-  public_deps = [
-    ":darwin_data_model",
-    ":framework",
-  ]
+  public_deps = [ ":framework" ]
 }

@@ -19,6 +19,7 @@
 #include <credentials/CHIPOperationalCredentials.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
@@ -73,6 +74,10 @@ public:
 
     SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
+    secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
+
+    SecureSessionHandle GetSessionLocalToPeer();
+    SecureSessionHandle GetSessionPeerToLocal();
 
     Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegateBase * delegate);
     Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegateBase * delegate);
@@ -82,6 +87,7 @@ public:
 private:
     SecureSessionMgr mSecureSessionMgr;
     Messaging::ExchangeManager mExchangeManager;
+    secure_channel::MessageCounterManager mMessageCounterManager;
 
     NodeId mSourceNodeId      = 123654;
     NodeId mDestinationNodeId = 111222333;

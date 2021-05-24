@@ -29,6 +29,7 @@
 #include <mbedtls/threading.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/KeyValueStoreManager.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPPlatformMemory.h>
 
@@ -36,7 +37,6 @@
 
 #include "AppConfig.h"
 #include "init_efrPlatform.h"
-#include <app/server/DataModelHandler.h>
 #include <app/server/Server.h>
 
 #if DISPLAY_ENABLED
@@ -116,6 +116,7 @@ int main(void)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -123,7 +124,7 @@ int main(void)
         EFR32_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_LIGHT");
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_WINDOW");
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();

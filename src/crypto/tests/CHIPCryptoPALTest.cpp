@@ -59,7 +59,7 @@ class Test_P256Keypair : public P256KeypairHSM
 {
 public:
     Test_P256Keypair() { SetKeyId(HSM_ECC_KEYID); }
-    Test_P256Keypair(int keyId) { SetKeyId(keyId); }
+    Test_P256Keypair(uint32_t keyId) { SetKeyId(keyId); }
 };
 #else
 using Test_P256Keypair                  = P256Keypair;
@@ -69,6 +69,18 @@ using Test_P256Keypair                  = P256Keypair;
 using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2pHSM_P256_SHA256_HKDF_HMAC;
 #else
 using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
+#endif
+
+#ifdef ENABLE_HSM_PBKDF2
+using TestPBKDF2_sha256 = PBKDF2_sha256HSM;
+#else
+using TestPBKDF2_sha256                 = PBKDF2_sha256;
+#endif
+
+#ifdef ENABLE_HSM_HKDF
+using TestHKDF_sha = HKDF_shaHSM;
+#else
+using TestHKDF_sha                      = HKDF_sha;
 #endif
 
 static uint32_t gs_test_entropy_source_called = 0;
@@ -637,6 +649,7 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
     int numOfTestsExecuted = 0;
+    TestHKDF_sha mHKDF;
 
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
@@ -645,8 +658,8 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
         chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
         out_buffer.Alloc(out_length);
         NL_TEST_ASSERT(inSuite, out_buffer);
-        HKDF_SHA256(v.initial_key_material, v.initial_key_material_length, v.salt, v.salt_length, v.info, v.info_length,
-                    out_buffer.Get(), v.output_key_material_length);
+        mHKDF.HKDF_SHA256(v.initial_key_material, v.initial_key_material_length, v.salt, v.salt_length, v.info, v.info_length,
+                          out_buffer.Get(), v.output_key_material_length);
         bool success = memcmp(v.output_key_material, out_buffer.Get(), out_length) == 0;
         NL_TEST_ASSERT(inSuite, success);
     }
@@ -934,6 +947,7 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
 {
     int numOfTestVectors = ArraySize(pbkdf2_sha256_test_vectors);
     int numOfTestsRan    = 0;
+    TestPBKDF2_sha256 pbkdf1;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const pbkdf2_test_vector * vector = pbkdf2_sha256_test_vectors[vectorIndex];
@@ -944,8 +958,8 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
             out_key.Alloc(vector->key_len);
             NL_TEST_ASSERT(inSuite, out_key);
 
-            CHIP_ERROR err = pbkdf2_sha256(vector->password, vector->plen, vector->salt, vector->slen, vector->iter,
-                                           vector->key_len, out_key.Get());
+            CHIP_ERROR err = pbkdf1.pbkdf2_sha256(vector->password, vector->plen, vector->salt, vector->slen, vector->iter,
+                                                  vector->key_len, out_key.Get());
             NL_TEST_ASSERT(inSuite, err == vector->result);
 
             if (vector->result == CHIP_NO_ERROR)
@@ -973,13 +987,32 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
 
 static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t csr[kMAX_CSR_Length];
+    static uint8_t csr[kMAX_CSR_Length];
     size_t length = sizeof(csr);
 
-    P256Keypair keypair;
+    static P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, length > 0);
+
+    static P256PublicKey pubkey;
+    CHIP_ERROR err = VerifyCertificateSigningRequest(csr, length, pubkey);
+    if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, pubkey.Length() == kP256_PublicKey_Length);
+        NL_TEST_ASSERT(inSuite, memcmp(pubkey, keypair.Pubkey(), pubkey.Length()) == 0);
+
+        // Let's corrupt the CSR buffer and make sure it fails to verify
+        csr[length - 2] = (uint8_t)(csr[length - 2] + 1);
+        csr[length - 1] = (uint8_t)(csr[length - 1] + 1);
+
+        NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) != CHIP_NO_ERROR);
+    }
+    else
+    {
+        ChipLogError(Crypto, "The current platform does not support CSR parsing.");
+    }
 }
 
 static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)

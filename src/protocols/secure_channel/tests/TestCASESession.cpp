@@ -52,11 +52,11 @@ using TestContext = chip::Test::MessagingContext;
 class LoopbackTransport : public Transport::Base
 {
 public:
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         ReturnErrorOnFailure(mMessageSendError);
         mSentMessageCount++;
-        HandleMessageReceived(header, address, std::move(msgBuf));
+        HandleMessageReceived(address, std::move(msgBuf));
 
         return CHIP_NO_ERROR;
     }
@@ -108,8 +108,8 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
 
-    NL_TEST_ASSERT(inSuite, pairing.WaitForSessionEstablishment(&accessoryDevOpCred, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, pairing.WaitForSessionEstablishment(&accessoryDevOpCred, 0, &delegate) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(&accessoryDevOpCred, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(&accessoryDevOpCred, 0, &delegate) == CHIP_NO_ERROR);
 }
 
 void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
@@ -169,7 +169,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForSessionEstablishment(&accessoryDevOpCred, 0, &delegateAccessory) == CHIP_NO_ERROR);
+                   pairingAccessory.ListenForSessionEstablishment(&accessoryDevOpCred, 0, &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 1, 0,
                                                         contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
@@ -228,7 +228,7 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
         SecureSession session1;
 
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession1->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session1) == CHIP_NO_ERROR);
+                       testPairingSession1->DeriveSecureSession(session1, SecureSession::SessionRole::kInitiator) == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, mac) == CHIP_NO_ERROR);
     }
@@ -236,7 +236,7 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     {
         SecureSession session2;
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession2->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session2) == CHIP_NO_ERROR);
+                       testPairingSession2->DeriveSecureSession(session2, SecureSession::SessionRole::kResponder) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
         NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);

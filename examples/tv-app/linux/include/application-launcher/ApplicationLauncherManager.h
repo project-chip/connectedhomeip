@@ -21,8 +21,8 @@
 #include "gen/af-structs.h"
 #include <core/CHIPError.h>
 
-#include <list>
 #include <string>
+#include <vector>
 
 struct ApplicationLaunchResponse
 {
@@ -35,5 +35,5 @@ class ApplicationLauncherManager
 public:
     CHIP_ERROR Init();
     ApplicationLaunchResponse proxyApplicationLaunchRequest(EmberAfApplicationLauncherApp application, std::string data);
-    std::list<uint16_t> proxyGetApplicationList();
+    std::vector<uint16_t> proxyGetApplicationList();
 };

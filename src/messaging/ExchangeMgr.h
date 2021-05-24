@@ -28,10 +28,10 @@
 
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgrDelegate.h>
-#include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <support/DLLUtil.h>
+#include <support/Pool.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -90,22 +90,24 @@ public:
     /**
      *  Creates a new ExchangeContext with a given peer CHIP node specified by the peer node identifier.
      *
-     *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext is being set up.
+     *  @param[in]    session    The identifier of the secure session (possibly
+     *                           the empty session for a non-secure exchange)
+     *                           for which the ExchangeContext is being set up.
      *
-     *  @param[in]    delegate      A pointer to ExchangeDelegate.
+     *  @param[in]    delegate   A pointer to ExchangeDelegate.
      *
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
     ExchangeContext * NewContext(SecureSessionHandle session, ExchangeDelegateBase * delegate);
 
+    void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
+
     /**
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
      *  invoked for all messages of the given protocol.
      *
      *  @param[in]    protocolId      The protocol identifier of the received message.
-     *
-     *  @param[in]    handler         The unsolicited message handler.
      *
      *  @param[in]    delegate        A pointer to ExchangeDelegate.
      *
@@ -176,8 +178,12 @@ public:
                                                           static_cast<uint8_t>(msgType));
     }
 
-    void IncrementContextsInUse();
-    void DecrementContextsInUse();
+    /**
+     * A method to call Close() on all contexts that have a given delegate as
+     * their delegate.  To be used if the delegate is being destroyed.  This
+     * method will guarantee that it does not call into the delegate.
+     */
+    void CloseAllContextsForDelegate(const ExchangeDelegateBase * delegate);
 
     void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
 
@@ -185,11 +191,9 @@ public:
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
-    MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
     Transport::AdminId GetAdminId() { return mAdminId; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
-    size_t GetContextsInUse() const { return mContextsInUse; }
 
 private:
     enum class State
@@ -226,17 +230,12 @@ private:
     ExchangeMgrDelegate * mDelegate;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
-    MessageCounterSyncMgr mMessageCounterSyncMgr;
 
     Transport::AdminId mAdminId = 0;
 
-    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
-    size_t mContextsInUse;
+    BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
-
-    ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                   ExchangeDelegateBase * delegate);
 
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegateBase * delegate);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
@@ -244,17 +243,14 @@ private:
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
+                           const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                            SecureSessionMgr * msgLayer) override;
 
     void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     // TransportMgrDelegate interface for rendezvous sessions
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBufferHandle msgBuf) override;
-
-    CHIP_ERROR QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 };
 
 } // namespace Messaging

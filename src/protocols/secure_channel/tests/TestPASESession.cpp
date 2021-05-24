@@ -44,11 +44,11 @@ using TestContext = chip::Test::MessagingContext;
 class LoopbackTransport : public Transport::Base
 {
 public:
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         ReturnErrorOnFailure(mMessageSendError);
         mSentMessageCount++;
-        HandleMessageReceived(header, address, std::move(msgBuf));
+        HandleMessageReceived(address, std::move(msgBuf));
 
         return CHIP_NO_ERROR;
     }
@@ -77,7 +77,7 @@ class MockAppDelegate : public ExchangeDelegate
 {
 public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle buffer) override
+                           System::PacketBufferHandle && buffer) override
     {
         ec->Close();
     }
@@ -201,7 +201,7 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     {
         SecureSession session1;
 
-        CHIP_ERROR err = testPairingSession1->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session1);
+        CHIP_ERROR err = testPairingSession1->DeriveSecureSession(session1, SecureSession::SessionRole::kInitiator);
 
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -212,7 +212,7 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     {
         SecureSession session2;
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession2->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session2) == CHIP_NO_ERROR);
+                       testPairingSession2->DeriveSecureSession(session2, SecureSession::SessionRole::kResponder) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
         NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);

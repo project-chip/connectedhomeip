@@ -23,6 +23,7 @@
 #include "enums.h"
 #include <app/util/basic-types.h>
 #include <stdint.h>
+#include <support/Span.h>
 
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
@@ -36,7 +37,7 @@ typedef struct _AudioOutputInfo
 {
     uint8_t index;
     uint8_t outputType;
-    uint8_t * name;
+    chip::ByteSpan name;
 } EmberAfAudioOutputInfo;
 
 // Struct for BasicCommissioningInfoType
@@ -201,7 +202,7 @@ typedef struct _EventLogPayload
     uint8_t logId;
     uint16_t eventId;
     uint32_t eventTime;
-    uint8_t * eventData;
+    chip::ByteSpan eventData;
 } EmberAfEventLogPayload;
 
 // Struct for ExtendedDiscoverAttributesInfoRecord
@@ -217,7 +218,6 @@ typedef struct _FabricDescriptor
 {
     chip::FabricId FabricId;
     uint16_t VendorId;
-    uint8_t * Label;
     chip::NodeId NodeId;
 } EmberAfFabricDescriptor;
 
@@ -237,8 +237,8 @@ typedef struct _GpTranslationTableUpdateTranslation
     uint16_t profile;
     uint16_t cluster;
     uint8_t zigbeeCommandId;
-    uint8_t * zigbeeCommandPayload;
-    uint8_t * additionalInfoBlock;
+    chip::ByteSpan zigbeeCommandPayload;
+    chip::ByteSpan additionalInfoBlock;
 } EmberAfGpTranslationTableUpdateTranslation;
 
 // Struct for GroupInformationRecord
@@ -253,7 +253,7 @@ typedef struct _GroupKey
 {
     uint16_t VendorId;
     uint16_t GroupKeyIndex;
-    uint8_t * GroupKeyRoot;
+    chip::ByteSpan GroupKeyRoot;
     uint64_t GroupKeyEpochStartTime;
     uint8_t GroupKeySecurityPolicy;
 } EmberAfGroupKey;
@@ -282,8 +282,8 @@ typedef struct _MediaInputInfo
 {
     uint8_t index;
     uint8_t inputType;
-    uint8_t * name;
-    uint8_t * description;
+    chip::ByteSpan name;
+    chip::ByteSpan description;
 } EmberAfMediaInputInfo;
 
 // Struct for MediaPlaybackPosition
@@ -297,7 +297,7 @@ typedef struct _MediaPlaybackPosition
 typedef struct _NavigateTargetTargetInfo
 {
     uint8_t identifier;
-    uint8_t * name;
+    chip::ByteSpan name;
 } EmberAfNavigateTargetTargetInfo;
 
 // Struct for NeighborInfo
@@ -310,6 +310,36 @@ typedef struct _NeighborInfo
     int8_t rssi;
     uint8_t numberRssiMeasurements;
 } EmberAfNeighborInfo;
+
+// Struct for NeighborTable
+typedef struct _NeighborTable
+{
+    uint64_t ExtAddress;
+    uint32_t Age;
+    uint16_t Rloc16;
+    uint32_t LinkFrameCounter;
+    uint32_t MleFrameCounter;
+    uint8_t LQI;
+    int8_t AverageRssi;
+    int8_t LastRssi;
+    uint8_t FrameErrorRate;
+    uint8_t MessageErrorRate;
+    uint8_t RxOnWhenIdle;
+    uint8_t FullThreadDevice;
+    uint8_t FullNetworkData;
+    uint8_t IsChild;
+} EmberAfNeighborTable;
+
+// Struct for NetworkInterfaceType
+typedef struct _NetworkInterfaceType
+{
+    chip::ByteSpan Name;
+    uint8_t FabricConnected;
+    uint8_t OffPremiseServicesReachableIPv4;
+    uint8_t OffPremiseServicesReachableIPv6;
+    uint64_t HardwareAddress;
+    uint8_t Type;
+} EmberAfNetworkInterfaceType;
 
 // Struct for NodeInformation
 typedef struct _NodeInformation
@@ -326,6 +356,23 @@ typedef struct _Notification
     uint16_t contentId;
     uint8_t statusFeedback;
 } EmberAfNotification;
+
+// Struct for OperationalDatasetComponents
+typedef struct _OperationalDatasetComponents
+{
+    uint8_t ActiveTimestampPresent;
+    uint8_t PendingTimestampPresent;
+    uint8_t MasterKeyPresent;
+    uint8_t NetworkNamePresent;
+    uint8_t ExtendedPanIdPresent;
+    uint8_t MeshLocalPrefixPresent;
+    uint8_t DelayPresent;
+    uint8_t PanIdPresent;
+    uint8_t ChannelPresent;
+    uint8_t PskcPresent;
+    uint8_t SecurityPolicyPresent;
+    uint8_t ChannelMaskPresent;
+} EmberAfOperationalDatasetComponents;
 
 // Struct for PowerProfileRecord
 typedef struct _PowerProfileRecord
@@ -395,6 +442,21 @@ typedef struct _ReportAttributeRecord
     uint8_t * attributeLocation;
 } EmberAfReportAttributeRecord;
 
+// Struct for RouteTable
+typedef struct _RouteTable
+{
+    uint64_t ExtAddress;
+    uint16_t Rloc16;
+    uint8_t RouterId;
+    uint8_t NextHop;
+    uint8_t PathCost;
+    uint8_t LQIIn;
+    uint8_t LQIOut;
+    uint8_t Age;
+    uint8_t Allocated;
+    uint8_t LinkEstablished;
+} EmberAfRouteTable;
+
 // Struct for SceneExtensionAttributeInfo
 typedef struct _SceneExtensionAttributeInfo
 {
@@ -452,6 +514,13 @@ typedef struct _SeasonEntry
     uint8_t weekIdRef;
 } EmberAfSeasonEntry;
 
+// Struct for SecurityPolicy
+typedef struct _SecurityPolicy
+{
+    uint16_t RotationTime;
+    uint8_t Flags;
+} EmberAfSecurityPolicy;
+
 // Void typedef for EmberAfSignature which is empty.
 // this will result in all the references to the data being as uint8_t*
 typedef uint8_t EmberAfSignature;
@@ -484,23 +553,40 @@ typedef struct _SpecialDay
     uint8_t dayIdRef;
 } EmberAfSpecialDay;
 
+// Struct for TestListStructOctet
+typedef struct _TestListStructOctet
+{
+    uint64_t fabricIndex;
+    chip::ByteSpan operationalCert;
+} EmberAfTestListStructOctet;
+
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
-    uint8_t * DiscoveryResponse;
+    chip::ByteSpan DiscoveryResponse;
 } EmberAfThreadInterfaceScanResult;
+
+// Struct for ThreadMetrics
+typedef struct _ThreadMetrics
+{
+    uint64_t Id;
+    chip::ByteSpan Name;
+    uint32_t StackFreeCurrent;
+    uint32_t StackFreeMinimum;
+    uint32_t StackSize;
+} EmberAfThreadMetrics;
 
 // Struct for TierLabelsPayload
 typedef struct _TierLabelsPayload
 {
     uint8_t tierId;
-    uint8_t * tierLabel;
+    chip::ByteSpan tierLabel;
 } EmberAfTierLabelsPayload;
 
 // Struct for TopUpPayload
 typedef struct _TopUpPayload
 {
-    uint8_t * topUpCode;
+    chip::ByteSpan topUpCode;
     int32_t topUpAmount;
     uint32_t topUpTime;
 } EmberAfTopUpPayload;
@@ -521,9 +607,9 @@ typedef struct _TvChannelInfo
 {
     uint16_t majorNumber;
     uint16_t minorNumber;
-    uint8_t * name;
-    uint8_t * callSign;
-    uint8_t * affiliateCallSign;
+    chip::ByteSpan name;
+    chip::ByteSpan callSign;
+    chip::ByteSpan affiliateCallSign;
 } EmberAfTvChannelInfo;
 
 // Struct for TvChannelLineupInfo
@@ -539,8 +625,8 @@ typedef struct _TvChannelLineupInfo
 typedef struct _WiFiInterfaceScanResult
 {
     uint8_t Security;
-    uint8_t * SSID;
-    uint8_t * BSSID;
+    chip::ByteSpan SSID;
+    chip::ByteSpan BSSID;
     uint8_t Channel;
     uint32_t FrequencyBand;
 } EmberAfWiFiInterfaceScanResult;

@@ -45,10 +45,19 @@ macro(chip_gn_arg_append arg val)
     string(APPEND chip_gn_args "${arg} = ${val}\n")
 endmacro()
 
+macro(chip_gn_arg_bool arg boolean)
+    if (${boolean})
+        string(APPEND chip_gn_args "${arg} = true\n")
+    else()
+        string(APPEND chip_gn_args "${arg} = false\n")
+    endif()
+endmacro()
+
 chip_gn_arg_append("esp32_ar"              "\"${CMAKE_AR}\"")
 chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
 chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
+chip_gn_arg_bool("is_debug"                is_debug)
 
 if(CONFIG_ENABLE_PW_RPC)
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
@@ -63,7 +72,7 @@ if (NOT CONFIG_USE_MINIMAL_MDNS)
 endif()
 
 if (CONFIG_ENABLE_CHIP_SHELL)
-    chip_gn_arg_append("chip_build_shell_lib"                   "true")
+    chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
 
@@ -168,6 +177,9 @@ if(NOT CONFIG_USE_MINIMAL_MDNS)
     idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
+
+idf_component_get_property(main_lib main COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group 
                                                 ${chip_libraries}

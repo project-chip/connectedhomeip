@@ -32,8 +32,14 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BASIC_CLUSTER_ID:
         emberAfBasicClusterInitCallback(endpoint);
         break;
+    case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+        emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
     case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
+        break;
+    case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
+        emberAfGeneralDiagnosticsClusterInitCallback(endpoint);
         break;
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         emberAfLevelControlClusterInitCallback(endpoint);
@@ -43,6 +49,15 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
+        break;
+    case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID:
+        emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
+        break;
+    case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+        emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
+    case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+        emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
     default:
         // Unrecognized cluster ID
@@ -55,7 +70,17 @@ void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -71,6 +96,21 @@ void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(Endpoi
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -352,15 +392,15 @@ bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * 
  * be handled by the application framework.
  *
  * @param type   Ver.: always
- * @param indexOrDestination   Ver.: always
+ * @param destination   Ver.: always
  * @param apsFrame   Ver.: always
  * @param msgLen   Ver.: always
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
 bool __attribute__((weak))
-emberAfMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                           uint8_t * message, EmberStatus status)
+emberAfMessageSentCallback(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
+                           uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
     return false;
 }
@@ -384,7 +424,7 @@ emberAfMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestin
  */
 EmberAfStatus __attribute__((weak))
 emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                  uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -406,7 +446,7 @@ emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, Attr
  */
 void __attribute__((weak))
 emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                   uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                   uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {}
 
 /** @brief Read Attributes Response
@@ -588,18 +628,6 @@ bool __attribute__((weak))
 emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
     return false;
-}
-
-/** @brief Get Source Route Overhead
- *
- * This function is called by the framework to determine the overhead required
- * in the network frame for source routing to a particular destination.
- *
- * @param destination The node id of the destination  Ver.: always
- */
-uint8_t __attribute__((weak)) emberAfGetSourceRouteOverheadCallback(chip::NodeId destination)
-{
-    return 0;
 }
 
 /** @brief Registration Abort

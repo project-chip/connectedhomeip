@@ -79,7 +79,6 @@ public:
      * @param[out]   apGeneralCode     Pointer to the storage for the GeneralCode
      * @param[out]   apProtocolId     Pointer to the storage for the ProtocolId
      * @param[out]   apProtocolCode   Pointer to the storage for the ProtocolCode
-     * @param[out]   apClusterId     Pointer to the storage for the ClusterId
      *
      * @return       CHIP_ERROR codes returned by chip::TLV objects. CHIP_END_OF_TLV if either
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong

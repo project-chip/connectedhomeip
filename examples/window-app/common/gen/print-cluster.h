@@ -180,6 +180,39 @@
 #define CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER
 #endif
 
+#if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_GENERAL_DIAGNOSTICS_CLUSTER { ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID, 51, "General Diagnostics" },
+#else
+#define CHIP_PRINTCLUSTER_GENERAL_DIAGNOSTICS_CLUSTER
+#endif
+
+#if defined(ZCL_USING_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_SOFTWARE_DIAGNOSTICS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SOFTWARE_DIAGNOSTICS_CLUSTER { ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID, 52, "Software Diagnostics" },
+#else
+#define CHIP_PRINTCLUSTER_SOFTWARE_DIAGNOSTICS_CLUSTER
+#endif
+
+#if defined(ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                       \
+    { ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID, 53, "Thread Network Diagnostics" },
+#else
+#define CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER
+#endif
+
+#if defined(ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
+    { ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID, 54, "WiFi Network Diagnostics" },
+#else
+#define CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                     \
+    { ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID, 55, "Ethernet Network Diagnostics" },
+#else
+#define CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER
+#endif
+
 #if defined(ZCL_USING_SWITCH_CLUSTER_SERVER) || defined(ZCL_USING_SWITCH_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_SWITCH_CLUSTER { ZCL_SWITCH_CLUSTER_ID, 59, "Switch" },
 #else
@@ -190,6 +223,13 @@
 #define CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER { ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, 62, "Operational Credentials" },
 #else
 #define CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TRUSTED_ROOT_CERTIFICATES_CLUSTER_SERVER) || defined(ZCL_USING_TRUSTED_ROOT_CERTIFICATES_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TRUSTED_ROOT_CERTIFICATES_CLUSTER                                                                        \
+    { ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID, 63, "Trusted Root Certificates" },
+#else
+#define CHIP_PRINTCLUSTER_TRUSTED_ROOT_CERTIFICATES_CLUSTER
 #endif
 
 #if defined(ZCL_USING_SHADE_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_SHADE_CONFIG_CLUSTER_CLIENT)
@@ -634,6 +674,12 @@
 #define CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER
 #endif
 
+#if defined(ZCL_USING_TEST_CLUSTER_SERVER) || defined(ZCL_USING_TEST_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TEST_CLUSTER { ZCL_TEST_CLUSTER_ID, 1295, "Test Cluster" },
+#else
+#define CHIP_PRINTCLUSTER_TEST_CLUSTER
+#endif
+
 #if defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_SERVER) || defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER { ZCL_GENERIC_TUNNEL_CLUSTER_ID, 1536, "Generic Tunnel" },
 #else
@@ -900,8 +946,14 @@
     CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_GENERAL_DIAGNOSTICS_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_SOFTWARE_DIAGNOSTICS_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                           \
+    CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                             \
+    CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
+    CHIP_PRINTCLUSTER_TRUSTED_ROOT_CERTIFICATES_CLUSTER                                                                            \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
@@ -965,6 +1017,7 @@
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_TEST_CLUSTER                                                                                                 \
     CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_11073_PROTOCOL_TUNNEL_CLUSTER                                                                                \

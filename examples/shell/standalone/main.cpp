@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
@@ -25,12 +25,20 @@
 #include <support/logging/CHIPLogging.h>
 
 #include <ChipShellCollection.h>
+#include <lib/support/CHIPMem.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::Shell;
 
 int main()
 {
+    chip::Platform::MemoryInit();
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
+#endif
     // Initialize the default streamer that was linked.
     const int rc = streamer_init(streamer_get());
 
@@ -41,9 +49,6 @@ int main()
     }
 
     cmd_misc_init();
-    cmd_base64_init();
-    cmd_device_init();
-    cmd_btp_init();
     cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();

@@ -70,7 +70,9 @@ has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
-the UART console.
+the UART console and shared using an NFC tag. For security reasons, you must
+start NFC tag emulation manually after powering up the device by pressing
+Button 4.
 
 ### Thread Provisioning
 
@@ -107,7 +109,7 @@ states are depicted:
 light bulb is on; when not lit, the light bulb is off.
 
 **Button SW2** can be used to reset the device to a default state. Pressing and
-holding Button SW3 for 6 seconds initiates a factory reset. After an initial
+holding Button SW2 for 6 seconds initiates a factory reset. After an initial
 period of 3 seconds, LED2 D2 and D3 will flash in unison to signal the pending
 reset. Holding the button past 6 seconds will cause the device to reset its
 persistent configuration and initiate a reboot. The reset action can be
@@ -124,7 +126,18 @@ being used if this button is pressed.
 The remaining two LEDs (D1/D2) and button (SW1) are unused.
 
 Directly on the development board, **Button USERINTERFACE** can be used for
-enabling Bluetooth LE advertising for a predefined period of time.
+enabling Bluetooth LE advertising for a predefined period of time. Also, pushing
+this button starts the NFC emulation by writing the onboarding information in
+the NTAG.
+
+### No expansion board
+
+In case the **OM15082** Expansion board is not attached to the DK6 board, the
+functionality of LED D2 and LED D3 is taken over by LED DS2, respectively LED
+DS3, which can be found on the DK6 board.
+
+Also, by long pressing the **USERINTERFACE** button, the factory reset action
+will be initiated.
 
 <a name="building"></a>
 
@@ -133,27 +146,31 @@ enabling Bluetooth LE advertising for a predefined period of time.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W061 SDK 2.6.2 for Project CHIP](https://mcuxpresso.nxp.com/).
+-   Download [K32W061 SDK 2.6.3 for Project CHIP](https://mcuxpresso.nxp.com/).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
-    SDK_2.6.2_K32W061DK6. The SDK Builder UI selection should be similar with
+    SDK_2.6.3_K32W061DK6. The SDK Builder UI selection should be similar with
     the one from the image below.
     ![MCUXpresso SDK Download](../../platform/k32w/doc/images/mcux-sdk-download.JPG)
 
 -   Start building the application
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.2_K32W061DK6/
-user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/mr2_fixes/patch_k32w_mr2_sdk.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.3_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/openthread/repo$ cd examples/lighting-app/k32w/
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" is_debug=true"
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/k32w/
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" chip_with_OM15082=1 is_debug=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lightin-app/k32w$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
-Note that "patch_k32w_mr2_sdk.sh" script must be run for patching the K32W061
-SDK 2.6.2.
+Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
+2.6.3.
+
+Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
+build argument (chip_with_OM15082) inside the gn build instruction should be set
+to zero. The argument chip_with_OM15082 is set to zero by default.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 install the recommanded packages (python version > 3, pip3, pycrypto,

@@ -27,6 +27,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
 from chip import exceptions
+import ctypes
 import sys
 import os
 import platform
@@ -35,6 +36,7 @@ from optparse import OptionParser, OptionValueError
 import shlex
 import base64
 import textwrap
+import time
 import string
 import re
 from cmd import Cmd
@@ -183,6 +185,8 @@ class DeviceMgrCmd(Cmd):
         "zclread",
         "zclconfigure",
 
+        "discover",
+
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
     ]
@@ -299,7 +303,6 @@ class DeviceMgrCmd(Cmd):
             print(str(ex))
             return
 
-        print("Done.")
 
     def do_setuppayload(self, line):
         """
@@ -388,13 +391,65 @@ class DeviceMgrCmd(Cmd):
 
         return
 
+    def ConnectFromSetupPayload(self, setupPayload, nodeid):
+        # TODO(cecille): Get this from the C++ code?
+        softap = 1 << 0
+        ble = 1 << 1
+        onnetwork = 1 << 2
+        # Devices may be uncommissioned, or may already be on the network. Need to check both ways.
+        # TODO(cecille): implement soft-ap connection.
+
+        if int(setupPayload.attributes["RendezvousInformation"]) & onnetwork:
+            print("Attempting to find device on Network")
+            longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
+            self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
+            print("Waiting for device responses...")
+            strlen = 100;
+            addrStrStorage = ctypes.create_string_buffer(strlen)
+            count = 0
+            # If this device is on the network and we're looking specifically for 1 device,
+            # expect a quick response.
+            maxWaitTime = 1
+            ok = False
+            while count < maxWaitTime:
+                ok = self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen)
+                if ok:
+                    break
+                time.sleep(0.2)
+                count = count + 0.2
+            if ok:
+                addrStr = addrStrStorage.value.decode('utf-8')
+                print("Connecting to device at " + addrStr)
+                pincode = ctypes.c_uint32(int(setupPayload.attributes['SetUpPINCode']))
+                if self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid):
+                    print("Connected")
+                    return 0
+                else:
+                    print("Unable to connect")
+                    return 1
+            else:
+                print("Unable to locate device on network")
+
+        if int(setupPayload.attributes["RendezvousInformation"]) & ble:
+            print("Attempting to connect via BLE")
+            longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
+            pincode = ctypes.c_uint32(int(setupPayload.attributes['SetUpPINCode']))
+            if self.devCtrl.ConnectBLE(longDiscriminator, pincode, nodeid):
+                print("Connected")
+                return 0
+            else:
+                print("Unable to connect")
+        return -1
+
     def do_connect(self, line):
         """
         connect -ip <ip address> <setup pin code> [<nodeid>]
         connect -ble <discriminator> <setup pin code> [<nodeid>]
+        connect -qr <qr code> [<nodeid>]
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
+        -qr option will connect to the first device with a matching long discriminator.
 
         TODO: Add more methods to connect to device (like cert for auth, and IP
               for connection)
@@ -417,6 +472,10 @@ class DeviceMgrCmd(Cmd):
                     "utf-8"), int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
+            elif args[0] == '-qr' and len(args) >=2:
+                print("Parsing QR code {}".format(args[1]))
+                setupPayload = SetupPayload().ParseQrCode(args[1])
+                self.ConnectFromSetupPayload(setupPayload, nodeid)
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
@@ -448,6 +507,50 @@ class DeviceMgrCmd(Cmd):
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
+
+    def do_discover(self, line):
+        """
+        discover -qr qrcode
+        discover -all
+
+        discover command is used to discover available devices.
+        """
+        try:
+            args = shlex.split(line)
+            if len(args) < 1:
+                print("Usage:")
+                self.do_help("discover")
+                return
+
+            if args[0] == "-qr" and len(args) >= 2:
+                setupPayload = SetupPayload().ParseQrCode(args[1])
+                longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
+                self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
+                print("Waiting for device responses...")
+                strlen = 100;
+                addrStrStorage = ctypes.create_string_buffer(strlen)
+                count = 0
+                maxWaitTime = 2
+                while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
+                    time.sleep(0.2)
+                    count = count + 0.2
+            elif args[0] == "-all":
+                self.devCtrl.DiscoverAllCommissioning()
+                # Discovery happens through mdns, which means we need to wait for responses to come back.
+                # TODO(cecille): I suppose we could make this a command line arg. Or Add a callback when
+                # x number of responses are received. For now, just 2 seconds. We can all wait that long.
+                print("Waiting for device responses...")
+                time.sleep(2)
+            else:
+                print("Usage:")
+                self.do_help("discover")
+                return
+        except exceptions.ChipStackException as ex:
+            print('exception')
+            print(str(ex))
+            return
+
+        self.devCtrl.PrintDiscoveredDevices()
 
     def do_zcl(self, line):
         """

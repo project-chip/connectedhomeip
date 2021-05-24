@@ -19,6 +19,7 @@
 
 #include <core/CHIPError.h>
 #include <core/PeerId.h>
+#include <mdns/Resolver.h>
 #include <support/Span.h>
 
 #include <cstddef>
@@ -36,6 +37,8 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId);
 /// Generates the host name that a CHIP device is to use for a given unique
 /// identifier (MAC address or EUI64)
 CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & macOrEui64);
+
+CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype);
 
 } // namespace Mdns
 } // namespace chip

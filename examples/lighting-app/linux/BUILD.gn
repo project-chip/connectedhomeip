@@ -31,6 +31,7 @@ config("includes") {
 executable("chip-lighting-app") {
   sources = [
     "LightingManager.cpp",
+    "include/CHIPProjectAppConfig.h",
     "include/LightingManager.h",
     "main.cpp",
   ]

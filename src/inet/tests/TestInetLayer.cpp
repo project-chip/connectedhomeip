@@ -595,7 +595,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError
 
 static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len) {}
 
-static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle aBuffer)
+static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle && aBuffer)
 {
     const uint32_t lFirstValueReceived = sTestState.mStats.mReceive.mActual;
     const uint8_t lFirstValue          = uint8_t(lFirstValueReceived);
@@ -667,7 +667,7 @@ static void HandleTCPConnectionReceived(TCPEndPoint * aListenEndPoint, TCPEndPoi
 
 // Raw Endpoint Callbacks
 
-static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer   = true;
     const bool lStatsByPacket = true;
@@ -720,7 +720,7 @@ static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError
 
 // UDP Endpoint Callbacks
 
-static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer = true;
     bool lStatus;

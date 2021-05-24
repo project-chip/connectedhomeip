@@ -45,9 +45,9 @@ public:
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
-                           uint8_t type, System::PacketBufferHandle message);
+                           uint8_t type, System::PacketBufferHandle && message);
 
-    virtual CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle message,
+    virtual CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
                                      EncryptedPacketBufferHandle * retainedMessage) const
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -63,7 +63,7 @@ protected:
     virtual CHIP_ERROR SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
                                        System::PacketBufferHandle && message, EncryptedPacketBufferHandle * retainedMessage) = 0;
 
-    virtual bool IsTransportReliable() { return false; }
+    virtual bool IsReliableTransmissionAllowed() { return true; }
 
 private:
     ReliableMessageMgr * mReliableMessageMgr = nullptr;

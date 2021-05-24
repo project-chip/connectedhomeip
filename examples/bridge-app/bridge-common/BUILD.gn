@@ -20,4 +20,5 @@ chip_data_model("bridge-common") {
   zap_file = "bridge-app.zap"
 
   zap_pregenerated_dir = "gen"
+  is_server = true
 }

@@ -39,7 +39,7 @@ namespace Messaging {
 
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry() : rc(nullptr), nextRetransTimeTick(0), sendCount(0) {}
 
-ReliableMessageMgr::ReliableMessageMgr(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
+ReliableMessageMgr::ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
     mContextPool(contextPool), mSystemLayer(nullptr), mSessionMgr(nullptr), mCurrentTimerExpiry(0),
     mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
 {}
@@ -134,13 +134,14 @@ void ReliableMessageMgr::ExecuteActions()
             continue;
 
         uint8_t sendCount = entry.sendCount;
+        uint32_t msgId    = entry.retainedBuf.GetMsgId();
 
         if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
         {
             err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
             ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
-                         entry.retainedBuf.GetMsgId(), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+                         msgId, sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // Remove from Table
             ClearRetransTable(entry);
@@ -155,8 +156,7 @@ void ReliableMessageMgr::ExecuteActions()
             // If the retransmission was successful, update the passive timer
             entry.nextRetransTimeTick = static_cast<uint16_t>(rc->GetActiveRetransmitTimeoutTick());
 #if !defined(NDEBUG)
-            ChipLogDetail(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", entry.retainedBuf.GetMsgId(),
-                          entry.sendCount);
+            ChipLogDetail(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", msgId, entry.sendCount);
 #endif
         }
     }
@@ -341,14 +341,21 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     ReliableMessageContext * rc = entry->rc;
+    uint32_t msgId              = 0; // Not actually used unless we reach the
+                                     // line that initializes it properly.
 
     VerifyOrReturnError(rc != nullptr, err);
 
-    const ExchangeMessageDispatch * transport = rc->GetExchangeContext()->GetMessageDispatch();
-    VerifyOrExit(transport != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // Now that we know this is a valid entry, grab the message id from the
+    // retained buffer.  We need to do that now, because we're about to hand it
+    // over to someone else, and on failure it will no longer be available.
+    msgId = entry->retainedBuf.GetMsgId();
+
+    const ExchangeMessageDispatch * dispatcher = rc->GetExchangeContext()->GetMessageDispatch();
+    VerifyOrExit(dispatcher != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err =
-        transport->ResendMessage(rc->GetExchangeContext()->GetSecureSession(), std::move(entry->retainedBuf), &entry->retainedBuf);
+        dispatcher->ResendMessage(rc->GetExchangeContext()->GetSecureSession(), std::move(entry->retainedBuf), &entry->retainedBuf);
     SuccessOrExit(err);
 
     // Update the counters
@@ -358,8 +365,8 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         // Remove from table
-        ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d", long(err),
-                     entry->retainedBuf.GetMsgId(), entry->sendCount);
+        ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d", long(err), msgId,
+                     entry->sendCount);
 
         ClearRetransTable(*entry);
     }

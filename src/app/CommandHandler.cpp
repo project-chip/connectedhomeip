@@ -34,7 +34,7 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
+                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
@@ -57,12 +57,13 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+
     err = FinalizeCommandsMessage();
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(mCommandMessageBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(mCommandMessageBuf));
     SuccessOrExit(err);
 
     MoveToState(CommandState::Sending);

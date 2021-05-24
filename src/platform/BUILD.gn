@@ -55,6 +55,9 @@ if (chip_device_platform != "none") {
 
     # Enable adding rotating device id to the additional data.
     chip_enable_rotating_device_id = true
+
+    # lock tracking: none/log/fatal or auto for a platform-dependent choice
+    chip_stack_lock_tracking = "auto"
   }
 
   buildconfig_header("platform_buildconfig") {
@@ -73,6 +76,30 @@ if (chip_device_platform != "none") {
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
+    }
+
+    stack_log_tracking = chip_stack_lock_tracking
+    if (stack_log_tracking == "auto") {
+      if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+        # TODO: should be fatal for development. Change once bugs are fixed
+        stack_log_tracking = "log"
+      } else {
+        # TODO: may want to enable at least logging for embedded to find bugs
+        # this needs tuning depending on how many resources various platforms have
+        # available (mainly flash size)
+        stack_log_tracking = "none"
+      }
+    }
+
+    if (stack_log_tracking == "fatal") {
+      defines += [
+        "CHIP_STACK_LOCK_TRACKING_ENABLED=1",
+        "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=1",
+      ]
+    } else if (stack_log_tracking == "log") {
+      defines += [ "CHIP_STACK_LOCK_TRACKING_ENABLED=1" ]
+    } else {
+      assert(stack_log_tracking == "none")
     }
 
     if (chip_enable_nfc) {
@@ -198,13 +225,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
-      "../include/platform/SoftwareUpdateManager.h",
       "../include/platform/SoftwareUpdateManagerImpl.h",
       "../include/platform/ThreadStackManager.h",
       "../include/platform/TimeSyncManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
-      "../include/platform/internal/DeviceDescriptionServer.h",
+      "../include/platform/internal/DeviceControlServer.h",
       "../include/platform/internal/DeviceNetworkInfo.h",
       "../include/platform/internal/DeviceNetworkProvisioning.h",
       "../include/platform/internal/EventLogging.h",
@@ -222,8 +248,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/internal/GenericSoftwareUpdateManagerImpl.h",
       "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
+      "DeviceControlServer.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
+      "LockTracker.cpp",
       "PersistedStorage.cpp",
       "SystemEventSupport.cpp",
       "SystemTimerSupport.cpp",
@@ -273,6 +301,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "cc13x2_26x2/Logging.cpp",
         "cc13x2_26x2/PlatformManagerImpl.cpp",
         "cc13x2_26x2/PlatformManagerImpl.h",
+        "cc13x2_26x2/Random.c",
         "cc13x2_26x2/SystemPlatformConfig.h",
       ]
 
@@ -446,6 +475,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "K32W/KeyValueStoreManagerImpl.cpp",
         "K32W/KeyValueStoreManagerImpl.h",
         "K32W/Logging.cpp",
+        "K32W/NFCManagerImpl.cpp",
+        "K32W/NFCManagerImpl.h",
         "K32W/PlatformManagerImpl.cpp",
         "K32W/PlatformManagerImpl.h",
         "K32W/SoftwareUpdateManagerImpl.h",
@@ -598,7 +629,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
 
       if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+        public_deps += [ "${openthread_root}:libopenthread-mtd" ]
 
         public_configs += [ "${chip_root}/third_party/openthread/platforms/qpg6100:openthread_qpg6100_config" ]
 

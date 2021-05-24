@@ -60,6 +60,12 @@ static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
 // The session establishment fails if the response is not received with in timeout window.
 static constexpr ExchangeContext::Timeout kSpake2p_Response_Timeout = 30000;
 
+#ifdef ENABLE_HSM_PBKDF2
+using PBKDF2_sha256_crypto = PBKDF2_sha256HSM;
+#else
+using PBKDF2_sha256_crypto = PBKDF2_sha256;
+#endif
+
 PASESession::PASESession() {}
 
 PASESession::~PASESession()
@@ -189,11 +195,12 @@ CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstabl
 CHIP_ERROR PASESession::ComputePASEVerifier(uint32_t setUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                             PASEVerifier & verifier)
 {
+    PBKDF2_sha256_crypto mPBKDF;
     uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
     Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setUpPINCode);
 
-    return pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt, saltLen, pbkdf2IterCount,
-                         sizeof(PASEVerifier), &verifier[0][0]);
+    return mPBKDF.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt, saltLen, pbkdf2IterCount,
+                                sizeof(PASEVerifier), &verifier[0][0]);
 }
 
 CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, bool useRandomPIN, uint32_t & setupPIN)
@@ -325,13 +332,11 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR PASESession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
+CHIP_ERROR PASESession::DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role)
 {
-    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(info_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
-
-    return session.InitFromSecret(mKe, mKeLen, nullptr, 0, info, info_len);
+    return session.InitFromSecret(ByteSpan(mKe, mKeLen), ByteSpan(nullptr, 0),
+                                  SecureSession::SessionInfoType::kSessionEstablishment, role);
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
@@ -628,8 +633,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
 
         // Call delegate to send the Msg3 to peer
-        err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize(),
-                                         SendFlags(SendMessageFlags::kNone));
+        err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize());
         SuccessOrExit(err);
     }
 
@@ -717,8 +721,7 @@ void PASESession::SendErrorMsg(Spake2pErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg),
-                                     SendFlags(SendMessageFlags::kNone));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg));
     SuccessOrExit(err);
 
 exit:
@@ -745,7 +748,7 @@ exit:
 }
 
 void PASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                    System::PacketBufferHandle msg)
+                                    System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

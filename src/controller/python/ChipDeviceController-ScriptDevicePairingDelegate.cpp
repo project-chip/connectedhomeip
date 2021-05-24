@@ -19,8 +19,6 @@
 
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 
-#include <transport/RendezvousSessionDelegate.h>
-
 namespace chip {
 namespace Controller {
 
