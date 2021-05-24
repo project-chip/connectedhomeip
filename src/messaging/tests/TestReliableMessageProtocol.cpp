@@ -238,7 +238,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockAppDelegate mockSender;
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
