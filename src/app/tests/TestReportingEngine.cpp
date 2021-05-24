@@ -120,8 +120,11 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder =
-        attributePathBuilder.NodeId(1).EndpointId(kTestEndpointId).ClusterId(kTestClusterId).FieldId(kRootFieldId).EndOfAttributePath();
+    attributePathBuilder = attributePathBuilder.NodeId(1)
+                               .EndpointId(kTestEndpointId)
+                               .ClusterId(kTestClusterId)
+                               .FieldId(kRootFieldId)
+                               .EndOfAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     attributePathListBuilder.EndOfAttributePathList();
     readRequestBuilder.EventNumber(1);
