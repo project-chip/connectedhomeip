@@ -156,14 +156,13 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipC
     err = reader.Next(kTLVType_Structure, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate));
     SuccessOrExit(err);
 
-    err = LoadCert(reader, decodeFlags, chipCert, chipCertLen);
+    err = LoadCert(reader, decodeFlags, ByteSpan(chipCert, chipCertLen));
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, const uint8_t * chipCert,
-                                        uint32_t chipCertLen)
+CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, ByteSpan chipCert)
 {
     CHIP_ERROR err;
     ASN1Writer writer; // ASN1Writer is used to encode TBS portion of the certificate for the purpose of signature
@@ -178,8 +177,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
 
     cert = new (&mCerts[mCertCount]) ChipCertificateData();
 
-    cert->mCertificateBegin = chipCert;
-    cert->mCertificateLen   = chipCertLen;
+    cert->mCertificate = chipCert;
 
     {
         TLVType containerType;
@@ -495,7 +493,8 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     // Verify the validity time of the certificate, if requested.
     if (cert->mNotBeforeTime != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotBefore))
     {
-        VerifyOrExit(context.mEffectiveTime >= cert->mNotBeforeTime, err = CHIP_ERROR_CERT_NOT_VALID_YET);
+        // TODO - enable check for certificate validity dates
+        // VerifyOrExit(context.mEffectiveTime >= cert->mNotBeforeTime, err = CHIP_ERROR_CERT_NOT_VALID_YET);
     }
     if (cert->mNotAfterTime != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotAfter))
     {
@@ -599,9 +598,6 @@ ChipCertificateData::~ChipCertificateData() {}
 
 void ChipCertificateData::Clear()
 {
-    mCertificateBegin = nullptr;
-    mCertificateLen   = 0;
-
     mSubjectDN.Clear();
     mIssuerDN.Clear();
     mSubjectKeyId.Clear();

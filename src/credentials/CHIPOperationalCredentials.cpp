@@ -299,9 +299,9 @@ CHIP_ERROR OperationalCredentialSet::ToSerializable(const CertificateKeyId & tru
 
     for (uint8_t i = 0; i < certificateSet->GetCertCount(); ++i)
     {
-        VerifyOrReturnError(CanCastTo<uint16_t>(dataSet[i].mCertificateLen), CHIP_ERROR_INTERNAL);
-        memcpy(ptrSerializableCerts[i], dataSet[i].mCertificateBegin, dataSet[i].mCertificateLen);
-        *ptrSerializableCertsLen[i] = static_cast<uint16_t>(dataSet[i].mCertificateLen);
+        VerifyOrReturnError(CanCastTo<uint16_t>(dataSet[i].mCertificate.size()), CHIP_ERROR_INTERNAL);
+        memcpy(ptrSerializableCerts[i], dataSet[i].mCertificate.data(), dataSet[i].mCertificate.size());
+        *ptrSerializableCertsLen[i] = static_cast<uint16_t>(dataSet[i].mCertificate.size());
     }
 
     return CHIP_NO_ERROR;
