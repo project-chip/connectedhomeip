@@ -27,13 +27,20 @@
 
 ## Flash
 
+### Presetup
+
+To make `west flash` command works following steps should be performed just
+once:
+
 1. Download toolchain:
     ```
     $ wget http://wiki.telink-semi.cn/tools_and_sdk/Tools/IDE/telink_riscv_linux_toolchain.zip
     $ unzip telink_riscv_linux_toolchain.zip
     ```
-    The toolchain contains **ice** and **SPI_burn** tool required to flash the
-    EVK
+1. Add TELINK_TOOLCHAIN_BASE variable to environment:
+    ```
+    $ export TELINK_TOOLCHAIN_BASE=${PATH_TO_TOOLCHAIN}
+    ```
 1. Setup dependencies:
 
     ```
@@ -42,22 +49,12 @@
     $ sudo apt-get install -y libc6:i386 libncurses5:i386 libstdc++6:i386
     ```
 
-1. Run **ice** tool:
+### Flashing
 
+1. Go to example directory and flash board with west command
     ```
-    $ cd ${ICE_TOOL_DIR} && sudo ./ICEman -Z v5 -I aice_sdp.cfg
+    $ cd ${TELINK_LIGHTING_EXAMPLE_DIR} && west flash
     ```
-
-    here `${ICE_TOOL_DIR}` is directory where the **ice** folder located **Leave
-    it running in the terminal**
-
-1. Flash binary image in separate terminal :
-    ```
-    $ sudo ${SPI_BURN_DIR}/SPI_burn --addr 0x0 --erase-all -i ${PATH_TO_ZEPHYR_BINARY}
-    ```
-    here:
-    - `${SPI_BURN_DIR}` is directory where **SPI_burn** tool located
-    - `${PATH_TO_ZEPHYR_BINARY}` path to firmware binary file
 
 ## Border Router
 
