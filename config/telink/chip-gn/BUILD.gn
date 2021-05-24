@@ -20,7 +20,6 @@ import("${build_root}/chip/tests.gni")
 assert(current_os == "zephyr")
 
 declare_args() {
-  chip_build_zephyr_shell = false
   chip_build_pw_rpc_lib = false
 }
 
@@ -29,10 +28,6 @@ group("telink") {
 
   if (chip_build_tests) {
     deps += [ "${chip_root}/src:tests" ]
-  }
-
-  if (chip_build_zephyr_shell) {
-    deps += [ "${chip_root}/src/platform/nrfconnect/shell:chip-zephyr-shell" ]
   }
 }
 
