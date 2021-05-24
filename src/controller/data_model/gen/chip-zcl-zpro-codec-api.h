@@ -56,6 +56,7 @@
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
+| SoftwareDiagnostics                                                 | 0x0034 |
 | Switch                                                              | 0x003B |
 | TvChannel                                                           | 0x0504 |
 | TargetNavigator                                                     | 0x0505 |
@@ -1962,6 +1963,39 @@ chip::System::PacketBufferHandle encodeScenesClusterReadNameSupportAttribute(uin
  */
 chip::System::PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                  chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster SoftwareDiagnostics                                         | 0x0034 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetWatermarks                                                   |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * CurrentHeapHighWatermark                                          | 0x0003 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Software Diagnostics server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSoftwareDiagnosticsClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Software Diagnostics server read command for the CurrentHeapHighWatermark attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeSoftwareDiagnosticsClusterReadCurrentHeapHighWatermarkAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Software Diagnostics server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSoftwareDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Switch                                                      | 0x003B |

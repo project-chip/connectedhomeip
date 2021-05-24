@@ -792,6 +792,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Software Diagnostics
+ *
+ */
+@interface CHIPSoftwareDiagnostics : CHIPCluster
+
+- (void)resetWatermarks:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentHeapHighWatermarkWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Switch
  *
  */

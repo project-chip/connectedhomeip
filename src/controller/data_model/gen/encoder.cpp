@@ -82,6 +82,7 @@ using namespace chip::Encoding::LittleEndian;
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
+| SoftwareDiagnostics                                                 | 0x0034 |
 | Switch                                                              | 0x003B |
 | TvChannel                                                           | 0x0504 |
 | TargetNavigator                                                     | 0x0505 |
@@ -288,6 +289,9 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_REMOVE_SCENE_COMMAND_ID (0x02)
 #define ZCL_STORE_SCENE_COMMAND_ID (0x04)
 #define ZCL_VIEW_SCENE_COMMAND_ID (0x01)
+
+#define SOFTWARE_DIAGNOSTICS_CLUSTER_ID 0x0034
+#define ZCL_RESET_WATERMARKS_COMMAND_ID (0x00)
 
 #define SWITCH_CLUSTER_ID 0x003B
 
@@ -2896,6 +2900,45 @@ PacketBufferHandle encodeScenesClusterReadNameSupportAttribute(uint8_t seqNum, E
 PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadScenesClusterRevision", SCENES_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster SoftwareDiagnostics                                         | 0x0034 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetWatermarks                                                   |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * CurrentHeapHighWatermark                                          | 0x0003 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeSoftwareDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverSoftwareDiagnosticsAttributes", SOFTWARE_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentHeapHighWatermark
+ */
+PacketBufferHandle encodeSoftwareDiagnosticsClusterReadCurrentHeapHighWatermarkAttribute(uint8_t seqNum,
+                                                                                         EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadSoftwareDiagnosticsCurrentHeapHighWatermark", SOFTWARE_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeSoftwareDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadSoftwareDiagnosticsClusterRevision", SOFTWARE_DIAGNOSTICS_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
