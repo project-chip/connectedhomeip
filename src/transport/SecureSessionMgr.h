@@ -63,6 +63,8 @@ public:
 
     uint32_t GetMsgId() const;
 
+    bool IsNull() const { return System::PacketBufferHandle::IsNull(); }
+
     /**
      * Creates a copy of the data in this packet.
      *
@@ -92,13 +94,13 @@ public:
     CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
 #endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
+    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
+
 private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
     friend class SecureSessionMgr;
 
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
-
-    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 };
 
 /**

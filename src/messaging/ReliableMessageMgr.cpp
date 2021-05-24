@@ -133,6 +133,13 @@ void ReliableMessageMgr::ExecuteActions()
         if (!rc || entry.nextRetransTimeTick != 0)
             continue;
 
+        if (entry.retainedBuf.IsNull())
+        {
+            // Discard the current entry if the retained buffer is null
+            ClearRetransTable(entry);
+            continue;
+        }
+
         uint8_t sendCount = entry.sendCount;
         uint32_t msgId    = entry.retainedBuf.GetMsgId();
 

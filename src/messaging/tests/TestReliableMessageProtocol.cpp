@@ -102,6 +102,49 @@ public:
     bool IsOnMessageReceivedCalled = false;
 };
 
+class MockSessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
+{
+public:
+    CHIP_ERROR SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
+                               EncryptedPacketBufferHandle * retainedMessage) override
+    {
+        PacketHeader packetHeader;
+
+        ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
+        ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
+
+        if (retainedMessage != nullptr && mRetainMessageOnSend)
+        {
+            (*retainedMessage) = message.Retain();
+        }
+        return gTransportMgr.SendMessage(Transport::PeerAddress(), std::move(message));
+    }
+
+    bool MessagePermitted(uint16_t protocol, uint8_t type) override { return true; }
+
+    bool mRetainMessageOnSend = true;
+};
+
+class MockSessionEstablishmentDelegate : public ExchangeDelegate
+{
+public:
+    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle && buffer) override
+    {
+        IsOnMessageReceivedCalled = true;
+    }
+
+    void OnResponseTimeout(ExchangeContext * ec) override {}
+
+    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) override
+    {
+        return &mMessageDispatch;
+    }
+
+    bool IsOnMessageReceivedCalled = false;
+    MockSessionEstablishmentExchangeDispatch mMessageDispatch;
+};
+
 void test_os_sleep_ms(uint64_t millisecs)
 {
     struct timespec sleep_time;
@@ -291,6 +334,62 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     rm->ClearRetransTable(rc);
 }
 
+void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockSessionEstablishmentDelegate mockSender;
+    // TODO: temporarily create a SecureSessionHandle from node id, will be fix in PR 3602
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+    NL_TEST_ASSERT(inSuite, rc != nullptr);
+
+    rc->SetConfig({
+        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    });
+
+    err = mockSender.mMessageDispatch.Init(rm);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    mockSender.mMessageDispatch.mRetainMessageOnSend = false;
+
+    // Let's drop the initial message
+    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 1;
+    gLoopback.mDroppedMessageCount = 0;
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message was dropped
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
+
+    // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
+    test_os_sleep_ms(65);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+
+    // Ensure the retransmit table is empty, as we did not provide a message to retain
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    exchange->Close();
+
+    rm->ClearRetransTable(rc);
+}
+
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -323,6 +422,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ReliableMessageMgr::CheckFailRetrans", CheckFailRetrans),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessage", CheckResendApplicationMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckCloseExchangeAndResendApplicationMessage", CheckCloseExchangeAndResendApplicationMessage),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckFailedMessageRetainOnSend", CheckFailedMessageRetainOnSend),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
 
     NL_TEST_SENTINEL()
