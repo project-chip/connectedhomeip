@@ -3057,12 +3057,28 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "GetFabricId",
+              "name": "SetFabric",
               "code": 0,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "OpCSRRequest",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "AddOpCert",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             },
             {
               "name": "UpdateFabricLabel",
@@ -3075,6 +3091,14 @@
             {
               "name": "RemoveFabric",
               "code": 10,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "RemoveAllFabrics",
+              "code": 11,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -3108,11 +3132,27 @@
           "enabled": 1,
           "commands": [
             {
-              "name": "GetFabricIdResponse",
+              "name": "SetFabricResponse",
               "code": 1,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "OpCSRResponse",
+              "code": 5,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "OpCertResponse",
+              "code": 8,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -5526,6 +5566,36 @@
               "reportableChange": 0
             },
             {
+              "name": "list_octet_string",
+              "code": 27,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "list_struct_octet_string",
+              "code": 28,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
               "name": "cluster revision",
               "code": 65533,
               "mfgCode": null,
@@ -6920,7 +6990,16 @@
           "define": "OTA_CLIENT_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [],
+          "commands": [
+            {
+              "name": "AnnounceOtaServer",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -11492,6 +11571,36 @@
             {
               "name": "list_int8u",
               "code": 26,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "list_octet_string",
+              "code": 27,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "list_struct_octet_string",
+              "code": 28,
               "mfgCode": null,
               "side": "server",
               "included": 1,
