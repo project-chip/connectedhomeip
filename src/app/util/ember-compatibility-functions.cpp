@@ -87,11 +87,11 @@ void ResetEmberAfObjects()
 
 } // namespace Compatibility
 
-CHIP_ERROR CheckIfClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
+bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
 {
     // TODO: Currently, we are using cluster catalog from the ember library, this should be modified or replaced after several
     // updates to Commands.
-    return emberAfContainsServer(aEndPointId, aClusterId) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_PROFILE_ID;
+    return emberAfContainsServer(aEndPointId, aClusterId);
 }
 
 } // namespace app

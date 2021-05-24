@@ -306,10 +306,10 @@ public:
 namespace chip {
 namespace app {
 
-CHIP_ERROR CheckIfClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
+bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
 {
-    // Always return no error in test.
-    return CHIP_NO_ERROR;
+    // Always return true in test.
+    return true;
 }
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,

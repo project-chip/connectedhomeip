@@ -90,7 +90,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     err = commandPath.GetEndpointId(&endpointId);
     SuccessOrExit(err);
 
-    SuccessOrExit(err = CheckIfClusterCommandExists(clusterId, commandId, endpointId));
+    VerifyOrExit(ServerClusterCommandExists(clusterId, commandId, endpointId), err = CHIP_ERROR_INVALID_PROFILE_ID);
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -116,13 +116,14 @@ exit:
 
         // The Path is the path in the request if there are any error occurred before we dispatch the command to clusters.
         // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
-        // Set the error with CHIP_NO_ERROR, then continue to process rest of commands
+        // TODO: The behavior when receiving a malformed message is not clear in the Spec. (Spec#3259)
         AddStatusCode(&returnStatusParam,
                       err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
                       Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
-        err = CHIP_NO_ERROR;
     }
-    return err;
+    // We have handled the error status above and puts the error status in response, now return success status so we can process
+    // other commands in the invoke request (by caller).
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPathParams,

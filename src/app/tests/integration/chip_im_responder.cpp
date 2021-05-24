@@ -45,12 +45,10 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR CheckIfClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
+bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
 {
     // The Mock cluster catalog -- only have one command on one cluster on one endpoint.
-    VerifyOrReturnError(aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestCommandId,
-                        CHIP_ERROR_INVALID_PROFILE_ID);
-    return CHIP_NO_ERROR;
+    return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestCommandId);
 }
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,

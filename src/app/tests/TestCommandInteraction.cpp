@@ -71,12 +71,10 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                   aCommandId, aEndPointId);
 }
 
-CHIP_ERROR CheckIfClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
+bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
 {
     // Mock cluster catalog, only support one command on one cluster on one endpoint.
-    return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestEndpointId)
-        ? CHIP_NO_ERROR
-        : CHIP_ERROR_INVALID_PROFILE_ID;
+    return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestEndpointId);
 }
 
 class TestCommandInteraction
