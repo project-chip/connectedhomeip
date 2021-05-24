@@ -23,7 +23,7 @@
         },
         "CY8CPROTO_062_4343W": { 
             "target.network-default-interface-type": "WIFI",
-            "target.macros_add" : ["MBEDTLS_SHA1_C"]
+            "target.macros_add" : ["MBEDTLS_SHA1_C", "WHD_PRINT_DISABLE"]
         }
     }
 }

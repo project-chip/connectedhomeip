@@ -851,11 +851,11 @@ int cmd_device_status(int argc, char ** argv)
     streamer_printf(sout, " WIFI status \r\n");
     NetworkStatus WifiStatus;
     ConnectivityMgrImpl().GetWifiStatus(&WifiStatus);
-    streamer_printf(sout, "Connection status: %s\r\n", WifiStatus.Status);
-    streamer_printf(sout, "MAC: %s\r\n", WifiStatus.MAC);
-    streamer_printf(sout, "IP: %s\r\n", WifiStatus.IP);
-    streamer_printf(sout, "Netmask: %s\r\n", WifiStatus.Netmask);
-    streamer_printf(sout, "Gateway: %s\r\n", WifiStatus.Gateway);
+    streamer_printf(sout, "Connection status: %s\r\n", WifiStatus.Status[0] != '\0' ? WifiStatus.Status : "Unknown");
+    streamer_printf(sout, "MAC: %s\r\n", WifiStatus.MAC[0] != '\0' ? WifiStatus.MAC : "Unknown");
+    streamer_printf(sout, "IP: %s\r\n", WifiStatus.IP[0] != '\0' ? WifiStatus.IP : "0.0.0.0");
+    streamer_printf(sout, "Netmask: %s\r\n", WifiStatus.Netmask[0] != '\0' ? WifiStatus.Netmask : "0.0.0.0");
+    streamer_printf(sout, "Gateway: %s\r\n", WifiStatus.Gateway[0] != '\0' ? WifiStatus.Gateway : "0.0.0.0");
     streamer_printf(sout, "RSSI: %d\r\n", WifiStatus.RSSI);
 exit:
     PlatformMgr().UnlockChipStack();

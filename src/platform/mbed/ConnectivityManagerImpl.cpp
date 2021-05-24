@@ -45,6 +45,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer::Internal;
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -62,7 +63,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 
 bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
 {
-    return mWiFiStationMode == kWiFiStationMode_ApplicationControlled;
+    return GetWiFiStationMode() == kWiFiStationMode_ApplicationControlled;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
@@ -97,22 +98,34 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 
 void ConnectivityManagerImpl::GetWifiStatus(::chip::DeviceLayer::Internal::NetworkStatus * WifiStatus)
 {
-    // TODO Update with snprintf or memcpy + strlen
-    if (!_interface)
+    SocketAddress address;
+
+    // Validate the interface is available
+    if (!_wifiInterface)
     {
-        ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
+        ChipLogError(DeviceLayer, "WiFi interface not supported");
         return;
     }
-    sprintf(WifiStatus->Status, "%s", status2str(_interface->get_connection_status()));
-    sprintf(WifiStatus->MAC, "%s", _interface->get_mac_address());
-    SocketAddress a;
-    _interface->get_ip_address(&a);
-    sprintf(WifiStatus->IP, "%s", a.get_ip_address());
-    _interface->get_netmask(&a);
-    sprintf(WifiStatus->Netmask, "%s", a.get_ip_address());
-    _interface->get_gateway(&a);
-    sprintf(WifiStatus->Gateway, "%s", a.get_ip_address());
-    WifiStatus->RSSI = _interface->get_rssi();
+
+    strncpy(WifiStatus->Status, status2str(_wifiInterface->get_connection_status()), kMaxWiFiStatusLength);
+    strncpy(WifiStatus->MAC, _wifiInterface->get_mac_address(), kMaxWiFiStatusLength);
+    _wifiInterface->get_ip_address(&address);
+    strncpy(WifiStatus->IP, address.get_ip_address(), kMaxWiFiStatusLength);
+    _wifiInterface->get_netmask(&address);
+    strncpy(WifiStatus->Netmask, address.get_ip_address(), kMaxWiFiStatusLength);
+    _wifiInterface->get_gateway(&address);
+    strncpy(WifiStatus->Gateway, address.get_ip_address(), kMaxWiFiStatusLength);
+    WifiStatus->RSSI = (int8_t) _wifiInterface->get_rssi();
+}
+
+bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
+{
+    return mWiFiStationState == kWiFiStationState_Connected;
+}
+
+bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
+{
+    return false;
 }
 
 // ==================== ConnectivityManager Platform Internal Methods ====================
@@ -121,7 +134,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mWiFiStationMode                = kWiFiStationMode_Disabled;
     mWiFiStationState               = kWiFiStationState_NotConnected;
     mIsProvisioned                  = false;
     mIp4Address                     = IPAddress::Any;
@@ -131,20 +143,31 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
 
     // TODO Initialize the Chip Addressing and Routing Module.
-    _interface = WiFiInterface::get_default_instance();
-    _security  = NSAPI_SECURITY_WPA_WPA2;
-    if (_interface)
+    NetworkInterface * net_if = NetworkInterface::get_default_instance();
+    if (net_if == nullptr)
     {
+        ChipLogError(DeviceLayer, "No network interface available");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    if (net_if->wifiInterface() != nullptr)
+    {
+        _wifiInterface   = net_if->wifiInterface();
+        mWiFiStationMode = kWiFiStationMode_Enabled;
+
         // TODO: Add to user documentation that add_event_listener must be used
         // To add more listener to the interface
-        _interface->add_event_listener([this](nsapi_event_t event, intptr_t data) {
+        _wifiInterface->add_event_listener([this](nsapi_event_t event, intptr_t data) {
             PlatformMgrImpl().mQueue.call([this, event, data] {
                 PlatformMgr().LockChipStack();
                 OnInterfaceEvent(event, data);
                 PlatformMgr().UnlockChipStack();
             });
         });
+
+        _security = NSAPI_SECURITY_WPA_WPA2;
     }
+
     return err;
 }
 
@@ -189,110 +212,112 @@ void ConnectivityManagerImpl::OnInterfaceEvent(nsapi_event_t event, intptr_t dat
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-#if defined(CHIP_DEVICE_CONFIG_WIFI_SECURITY_SCAN)
-#error Wifi security scan Not implemented yet
-#else
     // Validate the interface is available
-    if (!_interface)
+    if (!_wifiInterface)
     {
-        ChipLogError(DeviceLayer, "No WiFiInterface found ");
+        ChipLogError(DeviceLayer, "WiFi interface not supported");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Connect the interface with the credentials provided
-    auto error = _interface->connect(ssid, key, _security);
+    // Set WiFi credentials
+    auto error = _wifiInterface->set_credentials(ssid, key, _security);
     if (error)
     {
-        ChipLogError(DeviceLayer, "Connection result %d", error);
+        ChipLogError(DeviceLayer, "Set WiFi credentials failed %d", error);
         return CHIP_ERROR_INTERNAL;
     }
 
     mIsProvisioned = true;
-    auto status    = _interface->get_connection_status();
+
+    // Connect the interface With network
+    error = _wifiInterface->connect();
+    if (error)
+    {
+        ChipLogError(DeviceLayer, "Netowrk connection failed %d", error);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    auto status = _wifiInterface->get_connection_status();
     ChipLogDetail(DeviceLayer, "Connection result %d status: %s", error, status2str(status));
     _ProcessInterfaceChange(status);
     return CHIP_NO_ERROR;
-#endif
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
-    if (!_interface)
+    // Validate the interface is available
+    if (!_wifiInterface)
     {
-        ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
+        ChipLogError(DeviceLayer, "WiFi interface not supported");
         return;
     }
 
     // Reset credentials
-    _security = NSAPI_SECURITY_WPA_WPA2;
-    auto err  = _interface->set_credentials(NULL, NULL, _security);
-    if (err)
+    auto error = _wifiInterface->set_credentials("ssid", NULL, NSAPI_SECURITY_NONE);
+    if (error)
     {
-        ChipLogError(DeviceLayer, "Failed to reset WiFi credentials: error = %d", err);
+        ChipLogError(DeviceLayer, "Reset WiFi credentials failed %d", error);
+        return;
     }
-    else
-    {
-        mIsProvisioned = false;
-    }
+
+    mIsProvisioned = false;
 
     // Disconnect from the WiFi station
-    err = _interface->disconnect();
-    if (err)
+    error = _wifiInterface->disconnect();
+    if (error)
     {
-        ChipLogError(DeviceLayer, "Failed to disconnect WiFi interface: error = %d", err);
-    }
-    else
-    {
-        mWiFiStationMode = kWiFiStationMode_Disabled;
+        ChipLogError(DeviceLayer, "Network disconnect failed %d", error);
+        return;
     }
 
-    _ProcessInterfaceChange(_interface->get_connection_status());
+    auto status = _wifiInterface->get_connection_status();
+    ChipLogDetail(DeviceLayer, "Disconnection result %d status: %s", error, status2str(status));
+    _ProcessInterfaceChange(status);
 }
+
 int ConnectivityManagerImpl::ScanWiFi(int APlimit, ::chip::DeviceLayer::Internal::NetworkInfo * wifiInfo)
 {
-
-    if (!_interface)
-    {
-        ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
-        return -1;
-    }
-    auto status = _interface->get_connection_status();
-    if (status != NSAPI_STATUS_GLOBAL_UP)
-    {
-        ChipLogDetail(DeviceLayer, "Currently device not connected to any WIFI  AP");
-    }
     WiFiAccessPoint * ap;
+    int count;
 
-    int count = _interface->scan(NULL, 0);
-
-    if (count <= 0)
+    // Validate the interface is available
+    if (!_wifiInterface)
     {
-        ChipLogDetail(DeviceLayer, "scan() failed with return value: %d", count);
-        return 0;
+        ChipLogError(DeviceLayer, "WiFi interface not supported");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    count = _wifiInterface->scan(NULL, 0);
+    if (count < 0)
+    {
+        ChipLogError(DeviceLayer, "WiFi scan failed with %d", count);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (count == 0)
+    {
+        ChipLogDetail(DeviceLayer, "No available networks");
+        return count;
     }
 
     count = count < APlimit ? count : APlimit;
-
     ap    = new WiFiAccessPoint[count];
-    count = _interface->scan(ap, count);
 
-    if (count <= 0)
+    count = _wifiInterface->scan(ap, count);
+    if (count < 0)
     {
-        return 0;
+        ChipLogError(DeviceLayer, "WiFi scan failed with %d", count);
+        return CHIP_ERROR_INTERNAL;
     }
+
     // use snprintf
     for (int i = 0; i < count; i++)
     {
-        sprintf(wifiInfo[i].WiFiSSID, "%s", ap[i].get_ssid());
+        strncpy(wifiInfo[i].WiFiSSID, ap[i].get_ssid(), kMaxWiFiSSIDLength);
         wifiInfo[i].security = NsapiToNetworkSecurity(ap[i].get_security());
-        wifiInfo[i].BSSID[0] = ap[i].get_bssid()[0];
-        wifiInfo[i].BSSID[1] = ap[i].get_bssid()[1];
-        wifiInfo[i].BSSID[2] = ap[i].get_bssid()[2];
-        wifiInfo[i].BSSID[3] = ap[i].get_bssid()[3];
-        wifiInfo[i].BSSID[4] = ap[i].get_bssid()[4];
-        wifiInfo[i].BSSID[5] = ap[i].get_bssid()[5];
-        wifiInfo[i].RSSI     = ap[i].get_rssi();
-        wifiInfo[i].channel  = ap[i].get_channel();
+        memcpy(wifiInfo[i].BSSID, ap[i].get_bssid(), sizeof(wifiInfo[i].BSSID));
+        wifiInfo[i].RSSI    = (int8_t) ap[i].get_rssi();
+        wifiInfo[i].channel = (int8_t) ap[i].get_channel();
     }
 
     delete[] ap;
@@ -315,7 +340,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
 
     // Update IPv4 address
     SocketAddress address;
-    auto error = _interface->get_ip_address(&address);
+    auto error = _wifiInterface->get_ip_address(&address);
     if (error)
     {
         if (mIp4Address != IPAddress::Any)
@@ -346,7 +371,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
     }
 
     // Update IPv6 address
-    error = _interface->get_ipv6_link_local_address(&address);
+    error = _wifiInterface->get_ipv6_link_local_address(&address);
     if (error)
     {
         if (mIp6Address != IPAddress::Any)

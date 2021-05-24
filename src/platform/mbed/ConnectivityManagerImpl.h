@@ -31,8 +31,8 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
-#include "netsocket/WiFiInterface.h"
 #include <inet/IPAddress.h>
+#include <netsocket/WiFiInterface.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -98,31 +98,21 @@ private:
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
     static ConnectivityManagerImpl sInstance;
-    WiFiStationMode mWiFiStationMode;
-    WiFiStationState mWiFiStationState;
-    WiFiAPMode mWiFiAPMode;
-    uint32_t mWiFiStationReconnectIntervalMS;
-    uint32_t mWiFiAPIdleTimeoutMS;
-    WiFiInterface * _interface;
-    nsapi_security_t _security = NSAPI_SECURITY_WPA_WPA2;
+    WiFiStationMode mWiFiStationMode         = kWiFiStationMode_NotSupported;
+    WiFiStationState mWiFiStationState       = kWiFiStationState_NotConnected;
+    WiFiAPMode mWiFiAPMode                   = kWiFiAPMode_NotSupported;
+    uint32_t mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
+    uint32_t mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
+    WiFiInterface * _wifiInterface           = nullptr;
+    nsapi_security_t _security               = NSAPI_SECURITY_WPA_WPA2;
     Inet::IPAddress mIp4Address;
     Inet::IPAddress mIp6Address;
-    bool mIsProvisioned : 1;
+    bool mIsProvisioned = false;
 };
-
-inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
-{
-    return mWiFiStationState == kWiFiStationState_Connected;
-}
-
-inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
-{
-    return false;
-}
 
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {
-    return mWiFiStationState == kWiFiStationState_Connected;
+    return HaveServiceConnectivityViaThread();
 }
 
 /**
