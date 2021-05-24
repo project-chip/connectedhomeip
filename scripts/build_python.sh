@@ -38,11 +38,61 @@ CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 
+declare chip_detail_logging=false
+declare chip_mdns="minimal"
+
+help() {
+
+    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging ChipDetailLoggingValue  ] [ -chip_mdns ChipMDNSValue  ]"
+
+    echo "General Options:
+  -h, --help                Display this information.
+Input Options:
+  -d, --chip_detail_logging ChipDetailLoggingValue          Specify ChipDetailLoggingValue as true or false.
+                                                            By default it is false.
+  -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
+                                                            By default it is minimal.
+"
+}
+
+file_name=${0##*/}
+
+case $1 in
+        --help | -h)
+            help
+            ;;
+        --chip_detail_logging | -d)
+            chip_detail_logging=$2
+            ;;
+        --chip_mdns | -m)
+            chip_mdns=$2
+            ;;
+        -*)
+            help
+            echo "Unknown Option \"$1\""
+            ;;
+esac
+case $3 in
+        --chip_detail_logging | -d)
+            chip_detail_logging=$4
+            ;;
+        --chip_mdns | -m)
+            chip_mdns=$4
+            ;;
+        -*)
+            help
+            echo "Unknown Option \"$3\""
+            ;;
+esac
+
+# Print input values
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\"" 
+ 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
 
 # Generates ninja files
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=false"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging chip_mdns=\"$chip_mdns\""
 
 # Compiles python files
 ninja -C "$OUTPUT_ROOT" python
