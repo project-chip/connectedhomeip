@@ -23,6 +23,7 @@
  */
 
 #include <app/InteractionModelEngine.h>
+#include <app/MessageDef/AttributePath.h>
 #include <app/MessageDef/EventPath.h>
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
@@ -166,38 +167,60 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aAttributePathListParser.GetReader(&reader);
-
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
+        ClusterInfo clusterInfo;
+        TLV::TLVReader pathReader;
         VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
         VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-        ClusterInfo clusterInfo;
-        AttributePath::Parser path;
-        err = path.Init(reader);
+        AttributePath::Parser pathParser;
+        err = pathParser.Init(reader);
         SuccessOrExit(err);
-        err = path.GetNodeId(&(clusterInfo.mNodeId));
-        SuccessOrExit(err);
-        err = path.GetEndpointId(&(clusterInfo.mEndpointId));
-        SuccessOrExit(err);
-        err = path.GetClusterId(&(clusterInfo.mClusterId));
-        SuccessOrExit(err);
-        err = path.GetFieldId(&(clusterInfo.mFieldId));
-        if (CHIP_NO_ERROR == err)
+        pathParser.GetReader(&pathReader);
+        //TODO: Add wildcard support
+        while (CHIP_NO_ERROR == (err = pathReader.Next()))
         {
-            clusterInfo.mType = ClusterInfo::Type::kFieldIdValid;
+            VerifyOrExit(chip::TLV::IsContextTag(pathReader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
+            switch (chip::TLV::TagNumFromTag(pathReader.GetTag()))
+            {
+                case AttributePath::kCsTag_NodeId:
+                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                    SuccessOrExit(err = pathReader.Get(clusterInfo.mNodeId));
+                    break;
+                case AttributePath::kCsTag_EndpointId:
+                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                    SuccessOrExit(err = pathReader.Get(clusterInfo.mEndpointId));
+                    break;
+                case AttributePath::kCsTag_ClusterId:
+                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                    SuccessOrExit(err = pathReader.Get(clusterInfo.mClusterId));
+                    break;
+                case AttributePath::kCsTag_FieldId:
+                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                    SuccessOrExit(err = clusterInfo.PushAttributePathSelectorHead());
+                    SuccessOrExit(err = pathReader.Get(clusterInfo.mpAttributePathSelector->mFieldId));
+                    clusterInfo.mpAttributePathSelector->mFlag = AttributePathSelectorFlag::kFieldIdValid;
+                    break;
+                case AttributePath::kCsTag_ListIndex:
+                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                    SuccessOrExit(err = clusterInfo.PushAttributePathSelectorHead());
+                    SuccessOrExit(err = pathReader.Get(clusterInfo.mpAttributePathSelector->mListIndex));
+                    clusterInfo.mpAttributePathSelector->mFlag = AttributePathSelectorFlag::kListIndexValid;
+                    break;
+                default:
+                    ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
+            }
         }
-        else if (CHIP_END_OF_TLV == err)
+        if (CHIP_END_OF_TLV == err)
         {
-            err = path.GetListIndex(&(clusterInfo.mListIndex));
-            SuccessOrExit(err);
-            clusterInfo.mType = ClusterInfo::Type::kListIndexValid;
+            err = CHIP_NO_ERROR;
         }
-        SuccessOrExit(err);
+
         err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
         SuccessOrExit(err);
         mpAttributeClusterInfoList->SetDirty();
     }
-    // if we have exhausted this container
+
     if (CHIP_END_OF_TLV == err)
     {
         err = CHIP_NO_ERROR;
@@ -230,7 +253,6 @@ CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathL
         SuccessOrExit(err);
         err = path.GetEventId(&(clusterInfo.mEventId));
         SuccessOrExit(err);
-        clusterInfo.mType = ClusterInfo::Type::kEventIdValid;
         err               = InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo);
         SuccessOrExit(err);
     }

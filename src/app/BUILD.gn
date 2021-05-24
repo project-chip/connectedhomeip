@@ -48,6 +48,7 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
+    "ClusterInfo.cpp",
     "Command.cpp",
     "Command.h",
     "CommandHandler.cpp",

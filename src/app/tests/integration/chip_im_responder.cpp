@@ -101,18 +101,20 @@ exit:
 CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    AttributePathSelector * current = aClusterInfo.mpAttributePathSelector;
     VerifyOrExit(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (aClusterInfo.mFieldId == kRootFieldId || aClusterInfo.mFieldId == 1)
+    while(current != nullptr)
     {
-        err = aWriter.Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
-        SuccessOrExit(err);
-    }
-    if (aClusterInfo.mFieldId == kRootFieldId || aClusterInfo.mFieldId == 2)
-    {
-        err = aWriter.Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
-        SuccessOrExit(err);
+        if (current->mFieldId == kRootFieldId || current->mFieldId == kTestFieldId1) {
+            err = aWriter.Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
+            SuccessOrExit(err);
+        }
+        if (current->mFieldId == kRootFieldId || current->mFieldId == kTestFieldId2) {
+            err = aWriter.Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
+            SuccessOrExit(err);
+        }
+        current = current->mpNext;
     }
 
 exit:

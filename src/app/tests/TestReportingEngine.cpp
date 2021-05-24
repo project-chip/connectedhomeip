@@ -54,32 +54,9 @@ constexpr ClusterId kTestClusterId       = 6;
 constexpr EndpointId kTestEndpointId     = 1;
 constexpr chip::FieldId kTestFieldId1    = 1;
 constexpr chip::FieldId kTestFieldId2    = 2;
-constexpr uint8_t kTestFieldValue1       = 1;
-constexpr uint8_t kTestFieldValue2       = 2;
+constexpr chip::ListIndex kTestListIndex = 1;
 
 namespace app {
-CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(aAttributePathParams.mClusterId == kTestClusterId && aAttributePathParams.mEndpointId == kTestEndpointId,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (aAttributePathParams.mFieldId == kRootFieldId || aAttributePathParams.mFieldId == kTestFieldId1)
-    {
-        err = aWriter.Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
-        SuccessOrExit(err);
-    }
-    if (aAttributePathParams.mFieldId == kRootFieldId || aAttributePathParams.mFieldId == kTestFieldId2)
-    {
-        err = aWriter.Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
-        SuccessOrExit(err);
-    }
-
-exit:
-    ChipLogFunctError(err);
-    return err;
-}
-
 namespace reporting {
 class TestReportingEngine
 {
@@ -121,17 +98,17 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder =
-        attributePathBuilder.NodeId(1).EndpointId(kTestEndpointId).ClusterId(kTestClusterId).FieldId(0).EndOfAttributePath();
+        attributePathBuilder.NodeId(1).EndpointId(kTestEndpointId).ClusterId(kTestClusterId).FieldId(kTestFieldId1).ListIndex(kTestListIndex).FieldId(kTestFieldId2).EndOfAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     attributePathListBuilder.EndOfAttributePathList();
-    readRequestBuilder.EventNumber(1);
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     readRequestBuilder.EndOfReadRequest();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    readHandler.OnReadRequest(exchangeCtx, std::move(readRequestbuf));
+    err = readHandler.OnReadRequest(exchangeCtx, std::move(readRequestbuf));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     reportingEngine.Init();
     err = reportingEngine.BuildAndSendSingleReportData(&readHandler);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);

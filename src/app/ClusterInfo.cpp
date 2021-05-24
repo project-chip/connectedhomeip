@@ -16,34 +16,34 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <app/util/basic-types.h>
-#include <support/BitFlags.h>
+#include <support/CHIPMem.h>
+#include <app/ClusterInfo.h>
 
 namespace chip {
 namespace app {
-enum class AttributePathSelectorFlag : uint8_t
-{
-    kInValid        = 0x00,
-    kFieldIdValid   = 0x01,
-    kListIndexValid = 0x02,
-};
 
-struct AttributePathSelector
+CHIP_ERROR ClusterInfo::PushAttributePathSelectorHead()
 {
-    BitFlags<AttributePathSelectorFlag> mFlag = AttributePathSelectorFlag::kInValid;
-    FieldId mFieldId       = 0;
-    ListIndex mListIndex   = 0;
-    AttributePathSelector * mpNext = nullptr;
-};
+    AttributePathSelector * selector = chip::Platform::New<AttributePathSelector>();
+    if (selector == nullptr)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    selector->mpNext = mpAttributePathSelector;
+    mpAttributePathSelector = selector;
+    return CHIP_NO_ERROR;
+}
 
-struct AttributePathParams
+void ClusterInfo::PopAllAttributePathSelector()
 {
-    NodeId mNodeId         = 0;
-    EndpointId mEndpointId = 0;
-    ClusterId mClusterId   = 0;
-    AttributePathSelector * mpSelector = nullptr;
-};
+    AttributePathSelector * next = nullptr;
+    while (mpAttributePathSelector != nullptr)
+    {
+        next = mpAttributePathSelector->mpNext;
+        chip::Platform::Delete(mpAttributePathSelector);
+        mpAttributePathSelector = next;
+    }
+}
+
 } // namespace app
 } // namespace chip

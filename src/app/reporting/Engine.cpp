@@ -59,9 +59,27 @@ Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElemen
     AttributePath::Builder attributePathBuilder = aAttributeDataElementBuilder.CreateAttributePathBuilder();
     attributePathBuilder.NodeId(aClusterInfo.mNodeId)
         .EndpointId(aClusterInfo.mEndpointId)
-        .ClusterId(aClusterInfo.mClusterId)
-        .FieldId(aClusterInfo.mFieldId)
-        .EndOfAttributePath();
+        .ClusterId(aClusterInfo.mClusterId);
+    AttributePathSelector * current = aClusterInfo.mpAttributePathSelector;
+
+    while (current != nullptr)
+    {
+        if (current->mFlag == AttributePathSelectorFlag::kFieldIdValid)
+        {
+            attributePathBuilder.FieldId(current->mFieldId);
+        }
+        else if (current->mFlag == AttributePathSelectorFlag::kListIndexValid)
+        {
+            attributePathBuilder.ListIndex(current->mListIndex);
+        }
+        else
+        {
+            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        current = current->mpNext;
+    }
+
+    attributePathBuilder.EndOfAttributePath();
     err = attributePathBuilder.GetError();
     SuccessOrExit(err);
 
@@ -97,7 +115,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
         if (clusterInfo->IsDirty())
         {
             AttributeDataElement::Builder attributeDataElementBuilder = attributeDataList.CreateAttributeDataElementBuilder();
-            ChipLogDetail(DataManagement, "<RE:Run> Cluster %u, Field %u is dirty", clusterInfo->mClusterId, clusterInfo->mFieldId);
+            ChipLogDetail(DataManagement, "<RE:Run> Cluster %u is dirty", clusterInfo->mClusterId);
             // Retrieve data for this cluster instance and clear its dirty flag.
             err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,

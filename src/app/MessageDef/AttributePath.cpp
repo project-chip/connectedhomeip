@@ -115,8 +115,6 @@ CHIP_ERROR AttributePath::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case kCsTag_FieldId:
-            // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_FieldId)), err = CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_FieldId);
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING

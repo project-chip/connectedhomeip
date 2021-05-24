@@ -133,8 +133,12 @@ CHIP_ERROR SendReadRequest(void)
     chip::app::EventPathParams eventPathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, kLivenessChangeEvent,
                                                false /*not urgent*/);
 
-    chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, 1, 0,
-                                                       chip::app::AttributePathFlags::kFieldIdValid);
+    chip::app::AttributePathSelector selector = {chip::app::AttributePathSelectorFlag::kFieldIdValid, 1, 0, nullptr };
+    chip::app::AttributePathParams attributePathParams;
+    attributePathParams.mNodeId = chip::kTestDeviceNodeId;
+    attributePathParams.mEndpointId = kTestEndpointId;
+    attributePathParams.mClusterId = kTestClusterId;
+    attributePathParams.mpSelector = &selector;
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 

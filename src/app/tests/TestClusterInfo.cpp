@@ -37,12 +37,30 @@ void TestDirty(nlTestSuite * apSuite, void * apContext)
     clusterInfo1.ClearDirty();
     NL_TEST_ASSERT(apSuite, !clusterInfo1.IsDirty());
 }
+
+void TestAttributePathSelectorLinkList(nlTestSuite * apSuite, void * apContext)
+{
+    int number = 0;
+    ClusterInfo clusterInfo1;
+    clusterInfo1.PushAttributePathSelectorHead();
+    clusterInfo1.PushAttributePathSelectorHead();
+    AttributePathSelector * current = clusterInfo1.mpAttributePathSelector;
+    while (current != nullptr)
+    {
+        number ++;
+        current = current->mpNext;
+    }
+    NL_TEST_ASSERT(apSuite, number == 2);
+    clusterInfo1.PopAllAttributePathSelector();
+    NL_TEST_ASSERT(apSuite, number == 0);
+}
 } // namespace TestClusterInfo
 } // namespace app
 } // namespace chip
 
 namespace {
-const nlTest sTests[] = { NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty), NL_TEST_SENTINEL() };
+const nlTest sTests[] = { NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty), NL_TEST_SENTINEL(),
+                          NL_TEST_DEF("TestAttributePathSelectorLinkList", chip::app::TestClusterInfo::TestAttributePathSelectorLinkList), NL_TEST_SENTINEL() };
 }
 
 int TestClusterInfo()

@@ -25,41 +25,34 @@ namespace chip {
 namespace app {
 struct ClusterInfo
 {
-    enum class Type : uint8_t
-    {
-        kInvalid        = 0,
-        kFieldIdValid   = 0x01,
-        kListIndexValid = 0x02,
-        kEventIdValid   = 0x03,
-    };
-
     ClusterInfo() {}
     bool IsDirty() { return mDirty; }
     void SetDirty() { mDirty = true; }
     void ClearDirty() { mDirty = false; }
+
+    CHIP_ERROR PushAttributePathSelectorHead();
+    void PopAllAttributePathSelector();
+
     NodeId mNodeId         = 0;
     ClusterId mClusterId   = 0;
-    ListIndex mListIndex   = 0;
-    FieldId mFieldId       = 0;
+    EventId mEventId       = 0;
+    AttributePathSelector * mpAttributePathSelector = nullptr;
+    ClusterInfo * mpNext   = nullptr;
     EndpointId mEndpointId = 0;
     bool mDirty            = false;
-    Type mType             = Type::kInvalid;
-    ClusterInfo * mpNext   = nullptr;
-    EventId mEventId       = 0;
+
     /* For better structure alignment
      * Above ordering is by bit-size to ensure least amount of memory alignment padding.
      * Changing order to something more natural (e.g. clusterid before nodeid) will result
      * in extra memory alignment padding.
      * uint64 mNodeId
      * uint16_t mClusterId
-     * uint16_t mListIndex
-     * uint8_t FieldId
+     * uint16_t EventId
+     * uint32_t mAttributeSelectors
+     * uint32_t mpNext
      * uint8_t EndpointId
      * uint8_t mDirty
-     * uint8_t mType
-     * uint32_t mpNext
-     * uint16_t EventId
-     * padding 2 bytes
+     * padding 1bytes
      */
 };
 } // namespace app
