@@ -58,34 +58,34 @@ Input Options:
 file_name=${0##*/}
 
 while (($#)); do
-case $1 in
-    --help | -h)
-        help
-        ;;
-    --chip_detail_logging | -d)
-        chip_detail_logging=$2
-        ;;
-    --chip_mdns | -m)
-        chip_mdns=$2
-        ;;
-    -*)
-        help
-        echo "Unknown Option \"$1\""
-        ;;
-esac
-case $3 in
-    --chip_detail_logging | -d)
-        chip_detail_logging=$4
-        ;;
-    --chip_mdns | -m)
-        chip_mdns=$4
-        ;;
-    -*)
-        help
-        echo "Unknown Option \"$3\""
-        ;;
-esac
-shift
+    case $1 in
+        --help | -h)
+            help
+            ;;
+        --chip_detail_logging | -d)
+            chip_detail_logging=$2
+            ;;
+        --chip_mdns | -m)
+            chip_mdns=$2
+            ;;
+        -*)
+            help
+            echo "Unknown Option \"$1\""
+            ;;
+    esac
+    case $3 in
+        --chip_detail_logging | -d)
+            chip_detail_logging=$4
+            ;;
+        --chip_mdns | -m)
+            chip_mdns=$4
+            ;;
+        -*)
+            help
+            echo "Unknown Option \"$3\""
+            ;;
+    esac
+    shift
 done
 
 # Print input values
