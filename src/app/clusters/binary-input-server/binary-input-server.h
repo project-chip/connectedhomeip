@@ -20,4 +20,6 @@
 #include <app/util/af-types.h>
 
 EmberAfStatus emberAfBinaryInputBasicClusterSetPresentValueCallback(chip::EndpointId endpoint, bool presentValue);
+EmberAfStatus emberAfBinaryInputBasicClusterGetPresentValue(chip::EndpointId endpoint, bool * presentValue);
 EmberAfStatus emberAfBinaryInputBasicClusterSetOutOfServiceCallback(chip::EndpointId endpoint, bool isOutOfService);
+EmberAfStatus emberAfBinaryInputBasicClusterGetOutOfService(chip::EndpointId endpoint, bool * isOutOfService);
