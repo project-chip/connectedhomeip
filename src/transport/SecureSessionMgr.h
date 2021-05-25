@@ -94,7 +94,6 @@ public:
     CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
 #endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
-
     // Making operator= available to tests by making it public.
 #ifdef CHIP_CONFIG_TEST
 public:
