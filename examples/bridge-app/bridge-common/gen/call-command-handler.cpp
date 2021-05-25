@@ -19,16 +19,17 @@
 
 #include <stdint.h>
 
-#include "af-structs.h"
 #include "app/util/util.h"
 #include "call-command-handler.h"
 #include "callback.h"
-#include "cluster-id.h"
-#include "command-id.h"
+#include <app/common/gen/af-structs.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 
 using namespace chip;
 
 EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfDescriptorClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfEthernetNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGeneralCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGeneralDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -80,6 +81,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         {
         case ZCL_BASIC_CLUSTER_ID:
             // No commands are enabled for cluster Basic
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_DESCRIPTOR_CLUSTER_ID:
+            // No commands are enabled for cluster Descriptor
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:

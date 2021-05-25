@@ -19,12 +19,12 @@
 
 #include <stdint.h>
 
-#include "af-structs.h"
 #include "app/util/util.h"
 #include "call-command-handler.h"
 #include "callback.h"
-#include "cluster-id.h"
-#include "command-id.h"
+#include <app/common/gen/af-structs.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 
 using namespace chip;
 

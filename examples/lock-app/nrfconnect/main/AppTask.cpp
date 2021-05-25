@@ -25,9 +25,9 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -416,7 +416,8 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
-    if (ConnectivityMgr().IsThreadProvisioned())
+    // In case of having software update enabled, allow on starting BLE advertising after Thread provisioning.
+    if (ConnectivityMgr().IsThreadProvisioned() && !sAppTask.mSoftwareUpdateEnabled)
     {
         LOG_INF("NFC Tag emulation and BLE advertisement not started - device is commissioned to a Thread network.");
         return;
