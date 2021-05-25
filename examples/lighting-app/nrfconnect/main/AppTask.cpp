@@ -415,7 +415,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
-    // In case of having software update enabled, allow on starting BLE advertising after Thread provisioning. 
+    // In case of having software update enabled, allow on starting BLE advertising after Thread provisioning.
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() && !sAppTask.mSoftwareUpdateEnabled)
     {
         LOG_INF("NFC Tag emulation and BLE advertisement not started - device is commissioned to a Thread network.");
