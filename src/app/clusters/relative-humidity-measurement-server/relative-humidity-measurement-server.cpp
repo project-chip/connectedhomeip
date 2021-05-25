@@ -27,89 +27,84 @@
 
 #include <support/logging/CHIPLogging.h>
 
+#ifndef emberAfRelativeHumidityMeasurementClusterPrintln
+#define emberAfRelativeHumidityMeasurementClusterPrintln(...) ChipLogProgress(Zcl, __VA_ARGS__);
+#endif
+
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterGetMeasuredValue(chip::EndpointId endpoint, uint16_t * measuredValue)
 {
-    return emberAfReadAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
-                                ZCL_RELATIVE_HUMIDITY_MEASURED_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, (uint8_t *) measuredValue,
-                                sizeof(*measuredValue), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
+                                      ZCL_RELATIVE_HUMIDITY_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t *) measuredValue,
+                                      sizeof(*measuredValue));
 }
 
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterGetMinMeasuredValue(chip::EndpointId endpoint, uint16_t * minMeasuredValue)
 {
-    return emberAfReadAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
-                                ZCL_RELATIVE_HUMIDITY_MIN_MEASURED_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
+                                      ZCL_RELATIVE_HUMIDITY_MIN_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t *) minMeasuredValue,
+                                      sizeof(*minMeasuredValue));
 }
 
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterGetMaxMeasuredValue(chip::EndpointId endpoint, uint16_t * maxMeasuredValue)
 {
-    return emberAfReadAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
-                                ZCL_RELATIVE_HUMIDITY_MAX_MEASURED_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
+                                      ZCL_RELATIVE_HUMIDITY_MAX_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t *) maxMeasuredValue,
+                                      sizeof(*maxMeasuredValue));
 }
 
 void emberAfRelativeHumidityMeasurementClusterServerInitCallback(chip::EndpointId endpoint)
 {
     uint16_t value       = 0;
     EmberAfStatus status = emberAfRelativeHumidityMeasurementClusterGetMeasuredValue(endpoint, &value);
-
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfRelativeHumidityMeasurementClusterSetMeasuredValueCallback(endpoint, 0);
+        status = emberAfRelativeHumidityMeasurementClusterSetMeasuredValueCallback(endpoint, 0);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfRelativeHumidityMeasurementClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 
     status = emberAfRelativeHumidityMeasurementClusterGetMinMeasuredValue(endpoint, &value);
-
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfRelativeHumidityMeasurementClusterSetMinMeasuredValueCallback(endpoint, UINT16_MAX);
+        status = emberAfRelativeHumidityMeasurementClusterSetMinMeasuredValueCallback(endpoint, UINT16_MAX);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfRelativeHumidityMeasurementClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 
     status = emberAfRelativeHumidityMeasurementClusterGetMaxMeasuredValue(endpoint, &value);
-
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfRelativeHumidityMeasurementClusterSetMaxMeasuredValueCallback(endpoint, UINT16_MAX);
+        status = emberAfRelativeHumidityMeasurementClusterSetMaxMeasuredValueCallback(endpoint, UINT16_MAX);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfRelativeHumidityMeasurementClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 }
 
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, uint16_t measuredValue)
 {
-    EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
-                                                 ZCL_RELATIVE_HUMIDITY_MEASURED_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &measuredValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        // emberAfRelativeHumidityMeasurementClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
+                                       ZCL_RELATIVE_HUMIDITY_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t *) &measuredValue,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterSetMinMeasuredValueCallback(chip::EndpointId endpoint,
                                                                                    uint16_t minMeasuredValue)
 {
-    EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
-                                                 ZCL_RELATIVE_HUMIDITY_MIN_MEASURED_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &minMeasuredValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        // emberAfRelativeHumidityMeasurementClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
+                                       ZCL_RELATIVE_HUMIDITY_MIN_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t *) &minMeasuredValue,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterSetMaxMeasuredValueCallback(chip::EndpointId endpoint,
                                                                                    uint16_t maxMeasuredValue)
 {
-    EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
-                                                 ZCL_RELATIVE_HUMIDITY_MAX_MEASURED_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &maxMeasuredValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        // emberAfRelativeHumidityMeasurementClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
+                                       ZCL_RELATIVE_HUMIDITY_MAX_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t *) &maxMeasuredValue,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
