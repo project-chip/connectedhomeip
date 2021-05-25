@@ -132,10 +132,10 @@ protected:
     InteractionModelDelegate * mpDelegate      = nullptr;
     chip::System::PacketBufferHandle mCommandMessageBuf;
     uint8_t mCommandIndex = 0;
+    CommandState mState   = CommandState::Uninitialized;
 
 private:
     friend class TestCommandInteraction;
-    CommandState mState                    = CommandState::Uninitialized;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 };

@@ -57,6 +57,8 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+
     err = FinalizeCommandsMessage();
     SuccessOrExit(err);
 
@@ -96,13 +98,9 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     if (CHIP_END_OF_TLV == err)
     {
         err = CHIP_NO_ERROR;
-        ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-        // The Path is not present when the CommandDataElement is used with an empty response, ResponseCommandElement would only
-        // have status code,
-        AddStatusCode(nullptr, GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-                      Protocols::SecureChannel::kProtocolCodeSuccess);
+        ChipLogDetail(DataManagement, "Received command without data for cluster %d", clusterId);
     }
-    else if (CHIP_NO_ERROR == err)
+    if (CHIP_NO_ERROR == err)
     {
         DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
