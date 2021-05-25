@@ -56,6 +56,7 @@ exit:
 CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    DeviceLayer::ChipDeviceEvent event;
 
     VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -63,8 +64,14 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(mCommandMessageBuf));
-    SuccessOrExit(err);
+
+    event.Type                                  = DeviceLayer::DeviceEventType::kInteractionModelCommandResponse;
+    event.ChipInteractionModelEvent.ExchangeCtx = mpExchangeCtx;
+    event.ChipInteractionModelEvent.Payload     = std::move(mCommandMessageBuf).UnsafeRelease();
+
+    DeviceLayer::PlatformMgr().LockChipStack();
+    DeviceLayer::PlatformMgr().PostEvent(&event);
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     MoveToState(CommandState::Sending);
 

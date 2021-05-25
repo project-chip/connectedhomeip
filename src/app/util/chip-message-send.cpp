@@ -26,6 +26,7 @@
 #include <inet/InetLayer.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
 #include <protocols/temp_zcl/TempZCL.h>
 #include <support/logging/CHIPLogging.h>
@@ -55,6 +56,8 @@ extern Messaging::ExchangeManager * ExchangeManager();
 EmberStatus chipSendUnicast(Messaging::ExchangeContext * exchange, EmberApsFrame * apsFrame, uint16_t messageLength,
                             uint8_t * message, Messaging::SendFlags sendFlags)
 {
+    DeviceLayer::ChipDeviceEvent event;
+
     uint16_t frameSize           = encodeApsFrame(nullptr, 0, apsFrame);
     uint32_t dataLengthUnchecked = uint32_t(frameSize) + uint32_t(messageLength);
     if (dataLengthUnchecked > UINT16_MAX)
@@ -88,13 +91,14 @@ EmberStatus chipSendUnicast(Messaging::ExchangeContext * exchange, EmberApsFrame
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    CHIP_ERROR err = exchange->SendMessage(Protocols::TempZCL::MsgType::TempZCLResponse, std::move(buffer), sendFlags);
+    event.Type                                  = DeviceLayer::DeviceEventType::kInteractionModelTempZCLResponse;
+    event.ChipInteractionModelEvent.ExchangeCtx = exchange;
+    event.ChipInteractionModelEvent.Payload     = std::move(buffer).UnsafeRelease();
+    event.ChipInteractionModelEvent.SendFlags   = sendFlags.Raw();
 
-    if (err != CHIP_NO_ERROR)
-    {
-        // FIXME: Figure out better translations between our error types?
-        return EMBER_DELIVERY_FAILED;
-    }
+    DeviceLayer::PlatformMgr().LockChipStack();
+    DeviceLayer::PlatformMgr().PostEvent(&event);
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     return EMBER_SUCCESS;
 }

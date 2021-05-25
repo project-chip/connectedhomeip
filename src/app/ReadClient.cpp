@@ -84,8 +84,11 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
+    DeviceLayer::ChipDeviceEvent event;
+
     ChipLogDetail(DataManagement, "%s: Client[%u] [%5.5s]", __func__,
                   InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this), GetStateStr());
+
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -171,9 +174,15 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
-    SuccessOrExit(err);
+    event.Type                                  = DeviceLayer::DeviceEventType::kInteractionModelReadRequest;
+    event.ChipInteractionModelEvent.ExchangeCtx = mpExchangeCtx;
+    event.ChipInteractionModelEvent.Payload     = std::move(msgBuf).UnsafeRelease();
+    event.ChipInteractionModelEvent.SendFlags   = Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Raw();
+
+    DeviceLayer::PlatformMgr().LockChipStack();
+    DeviceLayer::PlatformMgr().PostEvent(&event);
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+
     MoveToState(ClientState::AwaitingResponse);
 
 exit:

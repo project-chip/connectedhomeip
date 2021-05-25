@@ -37,6 +37,7 @@ namespace app {
 CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    DeviceLayer::ChipDeviceEvent event;
 
     VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -61,10 +62,17 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    err = mpExchangeCtx->SendMessage(
-        Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
-        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
-    SuccessOrExit(err);
+    event.Type                                  = DeviceLayer::DeviceEventType::kInteractionModelCommandRequest;
+    event.ChipInteractionModelEvent.ExchangeCtx = mpExchangeCtx;
+    event.ChipInteractionModelEvent.Payload     = std::move(mCommandMessageBuf).UnsafeRelease();
+    event.ChipInteractionModelEvent.SendFlags   = Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)
+                                                    .Set(Messaging::SendMessageFlags::kNoAutoRequestAck)
+                                                    .Raw();
+
+    DeviceLayer::PlatformMgr().LockChipStack();
+    DeviceLayer::PlatformMgr().PostEvent(&event);
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+
     MoveToState(CommandState::Sending);
 
 exit:

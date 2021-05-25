@@ -89,6 +89,7 @@ public:
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
+    void PostEvent(const ChipDeviceEvent * event);
     void RunEventLoop();
     CHIP_ERROR StartEventLoopTask();
     void LockChipStack();
@@ -140,7 +141,6 @@ private:
     friend ::chip::System::Error(::chip::System::Platform::Layer::StartTimer)(::chip::System::Layer & aLayer, void * aContext,
                                                                               uint32_t aMilliseconds);
 
-    void PostEvent(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
     CHIP_ERROR StartChipTimer(uint32_t durationMS);
 

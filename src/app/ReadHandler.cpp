@@ -93,9 +93,18 @@ exit:
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    DeviceLayer::ChipDeviceEvent event;
+
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload));
+    event.Type                                  = DeviceLayer::DeviceEventType::kInteractionModelReportData;
+    event.ChipInteractionModelEvent.ExchangeCtx = mpExchangeCtx;
+    event.ChipInteractionModelEvent.Payload     = std::move(aPayload).UnsafeRelease();
+
+    DeviceLayer::PlatformMgr().LockChipStack();
+    DeviceLayer::PlatformMgr().PostEvent(&event);
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+
 exit:
     ChipLogFunctError(err);
     Shutdown();

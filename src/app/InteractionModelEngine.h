@@ -30,6 +30,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <support/CodeUtils.h>
@@ -151,6 +152,8 @@ private:
      */
     void OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+
+    static void OnEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;

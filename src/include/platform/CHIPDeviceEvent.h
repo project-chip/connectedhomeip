@@ -207,6 +207,13 @@ enum PublicEventTypes
      *
      */
     kOperationalNetworkEnabled,
+
+    kInteractionModelReportData,
+    kInteractionModelReadRequest,
+    kInteractionModelCommandRequest,
+    kInteractionModelCommandResponse,
+    kInteractionModelTempZCLRequest,
+    kInteractionModelTempZCLResponse,
 };
 
 /**
@@ -291,6 +298,7 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 #include <ble/BleConfig.h>
+#include <messaging/ExchangeContext.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -381,7 +389,7 @@ struct ChipDeviceEvent final
         struct
         {
             BLE_CONNECTION_OBJECT ConId;
-            chip::System::PacketBuffer * Data;
+            System::PacketBuffer * Data;
         } CHIPoBLEWriteReceived;
         struct
         {
@@ -411,17 +419,21 @@ struct ChipDeviceEvent final
         {
             InterfaceIpChangeType Type;
         } InterfaceIpAddressChanged;
-
         struct
         {
             CHIP_ERROR status;
         } CommissioningComplete;
-
         struct
         {
             // TODO(cecille): This should just specify wifi or thread since we assume at most 1.
             int network;
         } OperationalNetwork;
+        struct
+        {
+            Messaging::ExchangeContext * ExchangeCtx;
+            System::PacketBuffer * Payload;
+            uint16_t SendFlags;
+        } ChipInteractionModelEvent;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }
