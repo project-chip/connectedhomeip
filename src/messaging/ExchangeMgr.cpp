@@ -141,7 +141,7 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols
 
 void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
 {
-#ifdef CHIP_ERROR_LOGGING
+#if CHIP_ERROR_LOGGING
     char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
     source.ToString(srcAddressStr);
 
