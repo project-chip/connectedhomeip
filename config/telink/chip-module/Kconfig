@@ -52,12 +52,6 @@ config CHIP_LIB_SHELL
 	help
 	  Link the application with the library containing CHIP shell commands.
 
-config CHIP_PW_RPC
-	bool "Enable Pigweed RPC library"
-	default n
-	help
-	  Link the application with the library containing Pigweed RPC functionalities.
-
 config CHIP_BUILD_TESTS
 	bool "Build CHIP unit tests"
 	default n
@@ -75,18 +69,6 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
 	default n
 	help
 	  Open pairing window automatically at application boot time.
-
-config CHIP_NFC_COMMISSIONING
-	bool "Enable NFC commissioning support"
-	default n
-	imply NFC_T2T_NRFXLIB
-	imply NFC_NDEF
-	imply NFC_NDEF_MSG
-	imply NFC_NDEF_RECORD
-	imply NFC_NDEF_URI_REC
-	imply NFC_NDEF_URI_MSG
-	help
-	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
 
 config CHIP_ENABLE_RENDEZVOUS_BYPASS
 	bool "Enable Rendezvous bypass"

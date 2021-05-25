@@ -46,11 +46,11 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
-    static void LightningActionButtonEventHandler(void);
-    static void FunctionButtonEventHandler(void);
+    static void LightingActionButtonEventHandler(void);
+    static void FactoryResetButtonEventHandler(void);
     static void StartThreadButtonEventHandler(void);
 
-    static void FunctionHandler(AppEvent * aEvent);
+    static void FactoryResetHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);
     static void LightingActionEventHandler(AppEvent * aEvent);
 

@@ -23,12 +23,12 @@
 #include "ButtonManager.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include "OnboardingCodesUtil.h"
-#include "Server.h"
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include "Service.h"
 #include "ThreadUtil.h"
 
-#include "attribute-storage.h"
+#include <app/util/attribute-storage.h>
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
@@ -59,8 +59,8 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 
 LEDWidget sStatusLED;
 
-Button sFactiryResetButton;
-Button sLightningButton;
+Button sFactoryResetButton;
+Button sLightingButton;
 Button sThreadStartButton;
 
 bool sIsThreadProvisioned     = false;
@@ -184,7 +184,7 @@ int AppTask::StartApp()
     }
 }
 
-void AppTask::LightningActionButtonEventHandler(void)
+void AppTask::LightingActionButtonEventHandler(void)
 {
     AppEvent event;
 
@@ -214,7 +214,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
         LOG_INF("Action is already in progress or active.");
 }
 
-void AppTask::FunctionButtonEventHandler(void)
+void AppTask::FactoryResetButtonEventHandler(void)
 {
     AppEvent event;
 
@@ -224,7 +224,7 @@ void AppTask::FunctionButtonEventHandler(void)
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::FunctionHandler(AppEvent * aEvent)
+void AppTask::FactoryResetHandler(AppEvent * aEvent)
 {
     LOG_INF("Factory Reset triggered.");
     ConfigurationMgr().InitiateFactoryReset();
@@ -347,11 +347,11 @@ void AppTask::InitButtons(void)
     const struct device * port = device_get_binding(BUTTON_PORT);
     assert(port != NULL);
 
-    sFactiryResetButton.Configure(port, BUTTON_PIN_3, BUTTON_PIN_1, FunctionButtonEventHandler);
-    sLightningButton.Configure(port, BUTTON_PIN_4, BUTTON_PIN_1, LightningActionButtonEventHandler);
+    sFactoryResetButton.Configure(port, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
+    sLightingButton.Configure(port, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
     sThreadStartButton.Configure(port, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
 
-    ButtonManagerInst().AddButton(sFactiryResetButton);
-    ButtonManagerInst().AddButton(sLightningButton);
+    ButtonManagerInst().AddButton(sFactoryResetButton);
+    ButtonManagerInst().AddButton(sLightingButton);
     ButtonManagerInst().AddButton(sThreadStartButton);
 }
