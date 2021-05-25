@@ -79,6 +79,67 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x001D: // Descriptor Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // device list
+        {
+            entryLength = 6;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _DeviceType
+            _DeviceType * entry = reinterpret_cast<_DeviceType *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->type, write ? (uint8_t *) &entry->type : src, write, &entryOffset,
+                           sizeof(entry->type)); // DEVICE_TYPE_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->revision, write ? (uint8_t *) &entry->revision : src, write,
+                           &entryOffset, sizeof(entry->revision)); // INT16U
+            break;
+        }
+        case 0x0001: // server list
+        {
+            entryLength = 2;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+            break;
+        }
+        case 0x0002: // client list
+        {
+            entryLength = 2;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+            break;
+        }
+        case 0x0003: // parts list
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENDPOINT_ID
+            break;
+        }
+        }
+        break;
+    }
     case 0x0033: // General Diagnostics Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -294,6 +355,27 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x001D: // Descriptor Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // device list
+            // Struct _DeviceType
+            entryLength = 6;
+            break;
+        case 0x0001: // server list
+            // chip::ClusterId
+            entryLength = 2;
+            break;
+        case 0x0002: // client list
+            // chip::ClusterId
+            entryLength = 2;
+            break;
+        case 0x0003: // parts list
+            // chip::EndpointId
+            entryLength = 1;
+            break;
+        }
+        break;
     case 0x0033: // General Diagnostics Cluster
         switch (attributeId)
         {
