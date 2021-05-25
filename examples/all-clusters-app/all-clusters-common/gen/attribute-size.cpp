@@ -234,6 +234,43 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
+    case 0x0040: // Fixed Label Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // label list
+        {
+            entryLength = 36;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _LabelStruct
+            _LabelStruct * entry       = reinterpret_cast<_LabelStruct *>(write ? src : dest);
+            chip::ByteSpan * labelSpan = &entry->label; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 18, labelSpan) : ReadByteSpan(src + entryOffset, 18, labelSpan)))
+            {
+                ChipLogError(Zcl, "Index %l is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset                = static_cast<uint16_t>(entryOffset + 18);
+            chip::ByteSpan * valueSpan = &entry->value; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 18, valueSpan) : ReadByteSpan(src + entryOffset, 18, valueSpan)))
+            {
+                ChipLogError(Zcl, "Index %l is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 18);
+            break;
+        }
+        }
+        break;
+    }
     case 0x0033: // General Diagnostics Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -773,6 +810,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0003: // parts list
             // chip::EndpointId
             entryLength = 1;
+            break;
+        }
+        break;
+    case 0x0040: // Fixed Label Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // label list
+            // Struct _LabelStruct
+            entryLength = 36;
             break;
         }
         break;

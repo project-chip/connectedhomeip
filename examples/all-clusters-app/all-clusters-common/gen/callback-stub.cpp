@@ -50,6 +50,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BINDING_CLUSTER_ID:
         emberAfBindingClusterInitCallback(endpoint);
         break;
+    case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
+        emberAfBridgedDeviceBasicClusterInitCallback(endpoint);
+        break;
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
         break;
@@ -64,6 +67,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
+    case ZCL_FIXED_LABEL_CLUSTER_ID:
+        emberAfFixedLabelClusterInitCallback(endpoint);
         break;
     case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
@@ -199,6 +205,11 @@ void __attribute__((weak)) emberAfBindingClusterInitCallback(EndpointId endpoint
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfBridgedDeviceBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfColorControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -220,6 +231,11 @@ void __attribute__((weak)) emberAfDoorLockClusterInitCallback(EndpointId endpoin
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfFixedLabelClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

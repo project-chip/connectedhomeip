@@ -2233,6 +2233,42 @@
                                                                                                                                    \
                                                                       ZCL_RESET_COUNTS_COMMAND_ID, "", );
 
+/** @brief Command description for StartUp
+ *
+ * Command: StartUp
+ */
+#define emberAfFillCommandBridged                                                                                                  \
+    Device BasicClusterStartUp() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_START_UP_COMMAND_ID, "", );
+
+/** @brief Command description for ShutDown
+ *
+ * Command: ShutDown
+ */
+#define emberAfFillCommandBridged                                                                                                  \
+    Device BasicClusterShutDown() emberAfFillExternalBuffer(mask,                                                                  \
+                                                                                                                                   \
+                                                            ZCL_SHUT_DOWN_COMMAND_ID, "", );
+
+/** @brief Command description for Leave
+ *
+ * Command: Leave
+ */
+#define emberAfFillCommandBridged                                                                                                  \
+    Device BasicClusterLeave() emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_LEAVE_COMMAND_ID, "", );
+
+/** @brief Command description for ReachableChanged
+ *
+ * Command: ReachableChanged
+ */
+#define emberAfFillCommandBridged                                                                                                  \
+    Device BasicClusterReachableChanged() emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_REACHABLE_CHANGED_COMMAND_ID, "", );
+
 /** @brief Command description for SetFabric
  *
  * Command: SetFabric
