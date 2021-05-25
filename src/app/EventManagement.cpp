@@ -604,7 +604,8 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     if (event.mPriority == apEventLoadOutContext->mPriority)
     {
         apEventLoadOutContext->mCurrentSystemTime.mValue += event.mDeltaSystemTime.mValue;
-        VerifyOrExit(!(apEventLoadOutContext->mCurrentEventNumber >= apEventLoadOutContext->mStartingEventNumber && IsInterestedEventPaths(apEventLoadOutContext->mpInterestedEventPaths, event)),
+        VerifyOrExit(!(apEventLoadOutContext->mCurrentEventNumber >= apEventLoadOutContext->mStartingEventNumber &&
+                       IsInterestedEventPaths(apEventLoadOutContext->mpInterestedEventPaths, event)),
                      err = CHIP_EVENT_ID_FOUND);
     }
 
@@ -633,7 +634,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         VerifyOrExit((err == CHIP_NO_ERROR) || (err == CHIP_END_OF_TLV), loadOutContext->mWriter = checkpoint);
 
         loadOutContext->mPreviousSystemTime.mValue = loadOutContext->mCurrentSystemTime.mValue;
-        loadOutContext->mFirst                    = false;
+        loadOutContext->mFirst                     = false;
     }
 
 exit:
@@ -677,12 +678,13 @@ exit:
     return err;
 }
 
-bool EventManagement::IsInterestedEventPaths(ClusterInfo * apInterestedEventPaths, EventEnvelopeContext &aEvent)
+bool EventManagement::IsInterestedEventPaths(ClusterInfo * apInterestedEventPaths, EventEnvelopeContext & aEvent)
 {
     ClusterInfo * interestedEventPaths = apInterestedEventPaths;
     while (interestedEventPaths != nullptr)
     {
-        if (interestedEventPaths->mNodeId == aEvent.mNodeId&& interestedEventPaths->mEndpointId == aEvent.mEndpointId && interestedEventPaths->mClusterId == aEvent.mClusterId && interestedEventPaths->mEventId == aEvent.mEventId)
+        if (interestedEventPaths->mNodeId == aEvent.mNodeId && interestedEventPaths->mEndpointId == aEvent.mEndpointId &&
+            interestedEventPaths->mClusterId == aEvent.mClusterId && interestedEventPaths->mEventId == aEvent.mEventId)
         {
             return true;
         }

@@ -48,8 +48,8 @@
 
 namespace {
 
-static const chip::NodeId kTestDeviceNodeId1     = 0x18B4300000000001ULL;
-static const chip::NodeId kTestDeviceNodeId2     = 0x18B4300000000002ULL;
+static const chip::NodeId kTestDeviceNodeId1    = 0x18B4300000000001ULL;
+static const chip::NodeId kTestDeviceNodeId2    = 0x18B4300000000002ULL;
 static const chip::ClusterId kLivenessClusterId = 0x00000022;
 static const uint32_t kLivenessChangeEvent      = 1;
 static const chip::EndpointId kTestEndpointId   = 2;
@@ -152,7 +152,7 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     uint8_t backingStore[1024];
     size_t elementCount;
     writer.Init(backingStore, 1024);
-    err                      = alogMgmt.FetchEventsSince(writer, clusterInfo, priority, startingEventNumber);
+    err = alogMgmt.FetchEventsSince(writer, clusterInfo, priority, startingEventNumber);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
 
     reader.Init(backingStore, writer.GetLengthWritten());
@@ -185,15 +185,15 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2, eid3, eid4, eid5, eid6;
     chip::app::EventSchema schema1 = { kTestDeviceNodeId1, kTestEndpointId, kLivenessClusterId, kLivenessChangeEvent,
-                                      chip::app::PriorityLevel::Info };
+                                       chip::app::PriorityLevel::Info };
     chip::app::EventSchema schema2 = { kTestDeviceNodeId2, kTestEndpointId, kLivenessClusterId, kLivenessChangeEvent,
-                                      chip::app::PriorityLevel::Info };
+                                       chip::app::PriorityLevel::Info };
     chip::app::EventOptions options1;
     chip::app::EventOptions options2;
     TestEventGenerator testEventGenerator;
 
-    options1.mpEventSchema = &schema1;
-    options2.mpEventSchema = &schema2;
+    options1.mpEventSchema               = &schema1;
+    options2.mpEventSchema               = &schema2;
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
@@ -232,15 +232,15 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     NL_TEST_ASSERT(apSuite, (eid5 + 1) == eid6);
 
     chip::app::ClusterInfo testClusterInfo1;
-    testClusterInfo1.mNodeId = kTestDeviceNodeId1;
+    testClusterInfo1.mNodeId     = kTestDeviceNodeId1;
     testClusterInfo1.mEndpointId = kTestEndpointId;
-    testClusterInfo1.mClusterId = kLivenessClusterId;
-    testClusterInfo1.mEventId = kLivenessChangeEvent;
+    testClusterInfo1.mClusterId  = kLivenessClusterId;
+    testClusterInfo1.mEventId    = kLivenessChangeEvent;
     chip::app::ClusterInfo testClusterInfo2;
-    testClusterInfo2.mNodeId = kTestDeviceNodeId2;
+    testClusterInfo2.mNodeId     = kTestDeviceNodeId2;
     testClusterInfo2.mEndpointId = kTestEndpointId;
-    testClusterInfo2.mClusterId = kLivenessClusterId;
-    testClusterInfo2.mEventId = kLivenessChangeEvent;
+    testClusterInfo2.mClusterId  = kLivenessClusterId;
+    testClusterInfo2.mEventId    = kLivenessChangeEvent;
 
     CheckLogReadOut(apSuite, logMgmt, chip::app::PriorityLevel::Info, eid1, 3, &testClusterInfo1);
     CheckLogReadOut(apSuite, logMgmt, chip::app::PriorityLevel::Info, eid2, 2, &testClusterInfo1);
@@ -295,8 +295,7 @@ static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apCon
  */
 
 const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithEvictToNextBuffer", CheckLogEventWithEvictToNextBuffer),
-                          NL_TEST_DEF("CheckLogEventWithDiscardLowEvent", CheckLogEventWithDiscardLowEvent),
-                          NL_TEST_SENTINEL() };
+                          NL_TEST_DEF("CheckLogEventWithDiscardLowEvent", CheckLogEventWithDiscardLowEvent), NL_TEST_SENTINEL() };
 } // namespace
 
 int TestEventLogging()

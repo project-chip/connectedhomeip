@@ -39,9 +39,9 @@
 
 namespace chip {
 namespace app {
-constexpr size_t kMaxEventSizeReserve = 512;
-constexpr uint16_t kRequiredEventField =
-    (1 << EventDataElement::kCsTag_PriorityLevel) | (1 << EventDataElement::kCsTag_DeltaSystemTimestamp) | (1 << EventDataElement::kCsTag_EventPath);
+constexpr size_t kMaxEventSizeReserve  = 512;
+constexpr uint16_t kRequiredEventField = (1 << EventDataElement::kCsTag_PriorityLevel) |
+    (1 << EventDataElement::kCsTag_DeltaSystemTimestamp) | (1 << EventDataElement::kCsTag_EventPath);
 
 /**
  * @brief
@@ -201,10 +201,10 @@ struct EventEnvelopeContext
     Timestamp mDeltaSystemTime = Timestamp::System(0);
     Timestamp mDeltaUtc        = Timestamp::UTC(0);
     PriorityLevel mPriority    = PriorityLevel::First;
-    NodeId mNodeId = 0;
-    ClusterId mClusterId = 0;
-    EndpointId mEndpointId = 0;
-    EventId mEventId = 0;
+    NodeId mNodeId             = 0;
+    ClusterId mClusterId       = 0;
+    EndpointId mEndpointId     = 0;
+    EventId mEventId           = 0;
 };
 
 /**
@@ -570,7 +570,7 @@ private:
      */
     static CHIP_ERROR CopyEvent(const TLV::TLVReader & aReader, TLV::TLVWriter & aWriter, EventLoadOutContext * apContext);
 
-    static bool IsInterestedEventPaths(ClusterInfo * apInterestedEventPaths, EventEnvelopeContext &aEvent);
+    static bool IsInterestedEventPaths(ClusterInfo * apInterestedEventPaths, EventEnvelopeContext & aEvent);
     /**
      * @brief
      *   A function to get the circular buffer for particular priority

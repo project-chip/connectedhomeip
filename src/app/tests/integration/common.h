@@ -32,8 +32,8 @@
 
 extern chip::Messaging::ExchangeManager gExchangeManager;
 
-constexpr chip::NodeId kTestNodeId  = 0x1ULL;
-constexpr chip::NodeId kTestNodeId1 = 0x2ULL;
+constexpr chip::NodeId kTestNodeId           = 0x1ULL;
+constexpr chip::NodeId kTestNodeId1          = 0x2ULL;
 constexpr chip::ClusterId kTestClusterId     = 6;
 constexpr chip::CommandId kTestCommandId     = 40;
 constexpr chip::EndpointId kTestEndpointId   = 1;

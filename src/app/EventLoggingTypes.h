@@ -174,7 +174,7 @@ struct EventLoadOutContext
     EventNumber mCurrentEventNumber = 0;
     Timestamp mCurrentUTCTime;
     ClusterInfo * mpInterestedEventPaths = nullptr;
-    bool mFirst = true;
+    bool mFirst                          = true;
 };
 } // namespace app
 } // namespace chip
