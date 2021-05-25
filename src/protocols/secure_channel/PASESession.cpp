@@ -250,10 +250,13 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * s
 CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                        uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
+    // Return early on error here, as we have not initalized any state yet
     ReturnErrorCodeIf(salt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(saltLen == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err = Init(myKeyId, mySetUpPINCode, delegate);
+    // From here onwards, let's go to exit on error, as some state might have already
+    // been initialized
     SuccessOrExit(err);
 
     VerifyOrExit(CanCastTo<uint16_t>(saltLen), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -729,7 +732,23 @@ CHIP_ERROR PASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
     Spake2pErrorMsg * pMsg = reinterpret_cast<Spake2pErrorMsg *>(msg->Start());
     ChipLogError(SecureChannel, "Received error during pairing process. %s", ErrorStr(pMsg->error));
 
-    return pMsg->error;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    switch (pMsg->error)
+    {
+    case Spake2pErrorType::kInvalidKeyConfirmation:
+        err = CHIP_ERROR_KEY_CONFIRMATION_FAILED;
+        break;
+
+    case Spake2pErrorType::kUnexpected:
+        err = CHIP_ERROR_INVALID_PASE_PARAMETER;
+        break;
+
+    default:
+        err = CHIP_ERROR_INTERNAL;
+        break;
+    };
+
+    return err;
 }
 
 CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, const PacketHeader & packetHeader,
