@@ -33,16 +33,16 @@ enum class AttributePathSelectorFlag : uint8_t
 struct AttributePathSelector
 {
     BitFlags<AttributePathSelectorFlag> mFlag = AttributePathSelectorFlag::kInValid;
-    FieldId mFieldId       = 0;
-    ListIndex mListIndex   = 0;
-    AttributePathSelector * mpNext = nullptr;
+    FieldId mFieldId                          = 0;
+    ListIndex mListIndex                      = 0;
+    AttributePathSelector * mpNext            = nullptr;
 };
 
 struct AttributePathParams
 {
-    NodeId mNodeId         = 0;
-    EndpointId mEndpointId = 0;
-    ClusterId mClusterId   = 0;
+    NodeId mNodeId                     = 0;
+    EndpointId mEndpointId             = 0;
+    ClusterId mClusterId               = 0;
     AttributePathSelector * mpSelector = nullptr;
 };
 } // namespace app

@@ -101,9 +101,9 @@ private:
 
     virtual ~ReadClient() = default;
 
-    CHIP_ERROR GenerateReadRequest(System::PacketBufferTLVWriter &aWriter, EventPathParams * apEventPathParamsList,
-                                           size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
-                                           size_t aAttributePathParamsListSize, EventNumber aEventNumber);
+    CHIP_ERROR GenerateReadRequest(System::PacketBufferTLVWriter & aWriter, EventPathParams * apEventPathParamsList,
+                                   size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
+                                   size_t aAttributePathParamsListSize, EventNumber aEventNumber);
 
     void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;

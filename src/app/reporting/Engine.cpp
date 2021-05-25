@@ -57,9 +57,7 @@ Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElemen
     CHIP_ERROR err                              = CHIP_NO_ERROR;
     TLV::TLVType type                           = TLV::kTLVType_NotSpecified;
     AttributePath::Builder attributePathBuilder = aAttributeDataElementBuilder.CreateAttributePathBuilder();
-    attributePathBuilder.NodeId(aClusterInfo.mNodeId)
-        .EndpointId(aClusterInfo.mEndpointId)
-        .ClusterId(aClusterInfo.mClusterId);
+    attributePathBuilder.NodeId(aClusterInfo.mNodeId).EndpointId(aClusterInfo.mEndpointId).ClusterId(aClusterInfo.mClusterId);
     AttributePathSelector * current = aClusterInfo.mpAttributePathSelector;
 
     while (current != nullptr)
