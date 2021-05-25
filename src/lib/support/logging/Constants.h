@@ -54,8 +54,6 @@ enum LogModule
     kLogModule_SetupPayload,
     kLogModule_AppServer,
     kLogModule_Discovery,
-    kLogModule_PASE,
-    kLogModule_CASE,
 
     kLogModule_Max
 };
