@@ -25,6 +25,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <core/CHIPError.h>
+#include <lib/shell/Engine.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
@@ -40,6 +41,7 @@ using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
+using chip::Shell::Engine;
 
 namespace {
 void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -110,8 +112,15 @@ exit:
 
 void ChipLinuxAppMainLoop()
 {
+#if CHIP_ENABLE_SHELL
+    std::thread t([]() { Engine::Root().RunMainLoop(); });
+#endif
+
     // Init ZCL Data Model and CHIP App Server
     InitServer();
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+#if CHIP_ENABLE_SHELL
+    t.join();
+#endif
 }

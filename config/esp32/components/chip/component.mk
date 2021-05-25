@@ -83,6 +83,10 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
                                -lCHIP
 
+ifdef CONFIG_ENABLE_CHIP_SHELL
+COMPONENT_ADD_LDFLAGS        += -lCHIPShell
+endif
+
 ifdef CONFIG_ENABLE_PW_RPC
 COMPONENT_ADD_LDFLAGS        += -lPwRpc
 endif

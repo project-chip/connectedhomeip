@@ -30,7 +30,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
 
-chip::Shell::Shell sShellBase64Commands;
+chip::Shell::Engine sShellBase64Commands;
 
 namespace chip {
 namespace Shell {
@@ -96,7 +96,7 @@ void RegisterBase64Commands()
     sShellBase64Commands.RegisterCommands(sBase64SubCommands, ArraySize(sBase64SubCommands));
 
     // Register the root `base64` command with the top-level shell.
-    shell_register(&sBase64Command, 1);
+    Engine::Root().RegisterCommands(&sBase64Command, 1);
 }
 
 } // namespace Shell

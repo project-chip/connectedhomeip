@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,27 +15,23 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/Commands.h>
-#include <lib/shell/Engine.h>
-#include <platform/CHIPDeviceLayer.h>
+/**
+ *    @file
+ *      This file declares test entry points for CHIP system layer
+ *      library unit tests.
+ *
+ */
 
-namespace chip {
-namespace Shell {
+#pragma once
 
-void Shell::RegisterDefaultCommands()
-{
-    RegisterBase64Commands();
-    RegisterMetaCommands();
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    RegisterBLECommands();
+#include <nlunit-test.h>
+
+#ifdef __cplusplus
+extern "C" {
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    RegisterWiFiCommands();
-#endif
-#if CONFIG_DEVICE_LAYER
-    RegisterConfigCommands();
-#endif
+
+int TestStreamerStdio(void);
+
+#ifdef __cplusplus
 }
-
-} // namespace Shell
-} // namespace chip
+#endif
