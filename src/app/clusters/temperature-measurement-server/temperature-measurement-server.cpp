@@ -29,83 +29,76 @@
 
 using namespace chip;
 
+#ifndef emberAfTemperatureMeasurementClusterPrintln
+#define emberAfTemperatureMeasurementClusterPrintln(...) ChipLogProgress(Zcl, __VA_ARGS__);
+#endif
+
 EmberAfStatus emberAfTemperatureMeasurementClusterGetMeasuredValue(chip::EndpointId endpoint, int16_t * measuredValue)
 {
-    return emberAfReadAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
-                                CLUSTER_MASK_SERVER, (uint8_t *) measuredValue, sizeof(*measuredValue), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
+                                      (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 
 EmberAfStatus emberAfTemperatureMeasurementClusterGetMinMeasuredValue(chip::EndpointId endpoint, int16_t * minMeasuredValue)
 {
-    return emberAfReadAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID,
-                                CLUSTER_MASK_SERVER, (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID,
+                                      (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 
 EmberAfStatus emberAfTemperatureMeasurementClusterGetMaxMeasuredValue(chip::EndpointId endpoint, int16_t * maxMeasuredValue)
 {
-    return emberAfReadAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID,
-                                CLUSTER_MASK_SERVER, (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID,
+                                      (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 
 void emberAfTemperatureMeasurementClusterServerInitCallback(chip::EndpointId endpoint)
 {
     int16_t value        = 0;
     EmberAfStatus status = emberAfTemperatureMeasurementClusterGetMeasuredValue(endpoint, &value);
-
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(endpoint, 0);
+        status = emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(endpoint, INT16_MIN);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfTemperatureMeasurementClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 
     status = emberAfTemperatureMeasurementClusterGetMinMeasuredValue(endpoint, &value);
-
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfTemperatureMeasurementClusterSetMinMeasuredValueCallback(endpoint, INT16_MIN);
+        status = emberAfTemperatureMeasurementClusterSetMinMeasuredValueCallback(endpoint, INT16_MIN);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfTemperatureMeasurementClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 
     status = emberAfTemperatureMeasurementClusterGetMaxMeasuredValue(endpoint, &value);
-
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfTemperatureMeasurementClusterSetMaxMeasuredValueCallback(endpoint, INT16_MIN);
+        status = emberAfTemperatureMeasurementClusterSetMaxMeasuredValueCallback(endpoint, INT16_MIN);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfTemperatureMeasurementClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 }
 
 EmberAfStatus emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, int16_t measuredValue)
 {
-    EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
-                                                 CLUSTER_MASK_SERVER, (uint8_t *) &measuredValue, ZCL_INT16S_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        // emberAfTemperatureMeasurementClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
+                                       (uint8_t *) &measuredValue, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus emberAfTemperatureMeasurementClusterSetMinMeasuredValueCallback(chip::EndpointId endpoint, int16_t minMeasuredValue)
 {
-    EmberAfStatus status =
-        emberAfWriteAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID,
-                              CLUSTER_MASK_SERVER, (uint8_t *) &minMeasuredValue, ZCL_INT16S_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        // emberAfTemperatureMeasurementClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID,
+                                       (uint8_t *) &minMeasuredValue, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus emberAfTemperatureMeasurementClusterSetMaxMeasuredValueCallback(chip::EndpointId endpoint, int16_t maxMeasuredValue)
 {
-    EmberAfStatus status =
-        emberAfWriteAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID,
-                              CLUSTER_MASK_SERVER, (uint8_t *) &maxMeasuredValue, ZCL_INT16S_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        // emberAfTemperatureMeasurementClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID,
+                                       (uint8_t *) &maxMeasuredValue, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
