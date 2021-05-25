@@ -249,9 +249,13 @@ private:
                            SecureSessionMgr * msgLayer) override;
 
     void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+#if CHIP_CONFIG_TEST
+public: // Allow OnConnectionExpired to be called directly from tests.
+#endif  // CHIP_CONFIG_TEST
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     // TransportMgrDelegate interface for rendezvous sessions
+private:
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 };
 
