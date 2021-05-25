@@ -473,14 +473,9 @@ void DeviceController::PersistDevice(Device * device)
     // mainly by test applications, do not require a storage delegate. This is to
     // reduce overheads on these tests.
     // Let's make sure the delegate object is available before calling into it.
-    if (mStorageDelegate != nullptr && mState == State::Initialized)
+    if (mState == State::Initialized)
     {
-        SerializedDevice serialized;
-        device->Serialize(serialized);
-
-        // TODO: no need to base-64 the serialized values AGAIN
-        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
+        device->Persist();
     }
 }
 

@@ -273,6 +273,21 @@ exit:
     return error;
 }
 
+CHIP_ERROR Device::Persist()
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    if (mStorageDelegate != nullptr)
+    {
+        SerializedDevice serialized;
+        Serialize(serialized);
+
+        // TODO: no need to base-64 the serialized values AGAIN
+        PERSISTENT_KEY_OP(GetDeviceId(), kPairedDeviceKeyPrefix, key,
+                          error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
+    }
+    return error;
+}
+
 void Device::OnNewConnection(SecureSessionHandle session)
 {
     mState         = ConnectionState::SecureConnected;
@@ -512,11 +527,7 @@ Device::~Device()
         // message counters available next time.
         Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
         VerifyOrReturn(connectionState != nullptr);
-        SerializedDevice serialized;
-        Serialize(serialized);
-        // TODO: no need to base-64 the serialized values AGAIN
-        PERSISTENT_KEY_OP(GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
+        Persist();
     }
 }
 

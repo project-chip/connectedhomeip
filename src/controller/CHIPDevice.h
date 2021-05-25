@@ -219,6 +219,13 @@ public:
     CHIP_ERROR Deserialize(const SerializedDevice & input);
 
     /**
+     * @brief Serialize and store the Device in persistent storage
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     */
+    CHIP_ERROR Persist();
+
+    /**
      * @brief
      *   Called when a new pairing is being established
      *
