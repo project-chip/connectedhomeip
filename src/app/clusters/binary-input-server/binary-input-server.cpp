@@ -25,57 +25,57 @@
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
-static inline EmberAfStatus emberAfBinaryInputBasicClusterGetPresentValueCallback(chip::EndpointId endpoint, bool * presentValue)
+#include <support/logging/CHIPLogging.h>
+
+#ifndef emberAfBinaryInputBasicClusterPrintln
+#define emberAfBinaryInputBasicClusterPrintln(...) ChipLogProgress(Zcl, __VA_ARGS__);
+#endif
+
+EmberAfStatus emberAfBinaryInputBasicClusterGetPresentValue(chip::EndpointId endpoint, bool * presentValue)
 {
-    return emberAfReadAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_PRESENT_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                (uint8_t *) presentValue, sizeof(uint8_t), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_PRESENT_VALUE_ATTRIBUTE_ID,
+                                      (uint8_t *) presentValue, sizeof(uint8_t));
 }
 
-static inline EmberAfStatus emberAfBinaryInputBasicClusterGetOutOfServiceCallback(chip::EndpointId endpoint, bool * isOutOfService)
+EmberAfStatus emberAfBinaryInputBasicClusterGetOutOfService(chip::EndpointId endpoint, bool * isOutOfService)
 {
-    return emberAfReadAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_OUT_OF_SERVICE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                (uint8_t *) isOutOfService, sizeof(uint8_t), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_OUT_OF_SERVICE_ATTRIBUTE_ID,
+                                      (uint8_t *) isOutOfService, sizeof(uint8_t));
 }
 
 void emberAfBinaryInputBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
     bool presentValue    = false;
-    EmberAfStatus status = emberAfBinaryInputBasicClusterGetPresentValueCallback(endpoint, &presentValue);
-
+    EmberAfStatus status = emberAfBinaryInputBasicClusterGetPresentValue(endpoint, &presentValue);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfBinaryInputBasicClusterSetPresentValueCallback(endpoint, false);
+        status = emberAfBinaryInputBasicClusterSetPresentValueCallback(endpoint, false);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfBinaryInputBasicClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 
     bool isOutOfService = false;
-    status              = emberAfBinaryInputBasicClusterGetOutOfServiceCallback(endpoint, &isOutOfService);
-
+    status              = emberAfBinaryInputBasicClusterGetOutOfService(endpoint, &isOutOfService);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfBinaryInputBasicClusterSetOutOfServiceCallback(endpoint, false);
+        status = emberAfBinaryInputBasicClusterSetOutOfServiceCallback(endpoint, false);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfBinaryInputBasicClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 }
 
 EmberAfStatus emberAfBinaryInputBasicClusterSetPresentValueCallback(chip::EndpointId endpoint, bool presentValue)
 {
-    EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_PRESENT_VALUE_ATTRIBUTE_ID,
-                                                 CLUSTER_MASK_SERVER, (uint8_t *) &presentValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        emberAfBinaryInputBasicClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_PRESENT_VALUE_ATTRIBUTE_ID,
+                                       (uint8_t *) &presentValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus emberAfBinaryInputBasicClusterSetOutOfServiceCallback(chip::EndpointId endpoint, bool isOutOfService)
 {
-    EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_OUT_OF_SERVICE_ATTRIBUTE_ID,
-                                                 CLUSTER_MASK_SERVER, (uint8_t *) &isOutOfService, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        emberAfBinaryInputBasicClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_OUT_OF_SERVICE_ATTRIBUTE_ID,
+                                       (uint8_t *) &isOutOfService, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
