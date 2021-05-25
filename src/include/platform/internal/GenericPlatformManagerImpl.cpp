@@ -94,6 +94,8 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 #endif
 
+#if !defined(CHIP_CONFIG_ESP32_QEMU)
+    // TODO(#7076): esp_wifi_init is pretty unstable on esp32_qemu
     // Initialize the Connectivity Manager object.
     err = ConnectivityMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -101,6 +103,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
         ChipLogError(DeviceLayer, "Connectivity Manager initialization failed: %s", ErrorStr(err));
     }
     SuccessOrExit(err);
+#endif
 
     // Initialize the NFC Manager.
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC

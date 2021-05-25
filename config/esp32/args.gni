@@ -17,7 +17,7 @@
 
 chip_device_platform = "esp32"
 
-chip_project_config_include = ""
+chip_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
 

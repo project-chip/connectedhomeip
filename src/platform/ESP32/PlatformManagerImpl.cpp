@@ -56,9 +56,11 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#if !defined(CHIP_CONFIG_ESP32_QEMU)
     wifi_init_config_t cfg;
     uint8_t ap_mac[6];
     wifi_mode_t mode;
+#endif
 
     if (mInitialized)
     {
@@ -85,6 +87,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
     SuccessOrExit(err);
 
+#if !defined(CHIP_CONFIG_ESP32_QEMU)
+    // TODO(#7076): esp_wifi_init is pretty unstable on esp32_qemu
     // Initialize the ESP WiFi layer.
     cfg = WIFI_INIT_CONFIG_DEFAULT();
     err = esp_wifi_init(&cfg);
@@ -99,6 +103,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         err = esp_wifi_set_mac(ESP_IF_WIFI_AP, ap_mac);
         SuccessOrExit(err);
     }
+#endif
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

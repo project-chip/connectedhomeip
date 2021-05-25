@@ -27,8 +27,6 @@
 #ifndef CHIP_PROJECT_CONFIG_H
 #define CHIP_PROJECT_CONFIG_H
 
-// Enable support functions for parsing command-line arguments
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 1
-#define CHIP_CONFIG_ESP32_QEMU 1
+// Override ESP32 CHIP Config here
 
 #endif // CHIP_PROJECT_CONFIG_H

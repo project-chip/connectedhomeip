@@ -240,7 +240,7 @@ void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSui
     commandSender.Shutdown();
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = commandSender.Init(&gExchangeManager, nullptr);
+    err                            = commandSender.Init(&gStack.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = commandSender.SendCommandRequest(kTestDeviceNodeId, gAdminId);
@@ -261,9 +261,9 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
     commandHandler.Shutdown();
 
-    err = commandHandler.Init(&chip::gExchangeManager, nullptr);
+    err = commandHandler.Init(&gStack.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    commandHandler.mpExchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
+    commandHandler.mpExchangeCtx = gStack.GetExchangeManager().NewContext({ 0, 0, 0 }, nullptr);
     TestExchangeDelegate delegate;
     commandHandler.mpExchangeCtx->SetDelegate(&delegate);
     err = commandHandler.SendCommandResponse();
@@ -399,7 +399,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistComman
     CHIP_ERROR err = CHIP_NO_ERROR;
     app::CommandHandler commandHandler;
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                                       = commandHandler.Init(&chip::gExchangeManager, nullptr);
+    err                                       = commandHandler.Init(&gStack.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Use some invalid endpoint / cluster / command.
     GenerateReceivedCommand(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/, 0xDE /* endpoint */,
@@ -418,7 +418,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
     CHIP_ERROR err = CHIP_NO_ERROR;
     app::CommandHandler commandHandler;
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                                       = commandHandler.Init(&chip::gExchangeManager, nullptr);
+    err                                       = commandHandler.Init(&gStack.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     chip::isCommandDispatched = false;
     GenerateReceivedCommand(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/);
