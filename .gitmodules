@@ -78,3 +78,6 @@
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
 	branch = int/CHIPSE_Release
+[submodule "third_party/openthread/ot-nxp"]
+	path = third_party/openthread/ot-nxp
+	url = https://github.com/openthread/ot-nxp.git
