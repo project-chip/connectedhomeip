@@ -38,6 +38,9 @@
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
+#include <messaging/ExchangeMgr.h>
+#include <protocols/echo/Echo.h>
+
 #include <protocols/secure_channel/PASESession.h>
 #include <rtos/EventFlags.h>
 
@@ -52,6 +55,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace mbed;
 using namespace rtos;
+using namespace chip::Protocols::Echo;
 
 static chip::Shell::Shell sShellDateSubcommands;
 static chip::Shell::Shell sShellNetworkSubcommands;
@@ -764,38 +768,23 @@ int cmd_server_help(int argc, char ** argv)
     return 0;
 }
 
-class ServerCallback : public SecureSessionMgrDelegate
+void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle buffer)
 {
-public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           const Transport::PeerAddress & source, System::PacketBufferHandle buffer,
-                           SecureSessionMgr * mgr) override
-    {
-        char src_addr[PeerAddress::kMaxToStringSize];
-        streamer_t * sout     = streamer_get();
-        auto state            = mgr->GetPeerConnectionState(session);
-        const size_t data_len = buffer->DataLength();
+    char src_addr[PeerAddress::kMaxToStringSize];
+    streamer_t * sout     = streamer_get();
+    auto state            = ec->GetExchangeMgr()->GetSessionMgr()->GetPeerConnectionState(ec->GetSecureSession());
+    const size_t data_len = buffer->DataLength();
 
-        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
-        streamer_printf(sout, "INFO: received %d bytes from: %s\r\n", data_len, src_addr);
-        streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                        strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
-    }
+    state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+    streamer_printf(sout, "INFO: received %d bytes from: %s\r\n", data_len, src_addr);
+    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
+                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
+}
 
-    void OnReceiveError(CHIP_ERROR error, const PeerAddress & source, SecureSessionMgr * mgr) override
-    {
-        streamer_printf(streamer_get(), "ERROR: packet received error: %s\r\n", ErrorStr(error));
-    }
-
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
-    {
-        streamer_printf(streamer_get(), "INFO: Received a new connection\r\n");
-    }
-};
-
-static ServerCallback gCallbacks;
 static SecurePairingUsingTestSecret gTestPairing;
 static AdminPairingTable gAdmin;
+static EchoServer gEchoServer;
+static Messaging::ExchangeManager gExchangeMgr;
 
 int cmd_server_on(int argc, char ** argv)
 {
@@ -893,7 +882,21 @@ int cmd_server_on(int argc, char ** argv)
         }
     }
 
-    gChipServer.sessionManager->SetDelegate(&gCallbacks);
+    err = gExchangeMgr.Init(gChipServer.sessionManager);
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: Exchange manager intialization failed\r\n");
+        ExitNow(error = err;);
+    }
+
+    err = gEchoServer.Init(&gExchangeMgr);
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: Echo server intialization failed\r\n");
+        ExitNow(error = err;);
+    }
+
+    gEchoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
 
     err = gChipServer.sessionManager->NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
                                                  chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
@@ -910,6 +913,9 @@ int cmd_server_on(int argc, char ** argv)
 exit:
     if (error != CHIP_NO_ERROR)
     {
+        gEchoServer.Shutdown();
+        gExchangeMgr.Shutdown();
+
         if (gChipServer.sessionManager)
         {
             delete gChipServer.sessionManager;
@@ -937,6 +943,9 @@ int cmd_server_off(int argc, char ** argv)
         streamer_printf(sout, "ERROR: CHIP server already disabled\r\n");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    gEchoServer.Shutdown();
+    gExchangeMgr.Shutdown();
 
     if (gChipServer.sessionManager)
     {
