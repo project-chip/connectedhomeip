@@ -236,6 +236,7 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // Return early on error here, as we have not initalized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     err = Init(operationalCredentialSet, myKeyId, delegate);
@@ -243,6 +244,9 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     // We are setting the exchange context specifically before checking for error.
     // This is to make sure the exchange will get closed if Init() returned an error.
     mExchangeCtxt = exchangeCtxt;
+
+    // From here onwards, let's go to exit on error, as some state might have already
+    // been initialized
     SuccessOrExit(err);
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout);
@@ -1106,7 +1110,29 @@ CHIP_ERROR CASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
     SigmaErrorMsg * pMsg = reinterpret_cast<SigmaErrorMsg *>(msg->Start());
     ChipLogError(SecureChannel, "Received error (%d) during CASE pairing process", pMsg->error);
 
-    return pMsg->error;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    switch (pMsg->error)
+    {
+    case SigmaErrorType::kNoSharedTrustRoots:
+        err = CHIP_ERROR_CERT_NOT_TRUSTED;
+        break;
+
+    case SigmaErrorType::kUnsupportedVersion:
+        err = CHIP_ERROR_UNSUPPORTED_CASE_CONFIGURATION;
+        break;
+
+    case SigmaErrorType::kInvalidSignature:
+    case SigmaErrorType::kInvalidResumptionTag:
+    case SigmaErrorType::kUnexpected:
+        err = CHIP_ERROR_INVALID_CASE_PARAMETER;
+        break;
+
+    default:
+        err = CHIP_ERROR_INTERNAL;
+        break;
+    };
+
+    return err;
 }
 
 CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PacketHeader & packetHeader,
