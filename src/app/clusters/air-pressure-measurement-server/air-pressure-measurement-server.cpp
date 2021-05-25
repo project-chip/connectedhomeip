@@ -25,61 +25,60 @@
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
+#include <support/logging/CHIPLogging.h>
+
+#ifndef emberAfAirPressureMeasurementClusterPrintln
+#define emberAfAirPressureMeasurementClusterPrintln(...) ChipLogProgress(Zcl, __VA_ARGS__);
+#endif
+
 EmberAfStatus emberAfAirPressureMeasurementClusterGetMeasuredValue(chip::EndpointId endpoint, uint16_t * measuredValue)
 {
-    return emberAfReadAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID,
-                                ZCL_AIR_PRESSURE_MEASUREMENT_MEASURED_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                (uint8_t *) measuredValue, sizeof(*measuredValue), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID,
+                                      ZCL_AIR_PRESSURE_MEASUREMENT_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t *) measuredValue,
+                                      sizeof(*measuredValue));
 }
 
 static EmberAfStatus emberAfAirPressureMeasurementClusterSetAltitudeCallback(chip::EndpointId endpoint, int16_t altitude)
 {
-    EmberAfStatus status =
-        emberAfWriteAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID, ZCL_AIR_PRESSURE_MEASUREMENT_ALTITUDE_ATTRIBUTE_ID,
-                              CLUSTER_MASK_SERVER, (uint8_t *) &altitude, ZCL_INT16S_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        // emberAfAirPressureMeasurementClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID,
+                                       ZCL_AIR_PRESSURE_MEASUREMENT_ALTITUDE_ATTRIBUTE_ID, (uint8_t *) &altitude,
+                                       ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 void emberAfAirPressureMeasurementClusterServerInitCallback(chip::EndpointId endpoint)
 {
     uint16_t measuredValue = 0;
     EmberAfStatus status   = emberAfAirPressureMeasurementClusterGetMeasuredValue(endpoint, &measuredValue);
-
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfAirPressureMeasurementClusterSetMeasuredValueCallback(endpoint, 10132);
+        status = emberAfAirPressureMeasurementClusterSetMeasuredValueCallback(endpoint, 10132);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfAirPressureMeasurementClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 
     int16_t altitude = 0;
     status           = emberAfAirPressureMeasurementClusterGetAltitudeValue(endpoint, &altitude);
-
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void) emberAfAirPressureMeasurementClusterSetAltitudeCallback(endpoint, 0);
+        status = emberAfAirPressureMeasurementClusterSetAltitudeCallback(endpoint, 0);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfAirPressureMeasurementClusterPrintln("ERR: writing present value %x", status);
+        }
     }
 }
 
 EmberAfStatus emberAfAirPressureMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, uint16_t measuredValue)
 {
-    EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID,
-                                                 ZCL_AIR_PRESSURE_MEASUREMENT_MEASURED_VALUE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &measuredValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        // emberAfAirPressureMeasurementClusterPrintln("ERR: writing present value %x", status);
-    }
-
-    return status;
+    return emberAfWriteServerAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID,
+                                       ZCL_AIR_PRESSURE_MEASUREMENT_MEASURED_VALUE_ATTRIBUTE_ID, (uint8_t *) &measuredValue,
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus emberAfAirPressureMeasurementClusterGetAltitudeValue(chip::EndpointId endpoint, int16_t * altitude)
 {
-    return emberAfReadAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID,
-                                ZCL_AIR_PRESSURE_MEASUREMENT_ALTITUDE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, (uint8_t *) altitude,
-                                sizeof(*altitude), NULL);
+    return emberAfReadServerAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID,
+                                      ZCL_AIR_PRESSURE_MEASUREMENT_ALTITUDE_ATTRIBUTE_ID, (uint8_t *) altitude, sizeof(*altitude));
 }
