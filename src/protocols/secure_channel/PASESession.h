@@ -68,7 +68,7 @@ struct PASESessionSerializable
 
 typedef uint8_t PASEVerifier[2][kSpake2p_WS_Length];
 
-class DLL_EXPORT PASESession : public Messaging::ExchangeDelegateBase, public PairingSession
+class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
     PASESession();
