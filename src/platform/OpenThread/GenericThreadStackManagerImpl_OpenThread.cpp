@@ -813,10 +813,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
-#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL) && !defined(PW_RPC_ENABLED)
-    otCliUartInit(otInst);
-#endif
-
     mOTInst = otInst;
 
     // Arrange for OpenThread to call the OnOpenThreadStateChange method whenever a
