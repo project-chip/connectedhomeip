@@ -319,8 +319,9 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->mSecureSession == session)
         {
-            ec->Close();
-            // Continue iterate because there can be multiple contexts associated with the connection.
+            ec->OnConnectionExpired();
+            // Continue to iterate because there can be multiple exchanges
+            // associated with the connection.
         }
         return true;
     });

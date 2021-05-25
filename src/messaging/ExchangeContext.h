@@ -209,6 +209,17 @@ private:
      */
     bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
+    /**
+     * Notify the exchange that its connection has expired.
+     */
+    void OnConnectionExpired();
+
+    /**
+     * Notify our delegate, if any, that we have timed out waiting for a
+     * response.
+     */
+    void NotifyResponseTimeout();
+
     CHIP_ERROR StartResponseTimer();
 
     void CancelResponseTimer();
