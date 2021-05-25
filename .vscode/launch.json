@@ -279,7 +279,7 @@
             "type": "pickString",
             "id": "mbedApp",
             "description": "What mbed application do you want to use?",
-            "options": ["shell", "lock-app", "lighting-app"],
+            "options": ["shell", "lock-app", "lighting-app", "all-clusters-app"],
             "default": "shell"
         }
     ]
