@@ -100,7 +100,7 @@ public:
 
     /**
      *  Retrieve a CommandSender that the SDK consumer can use to send a set of commands.  If the call succeeds,
-     *  the consumer is responsible for calling Shutdown() on the CommandSender once it's done using it.
+     *  see CommandSender documentation for lifetime handling.
      *
      *  @param[out]    apCommandSender    A pointer to the CommandSender object.
      *
