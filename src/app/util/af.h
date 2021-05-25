@@ -1297,13 +1297,13 @@ EmberStatus emberAfSendMulticastWithCallback(chip::GroupId multicastId, EmberAps
 /**
  * @brief Sends unicast.
  */
-EmberStatus emberAfSendUnicast(chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+EmberStatus emberAfSendUnicast(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t messageLength,
                                uint8_t * message);
 
 /**
  * @brief Sends unicast with attached message sent callback.
  */
-EmberStatus emberAfSendUnicastWithCallback(chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+EmberStatus emberAfSendUnicastWithCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                            uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
@@ -1390,12 +1390,13 @@ EmberStatus emberAfSendCommandMulticastToBindings(void);
  * using the emberAfFill... macros from the client command API.
  * It will be sent as unicast.
  */
-EmberStatus emberAfSendCommandUnicast(chip::MessageSendDestination & destination);
+EmberStatus emberAfSendCommandUnicast(const chip::MessageSendDestination & destination);
 
 /**
  * @brief emberAfSendCommandUnicast with attached message sent callback.
  */
-EmberStatus emberAfSendCommandUnicastWithCallback(chip::MessageSendDestination & destination, EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendCommandUnicastWithCallback(const chip::MessageSendDestination & destination,
+                                                  EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends the command prepared with emberAfFill.... macro.

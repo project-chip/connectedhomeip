@@ -127,7 +127,7 @@ public:
         that.mTypeId = kInvalidType;
     }
 
-    Variant<Ts...> & operator=(Variant<Ts...> & that)
+    Variant<Ts...> & operator=(const Variant<Ts...> & that)
     {
         Curry::Destroy(mTypeId, &mData);
         mTypeId = that.mTypeId;

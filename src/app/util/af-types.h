@@ -1259,84 +1259,98 @@ namespace chip {
 class MessageSendDestination
 {
 public:
-    struct OutGoingBinding
+    struct VariantViaBinding
     {
         static constexpr const std::size_t VariantId = 1;
-        explicit OutGoingBinding(uint8_t bindingIndex) : mBindingIndex(bindingIndex) {}
+        explicit VariantViaBinding(uint8_t bindingIndex) : mBindingIndex(bindingIndex) {}
         uint8_t mBindingIndex;
     };
 
-    struct OutGoingAddressTable
+    struct VariantViaAddressTable
     {
         static constexpr const std::size_t VariantId = 2;
     };
 
-    struct OutGoingDirect
+    struct VariantDirect
     {
         static constexpr const std::size_t VariantId = 3;
-        explicit OutGoingDirect(NodeId nodeId) : mNodeId(nodeId) {}
+        explicit VariantDirect(NodeId nodeId) : mNodeId(nodeId) {}
         NodeId mNodeId;
     };
 
-    struct OutGoingMulticast
+    struct VariantMulticast
     {
         static constexpr const std::size_t VariantId = 4;
-        explicit OutGoingMulticast(GroupId groupId) : mGroupId(groupId) {}
+        explicit VariantMulticast(GroupId groupId) : mGroupId(groupId) {}
         GroupId mGroupId;
     };
 
-    struct OutGoingMulticastWithAlias
+    struct VariantMulticastWithAlias
     {
         static constexpr const std::size_t VariantId = 5;
-        explicit OutGoingMulticastWithAlias(GroupId groupId) : mGroupId(groupId) {}
+        explicit VariantMulticastWithAlias(GroupId groupId) : mGroupId(groupId) {}
         GroupId mGroupId;
     };
 
-    struct OutGoingBroadcast
+    struct VariantBroadcast
     {
         static constexpr const std::size_t VariantId = 6;
     };
 
-    struct OutGoingBroadcastWithAlias
+    struct VariantBroadcastWithAlias
     {
         static constexpr const std::size_t VariantId = 7;
     };
 
-    struct OutGoingExchange
+    struct VariantViaExchange
     {
         static constexpr const std::size_t VariantId = 8;
-        explicit OutGoingExchange(Messaging::ExchangeContext * exchangeContext) : mExchangeContext(exchangeContext) {}
+        explicit VariantViaExchange(Messaging::ExchangeContext * exchangeContext) : mExchangeContext(exchangeContext) {}
         Messaging::ExchangeContext * mExchangeContext;
     };
 
-    MessageSendDestination()                                    = default;
     MessageSendDestination(MessageSendDestination & that)       = default;
     MessageSendDestination(const MessageSendDestination & that) = default;
     MessageSendDestination(MessageSendDestination && that)      = default;
 
-    template <typename OutGoing>
-    MessageSendDestination(OutGoing && destination)
+    static MessageSendDestination ViaBinding(uint8_t bindingIndex)
     {
-        mDestination.Set<OutGoing>(std::forward<OutGoing>(destination));
+        return MessageSendDestination(VariantViaBinding(bindingIndex));
     }
 
-    std::size_t GetType() { return mDestination.GetType(); }
+    static MessageSendDestination Direct(NodeId nodeId) { return MessageSendDestination(VariantDirect(nodeId)); }
 
-    template <typename OutGoing>
-    bool Is()
+    static MessageSendDestination Multicast(GroupId groupId) { return MessageSendDestination(VariantMulticast(groupId)); }
+
+    static MessageSendDestination MulticastWithAlias(GroupId groupId)
     {
-        return mDestination.Is<OutGoing>();
+        return MessageSendDestination(VariantMulticastWithAlias(groupId));
     }
 
-    template <typename OutGoing>
-    OutGoing & Get()
+    static MessageSendDestination ViaExchange(Messaging::ExchangeContext * exchangeContext)
     {
-        return mDestination.Get<OutGoing>();
+        return MessageSendDestination(VariantViaExchange(exchangeContext));
+    }
+
+    std::size_t GetType() const { return mDestination.GetType(); }
+
+    bool IsViaBinding() const { return mDestination.Is<VariantViaBinding>(); }
+
+    template <typename Destination>
+    const Destination & Get() const
+    {
+        return mDestination.Get<Destination>();
     }
 
 private:
-    Variant<OutGoingBinding, OutGoingAddressTable, OutGoingDirect, OutGoingMulticast, OutGoingMulticastWithAlias, OutGoingBroadcast,
-            OutGoingBroadcastWithAlias, OutGoingExchange>
+    template <typename Destination>
+    MessageSendDestination(Destination && destination)
+    {
+        mDestination.Set<Destination>(std::forward<Destination>(destination));
+    }
+
+    Variant<VariantViaBinding, VariantViaAddressTable, VariantDirect, VariantMulticast, VariantMulticastWithAlias, VariantBroadcast,
+            VariantBroadcastWithAlias, VariantViaExchange>
         mDestination;
 };
 } // namespace chip
@@ -1346,8 +1360,8 @@ private:
  *
  * This function is called when a message is sent.
  */
-typedef void (*EmberAfMessageSentFunction)(chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                                           uint8_t * message, EmberStatus status);
+typedef void (*EmberAfMessageSentFunction)(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                           uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /**
  * @brief The EmberAfMessageStruct is a struct wrapper that
@@ -1359,7 +1373,7 @@ typedef struct
     EmberAfMessageSentFunction callback;
     EmberApsFrame * apsFrame;
     uint8_t * message;
-    chip::MessageSendDestination destination;
+    const chip::MessageSendDestination destination;
     uint16_t messageLength;
     bool broadcast;
 } EmberAfMessageStruct;
