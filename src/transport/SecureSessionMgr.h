@@ -94,19 +94,20 @@ public:
     CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
 #endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
+
+    // Making operator= available to tests by making it public.
 #ifdef CHIP_CONFIG_TEST
-    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
+public:
+#else
+private:
 #endif
+    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 
 private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
     friend class SecureSessionMgr;
 
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
-
-#ifndef CHIP_CONFIG_TEST
-    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
-#endif
 };
 
 /**
