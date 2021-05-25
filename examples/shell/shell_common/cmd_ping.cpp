@@ -488,5 +488,5 @@ static shell_command_t cmds_ping[] = {
 
 void cmd_ping_init()
 {
-    shell_register(cmds_ping, ArraySize(cmds_ping));
+    Engine::Root().RegisterCommands(cmds_ping, ArraySize(cmds_ping));
 }

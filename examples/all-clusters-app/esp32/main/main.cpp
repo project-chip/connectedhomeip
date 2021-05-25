@@ -49,6 +49,7 @@
 #include <app/server/Mdns.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -545,6 +546,13 @@ public:
     void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
 };
 
+#if CONFIG_ENABLE_CHIP_SHELL
+void ChipShellTask(void * args)
+{
+    chip::Shell::Engine::Root().RunMainLoop();
+}
+#endif // CONFIG_ENABLE_CHIP_SHELL
+
 } // namespace
 
 extern "C" void app_main()
@@ -598,6 +606,10 @@ extern "C" void app_main()
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
     InitServer(&callbacks);
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    xTaskCreate(&ChipShellTask, "chip_shell", 2048, NULL, 5, NULL);
+#endif
 
     SetupPretendDevices();
 

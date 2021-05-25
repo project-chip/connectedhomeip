@@ -37,14 +37,19 @@ static_library("shell") {
   output_name = "libCHIPShell"
   output_dir = "${root_out_dir}/lib"
 
-  sources = [ "Commands.cpp" ]
+  sources = []
 
   if (chip_target_style == "unix") {
     sources += [ "streamer_stdio.cpp" ]
   }
 
   if (chip_device_platform == "esp32") {
-    sources += [ "streamer_esp32.cpp" ]
+    sources += [
+      "MainLoopESP32.cpp",
+      "streamer_esp32.cpp",
+    ]
+  } else {
+    sources += [ "MainLoopDefault.cpp" ]
   }
 
   if (current_os == "zephyr") {
