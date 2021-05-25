@@ -164,84 +164,80 @@ exit:
 
 CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags)
 {
-    CHIP_ERROR err;
     ASN1Writer writer; // ASN1Writer is used to encode TBS portion of the certificate for the purpose of signature
                        // validation, which should be performed on the TBS data encoded in ASN.1 DER form.
-    ChipCertificateData * cert = nullptr;
+    ChipCertificateData cert;
+    cert.Clear();
 
     // Must be positioned on the structure element representing the certificate.
-    VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Verify we have room for the new certificate.
-    VerifyOrExit(mCertCount < mMaxCerts, err = CHIP_ERROR_NO_MEMORY);
-
-    cert = new (&mCerts[mCertCount]) ChipCertificateData();
+    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_INVALID_ARGUMENT);
 
     {
         TLVType containerType;
 
         // Enter the certificate structure...
-        err = reader.EnterContainer(containerType);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
         // Initialize an ASN1Writer and convert the TBS (to-be-signed) portion of the certificate to ASN.1 DER
         // encoding.  At the same time, parse various components within the certificate and set the corresponding
         // fields in the CertificateData object.
         writer.Init(mDecodeBuf, mDecodeBufSize);
-        err = DecodeConvertTBSCert(reader, writer, *cert);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(DecodeConvertTBSCert(reader, writer, cert));
 
         // Verify the cert has both the Subject Key Id and Authority Key Id extensions present.
         // Only certs with both these extensions are supported for the purposes of certificate validation.
-        VerifyOrExit(cert->mCertFlags.HasAll(CertFlags::kExtPresent_SubjectKeyId, CertFlags::kExtPresent_AuthKeyId),
-                     err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+        VerifyOrReturnError(cert.mCertFlags.HasAll(CertFlags::kExtPresent_SubjectKeyId, CertFlags::kExtPresent_AuthKeyId),
+                            CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
         // Verify the cert was signed with ECDSA-SHA256. This is the only signature algorithm currently supported.
-        VerifyOrExit(cert->mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, err = CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
+        VerifyOrReturnError(cert.mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
 
         // If requested, generate the hash of the TBS portion of the certificate...
         if (decodeFlags.Has(CertDecodeFlags::kGenerateTBSHash))
         {
             // Finish writing the ASN.1 DER encoding of the TBS certificate.
-            err = writer.Finalize();
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(writer.Finalize());
 
             // Generate a SHA hash of the encoded TBS certificate.
-            chip::Crypto::Hash_SHA256(mDecodeBuf, writer.GetLengthWritten(), cert->mTBSHash);
+            chip::Crypto::Hash_SHA256(mDecodeBuf, writer.GetLengthWritten(), cert.mTBSHash);
 
-            cert->mCertFlags.Set(CertFlags::kTBSHashPresent);
+            cert.mCertFlags.Set(CertFlags::kTBSHashPresent);
         }
 
         // Decode the certificate's signature...
-        err = DecodeECDSASignature(reader, *cert);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(DecodeECDSASignature(reader, cert));
 
         // Verify no more elements in the certificate.
-        err = reader.VerifyEndOfContainer();
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.VerifyEndOfContainer());
 
-        err = reader.ExitContainer(containerType);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.ExitContainer(containerType));
     }
 
     // If requested by the caller, mark the certificate as trusted.
     if (decodeFlags.Has(CertDecodeFlags::kIsTrustAnchor))
     {
-        cert->mCertFlags.Set(CertFlags::kIsTrustAnchor);
+        cert.mCertFlags.Set(CertFlags::kIsTrustAnchor);
     }
 
-    mCertCount++;
-
-exit:
-    if (err != CHIP_NO_ERROR)
+    // Check if this cert matches any currently loaded certificates
+    for (uint32_t i = 0; i < mCertCount; i++)
     {
-        if (cert != nullptr)
+        if (cert.IsEqual(mCerts[i]))
         {
-            cert->~ChipCertificateData();
+            // This cert is already loaded. Let's skip adding this cert.
+            return CHIP_NO_ERROR;
         }
     }
 
-    return err;
+    // Verify we have room for the new certificate.
+    VerifyOrReturnError(mCertCount < mMaxCerts, CHIP_ERROR_NO_MEMORY);
+
+    ChipCertificateData * new_cert = new (&mCerts[mCertCount]) ChipCertificateData();
+    memcpy(new_cert, &cert, sizeof(cert));
+
+    mCertCount++;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipCertificateSet::LoadCerts(const uint8_t * chipCerts, uint32_t chipCertsLen, BitFlags<CertDecodeFlags> decodeFlags)
@@ -616,6 +612,21 @@ void ChipCertificateData::Clear()
     mSignature.S       = nullptr;
     mSignature.SLen    = 0;
     memset(mTBSHash, 0, sizeof(mTBSHash));
+}
+
+bool ChipCertificateData::IsEqual(const ChipCertificateData & other) const
+{
+    return mSubjectDN.IsEqual(other.mSubjectDN) && mIssuerDN.IsEqual(other.mIssuerDN) &&
+        mSubjectKeyId.IsEqual(other.mSubjectKeyId) && mAuthKeyId.IsEqual(other.mAuthKeyId) &&
+        (mNotBeforeTime == other.mNotBeforeTime) && (mNotAfterTime == other.mNotAfterTime) &&
+        (mPublicKeyLen == other.mPublicKeyLen) && (memcmp(mPublicKey, other.mPublicKey, mPublicKeyLen) == 0) &&
+        (mPubKeyCurveOID == other.mPubKeyCurveOID) && (mPubKeyAlgoOID == other.mPubKeyAlgoOID) &&
+        (mSigAlgoOID == other.mSigAlgoOID) && (mCertFlags.Raw() == other.mCertFlags.Raw()) &&
+        (mKeyUsageFlags.Raw() == other.mKeyUsageFlags.Raw()) && (mKeyPurposeFlags.Raw() == other.mKeyPurposeFlags.Raw()) &&
+        (mPathLenConstraint == other.mPathLenConstraint) && (mSignature.RLen == other.mSignature.RLen) &&
+        (memcmp(mSignature.R, other.mSignature.R, mSignature.RLen) == 0) && (mSignature.SLen == other.mSignature.SLen) &&
+        (memcmp(mSignature.S, other.mSignature.S, mSignature.SLen) == 0) &&
+        (memcmp(mTBSHash, other.mTBSHash, sizeof(mTBSHash)) == 0);
 }
 
 void ValidationContext::Reset()
