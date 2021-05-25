@@ -172,7 +172,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
  *  TODO: The endpoint id on response command (client side command) is unclear, so we don't have a ClientClusterCommandExists
  * function. (Spec#3258)
  *
- *  @retval  If the endpoint contains the cluster and command.
+ *  @retval  True if the endpoint contains the server side of the given cluster and that cluster implements the given command, false
+ * otherwise.
  */
 bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId);
 CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter);
