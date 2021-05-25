@@ -83,7 +83,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
 {
     // Mock cluster catalog, only support one command on one cluster on one endpoint.
-    return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestEndpointId);
+    return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestCommandId);
 }
 
 class TestCommandInteraction
