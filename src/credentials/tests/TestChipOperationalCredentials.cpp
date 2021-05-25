@@ -216,8 +216,8 @@ static void TestChipOperationalCredentials_Serialization(nlTestSuite * inSuite, 
                    serializedKeypair.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len) ==
                        CHIP_NO_ERROR);
 
-    memcpy((uint8_t *) (serializedKeypair), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (serializedKeypair) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+    memcpy(static_cast<uint8_t *>(serializedKeypair), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+    memcpy(static_cast<uint8_t *>(serializedKeypair) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
            sTestCert_Node01_01_PrivateKey_Len);
 
     NL_TEST_ASSERT(inSuite, keypair.Deserialize(serializedKeypair) == CHIP_NO_ERROR);
@@ -232,12 +232,7 @@ static void TestChipOperationalCredentials_Serialization(nlTestSuite * inSuite, 
     NL_TEST_ASSERT(inSuite, opCredSet2.FromSerializable(sSerialized) == CHIP_NO_ERROR);
 
     const CertificateKeyId * trustedRootId2 = opCredSet2.GetTrustedRootId(static_cast<uint16_t>(opCredSet2.GetCertCount() - 1));
-    NL_TEST_ASSERT(inSuite, trustedRootId2 != nullptr);
-
-    NL_TEST_ASSERT(inSuite, trustedRootId2->mLen == trustedRootId->mLen);
-    NL_TEST_ASSERT(inSuite,
-                   strncmp(reinterpret_cast<const char *>(trustedRootId2->mId), reinterpret_cast<const char *>(trustedRootId->mId),
-                           trustedRootId->mLen) == 0);
+    NL_TEST_ASSERT(inSuite, trustedRootId2->IsEqual(*trustedRootId));
 
     NL_TEST_ASSERT(inSuite, opCredSet2.ToSerializable(*trustedRootId2, sSerialized2) == CHIP_NO_ERROR);
 

@@ -56,8 +56,6 @@ struct OperationalCredentialSerializable
     uint8_t mRootCertificate[kOperationalCertificateMaxSize];
     uint16_t mCACertificateLen;
     uint8_t mCACertificate[kOperationalCertificateMaxSize];
-    uint16_t mLeafCertificateLen;
-    uint8_t mLeafCertificate[kOperationalCertificateMaxSize];
 };
 
 struct NodeCredentialMap

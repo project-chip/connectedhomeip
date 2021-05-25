@@ -278,10 +278,8 @@ CHIP_ERROR OperationalCredentialSet::ToSerializable(const CertificateKeyId & tru
     P256SerializedKeypair serializedKeypair;
     ChipCertificateSet * certificateSet  = FindCertSet(trustedRootId);
     const ChipCertificateData * dataSet  = nullptr;
-    uint8_t * ptrSerializableCerts[]     = { serializable.mRootCertificate, serializable.mCACertificate,
-                                         serializable.mLeafCertificate };
-    uint16_t * ptrSerializableCertsLen[] = { &serializable.mRootCertificateLen, &serializable.mCACertificateLen,
-                                             &serializable.mLeafCertificateLen };
+    uint8_t * ptrSerializableCerts[]     = { serializable.mRootCertificate, serializable.mCACertificate };
+    uint16_t * ptrSerializableCertsLen[] = { &serializable.mRootCertificateLen, &serializable.mCACertificateLen };
 
     VerifyOrReturnError(certificateSet != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(keypair->Serialize(serializedKeypair));
@@ -325,9 +323,12 @@ CHIP_ERROR OperationalCredentialSet::FromSerializable(const OperationalCredentia
     trustedRootId.mId  = certificateSet.GetLastCert()->mAuthKeyId.mId;
     trustedRootId.mLen = certificateSet.GetLastCert()->mAuthKeyId.mLen;
 
-    err = certificateSet.LoadCert(serializable.mCACertificate, serializable.mCACertificateLen,
-                                  BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
-    SuccessOrExit(err);
+    if (serializable.mCACertificateLen != 0)
+    {
+        err = certificateSet.LoadCert(serializable.mCACertificate, serializable.mCACertificateLen,
+                                      BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
+        SuccessOrExit(err);
+    }
 
     LoadCertSet(&certificateSet);
 
