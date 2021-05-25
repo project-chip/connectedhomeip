@@ -346,7 +346,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockSessionEstablishmentDelegate mockSender;
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fix in PR 3602
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
