@@ -174,11 +174,16 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    event.Type                                  = DeviceLayer::DeviceEventType::kInteractionModelReadRequest;
-    event.ChipInteractionModelEvent.ExchangeCtx = mpExchangeCtx;
-    event.ChipInteractionModelEvent.Payload     = std::move(msgBuf).UnsafeRelease();
-    event.ChipInteractionModelEvent.SendFlags   = Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Raw();
+    event.Type                              = DeviceLayer::DeviceEventType::kInteractionModelReadRequest;
+    event.InteractionModelEvent.ExchangeCtx = mpExchangeCtx;
 
+    // ChipDeviceEvent can only contains the structures with trivial copy assignment operator, so we can't use PacketBufferHandle
+    // and SendFlags directly within ChipDeviceEvent.
+    event.InteractionModelEvent.Payload   = std::move(msgBuf).UnsafeRelease();
+    event.InteractionModelEvent.SendFlags = Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Raw();
+
+    // Currently, Interaction Model protocol is implemented in app thread instead of CHIP thread, we need to lock CHIP stack to
+    // prevent it from operating before we post an event to the event queue associated with the CHIP thread.
     DeviceLayer::PlatformMgr().LockChipStack();
     DeviceLayer::PlatformMgr().PostEvent(&event);
     DeviceLayer::PlatformMgr().UnlockChipStack();

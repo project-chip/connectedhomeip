@@ -31,7 +31,6 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
-#include <protocols/temp_zcl/TempZCL.h>
 
 namespace chip {
 namespace app {
@@ -257,59 +256,29 @@ void InteractionModelEngine::OnEventHandler(const DeviceLayer::ChipDeviceEvent *
     System::PacketBufferHandle msgBuf;
     Messaging::SendFlags sendFlags;
 
+    ChipLogDetail(DataManagement, "Received Interaction Model Event of type: %d", event->Type);
+
     switch (event->Type)
     {
-    case DeviceLayer::DeviceEventType::kInteractionModelReportData:
-        exchangeCtx = event->ChipInteractionModelEvent.ExchangeCtx;
-        VerifyOrReturn(exchangeCtx != nullptr);
-
-        VerifyOrReturn(event->ChipInteractionModelEvent.Payload != nullptr);
-        msgBuf = System::PacketBufferHandle::Adopt(event->ChipInteractionModelEvent.Payload);
-        err    = exchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf));
-        break;
     case DeviceLayer::DeviceEventType::kInteractionModelReadRequest:
-        exchangeCtx = event->ChipInteractionModelEvent.ExchangeCtx;
+        exchangeCtx = event->InteractionModelEvent.ExchangeCtx;
         VerifyOrReturn(exchangeCtx != nullptr);
 
-        VerifyOrReturn(event->ChipInteractionModelEvent.Payload != nullptr);
-        msgBuf = System::PacketBufferHandle::Adopt(event->ChipInteractionModelEvent.Payload);
-        err    = exchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf));
+        VerifyOrReturn(event->InteractionModelEvent.Payload != nullptr);
+        msgBuf = System::PacketBufferHandle::Adopt(event->InteractionModelEvent.Payload);
+
+        sendFlags.SetRaw(event->InteractionModelEvent.SendFlags);
+        err = exchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf), sendFlags);
         break;
     case DeviceLayer::DeviceEventType::kInteractionModelCommandRequest:
-        exchangeCtx = event->ChipInteractionModelEvent.ExchangeCtx;
+        exchangeCtx = event->InteractionModelEvent.ExchangeCtx;
         VerifyOrReturn(exchangeCtx != nullptr);
 
-        VerifyOrReturn(event->ChipInteractionModelEvent.Payload != nullptr);
-        msgBuf = System::PacketBufferHandle::Adopt(event->ChipInteractionModelEvent.Payload);
-        err    = exchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(msgBuf));
-        break;
-    case DeviceLayer::DeviceEventType::kInteractionModelCommandResponse:
-        exchangeCtx = event->ChipInteractionModelEvent.ExchangeCtx;
-        VerifyOrReturn(exchangeCtx != nullptr);
+        VerifyOrReturn(event->InteractionModelEvent.Payload != nullptr);
+        msgBuf = System::PacketBufferHandle::Adopt(event->InteractionModelEvent.Payload);
 
-        VerifyOrReturn(event->ChipInteractionModelEvent.Payload != nullptr);
-        msgBuf = System::PacketBufferHandle::Adopt(event->ChipInteractionModelEvent.Payload);
-        err    = exchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(msgBuf));
-        break;
-    case DeviceLayer::DeviceEventType::kInteractionModelTempZCLRequest:
-        exchangeCtx = event->ChipInteractionModelEvent.ExchangeCtx;
-        VerifyOrReturn(exchangeCtx != nullptr);
-
-        VerifyOrReturn(event->ChipInteractionModelEvent.Payload != nullptr);
-        msgBuf = System::PacketBufferHandle::Adopt(event->ChipInteractionModelEvent.Payload);
-
-        sendFlags.SetRaw(event->ChipInteractionModelEvent.SendFlags);
-        err = exchangeCtx->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, std::move(msgBuf), sendFlags);
-        break;
-    case DeviceLayer::DeviceEventType::kInteractionModelTempZCLResponse:
-        exchangeCtx = event->ChipInteractionModelEvent.ExchangeCtx;
-        VerifyOrReturn(exchangeCtx != nullptr);
-
-        VerifyOrReturn(event->ChipInteractionModelEvent.Payload != nullptr);
-        msgBuf = System::PacketBufferHandle::Adopt(event->ChipInteractionModelEvent.Payload);
-
-        sendFlags.SetRaw(event->ChipInteractionModelEvent.SendFlags);
-        err = exchangeCtx->SendMessage(Protocols::TempZCL::MsgType::TempZCLResponse, std::move(msgBuf), sendFlags);
+        sendFlags.SetRaw(event->InteractionModelEvent.SendFlags);
+        err = exchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(msgBuf), sendFlags);
         break;
     default:
         break;
@@ -317,8 +286,7 @@ void InteractionModelEngine::OnEventHandler(const DeviceLayer::ChipDeviceEvent *
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement,
-                     "Default ReadSingleClusterData is called, this should be replaced by actual dispatched for cluster");
+        ChipLogError(DataManagement, "OnEventHandler: Failed to send message with error: %s", ErrorStr(err));
     }
 }
 

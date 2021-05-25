@@ -208,12 +208,17 @@ enum PublicEventTypes
      */
     kOperationalNetworkEnabled,
 
-    kInteractionModelReportData,
+    /**
+     * Singals Read Request Action is generated when an initiator wishes to determine the value of one or more attributes
+     * or events located on one or more other nodes.
+     */
     kInteractionModelReadRequest,
+
+    /**
+     * Singals Invoke Command Action is generated when a device wishes to invoke one or more cluster specific commands on
+     * one or more nodes.
+     */
     kInteractionModelCommandRequest,
-    kInteractionModelCommandResponse,
-    kInteractionModelTempZCLRequest,
-    kInteractionModelTempZCLResponse,
 };
 
 /**
@@ -433,7 +438,7 @@ struct ChipDeviceEvent final
             Messaging::ExchangeContext * ExchangeCtx;
             System::PacketBuffer * Payload;
             uint16_t SendFlags;
-        } ChipInteractionModelEvent;
+        } InteractionModelEvent;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }
