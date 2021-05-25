@@ -24,14 +24,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import chip.devicecontroller.ChipDeviceControllerException
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.util.DeviceIdUtil
+import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.channelEd
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.masterKeyEd
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.panIdEd
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.xpanIdEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.*
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.view.*
+import kotlinx.android.synthetic.main.on_off_client_fragment.*
 
 /**
  * Fragment to collect Wi-Fi network information from user and send it to device being provisioned.
@@ -114,7 +118,18 @@ class EnterNetworkFragment : Fragment() {
       return
     }
 
-    // Do something with the credentials
+    try {
+      ChipClient.getDeviceController().enableThreadNetwork(
+          DeviceIdUtil.getLastDeviceId(requireContext()),
+          channelStr.toString().toInt(),
+          panIdStr.toString().toInt(16),
+          xpanIdStr.hexToByteArray(),
+          masterKeyStr.hexToByteArray())
+    } catch (e: ChipDeviceControllerException) {
+      Toast.makeText(requireContext(), R.string.rendezvous_over_ble_commissioning_failure_text, Toast.LENGTH_SHORT).show()
+      FragmentUtil.getHost(this, DeviceProvisioningFragment.Callback::class.java)
+          ?.onCommissioningComplete(e.errorCode)
+    }
   }
 
   private fun String.hexToByteArray(): ByteArray {
