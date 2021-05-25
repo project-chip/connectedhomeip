@@ -222,17 +222,17 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Secu
     ExchangeMessageDispatch * dispatch = nullptr;
     if (delegate != nullptr)
     {
-        // If there's a delegate, get the dispatch object from it.
         dispatch = delegate->GetMessageDispatch(em->GetReliableMessageMgr(), em->GetSessionMgr());
+        if (dispatch == nullptr)
+        {
+            dispatch = &em->mDefaultExchangeDispatch;
+        }
     }
-
-    // If the delegate is not provided, or the delegate hasn't provided a dispatch object, let's use
-    // the default delegate object
-    if (dispatch == nullptr)
+    else
     {
         dispatch = &em->mDefaultExchangeDispatch;
-        VerifyOrDie(dispatch != nullptr);
     }
+    VerifyOrDie(dispatch != nullptr);
     mDispatch = dispatch->Retain();
 
     SetDropAckDebug(false);
