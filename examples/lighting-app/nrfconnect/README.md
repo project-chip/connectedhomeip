@@ -462,14 +462,20 @@ CHIP-enabled Thread network.
 
 ### Testing Device Firmware Upgrade
 
-> **_NOTE:_** Currently performing DFU over BLE is supported only using smartphone with dedicated
-> Nordic application installed.
+> **_NOTE:_** Currently performing DFU over BLE is supported only using
+> smartphone with dedicated Nordic application installed.
 
-To upgrade your device firmware over Bluetooth LE using smartphone, complete the following tasks:
+To upgrade your device firmware over Bluetooth LE using smartphone, complete the
+following tasks:
 
-1. Install on your smartphone [nRF Connect for Mobile](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Connect-for-mobile) or [nRF Toolbox](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Toolbox) application.
+1. Install on your smartphone
+   [nRF Connect for Mobile](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Connect-for-mobile)
+   or
+   [nRF Toolbox](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Toolbox)
+   application.
 2. Push **Button 4** on the device to start Bluetooth LE advertising.
 3. Push **Button 1** on the device to enable software update functionality.
-4. Follow the instructions in the section about downloading the new image to a device on the
-[FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
-page in the nRF Connect documentation.
+4. Follow the instructions in the section about downloading the new image to a
+   device on the
+   [FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
+   page in the nRF Connect documentation.
