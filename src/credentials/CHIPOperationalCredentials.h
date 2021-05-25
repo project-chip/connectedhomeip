@@ -246,9 +246,10 @@ public:
      *  @brief
      *    Reconstruct OperationalCredentialSet class from the serializable data structure.
      *
-     *    This method must be called after initializing the OperationalCredentialSet class with internal allocation
+     *    This method must be called after initializing the OperationalCredentialSet class with internal allocation.
+     *    No references/pointers to the input parameter are made. The input parameter can be freed after calling this method.
      */
-    CHIP_ERROR FromSerializable(const OperationalCredentialSerializable & output);
+    CHIP_ERROR FromSerializable(const OperationalCredentialSerializable & input);
 
     P256Keypair & GetDevOpCredKeypair(const CertificateKeyId & trustedRootId) { return *GetNodeKeypairAt(trustedRootId); }
 

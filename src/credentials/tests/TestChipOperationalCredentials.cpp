@@ -40,10 +40,15 @@ enum
                              // (in either CHIP or DER form), or to decode the certificates.
 };
 
+namespace {
 static const BitFlags<CertDecodeFlags> sGenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
 static const BitFlags<CertDecodeFlags> sTrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
 
 static const BitFlags<TestCertLoadFlags> sNullLoadFlag;
+
+static OperationalCredentialSerializable sSerialized;
+static OperationalCredentialSerializable sSerialized2;
+} // namespace
 
 static CHIP_ERROR SetEffectiveTime(ValidationContext & validContext, uint16_t year, uint8_t mon, uint8_t day, uint8_t hour = 0,
                                    uint8_t min = 0, uint8_t sec = 0)
@@ -192,8 +197,6 @@ static void TestChipOperationalCredentials_Serialization(nlTestSuite * inSuite, 
     {
         kMaxCerts = 2
     };
-    OperationalCredentialSerializable serialized;
-    OperationalCredentialSerializable serialized2;
 
     // Initialize the certificate set and load the specified test certificates.
     certSet.Init(kMaxCerts, kTestCertBufSize);
@@ -225,8 +228,8 @@ static void TestChipOperationalCredentials_Serialization(nlTestSuite * inSuite, 
                    opCredSet.SetDevOpCred(*trustedRootId, sTestCert_Node01_01_Chip,
                                           static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len)) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, opCredSet.ToSerializable(*trustedRootId, serialized) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, opCredSet2.FromSerializable(serialized) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, opCredSet.ToSerializable(*trustedRootId, sSerialized) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, opCredSet2.FromSerializable(sSerialized) == CHIP_NO_ERROR);
 
     const CertificateKeyId * trustedRootId2 = opCredSet2.GetTrustedRootId(static_cast<uint16_t>(opCredSet2.GetCertCount() - 1));
     NL_TEST_ASSERT(inSuite, trustedRootId2 != nullptr);
@@ -236,11 +239,11 @@ static void TestChipOperationalCredentials_Serialization(nlTestSuite * inSuite, 
                    strncmp(reinterpret_cast<const char *>(trustedRootId2->mId), reinterpret_cast<const char *>(trustedRootId->mId),
                            trustedRootId->mLen) == 0);
 
-    NL_TEST_ASSERT(inSuite, opCredSet2.ToSerializable(*trustedRootId2, serialized2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, opCredSet2.ToSerializable(*trustedRootId2, sSerialized2) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   strncmp(reinterpret_cast<const char *>(&serialized), reinterpret_cast<const char *>(&serialized2),
-                           sizeof(serialized)) == 0);
+                   strncmp(reinterpret_cast<const char *>(&sSerialized), reinterpret_cast<const char *>(&sSerialized2),
+                           sizeof(sSerialized)) == 0);
 
     // Clear the certificate set.
     certSet.Release();

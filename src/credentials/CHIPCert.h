@@ -442,8 +442,8 @@ public:
      *
      * @param reader       A TLVReader positioned at the CHIP certificate TLV structure.
      * @param decodeFlags  Certificate decoding option flags.
-     * @param chipCert     Buffer containing certificate encoded on CHIP format.
-     * @param chipCertLen  The length of the certificate buffer.
+     * @param chipCert     Buffer containing certificate encoded on CHIP format. It is required that this CHIP certificate
+     *                     in chipCert ByteSpan stays valid while the certificate data in the set is used.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
