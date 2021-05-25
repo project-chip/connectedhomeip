@@ -213,6 +213,12 @@
 #define CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER
 #endif
 
+#if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER { ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, 57, "Bridged Device Basic" },
+#else
+#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER
+#endif
+
 #if defined(ZCL_USING_SWITCH_CLUSTER_SERVER) || defined(ZCL_USING_SWITCH_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_SWITCH_CLUSTER { ZCL_SWITCH_CLUSTER_ID, 59, "Switch" },
 #else
@@ -230,6 +236,12 @@
     { ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID, 63, "Trusted Root Certificates" },
 #else
 #define CHIP_PRINTCLUSTER_TRUSTED_ROOT_CERTIFICATES_CLUSTER
+#endif
+
+#if defined(ZCL_USING_FIXED_LABEL_CLUSTER_SERVER) || defined(ZCL_USING_FIXED_LABEL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER { ZCL_FIXED_LABEL_CLUSTER_ID, 64, "Fixed Label" },
+#else
+#define CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER
 #endif
 
 #if defined(ZCL_USING_SHADE_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_SHADE_CONFIG_CLUSTER_CLIENT)
@@ -951,9 +963,11 @@
     CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_TRUSTED_ROOT_CERTIFICATES_CLUSTER                                                                            \
+    CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \

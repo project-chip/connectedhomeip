@@ -277,6 +277,13 @@ typedef struct _IasAceZoneStatusResult
 // this will result in all the references to the data being as uint8_t*
 typedef uint8_t EmberAfIdentity;
 
+// Struct for LabelStruct
+typedef struct _LabelStruct
+{
+    chip::ByteSpan label;
+    chip::ByteSpan value;
+} EmberAfLabelStruct;
+
 // Struct for MediaInputInfo
 typedef struct _MediaInputInfo
 {

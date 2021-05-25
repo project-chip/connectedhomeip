@@ -113,6 +113,9 @@
 // Definitions for cluster: Ethernet Network Diagnostics
 #define ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID (0x0037)
 
+// Definitions for cluster: Bridged Device Basic
+#define ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID (0x0039)
+
 // Definitions for cluster: Switch
 #define ZCL_SWITCH_CLUSTER_ID (0x003B)
 
@@ -121,6 +124,9 @@
 
 // Definitions for cluster: Trusted Root Certificates
 #define ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID (0x003F)
+
+// Definitions for cluster: Fixed Label
+#define ZCL_FIXED_LABEL_CLUSTER_ID (0x0040)
 
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)

@@ -548,6 +548,26 @@
 #define ZCL_CARRIER_DETECT_ATTRIBUTE_ID (0x0007)
 #define ZCL_TIME_SINCE_RESET_ATTRIBUTE_ID (0x0008)
 
+// Attribute ids for cluster: Bridged Device Basic
+
+// Client attributes
+
+// Server attributes
+#define ZCL_VENDOR_NAME_ATTRIBUTE_ID (0x0001)
+#define ZCL_VENDOR_ID_ATTRIBUTE_ID (0x0002)
+#define ZCL_PRODUCT_NAME_ATTRIBUTE_ID (0x0003)
+#define ZCL_USER_LABEL_ATTRIBUTE_ID (0x0005)
+#define ZCL_HARDWARE_VERSION_ATTRIBUTE_ID (0x0007)
+#define ZCL_HARDWARE_VERSION_STRING_ATTRIBUTE_ID (0x0008)
+#define ZCL_SOFTWARE_VERSION_ATTRIBUTE_ID (0x0009)
+#define ZCL_SOFTWARE_VERSION_STRING_ATTRIBUTE_ID (0x000A)
+#define ZCL_MANUFACTURING_DATE_ATTRIBUTE_ID (0x000B)
+#define ZCL_PART_NUMBER_ATTRIBUTE_ID (0x000C)
+#define ZCL_PRODUCT_URL_ATTRIBUTE_ID (0x000D)
+#define ZCL_PRODUCT_LABEL_ATTRIBUTE_ID (0x000E)
+#define ZCL_SERIAL_NUMBER_ATTRIBUTE_ID (0x000F)
+#define ZCL_REACHABLE_ATTRIBUTE_ID (0x0011)
+
 // Attribute ids for cluster: Switch
 
 // Client attributes
@@ -569,6 +589,13 @@
 // Client attributes
 
 // Server attributes
+
+// Attribute ids for cluster: Fixed Label
+
+// Client attributes
+
+// Server attributes
+#define ZCL_LABEL_LIST_ATTRIBUTE_ID (0x0000)
 
 // Attribute ids for cluster: Shade Configuration
 
