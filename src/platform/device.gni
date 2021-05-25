@@ -56,7 +56,8 @@ declare_args() {
   } else {
     chip_mdns = "none"
   }
-  chip_use_clusters_for_ip_commissioning = 0
+  # Enables full cluster-based commissioning for already-on-network devices.
+  chip_use_clusters_for_ip_commissioning = false
 }
 
 _chip_device_layer = "none"

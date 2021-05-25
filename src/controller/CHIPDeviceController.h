@@ -27,7 +27,6 @@
  */
 
 #pragma once
-#include <memory>
 
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
@@ -280,10 +279,7 @@ protected:
     PersistentStorageDelegate * mStorageDelegate;
     DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    static constexpr size_t kMaxAddrUpdateDelegates                                     = 2;
-    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate[kMaxAddrUpdateDelegates] = {};
-    CHIP_ERROR RegisterAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate);
-    CHIP_ERROR UnregisterAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate);
+    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
@@ -317,6 +313,13 @@ protected:
 
     uint16_t mNextKeyId = 0;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    //////////// ResolverDelegate Implementation ///////////////
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+
 private:
     //////////// ExchangeDelegate Implementation ///////////////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -326,13 +329,6 @@ private:
     //////////// ExchangeMgrDelegate Implementation ///////////////
     void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    //////////// ResolverDelegate Implementation ///////////////
-    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
 
@@ -366,11 +362,7 @@ public:
  *   required to provide write access to the persistent storage, where the paired device information
  *   will be stored.
  */
-class DLL_EXPORT DeviceCommissioner : public DeviceController,
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-                                      public DeviceAddressUpdateDelegate,
-#endif
-                                      public SessionEstablishmentDelegate
+class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEstablishmentDelegate
 
 {
 public:
@@ -427,11 +419,6 @@ public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
-    //////////// DeviceAddressUpdateDelegate Implementation ///////////////
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
-#endif
-
     void RendezvousCleanup(CHIP_ERROR status);
 
     void ReleaseDevice(Device * device) override;
@@ -478,6 +465,9 @@ public:
      * @return int  The max number of commissionable nodes supported
      */
     int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
+
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
 
 #endif
 
@@ -578,10 +568,8 @@ private:
                             const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
 
     // Cluster callbacks for advancing commissioning flows
-    std::unique_ptr<Callback::Callback<BasicSuccessCallback>> success =
-        std::make_unique<Callback::Callback<BasicSuccessCallback>>(BasicSuccess, this);
-    std::unique_ptr<Callback::Callback<BasicFailureCallback>> failure =
-        std::make_unique<Callback::Callback<BasicFailureCallback>>(BasicFailure, this);
+    Callback::Callback<BasicSuccessCallback> mSuccess;
+    Callback::Callback<BasicFailureCallback> mFailure;
 
     CommissioningStage GetNextCommissioningStage();
 

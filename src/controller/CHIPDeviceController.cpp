@@ -229,7 +229,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
         err = Mdns::Resolver::Instance().SetResolverDelegate(this);
         SuccessOrExit(err);
 
-        mDeviceAddressUpdateDelegate[0] = params.mDeviceAddressUpdateDelegate;
+        mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
     }
     Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
@@ -370,10 +370,7 @@ CHIP_ERROR DeviceController::Shutdown()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     Mdns::Resolver::Instance().SetResolverDelegate(nullptr);
-    for (size_t i = 0; i < kMaxAddrUpdateDelegates; ++i)
-    {
-        mDeviceAddressUpdateDelegate[i] = nullptr;
-    }
+    mDeviceAddressUpdateDelegate = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     return CHIP_NO_ERROR;
@@ -719,33 +716,6 @@ void DeviceController::PersistNextKeyId()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-
-CHIP_ERROR DeviceController::RegisterAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate)
-{
-    for (size_t i = 0; i < kMaxAddrUpdateDelegates; ++i)
-    {
-        if (mDeviceAddressUpdateDelegate[i] == nullptr || mDeviceAddressUpdateDelegate[i] == delegate)
-        {
-            mDeviceAddressUpdateDelegate[i] = delegate;
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_NO_MEMORY;
-}
-
-CHIP_ERROR DeviceController::UnregisterAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate)
-{
-    for (size_t i = 0; i < kMaxAddrUpdateDelegates; ++i)
-    {
-        if (mDeviceAddressUpdateDelegate[i] == delegate)
-        {
-            mDeviceAddressUpdateDelegate[i] = nullptr;
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_KEY_NOT_FOUND;
-}
-
 void DeviceController::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -761,12 +731,9 @@ void DeviceController::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nod
 
 exit:
 
-    for (size_t i = 0; i < kMaxAddrUpdateDelegates; ++i)
+    if (mDeviceAddressUpdateDelegate != nullptr)
     {
-        if (mDeviceAddressUpdateDelegate[i] != nullptr)
-        {
-            mDeviceAddressUpdateDelegate[i]->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), err);
-        }
+        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), err);
     }
     return;
 };
@@ -775,12 +742,9 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
 {
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
 
-    for (size_t i = 0; i < kMaxAddrUpdateDelegates; ++i)
+    if (mDeviceAddressUpdateDelegate != nullptr)
     {
-        if (mDeviceAddressUpdateDelegate[i] != nullptr)
-        {
-            mDeviceAddressUpdateDelegate[i]->OnAddressUpdateComplete(peer.GetNodeId(), error);
-        }
+        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
     }
 };
 
@@ -822,6 +786,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 }
 
 DeviceCommissioner::DeviceCommissioner() :
+    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this),
     mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
     mOpCertResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
     mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddOpCertFailureResponse, this),
@@ -1574,7 +1539,7 @@ void BasicFailure(void * context, uint8_t status)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-void DeviceCommissioner::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error)
+void DeviceCommissioner::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
     Device * device = nullptr;
     if (mDeviceBeingPaired >= kNumMaxActiveDevices)
@@ -1583,12 +1548,29 @@ void DeviceCommissioner::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error
     }
 
     device = &mActiveDevices[mDeviceBeingPaired];
-    if (device->GetDeviceId() == nodeId && mCommissioningStage == CommissioningStage::kFindOperational)
+    if (device->GetDeviceId() == nodeData.mPeerId.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
     {
-        UnregisterAddressUpdateDelegate(this);
-        AdvanceCommissioningStage(error);
+        AdvanceCommissioningStage(CHIP_NO_ERROR);
     }
+    DeviceController::OnNodeIdResolved(nodeData);
 }
+
+void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
+{
+    Device * device = nullptr;
+    if (mDeviceBeingPaired >= kNumMaxActiveDevices)
+    {
+        return;
+    }
+
+    device = &mActiveDevices[mDeviceBeingPaired];
+    if (device->GetDeviceId() == peer.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
+    {
+        OnSessionEstablishmentError(error);
+    }
+    DeviceController::OnNodeIdResolutionFailed(peer, error);
+}
+
 #endif
 
 CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
@@ -1667,7 +1649,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         uint16_t commissioningExpirySeconds = 5;
         // TODO: should get the endpoint information from the descriptor cluster.
         genCom.Associate(device, 0);
-        genCom.ArmFailSafe(success->Cancel(), failure->Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
+        genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
@@ -1708,7 +1690,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
-        genCom.SetRegulatoryConfig(success->Cancel(), failure->Cancel(), static_cast<uint8_t>(regulatoryLocation), countryCode,
+        genCom.SetRegulatoryConfig(mSuccess.Cancel(), mFailure.Cancel(), static_cast<uint8_t>(regulatoryLocation), countryCode,
                                    breadcrumb, kCommandTimeoutMs);
     }
     break;
@@ -1744,14 +1726,13 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         // will cause an error to be sent back. At that point, we should scan and we shoud see the proper ethernet network ID
         // returned in the scan results. For now, we use magic.
         char magicNetworkEnableCode[] = "ETH0";
-        netCom.EnableNetwork(success->Cancel(), failure->Cancel(),
+        netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(),
                              ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
                              breadcrumb, kCommandTimeoutMs);
     }
     break;
     case CommissioningStage::kFindOperational: {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-        RegisterAddressUpdateDelegate(this);
         ChipLogProgress(Controller, "Finding node on operational network");
         Mdns::Resolver::Instance().ResolveNodeId(PeerId().SetFabricId(0).SetNodeId(device->GetDeviceId()),
                                                  Inet::IPAddressType::kIPAddressType_Any);
@@ -1763,7 +1744,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Calling commissioning complete");
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
-        genCom.CommissioningComplete(success->Cancel(), failure->Cancel());
+        genCom.CommissioningComplete(mSuccess.Cancel(), mFailure.Cancel());
     }
     break;
     case CommissioningStage::kCleanup:
