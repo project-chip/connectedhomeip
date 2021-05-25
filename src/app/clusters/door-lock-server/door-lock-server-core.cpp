@@ -38,11 +38,10 @@
  ******************************************************************************/
 
 #include "door-lock-server.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/af.h>
-
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
 
 static void setActuatorEnable(void)
 {

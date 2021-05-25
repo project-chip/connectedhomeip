@@ -20,8 +20,8 @@
 #pragma once
 
 #include <app/Command.h>
+#include <app/common/gen/af-structs.h>
 #include <app/util/af-enums.h>
-#include <gen/af-structs.h>
 #include <inttypes.h>
 #include <lib/support/Span.h>
 

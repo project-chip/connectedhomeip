@@ -27,8 +27,8 @@
 
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <support/CodeUtils.h>
 
 static const char * TAG = "lock-devicecallbacks";

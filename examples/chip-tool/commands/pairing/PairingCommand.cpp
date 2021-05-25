@@ -17,7 +17,6 @@
  */
 
 #include "PairingCommand.h"
-#include "gen/enums.h"
 #include <lib/core/CHIPSafeCasts.h>
 
 using namespace ::chip;
