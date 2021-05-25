@@ -713,7 +713,8 @@ void PASESession::SendErrorMsg(Spake2pErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    VerifyOrReturn(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg)),
+    VerifyOrReturn(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg)) ==
+                       CHIP_NO_ERROR,
                    ChipLogError(SecureChannel, "Failed to send error message"));
 }
 
