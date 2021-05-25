@@ -502,6 +502,52 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             copyListMember(dest, src, write, &entryOffset, entryLength); // INT8U
             break;
         }
+        case 0x001B: // list_octet_string
+        {
+            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, index - 1);
+            if (entryOffset == 0)
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+
+            chip::ByteSpan * listOctetStringSpan   = reinterpret_cast<chip::ByteSpan *>(write ? src : dest); // OCTET_STRING
+            uint16_t listOctetStringRemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, listOctetStringRemainingSpace, listOctetStringSpan)
+                       : ReadByteSpan(src + entryOffset, listOctetStringRemainingSpace, listOctetStringSpan)))
+            {
+                ChipLogError(Zcl, "Index %l is invalid. Not enough remaining space", index);
+                return 0;
+            }
+
+            entryLength = listOctetStringSpan->size();
+            break;
+        }
+        case 0x001C: // list_struct_octet_string
+        {
+            entryLength = 42;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _TestListStructOctet
+            _TestListStructOctet * entry = reinterpret_cast<_TestListStructOctet *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->fabricIndex, write ? (uint8_t *) &entry->fabricIndex : src, write,
+                           &entryOffset, sizeof(entry->fabricIndex));       // INT64U
+            chip::ByteSpan * operationalCertSpan = &entry->operationalCert; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 34, operationalCertSpan)
+                       : ReadByteSpan(src + entryOffset, 34, operationalCertSpan)))
+            {
+                ChipLogError(Zcl, "Index %l is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            break;
+        }
         }
         break;
     }
@@ -795,6 +841,14 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x001A: // list_int8u
             // uint8_t
             entryLength = 1;
+            break;
+        case 0x001B: // list_octet_string
+            // chip::ByteSpan
+            return GetByteSpanOffsetFromIndex(buffer, 256, entryCount);
+            break;
+        case 0x001C: // list_struct_octet_string
+            // Struct _TestListStructOctet
+            entryLength = 42;
             break;
         }
         break;
