@@ -300,8 +300,8 @@ void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId cluste
 }
 
 // This function is used to call the per-cluster message sent callback
-void emberAfClusterMessageSentWithMfgCodeCallback(MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                                                  uint8_t * message, EmberStatus status, uint16_t mfgCode)
+void emberAfClusterMessageSentWithMfgCodeCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                  uint16_t msgLen, uint8_t * message, EmberStatus status, uint16_t mfgCode)
 {
     if (apsFrame != NULL && message != NULL && msgLen != 0)
     {
