@@ -53,6 +53,7 @@
 #include <inet/IPAddress.h>
 #include <mdns/Resolver.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <support/BytesToHex.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -254,11 +255,9 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         {
             continue;
         }
-        char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1];
-        for (size_t j = 0; j < dnsSdInfo->rotatingIdLen; ++j)
-        {
-            sprintf(rotatingId + 2 * j, "%02X", dnsSdInfo->rotatingId[j]);
-        }
+        char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
+
         ChipLogProgress(Discovery, "Device %d", i);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
         ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);

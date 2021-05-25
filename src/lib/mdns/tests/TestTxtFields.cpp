@@ -70,6 +70,23 @@ void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
     sprintf(key, "XX");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
 }
+
+void TestGetTxtFieldKeyCaseInsensitive(nlTestSuite * inSuite, void * inContext)
+{
+    char key[3];
+    sprintf(key, "d");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kLongDiscriminator);
+
+    sprintf(key, "vp");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
+    sprintf(key, "Vp");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
+    sprintf(key, "vP");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
+
+    sprintf(key, "Xx");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
+}
 void TestGetProduct(nlTestSuite * inSuite, void * inContext)
 {
     // Product and vendor are given as part of the same key, on either side of a + sign. Product is after the +
@@ -196,6 +213,13 @@ void TestGetRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
     sprintf(ri, "0ATT");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
     NL_TEST_ASSERT(inSuite, len == 0);
+
+    // Lower case should work on SDK even though devices shouldn't be sending that.
+    sprintf(ri, "0a1b");
+    GetRotatingDeviceId(GetSpan(ri), id, &len);
+    NL_TEST_ASSERT(inSuite, id[0] == 0x0A);
+    NL_TEST_ASSERT(inSuite, id[1] == 0x1B);
+    NL_TEST_ASSERT(inSuite, len == 2);
 
     sprintf(ri, "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F3031");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
@@ -350,19 +374,20 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("TxtFieldKey", TestGetTxtFieldKey),                       //
-    NL_TEST_DEF("TxtFieldProduct", TestGetProduct),                       //
-    NL_TEST_DEF("TxtFieldVendor", TestGetVendor),                         //
-    NL_TEST_DEF("TxtFieldLongDiscriminator", TestGetLongDiscriminator),   //
-    NL_TEST_DEF("TxtFieldAdditionalPairing", TestGetAdditionalPairing),   //
-    NL_TEST_DEF("TxtFieldCommissioningMode", TestGetCommissioningMode),   //
-    NL_TEST_DEF("TxtFieldDeviceType", TestGetDeviceType),                 //
-    NL_TEST_DEF("TxtFieldDeviceName", TestGetDeviceName),                 //
-    NL_TEST_DEF("TxtFieldRotatingDeviceId", TestGetRotatingDeviceId),     //
-    NL_TEST_DEF("TxtFieldPairingHint", TestGetPairingHint),               //
-    NL_TEST_DEF("TxtFieldPairingInstruction", TestGetPairingInstruction), //
-    NL_TEST_DEF("TxtFieldFillNodeDataFromTxt", TestFillNodeDataFromTxt),  //
-    NL_TEST_SENTINEL()                                                    //
+    NL_TEST_DEF("TxtFieldKey", TestGetTxtFieldKey),                               //
+    NL_TEST_DEF("TxtFieldKeyCaseInsensitive", TestGetTxtFieldKeyCaseInsensitive), //
+    NL_TEST_DEF("TxtFieldProduct", TestGetProduct),                               //
+    NL_TEST_DEF("TxtFieldVendor", TestGetVendor),                                 //
+    NL_TEST_DEF("TxtFieldLongDiscriminator", TestGetLongDiscriminator),           //
+    NL_TEST_DEF("TxtFieldAdditionalPairing", TestGetAdditionalPairing),           //
+    NL_TEST_DEF("TxtFieldCommissioningMode", TestGetCommissioningMode),           //
+    NL_TEST_DEF("TxtFieldDeviceType", TestGetDeviceType),                         //
+    NL_TEST_DEF("TxtFieldDeviceName", TestGetDeviceName),                         //
+    NL_TEST_DEF("TxtFieldRotatingDeviceId", TestGetRotatingDeviceId),             //
+    NL_TEST_DEF("TxtFieldPairingHint", TestGetPairingHint),                       //
+    NL_TEST_DEF("TxtFieldPairingInstruction", TestGetPairingInstruction),         //
+    NL_TEST_DEF("TxtFieldFillNodeDataFromTxt", TestFillNodeDataFromTxt),          //
+    NL_TEST_SENTINEL()                                                            //
 };
 
 } // namespace

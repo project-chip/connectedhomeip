@@ -18,6 +18,7 @@
 #include "TxtFields.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cstdio>
 #include <inttypes.h>
 #include <limits>
@@ -31,13 +32,25 @@ namespace Mdns {
 namespace Internal {
 
 namespace {
+
+char SafeToLower(uint8_t ch)
+{
+    return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+}
 bool IsKey(const ByteSpan & key, const char * desired)
 {
     if (key.size() != strlen(desired))
     {
         return false;
     }
-    return memcmp(key.data(), desired, key.size()) == 0;
+    for (size_t i = 0; i < key.size(); ++i)
+    {
+        if (SafeToLower(key.data()[i]) != SafeToLower(desired[i]))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 uint16_t MakeU16FromAsciiDecimal(const ByteSpan & val)
@@ -91,6 +104,10 @@ CHIP_ERROR MakeU8FromAsciiHex(const ByteSpan & ascii, uint8_t * val)
         {
             ret += ascii.data()[i] - static_cast<uint8_t>('A') + 0xA;
         }
+        else if (c >= 'a' && c <= 'f')
+        {
+            ret += ascii.data()[i] - static_cast<uint8_t>('a') + 0xA;
+        }
         else
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -120,7 +137,9 @@ uint16_t GetProduct(const ByteSpan & value)
     size_t plussign = GetPlusSignIdx(value);
     if (plussign < value.size() - 1)
     {
-        return MakeU16FromAsciiDecimal(ByteSpan(value.data() + plussign + 1, value.size() - plussign - 1));
+        const uint8_t * productStrStart = value.data() + plussign + 1;
+        size_t productStrLen            = value.size() - plussign - 1;
+        return MakeU16FromAsciiDecimal(ByteSpan(productStrStart, productStrLen));
     }
     return 0;
 }
