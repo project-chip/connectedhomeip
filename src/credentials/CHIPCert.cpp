@@ -233,8 +233,8 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
     VerifyOrReturnError(mCertCount < mMaxCerts, CHIP_ERROR_NO_MEMORY);
 
     ChipCertificateData * new_cert = new (&mCerts[mCertCount]) ChipCertificateData();
-    memcpy(new_cert, &cert, sizeof(cert));
 
+    *new_cert = cert;
     mCertCount++;
 
     return CHIP_NO_ERROR;
