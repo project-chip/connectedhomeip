@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <support/CHIPMem.h>
 #include <app/ClusterInfo.h>
+#include <support/CHIPMem.h>
 
 namespace chip {
 namespace app {
@@ -29,7 +29,7 @@ CHIP_ERROR ClusterInfo::PushAttributePathSelectorHead()
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    selector->mpNext = mpAttributePathSelector;
+    selector->mpNext        = mpAttributePathSelector;
     mpAttributePathSelector = selector;
     return CHIP_NO_ERROR;
 }

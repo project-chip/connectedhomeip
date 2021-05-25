@@ -49,8 +49,8 @@ Messaging::ExchangeManager gExchangeManager;
 TransportMgr<Transport::UDP> gTransportManager;
 const Transport::AdminId gAdminId = 0;
 secure_channel::MessageCounterManager gMessageCounterManager;
-constexpr ClusterId kTestClusterId       = 6;
-constexpr EndpointId kTestEndpointId     = 1;
+constexpr ClusterId kTestClusterId   = 6;
+constexpr EndpointId kTestEndpointId = 1;
 
 namespace app {
 
@@ -146,24 +146,27 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     app::ReadClient readClient;
     EventNumber eventNumber = 0;
     chip::app::InteractionModelDelegate imDelegate;
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    System::PacketBufferHandle buf       = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle reportBuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, &imDelegate);
+    err                                  = readClient.Init(&gExchangeManager, &imDelegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    chip::app::AttributePathSelector selector1 = {chip::app::AttributePathSelectorFlag::kFieldIdValid, 1/*FieldId*/, 0/*ListIndex*/, nullptr};
-    chip::app::AttributePathSelector selector2 = {chip::app::AttributePathSelectorFlag::kListIndexValid, 0/*FieldId*/, 1/*ListIndex*/, &selector1};
-    chip::app::AttributePathSelector selector3 = {chip::app::AttributePathSelectorFlag::kFieldIdValid, 2/*FieldId*/, 0/*ListIndex*/,  &selector2 };
+    chip::app::AttributePathSelector selector1 = { chip::app::AttributePathSelectorFlag::kFieldIdValid, 1 /*FieldId*/,
+                                                   0 /*ListIndex*/, nullptr };
+    chip::app::AttributePathSelector selector2 = { chip::app::AttributePathSelectorFlag::kListIndexValid, 0 /*FieldId*/,
+                                                   1 /*ListIndex*/, &selector1 };
+    chip::app::AttributePathSelector selector3 = { chip::app::AttributePathSelectorFlag::kFieldIdValid, 2 /*FieldId*/,
+                                                   0 /*ListIndex*/, &selector2 };
     chip::app::AttributePathParams attributePathParams;
-    attributePathParams.mNodeId = chip::kTestDeviceNodeId;
+    attributePathParams.mNodeId     = chip::kTestDeviceNodeId;
     attributePathParams.mEndpointId = kTestEndpointId;
-    attributePathParams.mClusterId = kTestClusterId;
-    attributePathParams.mpSelector = &selector3;
+    attributePathParams.mClusterId  = kTestClusterId;
+    attributePathParams.mpSelector  = &selector3;
 
     writer.Init(std::move(buf));
     err = readClient.GenerateReadRequest(writer, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
-                                     &attributePathParams /*apAttributePathParamsList*/, 1 /*aAttributePathParamsListSize*/,
-                                     eventNumber /*aEventNumber*/);
+                                         &attributePathParams /*apAttributePathParamsList*/, 1 /*aAttributePathParamsListSize*/,
+                                         eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

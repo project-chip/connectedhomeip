@@ -22,8 +22,8 @@
  *
  */
 
-#include <app/MessageDef/AttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/MessageDef/AttributePath.h>
 #include <app/ReadClient.h>
 
 namespace chip {
@@ -78,9 +78,9 @@ void ReadClient::MoveToState(const ClientState aTargetState)
                   GetStateStr());
 }
 
-CHIP_ERROR ReadClient::GenerateReadRequest(System::PacketBufferTLVWriter &aWriter, EventPathParams * apEventPathParamsList,
-                                       size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
-                                       size_t aAttributePathParamsListSize, EventNumber aEventNumber)
+CHIP_ERROR ReadClient::GenerateReadRequest(System::PacketBufferTLVWriter & aWriter, EventPathParams * apEventPathParamsList,
+                                           size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
+                                           size_t aAttributePathParamsListSize, EventNumber aEventNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReadRequest::Builder request;
@@ -95,10 +95,10 @@ CHIP_ERROR ReadClient::GenerateReadRequest(System::PacketBufferTLVWriter &aWrite
         {
             EventPathParams eventPath = apEventPathParamsList[eventIndex];
             eventPathBuilder.NodeId(eventPath.mNodeId)
-                    .EventId(eventPath.mEventId)
-                    .EndpointId(eventPath.mEndpointId)
-                    .ClusterId(eventPath.mClusterId)
-                    .EndOfEventPath();
+                .EventId(eventPath.mEventId)
+                .EndpointId(eventPath.mEndpointId)
+                .ClusterId(eventPath.mClusterId)
+                .EndOfEventPath();
             SuccessOrExit(err = eventPathBuilder.GetError());
         }
 
@@ -120,8 +120,8 @@ CHIP_ERROR ReadClient::GenerateReadRequest(System::PacketBufferTLVWriter &aWrite
         {
             AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
             attributePathBuilder.NodeId(apAttributePathParamsList[index].mNodeId)
-                    .EndpointId(apAttributePathParamsList[index].mEndpointId)
-                    .ClusterId(apAttributePathParamsList[index].mClusterId);
+                .EndpointId(apAttributePathParamsList[index].mEndpointId)
+                .ClusterId(apAttributePathParamsList[index].mClusterId);
 
             AttributePathSelector * selector = apAttributePathParamsList[index].mpSelector;
 
@@ -178,7 +178,8 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     writer.Init(std::move(msgBuf));
 
-    err = GenerateReadRequest(writer, apEventPathParamsList, aEventPathParamsListSize, apAttributePathParamsList, aAttributePathParamsListSize, aEventNumber);
+    err = GenerateReadRequest(writer, apEventPathParamsList, aEventPathParamsListSize, apAttributePathParamsList,
+                              aAttributePathParamsListSize, aEventNumber);
     SuccessOrExit(err);
 
     err = writer.Finalize(&msgBuf);
@@ -350,7 +351,7 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         AttributeDataElement::Parser element;
         AttributePath::Parser attributePathParser;
         ClusterInfo clusterInfo;
-        err                   = element.Init(aAttributeDataListReader);
+        err = element.Init(aAttributeDataListReader);
         SuccessOrExit(err);
 
         err = element.GetAttributePath(&attributePathParser);
@@ -361,32 +362,32 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
             VerifyOrExit(chip::TLV::IsContextTag(pathReader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
             switch (chip::TLV::TagNumFromTag(pathReader.GetTag()))
             {
-                case AttributePath::kCsTag_NodeId:
-                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-                    SuccessOrExit(err = pathReader.Get(clusterInfo.mNodeId));
-                    break;
-                case AttributePath::kCsTag_EndpointId:
-                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-                    SuccessOrExit(err = pathReader.Get(clusterInfo.mEndpointId));
-                    break;
-                case AttributePath::kCsTag_ClusterId:
-                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-                    SuccessOrExit(err = pathReader.Get(clusterInfo.mClusterId));
-                    break;
-                case AttributePath::kCsTag_FieldId:
-                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-                    SuccessOrExit(err = clusterInfo.PushAttributePathSelectorHead());
-                    SuccessOrExit(err = pathReader.Get(clusterInfo.mpAttributePathSelector->mFieldId));
-                    clusterInfo.mpAttributePathSelector->mFlag = AttributePathSelectorFlag::kFieldIdValid;
-                    break;
-                case AttributePath::kCsTag_ListIndex:
-                    VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-                    SuccessOrExit(err = clusterInfo.PushAttributePathSelectorHead());
-                    SuccessOrExit(err = pathReader.Get(clusterInfo.mpAttributePathSelector->mListIndex));
-                    clusterInfo.mpAttributePathSelector->mFlag = AttributePathSelectorFlag::kListIndexValid;
-                    break;
-                default:
-                    ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
+            case AttributePath::kCsTag_NodeId:
+                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                SuccessOrExit(err = pathReader.Get(clusterInfo.mNodeId));
+                break;
+            case AttributePath::kCsTag_EndpointId:
+                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                SuccessOrExit(err = pathReader.Get(clusterInfo.mEndpointId));
+                break;
+            case AttributePath::kCsTag_ClusterId:
+                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                SuccessOrExit(err = pathReader.Get(clusterInfo.mClusterId));
+                break;
+            case AttributePath::kCsTag_FieldId:
+                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                SuccessOrExit(err = clusterInfo.PushAttributePathSelectorHead());
+                SuccessOrExit(err = pathReader.Get(clusterInfo.mpAttributePathSelector->mFieldId));
+                clusterInfo.mpAttributePathSelector->mFlag = AttributePathSelectorFlag::kFieldIdValid;
+                break;
+            case AttributePath::kCsTag_ListIndex:
+                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == pathReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+                SuccessOrExit(err = clusterInfo.PushAttributePathSelectorHead());
+                SuccessOrExit(err = pathReader.Get(clusterInfo.mpAttributePathSelector->mListIndex));
+                clusterInfo.mpAttributePathSelector->mFlag = AttributePathSelectorFlag::kListIndexValid;
+                break;
+            default:
+                ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
             }
         }
         if (CHIP_END_OF_TLV == err)

@@ -33,13 +33,13 @@ struct ClusterInfo
     CHIP_ERROR PushAttributePathSelectorHead();
     void PopAllAttributePathSelector();
 
-    NodeId mNodeId         = 0;
-    ClusterId mClusterId   = 0;
-    EventId mEventId       = 0;
+    NodeId mNodeId                                  = 0;
+    ClusterId mClusterId                            = 0;
+    EventId mEventId                                = 0;
     AttributePathSelector * mpAttributePathSelector = nullptr;
-    ClusterInfo * mpNext   = nullptr;
-    EndpointId mEndpointId = 0;
-    bool mDirty            = false;
+    ClusterInfo * mpNext                            = nullptr;
+    EndpointId mEndpointId                          = 0;
+    bool mDirty                                     = false;
 
     /* For better structure alignment
      * Above ordering is by bit-size to ensure least amount of memory alignment padding.

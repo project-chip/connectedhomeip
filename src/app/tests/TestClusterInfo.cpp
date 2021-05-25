@@ -47,7 +47,7 @@ void TestAttributePathSelectorLinkList(nlTestSuite * apSuite, void * apContext)
     AttributePathSelector * current = clusterInfo1.mpAttributePathSelector;
     while (current != nullptr)
     {
-        number ++;
+        number++;
         current = current->mpNext;
     }
     NL_TEST_ASSERT(apSuite, number == 2);
@@ -60,7 +60,9 @@ void TestAttributePathSelectorLinkList(nlTestSuite * apSuite, void * apContext)
 
 namespace {
 const nlTest sTests[] = { NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty), NL_TEST_SENTINEL(),
-                          NL_TEST_DEF("TestAttributePathSelectorLinkList", chip::app::TestClusterInfo::TestAttributePathSelectorLinkList), NL_TEST_SENTINEL() };
+                          NL_TEST_DEF("TestAttributePathSelectorLinkList",
+                                      chip::app::TestClusterInfo::TestAttributePathSelectorLinkList),
+                          NL_TEST_SENTINEL() };
 }
 
 int TestClusterInfo()
