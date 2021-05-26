@@ -25,17 +25,17 @@
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
 #include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
-#include <lib/core/CHIPSafeCasts.h>
 
 namespace chip {
 namespace Transport {
 
 typedef uint16_t AdminId;
-static constexpr AdminId kUndefinedAdminId = UINT16_MAX;
+static constexpr AdminId kUndefinedAdminId            = UINT16_MAX;
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying
@@ -137,10 +137,10 @@ public:
      */
     void Reset()
     {
-        mNodeId   = kUndefinedNodeId;
-        mAdmin    = kUndefinedAdminId;
-        mFabricId = kUndefinedFabricId;
-        mVendorId = kUndefinedVendorId;
+        mNodeId         = kUndefinedNodeId;
+        mAdmin          = kUndefinedAdminId;
+        mFabricId       = kUndefinedFabricId;
+        mVendorId       = kUndefinedVendorId;
         mFabricLabel[0] = '\0';
 
         if (mOperationalKey != nullptr)
@@ -154,11 +154,11 @@ public:
     friend class AdminPairingTable;
 
 private:
-    NodeId mNodeId     = kUndefinedNodeId;
-    FabricId mFabricId = kUndefinedFabricId;
-    AdminId mAdmin     = kUndefinedAdminId;
-    uint16_t mVendorId = kUndefinedVendorId;
-    char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = {'\0'};
+    NodeId mNodeId                                      = kUndefinedNodeId;
+    FabricId mFabricId                                  = kUndefinedFabricId;
+    AdminId mAdmin                                      = kUndefinedAdminId;
+    uint16_t mVendorId                                  = kUndefinedVendorId;
+    char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
     AccessControlList mACL;
 
@@ -189,7 +189,7 @@ private:
         uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
 
-        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = {'\0'};
+        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
         uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
         uint16_t mOpCertLen;   /* This field is serialized in LittleEndian byte order */
