@@ -121,5 +121,3 @@ void Device::SetChangeCallback(DeviceCallback_fn aChanged_CB)
 {
     mChanged_CB = aChanged_CB;
 }
-
-
