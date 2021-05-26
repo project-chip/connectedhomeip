@@ -46,13 +46,22 @@ class CommandSender : public Command, public Messaging::ExchangeDelegate
 {
 public:
     // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
+    // Once SendCommandRequest returns successfully, the CommandSender will
+    // handle calling Shutdown on itself once it decides it's done with waiting
+    // for a response (i.e. times out or gets a response).
+    //
+    // If SendCommandRequest is never called, or the call fails, the API
+    // consumer is responsible for calling Shutdown on the CommandSender.
     CHIP_ERROR SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession = nullptr);
 
+private:
+    // ExchangeDelegate interface implementation.  Private so people won't
+    // accidentally call it on us when we're not being treated as an actual
+    // ExchangeDelegate.
     void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
-private:
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 };
 

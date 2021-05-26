@@ -35,11 +35,13 @@
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
+| BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
 | ContentLaunch                                                       | 0x050A |
 | Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
+| FixedLabel                                                          | 0x0040 |
 | GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -487,6 +489,149 @@ chip::System::PacketBufferHandle encodeBindingClusterDiscoverAttributes(uint8_t 
  */
 chip::System::PacketBufferHandle encodeBindingClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                   chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster BridgedDeviceBasic                                          | 0x0039 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * VendorName                                                        | 0x0001 |
+| * VendorID                                                          | 0x0002 |
+| * ProductName                                                       | 0x0003 |
+| * UserLabel                                                         | 0x0005 |
+| * HardwareVersion                                                   | 0x0007 |
+| * HardwareVersionString                                             | 0x0008 |
+| * SoftwareVersion                                                   | 0x0009 |
+| * SoftwareVersionString                                             | 0x000A |
+| * ManufacturingDate                                                 | 0x000B |
+| * PartNumber                                                        | 0x000C |
+| * ProductURL                                                        | 0x000D |
+| * ProductLabel                                                      | 0x000E |
+| * SerialNumber                                                      | 0x000F |
+| * Reachable                                                         | 0x0011 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the VendorName attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadVendorNameAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the VendorID attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadVendorIDAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the ProductName attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadProductNameAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the UserLabel attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadUserLabelAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server write command for the UserLabel attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterWriteUserLabelAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint,
+                                                                                        chip::ByteSpan userLabel);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the HardwareVersion attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadHardwareVersionAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the HardwareVersionString attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeBridgedDeviceBasicClusterReadHardwareVersionStringAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the SoftwareVersion attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadSoftwareVersionAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the SoftwareVersionString attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeBridgedDeviceBasicClusterReadSoftwareVersionStringAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the ManufacturingDate attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeBridgedDeviceBasicClusterReadManufacturingDateAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the PartNumber attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadPartNumberAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the ProductURL attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadProductURLAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the ProductLabel attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadProductLabelAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the SerialNumber attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadSerialNumberAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the Reachable attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadReachableAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Bridged Device Basic server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster ColorControl                                                | 0x0300 |
@@ -1302,6 +1447,36 @@ encodeEthernetNetworkDiagnosticsClusterReadOverrunCountAttribute(uint8_t seqNum,
  */
 chip::System::PacketBufferHandle
 encodeEthernetNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster FixedLabel                                                  | 0x0040 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * LabelList                                                         | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Fixed Label server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFixedLabelClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Fixed Label server read command for the label list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFixedLabelClusterReadLabelListAttribute(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Fixed Label server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFixedLabelClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster GeneralCommissioning                                        | 0x0030 |

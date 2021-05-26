@@ -21,8 +21,8 @@
 
 #include <cinttypes>
 
-#include "gen/enums.h"
 #include <app/Command.h>
+#include <app/common/gen/enums.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -567,6 +567,29 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
 
                         Callback::Callback<DescriptorPartsListListAttributeCallback> * cb =
                             Callback::Callback<DescriptorPartsListListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
+                case 0x0040:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // LabelStruct
+                    {
+                        _LabelStruct data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_STATUS(ReadByteSpan(message, 18, &data[i].label));
+                            messageLen -= 18;
+                            message += 18;
+                            CHECK_STATUS(ReadByteSpan(message, 18, &data[i].value));
+                            messageLen -= 18;
+                            message += 18;
+                        }
+
+                        Callback::Callback<FixedLabelLabelListListAttributeCallback> * cb =
+                            Callback::Callback<FixedLabelLabelListListAttributeCallback>::FromCancelable(onSuccessCallback);
                         cb->mCall(cb->mContext, count, data);
                         break;
                     }

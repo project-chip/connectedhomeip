@@ -21,9 +21,9 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 

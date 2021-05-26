@@ -71,7 +71,7 @@ struct CASESessionSerializable
     uint16_t mPeerKeyId;
 };
 
-class DLL_EXPORT CASESession : public Messaging::ExchangeDelegateBase, public PairingSession
+class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
     CASESession();

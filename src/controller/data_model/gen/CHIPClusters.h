@@ -34,11 +34,13 @@ constexpr ClusterId kAudioOutputClusterId                 = 0x050B;
 constexpr ClusterId kBarrierControlClusterId              = 0x0103;
 constexpr ClusterId kBasicClusterId                       = 0x0028;
 constexpr ClusterId kBindingClusterId                     = 0xF000;
+constexpr ClusterId kBridgedDeviceBasicClusterId          = 0x0039;
 constexpr ClusterId kColorControlClusterId                = 0x0300;
 constexpr ClusterId kContentLaunchClusterId               = 0x050A;
 constexpr ClusterId kDescriptorClusterId                  = 0x001D;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
+constexpr ClusterId kFixedLabelClusterId                  = 0x0040;
 constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
 constexpr ClusterId kGeneralDiagnosticsClusterId          = 0x0033;
 constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
@@ -232,6 +234,35 @@ public:
 private:
     static constexpr CommandId kBindCommandId   = 0x00;
     static constexpr CommandId kUnbindCommandId = 0x01;
+};
+
+class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
+{
+public:
+    BridgedDeviceBasicCluster() : ClusterBase(kBridgedDeviceBasicClusterId) {}
+    ~BridgedDeviceBasicCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       chip::ByteSpan value);
 };
 
 class DLL_EXPORT ColorControlCluster : public ClusterBase
@@ -536,6 +567,18 @@ public:
 
 private:
     static constexpr CommandId kResetCountsCommandId = 0x00;
+};
+
+class DLL_EXPORT FixedLabelCluster : public ClusterBase
+{
+public:
+    FixedLabelCluster() : ClusterBase(kFixedLabelClusterId) {}
+    ~FixedLabelCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLabelList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
