@@ -146,7 +146,7 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+                           SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !receiveDelegate.IsOnMessageReceivedCalled);
 
