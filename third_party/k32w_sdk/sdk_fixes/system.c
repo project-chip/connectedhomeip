@@ -32,8 +32,8 @@
  *
  */
 #include "board.h"
-#include "pin_mux.h"
 #include "clock_config.h"
+#include "pin_mux.h"
 #include "platform-k32w.h"
 #include "utils/uart.h"
 
@@ -42,10 +42,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-otInstance *          sInstance;
+otInstance * sInstance;
 OT_TOOL_WEAK uint32_t gInterruptDisableCount = 0;
 
-void otSysInit(int argc, char *argv[])
+void otSysInit(int argc, char * argv[])
 {
     bool bHwInit = true;
 
@@ -68,7 +68,7 @@ void otSysInit(int argc, char *argv[])
     K32WAlarmInit();
     K32WRadioInit();
 
-#if (OPENTHREAD_CONFIG_LOG_OUTPUT == OPENTHREAD_CONFIG_LOG_OUTPUT_PLATFORM_DEFINED) || \
+#if (OPENTHREAD_CONFIG_LOG_OUTPUT == OPENTHREAD_CONFIG_LOG_OUTPUT_PLATFORM_DEFINED) ||                                             \
     (OPENTHREAD_CONFIG_LOG_OUTPUT == OPENTHREAD_CONFIG_LOG_OUTPUT_NCP_SPINEL)
     K32WLogInit();
 #endif
@@ -85,7 +85,7 @@ void otSysDeinit(void)
     /* TODO */
 }
 
-void otSysProcessDrivers(otInstance *aInstance)
+void otSysProcessDrivers(otInstance * aInstance)
 {
     K32WRadioProcess(aInstance);
     K32WUartProcess();
@@ -140,6 +140,6 @@ OT_TOOL_WEAK void OSA_InterruptDisable(void)
 OT_TOOL_WEAK void OSA_InstallIntHandler(uint32_t IRQNumber, void (*handler)(void))
 {
 #ifdef ENABLE_RAM_VECTOR_TABLE
-    InstallIRQHandler((IRQn_Type)IRQNumber, (uint32_t)handler);
+    InstallIRQHandler((IRQn_Type) IRQNumber, (uint32_t) handler);
 #endif
 }
