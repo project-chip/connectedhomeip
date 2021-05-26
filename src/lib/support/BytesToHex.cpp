@@ -52,16 +52,16 @@ CHIP_ERROR MakeU8FromAsciiHex(const char * src, const size_t srcLen, uint8_t * v
         uint8_t cval = static_cast<uint8_t>(c);
         if (c >= '0' && c <= '9')
         {
-            ret += static_cast<uint8_t>(cval - static_cast<uint8_t>('0'));
+            ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('0'));
         }
         // Only uppercase is supported according to spec.
         else if (c >= 'A' && c <= 'F')
         {
-            ret += static_cast<uint8_t>(cval - static_cast<uint8_t>('A') + 0xA);
+            ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('A') + 0xA);
         }
         else if (c >= 'a' && c <= 'f')
         {
-            ret += static_cast<uint8_t>(cval - static_cast<uint8_t>('a') + 0xA);
+            ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('a') + 0xA);
         }
         else
         {
