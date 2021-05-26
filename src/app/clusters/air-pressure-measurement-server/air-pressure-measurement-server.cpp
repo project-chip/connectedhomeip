@@ -47,27 +47,10 @@ static EmberAfStatus emberAfAirPressureMeasurementClusterSetAltitudeCallback(chi
 
 void emberAfAirPressureMeasurementClusterServerInitCallback(chip::EndpointId endpoint)
 {
-    uint16_t measuredValue = 0;
-    EmberAfStatus status   = emberAfAirPressureMeasurementClusterGetMeasuredValue(endpoint, &measuredValue);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfAirPressureMeasurementClusterSetMeasuredValueCallback(endpoint, 10132);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfAirPressureMeasurementClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
-
-    int16_t altitude = 0;
-    status           = emberAfAirPressureMeasurementClusterGetAltitudeValue(endpoint, &altitude);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfAirPressureMeasurementClusterSetAltitudeCallback(endpoint, 0);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfAirPressureMeasurementClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
+    /**
+     * nothing to do here - default values set by attribute storage
+     */
+    (void) endpoint;
 }
 
 EmberAfStatus emberAfAirPressureMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, uint16_t measuredValue)
