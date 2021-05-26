@@ -370,14 +370,14 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    const char * serviceType =
-        params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode ? "_chipc" : "_chipd";
-
-    FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
-    FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
+    const char * serviceType = params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode
+        ? kCommissionableServiceName
+        : kCommissionerServiceName;
+    FullQName operationalServiceName = AllocateQName(serviceType, kCommissionProtocol, kLocalDomain);
+    FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, kCommissionProtocol, kLocalDomain);
 
     ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
-    FullQName serverName = AllocateQName(nameBuffer, "local");
+    FullQName serverName = AllocateQName(nameBuffer, kLocalDomain);
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {
@@ -418,8 +418,10 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     if (params.GetVendorId().HasValue())
     {
-        sprintf(nameBuffer, "_V%d", params.GetVendorId().Value());
-        FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                           DiscoveryFilter(DiscoveryFilterType::kVendor, params.GetVendorId().Value()));
+        FullQName vendorServiceName =
+            AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
         if (!AddResponder<PtrResponder>(vendorServiceName, operationalServerName)
@@ -434,8 +436,10 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     if (params.GetDeviceType().HasValue())
     {
-        sprintf(nameBuffer, "_T%d", params.GetDeviceType().Value());
-        FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                           DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDeviceType().Value()));
+        FullQName vendorServiceName =
+            AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
         if (!AddResponder<PtrResponder>(vendorServiceName, operationalServerName)
@@ -452,8 +456,10 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         {
-            sprintf(nameBuffer, "_S%03d", params.GetShortDiscriminator());
-            FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator()));
+            FullQName shortServiceName =
+                AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
             if (!AddResponder<PtrResponder>(shortServiceName, operationalServerName)
@@ -467,8 +473,10 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
 
         {
-            sprintf(nameBuffer, "_L%04d", params.GetLongDiscriminator());
-            FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                               DiscoveryFilter(DiscoveryFilterType::kLong, params.GetLongDiscriminator()));
+            FullQName longServiceName =
+                AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
             if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
                      .SetReportAdditional(operationalServerName)
@@ -481,8 +489,10 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
 
         {
-            sprintf(nameBuffer, "_C%d", params.GetCommissioningMode() ? 1 : 0);
-            FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                               DiscoveryFilter(DiscoveryFilterType::kCommissioningMode, params.GetCommissioningMode() ? 1 : 0));
+            FullQName longServiceName =
+                AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
             if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
                      .SetReportAdditional(operationalServerName)
@@ -496,8 +506,10 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
         if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
-            sprintf(nameBuffer, "_A1");
-            FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                               DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1));
+            FullQName longServiceName =
+                AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
             if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
                      .SetReportAdditional(operationalServerName)
