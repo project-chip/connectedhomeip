@@ -973,9 +973,9 @@ void emberAfBridgedDeviceBasicClusterClientManufacturerSpecificAttributeChangedC
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBridgedDeviceBasicClusterClientMessageSentCallback(EmberOutgoingMessageType type,
-                                                               chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
-                                                               uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBridgedDeviceBasicClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                               EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                               EmberStatus status);
 
 /** @brief Bridged Device Basic Cluster Client Pre Attribute Changed
  *
@@ -1393,9 +1393,8 @@ void emberAfFixedLabelClusterClientManufacturerSpecificAttributeChangedCallback(
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfFixedLabelClusterClientMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfFixedLabelClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                       uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Fixed Label Cluster Client Pre Attribute Changed
  *
