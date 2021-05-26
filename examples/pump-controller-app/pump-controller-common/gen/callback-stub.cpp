@@ -484,10 +484,11 @@ bool __attribute__((weak)) emberAfReadAttributesResponseCallback(ClusterId clust
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
  * @param maxReadLength   Ver.: always
+ * @param index   Ver.: always
  */
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
-                                     uint16_t manufacturerCode, uint8_t * buffer, uint16_t maxReadLength)
+                                     uint16_t manufacturerCode, uint8_t * buffer, uint16_t maxReadLength, int32_t index)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
@@ -553,10 +554,11 @@ bool __attribute__((weak)) emberAfWriteAttributesResponseCallback(ClusterId clus
  * @param attributeMetadata   Ver.: always
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
+ * @param index   Ver.: always
  */
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
-                                      uint16_t manufacturerCode, uint8_t * buffer)
+                                      uint16_t manufacturerCode, uint8_t * buffer, int32_t index)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }

@@ -790,7 +790,7 @@ static void OnFixedLabelLabelListListAttributeResponse(void * context, uint16_t 
     for (uint16_t i = 0; i < count; i++)
     {
         ChipLogProgress(chipTool, "LabelStruct[%lu]:", i);
-        ChipLogProgress(Zcl, "  label: %zu", entries[i].label.size());
+        ChipLogProgress(Zcl, "  label: %zu, %s", entries[i].label.size(), entries[i].label);
         ChipLogProgress(Zcl, "  value: %zu", entries[i].value.size());
     }
 
