@@ -35,8 +35,8 @@
 // module header, comes first
 #include <controller/CHIPDeviceController.h>
 
+#include <app/common/gen/enums.h>
 #include <controller/data_model/gen/CHIPClusters.h>
-#include <controller/data_model/gen/enums.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>

@@ -15,6 +15,4 @@
 arm_arch = "armv7e-m"
 arm_abi = "aapcs"
 arm_cpu = "cortex-m4"
-
-arm_float_abi = "softfp"
-#arm_fpu = "fpv4-sp-d16"
+arm_float_abi = "soft"

@@ -173,6 +173,31 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Bridged Device Basic
+ *
+ */
+@interface CHIPBridgedDeviceBasic : CHIPCluster
+
+- (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeVendorIDWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeUserLabelWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeHardwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeHardwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSoftwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSoftwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeManufacturingDateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePartNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductURLWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Color Control
  *
  */
@@ -454,6 +479,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeTxErrCountWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Fixed Label
+ *
+ */
+@interface CHIPFixedLabel : CHIPCluster
+
+- (void)readAttributeLabelListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

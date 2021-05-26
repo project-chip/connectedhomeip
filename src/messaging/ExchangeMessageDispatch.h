@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <lib/core/ReferenceCounted.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -31,7 +32,7 @@ namespace Messaging {
 class ReliableMessageMgr;
 class ReliableMessageContext;
 
-class ExchangeMessageDispatch
+class ExchangeMessageDispatch : public ReferenceCounted<ExchangeMessageDispatch>
 {
 public:
     ExchangeMessageDispatch() {}
