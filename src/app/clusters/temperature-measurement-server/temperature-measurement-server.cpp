@@ -53,36 +53,10 @@ EmberAfStatus emberAfTemperatureMeasurementClusterGetMaxMeasuredValue(chip::Endp
 
 void emberAfTemperatureMeasurementClusterServerInitCallback(chip::EndpointId endpoint)
 {
-    int16_t value        = 0;
-    EmberAfStatus status = emberAfTemperatureMeasurementClusterGetMeasuredValue(endpoint, &value);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(endpoint, INT16_MIN);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfTemperatureMeasurementClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
-
-    status = emberAfTemperatureMeasurementClusterGetMinMeasuredValue(endpoint, &value);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfTemperatureMeasurementClusterSetMinMeasuredValueCallback(endpoint, INT16_MIN);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfTemperatureMeasurementClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
-
-    status = emberAfTemperatureMeasurementClusterGetMaxMeasuredValue(endpoint, &value);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfTemperatureMeasurementClusterSetMaxMeasuredValueCallback(endpoint, INT16_MIN);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfTemperatureMeasurementClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
+    /**
+     * nothing to do here - default values set by attribute storage
+     */
+    (void) endpoint;
 }
 
 EmberAfStatus emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, int16_t measuredValue)
