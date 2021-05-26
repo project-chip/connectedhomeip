@@ -1787,13 +1787,6 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::Command * commandO
 bool emberAfAccountLoginClusterLoginCallback(chip::app::Command * commandObj, uint8_t * tempAccountIdentifier, uint8_t * setupPIN);
 
 /**
- * @brief Application Launcher Cluster LaunchApp Command callback
- */
-
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, uint8_t * data,
-                                                        /* TYPE WARNING: array array defaults to */ uint8_t * application);
-
-/**
  * @brief Audio Output Cluster RenameOutput Command callback
  */
 
@@ -1804,24 +1797,6 @@ bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * commandO
  */
 
 bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::Command * commandObj, uint8_t index);
-
-/**
- * @brief Content Launch Cluster LaunchContent Command callback
- */
-
-bool emberAfContentLaunchClusterLaunchContentCallback(chip::app::Command * commandObj, uint8_t autoPlay, uint8_t * data);
-
-/**
- * @brief Content Launch Cluster LaunchURL Command callback
- */
-
-bool emberAfContentLaunchClusterLaunchURLCallback(chip::app::Command * commandObj, uint8_t * contentURL, uint8_t * displayString);
-
-/**
- * @brief Keypad Input Cluster SendKey Command callback
- */
-
-bool emberAfKeypadInputClusterSendKeyCallback(chip::app::Command * commandObj, uint8_t keyCode);
 
 /**
  * @brief Level Control Cluster Move Command callback
@@ -1877,120 +1852,6 @@ bool emberAfLevelControlClusterStopCallback(chip::app::Command * commandObj, uin
 bool emberAfLevelControlClusterStopWithOnOffCallback(chip::app::Command * commandObj);
 
 /**
- * @brief Low Power Cluster Sleep Command callback
- */
-
-bool emberAfLowPowerClusterSleepCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Input Cluster HideInputStatus Command callback
- */
-
-bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Input Cluster RenameInput Command callback
- */
-
-bool emberAfMediaInputClusterRenameInputCallback(chip::app::Command * commandObj, uint8_t index, uint8_t * name);
-
-/**
- * @brief Media Input Cluster SelectInput Command callback
- */
-
-bool emberAfMediaInputClusterSelectInputCallback(chip::app::Command * commandObj, uint8_t index);
-
-/**
- * @brief Media Input Cluster ShowInputStatus Command callback
- */
-
-bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Playback Cluster MediaFastForward Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaFastForwardCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Playback Cluster MediaNext Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaNextCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Playback Cluster MediaPause Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaPauseCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Playback Cluster MediaPlay Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaPlayCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Playback Cluster MediaPrevious Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaPreviousCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Playback Cluster MediaRewind Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaRewindCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Playback Cluster MediaSkipBackward Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::Command * commandObj, uint64_t deltaPositionMilliseconds);
-
-/**
- * @brief Media Playback Cluster MediaSkipForward Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::Command * commandObj, uint64_t deltaPositionMilliseconds);
-
-/**
- * @brief Media Playback Cluster MediaSkipSeek Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaSkipSeekCallback(chip::app::Command * commandObj, uint64_t position);
-
-/**
- * @brief Media Playback Cluster MediaStartOver Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaStartOverCallback(chip::app::Command * commandObj);
-
-/**
- * @brief Media Playback Cluster MediaStop Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaStopCallback(chip::app::Command * commandObj);
-
-/**
- * @brief On/off Cluster Off Command callback
- */
-
-bool emberAfOnOffClusterOffCallback(chip::app::Command * commandObj);
-
-/**
- * @brief On/off Cluster On Command callback
- */
-
-bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj);
-
-/**
- * @brief On/off Cluster Toggle Command callback
- */
-
-bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj);
-
-/**
  * @brief Operational Credentials Cluster AddOpCert Command callback
  */
 
@@ -2028,31 +1889,6 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
  */
 
 bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label);
-
-/**
- * @brief TV Channel Cluster ChangeChannel Command callback
- */
-
-bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * commandObj, uint8_t * match);
-
-/**
- * @brief TV Channel Cluster ChangeChannelByNumber Command callback
- */
-
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * commandObj, uint16_t majorNumber,
-                                                          uint16_t minorNumber);
-
-/**
- * @brief TV Channel Cluster SkipChannel Command callback
- */
-
-bool emberAfTvChannelClusterSkipChannelCallback(chip::app::Command * commandObj, uint16_t Count);
-
-/**
- * @brief Target Navigator Cluster NavigateTarget Command callback
- */
-
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::Command * commandObj, uint8_t target, uint8_t * data);
 
 /**
  * @brief Trusted Root Certificates Cluster AddTrustedRootCertificate Command callback
