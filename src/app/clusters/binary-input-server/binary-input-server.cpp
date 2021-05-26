@@ -45,27 +45,10 @@ EmberAfStatus emberAfBinaryInputBasicClusterGetOutOfService(chip::EndpointId end
 
 void emberAfBinaryInputBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
-    bool presentValue    = false;
-    EmberAfStatus status = emberAfBinaryInputBasicClusterGetPresentValue(endpoint, &presentValue);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfBinaryInputBasicClusterSetPresentValueCallback(endpoint, false);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfBinaryInputBasicClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
-
-    bool isOutOfService = false;
-    status              = emberAfBinaryInputBasicClusterGetOutOfService(endpoint, &isOutOfService);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfBinaryInputBasicClusterSetOutOfServiceCallback(endpoint, false);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfBinaryInputBasicClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
+    /**
+     * nothing to do here - default values set by attribute storage
+     */
+    (void) endpoint;
 }
 
 EmberAfStatus emberAfBinaryInputBasicClusterSetPresentValueCallback(chip::EndpointId endpoint, bool presentValue)
