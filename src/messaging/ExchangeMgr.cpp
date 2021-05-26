@@ -223,6 +223,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d", payloadHeader.GetMessageType(),
                     payloadHeader.GetProtocolID());
 
+    msgBuf->DebugDump("ExchangeManager::OnMessageReceived");
+
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : mContextPool)
     {

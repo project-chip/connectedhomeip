@@ -49,7 +49,7 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
                   "Addition to generate payloadLength might overflow");
 
     // TODO: Echo should be encrypted so remove this from list of exceptions
-    if (!payloadHeader.HasProtocol(Protocols::UserDirectedCommissioning::Id) && !payloadHeader.HasProtocol(Protocols::Echo::Id))
+    if (!payloadHeader.HasProtocol(Protocols::UserDirectedCommissioning::Id))
     {
         packetHeader
             .SetSourceNodeId(localNodeId) //

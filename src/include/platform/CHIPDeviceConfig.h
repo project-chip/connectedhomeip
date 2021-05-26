@@ -1081,6 +1081,19 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+ *
+ * Enable or disable whether this device will attempt to
+ * discover commissioners and send Uder Directed Commissioning
+ * messages to them.
+ *
+ * For Video Player Clients, this value will be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
  *
  * Enable or disable whether this device advertises when not in commissioning mode.
