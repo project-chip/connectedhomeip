@@ -25,6 +25,8 @@
 #include <string.h>
 
 #include <mdns/Resolver.h>
+#include <support/BytesToHex.h>
+#include <support/CHIPMemString.h>
 
 namespace chip {
 namespace Mdns {
@@ -84,39 +86,6 @@ uint8_t MakeU8FromAsciiDecimal(const ByteSpan & val)
     return static_cast<uint8_t>(u16);
 }
 
-CHIP_ERROR MakeU8FromAsciiHex(const ByteSpan & ascii, uint8_t * val)
-{
-    if (ascii.size() != 2)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    uint8_t ret = 0;
-    for (size_t i = 0; i < ascii.size(); ++i)
-    {
-        ret    = ret << 4;
-        char c = static_cast<char>(ascii.data()[i]);
-        if (c >= '0' && c <= '9')
-        {
-            ret += ascii.data()[i] - static_cast<uint8_t>('0');
-        }
-        // Only uppercase is supported according to spec.
-        else if (c >= 'A' && c <= 'F')
-        {
-            ret += ascii.data()[i] - static_cast<uint8_t>('A') + 0xA;
-        }
-        else if (c >= 'a' && c <= 'f')
-        {
-            ret += ascii.data()[i] - static_cast<uint8_t>('a') + 0xA;
-        }
-        else
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-    }
-    *val = ret;
-    return CHIP_NO_ERROR;
-}
-
 size_t GetPlusSignIdx(const ByteSpan & value)
 {
     // Fist value is the vendor id, second (after the +) is the product.
@@ -173,31 +142,12 @@ uint16_t GetDeviceType(const ByteSpan & value)
 
 void GetDeviceName(const ByteSpan & value, char * name)
 {
-    size_t len = std::min(value.size(), kMaxDeviceNameLen);
-    memcpy(name, value.data(), len);
-    name[len] = '\0';
+    Platform::CopyString(name, kMaxDeviceNameLen + 1, value);
 }
 
 void GetRotatingDeviceId(const ByteSpan & value, uint8_t * rotatingId, size_t * len)
 {
-    memset(rotatingId, 0, kMaxRotatingIdLen);
-    *len = 0;
-    // Octet string where each octet is 2 ascii digits representing the hex value
-    // Each is represented by two ascii chars, so must be even number
-    if ((value.size() & 0x1) != 0 || value.size() > (kMaxRotatingIdLen * 2))
-    {
-        return;
-    }
-    for (size_t i = 0; i < value.size(); i += 2)
-    {
-        if (MakeU8FromAsciiHex(ByteSpan(value.data() + i, 2), &rotatingId[i / 2]) != CHIP_NO_ERROR)
-        {
-            *len = 0;
-            memset(rotatingId, 0, kMaxRotatingIdLen);
-            return;
-        }
-        *len = *len + 1;
-    }
+    *len = Encoding::HexToBytes(reinterpret_cast<const char *>(value.data()), value.size(), rotatingId, kMaxRotatingIdLen);
 }
 
 uint16_t GetPairingHint(const ByteSpan & value)
@@ -207,9 +157,7 @@ uint16_t GetPairingHint(const ByteSpan & value)
 
 void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
 {
-    size_t len = std::min(value.size(), kMaxPairingInstructionLen);
-    memcpy(pairingInstruction, value.data(), len);
-    pairingInstruction[len] = '\0';
+    Platform::CopyString(pairingInstruction, kMaxPairingInstructionLen + 1, value);
 }
 
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)

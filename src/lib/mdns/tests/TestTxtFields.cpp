@@ -34,7 +34,10 @@ namespace {
 
 ByteSpan GetSpan(char * key)
 {
-    return ByteSpan(reinterpret_cast<uint8_t *>(key), strlen(key));
+    size_t len = strlen(key);
+    // Stop the string from being null terminated to ensure the code makes no assumptions.
+    key[len] = '1';
+    return ByteSpan(reinterpret_cast<uint8_t *>(key), len);
 }
 
 void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
@@ -87,6 +90,7 @@ void TestGetTxtFieldKeyCaseInsensitive(nlTestSuite * inSuite, void * inContext)
     sprintf(key, "Xx");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
 }
+
 void TestGetProduct(nlTestSuite * inSuite, void * inContext)
 {
     // Product and vendor are given as part of the same key, on either side of a + sign. Product is after the +
@@ -139,6 +143,7 @@ void TestGetLongDiscriminator(nlTestSuite * inSuite, void * inContext)
     printf("ld = %s\n", ld);
     NL_TEST_ASSERT(inSuite, GetLongDisriminator(GetSpan(ld)) == 0);
 }
+
 void TestGetAdditionalPairing(nlTestSuite * inSuite, void * inContext)
 {
     char ap[64];
@@ -149,6 +154,7 @@ void TestGetAdditionalPairing(nlTestSuite * inSuite, void * inContext)
     sprintf(ap, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
     NL_TEST_ASSERT(inSuite, GetAdditionalPairing(GetSpan(ap)) == 0);
 }
+
 void TestGetCommissioningMode(nlTestSuite * inSuite, void * inContext)
 {
     char cm[64];
@@ -162,6 +168,7 @@ void TestGetCommissioningMode(nlTestSuite * inSuite, void * inContext)
     sprintf(cm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
     NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 0);
 }
+
 void TestGetDeviceType(nlTestSuite * inSuite, void * inContext)
 {
     char dt[64];
@@ -172,6 +179,7 @@ void TestGetDeviceType(nlTestSuite * inSuite, void * inContext)
     sprintf(dt, "%u", static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
     NL_TEST_ASSERT(inSuite, GetDeviceType(GetSpan(dt)) == 0);
 }
+
 void TestGetDeviceName(nlTestSuite * inSuite, void * inContext)
 {
     char name[kMaxDeviceNameLen + 1] = "";
@@ -190,6 +198,7 @@ void TestGetDeviceName(nlTestSuite * inSuite, void * inContext)
     val[kMaxDeviceNameLen] = '\0';
     NL_TEST_ASSERT(inSuite, strcmp(name, val) == 0);
 }
+
 void TestGetRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 {
     // Rotating device ID is given as up to 50 hex bytes
@@ -229,6 +238,7 @@ void TestGetRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, id[i] == i);
     }
 }
+
 void TestGetPairingHint(nlTestSuite * inSuite, void * inContext)
 {
     char ph[64];
@@ -242,6 +252,7 @@ void TestGetPairingHint(nlTestSuite * inSuite, void * inContext)
     sprintf(ph, "%u", static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
     NL_TEST_ASSERT(inSuite, GetPairingHint(GetSpan(ph)) == 0);
 }
+
 void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
 {
     char data[kMaxPairingInstructionLen + 2];
@@ -255,6 +266,8 @@ void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
     memset(data, 'a', kMaxPairingInstructionLen);
     data[kMaxPairingInstructionLen] = '\0';
     GetPairingInstruction(GetSpan(data), ret);
+    // Add back the null terminator removed by GetSpan.
+    data[kMaxPairingInstructionLen] = '\0';
     NL_TEST_ASSERT(inSuite, strcmp(data, ret) == 0);
 
     // Too long - should truncate end.

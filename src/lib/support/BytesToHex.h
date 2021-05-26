@@ -96,5 +96,7 @@ inline CHIP_ERROR BytesToLowercaseHexString(const uint8_t * src_bytes, size_t sr
     return BytesToHex(src_bytes, src_size, dest_hex_str, dest_size_max, HexFlags::kNullTerminate);
 }
 
+size_t HexToBytes(const char * srcHex, const size_t srcLen, uint8_t * destBytes, size_t destMaxLen);
+
 } // namespace Encoding
 } // namespace chip

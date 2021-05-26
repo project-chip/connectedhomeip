@@ -27,6 +27,7 @@
 namespace chip {
 namespace Mdns {
 
+#ifdef CHIP_CONFIG_TEST
 namespace Internal {
 
 enum class TxtFieldKey : uint8_t
@@ -58,6 +59,7 @@ uint16_t GetPairingHint(const ByteSpan & value);
 void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction);
 
 } // namespace Internal
+#endif
 
 void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommissionableNodeData * nodeData);
 
