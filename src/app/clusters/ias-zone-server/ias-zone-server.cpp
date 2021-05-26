@@ -52,17 +52,17 @@
 
 #include "ias-zone-server.h"
 #include <app/Command.h>
+#include <app/common/gen/att-storage.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 #include <system/SystemLayer.h>
 
-#include "gen/att-storage.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
 #include "gen/callback.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 using namespace chip;
 

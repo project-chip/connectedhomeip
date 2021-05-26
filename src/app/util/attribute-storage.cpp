@@ -43,7 +43,8 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 
-#include "gen/attribute-type.h"
+#include <app/common/gen/attribute-type.h>
+
 #include "gen/callback.h"
 
 using namespace chip;
