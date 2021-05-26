@@ -142,6 +142,18 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 public:
+    void DebugDump(const char * title) const
+    {
+        printf("DebugDump %s message DataLength=%d\n", title, DataLength());
+        uint8_t startOfBuf[DataLength()];
+        Read(startOfBuf, sizeof(startOfBuf));
+        for (int i = 0; i < (int) sizeof(startOfBuf); i++)
+        {
+            printf("%d ", startOfBuf[i]);
+        }
+        printf("\n");
+    }
+
     /**
      * The maximum size buffer an application can allocate with no protocol header reserve.
      */

@@ -30,10 +30,13 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
+#include <mdns/ServiceNaming.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -54,6 +57,12 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Messaging;
 
 namespace {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+// TODO: remove Echo Server - this is just temporary for debugging
+chip::Protocols::Echo::EchoServer gEchoServer;
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer gUDCServer;
+#endif
 
 constexpr bool isRendezvousBypassed()
 {
@@ -567,6 +576,24 @@ void InitServer(AppDelegate * delegate)
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    err = gEchoServer.Init(&gExchangeMgr);
+    SuccessOrExit(err);
+
+    err = gUDCServer.Init(&gExchangeMgr);
+    SuccessOrExit(err);
+#endif
+
+    /*
+    printf("sleeping for 2 secs\n");
+    sleep(1);
+    printf("done sleeping\n");
+
+    chip::Inet::IPAddress commissioner;
+    chip::Inet::IPAddress::FromString("127.0.0.1", commissioner);
+    SendUserDirectedCommissioningRequest(commissioner, CHIP_PORT + 2);
+    */
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -577,6 +604,75 @@ exit:
         ChipLogProgress(AppServer, "Server Listening...");
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
+constexpr chip::Transport::AdminId gAdminId = 0;
+
+CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port)
+{
+    printf("SendUserDirectedCommissioningRequest\n");
+
+    CHIP_ERROR err;
+    chip::Optional<chip::Transport::PeerAddress> peerAddr;
+    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
+    VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    peerAddr = chip::Optional<chip::Transport::PeerAddress>::Value(
+        chip::Transport::PeerAddress::UDP(commissioner, port, INET_NULL_INTERFACEID));
+
+    err = gSessions.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
+                               chip::SecureSession::SessionRole::kInitiator, gAdminId);
+
+    char nameBuffer[17];
+    err = app::Mdns::GetInstanceName(nameBuffer, sizeof(nameBuffer));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to create mdns hostname: %s", ErrorStr(err));
+        return err;
+    }
+    printf("instanceName=%s\n", nameBuffer);
+
+    err = gUDCClient.Init(&gExchangeMgr, { chip::kTestDeviceNodeId, 0, gAdminId });
+
+    SuccessOrExit(err);
+
+    for (unsigned int i = 0; i < 5; i++)
+    {
+        chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+
+        if (payloadBuf.IsNull())
+        {
+            printf("Unable to allocate packet buffer\n");
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        err = gUDCClient.SendUDCRequest(std::move(payloadBuf));
+
+        if (err == CHIP_NO_ERROR)
+        {
+            printf("Send UDC request success");
+        }
+        else
+        {
+            printf("Send UDC request failed, err: %s\n", chip::ErrorStr(err));
+        }
+
+        sleep(1);
+    }
+
+exit:
+    gUDCClient.Shutdown();
+
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));
+    }
+
+    return err;
+}
+#endif
 
 CHIP_ERROR AddTestPairing()
 {

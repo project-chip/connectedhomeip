@@ -21,6 +21,7 @@
 
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
+#include <mdns/ServiceNaming.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
@@ -83,6 +84,12 @@ chip::ByteSpan FillMAC(uint8_t (&mac)[8])
 }
 
 } // namespace
+
+CHIP_ERROR GetInstanceName(char * buffer, size_t bufferLen)
+{
+    uint8_t mac[8];
+    return chip::Mdns::MakeHostName(buffer, bufferLen, FillMAC(mac));
+}
 
 /// Set MDNS operational advertisement
 CHIP_ERROR AdvertiseOperational()

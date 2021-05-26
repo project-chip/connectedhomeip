@@ -47,6 +47,10 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
  */
 void InitServer(AppDelegate * delegate = nullptr);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port);
+#endif
+
 CHIP_ERROR AddTestPairing();
 
 chip::Transport::AdminPairingTable & GetGlobalAdminPairingTable();

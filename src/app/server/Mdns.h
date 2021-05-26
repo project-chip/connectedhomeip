@@ -42,6 +42,10 @@ void StartServer();
 
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
+/// Generates the instance name that a CHIP device is to use for DNS-SD
+/// (based upon MAC address)
+CHIP_ERROR GetInstanceName(char * buffer, size_t bufferLen);
+
 } // namespace Mdns
 } // namespace app
 } // namespace chip

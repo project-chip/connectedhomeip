@@ -49,6 +49,8 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
     err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
 
+    printf("UDP::Init bind&listen port=%d\n", params.GetListenPort());
+
     err = mUDPEndPoint->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
     SuccessOrExit(err);
 
@@ -87,6 +89,8 @@ void UDP::Close()
 
 CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
+    msgBuf->DebugDump("UDP::SendMessage");
+
     VerifyOrReturnError(address.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mUDPEndPoint != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -103,6 +107,13 @@ CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::Pack
 
 void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer, const Inet::IPPacketInfo * pktInfo)
 {
+    // TODO: remove diagnostic (or put behind compile time #ifdef)
+    char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+    pktInfo->SrcAddress.ToString(addrBuffer, sizeof(addrBuffer));
+
+    printf("UDP::OnUdpReceive message from %s, DataLength=%d\n", addrBuffer, buffer->DataLength());
+    buffer->DebugDump("UDP::OnUdpReceive");
+
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);

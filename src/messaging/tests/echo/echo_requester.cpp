@@ -33,6 +33,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
@@ -48,15 +49,16 @@
 namespace {
 
 // Max value for the number of EchoRequests sent.
-constexpr size_t kMaxEchoCount = 3;
+constexpr size_t kMaxEchoCount = 5;
 
 // The CHIP Echo interval time in milliseconds.
-constexpr int32_t gEchoInterval = 1000;
+constexpr int32_t gEchoInterval = 100;
 
 constexpr chip::Transport::AdminId gAdminId = 0;
 
 // The EchoClient object.
 chip::Protocols::Echo::EchoClient gEchoClient;
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
 
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
@@ -76,7 +78,11 @@ uint64_t gEchoCount = 0;
 // Count of the number of EchoResponses received.
 uint64_t gEchoRespCount = 0;
 
+const char gInstanceName[] = "1234567890abcdef";
+
 bool gUseTCP = false;
+
+bool gUseUDC = false;
 
 bool EchoIntervalExpired(void)
 {
@@ -118,6 +124,38 @@ CHIP_ERROR SendEchoRequest(void)
     return err;
 }
 
+CHIP_ERROR SendUDCRequest(const char * name)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    char instanceName[16];
+    snprintf(instanceName, sizeof instanceName, "%s", name);
+    chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(instanceName, strlen(instanceName));
+
+    if (payloadBuf.IsNull())
+    {
+        printf("Unable to allocate packet buffer\n");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
+
+    printf("\nSend UDC request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
+
+    err = gUDCClient.SendUDCRequest(std::move(payloadBuf));
+
+    if (err == CHIP_NO_ERROR)
+    {
+        gWaitingForEchoResp = true;
+        gEchoCount++;
+    }
+    else
+    {
+        printf("Send UDC request failed, err: %s\n", chip::ErrorStr(err));
+    }
+
+    return err;
+}
+
 CHIP_ERROR EstablishSecureSession()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -133,7 +171,7 @@ CHIP_ERROR EstablishSecureSession()
     else
     {
         peerAddr = chip::Optional<chip::Transport::PeerAddress>::Value(
-            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID));
+            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT + 2, INET_NULL_INTERFACEID));
     }
 
     // Attempt to connect to the peer.
@@ -164,6 +202,22 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
 
     printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
            static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
+
+    payload->DebugDump("HandleEchoResponseReceived");
+}
+
+void HandleUDCResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle payload)
+{
+    uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
+    uint32_t transitTime = respTime - gLastEchoTime;
+
+    gWaitingForEchoResp = false;
+    gEchoRespCount++;
+
+    printf("UDC Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
+           static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
+
+    payload->DebugDump("HandleUDCResponseReceived");
 }
 
 void RunPinging()
@@ -173,7 +227,15 @@ void RunPinging()
     // Connection has been established. Now send the EchoRequests.
     for (unsigned int i = 0; i < kMaxEchoCount; i++)
     {
-        err = SendEchoRequest();
+        if (gUseUDC)
+        {
+            err = SendUDCRequest(gInstanceName);
+        }
+        else
+        {
+            err = SendEchoRequest();
+        }
+
         if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
@@ -219,6 +281,11 @@ int main(int argc, char * argv[])
     if ((argc == 3) && (strcmp(argv[2], "--tcp") == 0))
     {
         gUseTCP = true;
+    }
+
+    if ((argc == 3) && (strcmp(argv[2], "--send-udc") == 0))
+    {
+        gUseUDC = true;
     }
 
     if (!chip::Inet::IPAddress::FromString(argv[1], gDestAddr))
@@ -268,15 +335,30 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
-    SuccessOrExit(err);
+    if (gUseUDC)
+    {
+        err = gUDCClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
+        SuccessOrExit(err);
 
-    // Arrange to get a callback whenever an Echo Response is received.
-    gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
+        // Arrange to get a callback whenever an Echo Response is received.
+        gUDCClient.SetUDCResponseReceived(HandleEchoResponseReceived);
 
-    RunPinging();
+        RunPinging();
 
-    gEchoClient.Shutdown();
+        gUDCClient.Shutdown();
+    }
+    else
+    {
+        err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
+        SuccessOrExit(err);
+
+        // Arrange to get a callback whenever an Echo Response is received.
+        gEchoClient.SetEchoResponseReceived(HandleUDCResponseReceived);
+
+        RunPinging();
+
+        gEchoClient.Shutdown();
+    }
 
     ShutdownChip();
 

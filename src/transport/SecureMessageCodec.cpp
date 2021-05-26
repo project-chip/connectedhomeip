@@ -48,17 +48,21 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
 
-    packetHeader
-        .SetSourceNodeId(localNodeId) //
-        .SetMessageId(msgId)          //
-        .SetEncryptionKeyID(state->GetPeerKeyID());
-
-    if (state->GetPeerNodeId() != kUndefinedNodeId)
+    // TODO: Echo should be encrypted so remove this from list of exceptions
+    if (!payloadHeader.HasProtocol(Protocols::UserDirectedCommissioning::Id) && !payloadHeader.HasProtocol(Protocols::Echo::Id))
     {
-        packetHeader.SetDestinationNodeId(state->GetPeerNodeId());
-    }
+        packetHeader
+            .SetSourceNodeId(localNodeId) //
+            .SetMessageId(msgId)          //
+            .SetEncryptionKeyID(state->GetPeerKeyID());
 
-    packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
+        if (state->GetPeerNodeId() != kUndefinedNodeId)
+        {
+            packetHeader.SetDestinationNodeId(state->GetPeerNodeId());
+        }
+
+        packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
+    }
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
 
@@ -66,10 +70,19 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
     uint16_t totalLen = msgBuf->TotalLength();
 
     MessageAuthenticationCode mac;
-    ReturnErrorOnFailure(state->EncryptBeforeSend(data, totalLen, data, packetHeader, mac));
-
     uint16_t taglen = 0;
-    ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], msgBuf->AvailableDataLength(), &taglen));
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    {
+        ReturnErrorOnFailure(state->EncryptBeforeSend(data, totalLen, data, packetHeader, mac));
+        ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], msgBuf->AvailableDataLength(), &taglen));
+    }
+    else
+    {
+        packetHeader.SetEncryptionType(Header::EncryptionType::kAESCCMTagLen8);
+    }
+
+    // TODO: remove
+    printf("SecureMessageCodec totalLen=%d taglen=%d \n", totalLen, taglen);
 
     VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
