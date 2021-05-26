@@ -503,7 +503,7 @@ bool emberAfDoorLockClusterClearAllPinsCallback(chip::app::Command * commandObj)
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), 0));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint8_t>(0)));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 exit:
@@ -659,7 +659,7 @@ bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::Command * commandObj
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), 0));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint8_t>(0)));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 exit:
