@@ -14,8 +14,8 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
-import("//build_overrides/qpg6100_sdk.gni")
 import("//build_overrides/ot_qorvo.gni")
+import("//build_overrides/qpg6100_sdk.gni")
 
 import("${qpg6100_sdk_build_root}/qpg6100_sdk.gni")
 
@@ -23,8 +23,7 @@ import("${qpg6100_sdk_build_root}/qpg6100_sdk.gni")
 openthread_qpg_family = "qpg6100"
 
 config("openthread_qpg6100_config") {
-  include_dirs =
-      [ "${openthread_qorvo_root}/src/${openthread_qpg_family}" ]
+  include_dirs = [ "${openthread_qorvo_root}/src/${openthread_qpg_family}" ]
 
   include_dirs += [ "${chip_root}/examples/platform/qpg6100" ]
 }
@@ -57,8 +56,7 @@ source_set("libopenthread-qpg6100") {
     "${openthread_qorvo_root}/src/${openthread_qpg_family}/uart.c",
   ]
 
-  include_dirs =
-      [ "${openthread_qorvo_root}/src/${openthread_qpg_family}" ]
+  include_dirs = [ "${openthread_qorvo_root}/src/${openthread_qpg_family}" ]
 
   libs = [ "${qpg6100_sdk_root}/qpg6100/lib/libOpenThread_qpg6100.a" ]
 
