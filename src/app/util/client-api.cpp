@@ -330,13 +330,13 @@ EmberStatus emberAfSendCommandMulticastToBindings(void)
     return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
 }
 
-// EmberStatus emberAfSendCommandUnicastWithCallback(chip::MessageSendDestination & destination, EmberAfMessageSentFunction
+// EmberStatus emberAfSendCommandUnicastWithCallback(const chip::MessageSendDestination & destination, EmberAfMessageSentFunction
 // callback)
 // {
 //     return emberAfSendUnicastWithCallback(destination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
 // }
 
-// EmberStatus emberAfSendCommandUnicast(chip::MessageSendDestination & destination)
+// EmberStatus emberAfSendCommandUnicast(const chip::MessageSendDestination & destination)
 // {
 //     return emberAfSendCommandUnicastWithCallback(destination, NULL);
 // }

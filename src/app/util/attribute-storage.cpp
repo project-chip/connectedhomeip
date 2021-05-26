@@ -326,7 +326,7 @@ void emberAfClusterMessageSentWithMfgCodeCallback(const MessageSendDestination &
 // This function is used to call the per-cluster message sent callback, and
 // wraps the emberAfClusterMessageSentWithMfgCodeCallback with a
 // EMBER_AF_NULL_MANUFACTURER_CODE.
-void emberAfClusterMessageSentCallback(MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
+void emberAfClusterMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
                                        uint8_t * message, EmberStatus status)
 {
     emberAfClusterMessageSentWithMfgCodeCallback(destination, apsFrame, msgLen, message, status, EMBER_AF_NULL_MANUFACTURER_CODE);

@@ -123,7 +123,7 @@ void emAfIncomingMessageHandler(EmberIncomingMessageType type, EmberApsFrame * a
                                 uint16_t messageLength, uint8_t * messageContents);
 EmberStatus emAfSend(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint8_t messageLength,
                      uint8_t * message, uint8_t * messageTag, EmberNodeId alias, uint8_t sequence);
-void emAfMessageSentHandler(chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, EmberStatus status,
+void emAfMessageSentHandler(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, EmberStatus status,
                             uint16_t messageLength, uint8_t * messageContents, uint8_t messageTag);
 
 void emAfStackStatusHandler(EmberStatus status);

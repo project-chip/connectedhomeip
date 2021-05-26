@@ -331,7 +331,7 @@ EmberStatus emberAfSendMulticastWithAliasWithCallback(GroupId multicastId, Ember
                                                       EmberAfMessageSentFunction callback)
 {
     apsFrame->groupId                        = multicastId;
-    const MessageSendDestination destination = MessageSendDestination::Multicast(multicastId);
+    const MessageSendDestination destination = MessageSendDestination::MulticastWithAlias(multicastId);
     return send(destination, apsFrame, messageLength, message,
                 true, // broadcast
                 alias, sequence, callback);
@@ -436,7 +436,7 @@ EmberStatus emberAfSendUnicastWithCallback(const MessageSendDestination & destin
         EmberBindingTableEntry binding;
         // TODO: This cast should go away once
         // https://github.com/project-chip/connectedhomeip/issues/3584 is fixed.
-        EmberStatus status = emberGetBinding(destination.Get<MessageSendDestination::VariantViaBinding>().mBindingIndex, &binding);
+        EmberStatus status = emberGetBinding(destination.GetBindingIndex(), &binding);
         if (status != EMBER_SUCCESS)
         {
             return status;
@@ -630,54 +630,31 @@ EmberStatus emAfSend(const MessageSendDestination & destination, EmberApsFrame *
     // tracks this.
     *messageTag        = INVALID_MESSAGE_TAG;
     EmberStatus status = EMBER_SUCCESS;
-    switch (destination.GetType())
+    if (destination.IsViaBinding())
     {
-    case MessageSendDestination::VariantViaBinding::VariantId: {
         EmberBindingTableEntry binding;
-        status = emberGetBinding(destination.Get<MessageSendDestination::VariantViaBinding>().mBindingIndex, &binding);
+        status = emberGetBinding(destination.GetBindingIndex(), &binding);
         if (status != EMBER_SUCCESS)
         {
-            break;
+            return status;
         }
         if (binding.type != EMBER_UNICAST_BINDING)
         {
-            status = EMBER_INVALID_BINDING_INDEX;
-            break;
+            return EMBER_INVALID_BINDING_INDEX;
         }
-        status = chipSendUnicast(binding.nodeId, apsFrame, messageLength, message);
-        break;
+        return chipSendUnicast(binding.nodeId, apsFrame, messageLength, message);
     }
-    case MessageSendDestination::VariantViaAddressTable::VariantId:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case MessageSendDestination::VariantDirect::VariantId:
-        status =
-            chipSendUnicast(destination.Get<MessageSendDestination::VariantDirect>().mNodeId, apsFrame, messageLength, message);
-        break;
-    case MessageSendDestination::VariantMulticast::VariantId:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case MessageSendDestination::VariantMulticastWithAlias::VariantId:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case MessageSendDestination::VariantBroadcast::VariantId:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case MessageSendDestination::VariantBroadcastWithAlias::VariantId:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case MessageSendDestination::VariantViaExchange::VariantId:
-        status = chipSendUnicast(destination.Get<MessageSendDestination::VariantViaExchange>().mExchangeContext, apsFrame,
-                                 messageLength, message);
-        break;
-    default:
-        status = EMBER_BAD_ARGUMENT;
-        break;
+    else if (destination.IsDirect())
+    {
+        return chipSendUnicast(destination.GetDirectNodeId(), apsFrame, messageLength, message);
     }
-    return status;
+    else if (destination.IsViaExchange())
+    {
+        return chipSendUnicast(destination.GetExchangeContext(), apsFrame, messageLength, message);
+    }
+    else
+    {
+        // No implementation yet.
+        return EMBER_ERR_FATAL;
+    }
 }

@@ -226,8 +226,7 @@ void emberAfPluginMessagingServerDisplayMessage(EmberNodeId nodeId, uint8_t srcE
                               message.startTime, message.durationInMinutes, message.message, message.extendedMessageControl);
     emberAfSetCommandEndpoints(srcEndpoint, dstEndpoint);
     emberAfGetCommandApsFrame()->options |= EMBER_APS_OPTION_SOURCE_EUI64;
-    MessageSendDestination destination = MessageSendDestination(MessageSendDestination::OutGoingDirect(nodeId));
-    status                             = emberAfSendCommandUnicast(destination);
+    status = emberAfSendCommandUnicast(MessageSendDestination::Direct(nodeId));
     if (status != EMBER_SUCCESS)
     {
         emberAfMessagingClusterPrintln("Error in display %x", status);
@@ -249,8 +248,7 @@ void emberAfPluginMessagingServerCancelMessage(EmberNodeId nodeId, uint8_t srcEn
                               ZCL_CANCEL_MESSAGE_COMMAND_ID, "wu", message.messageId, message.messageControl);
     emberAfSetCommandEndpoints(srcEndpoint, dstEndpoint);
     emberAfGetCommandApsFrame()->options |= EMBER_APS_OPTION_SOURCE_EUI64;
-    MessageSendDestination destination = MessageSendDestination(MessageSendDestination::OutGoingDirect(nodeId));
-    status                             = emberAfSendCommandUnicast(destination);
+    status = emberAfSendCommandUnicast(MessageSendDestination::Direct(nodeId));
     if (status != EMBER_SUCCESS)
     {
         emberAfMessagingClusterPrintln("Error in cancel %x", status);

@@ -1259,6 +1259,40 @@ namespace chip {
 class MessageSendDestination
 {
 public:
+    MessageSendDestination(MessageSendDestination & that)       = default;
+    MessageSendDestination(const MessageSendDestination & that) = default;
+    MessageSendDestination(MessageSendDestination && that)      = default;
+
+    static MessageSendDestination ViaBinding(uint8_t bindingIndex)
+    {
+        return MessageSendDestination(VariantViaBinding(bindingIndex));
+    }
+
+    static MessageSendDestination Direct(NodeId nodeId) { return MessageSendDestination(VariantDirect(nodeId)); }
+
+    static MessageSendDestination Multicast(GroupId groupId) { return MessageSendDestination(VariantMulticast(groupId)); }
+
+    static MessageSendDestination MulticastWithAlias(GroupId groupId)
+    {
+        return MessageSendDestination(VariantMulticastWithAlias(groupId));
+    }
+
+    static MessageSendDestination ViaExchange(Messaging::ExchangeContext * exchangeContext)
+    {
+        return MessageSendDestination(VariantViaExchange(exchangeContext));
+    }
+
+    std::size_t GetType() const { return mDestination.GetType(); }
+
+    bool IsViaBinding() const { return mDestination.Is<VariantViaBinding>(); }
+    bool IsDirect() const { return mDestination.Is<VariantDirect>(); }
+    bool IsViaExchange() const { return mDestination.Is<VariantViaExchange>(); }
+
+    uint8_t GetBindingIndex() const { return mDestination.Get<VariantViaBinding>().mBindingIndex; }
+    NodeId GetDirectNodeId() const { return mDestination.Get<VariantDirect>().mNodeId; }
+    Messaging::ExchangeContext * GetExchangeContext() const { return mDestination.Get<VariantViaExchange>().mExchangeContext; }
+
+private:
     struct VariantViaBinding
     {
         static constexpr const std::size_t VariantId = 1;
@@ -1309,40 +1343,6 @@ public:
         Messaging::ExchangeContext * mExchangeContext;
     };
 
-    MessageSendDestination(MessageSendDestination & that)       = default;
-    MessageSendDestination(const MessageSendDestination & that) = default;
-    MessageSendDestination(MessageSendDestination && that)      = default;
-
-    static MessageSendDestination ViaBinding(uint8_t bindingIndex)
-    {
-        return MessageSendDestination(VariantViaBinding(bindingIndex));
-    }
-
-    static MessageSendDestination Direct(NodeId nodeId) { return MessageSendDestination(VariantDirect(nodeId)); }
-
-    static MessageSendDestination Multicast(GroupId groupId) { return MessageSendDestination(VariantMulticast(groupId)); }
-
-    static MessageSendDestination MulticastWithAlias(GroupId groupId)
-    {
-        return MessageSendDestination(VariantMulticastWithAlias(groupId));
-    }
-
-    static MessageSendDestination ViaExchange(Messaging::ExchangeContext * exchangeContext)
-    {
-        return MessageSendDestination(VariantViaExchange(exchangeContext));
-    }
-
-    std::size_t GetType() const { return mDestination.GetType(); }
-
-    bool IsViaBinding() const { return mDestination.Is<VariantViaBinding>(); }
-
-    template <typename Destination>
-    const Destination & Get() const
-    {
-        return mDestination.Get<Destination>();
-    }
-
-private:
     template <typename Destination>
     MessageSendDestination(Destination && destination)
     {
