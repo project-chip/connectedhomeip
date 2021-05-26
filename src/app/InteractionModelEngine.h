@@ -27,8 +27,8 @@
 
 #include <app/MessageDef/ReportData.h>
 #include <core/CHIPCore.h>
-#include <messaging/ExchangeHandle.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHandle.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>

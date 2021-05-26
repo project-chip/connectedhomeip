@@ -44,8 +44,7 @@ public:
     }
 
     CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
-                                 const Transport::PeerAddress & peerAddress,
-                                 Messaging::ExchangeHandle exchangeContext) override;
+                                 const Transport::PeerAddress & peerAddress, Messaging::ExchangeHandle exchangeContext) override;
 
     const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 

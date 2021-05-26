@@ -24,24 +24,29 @@ namespace Messaging {
 
 ExchangeHandle::ExchangeHandle(ExchangeContext * context) : mContext(context)
 {
-    if (mContext != nullptr) mContext->Retain();
+    if (mContext != nullptr)
+        mContext->Retain();
 }
 
 ExchangeHandle::ExchangeHandle(const ExchangeHandle & that) : mContext(that.mContext)
 {
-    if (mContext != nullptr) mContext->Retain();
+    if (mContext != nullptr)
+        mContext->Retain();
 }
 
 ExchangeHandle::~ExchangeHandle()
 {
-    if (mContext != nullptr) mContext->Release();
+    if (mContext != nullptr)
+        mContext->Release();
 }
 
 ExchangeHandle & ExchangeHandle::operator=(const ExchangeHandle & that)
 {
-    if (this == &that) return *this;
+    if (this == &that)
+        return *this;
     mContext = that.mContext;
-    if (mContext != nullptr) mContext->Retain();
+    if (mContext != nullptr)
+        mContext->Retain();
     return *this;
 }
 

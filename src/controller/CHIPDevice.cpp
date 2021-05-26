@@ -270,8 +270,8 @@ void Device::OnConnectionExpired(SecureSessionHandle session)
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(Messaging::ExchangeHandle exchange, const PacketHeader & header,
-                               const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+void Device::OnMessageReceived(Messaging::ExchangeHandle exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
+                               System::PacketBufferHandle && msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {

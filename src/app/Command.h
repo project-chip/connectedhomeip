@@ -129,7 +129,7 @@ protected:
     InvokeCommand::Builder mInvokeCommandBuilder;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeHandle mpExchangeCtx;
-    InteractionModelDelegate * mpDelegate      = nullptr;
+    InteractionModelDelegate * mpDelegate = nullptr;
     chip::System::PacketBufferHandle mCommandMessageBuf;
     uint8_t mCommandIndex = 0;
     CommandState mState   = CommandState::Uninitialized;

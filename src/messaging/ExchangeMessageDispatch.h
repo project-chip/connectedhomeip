@@ -24,8 +24,8 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
-#include <transport/SecureSessionMgr.h>
 #include <messaging/ExchangeHandle.h>
+#include <transport/SecureSessionMgr.h>
 
 namespace chip {
 namespace Messaging {
@@ -45,9 +45,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
-                           ExchangeHandle exchangeContext, bool isReliableTransmission, Protocols::Id protocol,
-                           uint8_t type, System::PacketBufferHandle && message);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator, ExchangeHandle exchangeContext,
+                           bool isReliableTransmission, Protocols::Id protocol, uint8_t type,
+                           System::PacketBufferHandle && message);
 
     virtual CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
                                      EncryptedPacketBufferHandle * retainedMessage) const
@@ -56,8 +56,7 @@ public:
     }
 
     virtual CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
-                                         const Transport::PeerAddress & peerAddress,
-                                         ExchangeHandle exchangeContext);
+                                         const Transport::PeerAddress & peerAddress, ExchangeHandle exchangeContext);
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;

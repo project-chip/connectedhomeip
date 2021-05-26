@@ -118,8 +118,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
     }
 
-    err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), ExchangeHandle(this),
-                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+    err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), ExchangeHandle(this), reliableTransmissionRequested,
+                                 protocolId, msgType, std::move(msgBuf));
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -314,7 +314,8 @@ void ExchangeContext::CancelResponseTimer()
 
 void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    if (aAppState == nullptr) return;
+    if (aAppState == nullptr)
+        return;
 
     ExchangeHandle ec(reinterpret_cast<ExchangeContext *>(aAppState));
 
@@ -337,8 +338,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     ExchangeHandle ec(this);
 
-    CHIP_ERROR err =
-        mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, ExchangeHandle(this));
+    CHIP_ERROR err = mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, ExchangeHandle(this));
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.

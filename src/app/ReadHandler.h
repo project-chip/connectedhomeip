@@ -131,7 +131,7 @@ private:
     CHIP_ERROR AbortExistingExchangeContext();
 
     Messaging::ExchangeHandle mpExchangeCtx;
-    InteractionModelDelegate * mpDelegate      = nullptr;
+    InteractionModelDelegate * mpDelegate = nullptr;
 
     // Don't need the response for report data if true
     bool mSuppressResponse = false;

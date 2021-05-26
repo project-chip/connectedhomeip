@@ -280,8 +280,8 @@ exit:
     return;
 }
 
-void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeHandle exchangeContext,
-                                                     const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
+void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeHandle exchangeContext, const PacketHeader & packetHeader,
+                                                     System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

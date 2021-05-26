@@ -88,8 +88,8 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
     {
         if (entry.ec.HasValue())
         {
-            ChipLogDetail(ExchangeManager, "EC:%04" PRIX16 " MsgId:%08" PRIX32 " NextRetransTimeCtr:%04" PRIX16, entry.ec->GetExchangeId(),
-                          entry.msgId, entry.nextRetransTimeTick);
+            ChipLogDetail(ExchangeManager, "EC:%04" PRIX16 " MsgId:%08" PRIX32 " NextRetransTimeCtr:%04" PRIX16,
+                          entry.ec->GetExchangeId(), entry.msgId, entry.nextRetransTimeTick);
         }
     }
 }
@@ -337,10 +337,10 @@ bool ReliableMessageMgr::CheckAndRemRetransTable(ExchangeHandle exchangeContext,
 
 CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
     ExchangeHandle exchangeContext = entry->ec;
-    uint32_t msgId              = 0; // Not actually used unless we reach the
-                                     // line that initializes it properly.
+    uint32_t msgId                 = 0; // Not actually used unless we reach the
+                                        // line that initializes it properly.
 
     VerifyOrDie(exchangeContext.HasValue());
 

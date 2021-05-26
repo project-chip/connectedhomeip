@@ -124,8 +124,8 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeHandle context = ctx.NewExchangeToLocal(&pairing);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 2, 0, ExchangeHandle(),
-                                            nullptr) != CHIP_NO_ERROR);
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 2, 0,
+                                            ExchangeHandle(), nullptr) != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 2, 0, context,
                                             &delegate) == CHIP_NO_ERROR);
@@ -139,7 +139,7 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     gLoopback.mSentMessageCount = 0;
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
-    ExchangeHandle context1  = ctx.NewExchangeToLocal(&pairing1);
+    ExchangeHandle context1     = ctx.NewExchangeToLocal(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
                    pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 2, 0, context1,

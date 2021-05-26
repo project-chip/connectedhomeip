@@ -100,7 +100,7 @@ public:
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     Messaging::ExchangeHandle mExchangeCtx;
-    EchoFunct OnEchoResponseReceived          = nullptr;
+    EchoFunct OnEchoResponseReceived = nullptr;
     SecureSessionHandle mSecureSession;
 
     void OnMessageReceived(Messaging::ExchangeHandle ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,

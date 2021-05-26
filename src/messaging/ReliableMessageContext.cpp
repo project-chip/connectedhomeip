@@ -42,7 +42,6 @@ ReliableMessageContext::ReliableMessageContext() :
     mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mPendingPeerAckId(0)
 {}
 
-
 bool ReliableMessageContext::AutoRequestAck() const
 {
     return mFlags.Has(Flags::kFlagAutoRequestAck);
@@ -179,7 +178,8 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(ExchangeHandle exchangeContext,
     return err;
 }
 
-CHIP_ERROR ReliableMessageContext::HandleNeedsAck(ExchangeHandle exchangeContext, uint32_t MessageId, BitFlags<MessageFlagValues> MsgFlags)
+CHIP_ERROR ReliableMessageContext::HandleNeedsAck(ExchangeHandle exchangeContext, uint32_t MessageId,
+                                                  BitFlags<MessageFlagValues> MsgFlags)
 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

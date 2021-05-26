@@ -122,7 +122,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     ExchangeHandle exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange.HasValue());
 
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
     ReliableMessageMgr::RetransTableEntry * entry;

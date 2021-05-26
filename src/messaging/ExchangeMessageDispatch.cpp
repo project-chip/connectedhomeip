@@ -40,8 +40,8 @@ namespace chip {
 namespace Messaging {
 
 CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
-                                                ExchangeHandle exchangeContext, bool isReliableTransmission,
-                                                Protocols::Id protocol, uint8_t type, System::PacketBufferHandle && message)
+                                                ExchangeHandle exchangeContext, bool isReliableTransmission, Protocols::Id protocol,
+                                                uint8_t type, System::PacketBufferHandle && message)
 {
     ReliableMessageContext & reliableMessageContext = exchangeContext->GetReliableMessageContext();
     ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
@@ -101,8 +101,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
 }
 
 CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
-                                                      const Transport::PeerAddress & peerAddress,
-                                                      ExchangeHandle exchangeContext)
+                                                      const Transport::PeerAddress & peerAddress, ExchangeHandle exchangeContext)
 {
     ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
                       CHIP_ERROR_INVALID_ARGUMENT);

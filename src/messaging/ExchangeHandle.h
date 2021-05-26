@@ -38,8 +38,9 @@ public:
     ExchangeHandle & operator=(const ExchangeHandle & that);
     ExchangeHandle & operator=(ExchangeHandle && that)
     {
-        if (this == &that) return *this;
-        mContext = that.mContext;
+        if (this == &that)
+            return *this;
+        mContext      = that.mContext;
         that.mContext = nullptr;
         return *this;
     }
@@ -50,6 +51,7 @@ public:
     ExchangeContext * operator->() const { return mContext; }
     bool operator==(const ExchangeHandle & that) const { return mContext == that.mContext; }
     bool operator!=(const ExchangeHandle & that) const { return !(*this == that); }
+
 private:
     friend class ExchangeContext;
     friend class ExchangeManager;

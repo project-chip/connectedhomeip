@@ -264,12 +264,12 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // If we found a handler or we need to create a new exchange context (EC).
     if (matchingUMH != nullptr || sendAckAndCloseExchange)
     {
-            // If rcvd msg is from initiator then this exchange is created as not Initiator.
-            // If rcvd msg is not from initiator then this exchange is created as Initiator.
-            // TODO: Figure out which channel to use for the received message
+        // If rcvd msg is from initiator then this exchange is created as not Initiator.
+        // If rcvd msg is not from initiator then this exchange is created as Initiator.
+        // TODO: Figure out which channel to use for the received message
         ExchangeHandle ec(mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session,
-                sendAckAndCloseExchange && !payloadHeader.IsInitiator(),
-                sendAckAndCloseExchange ? nullptr : matchingUMH->Delegate));
+                                                    sendAckAndCloseExchange && !payloadHeader.IsInitiator(),
+                                                    sendAckAndCloseExchange ? nullptr : matchingUMH->Delegate));
 
         VerifyOrExit(ec.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 

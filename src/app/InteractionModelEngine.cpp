@@ -156,9 +156,8 @@ void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeHandle apExchan
     ChipLogFunctError(err);
 }
 
-void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeHandle apExchangeContext,
-                                                    const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
-                                                    System::PacketBufferHandle && aPayload)
+void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeHandle apExchangeContext, const PacketHeader & aPacketHeader,
+                                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

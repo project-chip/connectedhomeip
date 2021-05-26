@@ -782,8 +782,8 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeHandle exchange, const P
     return CHIP_NO_ERROR;
 }
 
-void PASESession::OnMessageReceived(ExchangeHandle exchange, const PacketHeader & packetHeader,
-                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
+void PASESession::OnMessageReceived(ExchangeHandle exchange, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                    System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = ValidateReceivedMessage(exchange, packetHeader, payloadHeader, std::move(msg));
     SuccessOrExit(err);

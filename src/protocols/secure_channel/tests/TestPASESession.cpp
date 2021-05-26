@@ -109,8 +109,8 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
     ExchangeHandle context = ctx.NewExchangeToLocal(&pairing);
 
-    NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, ExchangeHandle(), nullptr) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(
+        inSuite, pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, ExchangeHandle(), nullptr) != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, context, &delegate) == CHIP_NO_ERROR);
 

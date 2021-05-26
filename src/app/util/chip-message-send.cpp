@@ -52,8 +52,8 @@ class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
 extern Messaging::ExchangeManager * ExchangeManager();
 } // namespace chip
 
-EmberStatus chipSendUnicast(Messaging::ExchangeHandle exchange, EmberApsFrame * apsFrame, uint16_t messageLength,
-                            uint8_t * message, Messaging::SendFlags sendFlags)
+EmberStatus chipSendUnicast(Messaging::ExchangeHandle exchange, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message,
+                            Messaging::SendFlags sendFlags)
 {
     uint16_t frameSize           = encodeApsFrame(nullptr, 0, apsFrame);
     uint32_t dataLengthUnchecked = uint32_t(frameSize) + uint32_t(messageLength);

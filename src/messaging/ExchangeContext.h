@@ -54,7 +54,8 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
+                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
