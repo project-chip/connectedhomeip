@@ -277,6 +277,7 @@ DevKitC
 DevKitM
 df
 dfu
+dhclient
 DHCP
 DHCPC
 DHCPv
