@@ -10,6 +10,7 @@
 # Build System
 out/
 /src/test_driver/nrfconnect/build/
+/src/darwin/Framework/build/
 
 # Environment directory
 .environment/

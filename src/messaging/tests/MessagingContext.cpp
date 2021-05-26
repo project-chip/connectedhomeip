@@ -67,13 +67,13 @@ SecureSessionHandle MessagingContext::GetSessionPeerToLocal()
     return { GetSourceNodeId(), GetLocalKeyId(), GetAdminId() };
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegateBase * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
     return mExchangeManager.NewContext(GetSessionLocalToPeer(), delegate);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegateBase * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
     return mExchangeManager.NewContext(GetSessionPeerToLocal(), delegate);

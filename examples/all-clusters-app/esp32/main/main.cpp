@@ -34,9 +34,6 @@
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
 #include "nvs_flash.h"
 
 #include <cmath>
@@ -45,6 +42,9 @@
 #include <string>
 #include <vector>
 
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/Mdns.h>
 #include <app/server/OnboardingCodesUtil.h>
