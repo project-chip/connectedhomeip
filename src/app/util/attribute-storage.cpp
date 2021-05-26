@@ -146,10 +146,12 @@ void emberAfEndpointConfigure(void)
         emAfEndpoints[ep].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
     }
 
+#ifdef DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
     {
         memset(&emAfEndpoints[FIXED_ENDPOINT_COUNT], 0, sizeof(EmberAfDefinedEndpoint) * (MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT));
     }
+#endif
 }
 
 void emberAfSetDynamicEndpointCount(uint8_t dynamicEndpointCount)
