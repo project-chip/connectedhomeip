@@ -393,12 +393,14 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
 
     if (packetHeader.GetDestinationNodeId().HasValue())
     {
-        ChipLogError(Inet, "Secure transport received message destined to node ID (0x" ChipLogFormatX64 ")",
-                     ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()));
+        ChipLogProgress(Inet, "Secure transport received message destined to fabric %d, node 0x" ChipLogFormatX64 ". Key ID %d",
+                        static_cast<int>(state->GetAdminId()), ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()),
+                        packetHeader.GetEncryptionKeyID());
     }
     else
     {
-        ChipLogError(Inet, "Secure transport received message without node ID with key ID (%d)", packetHeader.GetEncryptionKeyID());
+        ChipLogProgress(Inet, "Secure transport received message for fabric %d without node ID. Key ID %d",
+                        static_cast<int>(state->GetAdminId()), packetHeader.GetEncryptionKeyID());
     }
 
     mPeerConnections.MarkConnectionActive(state);

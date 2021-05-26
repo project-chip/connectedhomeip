@@ -141,6 +141,36 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testReuseChipClusterObject
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseCHIPClusterObjectFirstCall"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster test:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    expectation = [self expectationWithDescription:@"ReuseCHIPClusterObjectSecondCall"];
+
+    // Reuse the CHIPCluster Object for multiple times.
+
+    [cluster test:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ReuseCHIPClusterObject test Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTestNotHandledCommand
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"TestClusterTestNotHandledCommand"];
