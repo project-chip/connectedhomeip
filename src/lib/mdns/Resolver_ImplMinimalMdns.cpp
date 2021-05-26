@@ -44,16 +44,17 @@ enum class DiscoveryType
     kUnknown,
     kOperational,
     kCommissionableNode,
+    kCommissionerNode
 };
 
 class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
 {
 public:
-    TxtRecordDelegateImpl(CommissionableNodeData * nodeData) : mNodeData(nodeData) {}
+    TxtRecordDelegateImpl(DiscoveredNodeData * nodeData) : mNodeData(nodeData) {}
     void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value);
 
 private:
-    CommissionableNodeData * mNodeData;
+    DiscoveredNodeData * mNodeData;
 };
 
 const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
@@ -101,7 +102,7 @@ private:
     ResolverDelegate * mDelegate = nullptr;
     DiscoveryType mDiscoveryType;
     ResolvedNodeData mNodeData;
-    CommissionableNodeData mCommissionableNodeData;
+    DiscoveredNodeData mDiscoveredNodeData;
     BytesRange mPacketRange;
 
     bool mValid       = false;
@@ -111,7 +112,7 @@ private:
     void OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
     void OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
 
-    void OnCommissionableNodeIPAddress(const chip::Inet::IPAddress & addr);
+    void OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr);
     void OnOperationalIPAddress(const chip::Inet::IPAddress & addr);
 };
 
@@ -164,7 +165,7 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     {
         return;
     }
-    strncpy(mCommissionableNodeData.hostName, it.Value(), sizeof(CommissionableNodeData::hostName));
+    strncpy(mDiscoveredNodeData.hostName, it.Value(), sizeof(DiscoveredNodeData::hostName));
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
@@ -179,13 +180,13 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     mHasIP             = true;
 }
 
-void PacketDataReporter::OnCommissionableNodeIPAddress(const chip::Inet::IPAddress & addr)
+void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
 {
-    if (mCommissionableNodeData.numIPs >= CommissionableNodeData::kMaxIPAddresses)
+    if (mDiscoveredNodeData.numIPs >= DiscoveredNodeData::kMaxIPAddresses)
     {
         return;
     }
-    mCommissionableNodeData.ipAddress[mCommissionableNodeData.numIPs++] = addr;
+    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs++] = addr;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
@@ -233,9 +234,9 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
                 mValid = false;
             }
         }
-        else if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+        else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
-            if (HasQNamePart(data.GetName(), kCommissionableServiceName))
+            if (HasQNamePart(data.GetName(), kCommissionableServiceName) || HasQNamePart(data.GetName(), kCommissionerServiceName))
             {
                 OnCommissionableNodeSrvRecord(data.GetName(), srv);
             }
@@ -247,9 +248,9 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         break;
     }
     case QType::TXT:
-        if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+        if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
-            TxtRecordDelegateImpl textRecordDelegate(&mCommissionableNodeData);
+            TxtRecordDelegateImpl textRecordDelegate(&mDiscoveredNodeData);
             ParseTxtRecord(data.GetData(), &textRecordDelegate);
         }
         break;
@@ -266,9 +267,9 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             {
                 OnOperationalIPAddress(addr);
             }
-            else if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+            else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnCommissionableNodeIPAddress(addr);
+                OnDiscoveredNodeIPAddress(addr);
             }
         }
         break;
@@ -286,9 +287,9 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             {
                 OnOperationalIPAddress(addr);
             }
-            else if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+            else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnCommissionableNodeIPAddress(addr);
+                OnDiscoveredNodeIPAddress(addr);
             }
         }
         break;
@@ -300,9 +301,10 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
 
 void PacketDataReporter::OnComplete()
 {
-    if (mDiscoveryType == DiscoveryType::kCommissionableNode && mCommissionableNodeData.IsValid())
+    if ((mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode) &&
+        mDiscoveredNodeData.IsValid())
     {
-        mDelegate->OnCommissionableNodeFound(mCommissionableNodeData);
+        mDelegate->OnNodeDiscoveryComplete(mDiscoveredNodeData);
     }
     else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
     {
@@ -323,6 +325,7 @@ public:
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
 private:
     ResolverDelegate * mDelegate = nullptr;
@@ -407,6 +410,11 @@ CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
     return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
 }
 
+CHIP_ERROR MinMdnsResolver::FindCommissioners(DiscoveryFilter filter)
+{
+    return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
+}
+
 // TODO(cecille): Extend filter and use this for Resolve
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
@@ -429,6 +437,19 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
             char subtypeStr[kMaxSubtypeDescSize];
             ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
             qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
+                                          kLocalDomain);
+        }
+        break;
+    case DiscoveryType::kCommissionerNode:
+        if (filter.type == DiscoveryFilterType::kNone)
+        {
+            qname = CheckAndAllocateQName(kCommissionerServiceName, kCommissionProtocol, kLocalDomain);
+        }
+        else
+        {
+            char subtypeStr[kMaxSubtypeDescSize];
+            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
+            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
                                           kLocalDomain);
         }
         break;

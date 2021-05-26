@@ -39,7 +39,7 @@ struct ResolvedNodeData
 constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
 constexpr size_t kMaxPairingInstructionLen = 128;
-struct CommissionableNodeData
+struct DiscoveredNodeData
 {
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
@@ -80,7 +80,7 @@ struct CommissionableNodeData
             ipAddress[i] = chip::Inet::IPAddress::Any;
         }
     }
-    CommissionableNodeData() { Reset(); }
+    DiscoveredNodeData() { Reset(); }
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
 };
@@ -94,6 +94,7 @@ enum class DiscoveryFilterType : uint8_t
     kDeviceType,
     kCommissioningMode,
     kCommissioningModeFromCommand,
+    kCommissioner
 };
 struct DiscoveryFilter
 {
@@ -114,8 +115,8 @@ public:
     /// Called when a CHIP node ID resolution has failed
     virtual void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
 
-    // Called when a CHIP Node in commissioning mode is found
-    virtual void OnCommissionableNodeFound(const CommissionableNodeData & nodeData) = 0;
+    // Called when a CHIP Node acting as Commissioner or in commissioning mode is found
+    virtual void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) = 0;
 };
 
 /// Interface for resolving CHIP services
@@ -138,6 +139,9 @@ public:
 
     // Finds all nodes with the given filter that are currently in commissioning mode.
     virtual CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+
+    // Finds all nodes with the given filter that are currently acting as Commissioners.
+    virtual CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
     /// Provides the system-wide implementation of the service resolver
     static Resolver & Instance();
