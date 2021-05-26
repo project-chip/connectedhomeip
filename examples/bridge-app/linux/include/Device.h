@@ -34,7 +34,7 @@
 class Device
 {
 public:
-    static const int kDeviceNameSize = 32;
+    static const int kDeviceNameSize     = 32;
     static const int kDeviceLocationSize = 32;
 
     enum State_t
@@ -51,14 +51,14 @@ public:
         kChanged_Name      = 0x08,
     } Changed;
 
-    Device(const char *szDeviceName, const char *szLocation);
+    Device(const char * szDeviceName, const char * szLocation);
 
     bool IsOn();
     bool IsReachable();
     void SetOnOff(bool aOn);
     void SetReachable(bool aReachable);
-    void SetName(const char *szDeviceName);
-    void SetLocation(const char *szLocation);
+    void SetName(const char * szDeviceName);
+    void SetLocation(const char * szLocation);
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
     inline char * GetName() { return mName; };
@@ -68,7 +68,7 @@ public:
     void SetChangeCallback(DeviceCallback_fn aChanged_CB);
 
 private:
-//    friend LightingManager & LightingMgr(void);
+    //    friend LightingManager & LightingMgr(void);
     State_t mState;
     bool mReachable;
     char mName[kDeviceNameSize];
@@ -76,10 +76,10 @@ private:
     chip::EndpointId mEndpointId;
     DeviceCallback_fn mChanged_CB;
 
-//    static LightingManager sLight;
+    //    static LightingManager sLight;
 };
 
-//inline LightingManager & LightingMgr(void)
+// inline LightingManager & LightingMgr(void)
 //{
 //    return LightingManager::sLight;
 //}

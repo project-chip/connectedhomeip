@@ -149,7 +149,8 @@ void emberAfEndpointConfigure(void)
 #ifdef DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
     {
-        memset(&emAfEndpoints[FIXED_ENDPOINT_COUNT], 0, sizeof(EmberAfDefinedEndpoint) * (MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT));
+        memset(&emAfEndpoints[FIXED_ENDPOINT_COUNT], 0,
+               sizeof(EmberAfDefinedEndpoint) * (MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT));
     }
 #endif
 }
@@ -172,7 +173,8 @@ uint8_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     return 0xFF;
 }
 
-EmberAfStatus emberAfSetDynamicEndpoint(uint8_t index, EndpointId id, EmberAfEndpointType *ep, uint16_t deviceId, uint8_t deviceVersion)
+EmberAfStatus emberAfSetDynamicEndpoint(uint8_t index, EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
+                                        uint8_t deviceVersion)
 {
     index += FIXED_ENDPOINT_COUNT;
 
@@ -219,8 +221,8 @@ EndpointId emberAfClearDynamicEndpoint(uint8_t index)
         if (ep)
         {
             emberAfSetDeviceEnabled(ep, false);
-            emAfEndpoints[index].endpoint      = 0;
-            emAfEndpoints[index].bitmask       = 0;
+            emAfEndpoints[index].endpoint = 0;
+            emAfEndpoints[index].bitmask  = 0;
         }
 
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
@@ -231,7 +233,6 @@ EndpointId emberAfClearDynamicEndpoint(uint8_t index)
 
     return ep;
 }
-
 
 uint8_t emberAfFixedEndpointCount(void)
 {
