@@ -754,8 +754,8 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
         .sessionMgr      = mSessionMgr,
         .exchangeMgr     = mExchangeMgr,
         .inetLayer       = mInetLayer,
-        .credentials     = &mCredentials,
         .storageDelegate = mStorageDelegate,
+        .credentials     = &mCredentials,
     };
 }
 
