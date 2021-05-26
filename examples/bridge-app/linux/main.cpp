@@ -532,12 +532,13 @@ int main(int argc, char * argv[])
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
-    gFirstDynamicEndpointId = emberAfEndpointFromIndex(emberAfFixedEndpointCount() - 1) + 1;
+    gFirstDynamicEndpointId = static_cast<chip::EndpointId>(static_cast<int>(emberAfEndpointFromIndex(
+                                                 static_cast<int>(emberAfFixedEndpointCount()) - 1)) + 1);
     gCurrentEndpointId = gFirstDynamicEndpointId;
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
-    emberAfEndpointEnableDisable(emberAfEndpointFromIndex(emberAfFixedEndpointCount() - 1), false);
+    emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<int>(emberAfFixedEndpointCount()) - 1), false);
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
