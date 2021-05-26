@@ -521,7 +521,7 @@ Device::~Device()
         mExchangeMgr->CloseAllContextsForDelegate(this);
     }
 
-    if (mStorageDelegate)
+    if (mStorageDelegate != nullptr && mSessionManager != nullptr)
     {
         // Store the current device in persistent storage so we have the latest
         // message counters available next time.

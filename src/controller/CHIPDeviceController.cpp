@@ -468,11 +468,6 @@ CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 
 void DeviceController::PersistDevice(Device * device)
 {
-    // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
-    // requires a valid storage delegate. However, test pairing usecase, that's used
-    // mainly by test applications, do not require a storage delegate. This is to
-    // reduce overheads on these tests.
-    // Let's make sure the delegate object is available before calling into it.
     if (mState == State::Initialized)
     {
         device->Persist();
@@ -754,11 +749,14 @@ void DeviceController::OnCommissionableNodeFound(const chip::Mdns::Commissionabl
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
-    return ControllerDeviceInitParams{ .transportMgr = mTransportMgr,
-                                       .sessionMgr   = mSessionMgr,
-                                       .exchangeMgr  = mExchangeMgr,
-                                       .inetLayer    = mInetLayer,
-                                       .credentials  = &mCredentials };
+    return ControllerDeviceInitParams{
+        .transportMgr    = mTransportMgr,
+        .sessionMgr      = mSessionMgr,
+        .exchangeMgr     = mExchangeMgr,
+        .inetLayer       = mInetLayer,
+        .credentials     = &mCredentials,
+        .storageDelegate = mStorageDelegate,
+    };
 }
 
 DeviceCommissioner::DeviceCommissioner() :
