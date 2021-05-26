@@ -645,7 +645,7 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     if (event.mPriority == apEventLoadOutContext->mPriority)
     {
         apEventLoadOutContext->mCurrentSystemTime.mValue += event.mDeltaSystemTime.mValue;
-        if(IsInterestedEventPaths(apEventLoadOutContext, event))
+        if (IsInterestedEventPaths(apEventLoadOutContext, event))
         {
             return CHIP_EVENT_ID_FOUND;
         }
