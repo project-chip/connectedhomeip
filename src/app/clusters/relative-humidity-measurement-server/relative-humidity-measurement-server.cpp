@@ -54,36 +54,10 @@ EmberAfStatus emberAfRelativeHumidityMeasurementClusterGetMaxMeasuredValue(chip:
 
 void emberAfRelativeHumidityMeasurementClusterServerInitCallback(chip::EndpointId endpoint)
 {
-    uint16_t value       = 0;
-    EmberAfStatus status = emberAfRelativeHumidityMeasurementClusterGetMeasuredValue(endpoint, &value);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfRelativeHumidityMeasurementClusterSetMeasuredValueCallback(endpoint, 0);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfRelativeHumidityMeasurementClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
-
-    status = emberAfRelativeHumidityMeasurementClusterGetMinMeasuredValue(endpoint, &value);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfRelativeHumidityMeasurementClusterSetMinMeasuredValueCallback(endpoint, UINT16_MAX);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfRelativeHumidityMeasurementClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
-
-    status = emberAfRelativeHumidityMeasurementClusterGetMaxMeasuredValue(endpoint, &value);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        status = emberAfRelativeHumidityMeasurementClusterSetMaxMeasuredValueCallback(endpoint, UINT16_MAX);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfRelativeHumidityMeasurementClusterPrintln("ERR: writing present value %x", status);
-        }
-    }
+    /**
+     * nothing to do here - default values set by attribute storage
+     */
+    (void) endpoint;
 }
 
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, uint16_t measuredValue)
