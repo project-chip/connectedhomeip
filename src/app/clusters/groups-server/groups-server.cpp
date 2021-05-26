@@ -181,8 +181,8 @@ bool emberAfGroupsClusterAddGroupCallback(chip::app::Command * commandObj, Group
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<int32_t>(status)));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), static_cast<int32_t>(groupId)));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 exit:
@@ -229,8 +229,8 @@ bool emberAfGroupsClusterViewGroupCallback(chip::app::Command * commandObj, Grou
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<int32_t>(status)));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), static_cast<int32_t>(groupId)));
         SuccessOrExit(err = writer->PutString(TLV::ContextTag(2), reinterpret_cast<char *>(&groupName[1]), groupName[0]));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
@@ -327,7 +327,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::Command * command
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(0), 0xff));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint16_t>(0xff)));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), count));
             SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(2), list, listLen));
             SuccessOrExit(err = commandObj->FinishCommand());
@@ -385,8 +385,8 @@ bool emberAfGroupsClusterRemoveGroupCallback(chip::app::Command * commandObj, Gr
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<int32_t>(status)));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), static_cast<int32_t>(groupId)));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
     if (EMBER_SUCCESS != sendStatus)

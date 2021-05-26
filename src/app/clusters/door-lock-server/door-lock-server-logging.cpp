@@ -155,8 +155,8 @@ bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj,
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), entry.logEntryId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), entry.timestamp));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(2), entry.eventType));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(3), entry.source));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(2), static_cast<int32_t>(entry.eventType)));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(3), static_cast<int32_t>(entry.source)));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(4), entry.eventId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(5), entry.userId));
             SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(6), entry.pin + 1, entry.pin[0]));
