@@ -20,7 +20,7 @@
 
 static bool isLogInitialized;
 extern uint8_t gOtLogUartInstance;
-extern "C" void K32WWriteBlocking(const uint8_t *aBuf, uint32_t len);
+extern "C" void K32WWriteBlocking(const uint8_t * aBuf, uint32_t len);
 
 namespace chip {
 namespace Logging {
@@ -101,7 +101,7 @@ void GenericLog(const char * format, va_list arg)
 
     if (!isLogInitialized)
     {
-        isLogInitialized = true;
+        isLogInitialized   = true;
         gOtLogUartInstance = 0;
         otPlatUartEnable();
     }
