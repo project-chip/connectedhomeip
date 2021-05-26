@@ -67,7 +67,7 @@ class DLL_EXPORT AdminPairingInfo
 {
 public:
     AdminPairingInfo() { Reset(); }
-    
+
     // Returns a pointer to a null terminated char array
     const uint8_t * GetFabricLabel() const { return Uint8::from_const_char(mFabricLabel); };
 
