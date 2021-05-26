@@ -75,9 +75,9 @@ while (($#)); do
             shift
             ;;
         --clusters_for_ip_commissioning | -c)
-           clusters=$2
-           shift
-           ;;
+            clusters=$2
+            shift
+            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
