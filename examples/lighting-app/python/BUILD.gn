@@ -1,0 +1,92 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+
+assert(chip_build_tools)
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+config("includes") {
+  include_dirs = [
+    ".",
+    "include",
+  ]
+}
+
+executable("chip-lighting-app") {
+  sources = [
+    "LightingManager.cpp",
+    "include/CHIPProjectAppConfig.h",
+    "include/LightingManager.h",
+    "main.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+  ]
+
+  include_dirs = [ "include" ]
+
+  cflags = [ "-Wconversion" ]
+
+  if (chip_enable_pw_rpc) {
+    import("//build_overrides/pigweed.gni")
+
+    defines = [ "PW_RPC_ENABLED" ]
+
+    sources += [
+      "${dir_pigweed}/targets/host/system_rpc_server.cc",
+      "Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:pw_rpc",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_log",
+      "$dir_pw_rpc:server",
+      "$dir_pw_rpc:synchronized_channel_output",
+      "$dir_pw_rpc/system_server:facade",
+      "$dir_pw_stream:socket_stream",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_sync:mutex",
+      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/lighting-app/lighting-common:lighting_service.nanopb_rpc",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("linux") {
+  deps = [ ":chip-lighting-app" ]
+
+  if (chip_enable_pw_rpc) {
+    deps += [
+      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app.install",
+      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app_wheel",
+    ]
+  }
+}
+
+group("default") {
+  deps = [ ":linux" ]
+}

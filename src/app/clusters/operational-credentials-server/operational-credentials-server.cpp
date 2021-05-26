@@ -120,7 +120,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
         if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                           "OpCreds: Skipping over unitialized admin with fabricId 0x" ChipLogFormatX64
+                           "OpCreds: Skipping over uninitialized admin with fabricId 0x" ChipLogFormatX64
                            ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
