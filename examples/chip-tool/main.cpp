@@ -18,6 +18,7 @@
 
 #include "commands/common/Commands.h"
 
+#include "commands/casting/Commands.h"
 #include "commands/clusters/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/pairing/Commands.h"
@@ -32,6 +33,7 @@
 int main(int argc, char * argv[])
 {
     Commands commands;
+    registerCommandsCasting(commands);
     registerCommandsDiscover(commands);
     registerCommandsPayload(commands);
     registerCommandsPairing(commands);

@@ -55,6 +55,7 @@ public:
         SetCommandExitStatus(false);
     }
     void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override {}
+    void OnCommissionerFound(const chip::Mdns::CommissionableNodeData & nodeData) override {}
 };
 
 class Update : public DiscoverCommand

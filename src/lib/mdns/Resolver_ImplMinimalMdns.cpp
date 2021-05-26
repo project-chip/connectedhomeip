@@ -43,6 +43,7 @@ enum class DiscoveryType
     kUnknown,
     kOperational,
     kCommissionableNode,
+    kCommissionerNode
 };
 
 class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
@@ -116,6 +117,18 @@ void TxtRecordDelegateImpl::OnRecord(const mdns::Minimal::BytesRange & name, con
         {
             mNodeData->productId = MakeU16(mdns::Minimal::BytesRange(value.Start() + plussign + 1, value.End()));
         }
+    }
+    else if (IsKey(name, "DT"))
+    {
+        mNodeData->deviceType = MakeU16(value);
+    }
+    else if (IsKey(name, "DN"))
+    {
+        for (size_t i = 0; i < value.Size(); ++i)
+        {
+            mNodeData->deviceName[i] = static_cast<char>(value.Start()[i]);
+        }
+        mNodeData->deviceName[value.Size()] = '\0';
     }
     // TODO(cecille): Add the new stuff from 0.7 ballot 2.
 }
@@ -267,7 +280,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
 {
     if (!mValid)
     {
-        return;
+        // return; TODO: bug?
     }
 
     /// Data content is expected to contain:
@@ -288,14 +301,14 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         {
             OnOperationalSrvRecord(data.GetName(), srv);
         }
-        else if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+        else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
             OnCommissionableNodeSrvRecord(data.GetName(), srv);
         }
         break;
     }
     case QType::TXT:
-        if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+        if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
             TxtRecordDelegateImpl textRecordDelegate(&mCommissionableNodeData);
             ParseTxtRecord(data.GetData(), &textRecordDelegate);
@@ -314,7 +327,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             {
                 OnOperationalIPAddress(addr);
             }
-            else if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+            else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
                 OnCommissionableNodeIPAddress(addr);
             }
@@ -334,7 +347,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             {
                 OnOperationalIPAddress(addr);
             }
-            else if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+            else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
                 OnCommissionableNodeIPAddress(addr);
             }
@@ -352,6 +365,10 @@ void PacketDataReporter::OnComplete()
     {
         mDelegate->OnCommissionableNodeFound(mCommissionableNodeData);
     }
+    else if (mDiscoveryType == DiscoveryType::kCommissionerNode && mCommissionableNodeData.IsValid())
+    {
+        mDelegate->OnCommissionerFound(mCommissionableNodeData);
+    }
 }
 
 class MinMdnsResolver : public Resolver, public MdnsPacketDelegate
@@ -367,6 +384,7 @@ public:
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
 private:
     ResolverDelegate * mDelegate = nullptr;
@@ -451,6 +469,11 @@ CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
     return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
 }
 
+CHIP_ERROR MinMdnsResolver::FindCommissioners(DiscoveryFilter filter)
+{
+    return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
+}
+
 // TODO(cecille): Extend filter and use this for Resolve
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
@@ -474,6 +497,16 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
         else
         {
             qname = CheckAndAllocateQName(subtypeStr, "_sub", "_chipc", "_udp", "local");
+        }
+        break;
+    case DiscoveryType::kCommissionerNode:
+        if (filter.type == DiscoveryFilterType::kNone)
+        {
+            qname = CheckAndAllocateQName("_chipd", "_udp", "local");
+        }
+        else
+        {
+            qname = CheckAndAllocateQName(subtypeStr, "_sub", "_chipd", "_udp", "local");
         }
         break;
     case DiscoveryType::kUnknown:

@@ -303,6 +303,7 @@ private:
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
     void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
+    void OnCommissionerFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();

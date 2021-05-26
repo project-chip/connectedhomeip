@@ -772,6 +772,7 @@ void DeviceController::OnCommissionableNodeFound(const chip::Mdns::Commissionabl
     ChipLogError(Discovery, "Failed to add discovered commisisonable node - Insufficient space");
 }
 
+void DeviceController::OnCommissionerFound(const chip::Mdns::CommissionableNodeData & nodeData) {}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()

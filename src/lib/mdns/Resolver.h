@@ -40,12 +40,15 @@ struct CommissionableNodeData
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
     // Largest host name is 64-bits in hex.
-    static constexpr int kHostNameSize = 16;
+    static constexpr int kHostNameSize   = 16;
+    static constexpr int kDeviceNameSize = 32;
 
     char hostName[kHostNameSize + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
+    uint16_t deviceType;
+    char deviceName[kDeviceNameSize + 1];
     int numIPs;
     Inet::IPAddress ipAddress[kMaxIPAddresses];
     void Reset()
@@ -54,7 +57,9 @@ struct CommissionableNodeData
         longDiscriminator = 0;
         vendorId          = 0;
         productId         = 0;
-        numIPs            = 0;
+        deviceType        = 0;
+        memset(deviceName, 0, sizeof(deviceName));
+        numIPs = 0;
         for (int i = 0; i < kMaxIPAddresses; ++i)
         {
             ipAddress[i] = chip::Inet::IPAddress::Any;
@@ -74,6 +79,7 @@ enum class DiscoveryFilterType : uint8_t
     kDeviceType,
     kCommissioningMode,
     kCommissioningModeFromCommand,
+    kCommissioner
 };
 struct DiscoveryFilter
 {
@@ -96,6 +102,9 @@ public:
 
     // Called when a CHIP Node in commissioning mode is found
     virtual void OnCommissionableNodeFound(const CommissionableNodeData & nodeData) = 0;
+
+    // Called when a CHIP Commissioner is found
+    virtual void OnCommissionerFound(const CommissionableNodeData & nodeData) = 0;
 };
 
 /// Interface for resolving CHIP services
@@ -118,6 +127,9 @@ public:
 
     // Finds all nodes with the given filter that are currently in commissioning mode.
     virtual CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+
+    // Finds all nodes with the given filter that are currently acting as Commissioners.
+    virtual CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
     /// Provides the system-wide implementation of the service resolver
     static Resolver & Instance();
