@@ -53,7 +53,7 @@ namespace chip {
  *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
-class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
+class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() {}
@@ -63,8 +63,6 @@ public:
 
     uint32_t GetMsgId() const;
 
-    bool IsNull() const { return System::PacketBufferHandle::IsNull(); }
-
     /**
      * Creates a copy of the data in this packet.
      *
@@ -72,7 +70,12 @@ public:
      *
      * @returns empty handle on allocation failure.
      */
-    EncryptedPacketBufferHandle CloneData() { return EncryptedPacketBufferHandle(PacketBufferHandle::CloneData()); }
+    EncryptedPacketBufferHandle CloneData()
+    {
+        EncryptedPacketBufferHandle handle = EncryptedPacketBufferHandle(PacketBufferHandle::CloneData());
+        handle.mEncryptedPacketBuffer      = mEncryptedPacketBuffer;
+        return handle;
+    }
 
 #ifdef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
     /**
@@ -94,19 +97,18 @@ public:
     CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
 #endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
-    // Making operator= available to tests by making it public.
-#ifdef CHIP_CONFIG_TEST
-public:
-#else
-private:
-#endif
-    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
+    void MarkEncrypted(PacketBufferHandle && aBuffer)
+    {
+        PacketBufferHandle::operator=(std::move(aBuffer));
+        mEncryptedPacketBuffer      = true;
+    }
+
+    bool IsEncrypted() const { return mEncryptedPacketBuffer; }
 
 private:
-    // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
-    friend class SecureSessionMgr;
-
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
+
+    bool mEncryptedPacketBuffer = false;
 };
 
 /**

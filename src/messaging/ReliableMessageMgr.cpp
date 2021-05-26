@@ -135,7 +135,10 @@ void ReliableMessageMgr::ExecuteActions()
 
         if (entry.retainedBuf.IsNull())
         {
-            // Discard the current entry if the retained buffer is null
+            // The exchange allocates an entry for the retransmit buffer and provides it to
+            // underlying message dispatch to fill in with the message buffer. If the dispatch
+            // does fill in the message buffer, the entry is still in the retransmit table.
+            // This check clears such entries from the retransmit table.
             ClearRetransTable(entry);
             continue;
         }
