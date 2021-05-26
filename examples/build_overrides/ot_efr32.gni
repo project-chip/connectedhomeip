@@ -13,5 +13,6 @@
 # limitations under the License.
 
 declare_args() {
-  openthread_efr32_root = "//third_party/connectedhomeip/third_party/openthread/ot-efr32"
+  openthread_efr32_root =
+      "//third_party/connectedhomeip/third_party/openthread/ot-efr32"
 }

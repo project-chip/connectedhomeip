@@ -18,9 +18,7 @@ import("//build_overrides/openthread.gni")
 import("//build_overrides/ot_nxp.gni")
 
 config("openthread_k32w_config") {
-  include_dirs = [
-    "${openthread_nxp_root}/src/k32w/k32w061",
-  ]
+  include_dirs = [ "${openthread_nxp_root}/src/k32w/k32w061" ]
 
   include_dirs += [ "${chip_root}/examples/platform/k32w" ]
 }
@@ -35,7 +33,8 @@ source_set("openthread_core_config_k32w") {
 }
 
 source_set("openthread_mbedtls_config_k32w") {
-  sources = [ "${openthread_nxp_root}/src/k32w/k32w061/k32w061-mbedtls-config.h" ]
+  sources =
+      [ "${openthread_nxp_root}/src/k32w/k32w061/k32w061-mbedtls-config.h" ]
 }
 
 source_set("libopenthread-k32w") {
