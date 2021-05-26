@@ -5794,60 +5794,88 @@ CHIP_ERROR OtaSoftwareUpdateServerCluster::ApplyUpdateRequest(Callback::Cancelab
                                                               Callback::Cancelable * onFailureCallback, chip::ByteSpan updateToken,
                                                               uint32_t newVersion)
 {
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
 
-    if (mpCommandSender == nullptr)
-    {
-        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
-    }
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kApplyUpdateRequestCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
-    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
-    uint8_t argSeqNumber    = 0;
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(&cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // updateToken: octetString
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
     // newVersion: int32u
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), newVersion));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), newVersion));
 
-    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
+    SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands(mpCommandSender);
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
 }
 
 CHIP_ERROR OtaSoftwareUpdateServerCluster::NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, chip::ByteSpan updateToken,
                                                                uint32_t currentVersion)
 {
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
 
-    if (mpCommandSender == nullptr)
-    {
-        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
-    }
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kNotifyUpdateAppliedCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
-    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
-    uint8_t argSeqNumber    = 0;
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(&cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // updateToken: octetString
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
     // currentVersion: int32u
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
 
-    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
+    SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands(mpCommandSender);
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
 }
 
 CHIP_ERROR OtaSoftwareUpdateServerCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
@@ -5856,44 +5884,58 @@ CHIP_ERROR OtaSoftwareUpdateServerCluster::QueryImage(Callback::Cancelable * onS
                                                       uint32_t currentVersion, uint8_t protocolsSupported, chip::ByteSpan location,
                                                       uint8_t clientCanConsent, chip::ByteSpan metadataForServer)
 {
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
 
-    if (mpCommandSender == nullptr)
-    {
-        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
-    }
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kQueryImageCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
-    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
-    uint8_t argSeqNumber    = 0;
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(&cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // vendorId: int16u
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
     // productId: int16u
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), productId));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), productId));
     // imageType: int16u
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), imageType));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), imageType));
     // hardwareVersion: int16u
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
     // currentVersion: int32u
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
     // protocolsSupported: oTADownloadProtocol
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
     // location: charString
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), location));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
     // clientCanConsent: boolean
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), clientCanConsent));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clientCanConsent));
     // metadataForServer: octetString
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), metadataForServer));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), metadataForServer));
 
-    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
+    SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands(mpCommandSender);
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
 }
 
 // OtaSoftwareUpdateServer Cluster Attributes

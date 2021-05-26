@@ -2281,38 +2281,34 @@ CHIP_ERROR chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(chip::Con
 // End of Cluster NetworkCommissioning
 // Cluster OtaSoftwareUpdateServer
 
-CHIP_ERROR chip_ime_AppendCommand_OtaSoftwareUpdateServer_ApplyUpdateRequest(chip::Controller::Device * device, uint64_t command,
+CHIP_ERROR chip_ime_AppendCommand_OtaSoftwareUpdateServer_ApplyUpdateRequest(chip::Controller::Device * device,
                                                                              chip::EndpointId ZCLendpointId, chip::GroupId,
                                                                              const uint8_t * updateToken, uint32_t updateToken_Len,
                                                                              uint32_t newVersion)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::app::CommandSender * commandSenderObj = reinterpret_cast<chip::app::CommandSender *>(command);
     chip::Controller::OtaSoftwareUpdateServerCluster cluster;
-    cluster.Associate(device, ZCLendpointId, commandSenderObj);
+    cluster.Associate(device, ZCLendpointId);
     return cluster.ApplyUpdateRequest(nullptr, nullptr, chip::ByteSpan(updateToken, updateToken_Len), newVersion);
 }
-CHIP_ERROR chip_ime_AppendCommand_OtaSoftwareUpdateServer_NotifyUpdateApplied(chip::Controller::Device * device, uint64_t command,
+CHIP_ERROR chip_ime_AppendCommand_OtaSoftwareUpdateServer_NotifyUpdateApplied(chip::Controller::Device * device,
                                                                               chip::EndpointId ZCLendpointId, chip::GroupId,
                                                                               const uint8_t * updateToken, uint32_t updateToken_Len,
                                                                               uint32_t currentVersion)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::app::CommandSender * commandSenderObj = reinterpret_cast<chip::app::CommandSender *>(command);
     chip::Controller::OtaSoftwareUpdateServerCluster cluster;
-    cluster.Associate(device, ZCLendpointId, commandSenderObj);
+    cluster.Associate(device, ZCLendpointId);
     return cluster.NotifyUpdateApplied(nullptr, nullptr, chip::ByteSpan(updateToken, updateToken_Len), currentVersion);
 }
 CHIP_ERROR chip_ime_AppendCommand_OtaSoftwareUpdateServer_QueryImage(
-    chip::Controller::Device * device, uint64_t command, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t vendorId,
-    uint16_t productId, uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion, uint8_t protocolsSupported,
-    const uint8_t * location, uint32_t location_Len, uint8_t clientCanConsent, const uint8_t * metadataForServer,
-    uint32_t metadataForServer_Len)
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t vendorId, uint16_t productId,
+    uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion, uint8_t protocolsSupported, const uint8_t * location,
+    uint32_t location_Len, uint8_t clientCanConsent, const uint8_t * metadataForServer, uint32_t metadataForServer_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::app::CommandSender * commandSenderObj = reinterpret_cast<chip::app::CommandSender *>(command);
     chip::Controller::OtaSoftwareUpdateServerCluster cluster;
-    cluster.Associate(device, ZCLendpointId, commandSenderObj);
+    cluster.Associate(device, ZCLendpointId);
     return cluster.QueryImage(nullptr, nullptr, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
                               chip::ByteSpan(location, location_Len), clientCanConsent,
                               chip::ByteSpan(metadataForServer, metadataForServer_Len));
