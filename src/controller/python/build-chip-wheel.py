@@ -56,13 +56,13 @@ class InstalledScriptInfo:
         self.installName = os.path.splitext(name)[0]
 
 
-chipDLLName = '_ChipDeviceCtrl.so'
+chipDLLName = "_ChipDeviceCtrl.so"
 packageName = args.package_name
 chipPackageVer = args.build_number
 
 installScripts = [
-    InstalledScriptInfo('chip-device-ctrl.py'),
-    InstalledScriptInfo('chip-repl.py'),
+    InstalledScriptInfo("chip-device-ctrl.py"),
+    InstalledScriptInfo("chip-repl.py"),
 ]
 
 # Record the current directory at the start of execution.
@@ -74,9 +74,9 @@ distDir = os.path.abspath(args.dist_dir)
 
 # Use a temporary directory within the build directory to assemble the components
 # for the installable package.
-tmpDir = os.path.join(buildDir, 'chip-wheel-components')
+tmpDir = os.path.join(buildDir, "chip-wheel-components")
 
-manifest = json.load(open(manifestFile, 'r'))
+manifest = json.load(open(manifestFile, "r"))
 
 try:
 
@@ -120,12 +120,12 @@ try:
         'dacite',
     ]
 
-    if platform.system() == 'Darwin':
-        requiredPackages.append('pyobjc-framework-corebluetooth')
+    if platform.system() == "Darwin":
+        requiredPackages.append("pyobjc-framework-corebluetooth")
 
-    if platform.system() == 'Linux':
-        requiredPackages.append('dbus-python')
-        requiredPackages.append('pygobject')
+    if platform.system() == "Linux":
+        requiredPackages.append("dbus-python")
+        requiredPackages.append("pygobject")
 
     #
     # Build the chip package...
@@ -145,6 +145,7 @@ try:
         'chip.clusters',
         'chip.tlv',
         'chip.setup_payload',
+        'chip.server',
     ]
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
@@ -152,17 +153,17 @@ try:
     setup(
         name=packageName,
         version=chipPackageVer,
-        description='Python-base APIs and tools for CHIP.',
-        url='https://github.com/project-chip/connectedhomeip',
-        license='Apache',
+        description="Python-base APIs and tools for CHIP.",
+        url="https://github.com/project-chip/connectedhomeip",
+        license="Apache",
         classifiers=[
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: Apache Software License',
-            'Programming Language :: Python :: 2',
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3',
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: Apache Software License",
+            "Programming Language :: Python :: 2",
+            "Programming Language :: Python :: 2.7",
+            "Programming Language :: Python :: 3",
         ],
-        python_requires='>=2.7',
+        python_requires=">=2.7",
         packages=packages,
         package_dir={
             # By default, look in the tmp directory for packages/modules to be included.

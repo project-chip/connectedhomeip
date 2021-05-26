@@ -46,3 +46,6 @@ pandas ; platform_machine != 'aarch64'
 
 # scripts/build
 click
+
+# dali
+python-dali
