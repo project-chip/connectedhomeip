@@ -54,7 +54,6 @@ EmberAfStatus emberAfLowPowerClusterServerCommandParse(EmberAfClusterCommand * c
 EmberAfStatus emberAfMediaInputClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfMediaPlaybackClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
-EmberAfStatus emberAfOtaSoftwareUpdateClientClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOtaSoftwareUpdateServerClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOccupancySensingClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -204,10 +203,6 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
             result = emberAfNetworkCommissioningClusterServerCommandParse(cmd);
-            break;
-        case ZCL_OTA_CLIENT_CLUSTER_ID:
-            // No commands are enabled for cluster OTA Software Update Client
-            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_OTA_SERVER_CLUSTER_ID:
             result = emberAfOtaSoftwareUpdateServerClusterServerCommandParse(cmd);

@@ -6890,7 +6890,7 @@
           "mfgCode": null,
           "define": "OTA_SERVER_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "QueryImageResponse",
@@ -6989,17 +6989,8 @@
           "mfgCode": null,
           "define": "OTA_CLIENT_CLUSTER",
           "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "AnnounceOtaServer",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            }
-          ],
+          "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "cluster revision",

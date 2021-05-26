@@ -18,8 +18,8 @@
 
 #pragma once
 
+#include <app/common/gen/enums.h>
 #include <app/util/af.h>
-#include <gen/enums.h>
 
 namespace chip {
 namespace app {
