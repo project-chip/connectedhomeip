@@ -134,7 +134,6 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
                                                   EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(msgBuf.IsEncrypted(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Advancing the start to encrypted header, since SendMessage will attach the packet header on top of it.
@@ -188,7 +187,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-        bufferRetainSlot->MarkEncrypted(msgBuf.Retain());
+        *bufferRetainSlot = EncryptedPacketBufferHandle::MarkEncrypted(msgBuf.Retain());
     }
 
     ChipLogProgress(Inet, "Sending msg from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec",

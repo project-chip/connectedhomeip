@@ -115,7 +115,7 @@ public:
 
         if (retainedMessage != nullptr && mRetainMessageOnSend)
         {
-            retainedMessage->MarkEncrypted(message.Retain());
+            *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(message.Retain());
         }
         return gTransportMgr.SendMessage(Transport::PeerAddress(), std::move(message));
     }

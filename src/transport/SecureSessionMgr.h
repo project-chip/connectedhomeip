@@ -70,12 +70,7 @@ public:
      *
      * @returns empty handle on allocation failure.
      */
-    EncryptedPacketBufferHandle CloneData()
-    {
-        EncryptedPacketBufferHandle handle = EncryptedPacketBufferHandle(PacketBufferHandle::CloneData());
-        handle.mEncryptedPacketBuffer      = mEncryptedPacketBuffer;
-        return handle;
-    }
+    EncryptedPacketBufferHandle CloneData() { return EncryptedPacketBufferHandle(PacketBufferHandle::CloneData()); }
 
 #ifdef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
     /**
@@ -97,18 +92,13 @@ public:
     CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
 #endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
-    void MarkEncrypted(PacketBufferHandle && aBuffer)
+    static EncryptedPacketBufferHandle MarkEncrypted(PacketBufferHandle && aBuffer)
     {
-        PacketBufferHandle::operator=(std::move(aBuffer));
-        mEncryptedPacketBuffer      = true;
+        return EncryptedPacketBufferHandle(std::move(aBuffer));
     }
-
-    bool IsEncrypted() const { return mEncryptedPacketBuffer; }
 
 private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
-
-    bool mEncryptedPacketBuffer = false;
 };
 
 /**
