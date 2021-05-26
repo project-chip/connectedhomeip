@@ -538,7 +538,7 @@ int main(int argc, char * argv[])
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
-    emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<int>(emberAfFixedEndpointCount() - 1)), false);
+    emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint8_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);
