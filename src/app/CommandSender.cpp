@@ -163,6 +163,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     }
     else if (CHIP_END_OF_TLV == err)
     {
+        // TODO(Spec#3258): The endpoint id in response command is not clear, so we cannot do "ClientClusterCommandExists" check.
         err = aCommandElement.GetData(&commandDataReader);
         SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "gen/enums.h"
+#include <app/common/gen/enums.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 

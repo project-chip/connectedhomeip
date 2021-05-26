@@ -68,7 +68,7 @@ struct PASESessionSerializable
 
 typedef uint8_t PASEVerifier[2][kSpake2p_WS_Length];
 
-class DLL_EXPORT PASESession : public Messaging::ExchangeDelegateBase, public PairingSession
+class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
     PASESession();
@@ -243,6 +243,9 @@ private:
 
     CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
+    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PacketHeader & packetHeader,
+                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg);
+
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                           PASEVerifier & verifier);
 
@@ -261,7 +264,9 @@ private:
     CHIP_ERROR HandleMsg3(const System::PacketBufferHandle & msg);
 
     void SendErrorMsg(Spake2pErrorType errorCode);
-    void HandleErrorMsg(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
+
+    void CloseExchange();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 

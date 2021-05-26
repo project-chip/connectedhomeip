@@ -19,12 +19,12 @@
 
 #include <stdint.h>
 
-#include "af-structs.h"
 #include "app/util/util.h"
 #include "call-command-handler.h"
 #include "callback.h"
-#include "cluster-id.h"
-#include "command-id.h"
+#include <app/common/gen/af-structs.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 
 using namespace chip;
 
@@ -35,11 +35,13 @@ EmberAfStatus emberAfAudioOutputClusterClientCommandParse(EmberAfClusterCommand 
 EmberAfStatus emberAfBarrierControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBindingClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfBridgedDeviceBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfColorControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfContentLaunchClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfDescriptorClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfEthernetNetworkDiagnosticsClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfFixedLabelClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGeneralCommissioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGeneralDiagnosticsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGroupKeyManagementClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -121,6 +123,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             // No commands are enabled for cluster Binding
             result = status(false, true, cmd->mfgSpecific);
             break;
+        case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
+            // No commands are enabled for cluster Bridged Device Basic
+            result = status(false, true, cmd->mfgSpecific);
+            break;
         case ZCL_COLOR_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Color Control
             result = status(false, true, cmd->mfgSpecific);
@@ -137,6 +143,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
             // No commands are enabled for cluster Ethernet Network Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_FIXED_LABEL_CLUSTER_ID:
+            // No commands are enabled for cluster Fixed Label
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
