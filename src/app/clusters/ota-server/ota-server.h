@@ -25,7 +25,7 @@ namespace app {
 namespace clusters {
 namespace OTAServer {
 
-void SetDelegate(OTAServerDelegate * delegate);
+void SetDelegate(chip::EndpointId endpointId, OTAServerDelegate * delegate);
 
 }
 } // namespace clusters

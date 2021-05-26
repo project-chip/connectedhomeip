@@ -34,18 +34,26 @@
 using namespace chip;
 using namespace chip::app::clusters;
 
+using chip::app::clusters::OTAServerDelegate;
+
 namespace {
 constexpr uint8_t kLocationParamLength   = 2;   // The expected length of the Location parameter in QueryImage
 constexpr size_t kMaxMetadataLen         = 512; // The maximum length of Metadata in any OTA Server command
 constexpr size_t kUpdateTokenParamLength = 32;  // The expected length of the Update Token parameter used in multiple commands
 
-chip::app::clusters::OTAServerDelegate * gServerDelegate = nullptr;
+OTAServerDelegate * gDelegateTable[EMBER_AF_OTA_SERVER_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
 
-bool SendStatusIfDelegateNull()
+OTAServerDelegate * GetDelegate(chip::EndpointId endpoint)
 {
-    if (gServerDelegate == nullptr)
+    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_OTA_SERVER_CLUSTER_ID);
+    return (ep == 0xFF ? NULL : gDelegateTable[ep]);
+}
+
+bool SendStatusIfDelegateNull(chip::EndpointId endpointId)
+{
+    if (GetDelegate(endpointId) == nullptr)
     {
-        ChipLogError(Zcl, "No OTAServerDelegate set");
+        ChipLogError(Zcl, "No OTAServerDelegate set for ep:%d", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
         return true;
     }
@@ -65,19 +73,24 @@ bool SendStatusIfDelegateNull()
 bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Command * commandObj, chip::ByteSpan updateToken,
                                                                      uint32_t newVersion)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status         = EMBER_ZCL_STATUS_SUCCESS;
+    chip::EndpointId endpointId  = emberAfCurrentEndpoint();
+    OTAServerDelegate * delegate = GetDelegate(endpointId);
 
     ChipLogDetail(Zcl, "OTA Server received ApplyUpdateRequest");
+
+    if (SendStatusIfDelegateNull(endpointId))
+    {
+        return true;
+    }
 
     if (updateToken.size() != kUpdateTokenParamLength)
     {
         // TODO: correct error?
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    if (SendStatusIfDelegateNull())
-        return true;
-    status = gServerDelegate->HandleApplyUpdateRequest(updateToken, newVersion);
+    status = delegate->HandleApplyUpdateRequest(updateToken, newVersion);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -98,18 +111,23 @@ bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Comman
 bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(app::Command * commandObj, chip::ByteSpan updateToken,
                                                                       uint32_t currentVersion)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status         = EMBER_ZCL_STATUS_SUCCESS;
+    chip::EndpointId endpointId  = emberAfCurrentEndpoint();
+    OTAServerDelegate * delegate = GetDelegate(endpointId);
 
     ChipLogDetail(Zcl, "OTA Server received NotifyUpdateUpplied");
 
-    if (updateToken.size() != kUpdateTokenParamLength)
+    if (SendStatusIfDelegateNull(endpointId))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        return true;
     }
 
-    if (SendStatusIfDelegateNull())
-        return true;
-    status = gServerDelegate->HandleNotifyUpdateApplied(updateToken, currentVersion);
+    if (updateToken.size() != kUpdateTokenParamLength)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    }
+
+    status = delegate->HandleNotifyUpdateApplied(updateToken, currentVersion);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -141,22 +159,28 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
     /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location, uint8_t clientCanConsent,
     chip::ByteSpan metadataForServer)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status         = EMBER_ZCL_STATUS_SUCCESS;
+    chip::EndpointId endpointId  = emberAfCurrentEndpoint();
+    OTAServerDelegate * delegate = GetDelegate(endpointId);
+
+    if (SendStatusIfDelegateNull(endpointId))
+    {
+        return true;
+    };
 
     ChipLogDetail(Zcl, "OTA Server received QueryImage");
 
+    // TODO: (#7112) change location size checking once CHAR_STRING is supported
     const uint8_t locationLen = emberAfStringLength(location);
     if ((locationLen != kLocationParamLength) || (metadataForServer.size() > kMaxMetadataLen))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
     chip::ByteSpan locationSpan(location, locationLen);
 
-    if (SendStatusIfDelegateNull())
-        return true;
-    status = gServerDelegate->HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
-                                               locationSpan, clientCanConsent, metadataForServer);
+    status = delegate->HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
+                                        locationSpan, clientCanConsent, metadataForServer);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -165,7 +189,11 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
     return true;
 }
 
-void chip::app::clusters::OTAServer::SetDelegate(OTAServerDelegate * delegate)
+void chip::app::clusters::OTAServer::SetDelegate(chip::EndpointId endpointId, OTAServerDelegate * delegate)
 {
-    gServerDelegate = delegate;
+    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpointId, ZCL_OTA_SERVER_CLUSTER_ID);
+    if (ep != 0xFF)
+    {
+        gDelegateTable[ep] = delegate;
+    }
 }
