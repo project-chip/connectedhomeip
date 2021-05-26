@@ -19,17 +19,17 @@
 
 #include "Device.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include <cstdio>
+#include <platform/CHIPDeviceLayer.h>
 
-//LightingManager LightingManager::sLight;
+// LightingManager LightingManager::sLight;
 
-Device::Device(const char *szDeviceName, const char *szLocation)
+Device::Device(const char * szDeviceName, const char * szLocation)
 {
     strncpy(mName, szDeviceName, sizeof(mName));
     strncpy(mLocation, szLocation, sizeof(mLocation));
-    mState = kState_Off;
-    mReachable = false;
+    mState      = kState_Off;
+    mReachable  = false;
     mEndpointId = 0;
     mChanged_CB = nullptr;
 }
@@ -51,13 +51,13 @@ void Device::SetOnOff(bool aOn)
     if (aOn)
     {
         changed = (mState != kState_On);
-        mState = kState_On;
+        mState  = kState_On;
         ChipLogProgress(DeviceLayer, "Device[%s]: ON", mName);
     }
     else
     {
         changed = (mState != kState_Off);
-        mState = kState_Off;
+        mState  = kState_Off;
         ChipLogProgress(DeviceLayer, "Device[%s]: OFF", mName);
     }
 
@@ -88,7 +88,7 @@ void Device::SetReachable(bool aReachable)
     }
 }
 
-void Device::SetName(const char *szName)
+void Device::SetName(const char * szName)
 {
     bool changed = (strncmp(mName, szName, sizeof(mName)) != 0);
 
@@ -102,7 +102,7 @@ void Device::SetName(const char *szName)
     }
 }
 
-void Device::SetLocation(const char *szLocation)
+void Device::SetLocation(const char * szLocation)
 {
     bool changed = (strncmp(mLocation, szLocation, sizeof(mLocation)) != 0);
 
@@ -115,7 +115,6 @@ void Device::SetLocation(const char *szLocation)
         mChanged_CB(this, kChanged_Location);
     }
 }
-
 
 void Device::SetChangeCallback(DeviceCallback_fn aChanged_CB)
 {
