@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "AppTask.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "esp_heap_caps_init.h"
@@ -67,6 +68,13 @@ extern "C" void app_main()
     }
 
     InitServer();
+
+    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
+    err = GetAppTask().StartAppTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetAppTask().Init() failed");
+    }
 
     while (true)
     {
