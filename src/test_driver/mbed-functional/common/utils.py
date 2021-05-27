@@ -39,7 +39,7 @@ def is_network_visible(net_list, net_ssid):
 def scan_chip_ble_devices(devCtrl):
     devices = []
     bleMgr = BleManager(devCtrl)
-    bleMgr.scan("-t 5")
+    bleMgr.scan("-t 10")
 
     for device in bleMgr.peripheral_list:
         devIdInfo = bleMgr.get_peripheral_devIdInfo(device)
@@ -60,7 +60,4 @@ def run_wifi_provisioning(devCtrl, ssid, password, discriminator, pinCode, nodeI
         log.error("WiFi provisioning failed: {}".format(str(ex)))
         return None
 
-    sleep(2)
-    ip_details = devCtrl.GetAddressAndPort(nodeId)
-
-    return (nodeId, ip_details)
+    return nodeId

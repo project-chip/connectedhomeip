@@ -24,10 +24,14 @@ log = logging.getLogger(__name__)
 
 DEVICE_NODE_ID=1234
 
-def test_lock_ctrl(device, network, device_controller):
+@pytest.mark.deviceControllerTest
+def test_lock_ctrl_dev_ctrl(device, network, device_controller):
     network_ssid = network[0]
     network_pass = network[1]
     
+    ret = device.wait_for_output("SetupQRCode")
+    assert ret != None and len(ret) > 1
+
     qr_code = ret[-1].split('[', 1)[1].split(']')[0]
     device_details = dict(SetupPayload().ParseQrCode("VP:vendorpayload%{}".format(qr_code)).attributes)
     assert device_details != None and len(device_details) != 0
@@ -46,18 +50,73 @@ def test_lock_ctrl(device, network, device_controller):
 
     assert chip_device_found
 
-    nodeId, ip_details = run_wifi_provisioning(device_controller, network_ssid, network_pass, int(device_details["Discriminator"]), int(device_details["SetUpPINCode"]), DEVICE_NODE_ID)
-    assert nodeId == DEVICE_NODE_ID
-    assert ip_details != None
+    ret = run_wifi_provisioning(device_controller, network_ssid, network_pass, int(device_details["Discriminator"]), int(device_details["SetUpPINCode"]), DEVICE_NODE_ID)
+    assert ret != None and ret == DEVICE_NODE_ID
+
+    args = {}
 
     # Check on command
-    err, res = device_controller.ZCLSend("OnOff", "On", nodeId, 1, 0, None, blocking=True)
+    err, res = device_controller.ZCLSend("OnOff", "On", DEVICE_NODE_ID, 1, 0, args, blocking=false)
     assert err == 0
+
+    ret = device.wait_for_output("Lock Action has been completed")
+    assert ret != None and len(ret) > 1
 
     # Check off command
     err, res = device_controller.ZCLSend("OnOff", "Off", nodeId, 1, 0, None, blocking=True)
     assert err == 0
 
+    ret = device.wait_for_output("Unlock Action has been completed")
+    assert ret != None and len(ret) > 1
+
     # Check toggle command
     err, res = device_controller.ZCLSend("OnOff", "Toggle", nodeId, 1, 0, None, blocking=True)
     assert err == 0
+
+    ret = device.wait_for_output("Lock Action has been completed")
+    assert ret != None and len(ret) > 1
+
+@pytest.mark.chipToolTest
+def test_lock_ctrl_chip_tool(device, network, chip_tools_dir):
+    network_ssid = network[0]
+    network_pass = network[1]
+    
+    ret = device.wait_for_output("SetupQRCode")
+    assert ret != None and len(ret) > 1
+
+    qr_code = ret[-1].split('[', 1)[1].split(']')[0]
+    device_details = dict(SetupPayload().ParseQrCode("VP:vendorpayload%{}".format(qr_code)).attributes)
+    assert device_details != None and len(device_details) != 0
+
+    process = subprocess.Popen(["./chip-tool", "pairing", "ble", network_ssid, network_pass, str(device_details["SetUpPINCode"]), str(device_details["Discriminator"])], cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
+    out = process.stdout.read()
+    process.wait()
+    assert process.returncode == 0
+    assert "ConnectDevice complete" in out and "Network Provisioning Success" in out
+
+    process = subprocess.Popen(["./chip-tool", "onoff", "on", "1", cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
+    out = process.stdout.read()
+    process.wait()
+    assert process.returncode == 0
+    assert "SendMessage returned No Error" in out and "Data model processing success" in out
+
+    ret = device.wait_for_output("Lock Action has been completed")
+    assert ret != None and len(ret) > 1
+
+    process = subprocess.Popen(["./chip-tool", "onoff", "off", "1", cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
+    out = process.stdout.read()
+    process.wait()
+    assert process.returncode == 0
+    assert "SendMessage returned No Error" in out and "Data model processing success" in out
+
+    ret = device.wait_for_output("Unlock Action has been completed")
+    assert ret != None and len(ret) > 1
+
+    process = subprocess.Popen(["./chip-tool", "onoff", "toggle", "1", cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
+    out = process.stdout.read()
+    process.wait()
+    assert process.returncode == 0
+    assert "SendMessage returned No Error" in out and "Data model processing success" in out
+
+    ret = device.wait_for_output("Lock Action has been completed")
+    assert ret != None and len(ret) > 1

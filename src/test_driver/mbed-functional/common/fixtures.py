@@ -226,3 +226,4 @@ def connected_device(device, network):
 def device_controller():
     devCtrl = ChipDeviceCtrl.ChipDeviceController()
     yield devCtrl
+    devCtrl.Close()
