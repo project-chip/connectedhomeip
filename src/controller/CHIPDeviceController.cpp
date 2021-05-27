@@ -472,6 +472,10 @@ void DeviceController::PersistDevice(Device * device)
     {
         device->Persist();
     }
+    else
+    {
+        ChipLogError(Controller, "Failed to persist device. Controller not initialized.");
+    }
 }
 
 CHIP_ERROR DeviceController::ServiceEvents()

@@ -279,12 +279,17 @@ CHIP_ERROR Device::Persist()
     if (mStorageDelegate != nullptr)
     {
         SerializedDevice serialized;
-        Serialize(serialized);
+        SuccessOrExit(error = Serialize(serialized));
 
         // TODO: no need to base-64 the serialized values AGAIN
         PERSISTENT_KEY_OP(GetDeviceId(), kPairedDeviceKeyPrefix, key,
                           error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to persist device %d", error);
+        }
     }
+exit:
     return error;
 }
 
@@ -527,8 +532,10 @@ Device::~Device()
     {
         // If a session can be found, persist the device so that we track the newest message counter values
         Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
-        VerifyOrReturn(connectionState != nullptr);
-        Persist();
+        if (connectionState != nullptr)
+        {
+            Persist();
+        }
     }
 }
 

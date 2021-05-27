@@ -221,7 +221,7 @@ public:
     /**
      * @brief Serialize and store the Device in persistent storage
      *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     * @return Returns a CHIP_ERROR if either serialization or storage fails
      */
     CHIP_ERROR Persist();
 
@@ -405,9 +405,8 @@ private:
 
     uint8_t mSequenceNumber = 0;
 
-    // Message counts start at 1
-    uint32_t mLocalMessageCounter = 1;
-    uint32_t mPeerMessageCounter  = 1;
+    uint32_t mLocalMessageCounter = 0;
+    uint32_t mPeerMessageCounter  = 0;
 
     app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
 
