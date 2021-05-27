@@ -603,9 +603,9 @@ CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddress
         Query query(instanceQName);
 
         query
-            .SetClass(QClass::IN)      //
-            .SetType(QType::ANY)       //
-            .SetAnswerViaUnicast(true) //
+            .SetClass(QClass::IN)       //
+            .SetType(QType::ANY)        //
+            .SetAnswerViaUnicast(false) //
             ;
 
         // NOTE: type above is NOT A or AAAA because the name searched for is
