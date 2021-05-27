@@ -53,7 +53,7 @@ namespace chip {
  *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
-class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
+class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() {}
@@ -92,13 +92,13 @@ public:
     CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
 #endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
+    static EncryptedPacketBufferHandle MarkEncrypted(PacketBufferHandle && aBuffer)
+    {
+        return EncryptedPacketBufferHandle(std::move(aBuffer));
+    }
+
 private:
-    // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
-    friend class SecureSessionMgr;
-
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
-
-    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 };
 
 /**
