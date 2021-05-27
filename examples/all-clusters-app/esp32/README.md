@@ -1,6 +1,8 @@
 # CHIP All Clusters Example
 
-A prototype application that demonstrate the device commissioning and cluster control. This example will evolve as more complex messaging is supported in CHIP.
+A prototype application that demonstrate the device commissioning and cluster
+control. This example will evolve as more complex messaging is supported in
+CHIP.
 
 ---
 
@@ -19,7 +21,8 @@ A prototype application that demonstrate the device commissioning and cluster co
 The CHIP demo application is intended to work on the categories of ESP32
 devices: the
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
-the [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
+the
+[ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
 and the [M5Stack](http://m5stack.com). On the [M5Stack](http://m5stack.com) this
 example displays a CHIP QRCode with the device's Soft-AP SSID encoded in the TLV
 section.
@@ -121,12 +124,14 @@ If packages are already installed then simply activate it.
 
 ## Using the Controller
 
-Controller is used to commission the device(connect to WiFi Network) and control the clusters.
+Controller is used to commission the device(connect to WiFi Network) and control
+the clusters.
 
 ### Connect the ESP32 to a 2.4GHz Network of your choice
 
-1.  Choose Rendezvous mode as bypass `idf.py menuconfig -> Demo -> Rendezvous Mode -> ByPass.`
-    Populate the `WiFi SSID` and `WiFi Password` of AP from menuconfig 
+1.  Choose Rendezvous mode as bypass
+    `idf.py menuconfig -> Demo -> Rendezvous Mode -> ByPass.` Populate the
+    `WiFi SSID` and `WiFi Password` of AP from menuconfig
     `idf.py menuconfig -> Component config -> CHIP Device Layer -> WiFi Station Options`
     If the `WiFi Station Options` mentioned above are populated through
     menuconfig, then ESP32 connects to the AP with those credentials (STA mode).
@@ -162,14 +167,13 @@ your network configuration. To erase it, simply run.
 
 ### Use the configurable network
 
-Configure the network using BLE or SoftAP.
-Set this mode using menuconfig `idf.py menuconfig -> Demo -> Rendezvous Mode`
+Configure the network using BLE or SoftAP. Set this mode using menuconfig
+`idf.py menuconfig -> Demo -> Rendezvous Mode`
 
-1.  Flash the application.
-    If Rendezvous mode is SoftAP then connect to the ESP32's Soft-AP. If
-    you use the M5Stack, the Soft-AP's SSID is encoded in the TLV section of the
-    QRCode on screen. It's usually something like `CHIP-XXX` where the last 3
-    digits are from the setup payload discriminator.
+1.  Flash the application. If Rendezvous mode is SoftAP then connect to the
+    ESP32's Soft-AP. If you use the M5Stack, the Soft-AP's SSID is encoded in
+    the TLV section of the QRCode on screen. It's usually something like
+    `CHIP-XXX` where the last 3 digits are from the setup payload discriminator.
 
 2.  Once you're connected, the server's IP can be found at the gateway address.
 
@@ -183,11 +187,11 @@ Set this mode using menuconfig `idf.py menuconfig -> Demo -> Rendezvous Mode`
     [Android chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/android/CHIPTool)
     to communicate with the device.
 
-This demo application also supports controlling OnOff cluster (Server) attributes of an endpoint. For `ESP32-DevKitC` and
-`ESP32-WROVER-KIT_V4.1`, a GPIO (configurable through `STATUS_LED_GPIO_NUM` in
-`main/main.cpp`) is updated through the on/off/toggle commands from the
-`chip-tool`. For `M5Stack`, a virtual Green LED on the display is used for the
-same.
+This demo application also supports controlling OnOff cluster (Server)
+attributes of an endpoint. For `ESP32-DevKitC` and `ESP32-WROVER-KIT_V4.1`, a
+GPIO (configurable through `STATUS_LED_GPIO_NUM` in `main/main.cpp`) is updated
+through the on/off/toggle commands from the `chip-tool`. For `M5Stack`, a
+virtual Green LED on the display is used for the same.
 
 Note: If you wish to see the actual effect of the commands on `ESP32-DevKitC`
 and `ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
