@@ -339,7 +339,7 @@ public:
         else if (i == 2)
         {
             app::Mdns::AdvertiseCommissionableNode();
-            OpenDefaultPairingWindow(ResetAdmins::kNo, PairingWindowAdvertisement::kMdns);
+            OpenDefaultPairingWindow(ResetAdmins::kYes, PairingWindowAdvertisement::kMdns);
         }
     }
 

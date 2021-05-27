@@ -142,7 +142,12 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols
 
 void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
 {
-    ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
+#if CHIP_ERROR_LOGGING
+    char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
+    source.ToString(srcAddressStr);
+
+    ChipLogError(ExchangeManager, "Error receiving message from %s: %s", srcAddressStr, ErrorStr(error));
+#endif // CHIP_ERROR_LOGGING
 }
 
 CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
@@ -314,8 +319,9 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->mSecureSession == session)
         {
-            ec->Close();
-            // Continue iterate because there can be multiple contexts associated with the connection.
+            ec->OnConnectionExpired();
+            // Continue to iterate because there can be multiple exchanges
+            // associated with the connection.
         }
         return true;
     });
