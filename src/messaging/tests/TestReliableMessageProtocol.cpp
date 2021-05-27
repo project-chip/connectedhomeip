@@ -131,11 +131,17 @@ public:
     CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
                              EncryptedPacketBufferHandle * retainedMessage) const override
     {
+        // Our send path needs a (writable) PacketBuffer, so get that from the
+        // EncryptedPacketBufferHandle.  Note that we have to do this before we
+        // set *retainedMessage, because 'message' and '*retainedMessage' might
+        // be the same memory location and we have to guarantee that we move out
+        // of 'message' before we write to *retainedMessage.
+        System::PacketBufferHandle writableBuf(std::move(message).CastToWritable());
         if (retainedMessage != nullptr && mRetainMessageOnSend)
         {
-            *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(message.Retain());
+            *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(writableBuf.Retain());
         }
-        return gTransportMgr.SendMessage(Transport::PeerAddress(), std::move(message));
+        return gTransportMgr.SendMessage(Transport::PeerAddress(), std::move(writableBuf));
     }
 
     bool MessagePermitted(uint16_t protocol, uint8_t type) override { return true; }

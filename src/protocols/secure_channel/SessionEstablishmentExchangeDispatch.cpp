@@ -41,6 +41,7 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
     if (retainedMessage != nullptr)
     {
         *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(message.Retain());
+        ChipLogError(Inet, "RETAINED IN SESS: %p %d", retainedMessage, (*retainedMessage).IsNull());
     }
     return mTransportMgr->SendMessage(mPeerAddress, std::move(message));
 }
@@ -50,11 +51,17 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::ResendMessage(SecureSessionHand
 {
     ReturnErrorCodeIf(mTransportMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    // Our send path needs a (writable) PacketBuffer, so get that from the
+    // EncryptedPacketBufferHandle.  Note that we have to do this before we set
+    // *retainedMessage, because 'message' and '*retainedMessage' might be the
+    // same memory location and we have to guarantee that we move out of
+    // 'message' before we write to *retainedMessage.
+    System::PacketBufferHandle writableBuf(std::move(message).CastToWritable());
     if (retainedMessage != nullptr)
     {
-        *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(message.Retain());
+        *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(writableBuf.Retain());
     }
-    return mTransportMgr->SendMessage(mPeerAddress, std::move(message));
+    return mTransportMgr->SendMessage(mPeerAddress, std::move(writableBuf));
 }
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
