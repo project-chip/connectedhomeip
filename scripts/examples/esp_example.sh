@@ -30,7 +30,6 @@ if [ -z "$app" ]; then
     exit 1
 fi
 
-
 source "scripts/activate.sh"
 # shellcheck source=/dev/null
 git -C "$IDF_PATH" submodule update --init --recursive
