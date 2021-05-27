@@ -295,7 +295,7 @@ void Device::OnNewConnection(SecureSessionHandle session)
 
     // Reset the message counters here because this is the first time we get a handle to the secure session.
     // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
-    // we need to restore the session counters along with the the session information.
+    // we need to restore the session counters along with the session information.
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
     VerifyOrReturn(connectionState != nullptr);
     MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
