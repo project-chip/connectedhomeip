@@ -68,7 +68,11 @@ int ChipLinuxAppInit(int argc, char ** argv)
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
+#ifdef CONFIG_RENDEZVOUS_MODE
+    PrintOnboardingCodes(static_cast<chip::RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE));
+#else
     PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
+#endif
 
 #if defined(PW_RPC_ENABLED)
     chip::rpc::Init();
