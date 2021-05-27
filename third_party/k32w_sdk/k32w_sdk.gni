@@ -22,6 +22,7 @@ declare_args() {
   # Location of the k32w SDK.
   k32w_sdk_root = getenv("K32W_SDK_ROOT")
   chip_with_OM15082 = 0
+  chip_with_ot_cli = 0
 }
 
 assert(k32w_sdk_root != "", "k32w_sdk_root must be specified")
@@ -181,6 +182,12 @@ template("k32w_sdk") {
     } else {
       defines += [ "gKBD_KeysCount_c=1" ]
     }
+
+    if (chip_with_ot_cli == 1) {
+      defines += [
+        "CHIP_DEVICE_CONFIG_ENABLE_CLI=1",
+      ]
+    } 
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
