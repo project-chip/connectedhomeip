@@ -31,7 +31,7 @@ source_set("app-main") {
     "Options.h",
   ]
 
-  defines = []
+  defines = [ "CHIP_ENABLE_SHELL" ]
 
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
@@ -40,12 +40,12 @@ source_set("app-main") {
   public_deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/lib/shell:shell_core",
   ]
 
-  if (chip_enable_shell) {
-    defines += [ "CHIP_ENABLE_SHELL" ]
-    public_deps += [ "${chip_root}/src/lib/shell" ]
-  }
+    public_deps += [ 
+    ]
 
   public_configs = [ ":app-main-config" ]
 }
