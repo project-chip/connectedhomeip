@@ -232,9 +232,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
     // Verify we have room for the new certificate.
     VerifyOrReturnError(mCertCount < mMaxCerts, CHIP_ERROR_NO_MEMORY);
 
-    ChipCertificateData * new_cert = new (&mCerts[mCertCount]) ChipCertificateData();
-
-    *new_cert = cert;
+    new (&mCerts[mCertCount]) ChipCertificateData(cert);
     mCertCount++;
 
     return CHIP_NO_ERROR;
@@ -616,6 +614,7 @@ void ChipCertificateData::Clear()
 
 bool ChipCertificateData::IsEqual(const ChipCertificateData & other) const
 {
+    // TODO - Add an operator== on BitFlags class.
     return mSubjectDN.IsEqual(other.mSubjectDN) && mIssuerDN.IsEqual(other.mIssuerDN) &&
         mSubjectKeyId.IsEqual(other.mSubjectKeyId) && mAuthKeyId.IsEqual(other.mAuthKeyId) &&
         (mNotBeforeTime == other.mNotBeforeTime) && (mNotAfterTime == other.mNotAfterTime) &&
