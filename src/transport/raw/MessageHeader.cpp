@@ -310,31 +310,38 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     encodeFlags.Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
         .Set(Header::FlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue());
 
-    printf("PacketHeader::Encode encodeFlags=%u\n", encodeFlags.Raw());
-
     uint16_t header = (kHeaderVersion << kVersionShift) | encodeFlags.Raw();
     header |= (static_cast<uint16_t>(static_cast<uint16_t>(mEncryptionType) << kEncryptionTypeShift) & kEncryptionTypeMask);
-
-    printf("PacketHeader::Encode header=%u\n", header);
 
     uint8_t * p = data;
     LittleEndian::Write16(p, header);
     LittleEndian::Write32(p, mMessageId);
 
-    printf("PacketHeader::Encode mMessageId=%u\n", mMessageId);
+#ifdef DEBUG
+    printf("PacketHeader::Encode encodeFlags=%u\n", encodeFlags.Raw());
+    printf("                     header=%u\n", header);
+    printf("                     mMessageId=%u\n", mMessageId);
+#endif
+
     if (mSourceNodeId.HasValue())
     {
         LittleEndian::Write64(p, mSourceNodeId.Value());
-        printf("PacketHeader::Encode mSourceNodeId=%lu\n", mSourceNodeId.Value());
+#ifdef DEBUG
+        printf("                     mSourceNodeId=%lu\n", mSourceNodeId.Value());
+#endif
     }
     if (mDestinationNodeId.HasValue())
     {
         LittleEndian::Write64(p, mDestinationNodeId.Value());
-        printf("PacketHeader::Encode mDestinationNodeId=%lu\n", mDestinationNodeId.Value());
+#ifdef DEBUG
+        printf("                     mDestinationNodeId=%lu\n", mDestinationNodeId.Value());
+#endif
     }
 
     LittleEndian::Write16(p, mEncryptionKeyID);
-    printf("PacketHeader::Encode mEncryptionKeyID=%u\n", mEncryptionKeyID);
+#ifdef DEBUG
+    printf("                     mEncryptionKeyID=%u\n", mEncryptionKeyID);
+#endif
 
     // Written data size provided to caller on success
     VerifyOrReturnError(p - data == EncodeSizeBytes(), CHIP_ERROR_INTERNAL);
@@ -362,24 +369,32 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
 
     uint8_t * p          = data;
     const uint8_t header = mExchangeFlags.Raw();
-    printf("PayloadHeader::Encode header=%u\n", header);
-    printf("PayloadHeader::Encode mMessageType=%u\n", mMessageType);
 
     Write8(p, header);
     Write8(p, mMessageType);
     LittleEndian::Write16(p, mExchangeID);
-    printf("PayloadHeader::Encode mExchangeID=%u\n", mExchangeID);
+#ifdef DEBUG
+    printf("PayloadHeader::Encode header=%u\n", header);
+    printf("                      mMessageType=%u\n", mMessageType);
+    printf("                      mExchangeID=%u\n", mExchangeID);
+#endif
     if (HaveVendorId())
     {
         LittleEndian::Write16(p, static_cast<std::underlying_type_t<VendorId>>(mProtocolID.GetVendorId()));
-        printf("PayloadHeader::Encode GetVendorId=%u\n", mProtocolID.GetVendorId());
+#ifdef DEBUG
+        printf("                      GetVendorId=%u\n", mProtocolID.GetVendorId());
+#endif
     }
     LittleEndian::Write16(p, mProtocolID.GetProtocolId());
-    printf("PayloadHeader::Encode mProtocolID=%u\n", mProtocolID.GetProtocolId());
+#ifdef DEBUG
+    printf("                      mProtocolID=%u\n", mProtocolID.GetProtocolId());
+#endif
     if (mAckId.HasValue())
     {
         LittleEndian::Write32(p, mAckId.Value());
-        printf("PayloadHeader::Encode mAckId=%u\n", mAckId.Value());
+#ifdef DEBUG
+        printf("                      mAckId=%u\n", mAckId.Value());
+#endif
     }
 
     // Written data size provided to caller on success

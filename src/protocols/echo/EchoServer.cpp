@@ -56,6 +56,7 @@ void EchoServer::Shutdown()
 void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
 {
+    payload->DebugDump("EchoServer::OnMessageReceive");
     System::PacketBufferHandle response;
 
     // NOTE: we already know this is an Echo Request message because we explicitly registered with the

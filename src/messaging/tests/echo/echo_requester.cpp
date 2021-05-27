@@ -341,7 +341,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
 
         // Arrange to get a callback whenever an Echo Response is received.
-        gUDCClient.SetUDCResponseReceived(HandleEchoResponseReceived);
+        gUDCClient.SetUDCResponseReceived(HandleUDCResponseReceived);
 
         RunPinging();
 
@@ -353,7 +353,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
 
         // Arrange to get a callback whenever an Echo Response is received.
-        gEchoClient.SetEchoResponseReceived(HandleUDCResponseReceived);
+        gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
         RunPinging();
 
