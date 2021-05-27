@@ -27,6 +27,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include "shell_extension/launch.h"
 #include <app/server/Server.h>
 
 #include <cmath>
@@ -57,6 +58,10 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "==================================================");
     ESP_LOGI(TAG, "chip-esp32-lock-example starting");
     ESP_LOGI(TAG, "==================================================");
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+#endif
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
