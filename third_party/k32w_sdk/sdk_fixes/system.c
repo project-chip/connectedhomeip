@@ -79,9 +79,7 @@ bool otSysPseudoResetWasRequested(void)
     return false;
 }
 
-void otSysDeinit(void)
-{
-}
+void otSysDeinit(void) {}
 
 void otSysProcessDrivers(otInstance * aInstance)
 {
