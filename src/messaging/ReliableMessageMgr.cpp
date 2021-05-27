@@ -138,7 +138,7 @@ void ReliableMessageMgr::ExecuteActions()
             // We generally try to prevent entries with a null buffer being in a table, but it could happen
             // if the message dispatch (which is supposed to fill in the buffer) fails to do so _and_ returns
             // success (so its caller doesn't clear out the bogus table entry).
-            // 
+            //
             // If that were to happen, we would crash in the code below.  Guard against it, just in case.
             ClearRetransTable(entry);
             continue;
