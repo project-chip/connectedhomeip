@@ -65,7 +65,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mChipStackLock  = PTHREAD_MUTEX_INITIALIZER;
+    mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();

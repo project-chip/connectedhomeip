@@ -33,9 +33,9 @@
 #include <unistd.h>
 
 #include <atomic>
+#include <mutex>
 #include <pthread.h>
 #include <queue>
-#include <mutex>
 
 namespace chip {
 namespace DeviceLayer {
