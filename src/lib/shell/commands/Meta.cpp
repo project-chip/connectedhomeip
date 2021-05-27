@@ -45,7 +45,7 @@ static int ExitHandler(int argc, char ** argv)
 
 static int HelpHandler(int argc, char ** argv)
 {
-    Engine::Root().ForEachCommand(PrintCommandHelp, nullptr);
+    shell_command_foreach(PrintCommandHelp, nullptr);
     return 0;
 }
 
@@ -63,7 +63,7 @@ void RegisterMetaCommands()
         { &VersionHandler, "version", "Output the software version" },
     };
 
-    Engine::Root().RegisterCommands(sCmds, ArraySize(sCmds));
+    shell_register(sCmds, ArraySize(sCmds));
 }
 
 } // namespace Shell

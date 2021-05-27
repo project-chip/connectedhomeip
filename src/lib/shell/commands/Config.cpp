@@ -195,7 +195,8 @@ void RegisterConfigCommands()
                                                    "Dump device configuration. Usage: config [param_name]" };
 
     // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1);
+    shell_register(&sDeviceComand, 1);
+
     return;
 }
 

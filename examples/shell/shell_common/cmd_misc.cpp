@@ -68,5 +68,5 @@ static shell_command_t cmds_misc[] = {
 
 void cmd_misc_init()
 {
-    Engine::Root().RegisterCommands(cmds_misc, ArraySize(cmds_misc));
+    shell_register(cmds_misc, ArraySize(cmds_misc));
 }

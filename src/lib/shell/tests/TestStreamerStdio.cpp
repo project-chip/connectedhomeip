@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "TestStreamerStdio.h"
+#include "TestShell.h"
 
 #include <shell/Engine.h>
 #include <support/CodeUtils.h>

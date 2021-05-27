@@ -30,5 +30,5 @@ int main(int argc, char * argv[])
     // Generate machine-readable, comma-separated value (CSV) output.
     nlTestSetOutputStyle(OUTPUT_CSV);
 
-    return (TestStreamerStdio());
+    return (TestShell());
 }

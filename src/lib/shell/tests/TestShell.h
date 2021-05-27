@@ -17,18 +17,22 @@
 
 /**
  *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP system layer library timer unit
- *      tests.
+ *      This file declares test entry points for CHIP system layer
+ *      library unit tests.
  *
  */
 
-#include "TestShell.h"
+#pragma once
 
-int main(int argc, char * argv[])
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
+#include <nlunit-test.h>
 
-    return (TestStreamerStdio());
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int TestShell(void);
+int TestStreamerStdio(void);
+
+#ifdef __cplusplus
 }
+#endif
