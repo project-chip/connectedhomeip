@@ -42,6 +42,23 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
 
+// strnlen is not always available
+// TODO: use emberAfStrnlen once it has been imported
+#ifndef strnlen
+/* Find the length of S, but scan at most MAXLEN characters.  If no '\0'
+   terminator is found within the first MAXLEN characters, return MAXLEN. */
+size_t opcreds_strnlen(const char * str, size_t maxlen)
+{
+  size_t len;
+  const char *p = str;
+
+  for (len = 0; len < maxlen && *p != '\0'; p++, len++);
+  return len;
+}
+#else
+#define opcreds_strnlen strnlen
+#endif
+
 /*
  * Temporary flow for fabric management until addOptCert + fabric index are implemented:
  * 1) When Commissioner pairs with CHIP device, store device nodeId in Admin Pairing table as NodeId
@@ -89,7 +106,7 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, c
     fabricDescriptor.VendorId = vendorId;
     if (fabricLabel != nullptr) 
     {
-        size_t lengthToStore = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
+        size_t lengthToStore   = opcreds_strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
         fabricDescriptor.Label = ByteSpan(fabricLabel, lengthToStore);
     }
     
