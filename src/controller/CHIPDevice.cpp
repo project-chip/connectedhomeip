@@ -307,7 +307,7 @@ void Device::OnNewConnection(SecureSessionHandle session)
     if (localCounter.SetCounter(mLocalMessageCounter))
     {
         ChipLogError(Controller, "Unable to restore local counter to %d", mLocalMessageCounter);
-    };
+    }
     Transport::PeerMessageCounter & peerCounter = connectionState->GetSessionMessageCounter().GetPeerMessageCounter();
     peerCounter.SetCounter(mPeerMessageCounter);
 }
