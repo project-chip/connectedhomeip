@@ -55,7 +55,7 @@
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CLI
-extern "C" void otAppCliInit(otInstance *aInstance);
+extern "C" void otAppCliInit(otInstance * aInstance);
 #endif
 
 namespace chip {

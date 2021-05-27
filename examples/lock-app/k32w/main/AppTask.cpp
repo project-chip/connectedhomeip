@@ -177,7 +177,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         if (PlatformMgr().TryLockChipStack())
         {
 #if CHIP_DEVICE_CONFIG_ENABLE_CLI
-    K32WUartProcess();
+            K32WUartProcess();
 #endif
 
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
