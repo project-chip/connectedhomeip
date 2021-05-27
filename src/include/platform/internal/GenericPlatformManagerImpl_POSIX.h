@@ -33,6 +33,7 @@
 #include <unistd.h>
 
 #include <atomic>
+#include <mutex>
 #include <pthread.h>
 #include <queue>
 
@@ -61,7 +62,6 @@ protected:
 
     // OS-specific members (pthread)
     pthread_mutex_t mChipStackLock;
-    pthread_mutex_t mEventQueueLock;
     std::queue<ChipDeviceEvent> mChipEventQueue;
 
     enum TaskType
@@ -118,12 +118,11 @@ private:
 
     void SysUpdate();
     void SysProcess();
-    void LockEventQueue();
-    void UnlockEventQueue();
     static void SysOnEventSignal(void * arg);
 
     void ProcessDeviceEvents();
 
+    std::mutex mEventQueueLock;
     std::atomic<bool> mShouldRunEventLoop;
     static void * EventLoopTaskMain(void * arg);
 };
