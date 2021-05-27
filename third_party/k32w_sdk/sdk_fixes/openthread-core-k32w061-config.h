@@ -94,22 +94,6 @@
 #endif
 
 /**
- * @def OPENTHREAD_CONFIG_ENABLE_SOFTWARE_RETRANSMIT
- *
- * Define to 1 if you want to enable software retransmission logic.
- *
- */
-/* TODO */
-
-/**
- * @def OPENTHREAD_CONFIG_ENABLE_SOFTWARE_CSMA_BACKOFF
- *
- * Define to 1 if you want to enable software CSMA-CA backoff logic.
- *
- */
-/* TODO */
-
-/**
  * @def OPENTHREAD_CONFIG_NCP_HDLC_ENABLE
  *
  * Define to 1 to enable NCP HDLC support.

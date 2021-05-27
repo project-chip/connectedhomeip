@@ -76,13 +76,11 @@ void otSysInit(int argc, char * argv[])
 
 bool otSysPseudoResetWasRequested(void)
 {
-    /* TODO */
     return false;
 }
 
 void otSysDeinit(void)
 {
-    /* TODO */
 }
 
 void otSysProcessDrivers(otInstance * aInstance)
