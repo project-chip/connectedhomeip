@@ -73,11 +73,11 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr        = nullptr;
-    SecureSessionMgr * sessionMgr            = nullptr;
-    Messaging::ExchangeManager * exchangeMgr = nullptr;
-    Inet::InetLayer * inetLayer              = nullptr;
-
+    DeviceTransportMgr * transportMgr                   = nullptr;
+    SecureSessionMgr * sessionMgr                       = nullptr;
+    Messaging::ExchangeManager * exchangeMgr            = nullptr;
+    Inet::InetLayer * inetLayer                         = nullptr;
+    PersistentStorageDelegate * storageDelegate         = nullptr;
     Credentials::OperationalCredentialSet * credentials = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
@@ -87,16 +87,7 @@ struct ControllerDeviceInitParams
 class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
 {
 public:
-    ~Device()
-    {
-        if (mExchangeMgr)
-        {
-            // Ensure that any exchange contexts we have open get closed now,
-            // because we don't want them to call back in to us after this
-            // point.
-            mExchangeMgr->CloseAllContextsForDelegate(this);
-        }
-    }
+    ~Device();
 
     enum class PairingWindowOption
     {
@@ -173,13 +164,14 @@ public:
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
     {
-        mTransportMgr   = params.transportMgr;
-        mSessionManager = params.sessionMgr;
-        mExchangeMgr    = params.exchangeMgr;
-        mInetLayer      = params.inetLayer;
-        mListenPort     = listenPort;
-        mAdminId        = admin;
-        mCredentials    = params.credentials;
+        mTransportMgr    = params.transportMgr;
+        mSessionManager  = params.sessionMgr;
+        mExchangeMgr     = params.exchangeMgr;
+        mInetLayer       = params.inetLayer;
+        mListenPort      = listenPort;
+        mAdminId         = admin;
+        mStorageDelegate = params.storageDelegate;
+        mCredentials     = params.credentials;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -225,6 +217,13 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Deserialize(const SerializedDevice & input);
+
+    /**
+     * @brief Serialize and store the Device in persistent storage
+     *
+     * @return Returns a CHIP_ERROR if either serialization or storage fails
+     */
+    CHIP_ERROR Persist();
 
     /**
      * @brief
@@ -406,6 +405,9 @@ private:
 
     uint8_t mSequenceNumber = 0;
 
+    uint32_t mLocalMessageCounter = 0;
+    uint32_t mPeerMessageCounter  = 0;
+
     app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
 
     /**
@@ -440,6 +442,8 @@ private:
     uint16_t mCASESessionKeyId = 0;
 
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
+
+    PersistentStorageDelegate * mStorageDelegate = nullptr;
 };
 
 /**
@@ -494,6 +498,8 @@ typedef struct SerializableDevice
     uint8_t mDeviceTransport;
     uint8_t mDeviceProvisioningComplete;
     uint8_t mInterfaceName[kMaxInterfaceName];
+    uint32_t mLocalMessageCounter; /* This field is serialized in LittleEndian byte order */
+    uint32_t mPeerMessageCounter;  /* This field is serialized in LittleEndian byte order */
 } SerializableDevice;
 
 typedef struct SerializedDevice
