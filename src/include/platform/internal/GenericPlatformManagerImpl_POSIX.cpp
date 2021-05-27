@@ -65,7 +65,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
+    mChipStackLock  = PTHREAD_MUTEX_INITIALIZER;
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
@@ -132,13 +132,18 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-    mChipEventQueue.push(*event); // Thread safe due to ChipStackLock taken by App thread
-    SysOnEventSignal(this);       // Trigger wake select on CHIP thread
+    // Critical section
+    {
+        std::unique_lock<std::mutex> lock(mEventQueueLock);
+        mChipEventQueue.push(*event);
+    }
+    SysOnEventSignal(this); // Trigger wake select on CHIP thread
 }
 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
 {
+    std::unique_lock<std::mutex> lock(mEventQueueLock);
     while (!mChipEventQueue.empty())
     {
         Impl()->DispatchEvent(&mChipEventQueue.front());

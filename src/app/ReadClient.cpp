@@ -182,11 +182,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     event.InteractionModelEvent.Payload   = std::move(msgBuf).UnsafeRelease();
     event.InteractionModelEvent.SendFlags = Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Raw();
 
-    // Currently, Interaction Model protocol is implemented in app thread instead of CHIP thread, we need to lock CHIP stack to
-    // prevent it from operating before we post an event to the event queue associated with the CHIP thread.
-    DeviceLayer::PlatformMgr().LockChipStack();
     DeviceLayer::PlatformMgr().PostEvent(&event);
-    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     MoveToState(ClientState::AwaitingResponse);
 

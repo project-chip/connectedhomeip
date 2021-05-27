@@ -35,6 +35,7 @@
 #include <atomic>
 #include <pthread.h>
 #include <queue>
+#include <mutex>
 
 namespace chip {
 namespace DeviceLayer {
@@ -103,6 +104,7 @@ private:
 
     void ProcessDeviceEvents();
 
+    std::mutex mEventQueueLock;
     std::atomic<bool> mShouldRunEventLoop;
     static void * EventLoopTaskMain(void * arg);
 };
