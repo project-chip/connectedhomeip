@@ -148,7 +148,6 @@ public:
         mSynced.mWindow.reset();
     }
 
-    /* Test-only */
     uint32_t GetCounter() { return mSynced.mMaxCounter; }
 
 private:

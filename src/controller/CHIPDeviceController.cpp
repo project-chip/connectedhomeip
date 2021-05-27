@@ -57,6 +57,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/PersistentStorageMacros.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
 #include <support/TimeUtils.h>
@@ -93,10 +94,6 @@ namespace Controller {
 
 using namespace chip::Encoding;
 
-constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
-constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
-constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
-
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 constexpr uint16_t kMdnsPort = 5353;
 #endif
@@ -106,20 +103,6 @@ constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 constexpr uint32_t kMaxCHIPOpCertLength = 1024;
 constexpr uint32_t kMaxCHIPCSRLength    = 1024;
 constexpr uint32_t kOpCSRNonceLength    = 32;
-
-// This macro generates a key using node ID an key prefix, and performs the given action
-// on that key.
-#define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        constexpr size_t len = std::extent<decltype(keyPrefix)>::value;                                                            \
-        nlSTATIC_ASSERT_PRINT(len > 0, "keyPrefix length must be known at compile time");                                          \
-        /* 2 * sizeof(NodeId) to accomodate 2 character for each byte in Node Id */                                                \
-        char key[len + 2 * sizeof(NodeId) + 1];                                                                                    \
-        nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
-        snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                 \
-        action;                                                                                                                    \
-    } while (0)
 
 DeviceController::DeviceController()
 {
@@ -486,19 +469,13 @@ CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 
 void DeviceController::PersistDevice(Device * device)
 {
-    // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
-    // requires a valid storage delegate. However, test pairing usecase, that's used
-    // mainly by test applications, do not require a storage delegate. This is to
-    // reduce overheads on these tests.
-    // Let's make sure the delegate object is available before calling into it.
-    if (mStorageDelegate != nullptr && mState == State::Initialized)
+    if (mState == State::Initialized)
     {
-        SerializedDevice serialized;
-        device->Serialize(serialized);
-
-        // TODO: no need to base-64 the serialized values AGAIN
-        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
+        device->Persist();
+    }
+    else
+    {
+        ChipLogError(Controller, "Failed to persist device. Controller not initialized.");
     }
 }
 
@@ -778,11 +755,14 @@ void DeviceController::OnCommissionableNodeFound(const chip::Mdns::Commissionabl
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
-    return ControllerDeviceInitParams{ .transportMgr = mTransportMgr,
-                                       .sessionMgr   = mSessionMgr,
-                                       .exchangeMgr  = mExchangeMgr,
-                                       .inetLayer    = mInetLayer,
-                                       .credentials  = &mCredentials };
+    return ControllerDeviceInitParams{
+        .transportMgr    = mTransportMgr,
+        .sessionMgr      = mSessionMgr,
+        .exchangeMgr     = mExchangeMgr,
+        .inetLayer       = mInetLayer,
+        .storageDelegate = mStorageDelegate,
+        .credentials     = &mCredentials,
+    };
 }
 
 DeviceCommissioner::DeviceCommissioner() :

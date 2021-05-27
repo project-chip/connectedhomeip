@@ -47,10 +47,11 @@ public:
 
     virtual ~MessageCounter() = 0;
 
-    virtual Type GetType()       = 0;
-    virtual void Reset()         = 0;
-    virtual uint32_t Value()     = 0; /** Get current value */
-    virtual CHIP_ERROR Advance() = 0; /** Advance the counter */
+    virtual Type GetType()                        = 0;
+    virtual void Reset()                          = 0;
+    virtual uint32_t Value()                      = 0; /** Get current value */
+    virtual CHIP_ERROR Advance()                  = 0; /** Advance the counter */
+    virtual CHIP_ERROR SetCounter(uint32_t count) = 0; /** Set the counter to the specified value */
 };
 
 inline MessageCounter::~MessageCounter() {}
@@ -71,6 +72,12 @@ public:
         ++value;
         return CHIP_NO_ERROR;
     }
+    CHIP_ERROR SetCounter(uint32_t count) override
+    {
+        Reset();
+        value = count;
+        return CHIP_NO_ERROR;
+    }
 
 private:
     uint32_t value;
@@ -89,6 +96,7 @@ public:
     }
     uint32_t Value() override { return persisted.GetValue(); }
     CHIP_ERROR Advance() override { return persisted.Advance(); }
+    CHIP_ERROR SetCounter(uint32_t count) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 private:
 #if CONFIG_DEVICE_LAYER
@@ -125,6 +133,12 @@ public:
     CHIP_ERROR Advance() override
     {
         ++value;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SetCounter(uint32_t count) override
+    {
+        Reset();
+        value = count;
         return CHIP_NO_ERROR;
     }
 
