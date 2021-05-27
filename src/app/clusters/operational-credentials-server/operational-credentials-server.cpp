@@ -89,7 +89,7 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, c
     fabricDescriptor.VendorId = vendorId;
     if (fabricLabel != nullptr)
     {
-        size_t lengthToStore = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
+        size_t lengthToStore   = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
         fabricDescriptor.Label = ByteSpan(fabricLabel, lengthToStore);
     }
 
