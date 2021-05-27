@@ -294,6 +294,8 @@ void Device::OnNewConnection(SecureSessionHandle session)
     mSecureSession = session;
 
     // Reset the message counters here because this is the first time we get a handle to the secure session.
+    // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
+    // we need to restore the session counters along with the the session information.
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
     VerifyOrReturn(connectionState != nullptr);
     MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
@@ -523,9 +525,7 @@ Device::~Device()
 
     if (mStorageDelegate != nullptr && mSessionManager != nullptr)
     {
-        // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
-        // We need to store the session counters along with the the session information so that when we deserialize
-        // this device next time, we can recreate the session correctly.
+        // If a session can be found, persist the device so that we track the newest message counter values
         Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
         VerifyOrReturn(connectionState != nullptr);
         Persist();
