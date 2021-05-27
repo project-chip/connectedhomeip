@@ -61,6 +61,7 @@ protected:
 
     // OS-specific members (pthread)
     pthread_mutex_t mChipStackLock;
+    pthread_mutex_t mEventQueueLock;
     std::queue<ChipDeviceEvent> mChipEventQueue;
 
     enum TaskType
@@ -117,6 +118,8 @@ private:
 
     void SysUpdate();
     void SysProcess();
+    void LockEventQueue();
+    void UnlockEventQueue();
     static void SysOnEventSignal(void * arg);
 
     void ProcessDeviceEvents();
