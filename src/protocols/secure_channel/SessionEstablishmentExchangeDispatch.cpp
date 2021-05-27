@@ -45,6 +45,17 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
+CHIP_ERROR SessionEstablishmentExchangeDispatch::ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
+                                                               EncryptedPacketBufferHandle * retainedMessage) const
+{
+    if (mTransportMgr != nullptr)
+    {
+        return mTransportMgr->SendMessage(mPeerAddress, std::move(message));
+    }
+
+    return CHIP_ERROR_INCORRECT_STATE;
+}
+
 CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    ReliableMessageContext * reliableMessageContext)

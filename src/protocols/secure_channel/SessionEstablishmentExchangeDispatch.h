@@ -36,12 +36,15 @@ public:
 
     virtual ~SessionEstablishmentExchangeDispatch() {}
 
-    CHIP_ERROR Init(TransportMgrBase * transportMgr)
+    CHIP_ERROR Init(Messaging::ReliableMessageMgr * reliableMessageMgr, TransportMgrBase * transportMgr)
     {
         ReturnErrorCodeIf(transportMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mTransportMgr = transportMgr;
-        return CHIP_NO_ERROR;
+        return ExchangeMessageDispatch::Init(reliableMessageMgr);
     }
+
+    CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
+                             EncryptedPacketBufferHandle * retainedMessage) const override;
 
     CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                  const Transport::PeerAddress & peerAddress,

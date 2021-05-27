@@ -455,7 +455,8 @@ CHIP_ERROR Device::EstablishCASESession()
     Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(SecureSessionHandle(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
+    ReturnErrorOnFailure(
+        mCASESession.MessageDispatch().Init(mExchangeMgr->GetReliableMessageMgr(), mSessionManager->GetTransportManager()));
     mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);
 
     ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, mCredentials, mDeviceId, 0, exchange, this));
