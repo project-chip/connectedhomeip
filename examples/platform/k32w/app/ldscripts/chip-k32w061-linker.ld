@@ -44,8 +44,8 @@ BOOT_RESUME_STACK_SIZE = 1024;
    going to sleep is more important than the total available stack size */
 STACK_SIZE             = (4096 - 32);
 
-MEM_RAM0_BASE = 0x4000400;
-MEM_RAM0_SIZE = 0x0015c00;
+MEM_RAM0_BASE          = 0x4000400;
+MEM_RAM0_SIZE          = 0x0015c00;
 
 MEMORY
 {
@@ -62,32 +62,24 @@ __top_RAM0      = MEM_RAM0_BASE + MEM_RAM0_SIZE; /* 87K bytes */
 /* To be improved. At this moment the second RAM bank is dedicated entirely to heap. */
 HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0xF000;
 
-/*** flash memory characteristics definitions required for OTA ***/
-m_flash_start   = 0x00000000;
-m_flash_end     = 0x0009FFFF;
-m_flash_size    = 0x000A0000;
-m_sector_size   = 512;
-m_fsl_prodInfo_size = m_sector_size;
+/* set external flash properties - external flash is present on the DK6 board */
+m_ext_flash_size          = 0x00100000;
+m_ext_flash_base          = 0x00000000;
+m_ext_flash_sector_size   = 4096;
 
-m_fsl_prodInfo_end                             = m_flash_size - 17 * m_sector_size - 1;
-m_fsl_prodInfo_start                           = m_fsl_prodInfo_end - m_fsl_prodInfo_size + 1;
+NVMSectorCountLink        = 63;
 
-NV_STORAGE_MAX_SECTORS                         = 63;
-NV_STORAGE_SIZE                                = NV_STORAGE_MAX_SECTORS * m_sector_size;
-NV_STORAGE_START_ADDRESS                       = m_fsl_prodInfo_start - 1;
-NV_STORAGE_END_ADDRESS                         = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;
+NV_STORAGE_SIZE           = NVMSectorCountLink * m_ext_flash_sector_size;
+NV_STORAGE_MAX_SECTORS    = NVMSectorCountLink;
+NV_STORAGE_SECTOR_SIZE    = m_ext_flash_sector_size;
+NV_STORAGE_START_ADDRESS  = m_ext_flash_size - 1;
+NV_STORAGE_END_ADDRESS    = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;
 
-INT_STORAGE_END                                = NV_STORAGE_START_ADDRESS - 1;
-INT_STORAGE_START                              = 0x48000;
-INT_STORAGE_SIZE                               = INT_STORAGE_END - INT_STORAGE_START;
+m_app_size                = 0x00a0000; /* 640K */
 
-FREESCALE_PROD_DATA_BASE_ADDR                  = m_fsl_prodInfo_start;
-INT_STORAGE_SECTOR_SIZE                        = m_sector_size;
-m_app_size                                     = 0xA0000; /* 640K: to accommodate all libs in debug */
-
-__ram_vector_table__                           = 1;
-vector_table_size                              = 0x120;
-M_VECTOR_RAM_SIZE                              = DEFINED(__ram_vector_table__) ? vector_table_size : 0x0;
+__ram_vector_table__      = 1;
+vector_table_size         = 0x120;
+M_VECTOR_RAM_SIZE         = DEFINED(__ram_vector_table__) ? vector_table_size : 0x0;
 
 ENTRY(ResetISR)
 
@@ -328,5 +320,6 @@ SECTIONS
     PROVIDE(Chip_LOWPOWER_ChipSoftwareReset = 0x03003fa1);
 
     __StackLimit = _vStackTop - STACK_SIZE;
-    ASSERT(__StackLimit >= _end_boot_resume_stack, "Possible stack corruption with data/bss/boot_stack")
+    /* ASSERT(__StackLimit >= _end_boot_resume_stack, "Possible stack corruption with data/bss/boot_stack") */
+    ASSERT(_etext < NV_STORAGE_START_ADDRESS, "Application does not fit into flash!")
 }
