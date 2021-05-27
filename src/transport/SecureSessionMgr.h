@@ -64,9 +64,7 @@ public:
     using System::PacketBufferHandle::IsNull;
     // Pass-through to HasChainedBuffer on our underlying buffer without
     // exposing operator->
-    bool HasChainedBuffer() const {
-        return (*this)->HasChainedBuffer();
-    }
+    bool HasChainedBuffer() const { return (*this)->HasChainedBuffer(); }
 
     uint32_t GetMsgId() const;
 
@@ -113,9 +111,7 @@ public:
      * We only allow doing this with an rvalue reference, so the fact that we
      * are moving out of the EncryptedPacketBufferHandle is clear.
      */
-    PacketBufferHandle PrepareToSend() && {
-                                           return PacketBufferHandle(std::move(*this));
-    }
+    PacketBufferHandle PrepareToSend() && { return PacketBufferHandle(std::move(*this)); }
 
 private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
