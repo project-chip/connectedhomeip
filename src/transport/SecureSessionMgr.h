@@ -53,13 +53,20 @@ namespace chip {
  *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
-class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
+class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() {}
     EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 
     void operator=(EncryptedPacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
+
+    using System::PacketBufferHandle::IsNull;
+    // Pass-through to HasChainedBuffer on our underlying buffer without
+    // exposing operator->
+    bool HasChainedBuffer() const {
+        return (*this)->HasChainedBuffer();
+    }
 
     uint32_t GetMsgId() const;
 
@@ -95,6 +102,19 @@ public:
     static EncryptedPacketBufferHandle MarkEncrypted(PacketBufferHandle && aBuffer)
     {
         return EncryptedPacketBufferHandle(std::move(aBuffer));
+    }
+
+    /**
+     * EncryptedPacketBufferHandle represents a buffer we want to resend as-is,
+     * without ever mutating it.  But the actual resend path does need to mutate
+     * it, and more importantly needs to end up calling into sending code that
+     * expects a PacketBuffer.  So we allow converting an
+     * EncryptedPacketBufferHandle to a PacketBufferHandle, in an explicit way.
+     * We only allow doing this with an rvalue reference, so the fact that we
+     * are moving out of the EncryptedPacketBufferHandle is clear.
+     */
+    PacketBufferHandle PrepareToSend() && {
+                                           return PacketBufferHandle(std::move(*this));
     }
 
 private:
