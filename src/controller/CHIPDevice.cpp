@@ -523,8 +523,9 @@ Device::~Device()
 
     if (mStorageDelegate != nullptr && mSessionManager != nullptr)
     {
-        // Store the current device in persistent storage so we have the latest
-        // message counters available next time.
+        // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
+        // We need to store the session counters along with the the session information so that when we deserialize
+        // this device next time, we can recreate the session correctly.
         Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
         VerifyOrReturn(connectionState != nullptr);
         Persist();
