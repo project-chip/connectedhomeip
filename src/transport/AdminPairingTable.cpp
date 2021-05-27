@@ -33,7 +33,7 @@ namespace Transport {
 CHIP_ERROR AdminPairingInfo::SetFabricLabel(const uint8_t * fabricLabel)
 {
     const char * charFabricLabel = Uint8::to_const_char(fabricLabel);
-    size_t stringLength = strnlen(charFabricLabel, kFabricLabelMaxLengthInBytes);
+    size_t stringLength          = strnlen(charFabricLabel, kFabricLabelMaxLengthInBytes);
     memcpy(mFabricLabel, charFabricLabel, stringLength);
     mFabricLabel[stringLength] = '\0'; // Set null terminator
 
@@ -42,59 +42,59 @@ CHIP_ERROR AdminPairingInfo::SetFabricLabel(const uint8_t * fabricLabel)
 
 CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
 {
-        CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-        char key[KeySize()];
-        ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
+    char key[KeySize()];
+    ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
 
-        StorableAdminPairingInfo * info = chip::Platform::New<StorableAdminPairingInfo>();
-        ReturnErrorCodeIf(info == nullptr, CHIP_ERROR_NO_MEMORY);
+    StorableAdminPairingInfo * info = chip::Platform::New<StorableAdminPairingInfo>();
+    ReturnErrorCodeIf(info == nullptr, CHIP_ERROR_NO_MEMORY);
 
-        info->mNodeId   = Encoding::LittleEndian::HostSwap64(mNodeId);
-        info->mAdmin    = Encoding::LittleEndian::HostSwap16(mAdmin);
-        info->mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
-        info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
+    info->mNodeId   = Encoding::LittleEndian::HostSwap64(mNodeId);
+    info->mAdmin    = Encoding::LittleEndian::HostSwap16(mAdmin);
+    info->mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
+    info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
-        size_t stringLength = strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes);
-        memcpy(info->mFabricLabel, mFabricLabel , stringLength);
-        info->mFabricLabel[stringLength] = '\0'; // Set null terminator
+    size_t stringLength = strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes);
+    memcpy(info->mFabricLabel, mFabricLabel, stringLength);
+    info->mFabricLabel[stringLength] = '\0'; // Set null terminator
 
-        if (mOperationalKey != nullptr)
-        {
-            SuccessOrExit(err = mOperationalKey->Serialize(info->mOperationalKey));
-        }
-        else
-        {
-            P256Keypair keypair;
-            SuccessOrExit(err = keypair.Initialize());
-            SuccessOrExit(err = keypair.Serialize(info->mOperationalKey));
-        }
+    if (mOperationalKey != nullptr)
+    {
+        SuccessOrExit(err = mOperationalKey->Serialize(info->mOperationalKey));
+    }
+    else
+    {
+        P256Keypair keypair;
+        SuccessOrExit(err = keypair.Initialize());
+        SuccessOrExit(err = keypair.Serialize(info->mOperationalKey));
+    }
 
-        if (mRootCert == nullptr || mRootCertLen == 0)
-        {
-            info->mRootCertLen = 0;
-        }
-        else
-        {
-            info->mRootCertLen = Encoding::LittleEndian::HostSwap16(mRootCertLen);
-            memcpy(info->mRootCert, mRootCert, mRootCertLen);
-        }
+    if (mRootCert == nullptr || mRootCertLen == 0)
+    {
+        info->mRootCertLen = 0;
+    }
+    else
+    {
+        info->mRootCertLen = Encoding::LittleEndian::HostSwap16(mRootCertLen);
+        memcpy(info->mRootCert, mRootCert, mRootCertLen);
+    }
 
-        if (mOperationalCert == nullptr || mOpCertLen == 0)
-        {
-            info->mOpCertLen = 0;
-        }
-        else
-        {
-            info->mOpCertLen = Encoding::LittleEndian::HostSwap16(mOpCertLen);
-            memcpy(info->mOperationalCert, mOperationalCert, mOpCertLen);
-        }
+    if (mOperationalCert == nullptr || mOpCertLen == 0)
+    {
+        info->mOpCertLen = 0;
+    }
+    else
+    {
+        info->mOpCertLen = Encoding::LittleEndian::HostSwap16(mOpCertLen);
+        memcpy(info->mOperationalCert, mOperationalCert, mOpCertLen);
+    }
 
-        err = kvs->SyncSetKeyValue(key, info, sizeof(StorableAdminPairingInfo));
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue: %s", chip::ErrorStr(err));
-        }
+    err = kvs->SyncSetKeyValue(key, info, sizeof(StorableAdminPairingInfo));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue: %s", chip::ErrorStr(err));
+    }
 
 exit:
     if (info != nullptr)

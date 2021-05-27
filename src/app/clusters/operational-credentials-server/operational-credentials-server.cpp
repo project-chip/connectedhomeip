@@ -29,14 +29,14 @@
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <string.h>
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <string.h>
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -49,11 +49,12 @@ using namespace ::chip::Transport;
    terminator is found within the first MAXLEN characters, return MAXLEN. */
 size_t opcreds_strnlen(const char * str, size_t maxlen)
 {
-  size_t len;
-  const char *p = str;
+    size_t len;
+    const char * p = str;
 
-  for (len = 0; len < maxlen && *p != '\0'; p++, len++);
-  return len;
+    for (len = 0; len < maxlen && *p != '\0'; p++, len++)
+        ;
+    return len;
 }
 #else
 #define opcreds_strnlen strnlen
@@ -110,7 +111,6 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, c
         fabricDescriptor.Label = ByteSpan(fabricLabel, lengthToStore);
     }
 
-
     emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                    "OpCreds: Writing admin into attribute store at index %d: fabricId 0x" ChipLogFormatX64
                    ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
@@ -128,9 +128,9 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     uint32_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
     {
-        NodeId nodeId     = pairing.GetNodeId();
-        uint64_t fabricId = pairing.GetFabricId();
-        uint16_t vendorId = pairing.GetVendorId();
+        NodeId nodeId               = pairing.GetNodeId();
+        uint64_t fabricId           = pairing.GetFabricId();
+        uint16_t vendorId           = pairing.GetVendorId();
         const uint8_t * fabricLabel = pairing.GetFabricLabel();
 
         // Skip over uninitialized admins
@@ -318,7 +318,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Co
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
-    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     CHIP_ERROR err;
 
     // Fetch current fabric
