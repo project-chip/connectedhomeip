@@ -1365,26 +1365,31 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING
-    AdvanceCommissioningStage(CHIP_NO_ERROR);
-#else
-    mPairingSession.ToSerializable(device->GetPairing());
-    mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-
-    mPairedDevices.Insert(device->GetDeviceId());
-    mPairedDevicesUpdated = true;
-
-    // Note - This assumes storage is synchronous, the device must be in storage before we can cleanup
-    // the rendezvous session and mark pairing success
-    PersistDevice(device);
-    // Also persist the device list at this time
-    // This makes sure that a newly added device is immediately available
-    PersistDeviceList();
-    if (mPairingDelegate != nullptr)
+    if (mIsIPRendezvous)
     {
-        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
+        AdvanceCommissioningStage(CHIP_NO_ERROR);
     }
-    RendezvousCleanup(CHIP_NO_ERROR);
+    else
 #endif
+    {
+        mPairingSession.ToSerializable(device->GetPairing());
+        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
+
+        mPairedDevices.Insert(device->GetDeviceId());
+        mPairedDevicesUpdated = true;
+
+        // Note - This assumes storage is synchronous, the device must be in storage before we can cleanup
+        // the rendezvous session and mark pairing success
+        PersistDevice(device);
+        // Also persist the device list at this time
+        // This makes sure that a newly added device is immediately available
+        PersistDeviceList();
+        if (mPairingDelegate != nullptr)
+        {
+            mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
+        }
+        RendezvousCleanup(CHIP_NO_ERROR);
+    }
 
     return CHIP_NO_ERROR;
 }
