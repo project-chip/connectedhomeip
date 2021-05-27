@@ -373,8 +373,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     const char * serviceType = params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode
         ? kCommissionableServiceName
         : kCommissionerServiceName;
-    FullQName serviceName = AllocateQName(serviceType, kCommissionProtocol, kLocalDomain);
-    FullQName instanceName  = AllocateQName(nameBuffer, serviceType, kCommissionProtocol, kLocalDomain);
+    FullQName serviceName  = AllocateQName(serviceType, kCommissionProtocol, kLocalDomain);
+    FullQName instanceName = AllocateQName(nameBuffer, serviceType, kCommissionProtocol, kLocalDomain);
 
     ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
     FullQName hostName = AllocateQName(nameBuffer, kLocalDomain);
