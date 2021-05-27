@@ -112,15 +112,11 @@ exit:
 
 void ChipLinuxAppMainLoop()
 {
-#if CHIP_ENABLE_SHELL
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
-#endif
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
-#if CHIP_ENABLE_SHELL
     shellThread.join();
-#endif
 }

@@ -19,10 +19,6 @@ config("app-main-config") {
   include_dirs = [ "." ]
 }
 
-declare_args() {
-  chip_enable_shell = false
-}
-
 source_set("app-main") {
   sources = [
     "AppMain.cpp",
@@ -40,12 +36,12 @@ source_set("app-main") {
   public_deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/lib/shell:shell_core",
   ]
 
-  if (chip_enable_shell) {
-    defines += [ "CHIP_ENABLE_SHELL" ]
-    public_deps += [ "${chip_root}/src/lib/shell" ]
-  }
+    public_deps += [ 
+    ]
 
   public_configs = [ ":app-main-config" ]
 }
