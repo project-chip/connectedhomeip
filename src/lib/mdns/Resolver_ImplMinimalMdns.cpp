@@ -455,8 +455,6 @@ CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
     mDiscoveryType = type;
-    char subtypeStr[kMaxSubtypeDescSize];
-    ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
 
     mdns::Minimal::FullQName qname;
 
@@ -472,6 +470,8 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
         }
         else
         {
+            char subtypeStr[kMaxSubtypeDescSize];
+            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
             qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
                                           kLocalDomain);
         }
