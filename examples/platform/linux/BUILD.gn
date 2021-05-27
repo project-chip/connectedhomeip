@@ -19,10 +19,6 @@ config("app-main-config") {
   include_dirs = [ "." ]
 }
 
-declare_args() {
-  chip_enable_shell = false
-}
-
 source_set("app-main") {
   sources = [
     "AppMain.cpp",
@@ -31,7 +27,7 @@ source_set("app-main") {
     "Options.h",
   ]
 
-  defines = [ "CHIP_ENABLE_SHELL" ]
+  defines = []
 
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
