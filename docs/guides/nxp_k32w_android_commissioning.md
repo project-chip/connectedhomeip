@@ -3,7 +3,7 @@
 This article describes how to use
 [CHIPTool](../../src/android/CHIPTool/README.md) for Android smartphones to
 commission an NXP K32W061 DK6 running
-[NXP K32W Lock/Light Example Application](../../examples/lock-light-app/k32w/README.md)
+[NXP K32W Lock/Light Example Application](../../examples/lighting-app/k32w/README.md)
 onto a CHIP-enabled Thread network.
 
 <hr>

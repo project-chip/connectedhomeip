@@ -26,3 +26,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Check broken links
         uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          config-file: mlc_config.json

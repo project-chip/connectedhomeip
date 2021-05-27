@@ -1,0 +1,8 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^https://ti.com/chip_sdk"
+    }
+  ],
+  "aliveStatusCodes": [200, 206, 0]
+}

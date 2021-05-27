@@ -38,8 +38,8 @@ following features are available:
     export EFR32_SDK_ROOT=<Path to cloned git repo>
 
 -   Download the
-    [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
-    command line tool, and ensure that `commander` is your shell search path.
+    [Simplicity Studio](https://www.silabs.com/developers/simplicity-studio)
+    development environment, and ensure that `commander` is your shell search path.
     (For Mac OS X, `commander` is located inside
     `Commander.app/Contents/MacOS/`.)
 

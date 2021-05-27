@@ -19,7 +19,7 @@ git clone https://github.com/project-chip/connectedhomeip.git
 
 2. Build the CHIP python package
 
-Follow [BUILDING.md](/docs/BUILDING.md) to setup CHIP on your platform.
+Follow [BUILDING.md](../../../docs/BUILDING.md) to setup CHIP on your platform.
 
 Genrally, once build dependencies are satisfied you can build the `python`
 target.
