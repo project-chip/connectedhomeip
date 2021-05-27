@@ -81,9 +81,9 @@
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
 	url = https://github.com/openthread/ot-nxp.git
-[submodule "third_party/openthread/ot-efr32"]
-	path = third_party/openthread/ot-efr32
-	url = https://github.com/openthread/ot-efr32.git
 [submodule "third_party/openthread/ot-qorvo"]
 	path = third_party/openthread/ot-qorvo
 	url = https://github.com/openthread/ot-qorvo.git
+[submodule "third_party/openthread/ot-efr32"]
+	path = third_party/openthread/ot-efr32
+	url = https://github.com/openthread/ot-efr32.git
