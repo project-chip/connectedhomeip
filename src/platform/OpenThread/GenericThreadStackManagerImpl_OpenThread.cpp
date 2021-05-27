@@ -54,7 +54,7 @@
 
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CLI
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 extern "C" void otAppCliInit(otInstance * aInstance);
 #endif
 
@@ -817,7 +817,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
-#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL) && !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_ENABLE_CLI
+#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL) && !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     otAppCliInit(otInst);
 #endif
 

@@ -184,7 +184,7 @@ template("k32w_sdk") {
     }
 
     if (chip_with_ot_cli == 1) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CLI=1" ]
+      defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
     }
 
     if (defined(invoker.defines)) {
