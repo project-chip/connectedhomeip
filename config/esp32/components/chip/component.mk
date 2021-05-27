@@ -83,6 +83,10 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
 COMPONENT_ADD_LDFLAGS        = -L$(OUTPUT_DIR)/lib/ \
                                -lCHIP
 
+ifdef CONFIG_ENABLE_CHIP_SHELL
+COMPONENT_ADD_LDFLAGS        += -lCHIPShell
+endif
+
 ifdef CONFIG_ENABLE_PW_RPC
 COMPONENT_ADD_LDFLAGS        += -lPwRpc
 endif
@@ -134,6 +138,9 @@ endif
 	  echo "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"" >> $(OUTPUT_DIR)/args.gn ;\
 	  echo "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"" >> $(OUTPUT_DIR)/args.gn      ;\
 	  echo "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"" >>$(OUTPUT_DIR)/args.gn         ;\
+	fi
+	if [[ "$(CONFIG_ENABLE_CHIP_SHELL)" = "y" ]]; then \
+	  echo "chip_build_libshell = true" >> $(OUTPUT_DIR)/args.gn ;\
 	fi
 	if [[ "$(CONFIG_USE_MINIMAL_MDNS)" = "n" ]]; then \
 	  echo "chip_mdns = platform" >> $(OUTPUT_DIR)/args.gn ;\

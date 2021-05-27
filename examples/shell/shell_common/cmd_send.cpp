@@ -441,5 +441,5 @@ static shell_command_t cmds_send[] = {
 
 void cmd_send_init()
 {
-    shell_register(cmds_send, ArraySize(cmds_send));
+    Engine::Root().RegisterCommands(cmds_send, ArraySize(cmds_send));
 }
