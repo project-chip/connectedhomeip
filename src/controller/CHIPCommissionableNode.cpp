@@ -42,18 +42,9 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
-#include <credentials/CHIPCert.h>
-#include <messaging/ExchangeContext.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
-#include <setup_payload/QRCodeSetupPayloadParser.h>
-#include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -68,11 +59,6 @@
 #include <memory>
 #include <stdint.h>
 #include <stdlib.h>
-#include <time.h>
-
-using namespace chip::Inet;
-using namespace chip::System;
-using namespace chip::Credentials;
 
 namespace chip {
 namespace Controller {
@@ -85,11 +71,13 @@ CHIP_ERROR CommissionableNode::Init()
         return 1;
     }
 
+#if CONFIG_DEVICE_LAYER
     if (DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "FAILED to initialize chip stack");
         return 1;
     }
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -97,11 +85,13 @@ CHIP_ERROR CommissionableNode::Init()
 CHIP_ERROR CommissionableNode::DiscoverAllCommissioners()
 {
     chip::Mdns::Resolver::Instance().SetResolverDelegate(this);
-    ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&chip::DeviceLayer::InetLayer, kMdnsPort));
+#if CONFIG_DEVICE_LAYER
+    ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
+#endif
 
-    for (int i = 0; i < kMaxCommissionerNodes; ++i)
+    for (int i = 0; i < kMaxCommissioners; ++i)
     {
-        mCommissionerNodes[i].Reset();
+        mCommissioners[i].Reset();
     }
     return chip::Mdns::Resolver::Instance().FindCommissioners();
 }
@@ -109,12 +99,13 @@ CHIP_ERROR CommissionableNode::DiscoverAllCommissioners()
 CHIP_ERROR CommissionableNode::DiscoverAllCommissionersLongDiscriminator(uint16_t long_discriminator)
 {
     chip::Mdns::Resolver::Instance().SetResolverDelegate(this);
-    ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&chip::DeviceLayer::InetLayer, kMdnsPort));
+#if CONFIG_DEVICE_LAYER
+    ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
+#endif
 
-    // TODO(cecille): Add assertion about main loop.
-    for (int i = 0; i < kMaxCommissionerNodes; ++i)
+    for (int i = 0; i < kMaxCommissioners; ++i)
     {
-        mCommissionerNodes[i].Reset();
+        mCommissioners[i].Reset();
     }
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
     return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
@@ -123,33 +114,33 @@ CHIP_ERROR CommissionableNode::DiscoverAllCommissionersLongDiscriminator(uint16_
 const Mdns::CommissionableNodeData * CommissionableNode::GetDiscoveredDevice(int idx)
 {
     // TODO(cecille): Add assertion about main loop.
-    if (mCommissionerNodes[idx].IsValid())
+    if (mCommissioners[idx].IsValid())
     {
-        return &mCommissionerNodes[idx];
+        return &mCommissioners[idx];
     }
     return nullptr;
 }
 
 void CommissionableNode::OnCommissionerFound(const chip::Mdns::CommissionableNodeData & nodeData)
 {
-    for (int i = 0; i < kMaxCommissionerNodes; ++i)
+    for (int i = 0; i < kMaxCommissioners; ++i)
     {
-        if (!mCommissionerNodes[i].IsValid())
+        if (!mCommissioners[i].IsValid())
         {
             continue;
         }
-        if (strcmp(mCommissionerNodes[i].hostName, nodeData.hostName) == 0)
+        if (strcmp(mCommissioners[i].hostName, nodeData.hostName) == 0)
         {
-            mCommissionerNodes[i] = nodeData;
+            mCommissioners[i] = nodeData;
             return;
         }
     }
     // Didn't find the host name already in our list, return an invalid
-    for (int i = 0; i < kMaxCommissionerNodes; ++i)
+    for (int i = 0; i < kMaxCommissioners; ++i)
     {
-        if (!mCommissionerNodes[i].IsValid())
+        if (!mCommissioners[i].IsValid())
         {
-            mCommissionerNodes[i] = nodeData;
+            mCommissioners[i] = nodeData;
             return;
         }
     }

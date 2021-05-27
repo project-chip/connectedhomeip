@@ -17,6 +17,7 @@
  */
 
 #include "DiscoverCommissionersCommand.h"
+#include <arpa/inet.h>
 #include <chrono>
 #include <string>
 #include <thread>
@@ -43,19 +44,46 @@ CHIP_ERROR DiscoverCommissionersCommand::Run(PersistentStorage & storage, NodeId
     DeviceLayer::PlatformMgr().RunEventLoop();
 
     int commissionerCount = 0;
-    for (int i = 0; i < mCommissionableNode.GetMaxCommissionerNodesSupported(); i++)
+    for (int i = 0; i < mCommissionableNode.GetMaxCommissionersSupported(); i++)
     {
         const Mdns::CommissionableNodeData * commissioner = mCommissionableNode.GetDiscoveredDevice(i);
         if (commissioner != nullptr)
         {
-            printf("\nDiscovered Commisioner #%d\n", ++commissionerCount);
-            printf(strcmp(commissioner->deviceName, "") != 0 ? "Device Name: %s. " : "", commissioner->deviceName);
-            printf((commissioner->vendorId > 0) ? "Vendor ID: %d. " : "", commissioner->vendorId);
-            printf((commissioner->productId > 0) ? "Product ID: %d. " : "", commissioner->productId);
-            printf((commissioner->deviceType > 0) ? "Device Type: %d. " : "", commissioner->deviceType);
-            printf((commissioner->longDiscriminator > 0) ? "Long Discriminator: %d. " : "", commissioner->longDiscriminator);
-            printf((!commissioner->IsHost("")) ? "Hostname: %s. " : "", commissioner->hostName);
-            printf((commissioner->numIPs > 0) ? "Number of IP addresses: %d. " : "", commissioner->numIPs);
+            printf("Discovered Commisioner #%d\n", ++commissionerCount);
+            if (strcmp(commissioner->deviceName, "") != 0)
+            {
+                printf("Device Name: %s. ", commissioner->deviceName);
+            }
+            if (commissioner->vendorId > 0)
+            {
+                printf("Vendor ID: %d. ", commissioner->vendorId);
+            }
+            if (commissioner->productId > 0)
+            {
+                printf("Product ID: %d. ", commissioner->productId);
+            }
+            if (commissioner->deviceType > 0)
+            {
+                printf("Device Type: %d. ", commissioner->deviceType);
+            }
+            if (commissioner->longDiscriminator > 0)
+            {
+                printf("Long Discriminator: %d. ", commissioner->longDiscriminator);
+            }
+            if (!commissioner->IsHost(""))
+            {
+                printf("Hostname: %s. ", commissioner->hostName);
+            }
+            if (commissioner->numIPs > 0)
+            {
+                printf("Number of IP addresses: %d. IP Adddress(es): ", commissioner->numIPs);
+                for (int j = 0; j < commissioner->numIPs; j++)
+                {
+                    char ipAddress[INET6_ADDRSTRLEN];
+                    printf("%s, ", commissioner->ipAddress[j].ToString(ipAddress, sizeof(ipAddress)));
+                }
+            }
+
             printf("\n");
         }
     }

@@ -176,10 +176,74 @@ private:
     void OnOperationalIPAddress(const chip::Inet::IPAddress & addr);
 };
 
+const char * ToString(mdns::Minimal::QType qtype)
+{
+    static char buff[32];
+
+    switch (qtype)
+    {
+    case mdns::Minimal::QType::A:
+        return "A";
+    case mdns::Minimal::QType::NS:
+        return "NS";
+    case mdns::Minimal::QType::CNAME:
+        return "CNAME";
+    case mdns::Minimal::QType::SOA:
+        return "SOA";
+    case mdns::Minimal::QType::WKS:
+        return "WKS";
+    case mdns::Minimal::QType::PTR:
+        return "PTR";
+    case mdns::Minimal::QType::MX:
+        return "MX";
+    case mdns::Minimal::QType::SRV:
+        return "SRV";
+    case mdns::Minimal::QType::AAAA:
+        return "AAAA";
+    case mdns::Minimal::QType::ANY:
+        return "ANY";
+    case mdns::Minimal::QType::TXT:
+        return "TXT";
+    default:
+        sprintf(buff, "UNKNOWN (%d)!!", static_cast<int>(qtype));
+        return buff;
+    }
+}
+
+const char * ToString(mdns::Minimal::QClass qclass)
+{
+    static char buff[32];
+
+    switch (qclass)
+    {
+    case mdns::Minimal::QClass::IN_UNICAST:
+        return "IN(UNICAST)";
+    case mdns::Minimal::QClass::IN:
+        return "IN";
+    default:
+        sprintf(buff, "UNKNOWN (%d)!!", static_cast<int>(qclass));
+        return buff;
+    }
+}
+
+void setQName(char qName[], mdns::Minimal::SerializedQNameIterator it)
+{
+    while (it.Next())
+    {
+        strcat(qName, it.Value());
+        strcat(qName, ".");
+    }
+    if (!it.IsValid())
+    {
+        strcat(qName, "   (INVALID!)");
+    }
+}
 void PacketDataReporter::OnQuery(const QueryData & data)
 {
-    ChipLogError(Discovery, "Unexpected query packet being parsed as a response");
-    mValid = false;
+    char qName[32] = "";
+    setQName(qName, data.GetName());
+    ChipLogDetail(Discovery, "QUERY %s/%s%s: %s", ToString(data.GetType()), ToString(data.GetClass()),
+                  data.RequestedUnicastAnswer() ? " UNICAST" : "", qName);
 }
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)
@@ -280,7 +344,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
 {
     if (!mValid)
     {
-        // return; TODO: bug?
+        return;
     }
 
     /// Data content is expected to contain:
