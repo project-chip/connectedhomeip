@@ -424,11 +424,12 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
                                       SecureSession::SessionRole::kInitiator, mAdminId);
     SuccessOrExit(err);
 
-    if (IsProvisioningComplete())
-    {
-        err = EstablishCASESession();
-        SuccessOrExit(err);
-    }
+    // TODO - Enable CASE Session setup before message is sent to a fully provisioned device
+    // if (IsProvisioningComplete())
+    // {
+    //     err = EstablishCASESession();
+    //     SuccessOrExit(err);
+    // }
 
 exit:
 
