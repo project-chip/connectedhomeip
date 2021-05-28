@@ -851,7 +851,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
-    err = mPairingSession.MessageDispatch().Init(mExchangeMgr->GetReliableMessageMgr(), mTransportMgr);
+    err = mPairingSession.MessageDispatch().Init(mTransportMgr);
     SuccessOrExit(err);
     mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
 

@@ -390,7 +390,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
         1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
-    err = mockSender.mMessageDispatch.Init(rm);
+    err = mockSender.mMessageDispatch.Init();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
@@ -526,7 +526,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
         1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
-    err = mockSender.mMessageDispatch.Init(rm);
+    err = mockSender.mMessageDispatch.Init();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Let's drop the initial message

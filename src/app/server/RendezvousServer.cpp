@@ -111,7 +111,7 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
                                                             strlen(kSpake2pKeyExchangeSalt), mNextKeyId++, this));
     }
 
-    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(mExchangeManager->GetReliableMessageMgr(), transportMgr));
+    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
     mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
 
     return CHIP_NO_ERROR;
