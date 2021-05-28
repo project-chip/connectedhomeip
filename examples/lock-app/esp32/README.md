@@ -161,10 +161,11 @@ commissioning and cluster control.
     using `EnableWiFiNetwork` command. In this example, we have used `TESTSSID`
     and `TESTPASSWD` as the SSID and passphrase respectively.
 
-         - chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 135246 0 0 ssid=str:TESTSSID credentials=str:TESTPASSWD breadcrumb=0
-timeoutMs=1000
+             - chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 135246 0 0 ssid=str:TESTSSID credentials=str:TESTPASSWD breadcrumb=0
 
-         - chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 135246 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
+    timeoutMs=1000
+
+             - chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 135246 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
 
 ### Cluster control
 
