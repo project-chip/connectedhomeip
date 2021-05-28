@@ -64,22 +64,19 @@ To download and install packages.
         $ ./install.sh
         $ . ./export.sh
         $ cd {path-to-connectedhomeip}
+
+    To download and install packages.
+
         $ source ./scripts/bootstrap.sh
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
 
-If packages are already installed then simply activate it.
+    If packages are already installed then simply activate them.
 
-        $ cd ${HOME}/tools/esp-idf
-        $ ./install.sh
-        $ . ./export.sh
-        $ cd {path-to-connectedhomeip}
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
 
 -   Configuration Options
 
-        To choose from the different configuration options, run menuconfig
+        To choose from the different configuration options, run menuconfig.
 
           $ idf.py menuconfig
 
