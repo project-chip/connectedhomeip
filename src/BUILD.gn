@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/lib/shell/shell.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -83,7 +84,7 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/lwip/tests" ]
     }
 
-    if (current_os != "zephyr" && chip_device_platform != "esp32") {
+    if (chip_shell) {
       deps += [ "${chip_root}/src/lib/shell/tests" ]
     }
 

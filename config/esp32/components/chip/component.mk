@@ -140,7 +140,7 @@ endif
 	  echo "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"" >>$(OUTPUT_DIR)/args.gn         ;\
 	fi
 	if [[ "$(CONFIG_ENABLE_CHIP_SHELL)" = "y" ]]; then \
-	  echo "chip_build_libshell = true" >> $(OUTPUT_DIR)/args.gn ;\
+	  echo "chip_shell = true" >> $(OUTPUT_DIR)/args.gn ;\
 	fi
 	if [[ "$(CONFIG_USE_MINIMAL_MDNS)" = "n" ]]; then \
 	  echo "chip_mdns = platform" >> $(OUTPUT_DIR)/args.gn ;\

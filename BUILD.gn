@@ -29,6 +29,7 @@ assert(chip_root == "//")
 
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/lib/shell/shell.gni")
 
 import("//src/crypto/crypto.gni")
 
@@ -101,7 +102,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (chip_build_tools) {
       deps += [
         ":certification",
-        "${chip_root}/examples/shell/standalone:chip-shell",
         "${chip_root}/src/app/tests/integration:chip-im-initiator",
         "${chip_root}/src/app/tests/integration:chip-im-responder",
         "${chip_root}/src/messaging/tests/echo:chip-echo-requester",
@@ -109,6 +109,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
+      if (chip_shell) {
+        deps += [ "${chip_root}/examples/shell/standalone:chip-shell" ]
+      }
       if (chip_crypto == "openssl") {
         deps += [ "${chip_root}/src/tools/chip-cert" ]
       }
