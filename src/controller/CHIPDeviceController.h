@@ -277,7 +277,7 @@ protected:
     Messaging::ExchangeManager * mExchangeMgr;
     secure_channel::MessageCounterManager * mMessageCounterManager;
     PersistentStorageDelegate * mStorageDelegate;
-    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
+    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
