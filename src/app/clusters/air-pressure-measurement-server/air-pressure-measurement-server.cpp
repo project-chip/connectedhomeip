@@ -38,7 +38,7 @@ EmberAfStatus emberAfAirPressureMeasurementClusterGetMeasuredValue(chip::Endpoin
                                       sizeof(*measuredValue));
 }
 
-static EmberAfStatus emberAfAirPressureMeasurementClusterSetAltitudeCallback(chip::EndpointId endpoint, int16_t altitude)
+EmberAfStatus emberAfAirPressureMeasurementClusterSetAltitudeValue(chip::EndpointId endpoint, int16_t altitude)
 {
     return emberAfWriteServerAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID,
                                        ZCL_AIR_PRESSURE_MEASUREMENT_ALTITUDE_ATTRIBUTE_ID, (uint8_t *) &altitude,

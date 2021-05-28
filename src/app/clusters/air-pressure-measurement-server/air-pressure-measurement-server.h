@@ -21,4 +21,5 @@
 
 EmberAfStatus emberAfAirPressureMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, uint16_t measuredValue);
 EmberAfStatus emberAfAirPressureMeasurementClusterGetMeasuredValue(chip::EndpointId endpoint, uint16_t * measuredValue);
+EmberAfStatus emberAfAirPressureMeasurementClusterSetAltitudeValue(chip::EndpointId endpoint, int16_t altitude);
 EmberAfStatus emberAfAirPressureMeasurementClusterGetAltitudeValue(chip::EndpointId endpoint, int16_t * altitude);
