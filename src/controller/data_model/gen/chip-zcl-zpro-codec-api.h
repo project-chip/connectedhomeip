@@ -34,6 +34,7 @@
 | AudioOutput                                                         | 0x050B |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
+| BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
@@ -464,6 +465,87 @@ chip::System::PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttri
  */
 chip::System::PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                 chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster BinaryInputBasic                                            | 0x000F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * OutOfService                                                      | 0x0051 |
+| * PresentValue                                                      | 0x0055 |
+| * StatusFlags                                                       | 0x006F |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server read command for the out of service attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterReadOutOfServiceAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server write command for the out of service attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeBinaryInputBasicClusterWriteOutOfServiceAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t outOfService);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server read command for the present value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterReadPresentValueAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server write command for the present value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeBinaryInputBasicClusterWritePresentValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t presentValue);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server configure report command for the present value attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterConfigurePresentValueAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             uint16_t minInterval,
+                                                                                             uint16_t maxInterval);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server read command for the status flags attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterReadStatusFlagsAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server configure report command for the status flags attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterConfigureStatusFlagsAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint,
+                                                                                            uint16_t minInterval,
+                                                                                            uint16_t maxInterval);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Binding                                                     | 0xF000 |

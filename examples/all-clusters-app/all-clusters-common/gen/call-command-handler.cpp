@@ -34,6 +34,7 @@ EmberAfStatus emberAfApplicationLauncherClusterServerCommandParse(EmberAfCluster
 EmberAfStatus emberAfAudioOutputClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBarrierControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfBinaryInputBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBindingClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBridgedDeviceBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -134,6 +135,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_BASIC_CLUSTER_ID:
             result = emberAfBasicClusterServerCommandParse(cmd);
+            break;
+        case ZCL_BINARY_INPUT_BASIC_CLUSTER_ID:
+            // No commands are enabled for cluster Binary Input (Basic)
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_BINDING_CLUSTER_ID:
             result = emberAfBindingClusterServerCommandParse(cmd);
