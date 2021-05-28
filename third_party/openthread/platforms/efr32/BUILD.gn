@@ -38,6 +38,7 @@ source_set("openthread_core_config_efr32") {
   sources = [
     "${openthread_efr32_root}/src/src/openthread-core-efr32-config-check.h",
     "${openthread_efr32_root}/src/src/openthread-core-efr32-config.h",
+    "${openthread_root}/src/cli/cli_config.h",
   ]
 
   public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
@@ -58,6 +59,7 @@ source_set("libopenthread-efr32") {
     "${openthread_efr32_root}/src/src/radio.c",
     "${openthread_efr32_root}/src/src/system.c",
     "${openthread_efr32_root}/third_party/silabs/rail_config/rail_config.c",
+    "${openthread_root}/examples/apps/cli/cli_uart.cpp",
   ]
 
   public_deps = [
