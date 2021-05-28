@@ -51,14 +51,6 @@ EmberAfStatus emberAfTemperatureMeasurementClusterGetMaxMeasuredValue(chip::Endp
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 
-void emberAfTemperatureMeasurementClusterServerInitCallback(chip::EndpointId endpoint)
-{
-    /**
-     * nothing to do here - default values set by attribute storage
-     */
-    (void) endpoint;
-}
-
 EmberAfStatus emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, int16_t measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
