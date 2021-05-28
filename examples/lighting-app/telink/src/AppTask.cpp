@@ -29,9 +29,9 @@
 #include "ThreadUtil.h"
 
 #include <app/util/attribute-storage.h>
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -220,7 +220,7 @@ void AppTask::FactoryResetButtonEventHandler(void)
 
     event.Type               = AppEvent::kEventType_Button;
     event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = FunctionHandler;
+    event.Handler            = FactoryResetHandler;
     sAppTask.PostEvent(&event);
 }
 
