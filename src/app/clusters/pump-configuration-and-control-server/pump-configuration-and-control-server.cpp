@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,20 +15,24 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP system layer library timer unit
- *      tests.
- *
- */
+#include <app/util/af.h>
 
-#include "TestShell.h"
+#include <app/util/af-event.h>
+#include <app/util/attribute-storage.h>
 
-int main(int argc, char * argv[])
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/enums.h>
+
+using namespace chip;
+
+void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
+    // TODO
+}
 
-    return (TestShell());
+void emberAfPumpConfigurationAndControlClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
+{
+    // TODO
 }

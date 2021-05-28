@@ -30,7 +30,6 @@
 extern "C" {
 #endif
 
-int TestShell(void);
 int TestStreamerStdio(void);
 
 #ifdef __cplusplus
