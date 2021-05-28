@@ -33,7 +33,7 @@
 #endif
 
 // module header, comes first
-#include <controller/CHIPCommissionableNode.h>
+#include <controller/CHIPCommissionableNodeController.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -63,84 +63,77 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR CommissionableNode::Init()
+CHIP_ERROR CommissionableNodeController::Init()
 {
-    if (Platform::MemoryInit() != CHIP_NO_ERROR)
-    {
-        ChipLogError(chipTool, "FAILED to initialize memory");
-        return 1;
-    }
-
+    CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_DEVICE_LAYER
-    if (DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
+    if ((err = DeviceLayer::PlatformMgr().InitChipStack()) != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "FAILED to initialize chip stack");
-        return 1;
     }
 #endif
-
-    return CHIP_NO_ERROR;
+    return err;
 }
 
-CHIP_ERROR CommissionableNode::DiscoverAllCommissioners()
+CHIP_ERROR CommissionableNodeController::DiscoverAllCommissioners()
 {
     chip::Mdns::Resolver::Instance().SetResolverDelegate(this);
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
 #endif
 
-    for (int i = 0; i < kMaxCommissioners; ++i)
+    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; ++i)
     {
-        mCommissioners[i].Reset();
+        mDiscoveredCommissioners[i].Reset();
     }
     return chip::Mdns::Resolver::Instance().FindCommissioners();
 }
 
-CHIP_ERROR CommissionableNode::DiscoverAllCommissionersLongDiscriminator(uint16_t long_discriminator)
+CHIP_ERROR CommissionableNodeController::DiscoverAllCommissionersLongDiscriminator(uint16_t long_discriminator)
 {
     chip::Mdns::Resolver::Instance().SetResolverDelegate(this);
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
 #endif
 
-    for (int i = 0; i < kMaxCommissioners; ++i)
+    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; ++i)
     {
-        mCommissioners[i].Reset();
+        mDiscoveredCommissioners[i].Reset();
     }
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
-    return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+    return Mdns::Resolver::Instance().FindCommissioners(filter);
 }
 
-const Mdns::CommissionableNodeData * CommissionableNode::GetDiscoveredDevice(int idx)
+const Mdns::CommissionableNodeData * CommissionableNodeController::GetDiscoveredDevice(int idx)
 {
     // TODO(cecille): Add assertion about main loop.
-    if (mCommissioners[idx].IsValid())
+    if (mDiscoveredCommissioners[idx].IsValid())
     {
-        return &mCommissioners[idx];
+        return &mDiscoveredCommissioners[idx];
     }
     return nullptr;
 }
 
-void CommissionableNode::OnCommissionerFound(const chip::Mdns::CommissionableNodeData & nodeData)
+void CommissionableNodeController::OnCommissionerFound(const chip::Mdns::CommissionableNodeData & nodeData)
 {
-    for (int i = 0; i < kMaxCommissioners; ++i)
+    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; ++i)
     {
-        if (!mCommissioners[i].IsValid())
+        if (!mDiscoveredCommissioners[i].IsValid())
         {
             continue;
         }
-        if (strcmp(mCommissioners[i].hostName, nodeData.hostName) == 0)
+        if (strcmp(mDiscoveredCommissioners[i].hostName, nodeData.hostName) == 0)
         {
-            mCommissioners[i] = nodeData;
+            mDiscoveredCommissioners[i] = nodeData;
             return;
         }
     }
     // Didn't find the host name already in our list, return an invalid
-    for (int i = 0; i < kMaxCommissioners; ++i)
+    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; ++i)
     {
-        if (!mCommissioners[i].IsValid())
+        if (!mDiscoveredCommissioners[i].IsValid())
         {
-            mCommissioners[i] = nodeData;
+            mDiscoveredCommissioners[i] = nodeData;
             return;
         }
     }

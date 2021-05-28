@@ -20,16 +20,14 @@
 
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
-#include <controller/CHIPCommissionableNode.h>
+#include <controller/CHIPCommissionableNodeController.h>
 
 class DiscoverCommissionersCommand : public Command
 {
 public:
-    using ChipCommissionableNode = ::chip::Controller::CommissionableNode;
-
     DiscoverCommissionersCommand() : Command("discover-commissioners") {}
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
 private:
-    ChipCommissionableNode mCommissionableNode;
+    chip::Controller::CommissionableNodeController mCommissionableNodeController;
 };

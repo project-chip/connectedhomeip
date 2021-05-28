@@ -124,11 +124,7 @@ void TxtRecordDelegateImpl::OnRecord(const mdns::Minimal::BytesRange & name, con
     }
     else if (IsKey(name, "DN"))
     {
-        for (size_t i = 0; i < value.Size(); ++i)
-        {
-            mNodeData->deviceName[i] = static_cast<char>(value.Start()[i]);
-        }
-        mNodeData->deviceName[value.Size()] = '\0';
+        memcpy(mNodeData->deviceName, value.Start(), value.Size());
     }
     // TODO(cecille): Add the new stuff from 0.7 ballot 2.
 }
@@ -226,24 +222,26 @@ const char * ToString(mdns::Minimal::QClass qclass)
     }
 }
 
-void setQName(char qName[], mdns::Minimal::SerializedQNameIterator it)
+const char * ToString(mdns::Minimal::SerializedQNameIterator qNameIterator)
 {
-    while (it.Next())
+    static char qName[32];
+    memset(qName, 0, sizeof qName);
+    while (qNameIterator.Next())
     {
-        strcat(qName, it.Value());
-        strcat(qName, ".");
+        strncat(qName, qNameIterator.Value(), sizeof qName - strlen(qName));
+        strncat(qName, ".", sizeof qName - strlen(qName));
     }
-    if (!it.IsValid())
+    if (!qNameIterator.IsValid())
     {
-        strcat(qName, "   (INVALID!)");
+        strncat(qName, "   (INVALID!)", sizeof qName - strlen(qName));
     }
+    return qName;
 }
+
 void PacketDataReporter::OnQuery(const QueryData & data)
 {
-    char qName[32] = "";
-    setQName(qName, data.GetName());
     ChipLogDetail(Discovery, "QUERY %s/%s%s: %s", ToString(data.GetType()), ToString(data.GetClass()),
-                  data.RequestedUnicastAnswer() ? " UNICAST" : "", qName);
+                  data.RequestedUnicastAnswer() ? " UNICAST" : "", ToString(data.GetName()));
 }
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)

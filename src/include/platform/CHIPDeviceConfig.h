@@ -633,6 +633,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS
+ *
+ * Maximum number of CHIP Commissioners that a Commissionable Node will discover
+ */
+#ifndef CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS
+#define CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS 10
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
  *
  * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.

@@ -17,15 +17,10 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Declaration of CHIP CommissionableNode
- *
- */
-
 #pragma once
 
 #include <mdns/Resolver.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -34,67 +29,39 @@ namespace Controller {
 
 constexpr uint16_t kMdnsPort = 5388;
 
-// struct ResolvedNodeData;
-struct CommissionableNodeData;
-
-class DLL_EXPORT CommissionableNode : public Mdns::ResolverDelegate
+class DLL_EXPORT CommissionableNodeController : public Mdns::ResolverDelegate
 {
 public:
-    CommissionableNode(){};
-    virtual ~CommissionableNode() {}
+    CommissionableNodeController(){};
+    virtual ~CommissionableNodeController() {}
 
     CHIP_ERROR Init();
 
-    /**
-     * @brief
-     *   Discover devices advertising as commissionable that match the long discriminator.
-     * @return CHIP_ERROR   The return status
-     */
     CHIP_ERROR DiscoverAllCommissionersLongDiscriminator(uint16_t long_discriminator);
 
-    /**
-     * @brief
-     *   Discover all devices advertising as commissionable.
-     *   Should be called on main loop thread.
-     * @return CHIP_ERROR   The return status
-     */
     CHIP_ERROR DiscoverAllCommissioners();
 
-    /**
-     * @brief
-     *   Returns information about discovered devices.
-     *   Should be called on main loop thread.
-     * @return const CommissionableNodeData* info about the selected device. May be nullptr if no information has been returned yet.
-     */
     const Mdns::CommissionableNodeData * GetDiscoveredDevice(int idx);
-
-    /**
-     * @brief
-     *   Returns the max number of commissionable nodes this commissioner can track mdns information for.
-     * @return int  The max number of commissionable nodes supported
-     */
-    int GetMaxCommissionersSupported() { return kMaxCommissioners; }
 
     void OnCommissionerFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
 
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override
     {
-        ChipLogError(chipTool, "Unsupported operation CommissionableNode::OnNodeIdResolved");
+        ChipLogError(chipTool, "Unsupported operation CommissionableNodeController::OnNodeIdResolved");
     };
 
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
     {
-        ChipLogError(chipTool, "Unsupported operation CommissionableNode::OnNodeIdResolutionFailed");
+        ChipLogError(chipTool, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
     };
 
     void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override
     {
-        ChipLogError(chipTool, "Unsupported operation CommissionableNode::OnCommissionableNodeFound");
+        ChipLogError(chipTool, "Unsupported operation CommissionableNodeController::OnCommissionableNodeFound");
     };
 
 private:
-    static constexpr int kMaxCommissioners = 10;
-    Mdns::CommissionableNodeData mCommissioners[kMaxCommissioners];
+    Mdns::CommissionableNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS];
 };
 
 } // namespace Controller

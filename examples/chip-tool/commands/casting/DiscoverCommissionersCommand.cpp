@@ -26,8 +26,8 @@ using namespace ::chip;
 
 CHIP_ERROR DiscoverCommissionersCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
-    mCommissionableNode.Init();
-    mCommissionableNode.DiscoverAllCommissioners();
+    mCommissionableNodeController.Init();
+    mCommissionableNodeController.DiscoverAllCommissioners();
 
     uint32_t waitTime     = 500;
     System::Timer * timer = nullptr;
@@ -38,15 +38,15 @@ CHIP_ERROR DiscoverCommissionersCommand::Run(PersistentStorage & storage, NodeId
     }
     else
     {
-        ChipLogError(chipTool, "Failed to create the shutdown timer. Kill with ^C.\n");
+        ChipLogError(chipTool, "Failed to create the shutdown timer. Kill with ^C.");
     }
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 
     int commissionerCount = 0;
-    for (int i = 0; i < mCommissionableNode.GetMaxCommissionersSupported(); i++)
+    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; i++)
     {
-        const Mdns::CommissionableNodeData * commissioner = mCommissionableNode.GetDiscoveredDevice(i);
+        const Mdns::CommissionableNodeData * commissioner = mCommissionableNodeController.GetDiscoveredDevice(i);
         if (commissioner != nullptr)
         {
             printf("Discovered Commisioner #%d\n", ++commissionerCount);
