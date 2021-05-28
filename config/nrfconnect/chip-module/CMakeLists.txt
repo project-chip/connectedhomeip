@@ -205,7 +205,7 @@ chip_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_inet_config_enable_raw_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_dns_resolver"   CONFIG_CHIP_BUILD_TESTS)
-chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_STANDALONE_SHELL)
+chip_gn_arg_bool  ("chip_shell"                             CONFIG_CHIP_STANDALONE_SHELL)
 chip_gn_arg_bool  ("chip_build_zephyr_shell"                CONFIG_CHIP_ZEPHYR_SHELL)
 chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                  CONFIG_CHIP_PW_RPC)
 
