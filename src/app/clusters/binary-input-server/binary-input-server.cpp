@@ -43,14 +43,6 @@ EmberAfStatus emberAfBinaryInputBasicClusterGetOutOfService(chip::EndpointId end
                                       (uint8_t *) isOutOfService, sizeof(uint8_t));
 }
 
-void emberAfBinaryInputBasicClusterServerInitCallback(chip::EndpointId endpoint)
-{
-    /**
-     * nothing to do here - default values set by attribute storage
-     */
-    (void) endpoint;
-}
-
 EmberAfStatus emberAfBinaryInputBasicClusterSetPresentValueCallback(chip::EndpointId endpoint, bool presentValue)
 {
     return emberAfWriteServerAttribute(endpoint, ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, ZCL_PRESENT_VALUE_ATTRIBUTE_ID,
