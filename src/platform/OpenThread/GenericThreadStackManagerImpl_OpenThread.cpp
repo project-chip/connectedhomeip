@@ -1167,6 +1167,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     ChipLogProgress(DeviceLayer, "removing srp service: %s.%s", aInstanceName, aName);
     error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &(srpService->mService)));
 
+    // Clear service entry from local cache
+    memset(srpService, 0, sizeof(typename SrpClient::Service));
+
 exit:
     Impl()->UnlockThreadStack();
 
@@ -1185,6 +1188,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveAllSrpSer
     VerifyOrExit(services != nullptr, error = CHIP_NO_ERROR);
 
     error = MapOpenThreadError(otSrpClientRemoveHostAndServices(mOTInst, false));
+
+    // Clear all service entries in local cache
+    memset(mSrpClient.mServices, 0, sizeof(mSrpClient.mServices));
 
 exit:
     Impl()->UnlockThreadStack();
