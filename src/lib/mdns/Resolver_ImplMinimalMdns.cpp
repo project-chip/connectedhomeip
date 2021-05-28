@@ -228,12 +228,12 @@ const char * ToString(mdns::Minimal::SerializedQNameIterator qNameIterator)
     memset(qName, 0, sizeof qName);
     while (qNameIterator.Next())
     {
-        strncat(qName, qNameIterator.Value(), sizeof qName - strlen(qName));
-        strncat(qName, ".", sizeof qName - strlen(qName));
+        strncat(qName, qNameIterator.Value(), sizeof qName - strlen(qName) - 1);
+        strncat(qName, ".", sizeof qName - strlen(qName) - 1);
     }
     if (!qNameIterator.IsValid())
     {
-        strncat(qName, "   (INVALID!)", sizeof qName - strlen(qName));
+        strncat(qName, "   (INVALID!)", sizeof qName - strlen(qName) - 1);
     }
     return qName;
 }
