@@ -15,9 +15,10 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/openthread.gni")
-import("//build_overrides/ot_efr32.gni")
 
 import("${efr32_sdk_build_root}/efr32_board.gni")
+
+openthread_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
 
 config("openthread_efr32_config") {
   defines = [

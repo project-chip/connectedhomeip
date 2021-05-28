@@ -15,8 +15,9 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/k32w_sdk.gni")
 import("//build_overrides/openthread.gni")
-import("//build_overrides/ot_nxp.gni")
 import("${chip_root}/third_party/k32w_sdk/k32w_sdk.gni")
+
+openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 config("openthread_k32w_config") {
   include_dirs = [ "${openthread_nxp_root}/src/k32w/k32w061" ]
