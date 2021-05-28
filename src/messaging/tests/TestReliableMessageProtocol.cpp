@@ -558,9 +558,13 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     rm->ClearRetransTable(rc);
     ctx.Shutdown();
 
-    // This test didn't use the global test context. Let's reset the state of transport manager
-    // so that other tests are not impacted as those could be using the global test context.
-    TestContext & inctx = *reinterpret_cast<TestContext *>(inContext);
+    // This test didn't use the global test context because the session establishment messages
+    // do not carry encryption key IDs (as the messages are not encrypted), or node IDs (as these
+    // are not assigned yet). A temporary context is created with default values for these
+    // parameters.
+    // Let's reset the state of transport manager so that other tests are not impacted
+    // as those could be using the global test context.
+    TestContext & inctx = *static_cast<TestContext *>(inContext);
     gTransportMgr.SetSecureSessionMgr(&inctx.GetSecureSessionManager());
 }
 
