@@ -557,6 +557,11 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
 
     rm->ClearRetransTable(rc);
     ctx.Shutdown();
+
+    // This test didn't use the global test context. Let's reset the state of transport manager
+    // so that other tests are not impacted as those could be using the global test context.
+    TestContext & inctx = *reinterpret_cast<TestContext *>(inContext);
+    gTransportMgr.SetSecureSessionMgr(&inctx.GetSecureSessionManager());
 }
 
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
