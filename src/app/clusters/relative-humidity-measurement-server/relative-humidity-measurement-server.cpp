@@ -52,14 +52,6 @@ EmberAfStatus emberAfRelativeHumidityMeasurementClusterGetMaxMeasuredValue(chip:
                                       sizeof(*maxMeasuredValue));
 }
 
-void emberAfRelativeHumidityMeasurementClusterServerInitCallback(chip::EndpointId endpoint)
-{
-    /**
-     * nothing to do here - default values set by attribute storage
-     */
-    (void) endpoint;
-}
-
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, uint16_t measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID,
