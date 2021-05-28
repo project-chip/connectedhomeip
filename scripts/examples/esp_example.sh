@@ -31,7 +31,7 @@ fi
 
 source "scripts/activate.sh"
 # shellcheck source=/dev/null
-source "${IDF_PATH}/export.sh"
+source "$IDF_PATH/export.sh"
 
 for sdkconfig in "$root"/sdkconfig*.defaults; do
     # remove root path to get sdkconfig*.defaults name
