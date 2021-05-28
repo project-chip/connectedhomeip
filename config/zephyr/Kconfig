@@ -20,6 +20,7 @@ menuconfig CHIP
 	select CPLUSPLUS
 	imply LIB_CPLUSPLUS
 	imply REQUIRES_FULL_LIBC
+	imply CBPRINTF_LIBC_SUBSTS
 	imply POSIX_API if !ARCH_POSIX
 	imply EVENTFD if !ARCH_POSIX
 	imply REBOOT
@@ -46,11 +47,25 @@ config CHIP_OPENTHREAD_CONFIG
 	  This option can be used to replace Zephyr-supplied OpenThread
 	  configuration file with a custom one.
 
-config CHIP_LIB_SHELL
+config CHIP_ZEPHYR_SHELL
+	bool "Enable Zephyr-based CHIP shell"
+	default n
+	imply SHELL
+	help
+	  Add CHIP commands to the Zephyr shell.
+
+config CHIP_STANDALONE_SHELL
 	bool "Enable CHIP shell library"
 	default n
+	depends on !CHIP_ZEPHYR_SHELL
 	help
 	  Link the application with the library containing CHIP shell commands.
+
+config CHIP_PW_RPC
+	bool "Enable Pigweed RPC library"
+	default n
+	help
+	  Link the application with the library containing Pigweed RPC functionalities.
 
 config CHIP_BUILD_TESTS
 	bool "Build CHIP unit tests"
@@ -70,11 +85,13 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
 	help
 	  Open pairing window automatically at application boot time.
 
-config CHIP_ENABLE_RENDEZVOUS_BYPASS
-	bool "Enable Rendezvous bypass"
-	default n
+config CHIP_ENABLE_DNSSD_SRP
+	bool "Enable support for service registration"
+	default y
+	imply OPENTHREAD_ECDSA
+	imply OPENTHREAD_SRP_CLIENT
 	help
-	  Enables bypassing rendezvous for the test purposes.
+	  Enables DNS-SD SRP client support
 
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"

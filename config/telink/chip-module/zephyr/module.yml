@@ -16,4 +16,4 @@
 
 build:
     cmake: .
-    kconfig: Kconfig
+    kconfig: ../../zephyr/Kconfig
