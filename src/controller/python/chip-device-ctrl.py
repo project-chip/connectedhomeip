@@ -635,11 +635,63 @@ def echo_alive(message):
     print(message)
     return message
 
-def ble_scan() -> Dict[Any, Any]:
+
+def resolve(fabric_id: int, node_id: int) -> Dict[str, Any]:
+    try:
+        __check_supported_os()
+        err = device_manager.devCtrl.ResolveNode(fabric_id, node_id)
+        if err != 0:
+            return __get_response_dict(status = StatusCodeEnum.FAILED, error = f"Failed to resolve node, with error code: {err}")
+
+        address = device_manager.devCtrl.GetAddressAndPort(node_id)
+        if address is not None:
+            address = "{}:{}".format(
+                *address)  
+            return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = {'address': address}) 
+            
+    except Exception as e:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
+
+def zcl_add_network(node_id: int, ssid: str, password: str, endpoint_id: Optional[int] = 1, group_id: Optional[int] = 0, breadcrumb: Optional[int] = 0, timeoutMs: Optional[int] = 1000) -> Dict[str, Any] :
+    try:
+        __check_supported_os()
+        args = {}
+        args['ssid'] = ssid.encode("utf-8") + b'\x00'
+        args['credentials'] = password.encode("utf-8") + b'\x00'
+        args['breadcrumb'] = breadcrumb
+        args['timeoutMs'] = timeoutMs 
+        err, res = device_manager.devCtrl.ZCLSend("NetworkCommissioning", "AddWiFiNetwork", node_id, endpoint_id, group_id, args, blocking=True)
+        if err != 0:
+            return __get_response_dict(status = StatusCodeEnum.FAILED)
+        elif res != None:
+            return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = str(res))
+        else:
+            return __get_response_dict(status = StatusCodeEnum.SUCCESS)
+
+    except Exception as e:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
+
+def zcl_enable_network(node_id: int, ssid:str, endpoint_id: Optional[int] = 1, group_id: Optional[int] = 0, breadcrumb: Optional[int] = 0, timeoutMs: Optional[int] = 1000) -> Dict[str, Any]:
+    try:
+        __check_supported_os()
+        args = {}
+        args['networkID'] = ssid.encode("utf-8") + b'\x00'
+        args['breadcrumb'] = breadcrumb
+        args['timeoutMs'] = timeoutMs 
+  
+        err, res = device_manager.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", node_id, endpoint_id, group_id, args, blocking=True)
+        if err != 0:
+            return __get_response_dict(status = StatusCodeEnum.FAILED)
+        else:
+            return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = str(res))
+        
+    except Exception as e:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
+
+def ble_scan():
     try:
         __check_supported_os()
         device_manager.do_blescan("")
-        
         return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = __get_peripheral_list())
     except Exception as e:
         return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
@@ -664,33 +716,32 @@ def __get_peripheral_list() -> Dict[Any, Any]:
             device_list.append(device_detail)
     return device_list
 
-def ble_connect(discriminator: int, pin_code: int, node_id: int) -> Dict[str, any]:
+def ble_connect(discriminator: int, pin_code: int, node_id: int) -> Dict[str, Any]:
     try:
         __check_supported_os()
         device_manager.devCtrl.ConnectBLE(discriminator, pin_code, node_id)
         return __get_response_dict(status = StatusCodeEnum.SUCCESS)
-    except exceptions.ChipStackException as ex:
-        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(ex))
     except Exception as e:
         return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
 
-def ip_connect(ip_address: string, pin_code: int, node_id: int) -> Dict[str, any]:
+def ip_connect(ip_address: string, pin_code: int, node_id: int) -> Dict[str, Any]:
     try:
         __check_supported_os()
         device_manager.devCtrl.ConnectIP(ip_address.encode("utf-8"), pin_code, node_id)
         return __get_response_dict(status = StatusCodeEnum.SUCCESS)
-    except exceptions.ChipStackException as ex:
-        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(ex))
     except Exception as e:
         return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
 
-def start_rpc_server():
 
-    with SimpleXMLRPCServer(("0.0.0.0", 5000)) as server:
+def start_rpc_server():
+    with SimpleXMLRPCServer(("0.0.0.0", 5000), allow_none=True) as server:
         server.register_function(echo_alive)
         server.register_function(ble_scan)
         server.register_function(ble_connect)
         server.register_function(ip_connect)
+        server.register_function(zcl_add_network)
+        server.register_function(zcl_enable_network)
+        server.register_function(resolve)
         server.register_multicall_functions()
         print('Serving XML-RPC on localhost port 5000')
         try:
