@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,24 +15,19 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file declares test entry points for CHIP system layer
- *      library unit tests.
- *
- */
+#include <app/util/af.h>
 
-#pragma once
+#include <app/Command.h>
+#include <app/util/af-event.h>
+#include <app/util/attribute-storage.h>
 
-#include <nlunit-test.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+using namespace chip;
 
-int TestShell(void);
-int TestStreamerStdio(void);
-
-#ifdef __cplusplus
+void emberAfPumpConfigurationAndControlClusterInitCallback(EndpointId endpoint)
+{
+    // TODO
 }
-#endif

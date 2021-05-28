@@ -187,7 +187,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-        (*bufferRetainSlot) = msgBuf.Retain();
+        *bufferRetainSlot = EncryptedPacketBufferHandle::MarkEncrypted(msgBuf.Retain());
     }
 
     ChipLogProgress(Inet, "Sending msg from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec",
@@ -370,11 +370,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         {
             ChipLogError(Inet, "Message counter verify failed, err = %d", err);
         }
-        // TODO - Enable exit on error for message counter verification failure.
-        //        We are now using IM messages in commissioner class to provision op creds and
-        //        other device commissioning steps. This is somehow causing issues with message counter
-        //        verification. Disabling this check for now. Enable it after debugging the cause.
-        // SuccessOrExit(err);
+        SuccessOrExit(err);
     }
 
     admin = mAdmins->FindAdminWithId(state->GetAdminId());

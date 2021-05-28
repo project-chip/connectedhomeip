@@ -15,20 +15,25 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP system layer library timer unit
- *      tests.
- *
- */
+#pragma once
 
-#include "TestShell.h"
+#include "driver/gpio.h"
 
-int main(int argc, char * argv[])
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
+// ---- Lock Example App Config ----
 
-    return (TestShell());
-}
+#define APP_TASK_NAME "LOCK-APP"
+
+#define SYSTEM_STATE_LED GPIO_NUM_25
+#define LOCK_STATE_LED GPIO_NUM_26
+
+#define APP_LOCK_BUTTON GPIO_NUM_34
+#define APP_FUNCTION_BUTTON GPIO_NUM_35
+
+#define APP_BUTTON_DEBOUNCE_PERIOD_MS 50
+
+#define APP_BUTTON_PRESSED 0
+#define APP_BUTTON_RELEASED 1
+
+// Time it takes in ms for the simulated actuator to move from one
+// state to another.
+#define ACTUATOR_MOVEMENT_PERIOS_MS 2000

@@ -308,6 +308,7 @@ struct ChipCertificateData
     ~ChipCertificateData();
 
     void Clear();
+    bool IsEqual(const ChipCertificateData & other) const;
 
     ByteSpan mCertificate;                      /**< Original raw buffer data. */
     ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
