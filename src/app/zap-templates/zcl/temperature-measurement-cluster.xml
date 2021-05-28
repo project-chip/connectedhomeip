@@ -24,7 +24,6 @@ limitations under the License.
     <define>TEMP_MEASUREMENT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
     <attribute side="server" code="0x0000" define="TEMP_MEASURED_VALUE" type="INT16S" writable="false" optional="false">measured value</attribute>
     <attribute side="server" code="0x0001" define="TEMP_MIN_MEASURED_VALUE" type="INT16S" min="-38221" max="65535" writable="false" optional="false">min measured value</attribute>
     <attribute side="server" code="0x0002" define="TEMP_MAX_MEASURED_VALUE" type="INT16S" min="-38221" max="65535" writable="false" optional="false">max measured value</attribute>
