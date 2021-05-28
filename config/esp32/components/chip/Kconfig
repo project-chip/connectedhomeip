@@ -350,7 +350,7 @@ menu "CHIP Device Layer"
         config MAX_EVENT_QUEUE_SIZE
             int "Max Event Queue Size"
             range 0 65535
-            default 100
+            default 25
             help
                 The maximum number of events that can be held in the CHIP Platform event queue.
 
