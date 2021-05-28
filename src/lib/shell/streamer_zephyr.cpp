@@ -20,7 +20,7 @@
  *      Source implementation of an input / output stream for zehpyr targets.
  */
 
-#include "shell_core.h"
+#include <lib/shell/streamer.h>
 
 #include <cassert>
 

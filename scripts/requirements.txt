@@ -4,6 +4,8 @@
 #
 #    pip-compile requirements.in
 #
+anytree==2.8.0
+    # via -r requirements.in
 appdirs==1.4.4
     # via
     #   -r requirements.in
@@ -34,6 +36,8 @@ colorama==0.4.4
 coloredlogs==15.0
     # via -r requirements.in
 cryptography==3.4.6
+    # via -r requirements.in
+cxxfilt==0.2.2
     # via -r requirements.in
 dbus-python==1.2.16 ; sys_platform == "linux"
     # via -r requirements.in
@@ -88,8 +92,12 @@ markupsafe==1.1.1
     # via jinja2
 mobly==1.10.1
     # via -r requirements.in
+numpy==1.20.3
+    # via pandas
 packaging==20.9
     # via west
+pandas==1.2.4
+    # via -r requirements.in
 parso==0.8.1
     # via jedi
 pep517==0.10.0
@@ -150,11 +158,15 @@ pyserial==3.5
     #   -r requirements.in
     #   mobly
 python-dateutil==2.8.1
-    # via pykwalify
+    # via
+    #   pandas
+    #   pykwalify
 python-engineio==4.0.1
     # via python-socketio
 python-socketio==5.1.0
     # via flask-socketio
+pytz==2021.1
+    # via pandas
 pyyaml==5.4.1
     # via
     #   mobly
@@ -169,6 +181,7 @@ ruamel.yaml==0.16.13
     # via pykwalify
 six==1.15.0
     # via
+    #   anytree
     #   ecdsa
     #   protobuf
     #   python-dateutil

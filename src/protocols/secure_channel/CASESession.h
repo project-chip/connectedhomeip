@@ -71,7 +71,7 @@ struct CASESessionSerializable
     uint16_t mPeerKeyId;
 };
 
-class DLL_EXPORT CASESession : public Messaging::ExchangeDelegateBase, public PairingSession
+class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
     CASESession();
@@ -93,8 +93,8 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
-                                           SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR ListenForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                             SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -180,7 +180,7 @@ public:
 
     //// ExchangeDelegate Implementation ////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
@@ -228,8 +228,6 @@ private:
 
     // TODO: Remove this and replace with system method to retrieve current time
     CHIP_ERROR SetEffectiveTime(void);
-
-    CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
 
     void Clear();
 

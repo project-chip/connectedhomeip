@@ -32,9 +32,11 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <credentials/CHIPOperationalCredentials.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/CASESession.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
@@ -71,34 +73,21 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr        = nullptr;
-    SecureSessionMgr * sessionMgr            = nullptr;
-    Messaging::ExchangeManager * exchangeMgr = nullptr;
-    Inet::InetLayer * inetLayer              = nullptr;
+    DeviceTransportMgr * transportMgr                   = nullptr;
+    SecureSessionMgr * sessionMgr                       = nullptr;
+    Messaging::ExchangeManager * exchangeMgr            = nullptr;
+    Inet::InetLayer * inetLayer                         = nullptr;
+    PersistentStorageDelegate * storageDelegate         = nullptr;
+    Credentials::OperationalCredentialSet * credentials = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
 };
 
-class DLL_EXPORT Device : public Messaging::ExchangeDelegate
+class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
 {
 public:
-    ~Device()
-    {
-        if (mExchangeMgr)
-        {
-            // Ensure that any exchange contexts we have open get closed now,
-            // because we don't want them to call back in to us after this
-            // point.
-            mExchangeMgr->CloseAllContextsForDelegate(this);
-        }
-
-        if (mCommandSender != nullptr)
-        {
-            mCommandSender->Shutdown();
-            mCommandSender = nullptr;
-        }
-    }
+    ~Device();
 
     enum class PairingWindowOption
     {
@@ -128,7 +117,7 @@ public:
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle message);
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle && message);
 
     /**
      * A strongly-message-typed version of SendMessage.
@@ -145,9 +134,7 @@ public:
      * @brief
      *   Send the command in internal command sender.
      */
-    CHIP_ERROR SendCommands();
-
-    app::CommandSender * GetCommandSender() { return mCommandSender; }
+    CHIP_ERROR SendCommands(app::CommandSender * commandObj);
 
     /**
      * @brief Get the IP address and port assigned to the device.
@@ -177,17 +164,17 @@ public:
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
     {
-        mTransportMgr   = params.transportMgr;
-        mSessionManager = params.sessionMgr;
-        mExchangeMgr    = params.exchangeMgr;
-        mInetLayer      = params.inetLayer;
-        mListenPort     = listenPort;
-        mAdminId        = admin;
+        mTransportMgr    = params.transportMgr;
+        mSessionManager  = params.sessionMgr;
+        mExchangeMgr     = params.exchangeMgr;
+        mInetLayer       = params.inetLayer;
+        mListenPort      = listenPort;
+        mAdminId         = admin;
+        mStorageDelegate = params.storageDelegate;
+        mCredentials     = params.credentials;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
-
-        InitCommandSender();
     }
 
     /**
@@ -198,7 +185,7 @@ public:
      *   all device specifc parameters (address, port, interface etc).
      *
      *   This is not done as part of constructor so that the controller can have a list of
-     *   uninitialzed/unpaired device objects. The object is initialized only when the device
+     *   uninitialized/unpaired device objects. The object is initialized only when the device
      *   is actually paired.
      *
      * @param[in] params       Wrapper object for transport manager etc.
@@ -230,6 +217,13 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Deserialize(const SerializedDevice & input);
+
+    /**
+     * @brief Serialize and store the Device in persistent storage
+     *
+     * @return Returns a CHIP_ERROR if either serialization or storage fails
+     */
+    CHIP_ERROR Persist();
 
     /**
      * @brief
@@ -264,7 +258,7 @@ public:
      * @param[in] msgBuf        The message buffer
      */
     void OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle msgBuf) override;
+                           System::PacketBufferHandle && msgBuf) override;
 
     /**
      * @brief ExchangeDelegate implementation of OnResponseTimeout.
@@ -351,8 +345,22 @@ public:
     // the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
     // type-safe.
     // TODO: Implement interaction model delegate in the application.
-    void AddIMResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    void CancelIMResponseHandler();
+    void AddIMResponseHandler(app::Command * commandObj, Callback::Cancelable * onSuccessCallback,
+                              Callback::Cancelable * onFailureCallback);
+    void CancelIMResponseHandler(app::Command * commandObj);
+
+    void ProvisioningComplete(uint16_t caseKeyId)
+    {
+        mDeviceProvisioningComplete = true;
+        mCASESessionKeyId           = caseKeyId;
+    }
+    bool IsProvisioningComplete() const { return mDeviceProvisioningComplete; }
+
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablished() override;
+
+    CASESession & GetCASESession() { return mCASESession; }
 
 private:
     enum class ConnectionState
@@ -393,11 +401,12 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    app::CommandSender * mCommandSender = nullptr;
-
     SecureSessionHandle mSecureSession = {};
 
     uint8_t mSequenceNumber = 0;
+
+    uint32_t mLocalMessageCounter = 0;
+    uint32_t mPeerMessageCounter  = 0;
 
     app::CHIPDeviceCallbacksMgr & mCallbacksMgr = app::CHIPDeviceCallbacksMgr::GetInstance();
 
@@ -421,16 +430,20 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
-    /**
-     * @brief
-     *   Initialize internal command sender, required for sending commands over interaction model.
-     *   It's safe to call InitCommandSender multiple times, but only one will be available.
-     */
-    void InitCommandSender();
+    CHIP_ERROR EstablishCASESession();
 
     uint16_t mListenPort;
 
     Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
+
+    bool mDeviceProvisioningComplete = false;
+
+    CASESession mCASESession;
+    uint16_t mCASESessionKeyId = 0;
+
+    Credentials::OperationalCredentialSet * mCredentials = nullptr;
+
+    PersistentStorageDelegate * mStorageDelegate = nullptr;
 };
 
 /**
@@ -450,7 +463,7 @@ public:
      *
      * @param[in] msg Received message buffer.
      */
-    virtual void OnMessage(System::PacketBufferHandle msg) = 0;
+    virtual void OnMessage(System::PacketBufferHandle && msg) = 0;
 
     /**
      * @brief
@@ -479,10 +492,14 @@ typedef struct SerializableDevice
     PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
-    uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
+    uint16_t mDevicePort;       /* This field is serialized in LittleEndian byte order */
+    uint16_t mAdminId;          /* This field is serialized in LittleEndian byte order */
+    uint16_t mCASESessionKeyId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceTransport;
+    uint8_t mDeviceProvisioningComplete;
     uint8_t mInterfaceName[kMaxInterfaceName];
+    uint32_t mLocalMessageCounter; /* This field is serialized in LittleEndian byte order */
+    uint32_t mPeerMessageCounter;  /* This field is serialized in LittleEndian byte order */
 } SerializableDevice;
 
 typedef struct SerializedDevice

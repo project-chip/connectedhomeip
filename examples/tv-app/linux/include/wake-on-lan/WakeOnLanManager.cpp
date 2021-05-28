@@ -18,11 +18,10 @@
 
 #include "WakeOnLanManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 
@@ -49,7 +48,10 @@ void WakeOnLanManager::store(chip::EndpointId endpoint, char macAddress[17])
     EmberAfStatus macAddressStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_WAKE_ON_LAN_CLUSTER_ID, ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID,
                                     (uint8_t *) &macAddress, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-    assert(macAddressStatus == EMBER_ZCL_STATUS_SUCCESS);
+    if (macAddressStatus != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfWakeOnLanClusterPrintln("Failed to store mac address attribute.");
+    }
 }
 
 void WakeOnLanManager::setMacAddress(chip::EndpointId endpoint, char * macAddress)

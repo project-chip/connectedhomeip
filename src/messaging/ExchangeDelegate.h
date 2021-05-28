@@ -42,10 +42,10 @@ class ExchangeContext;
  *   is interested in receiving these callbacks, they can specialize this class and handle
  *   each trigger in their implementation of this class.
  */
-class DLL_EXPORT ExchangeDelegateBase
+class DLL_EXPORT ExchangeDelegate
 {
 public:
-    virtual ~ExchangeDelegateBase() {}
+    virtual ~ExchangeDelegate() {}
 
     /**
      * @brief
@@ -57,7 +57,7 @@ public:
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
     virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   System::PacketBufferHandle payload) = 0;
+                                   System::PacketBufferHandle && payload) = 0;
 
     /**
      * @brief
@@ -77,22 +77,10 @@ public:
      */
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
 
-    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) = 0;
-};
-
-class DLL_EXPORT ExchangeDelegate : public ExchangeDelegateBase
-{
-public:
-    virtual ~ExchangeDelegate() {}
-
-    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr)
+    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * reliableMessageMgr, SecureSessionMgr * sessionMgr)
     {
-        mMessageDispatch.Init(rmMgr, sessionMgr);
-        return &mMessageDispatch;
+        return nullptr;
     }
-
-private:
-    ApplicationExchangeDispatch mMessageDispatch;
 };
 
 } // namespace Messaging

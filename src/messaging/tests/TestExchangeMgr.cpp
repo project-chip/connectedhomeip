@@ -63,7 +63,7 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         HandleMessageReceived(address, std::move(msgBuf));
         return CHIP_NO_ERROR;
@@ -78,7 +78,7 @@ class MockAppDelegate : public ExchangeDelegate
 {
 public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle buffer) override
+                           System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
         ec->Close();
@@ -87,6 +87,22 @@ public:
     void OnResponseTimeout(ExchangeContext * ec) override {}
 
     bool IsOnMessageReceivedCalled = false;
+};
+
+class WaitForTimeoutDelegate : public ExchangeDelegate
+{
+public:
+    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle && buffer) override
+    {}
+
+    void OnResponseTimeout(ExchangeContext * ec) override
+    {
+        IsOnResponseTimeoutCalled = true;
+        ec->Close();
+    }
+
+    bool IsOnResponseTimeoutCalled = false;
 };
 
 void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
@@ -112,6 +128,48 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
 
     ec1->Close();
     ec2->Close();
+}
+
+void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    MockAppDelegate sendDelegate;
+    ExchangeContext * ec1 = ctx.NewExchangeToLocal(&sendDelegate);
+
+    // Expire the session this exchange is supposedly on.
+    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession(), &ctx.GetSecureSessionManager());
+
+    MockAppDelegate receiveDelegate;
+    CHIP_ERROR err =
+        ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &receiveDelegate);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                           SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, !receiveDelegate.IsOnMessageReceivedCalled);
+
+    ec1->Close();
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
+void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    WaitForTimeoutDelegate sendDelegate;
+    ExchangeContext * ec1 = ctx.NewExchangeToLocal(&sendDelegate);
+
+    ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                     SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
+
+    // Expire the session this exchange is supposedly on.  This should close the
+    // exchange.
+    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession(), &ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 }
 
 void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
@@ -167,6 +225,8 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     ec1->Close();
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 // Test Suite
@@ -180,6 +240,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ExchangeMgr::NewContext",               CheckNewContextTest),
     NL_TEST_DEF("Test ExchangeMgr::CheckUmhRegistrationTest", CheckUmhRegistrationTest),
     NL_TEST_DEF("Test ExchangeMgr::CheckExchangeMessages",    CheckExchangeMessages),
+    NL_TEST_DEF("Test OnConnectionExpired basics",            CheckSessionExpirationBasics),
+    NL_TEST_DEF("Test OnConnectionExpired timeout handling",  CheckSessionExpirationTimeout),
 
     NL_TEST_SENTINEL()
 };

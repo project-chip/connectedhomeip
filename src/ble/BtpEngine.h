@@ -150,7 +150,8 @@ public:
 
     bool HasUnackedData() const;
 
-    BLE_ERROR HandleCharacteristicReceived(System::PacketBufferHandle data, SequenceNumber_t & receivedAck, bool & didReceiveAck);
+    BLE_ERROR HandleCharacteristicReceived(System::PacketBufferHandle && data, SequenceNumber_t & receivedAck,
+                                           bool & didReceiveAck);
     bool HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack);
     BLE_ERROR EncodeStandAloneAck(const PacketBufferHandle & data);
 

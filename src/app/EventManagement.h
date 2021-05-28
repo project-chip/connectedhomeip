@@ -39,9 +39,9 @@
 
 namespace chip {
 namespace app {
-constexpr size_t kMaxEventSizeReserve = 512;
-constexpr uint16_t kRequiredEventField =
-    (1 << EventDataElement::kCsTag_PriorityLevel) | (1 << EventDataElement::kCsTag_DeltaSystemTimestamp);
+constexpr size_t kMaxEventSizeReserve  = 512;
+constexpr uint16_t kRequiredEventField = (1 << EventDataElement::kCsTag_PriorityLevel) |
+    (1 << EventDataElement::kCsTag_DeltaSystemTimestamp) | (1 << EventDataElement::kCsTag_EventPath);
 
 /**
  * @brief

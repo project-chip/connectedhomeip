@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
@@ -68,5 +68,5 @@ static shell_command_t cmds_misc[] = {
 
 void cmd_misc_init()
 {
-    shell_register(cmds_misc, ArraySize(cmds_misc));
+    Engine::Root().RegisterCommands(cmds_misc, ArraySize(cmds_misc));
 }

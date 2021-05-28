@@ -110,7 +110,8 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
                     if (IsChip64bitDNAttr(attrOID))
                     {
                         // For CHIP 64-bit attribute the string representation is 16 uppercase hex characters.
-                        snprintf(reinterpret_cast<char *>(chipAttrStr), sizeof(chipAttrStr), "%016" PRIX64, chipAttr);
+                        snprintf(reinterpret_cast<char *>(chipAttrStr), sizeof(chipAttrStr), ChipLogFormatX64,
+                                 ChipLogValueX64(chipAttr));
                         asn1AttrVal    = chipAttrStr;
                         asn1AttrValLen = 16;
                     }

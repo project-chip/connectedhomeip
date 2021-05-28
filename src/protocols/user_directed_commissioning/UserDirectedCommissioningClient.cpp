@@ -103,7 +103,7 @@ CHIP_ERROR UserDirectedCommissioningClient::SendUDCRequest(System::PacketBufferH
 }
 
 void UserDirectedCommissioningClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
+                                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     // There is no response to UDC at this time
     ChipLogProgress(Echo, "Unexpected UDC response from Exchange: %p", ec);

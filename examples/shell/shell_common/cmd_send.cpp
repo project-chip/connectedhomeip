@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <lib/core/CHIPCore.h>
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeMgr.h>
@@ -101,7 +101,7 @@ class MockAppDelegate : public Messaging::ExchangeDelegate
 {
 public:
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle buffer) override
+                           System::PacketBufferHandle && buffer) override
     {
         uint32_t respTime    = System::Timer::GetCurrentEpoch();
         uint32_t transitTime = respTime - gSendArguments.GetLastSendTime();
@@ -230,7 +230,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     Transport::PeerAddress peerAddress;
     Transport::AdminPairingInfo * adminInfo = nullptr;
 
-    if (!Inet::IPAddress::FromString(destination, gDestAddr))
+    if (!chip::Inet::IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid CHIP Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -441,5 +441,5 @@ static shell_command_t cmds_send[] = {
 
 void cmd_send_init()
 {
-    shell_register(cmds_send, ArraySize(cmds_send));
+    Engine::Root().RegisterCommands(cmds_send, ArraySize(cmds_send));
 }

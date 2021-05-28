@@ -38,32 +38,32 @@ namespace Platform {
  *  - `dest` can be nullptr, in which case no copy is attempted, and the function returns nullptr.
  *  - A non-nullptr result is always null-terminated.
  *
- * @param[in]  dest             Destination string buffer (which must be at least `length`+1 bytes)
- *                              or nullptr.
+ * @param[in]  dest             Destination string buffer or nullptr.
+ *
+ * @param[in]  destLength       Maximum length to be copied. Will need space for null terminator as
+ *                              well (string will be truncated if it does not fit). If 0 this method
+ *                              is a noop.
  *
  * @param[in]  source           String to be copied.
  *
- * @param[in]  length           Length to be copied.
- *
  * @retval  Same as `dest`.
  */
-inline char * CopyString(char * dest, const char * source, size_t length)
+inline void CopyString(char * dest, size_t destLength, const char * source)
 {
-    if (dest)
+    if (dest && destLength)
     {
-        strncpy(dest, source, length);
-        dest[length] = 0;
+        strncpy(dest, source, destLength);
+        dest[destLength - 1] = 0;
     }
-    return dest;
 }
 
 /**
  * Convenience method for CopyString to auto-detect destination size.
  */
 template <size_t N>
-inline char * CopyString(char (&dest)[N], const char * source)
+inline void CopyString(char (&dest)[N], const char * source)
 {
-    return CopyString(dest, source, N);
+    CopyString(dest, N, source);
 }
 
 /**
@@ -82,7 +82,10 @@ inline char * CopyString(char (&dest)[N], const char * source)
  */
 inline char * MemoryAllocString(const char * string, size_t length)
 {
-    return CopyString(static_cast<char *>(MemoryAlloc(length + 1)), string, length);
+    size_t lengthWithNull = length + 1;
+    char * result         = static_cast<char *>(MemoryAlloc(lengthWithNull));
+    CopyString(result, lengthWithNull, string);
+    return result;
 }
 
 /**
@@ -101,7 +104,11 @@ public:
      *                              `length`, then the remaining space will be filled with null bytes. Like
      *                              `strndup()` but unlike `strncpy()`, the result is always null-terminated.
      */
-    ScopedMemoryString(const char * string, size_t length) { CopyString(Alloc(length + 1).Get(), string, length); }
+    ScopedMemoryString(const char * string, size_t length)
+    {
+        size_t lengthWithNull = length + 1;
+        CopyString(Alloc(lengthWithNull).Get(), lengthWithNull, string);
+    }
 };
 
 } // namespace Platform

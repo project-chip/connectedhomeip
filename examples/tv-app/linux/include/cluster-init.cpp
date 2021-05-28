@@ -17,18 +17,19 @@
  */
 
 #include "application-basic/ApplicationBasicManager.h"
+#include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
+#include "cluster-util/ClusterManager.h"
+#include "content-launcher/ContentLauncherManager.h"
+#include "media-input/MediaInputManager.h"
+#include "target-navigator/TargetNavigatorManager.h"
+#include "tv-channel/TvChannelManager.h"
 #include "wake-on-lan/WakeOnLanManager.h"
 
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
-#include <iostream>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-#include "gen/enums.h"
+using namespace chip;
 
 /** @brief Application Basic Cluster Init
  *
@@ -71,4 +72,98 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
         wolManager.setMacAddress(endpoint, macAddress);
         wolManager.store(endpoint, macAddress);
     }
+}
+
+/** @brief Tv Channel  Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ */
+void emberAfTvChannelClusterInitCallback(EndpointId endpoint)
+{
+    ClusterManager().writeListAttribute(endpoint, ZCL_TV_CHANNEL_CLUSTER_ID, ZCL_TV_CHANNEL_LIST_ATTRIBUTE_ID,
+                                        TvChannelManager().proxyGetTvChannelList());
+}
+
+/** @brief Application Launcher  Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ */
+void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
+{
+    ClusterManager().writeListAttribute(endpoint, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_LIST_ATTRIBUTE_ID,
+                                        ApplicationLauncherManager().proxyGetApplicationList());
+}
+
+/** @brief Audio Output Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ */
+void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
+{
+    ClusterManager().writeListAttribute(endpoint, ZCL_AUDIO_OUTPUT_CLUSTER_ID, ZCL_AUDIO_OUTPUT_LIST_ATTRIBUTE_ID,
+                                        AudioOutputManager().proxyGetListOfAudioOutputInfo());
+}
+
+/** @brief Content Launch Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ */
+void emberAfContentLaunchClusterInitCallback(EndpointId endpoint)
+{
+    ClusterManager().writeListAttribute(endpoint, ZCL_CONTENT_LAUNCH_CLUSTER_ID, ZCL_CONTENT_LAUNCHER_ACCEPTS_HEADER_ATTRIBUTE_ID,
+                                        ContentLauncherManager().proxyGetAcceptsHeader());
+
+    ClusterManager().writeListAttribute(endpoint, ZCL_CONTENT_LAUNCH_CLUSTER_ID,
+                                        ZCL_CONTENT_LAUNCHER_SUPPORTED_STREAMING_TYPES_ATTRIBUTE_ID,
+                                        ContentLauncherManager().proxyGetSupportedStreamingTypes());
+}
+
+/** @brief Media Input Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ */
+void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
+{
+    ClusterManager().writeListAttribute(endpoint, ZCL_MEDIA_INPUT_CLUSTER_ID, ZCL_MEDIA_INPUT_LIST_ATTRIBUTE_ID,
+                                        MediaInputManager().proxyGetInputList());
+}
+
+/** @brief Target Navigator Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ */
+void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
+{
+    ClusterManager().writeListAttribute(endpoint, ZCL_TARGET_NAVIGATOR_CLUSTER_ID, ZCL_TARGET_NAVIGATOR_LIST_ATTRIBUTE_ID,
+                                        TargetNavigatorManager().proxyGetTargetInfoList());
 }

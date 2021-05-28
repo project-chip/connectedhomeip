@@ -37,6 +37,9 @@ chip_inet_config_enable_raw_endpoint = false
 #chip_progress_logging = false
 chip_detail_logging = false
 
+# Use -Os
+is_debug = false
+
 chip_build_tests = false
 
 # GH #4224

@@ -24,8 +24,10 @@
  *    the CHIP device.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <controller/CHIPCluster.h>
 #include <protocols/temp_zcl/TempZCL.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {
@@ -37,6 +39,7 @@ CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint)
 
     mDevice   = device;
     mEndpoint = endpoint;
+
     return err;
 }
 
@@ -45,7 +48,7 @@ void ClusterBase::Dissociate()
     mDevice = nullptr;
 }
 
-CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle payload,
+CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle && payload,
                                     Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

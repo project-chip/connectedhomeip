@@ -97,7 +97,7 @@ CHIP_ERROR SendEchoRequest(void)
     const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
     char requestData[(sizeof kRequestFormat) + 20 /* uint64_t decimal digits */];
     snprintf(requestData, sizeof requestData, kRequestFormat, gEchoCount);
-    chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(requestData, strlen(requestData));
+    chip::System::PacketBufferHandle && payloadBuf = chip::MessagePacketBuffer::NewWithData(requestData, strlen(requestData));
 
     if (payloadBuf.IsNull())
     {
@@ -171,7 +171,7 @@ CHIP_ERROR EstablishSecureSession()
     else
     {
         peerAddr = chip::Optional<chip::Transport::PeerAddress>::Value(
-            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT + 2, INET_NULL_INTERFACEID));
+            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID));
     }
 
     // Attempt to connect to the peer.
@@ -192,7 +192,7 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle payload)
+void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
     uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastEchoTime;
@@ -206,7 +206,7 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
     payload->DebugDump("HandleEchoResponseReceived");
 }
 
-void HandleUDCResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle payload)
+void HandleUDCResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
     uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastEchoTime;

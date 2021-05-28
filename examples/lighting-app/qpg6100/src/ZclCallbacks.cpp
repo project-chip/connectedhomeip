@@ -21,11 +21,10 @@
 #include "AppTask.h"
 #include "LightingManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -48,7 +47,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
     else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
     {
-        if (attributeId != ZCL_MOVE_TO_LEVEL_COMMAND_ID)
+        if (attributeId != ZCL_CURRENT_LEVEL_ATTRIBUTE_ID)
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
             return;

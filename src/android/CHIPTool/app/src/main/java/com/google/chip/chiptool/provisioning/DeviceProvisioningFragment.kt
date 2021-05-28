@@ -120,21 +120,36 @@ class DeviceProvisioningFragment : Fragment() {
     }
 
     override fun onStatusUpdate(status: Int) {
-      Log.i(TAG, "Pairing status update: $status");
-
-      if (status == STATUS_NETWORK_PROVISIONING_SUCCESS) {
-        showMessage(R.string.rendezvous_over_ble_provisioning_success_text)
-        FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
-            ?.onPairingComplete()
-      }
+      Log.d(TAG, "Pairing status update: $status");
     }
 
     override fun onPairingComplete(code: Int) {
       Log.d(TAG, "onPairingComplete: $code")
+
+      if (code == 0) {
+        childFragmentManager.beginTransaction()
+            .add(R.id.fragment_container, EnterNetworkFragment.newInstance(networkType))
+            .commit()
+      } else {
+        showMessage(R.string.rendezvous_over_ble_pairing_failure_text)
+      }
     }
 
     override fun onPairingDeleted(code: Int) {
       Log.d(TAG, "onPairingDeleted: $code")
+    }
+
+    override fun onNetworkCommissioningComplete(code: Int) {
+      Log.d(TAG, "onNetworkCommissioningComplete: $code")
+
+      if (code == 0) {
+        showMessage(R.string.rendezvous_over_ble_commissioning_success_text)
+      } else {
+        showMessage(R.string.rendezvous_over_ble_commissioning_failure_text)
+      }
+
+      FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
+          ?.onCommissioningComplete(code)
     }
 
     override fun onCloseBleComplete() {
@@ -148,8 +163,8 @@ class DeviceProvisioningFragment : Fragment() {
 
   /** Callback from [DeviceProvisioningFragment] notifying any registered listeners. */
   interface Callback {
-    /** Notifies that pairing has been completed. */
-    fun onPairingComplete()
+    /** Notifies that commissioning has been completed. */
+    fun onCommissioningComplete(code: Int)
   }
 
   companion object {

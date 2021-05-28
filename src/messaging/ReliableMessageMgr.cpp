@@ -39,7 +39,7 @@ namespace Messaging {
 
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry() : rc(nullptr), nextRetransTimeTick(0), sendCount(0) {}
 
-ReliableMessageMgr::ReliableMessageMgr(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
+ReliableMessageMgr::ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
     mContextPool(contextPool), mSystemLayer(nullptr), mSessionMgr(nullptr), mCurrentTimerExpiry(0),
     mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
 {}
@@ -133,14 +133,26 @@ void ReliableMessageMgr::ExecuteActions()
         if (!rc || entry.nextRetransTimeTick != 0)
             continue;
 
+        if (entry.retainedBuf.IsNull())
+        {
+            // We generally try to prevent entries with a null buffer being in a table, but it could happen
+            // if the message dispatch (which is supposed to fill in the buffer) fails to do so _and_ returns
+            // success (so its caller doesn't clear out the bogus table entry).
+            //
+            // If that were to happen, we would crash in the code below.  Guard against it, just in case.
+            ClearRetransTable(entry);
+            continue;
+        }
+
         uint8_t sendCount = entry.sendCount;
+        uint32_t msgId    = entry.retainedBuf.GetMsgId();
 
         if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
         {
             err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
             ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
-                         entry.retainedBuf.GetMsgId(), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+                         msgId, sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // Remove from Table
             ClearRetransTable(entry);
@@ -155,8 +167,7 @@ void ReliableMessageMgr::ExecuteActions()
             // If the retransmission was successful, update the passive timer
             entry.nextRetransTimeTick = static_cast<uint16_t>(rc->GetActiveRetransmitTimeoutTick());
 #if !defined(NDEBUG)
-            ChipLogDetail(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", entry.retainedBuf.GetMsgId(),
-                          entry.sendCount);
+            ChipLogDetail(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", msgId, entry.sendCount);
 #endif
         }
     }
@@ -503,6 +514,7 @@ void ReliableMessageMgr::StopTimer()
     mSystemLayer->CancelTimer(Timeout, this);
 }
 
+#if CHIP_CONFIG_TEST
 int ReliableMessageMgr::TestGetCountRetransTable()
 {
     int count = 0;
@@ -516,6 +528,7 @@ int ReliableMessageMgr::TestGetCountRetransTable()
 
     return count;
 }
+#endif // CHIP_CONFIG_TEST
 
 } // namespace Messaging
 } // namespace chip

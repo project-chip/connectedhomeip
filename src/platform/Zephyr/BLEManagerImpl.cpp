@@ -72,7 +72,7 @@ BT_GATT_SERVICE_DEFINE(CHIPoBLE_Service,
                                BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
                                nullptr, BLEManagerImpl::HandleRXWrite, nullptr),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_TX.uuid,
-                               BT_GATT_CHRC_INDICATE,
+                               BT_GATT_CHRC_NOTIFY,
                                BT_GATT_PERM_NONE,
                                nullptr, nullptr, nullptr),
         BT_GATT_CCC_MANAGED(&CHIPoBLEChar_TX_CCC, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE)
@@ -432,7 +432,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 
     mGAPConns--;
 
-    // If indications were enabled for this connection, record that they are now disabled and
+    // If notifications were enabled for this connection, record that they are now disabled and
     // notify the BLE Layer of a disconnect.
     if (UnsetSubscribed(connEvent->BtConn))
     {
@@ -475,8 +475,8 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
     ChipLogDetail(DeviceLayer, "ConnId: 0x%02" PRIx16 ", New CCCD value: 0x%04" PRIx16, bt_conn_index(writeEvent->BtConn),
                   writeEvent->Value);
 
-    // If the client has requested to enabled indications and if it is not yet subscribed
-    if (writeEvent->Value == BT_GATT_CCC_INDICATE && SetSubscribed(writeEvent->BtConn))
+    // If the client has requested to enable notifications and if it is not yet subscribed
+    if (writeEvent->Value != 0 && SetSubscribed(writeEvent->BtConn))
     {
         // Alert the BLE layer that CHIPoBLE "subscribe" has been received and increment the bt_conn reference counter.
         HandleSubscribeReceived(writeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
@@ -506,28 +506,27 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
 
 CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
 {
-    const BleC1WriteEventType * c1WriteEvent = &event->Platform.BleC1WriteEvent;
+    const BleRXWriteEventType * writeEvent = &event->Platform.BleRXWriteEvent;
 
-    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX characteristic (ConnId 0x%02" PRIx16 ")",
-                  bt_conn_index(c1WriteEvent->BtConn));
+    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (ConnId 0x%02" PRIx16 ")",
+                  bt_conn_index(writeEvent->BtConn));
 
-    HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
-                        PacketBufferHandle::Adopt(c1WriteEvent->Data));
-    bt_conn_unref(c1WriteEvent->BtConn);
+    HandleWriteReceived(writeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
+                        PacketBufferHandle::Adopt(writeEvent->Data));
+    bt_conn_unref(writeEvent->BtConn);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLEManagerImpl::HandleTXComplete(const ChipDeviceEvent * event)
+CHIP_ERROR BLEManagerImpl::HandleTXCharComplete(const ChipDeviceEvent * event)
 {
-    const BleC2IndDoneEventType * c2IndDoneEvent = &event->Platform.BleC2IndDoneEvent;
+    const BleTXCompleteEventType * completeEvent = &event->Platform.BleTXCompleteEvent;
 
-    ChipLogDetail(DeviceLayer, "Indication for CHIPoBLE TX characteristic done (ConnId 0x%02" PRIx16 ", result 0x%02" PRIx16 ")",
-                  bt_conn_index(c2IndDoneEvent->BtConn), c2IndDoneEvent->Result);
+    ChipLogDetail(DeviceLayer, "Notification for CHIPoBLE TX done (ConnId 0x%02" PRIx16 ")", bt_conn_index(completeEvent->BtConn));
 
-    // Signal the BLE Layer that the outstanding indication is complete.
-    HandleIndicationConfirmation(c2IndDoneEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
-    bt_conn_unref(c2IndDoneEvent->BtConn);
+    // Signal the BLE Layer that the outstanding notification is complete.
+    HandleIndicationConfirmation(completeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+    bt_conn_unref(completeEvent->BtConn);
 
     return CHIP_NO_ERROR;
 }
@@ -562,12 +561,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         err = HandleTXCharCCCDWrite(event);
         break;
 
-    case DeviceEventType::kPlatformZephyrBleC1WriteEvent:
+    case DeviceEventType::kPlatformZephyrBleRXWrite:
         err = HandleRXCharWrite(event);
         break;
 
-    case DeviceEventType::kPlatformZephyrBleC2IndDoneEvent:
-        err = HandleTXComplete(event);
+    case DeviceEventType::kPlatformZephyrBleTXComplete:
+        err = HandleTXCharComplete(event);
         break;
 
     case DeviceEventType::kFabricMembershipChange:
@@ -635,27 +634,28 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                     PacketBufferHandle pBuf)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    uint8_t index                    = bt_conn_index(conId);
-    bt_gatt_indicate_params * params = &mIndicateParams[index];
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    uint8_t index                  = bt_conn_index(conId);
+    bt_gatt_notify_params * params = &mNotifyParams[index];
 
     VerifyOrExit(IsSubscribed(conId) == true, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE TX characteristic (ConnId %u, len %u)", index, pBuf->DataLength());
+    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE TX (ConnId %02" PRIx16 ", len %u)", index, pBuf->DataLength());
 
-    params->uuid = nullptr;
-    params->attr = &CHIPoBLE_Service.attrs[kCHIPoBLE_CCC_AttributeIndex];
-    params->func = HandleTXIndicated;
-    params->data = pBuf->Start();
-    params->len  = pBuf->DataLength();
+    params->uuid      = nullptr;
+    params->attr      = &CHIPoBLE_Service.attrs[kCHIPoBLE_CCC_AttributeIndex];
+    params->data      = pBuf->Start();
+    params->len       = pBuf->DataLength();
+    params->func      = HandleTXCompleted;
+    params->user_data = nullptr;
 
-    err = bt_gatt_indicate(conId, params);
+    err = bt_gatt_notify_cb(conId, params);
     VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Sending notification for CHIPoBLE TX failed: %s", ErrorStr(err));
     }
 
     return err == CHIP_NO_ERROR;
@@ -741,9 +741,9 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
     if (!packetBuf.IsNull())
     {
         // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
-        event.Type                            = DeviceEventType::kPlatformZephyrBleC1WriteEvent;
-        event.Platform.BleC1WriteEvent.BtConn = bt_conn_ref(conId);
-        event.Platform.BleC1WriteEvent.Data   = std::move(packetBuf).UnsafeRelease();
+        event.Type                            = DeviceEventType::kPlatformZephyrBleRXWrite;
+        event.Platform.BleRXWriteEvent.BtConn = bt_conn_ref(conId);
+        event.Platform.BleRXWriteEvent.Data   = std::move(packetBuf).UnsafeRelease();
     }
 
     // If we failed to allocate a buffer, post a kPlatformZephyrBleOutOfBuffersEvent event.
@@ -761,7 +761,7 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
 {
     ChipDeviceEvent event;
 
-    if (value != BT_GATT_CCC_INDICATE && value != 0)
+    if (value != BT_GATT_CCC_NOTIFY && value != 0)
     {
         return BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED);
     }
@@ -775,13 +775,12 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
     return sizeof(value);
 }
 
-void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, IndicationAttrType, uint8_t err)
+void BLEManagerImpl::HandleTXCompleted(struct bt_conn * conId, void * /* param */)
 {
     ChipDeviceEvent event;
 
-    event.Type                              = DeviceEventType::kPlatformZephyrBleC2IndDoneEvent;
-    event.Platform.BleC2IndDoneEvent.BtConn = bt_conn_ref(conId);
-    event.Platform.BleC2IndDoneEvent.Result = err;
+    event.Type                               = DeviceEventType::kPlatformZephyrBleTXComplete;
+    event.Platform.BleTXCompleteEvent.BtConn = bt_conn_ref(conId);
 
     PlatformMgr().PostEvent(&event);
 }

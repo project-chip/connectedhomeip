@@ -46,7 +46,7 @@ enum class MsgType : uint8_t
     IdentificationDeclaration = 0x00,
 };
 
-using UDCFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload);
+using UDCFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload);
 
 class DLL_EXPORT UserDirectedCommissioningClient : public Messaging::ExchangeDelegate
 {
@@ -104,7 +104,7 @@ private:
     SecureSessionHandle mSecureSession;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 };
 
@@ -146,7 +146,7 @@ private:
     UDCFunct OnUDCRequestReceived             = nullptr;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 

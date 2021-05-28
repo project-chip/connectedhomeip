@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "gen/af-structs.h"
+#include <app/common/gen/af-structs.h>
 
 #include <core/CHIPError.h>
-#include <list>
 #include <string>
+#include <vector>
 
 struct TargetNavigatorLaunchResponse
 {
@@ -34,5 +34,5 @@ class TargetNavigatorManager
 public:
     CHIP_ERROR Init();
     TargetNavigatorLaunchResponse proxyNavigateTargetRequest(uint8_t target, std::string data);
-    std::list<EmberAfNavigateTargetTargetInfo> proxyGetTargetInfoList();
+    std::vector<EmberAfNavigateTargetTargetInfo> proxyGetTargetInfoList();
 };

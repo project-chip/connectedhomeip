@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "gen/af-structs.h"
+#include <app/common/gen/af-structs.h>
 
 #include <core/CHIPError.h>
 #include <list>

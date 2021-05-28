@@ -260,7 +260,6 @@ public:
      **/
     bool IsEmpty() const { return RDNCount() == 0; }
 
-protected:
     ChipRDN rdn[CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES];
 
     uint8_t RDNCount() const;
@@ -300,6 +299,7 @@ struct ChipCertificateData
     ~ChipCertificateData();
 
     void Clear();
+    bool IsEqual(const ChipCertificateData & other) const;
 
     ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
     ChipDN mIssuerDN;                           /**< Certificate Issuer DN. */

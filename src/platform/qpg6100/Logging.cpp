@@ -123,20 +123,4 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     chip::DeviceLayer::OnLogOutput();
 }
 
-// TODO: have qpg6100 openthread platform implementation defines the APIs.
-// It is not perfect to have the openthread platform calloc/free
-// APIs defined here. If a dedicated source file (e.g. Memory.cpp)
-// that includes only the two functions is used, the target file
-// Memory.o will be thrown away whening linking the libary because
-// there is no one referring the symbols (We are not linking
-// the 'platform' library against openthread).
-extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
-{
-    return CHIPPlatformMemoryCalloc(aNum, aSize);
-}
-
-extern "C" void otPlatFree(void * aPtr)
-{
-    CHIPPlatformMemoryFree(aPtr);
-}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

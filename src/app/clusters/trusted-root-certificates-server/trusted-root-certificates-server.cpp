@@ -21,6 +21,11 @@
  ***************************************************************************/
 
 #include <app/Command.h>
+#include <app/common/gen/af-structs.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -29,12 +34,6 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-
-#include "gen/af-structs.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 using namespace chip;
 using namespace ::chip::Transport;
@@ -56,6 +55,8 @@ bool emberAfTrustedRootCertificatesClusterAddTrustedRootCertificateCallback(chip
     AdminPairingInfo * admin = retrieveCurrentAdmin();
     VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(admin->SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+    VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
     emberAfSendImmediateDefaultResponse(status);

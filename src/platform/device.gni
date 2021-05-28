@@ -38,13 +38,11 @@ declare_args() {
       chip_device_platform == "cc13x2_26x2" || chip_device_platform == "k32w"
 
   # Enable wifi support.
-  chip_enable_wifi = chip_device_platform == "linux"
+  chip_enable_wifi =
+      chip_device_platform == "linux" || chip_device_platform == "esp32"
 
   # Enable ble support.
-  chip_enable_ble =
-      chip_config_network_layer_ble &&
-      (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
-       chip_device_platform == "cc13x2_26x2")
+  chip_enable_ble = chip_config_network_layer_ble
 
   # Enable NFC support
   chip_enable_nfc = false
@@ -58,6 +56,9 @@ declare_args() {
   } else {
     chip_mdns = "none"
   }
+
+  # Enables full cluster-based commissioning for already-on-network devices.
+  chip_use_clusters_for_ip_commissioning = false
 }
 
 _chip_device_layer = "none"

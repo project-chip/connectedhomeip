@@ -53,7 +53,7 @@ namespace chip {
  *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
-class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
+class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() {}
@@ -92,13 +92,13 @@ public:
     CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
 #endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
+    static EncryptedPacketBufferHandle MarkEncrypted(PacketBufferHandle && aBuffer)
+    {
+        return EncryptedPacketBufferHandle(std::move(aBuffer));
+    }
+
 private:
-    // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
-    friend class SecureSessionMgr;
-
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
-
-    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 };
 
 /**
@@ -125,7 +125,7 @@ public:
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    SecureSessionHandle session, const Transport::PeerAddress & source,
-                                   System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+                                   System::PacketBufferHandle && msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
@@ -176,7 +176,7 @@ public:
      */
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
                            EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
-    CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
+    CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && msgBuf,
                                     EncryptedPacketBufferHandle * bufferRetainSlot);
 
     Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
@@ -255,7 +255,7 @@ public:
      * @param source    the source address of the package
      * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
      */
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
 private:
     /**
@@ -287,7 +287,7 @@ private:
     GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                           System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
+                           System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
                            EncryptionState encryptionState);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
@@ -307,9 +307,9 @@ private:
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
 
     void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle msg);
+                               System::PacketBufferHandle && msg);
     void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                         System::PacketBufferHandle msg);
+                         System::PacketBufferHandle && msg);
 
     static bool IsControlMessage(PayloadHeader & payloadHeader)
     {

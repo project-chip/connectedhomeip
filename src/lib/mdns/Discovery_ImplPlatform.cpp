@@ -235,28 +235,47 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
                                              strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
         }
 
-        snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
-        subTypes[subTypeSize++] = shortDiscriminatorSubtype;
-        snprintf(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype), "_L%04u", params.GetLongDiscriminator());
-        subTypes[subTypeSize++] = longDiscriminatorSubtype;
-        snprintf(commissioningModeSubType, sizeof(commissioningModeSubType), "_C%u", params.GetCommissioningMode() ? 1 : 0);
-        subTypes[subTypeSize++] = commissioningModeSubType;
+        if (MakeServiceSubtype(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype),
+                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator())) == CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = shortDiscriminatorSubtype;
+        }
+        if (MakeServiceSubtype(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype),
+                               DiscoveryFilter(DiscoveryFilterType::kLong, params.GetLongDiscriminator())) == CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = longDiscriminatorSubtype;
+        }
+        if (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kCommissioningMode, params.GetCommissioningMode() ? 1 : 0)) ==
+            CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = commissioningModeSubType;
+        }
         if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
-            snprintf(openWindowSubType, sizeof(openWindowSubType), "_A1");
-            subTypes[subTypeSize++] = openWindowSubType;
+            if (MakeServiceSubtype(openWindowSubType, sizeof(openWindowSubType),
+                                   DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1)) == CHIP_NO_ERROR)
+            {
+                subTypes[subTypeSize++] = openWindowSubType;
+            }
         }
     }
 
     if (params.GetVendorId().HasValue())
     {
-        snprintf(vendorSubType, sizeof(vendorSubType), "_V%u", params.GetVendorId().Value());
-        subTypes[subTypeSize++] = vendorSubType;
+        if (MakeServiceSubtype(vendorSubType, sizeof(vendorSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kVendor, params.GetVendorId().Value())) == CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = vendorSubType;
+        }
     }
     if (params.GetDeviceType().HasValue())
     {
-        snprintf(deviceTypeSubType, sizeof(deviceTypeSubType), "_T%u", params.GetDeviceType().Value());
-        subTypes[subTypeSize++] = deviceTypeSubType;
+        if (MakeServiceSubtype(deviceTypeSubType, sizeof(deviceTypeSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDeviceType().Value())) == CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = deviceTypeSubType;
+        }
     }
 
     service.mTextEntries   = textEntries;
@@ -459,8 +478,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
 
-    ChipLogProgress(Discovery, "Node ID resolved for 0x08%" PRIX32 "08%" PRIX32,
-                    static_cast<uint32_t>(nodeData.mPeerId.GetNodeId() >> 32), static_cast<uint32_t>(nodeData.mPeerId.GetNodeId()));
+    ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 

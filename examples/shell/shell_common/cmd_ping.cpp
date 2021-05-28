@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <lib/core/CHIPCore.h>
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeMgr.h>
@@ -220,7 +220,7 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload)
+void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
 {
     uint32_t respTime    = System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gPingArguments.GetLastEchoTime();
@@ -488,5 +488,5 @@ static shell_command_t cmds_ping[] = {
 
 void cmd_ping_init()
 {
-    shell_register(cmds_ping, ArraySize(cmds_ping));
+    Engine::Root().RegisterCommands(cmds_ping, ArraySize(cmds_ping));
 }

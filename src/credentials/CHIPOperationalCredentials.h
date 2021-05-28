@@ -41,8 +41,8 @@ using namespace Crypto;
 
 struct NodeCredential
 {
-    uint8_t * mCredential;
-    uint16_t mLen;
+    uint8_t * mCredential = nullptr;
+    uint16_t mLen         = 0;
 };
 
 struct NodeCredentialMap

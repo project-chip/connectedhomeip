@@ -83,14 +83,14 @@ public:
     typedef void (*OnConnectCompleteFunct)(BLEEndPoint * endPoint, BLE_ERROR err);
     OnConnectCompleteFunct OnConnectComplete;
 
-    typedef void (*OnMessageReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle msg);
+    typedef void (*OnMessageReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle && msg);
     OnMessageReceivedFunct OnMessageReceived;
 
     typedef void (*OnConnectionClosedFunct)(BLEEndPoint * endPoint, BLE_ERROR err);
     OnConnectionClosedFunct OnConnectionClosed;
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle msg);
+    typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle && msg);
     OnCommandReceivedFunct OnCommandReceived;
     inline void SetOnCommandReceivedCB(OnCommandReceivedFunct cb) { OnCommandReceived = cb; };
     BtpEngineTest mBtpEngineTest;
@@ -99,8 +99,8 @@ public:
 #endif
 
     // Public functions:
-    BLE_ERROR Send(PacketBufferHandle data);
-    BLE_ERROR Receive(PacketBufferHandle data);
+    BLE_ERROR Send(PacketBufferHandle && data);
+    BLE_ERROR Receive(PacketBufferHandle && data);
     BLE_ERROR StartConnect();
 
     bool IsUnsubscribePending() const;
@@ -195,8 +195,8 @@ private:
     BLE_ERROR HandleGattSendConfirmationReceived();
     BLE_ERROR HandleHandshakeConfirmationReceived();
     BLE_ERROR HandleFragmentConfirmationReceived();
-    BLE_ERROR HandleCapabilitiesRequestReceived(PacketBufferHandle data);
-    BLE_ERROR HandleCapabilitiesResponseReceived(PacketBufferHandle data);
+    BLE_ERROR HandleCapabilitiesRequestReceived(PacketBufferHandle && data);
+    BLE_ERROR HandleCapabilitiesResponseReceived(PacketBufferHandle && data);
     SequenceNumber_t AdjustRemoteReceiveWindow(SequenceNumber_t lastReceivedAck, SequenceNumber_t maxRemoteWindowSize,
                                                SequenceNumber_t newestUnackedSentSeqNum);
 

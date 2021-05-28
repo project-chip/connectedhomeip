@@ -54,14 +54,18 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
-                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
 
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
+
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                    ExchangeDelegate * delegate);
+
+    ~ExchangeContext();
 
     /**
      *  Determine whether the context is the initiator of the exchange.
@@ -90,7 +94,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle && msgPayload,
                            const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone));
 
     /**
@@ -122,16 +126,16 @@ public:
      *                                                       protocol layer.
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
+                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msgBuf);
 
-    ExchangeDelegateBase * GetDelegate() const { return mDelegate; }
-    void SetDelegate(ExchangeDelegateBase * delegate) { mDelegate = delegate; }
+    ExchangeDelegate * GetDelegate() const { return mDelegate; }
+    void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeMessageDispatch * GetMessageDispatch();
+    ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
     ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {
@@ -163,17 +167,14 @@ public:
 
 private:
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ExchangeDelegateBase * mDelegate = nullptr;
-    ExchangeManager * mExchangeMgr   = nullptr;
-    ExchangeACL * mExchangeACL       = nullptr;
+    ExchangeDelegate * mDelegate   = nullptr;
+    ExchangeManager * mExchangeMgr = nullptr;
+    ExchangeACL * mExchangeACL     = nullptr;
+
+    ExchangeMessageDispatch * mDispatch = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
-
-    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                            ExchangeDelegateBase * delegate);
-    void Free();
-    void Reset();
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -208,6 +209,17 @@ private:
      */
     bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
+    /**
+     * Notify the exchange that its connection has expired.
+     */
+    void OnConnectionExpired();
+
+    /**
+     * Notify our delegate, if any, that we have timed out waiting for a
+     * response.
+     */
+    void NotifyResponseTimeout();
+
     CHIP_ERROR StartResponseTimer();
 
     void CancelResponseTimer();
@@ -215,11 +227,6 @@ private:
 
     void DoClose(bool clearRetransTable);
 };
-
-inline void ExchangeContextDeletor::Release(ExchangeContext * obj)
-{
-    obj->Free();
-}
 
 } // namespace Messaging
 } // namespace chip

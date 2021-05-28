@@ -334,7 +334,7 @@ menu "CHIP Device Layer"
         config CHIP_TASK_STACK_SIZE
             int "CHIP Task Stack Size"
             range 0 65535
-            default 6144
+            default 8192
             help
                 The size (in bytes) of the CHIP task stack.
 
@@ -653,6 +653,18 @@ menu "CHIP Device Layer"
                 Provisioning service.
 
     endmenu
+
+    menu "Commissioning options"
+        config RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE
+            int "Use full IP-based commissioning (expect cluster commands)"
+            default 0
+            help
+                Setting this to y will cause the commissioner to send commissioning commands to the
+                various clusters after establishing a PASE session.
+
+    endmenu
+
+
 
     menu "Testing Options"
 

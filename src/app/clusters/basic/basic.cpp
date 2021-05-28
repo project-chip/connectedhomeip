@@ -20,12 +20,12 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/common/gen/att-storage.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
-#include <gen/att-storage.h>
-#include <gen/attribute-id.h>
-#include <gen/attribute-type.h>
-#include <gen/cluster-id.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <cstring>

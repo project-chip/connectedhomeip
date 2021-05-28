@@ -35,6 +35,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/echo/Echo.h>
+#include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <setup_payload/SetupPayload.h>
@@ -60,7 +61,7 @@ namespace {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 // TODO: remove Echo Server - this is just temporary for debugging
-chip::Protocols::Echo::EchoServer gEchoServer;
+// chip::Protocols::Echo::EchoServer gEchoServer;
 chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer gUDCServer;
 #endif
 
@@ -137,8 +138,8 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
             AdminPairingInfo * admin = adminPairings.FindAdminWithId(id);
             if (admin != nullptr)
             {
-                ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
-                                static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
+                ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x" ChipLogFormatX64, admin->GetAdminId(),
+                                ChipLogValueX64(admin->GetNodeId()));
             }
         }
     }
@@ -176,9 +177,8 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
         {
             connection.GetPASESession(session);
 
-            ChipLogProgress(AppServer, "Fetched the session information: from 0x%08" PRIx32 "%08" PRIx32,
-                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId() >> 32),
-                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId()));
+            ChipLogProgress(AppServer, "Fetched the session information: from 0x" ChipLogFormatX64,
+                            ChipLogValueX64(session->PeerConnection().GetPeerNodeId()));
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
                                   session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
                                   connection.GetAdminId(), nullptr);
@@ -294,6 +294,7 @@ private:
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
+CASEServer gCASEServer;
 Messaging::ExchangeManager gExchangeMgr;
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
@@ -324,7 +325,7 @@ class ServerCallback : public ExchangeDelegate
 {
 public:
     void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                           const PayloadHeader & payloadHeader, System::PacketBufferHandle buffer) override
+                           const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
     {
         // as soon as a client connects, assume it is connected
         VerifyOrExit(!buffer.IsNull(), ChipLogError(AppServer, "Received data but couldn't process it..."));
@@ -465,6 +466,7 @@ static void ChipEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_
     {
     case DeviceLayer::DeviceEventType::kInternetConnectivityChange:
         VerifyOrReturn(event->InternetConnectivityChange.IPv4 == DeviceLayer::kConnectivity_Established);
+        // TODO : Need to check if we're properly commissioned.
         advertise();
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -493,6 +495,8 @@ void InitServer(AppDelegate * delegate)
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
     err = PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
     SuccessOrExit(err);
+#elif CHIP_DEVICE_LAYER_TARGET_LINUX
+    PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_server_kvs");
 #endif
 
     err = gRendezvousServer.Init(delegate, &gServerStorage);
@@ -577,8 +581,8 @@ void InitServer(AppDelegate * delegate)
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-    err = gEchoServer.Init(&gExchangeMgr);
-    SuccessOrExit(err);
+    // err = gEchoServer.Init(&gExchangeMgr);
+    // SuccessOrExit(err);
 
     err = gUDCServer.Init(&gExchangeMgr);
     SuccessOrExit(err);
@@ -593,6 +597,9 @@ void InitServer(AppDelegate * delegate)
     chip::Inet::IPAddress::FromString("127.0.0.1", commissioner);
     SendUserDirectedCommissioningRequest(commissioner, CHIP_PORT + 2);
     */
+
+    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable());
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)

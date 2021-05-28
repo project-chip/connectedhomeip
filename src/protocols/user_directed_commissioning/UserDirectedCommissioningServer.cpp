@@ -54,7 +54,7 @@ void UserDirectedCommissioningServer::Shutdown()
 }
 
 void UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
+                                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     payload->DebugDump("UserDirectedCommissioningServer::OnMessageReceive");
 

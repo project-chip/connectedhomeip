@@ -17,7 +17,6 @@
  */
 
 #include "PairingCommand.h"
-#include "gen/enums.h"
 #include <lib/core/CHIPSafeCasts.h>
 
 using namespace ::chip;
@@ -31,12 +30,14 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mOpCredsIssuer.Initialize();
-
     chip::Controller::CommissionerInitParams params;
-    params.storageDelegate                = &storage;
-    params.mDeviceAddressUpdateDelegate   = this;
-    params.pairingDelegate                = this;
+    params.storageDelegate              = &storage;
+    params.mDeviceAddressUpdateDelegate = this;
+    params.pairingDelegate              = this;
+
+    err = mOpCredsIssuer.Initialize(storage);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", ErrorStr(err)));
+
     params.operationalCredentialsDelegate = &mOpCredsIssuer;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());

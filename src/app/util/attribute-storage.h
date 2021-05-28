@@ -45,7 +45,7 @@
 #include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
-#include "gen/att-storage.h"
+#include <app/common/gen/att-storage.h>
 #endif
 
 #if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)

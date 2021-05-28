@@ -87,7 +87,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, co
 }
 
 void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
+                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     payload->DebugDump("EchoClient::OnMessageReceive");
     // Assert that the exchange context matches the client's current context.

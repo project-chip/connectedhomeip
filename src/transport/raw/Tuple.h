@@ -81,7 +81,7 @@ template <typename... TransportTypes>
 class Tuple : public Base
 {
 public:
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         return SendMessageImpl<0>(address, std::move(msgBuf));
     }

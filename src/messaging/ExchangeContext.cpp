@@ -50,7 +50,7 @@ namespace chip {
 namespace Messaging {
 
 static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, Protocols::Id protocolId,
-                                     uint8_t msgType, PacketBufferHandle payload)
+                                     uint8_t msgType, PacketBufferHandle && payload)
 {
     ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32,
                  protocolId.ToFullyQualifiedSpecForm(), msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
@@ -76,7 +76,7 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
     mResponseTimeout = timeout;
 }
 
-CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
+CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
@@ -105,15 +105,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
     }
 
-    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
-    ApplicationExchangeDispatch defaultDispatch;
-
-    if (dispatch == nullptr)
-    {
-        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-        dispatch = &defaultDispatch;
-    }
-
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse))
     {
@@ -130,8 +121,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
     }
 
-    err = dispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
-                                reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+    err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
+                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -212,34 +203,37 @@ void ExchangeContext::Abort()
     Release();
 }
 
-void ExchangeContext::Reset()
+void ExchangeContextDeletor::Release(ExchangeContext * ec)
 {
-    *this = ExchangeContext();
+    ec->mExchangeMgr->ReleaseContext(ec);
 }
 
-ExchangeMessageDispatch * ExchangeContext::GetMessageDispatch()
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                                 ExchangeDelegate * delegate)
 {
-    if (mDelegate != nullptr)
-    {
-        return mDelegate->GetMessageDispatch(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-    }
+    VerifyOrDie(mExchangeMgr == nullptr);
 
-    return nullptr;
-}
-
-ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                         ExchangeDelegateBase * delegate)
-{
-    VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
-
-    Reset();
-    Retain();
-    mExchangeMgr = em;
-    em->IncrementContextsInUse();
+    mExchangeMgr   = em;
     mExchangeId    = ExchangeId;
     mSecureSession = session;
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
+
+    ExchangeMessageDispatch * dispatch = nullptr;
+    if (delegate != nullptr)
+    {
+        dispatch = delegate->GetMessageDispatch(em->GetReliableMessageMgr(), em->GetSessionMgr());
+        if (dispatch == nullptr)
+        {
+            dispatch = &em->mDefaultExchangeDispatch;
+        }
+    }
+    else
+    {
+        dispatch = &em->mDefaultExchangeDispatch;
+    }
+    VerifyOrDie(dispatch != nullptr);
+    mDispatch = dispatch->Retain();
 
     SetDropAckDebug(false);
     SetAckPending(false);
@@ -248,27 +242,21 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     SetAutoRequestAck(true);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()), em->GetContextsInUse(),
-                  this);
+    ChipLogDetail(ExchangeManager, "ec++ id: %d", ExchangeId);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
-
-    return this;
 }
 
-void ExchangeContext::Free()
+ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
 
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and
     // the boolean parameter passed to DoClose() should not matter.
-    ExchangeManager * em = mExchangeMgr;
 
     DoClose(false);
     mExchangeMgr = nullptr;
-
-    em->DecrementContextsInUse();
 
     if (mExchangeACL != nullptr)
     {
@@ -276,9 +264,14 @@ void ExchangeContext::Free()
         mExchangeACL = nullptr;
     }
 
+    if (mDispatch != nullptr)
+    {
+        mDispatch->Release();
+        mDispatch = nullptr;
+    }
+
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()),
-                  mExchangeId, em->GetContextsInUse(), this);
+    ChipLogDetail(ExchangeManager, "ec-- id: %d", mExchangeId);
 #endif
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
@@ -305,6 +298,27 @@ bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHea
         //    case, the initiator is ill defined)
 
         && (payloadHeader.IsInitiator() != IsInitiator());
+}
+
+void ExchangeContext::OnConnectionExpired()
+{
+    // Reset our mSecureSession to a default-initialized (hence not matching any
+    // connection state) value, because it's still referencing the now-expired
+    // connection.  This will mean that no more messages can be sent via this
+    // exchange, which seems fine given the semantics of connection expiration.
+    mSecureSession = SecureSessionHandle();
+
+    if (!IsResponseExpected())
+    {
+        // Nothing to do in this case
+        return;
+    }
+
+    // If we're waiting on a response, we now know it's never going to show up
+    // and we should notify our delegate accordingly.
+    CancelResponseTimer();
+    SetResponseExpected(false);
+    NotifyResponseTimeout();
 }
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
@@ -341,15 +355,22 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
     // wants to never receive the response, they must close the exchange context.
 
-    ExchangeDelegateBase * delegate = ec->GetDelegate();
+    ec->NotifyResponseTimeout();
+}
+
+void ExchangeContext::NotifyResponseTimeout()
+{
+    ExchangeDelegate * delegate = GetDelegate();
 
     // Call the user's timeout handler.
     if (delegate != nullptr)
-        delegate->OnResponseTimeout(ec);
+    {
+        delegate->OnResponseTimeout(this);
+    }
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                          const Transport::PeerAddress & peerAddress, PacketBufferHandle msgBuf)
+                                          const Transport::PeerAddress & peerAddress, PacketBufferHandle && msgBuf)
 {
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference
@@ -357,17 +378,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
-    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
-    ApplicationExchangeDispatch defaultDispatch;
-
-    if (dispatch == nullptr)
-    {
-        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-        dispatch = &defaultDispatch;
-    }
-
     CHIP_ERROR err =
-        dispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
+        mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.

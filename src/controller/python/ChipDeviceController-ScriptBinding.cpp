@@ -143,7 +143,7 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
         localDeviceId = kDefaultLocalDeviceId;
     }
 
-    ReturnErrorOnFailure(sOperationalCredentialsIssuer.Initialize());
+    ReturnErrorOnFailure(sOperationalCredentialsIssuer.Initialize(sStorageDelegate));
 
     initParams.storageDelegate                = &sStorageDelegate;
     initParams.mDeviceAddressUpdateDelegate   = &sDeviceAddressUpdateDelegate;
@@ -359,8 +359,7 @@ CHIP_ERROR pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::Device
 
 uint64_t pychip_GetCommandSenderHandle(chip::Controller::Device * device)
 {
-    chip::app::CommandSender * sender = device->GetCommandSender();
-    return sender == nullptr ? 0 : reinterpret_cast<uint64_t>(sender);
+    return 0;
 }
 
 void pychip_Stack_SetLogFunct(LogMessageFunct logFunct)
