@@ -32,6 +32,7 @@
         "group-key-mgmt-cluster.xml",
         "ha.xml",
         "ha-devices.xml",
+        "pressure-measurement.xml",
         "pump-configuration-and-control-cluster.xml",
         "pump-device.xml",
         "pump-controller-device.xml",
