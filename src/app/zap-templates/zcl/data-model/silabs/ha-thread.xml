@@ -463,23 +463,6 @@ limitations under the License.
     <attribute side="server" code="0x0014" define="PRESSURE_SCALE" type="INT8S" min="0x81" max="0x7F" writable="false" optional="true">scale</attribute>
   </cluster>
   <cluster>
-    <name>Flow Measurement</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring the measurement of flow, and reporting flow rates.</description>
-    <code>0x0404</code>
-    <define>FLOW_MEASUREMENT_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" tickFrequency="half" init="false">true</server>
-    <attribute side="server" code="0x0000" define="FLOW_MEASURED_VALUE" type="INT16U" writable="false" reportable="true" default="0x0000" optional="false">measured value</attribute>
-    <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="FLOW_MIN_MEASURED_VALUE" type="INT16U" min="0x0000" max="0xfffd" writable="false" optional="false">min measured value</attribute>
-    <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="FLOW_MAX_MEASURED_VALUE" type="INT16U" min="0x0001" max="0xfffe" writable="false" optional="false">max measured value</attribute>
-    <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="FLOW_TOLERANCE" type="INT16U" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true">tolerance</attribute>
-    <!-- TOLERANCE -->
-  </cluster>
-  <cluster>
     <name>Relative Humidity Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements.</description>
