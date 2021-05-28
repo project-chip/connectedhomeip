@@ -172,76 +172,10 @@ private:
     void OnOperationalIPAddress(const chip::Inet::IPAddress & addr);
 };
 
-const char * ToString(mdns::Minimal::QType qtype)
-{
-    static char buff[32];
-
-    switch (qtype)
-    {
-    case mdns::Minimal::QType::A:
-        return "A";
-    case mdns::Minimal::QType::NS:
-        return "NS";
-    case mdns::Minimal::QType::CNAME:
-        return "CNAME";
-    case mdns::Minimal::QType::SOA:
-        return "SOA";
-    case mdns::Minimal::QType::WKS:
-        return "WKS";
-    case mdns::Minimal::QType::PTR:
-        return "PTR";
-    case mdns::Minimal::QType::MX:
-        return "MX";
-    case mdns::Minimal::QType::SRV:
-        return "SRV";
-    case mdns::Minimal::QType::AAAA:
-        return "AAAA";
-    case mdns::Minimal::QType::ANY:
-        return "ANY";
-    case mdns::Minimal::QType::TXT:
-        return "TXT";
-    default:
-        sprintf(buff, "UNKNOWN (%d)!!", static_cast<int>(qtype));
-        return buff;
-    }
-}
-
-const char * ToString(mdns::Minimal::QClass qclass)
-{
-    static char buff[32];
-
-    switch (qclass)
-    {
-    case mdns::Minimal::QClass::IN_UNICAST:
-        return "IN(UNICAST)";
-    case mdns::Minimal::QClass::IN:
-        return "IN";
-    default:
-        sprintf(buff, "UNKNOWN (%d)!!", static_cast<int>(qclass));
-        return buff;
-    }
-}
-
-const char * ToString(mdns::Minimal::SerializedQNameIterator qNameIterator)
-{
-    static char qName[32];
-    memset(qName, 0, sizeof qName);
-    while (qNameIterator.Next())
-    {
-        strncat(qName, qNameIterator.Value(), sizeof qName - strlen(qName) - 1);
-        strncat(qName, ".", sizeof qName - strlen(qName) - 1);
-    }
-    if (!qNameIterator.IsValid())
-    {
-        strncat(qName, "   (INVALID!)", sizeof qName - strlen(qName) - 1);
-    }
-    return qName;
-}
-
 void PacketDataReporter::OnQuery(const QueryData & data)
 {
-    ChipLogDetail(Discovery, "QUERY %s/%s%s: %s", ToString(data.GetType()), ToString(data.GetClass()),
-                  data.RequestedUnicastAnswer() ? " UNICAST" : "", ToString(data.GetName()));
+    ChipLogError(Discovery, "Unexpected query packet being parsed as a response");
+    mValid = false;
 }
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)

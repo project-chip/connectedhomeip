@@ -27,7 +27,7 @@ namespace chip {
 
 namespace Controller {
 
-constexpr uint16_t kMdnsPort = 5388;
+constexpr uint16_t kMdnsPort = 5353;
 
 class DLL_EXPORT CommissionableNodeController : public Mdns::ResolverDelegate
 {
