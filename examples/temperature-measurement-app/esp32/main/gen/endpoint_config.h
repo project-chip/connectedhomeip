@@ -385,7 +385,7 @@
                 0x003F, ZAP_ATTRIBUTE_INDEX(35), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Trusted Root Certificates (server) */                                                      \
             { 0x0402,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(34),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(36),                                                                                             \
               4,                                                                                                                   \
               8,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \

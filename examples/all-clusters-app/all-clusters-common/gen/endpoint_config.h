@@ -2103,6 +2103,9 @@
     const EmberAfGenericClusterFunction chipFuncArrayColorControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback,                                              \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayTemperatureMeasurementServer[] = {                                            \
+        (EmberAfGenericClusterFunction) emberAfTemperatureMeasurementClusterServerInitCallback,                                    \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIasZoneServer[] = {                                                           \
         (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerInitCallback,                                                   \
         (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerMessageSentCallback,                                            \
@@ -2230,9 +2233,12 @@
               336,                                                                                                                 \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayColorControlServer }, /* Endpoint: 1, Cluster: Color Control (server) */                                \
-            {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(237), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
+            { 0x0402,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(237),                                                                                            \
+              4,                                                                                                                   \
+              8,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayTemperatureMeasurementServer }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */            \
             { 0x0500,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(241),                                                                                            \
               6,                                                                                                                   \
