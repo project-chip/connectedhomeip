@@ -483,7 +483,8 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
 
 void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)
 {
-    TestContext ctx;
+    // Making this static to reduce stack usage, as some platforms have limits on stack size.
+    static TestContext ctx;
 
     CHIP_ERROR err = ctx.Init(inSuite, &gTransportMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
