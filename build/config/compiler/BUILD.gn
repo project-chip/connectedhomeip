@@ -287,6 +287,7 @@ config("sanitize_undefined_behavior") {
     "-fsanitize=unsigned-integer-overflow",
     "-fsanitize=implicit-conversion",
     "-fsanitize=nullability",
+    "-fno-sanitize=vptr,function",
   ]
   ldflags = cflags
 }

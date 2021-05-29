@@ -27,6 +27,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen  \
   ../third_party/connectedhomeip/src/app/server                                     \
   ../third_party/connectedhomeip/src/app/util                                       \
+  ../third_party/connectedhomeip/src/app/clusters/test-cluster-server               \
   ../third_party/connectedhomeip/src/app/clusters/descriptor                        \
   ../third_party/connectedhomeip/src/app/clusters/on-off-server                     \
   ../third_party/connectedhomeip/src/app/clusters/level-control                     \
@@ -42,7 +43,8 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/low-power-server                  \
   ../third_party/connectedhomeip/src/app/clusters/keypad-input-server               \
   ../third_party/connectedhomeip/src/app/clusters/media-playback-server             \
-  ../third_party/connectedhomeip/src/app/clusters/operational-credentials           \
+  ../third_party/connectedhomeip/src/app/clusters/operational-credentials-server    \
+  ../third_party/connectedhomeip/src/app/clusters/trusted-root-certificates-server  \
   ../third_party/connectedhomeip/src/app/clusters/media-input-server                \
   ../third_party/connectedhomeip/src/app/clusters/network-commissioning             \
   ../third_party/connectedhomeip/src/app/clusters/ota-server                        \
@@ -54,7 +56,9 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/bindings                          \
   ../third_party/connectedhomeip/src/app/reporting                                  \
   ../third_party/connectedhomeip/src/app/clusters/door-lock-server                  \
+  ../third_party/connectedhomeip/src/app/clusters/occupancy-sensor-server           \
    ../third_party/connectedhomeip/src/app/clusters/ias-zone-server                  \
+   ../third_party/connectedhomeip/src/app/clusters/relative-humidity-measurement-server \
 #  ../third_party/connectedhomeip/src/app/clusters/ias-zone-client                  \
 
 

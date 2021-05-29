@@ -24,10 +24,10 @@
  **/
 #include "DeviceCallbacks.h"
 
-#include "../gen/attribute-id.h"
-#include "../gen/cluster-id.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <support/CodeUtils.h>
 
 static const char * TAG = "echo-devicecallbacks";
@@ -54,7 +54,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 }
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);

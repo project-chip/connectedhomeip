@@ -42,10 +42,10 @@
 #pragma once
 
 //#include PLATFORM_HEADER
-#include "af.h"
+#include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
-#include "gen/att-storage.h"
+#include <app/common/gen/att-storage.h>
 #endif
 
 #if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
@@ -176,7 +176,7 @@ void emAfClusterAttributeChangedCallback(chip::EndpointId endpoint, chip::Cluste
 // Calls the attribute changed callback for a specific cluster.
 EmberAfStatus emAfClusterPreAttributeChangedCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                      chip::AttributeId attributeId, uint8_t clientServerMask,
-                                                     uint16_t manufacturerCode, EmberAfAttributeType attributeType, uint8_t size,
+                                                     uint16_t manufacturerCode, EmberAfAttributeType attributeType, uint16_t size,
                                                      uint8_t * value);
 
 // Calls the default response callback for a specific cluster, and wraps emberAfClusterDefaultResponseWithMfgCodeCallback
@@ -189,11 +189,11 @@ void emberAfClusterDefaultResponseWithMfgCodeCallback(chip::EndpointId endpoint,
                                                       EmberAfStatus status, uint8_t clientServerMask, uint16_t manufacturerCode);
 
 // Calls the message sent callback for a specific cluster, and wraps emberAfClusterMessageSentWithMfgCodeCallback
-void emberAfClusterMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
-                                       uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfClusterMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
+                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 // Calls the message sent callback for a specific cluster.
-void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status,
                                                   uint16_t manufacturerCode);
 

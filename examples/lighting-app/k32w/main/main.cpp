@@ -32,6 +32,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 #include <support/CHIPMem.h>
+#include <support/CHIPPlatformMemory.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "FreeRtosMbedtlsUtils.h"
@@ -43,8 +44,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
-
-extern "C" void * pvPortCallocRtos(size_t num, size_t size);
 
 #include <AppTask.h>
 
@@ -66,7 +65,7 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
-    mbedtls_platform_set_calloc_free(pvPortCallocRtos, vPortFree);
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     /* Used for HW initializations */
     otSysInit(0, NULL);
@@ -99,25 +98,10 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
     if (ret != CHIP_NO_ERROR)
     {
         goto exit;
-    }
-
-    // Configure the Thread polling behavior for the device.
-    {
-        ConnectivityManager::ThreadPollingConfig pollingConfig;
-        pollingConfig.Clear();
-        pollingConfig.ActivePollingIntervalMS   = THREAD_ACTIVE_POLLING_INTERVAL_MS;
-        pollingConfig.InactivePollingIntervalMS = THREAD_INACTIVE_POLLING_INTERVAL_MS;
-
-        ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
-        if (ret != CHIP_NO_ERROR)
-        {
-            K32W_LOG("Error during ConnectivityMgr().SetThreadPollingConfig(pollingConfig)");
-            goto exit;
-        }
     }
 
     ret = PlatformMgr().StartEventLoopTask();

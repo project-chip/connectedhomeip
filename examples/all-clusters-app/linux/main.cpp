@@ -19,20 +19,20 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include "af.h"
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
 #include <app/Command.h>
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/server/Mdns.h>
 #include <app/util/af-types.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <core/CHIPError.h>
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
 
-#include "Server.h"
+#include "AppMain.h"
 
 #include <cassert>
 #include <iostream>
@@ -43,7 +43,7 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {}
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
@@ -54,28 +54,7 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 
 int main(int argc, char * argv[])
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = chip::Platform::MemoryInit();
-    SuccessOrExit(err);
-
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
-
-    // Init ZCL Data Model and CHIP App Server
-    InitServer();
-
-    // Init Mdns Server
-    app::Mdns::StartServer();
-
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        std::cerr << "Failed to run All Clusters App: " << ErrorStr(err) << std::endl;
-        // End the program with non zero error code to indicate a error.
-        return 1;
-    }
+    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    ChipLinuxAppMainLoop();
     return 0;
 }

@@ -114,6 +114,8 @@ if [[ -d "${ANDROID_NDK_HOME}/toolchains" && -d "${ANDROID_HOME}/platforms" ]]; 
 else
     echo
     echo "Hint: Set \$ANDROID_HOME and \$ANDROID_NDK_HOME to enable building for Android"
+    echo "      The required android sdk platform version is 21. It can be obtained from"
+    echo "      https://dl.google.com/android/repository/android-21_r02.zip"
 fi
 
 echo
@@ -170,7 +172,7 @@ echo
 _chip_banner "Build: GN configure"
 
 gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args$user_args"
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_arg$user_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args$user_args"
 
 _chip_banner "Build: Ninja build"
 

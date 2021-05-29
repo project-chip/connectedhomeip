@@ -26,6 +26,7 @@
 
 #include <app/MessageDef/ReportData.h>
 #include <app/ReadHandler.h>
+#include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -34,7 +35,6 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <util/basic-types.h>
 
 namespace chip {
 namespace app {
@@ -77,6 +77,11 @@ private:
      *
      */
     CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
+
+    CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
+    CHIP_ERROR BuildSingleReportDataEventList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
+    CHIP_ERROR RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo);
+    EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
     /**
      * Send Report via ReadHandler

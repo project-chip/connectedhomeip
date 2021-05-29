@@ -20,6 +20,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <CHIP/CHIPOnboardingPayloadParser.h>
+
 @class CHIPDevice;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -35,16 +37,30 @@ NS_ASSUME_NONNULL_BEGIN
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
+
+- (BOOL)pairDevice:(uint64_t)deviceID
+           address:(NSString *)address
+              port:(uint16_t)port
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error;
+
 - (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
                           address:(NSString *)address
                              port:(uint16_t)port
                             error:(NSError * __autoreleasing *)error;
+
+- (BOOL)pairDevice:(uint64_t)deviceID
+        onboardingPayload:(NSString *)onboardingPayload
+    onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType
+                    error:(NSError * __autoreleasing *)error;
+
 - (void)setListenPort:(uint16_t)port;
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId;
 
-- (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (nullable CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -73,10 +89,8 @@ NS_ASSUME_NONNULL_BEGIN
  * check if the stack needs to be started up.
  *
  * @param[in] storageDelegate The delegate for persistent storage
- *
- * @param[in] queue The queue on which the storage callbacks will be delivered
  */
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate queue:(_Nullable dispatch_queue_t)queue;
+- (BOOL)startup:(nullable id<CHIPPersistentStorageDelegate>)storageDelegate;
 
 /**
  * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.

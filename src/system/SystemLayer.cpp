@@ -33,6 +33,7 @@
 #include <system/SystemTimer.h>
 
 // Include additional CHIP headers
+#include <platform/LockTracker.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -246,6 +247,8 @@ static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
  */
 void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback)
 {
+    assertChipStackLockedByCurrentThread();
+
     Cancelable * ca = aCallback->Cancel();
 
     ca->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
@@ -367,6 +370,8 @@ void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void * aAppState)
  */
 Error Layer::ScheduleWork(TimerCompleteFunct aComplete, void * aAppState)
 {
+    assertChipStackLockedByCurrentThread();
+
     Error lReturn;
     Timer * lTimer;
 
@@ -574,7 +579,17 @@ void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
         // one-shot
         chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromCancelable(ready.mNext);
         cb->Cancel();
-        cb->mCall(cb->mContext);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        if (mDispatchQueue != nullptr)
+        {
+            dispatch_sync(mDispatchQueue, ^{
+                cb->mCall(cb->mContext);
+            });
+        }
+        else
+#endif
+            cb->mCall(cb->mContext);
     }
 }
 
@@ -657,6 +672,8 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
  */
 void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet)
 {
+    assertChipStackLockedByCurrentThread();
+
     pthread_t lThreadSelf;
     Error lReturn;
 
@@ -695,7 +712,16 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
 
         if (lTimer != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
         {
-            lTimer->HandleComplete();
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+            if (mDispatchQueue != nullptr)
+            {
+                dispatch_sync(mDispatchQueue, ^{
+                    lTimer->HandleComplete();
+                });
+            }
+            else
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+                lTimer->HandleComplete();
         }
     }
 

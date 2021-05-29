@@ -26,12 +26,12 @@
 #include "ListBuilder.h"
 #include "ListParser.h"
 
+#include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <protocols/secure_channel/Constants.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <util/basic-types.h>
 
 namespace chip {
 namespace app {
@@ -79,7 +79,6 @@ public:
      * @param[out]   apGeneralCode     Pointer to the storage for the GeneralCode
      * @param[out]   apProtocolId     Pointer to the storage for the ProtocolId
      * @param[out]   apProtocolCode   Pointer to the storage for the ProtocolCode
-     * @param[out]   apClusterId     Pointer to the storage for the ClusterId
      *
      * @return       CHIP_ERROR codes returned by chip::TLV objects. CHIP_END_OF_TLV if either
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong

@@ -39,11 +39,12 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "attribute-storage.h"
-#include "af.h"
 #include "app/util/common.h"
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 
-#include "gen/attribute-type.h"
+#include <app/common/gen/attribute-type.h>
+
 #include "gen/callback.h"
 
 using namespace chip;
@@ -213,7 +214,7 @@ void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId cluste
 }
 
 // This function is used to call the per-cluster message sent callback
-void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type, MessageSendDestination destination,
                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status,
                                                   uint16_t mfgCode)
 {
@@ -230,7 +231,7 @@ void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type,
             if (f != NULL)
             {
                 // emberAfPushEndpointNetworkIndex(apsFrame->sourceEndpoint);
-                ((EmberAfMessageSentFunction) f)(type, indexOrDestination, apsFrame, msgLen, message, status);
+                ((EmberAfMessageSentFunction) f)(type, destination, apsFrame, msgLen, message, status);
                 // emberAfPopNetworkIndex();
             }
         }
@@ -240,10 +241,10 @@ void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type,
 // This function is used to call the per-cluster message sent callback, and
 // wraps the emberAfClusterMessageSentWithMfgCodeCallback with a
 // EMBER_AF_NULL_MANUFACTURER_CODE.
-void emberAfClusterMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+void emberAfClusterMessageSentCallback(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
                                        uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
-    emberAfClusterMessageSentWithMfgCodeCallback(type, indexOrDestination, apsFrame, msgLen, message, status,
+    emberAfClusterMessageSentWithMfgCodeCallback(type, destination, apsFrame, msgLen, message, status,
                                                  EMBER_AF_NULL_MANUFACTURER_CODE);
 }
 
@@ -281,7 +282,7 @@ void emAfClusterAttributeChangedCallback(EndpointId endpoint, ClusterId clusterI
 // This function is used to call the per-cluster pre-attribute changed callback
 EmberAfStatus emAfClusterPreAttributeChangedCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
                                                      uint8_t clientServerMask, uint16_t manufacturerCode,
-                                                     EmberAfAttributeType attributeType, uint8_t size, uint8_t * value)
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, clientServerMask, manufacturerCode);
     if (cluster == NULL)

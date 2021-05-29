@@ -80,18 +80,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
     event.ThreadStateChange.ChildNodesChanged = (flags & (OT_CHANGED_THREAD_CHILD_ADDED | OT_CHANGED_THREAD_CHILD_REMOVED)) != 0;
     event.ThreadStateChange.OpenThread.Flags  = flags;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    if (event.ThreadStateChange.AddressChanged)
-    {
-        const otSrpClientHostInfo * hostInfo =
-            otSrpClientGetHostInfo(static_cast<GenericThreadStackManagerImpl_OpenThread *>(context)->Impl()->OTInstance());
-        if (hostInfo && hostInfo->mName)
-        {
-            static_cast<GenericThreadStackManagerImpl_OpenThread *>(context)->Impl()->_SetupSrpHost(hostInfo->mName);
-        }
-    }
-#endif
-
     PlatformMgr().PostEvent(&event);
 }
 
@@ -161,6 +149,16 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 {
     if (event->Type == DeviceEventType::kThreadStateChange)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+        if (event->ThreadStateChange.AddressChanged)
+        {
+            const otSrpClientHostInfo * hostInfo = otSrpClientGetHostInfo(Impl()->OTInstance());
+            if (hostInfo && hostInfo->mName)
+            {
+                Impl()->_SetupSrpHost(hostInfo->mName);
+            }
+        }
+#endif
         Impl()->LockThreadStack();
 
 #if CHIP_DETAIL_LOGGING
@@ -759,15 +757,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetFactoryAssignedEUI64(uint8_t (&buf)[8])
-{
-    otExtAddress extendedAddr;
-    otLinkGetFactoryAssignedIeeeEui64(mOTInst, &extendedAddr);
-    memcpy(buf, extendedAddr.m8, sizeof(extendedAddr.m8));
-    return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
     const otNetifAddress * otAddresses = otIp6GetUnicastAddresses(mOTInst);
@@ -1085,9 +1074,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     Impl()->LockThreadStack();
 
     VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aInstanceName) < SrpClient::kMaxInstanceNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aInstanceName) <= SrpClient::kMaxInstanceNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
     VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aName) < SrpClient::kMaxNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aName) <= SrpClient::kMaxNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     // Check if service with desired instance name already exists and try to find empty slot in array for new service
     for (typename SrpClient::Service & service : mSrpClient.mServices)
@@ -1141,6 +1130,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
         srpService->mService.mTxtEntries = srpService->mTxtEntries;
     }
 
+    ChipLogProgress(DeviceLayer, "advertising srp service: %s.%s", srpService->mService.mInstanceName, srpService->mService.mName);
     error = MapOpenThreadError(otSrpClientAddService(mOTInst, &(srpService->mService)));
 
 exit:
@@ -1158,9 +1148,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     Impl()->LockThreadStack();
 
     VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aInstanceName) < SrpClient::kMaxInstanceNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aInstanceName) <= SrpClient::kMaxInstanceNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
     VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aName) < SrpClient::kMaxNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aName) <= SrpClient::kMaxNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     // Check if service to remove exists.
     for (typename SrpClient::Service & service : mSrpClient.mServices)
@@ -1174,6 +1164,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
 
     VerifyOrExit(srpService, error = MapOpenThreadError(OT_ERROR_NOT_FOUND));
 
+    ChipLogProgress(DeviceLayer, "removing srp service: %s.%s", aInstanceName, aName);
     error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &(srpService->mService)));
 
 exit:
@@ -1210,7 +1201,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
     Impl()->LockThreadStack();
 
     VerifyOrExit(aHostName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aHostName) < SrpClient::kMaxHostNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrExit(strlen(aHostName) <= SrpClient::kMaxHostNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     // Avoid adding the same host name multiple times
     if (strcmp(mSrpClient.mHostName, aHostName) != 0)

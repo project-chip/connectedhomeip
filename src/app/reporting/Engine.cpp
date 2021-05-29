@@ -37,6 +37,192 @@ CHIP_ERROR Engine::Init()
     return CHIP_NO_ERROR;
 }
 
+EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents)
+{
+    EventNumber event_count             = 0;
+    EventNumber * vendedEventNumberList = apReadHandler->GetVendedEventNumberList();
+    for (size_t index = 0; index < kNumPriorityLevel; index++)
+    {
+        if (vendedEventNumberList[index] > apInitialEvents[index])
+        {
+            event_count += vendedEventNumberList[index] - apInitialEvents[index];
+        }
+    }
+    return event_count;
+}
+
+CHIP_ERROR
+Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo)
+{
+    CHIP_ERROR err                              = CHIP_NO_ERROR;
+    TLV::TLVType type                           = TLV::kTLVType_NotSpecified;
+    AttributePath::Builder attributePathBuilder = aAttributeDataElementBuilder.CreateAttributePathBuilder();
+    attributePathBuilder.NodeId(aClusterInfo.mNodeId)
+        .EndpointId(aClusterInfo.mEndpointId)
+        .ClusterId(aClusterInfo.mClusterId)
+        .FieldId(aClusterInfo.mFieldId)
+        .EndOfAttributePath();
+    err = attributePathBuilder.GetError();
+    SuccessOrExit(err);
+
+    aAttributeDataElementBuilder.GetWriter()->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data),
+                                                             TLV::kTLVType_Structure, type);
+    err = ReadSingleClusterData(aClusterInfo, *(aAttributeDataElementBuilder.GetWriter()));
+    SuccessOrExit(err);
+    aAttributeDataElementBuilder.GetWriter()->EndContainer(type);
+    aAttributeDataElementBuilder.DataVersion(0).MoreClusterData(false).EndOfAttributeDataElement();
+    err = aAttributeDataElementBuilder.GetError();
+    // TODO: Add DataVersion support
+
+exit:
+    aClusterInfo.ClearDirty();
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Error retrieving data from clusterId: %08x, err = %d", aClusterInfo.mClusterId, err);
+    }
+
+    return err;
+}
+
+CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler)
+{
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    ClusterInfo * clusterInfo                    = apReadHandler->GetAttributeClusterInfolist();
+    AttributeDataList::Builder attributeDataList = reportDataBuilder.CreateAttributeDataListBuilder();
+    SuccessOrExit(err = reportDataBuilder.GetError());
+    // TODO: Need to handle multiple chunk of message
+    while (clusterInfo != nullptr)
+    {
+        if (clusterInfo->IsDirty())
+        {
+            AttributeDataElement::Builder attributeDataElementBuilder = attributeDataList.CreateAttributeDataElementBuilder();
+            ChipLogDetail(DataManagement, "<RE:Run> Cluster %u, Field %u is dirty", clusterInfo->mClusterId, clusterInfo->mFieldId);
+            // Retrieve data for this cluster instance and clear its dirty flag.
+            err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
+            VerifyOrExit(err == CHIP_NO_ERROR,
+                         ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
+        }
+
+        clusterInfo = clusterInfo->mpNext;
+    }
+    attributeDataList.EndOfAttributeDataList();
+    err = attributeDataList.GetError();
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
+
+CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
+{
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    EventNumber eventCount = 0;
+    TLV::TLVWriter backup;
+    bool eventClean = true;
+    EventNumber initialEvents[kNumPriorityLevel];
+    ClusterInfo * clusterInfoList  = apReadHandler->GetEventClusterInfolist();
+    EventNumber * eventNumberList  = apReadHandler->GetVendedEventNumberList();
+    EventManagement & eventManager = EventManagement::GetInstance();
+    EventList::Builder eventList;
+
+    VerifyOrExit(clusterInfoList != nullptr, );
+
+    aReportDataBuilder.Checkpoint(backup);
+
+    VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    eventList = aReportDataBuilder.CreateEventDataListBuilder();
+    SuccessOrExit(err = eventList.GetError());
+
+    memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
+    // If the eventManager is not valid or has not been initialized,
+    // skip the rest of processing
+    VerifyOrExit(eventManager.IsValid(), err = CHIP_ERROR_INCORRECT_STATE);
+
+    for (size_t index = 0; index < kNumPriorityLevel; index++)
+    {
+        EventNumber tmpNumber = eventManager.GetFirstEventNumber(static_cast<PriorityLevel>(index));
+        if (tmpNumber > initialEvents[index])
+        {
+            initialEvents[index] = tmpNumber;
+        }
+    }
+
+    eventClean = apReadHandler->CheckEventClean(eventManager);
+
+    // proceed only if there are new events.
+    if (eventClean)
+    {
+        aReportDataBuilder.Rollback(backup);
+        ExitNow(); // Read clean, move along
+    }
+
+    while (apReadHandler->GetCurrentPriority() != PriorityLevel::Invalid)
+    {
+        uint8_t priorityIndex = static_cast<uint8_t>(apReadHandler->GetCurrentPriority());
+        err = eventManager.FetchEventsSince(*(eventList.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
+                                            eventNumberList[priorityIndex]);
+
+        if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
+        {
+            // We have successfully reached the end of the log for
+            // the current priority. Advance to the next
+            // priority level.
+            err = CHIP_NO_ERROR;
+            apReadHandler->MoveToNextScheduledDirtyPriority();
+            mMoreChunkedMessages = false;
+        }
+        else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
+        {
+            eventCount = CountEvents(apReadHandler, initialEvents);
+
+            // when first cluster event is too big to fit in the packet, ignore that cluster event.
+            if (eventCount == 0)
+            {
+                eventNumberList[priorityIndex]++;
+                ChipLogDetail(DataManagement, "<RE:Run> first cluster event is too big so that it fails to fit in the packet!");
+                err = CHIP_NO_ERROR;
+            }
+            else
+            {
+                // `FetchEventsSince` has filled the available space
+                // within the allowed buffer before it fit all the
+                // available events.  This is an expected condition,
+                // so we do not propagate the error to higher levels;
+                // instead, we terminate the event processing for now
+                // (we will get another chance immediately afterwards,
+                // with a ew buffer) and do not advance the processing
+                // to the next priority level.
+                err = CHIP_NO_ERROR;
+                break;
+            }
+            mMoreChunkedMessages = true;
+        }
+        else
+        {
+            // All other errors are propagated to higher level.
+            // Exiting here and returning an error will lead to
+            // abandoning subscription.
+            ExitNow();
+        }
+    }
+
+    eventList.EndOfEventList();
+    SuccessOrExit(err = eventList.GetError());
+
+    eventCount = CountEvents(apReadHandler, initialEvents);
+    ChipLogDetail(DataManagement, "Fetched %d events", eventCount);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Error retrieving events, err = %d", err);
+    }
+
+    return err;
+}
+
 CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -52,9 +238,11 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     err = reportDataBuilder.Init(&reportDataWriter);
     SuccessOrExit(err);
 
-    // TODO: Fill in the EventList.
-    // err = BuildSingleReportDataEventList(reportDataBuilder, apReadHandler);
-    // SuccessOrExit(err);
+    err = BuildSingleReportDataAttributeDataList(reportDataBuilder, apReadHandler);
+    SuccessOrExit(err);
+
+    err = BuildSingleReportDataEventList(reportDataBuilder, apReadHandler);
+    SuccessOrExit(err);
 
     // TODO: Add mechanism to set mSuppressResponse to handle status reports for multiple reports
     // TODO: Add more chunk message support, currently mMoreChunkedMessages is always false.
@@ -64,7 +252,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     }
 
     reportDataBuilder.EndOfReportData();
-    SuccessOrExit(reportDataBuilder.GetError());
+    SuccessOrExit(err = reportDataBuilder.GetError());
 
     err = reportDataWriter.Finalize(&bufHandle);
     SuccessOrExit(err);

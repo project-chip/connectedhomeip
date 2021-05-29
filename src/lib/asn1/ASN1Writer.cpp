@@ -333,6 +333,20 @@ ASN1_ERROR ASN1Writer::PutNull()
     return EncodeHead(kASN1TagClass_Universal, kASN1UniversalTag_Null, false, 0);
 }
 
+ASN1_ERROR ASN1Writer::PutConstructedType(const uint8_t * val, uint16_t valLen)
+{
+    ASN1_ERROR err = ASN1_NO_ERROR;
+
+    // Do nothing for a null writer.
+    VerifyOrExit(mBuf != nullptr, err = ASN1_NO_ERROR);
+
+    memcpy(mWritePoint, val, valLen);
+    mWritePoint += valLen;
+
+exit:
+    return err;
+}
+
 ASN1_ERROR ASN1Writer::StartConstructedType(uint8_t cls, uint32_t tag)
 {
     return EncodeHead(cls, tag, true, kUnkownLength);

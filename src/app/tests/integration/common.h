@@ -32,11 +32,17 @@
 
 extern chip::Messaging::ExchangeManager gExchangeManager;
 
-constexpr chip::ClusterId kTestClusterId   = 6;
-constexpr chip::CommandId kTestCommandId   = 40;
-constexpr chip::EndpointId kTestEndPointId = 1;
-constexpr chip::GroupId kTestGroupId       = 0;
-
+constexpr chip::NodeId kTestNodeId           = 0x1ULL;
+constexpr chip::NodeId kTestNodeId1          = 0x2ULL;
+constexpr chip::ClusterId kTestClusterId     = 6;
+constexpr chip::CommandId kTestCommandId     = 40;
+constexpr chip::EndpointId kTestEndpointId   = 1;
+constexpr chip::GroupId kTestGroupId         = 0;
+constexpr chip::FieldId kTestFieldId1        = 1;
+constexpr chip::FieldId kTestFieldId2        = 2;
+constexpr uint8_t kTestFieldValue1           = 1;
+constexpr uint8_t kTestFieldValue2           = 2;
+constexpr chip::EventId kLivenessChangeEvent = 1;
 void InitializeChip(void);
 void ShutdownChip(void);
 void TLVPrettyPrinter(const char * aFormat, ...);

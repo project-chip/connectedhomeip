@@ -30,6 +30,8 @@ assert(chip_root == "//")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/build/chip/tools.gni")
 
+import("//src/crypto/crypto.gni")
+
 if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   declare_args() {
     chip_enable_python_modules =
@@ -63,6 +65,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     deps = [
       "${chip_root}/src/app",
       "${chip_root}/src/ble",
+      "${chip_root}/src/channel",
       "${chip_root}/src/controller",
       "${chip_root}/src/credentials",
       "${chip_root}/src/crypto",
@@ -106,6 +109,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
+      if (chip_crypto == "openssl") {
+        deps += [ "${chip_root}/src/tools/chip-cert" ]
+      }
       if (chip_enable_python_modules) {
         deps += [ "${chip_root}/src/controller/python" ]
       }
@@ -191,6 +197,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     # Build the Linux all clusters app example.
     enable_linux_all_clusters_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux tv app example.
+    enable_linux_tv_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the Linux bridge app example.
@@ -293,6 +303,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_linux_tv_app_build) {
+    group("linux_tv_app") {
+      deps = [ "${chip_root}/examples/tv-app/linux(${standalone_toolchain})" ]
+    }
+  }
+
   if (enable_linux_bridge_app_build) {
     group("linux_bridge_app") {
       deps =
@@ -368,6 +384,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_linux_all_clusters_app_build) {
       deps += [ ":linux_all_clusters_app" ]
+    }
+    if (enable_linux_tv_app_build) {
+      deps += [ ":linux_tv_app" ]
     }
     if (enable_linux_bridge_app_build) {
       deps += [ ":linux_bridge_app" ]

@@ -37,7 +37,6 @@ CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, Interaction
     // Error if already initialized.
     VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mpExchangeMgr = apExchangeMgr;
     mpDelegate    = apDelegate;
@@ -53,7 +52,7 @@ CHIP_ERROR Command::Reset()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandList::Builder commandListBuilder;
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
 
     if (mCommandMessageBuf.IsNull())
     {
@@ -133,7 +132,7 @@ void Command::Shutdown()
     mCommandMessageWriter.Reset();
     mCommandMessageBuf = nullptr;
 
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
 
     mpExchangeMgr = nullptr;
     mpDelegate    = nullptr;
@@ -144,13 +143,13 @@ exit:
     return;
 }
 
-CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams)
+CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    CommandDataElement::Builder commandDataElement =
-        mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
-    err = commandDataElement.GetError();
+    CommandDataElement::Builder commandDataElement;
+    VerifyOrExit(mState == CommandState::Initialized || mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+    commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+    err                = commandDataElement.GetError();
     SuccessOrExit(err);
 
     if (apCommandPathParams != nullptr)
@@ -159,8 +158,11 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPath
         SuccessOrExit(err);
     }
 
-    err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data), TLV::kTLVType_Structure,
-                                                         mDataElementContainerType);
+    if (!aIsStatus)
+    {
+        err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data),
+                                                             TLV::kTLVType_Structure, mDataElementContainerType);
+    }
 exit:
     ChipLogFunctError(err);
     return err;
@@ -171,13 +173,16 @@ TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
     return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
 }
 
-CHIP_ERROR Command::FinishCommand()
+CHIP_ERROR Command::FinishCommand(bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
-    err                                            = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
-    SuccessOrExit(err);
+    if (!aIsStatus)
+    {
+        err = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
+        SuccessOrExit(err);
+    }
     commandDataElement.EndOfCommandDataElement();
     err = commandDataElement.GetError();
     SuccessOrExit(err);
@@ -207,7 +212,7 @@ CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathP
     return commandPath.GetError();
 }
 
-CHIP_ERROR Command::ClearExistingExchangeContext()
+CHIP_ERROR Command::AbortExistingExchangeContext()
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.

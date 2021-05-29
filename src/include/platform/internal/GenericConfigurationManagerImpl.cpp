@@ -197,7 +197,6 @@ template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
 {
     CHIP_ERROR err;
-
     err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
 #ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -658,6 +657,42 @@ exit:
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetRegulatoryLocation(uint32_t & location)
+{
+    return Impl()->ReadConfigValue(ImplClass::kConfigKey_RegulatoryLocation, location);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreRegulatoryLocation(uint32_t location)
+{
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_RegulatoryLocation, location);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
+{
+    return Impl()->ReadConfigValueStr(ImplClass::kConfigKey_CountryCode, buf, bufSize, codeLen);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreCountryCode(const char * code, size_t codeLen)
+{
+    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_CountryCode, code, codeLen);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetBreadcrumb(uint64_t & breadcrumb)
+{
+    return Impl()->ReadConfigValue(ImplClass::kConfigKey_Breadcrumb, breadcrumb);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreBreadcrumb(uint64_t breadcrumb)
+{
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_Breadcrumb, breadcrumb);
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceId(uint64_t & serviceId)
 {
     return Impl()->ReadConfigValue(ImplClass::kConfigKey_ServiceId, serviceId);
@@ -891,6 +926,42 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 }
 
 template <class ImplClass>
+bool GenericConfigurationManagerImpl<ImplClass>::_IsCommissionableDeviceTypeEnabled()
+{
+    return CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE == 1;
+}
+
+template <class ImplClass>
+bool GenericConfigurationManagerImpl<ImplClass>::_IsCommissionableDeviceNameEnabled()
+{
+    return CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME == 1;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceName(char * buf, size_t bufSize)
+{
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_NAME);
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetInitialPairingInstruction(char * buf, size_t bufSize)
+{
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSecondaryPairingInstruction(char * buf, size_t bufSize)
+{
+    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -936,7 +1007,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         err = Impl()->_GetManufacturerDeviceId(deviceId);
         SuccessOrExit(err);
 
-        snprintf(inputBuf, sizeof(inputBuf), "0010%016" PRIX64, deviceId);
+        snprintf(inputBuf, sizeof(inputBuf), "0010" ChipLogFormatX64, ChipLogValueX64(deviceId));
 
         hash.AddData((uint8_t *) inputBuf, kLenFieldLen + kDeviceIdLen);
     }
@@ -1047,7 +1118,7 @@ void GenericConfigurationManagerImpl<ImplClass>::_LogDeviceConfig()
     ChipLogProgress(DeviceLayer, "Device Configuration:");
 
 #if CHIP_CONFIG_ENABLE_FABRIC_STATE
-    ChipLogProgress(DeviceLayer, "  Device Id: %016" PRIX64, FabricState.LocalNodeId);
+    ChipLogProgress(DeviceLayer, "  Device Id: 0x" ChipLogFormatX64, ChipLogValueX64(FabricState.LocalNodeId));
 #endif
 
     {
@@ -1119,7 +1190,7 @@ void GenericConfigurationManagerImpl<ImplClass>::_LogDeviceConfig()
 #if CHIP_CONFIG_ENABLE_FABRIC_STATE
     if (FabricState.FabricId != kFabricIdNotSpecified)
     {
-        ChipLogProgress(DeviceLayer, "  Fabric Id: %016" PRIX64, FabricState.FabricId);
+        ChipLogProgress(DeviceLayer, "  Fabric Id: 0x" ChipLogFormatX64, ChipLogValueX64(FabricState.FabricId));
     }
     else
     {
@@ -1128,6 +1199,15 @@ void GenericConfigurationManagerImpl<ImplClass>::_LogDeviceConfig()
 
     ChipLogProgress(DeviceLayer, "  Pairing Code: %s", (FabricState.PairingCode != NULL) ? FabricState.PairingCode : "(none)");
 #endif // CHIP_CONFIG_ENABLE_FABRIC_STATE
+
+    {
+        uint16_t deviceType;
+        if (Impl()->_GetDeviceType(deviceType) != CHIP_NO_ERROR)
+        {
+            deviceType = 0;
+        }
+        ChipLogProgress(DeviceLayer, "  Device Type: %" PRIu16 " (0x%" PRIX16 ")", deviceType, deviceType);
+    }
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.

@@ -20,12 +20,13 @@
 #include <stdlib.h>
 
 #include <lib/core/CHIPCore.h>
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
@@ -33,16 +34,12 @@
 #include <transport/raw/UDP.h>
 
 #include <ChipShellCollection.h>
+#include <Globals.h>
 
 using namespace chip;
 using namespace Shell;
 using namespace Logging;
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-constexpr size_t kMaxTcpActiveConnectionCount = 4;
-constexpr size_t kMaxTcpPendingPackets        = 4;
-#endif
-constexpr size_t kMaxPayloadSize = 1280;
+using chip::Inet::IPAddress;
 
 namespace {
 
@@ -131,19 +128,7 @@ private:
     bool mUsingCRMP;
 } gPingArguments;
 
-constexpr Transport::AdminId gAdminId = 0;
-
 Protocols::Echo::EchoClient gEchoClient;
-
-TransportMgr<Transport::UDP> gUDPManager;
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-TransportMgr<Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-#endif
-
-Messaging::ExchangeManager gExchangeManager;
-SecureSessionMgr gSessionManager;
-Inet::IPAddress gDestAddr;
 
 bool EchoIntervalExpired(void)
 {
@@ -161,7 +146,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     char * requestData = nullptr;
 
     uint32_t size = gPingArguments.GetEchoReqSize();
-    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_MESSAGE_TOO_LONG);
 
     requestData = static_cast<char *>(chip::Platform::MemoryAlloc(size));
     VerifyOrExit(requestData != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -218,8 +203,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
-                                     SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
+    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator,
+                                     gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -235,7 +220,7 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload)
+void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
 {
     uint32_t respTime    = System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gPingArguments.GetLastEchoTime();
@@ -259,7 +244,7 @@ void StartPinging(streamer_t * stream, char * destination)
     Transport::AdminPairingInfo * adminInfo = nullptr;
     uint32_t maxEchoCount                   = 0;
 
-    if (!Inet::IPAddress::FromString(destination, gDestAddr))
+    if (!IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid Echo Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -285,7 +270,8 @@ void StartPinging(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
 
-        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        err =
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -296,12 +282,16 @@ void StartPinging(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
 
-        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        err =
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
         SuccessOrExit(err);
     }
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
+    SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP echo responder.
     err = EstablishSecureSession(stream, peerAddress);
@@ -425,7 +415,7 @@ int cmd_ping(int argc, char ** argv)
         case 'p':
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
-                streamer_printf(sout, "Invalid argument specified for -c\n");
+                streamer_printf(sout, "Invalid argument specified for -p\n");
                 return -1;
             }
             else
@@ -498,5 +488,5 @@ static shell_command_t cmds_ping[] = {
 
 void cmd_ping_init()
 {
-    shell_register(cmds_ping, ArraySize(cmds_ping));
+    Engine::Root().RegisterCommands(cmds_ping, ArraySize(cmds_ping));
 }

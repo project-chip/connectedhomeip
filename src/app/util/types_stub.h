@@ -45,7 +45,7 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
-#include "basic-types.h"
+#include <app/util/basic-types.h>
 
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
@@ -392,7 +392,9 @@ enum
     EMBER_OUTGOING_BROADCAST_WITH_ALIAS,
     /** A broadcast message.  This value is passed to emberMessageSentHandler() only.
      * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_BROADCAST
+    EMBER_OUTGOING_BROADCAST,
+    /** A messaging going via some existing exchange. */
+    EMBER_OUTGOING_VIA_EXCHANGE,
 };
 
 /** @brief Endpoint information (a ZigBee Simple Descriptor).
@@ -1197,31 +1199,13 @@ enum
     /**
      * @brief Drop frame.
      */
-    EMBER_DROP_FRAME = 0x79,
-    /**
-     * @brief
-     */
+    EMBER_DROP_FRAME       = 0x79,
     EMBER_PASS_UNPROCESSED = 0x7A,
-    /**
-     * @brief
-     */
-    EMBER_TX_THEN_DROP = 0x7B,
-    /**
-     * @brief
-     */
-    EMBER_NO_SECURITY = 0x7C,
-    /**
-     * @brief
-     */
-    EMBER_COUNTER_FAILURE = 0x7D,
-    /**
-     * @brief
-     */
-    EMBER_AUTH_FAILURE = 0x7E,
-    /**
-     * @brief
-     */
-    EMBER_UNPROCESSED = 0x7F,
+    EMBER_TX_THEN_DROP     = 0x7B,
+    EMBER_NO_SECURITY      = 0x7C,
+    EMBER_COUNTER_FAILURE  = 0x7D,
+    EMBER_AUTH_FAILURE     = 0x7E,
+    EMBER_UNPROCESSED      = 0x7F,
 
     //@}
     //

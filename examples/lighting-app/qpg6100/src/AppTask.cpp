@@ -22,15 +22,13 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#include "OnboardingCodesUtil.h"
+#include <app/server/OnboardingCodesUtil.h>
 
-#include "Server.h"
-#include "attribute-storage.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-
-#include "Service.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -104,6 +102,10 @@ int AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
+    // Enable BLE advertisements
+    OpenDefaultPairingWindow(chip::ResetAdmins::kNo);
+    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+
     return err;
 }
 
@@ -111,7 +113,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     int err;
     AppEvent event;
-    uint64_t mLastChangeTimeUS = 0;
 
     err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -121,7 +122,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     ChipLogProgress(NotSpecified, "App Task started");
-    SetDeviceName("QPG6100LightingDemo._chip._udp.local.");
 
     while (true)
     {
@@ -178,15 +178,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 qvCHIP_LedBlink(SYSTEM_STATE_LED, 50, 950);
             }
-        }
-
-        uint64_t nowUS            = chip::System::Layer::GetClock_Monotonic();
-        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            PublishService();
-            mLastChangeTimeUS = nowUS;
         }
     }
 }

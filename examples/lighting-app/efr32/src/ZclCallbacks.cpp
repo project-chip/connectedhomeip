@@ -21,18 +21,16 @@
  */
 
 #include "AppConfig.h"
-#include "DataModelHandler.h"
 #include "LightingManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
-
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/af-types.h>
 
 using namespace ::chip;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {

@@ -33,7 +33,7 @@ CHIP_ERROR ApplicationExchangeDispatch::SendMessageImpl(SecureSessionHandle sess
     return mSessionMgr->SendMessage(session, payloadHeader, std::move(message), retainedMessage);
 }
 
-CHIP_ERROR ApplicationExchangeDispatch::ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle message,
+CHIP_ERROR ApplicationExchangeDispatch::ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
                                                       EncryptedPacketBufferHandle * retainedMessage) const
 {
     return mSessionMgr->SendEncryptedMessage(session, std::move(message), retainedMessage);

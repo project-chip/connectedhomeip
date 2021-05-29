@@ -93,6 +93,9 @@ public:
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter);
 #endif
+    CHIP_ERROR GetRegulatoryLocation(uint32_t & location);
+    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen);
+    CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb);
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen);
     CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf);
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf);
@@ -116,6 +119,9 @@ public:
     CHIP_ERROR ClearServiceProvisioningData();
     CHIP_ERROR StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen);
     CHIP_ERROR StorePairedAccountId(const char * accountId, size_t accountIdLen);
+    CHIP_ERROR StoreRegulatoryLocation(uint32_t location);
+    CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen);
+    CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb);
 
     CHIP_ERROR GetQRCodeString(char * buf, size_t bufSize);
 
@@ -140,6 +146,15 @@ public:
     CHIP_ERROR ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize);
 
     void LogDeviceConfig();
+
+    bool IsCommissionableDeviceTypeEnabled();
+    CHIP_ERROR GetDeviceType(uint16_t & deviceType);
+    bool IsCommissionableDeviceNameEnabled();
+    CHIP_ERROR GetDeviceName(char * buf, size_t bufSize);
+    CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint);
+    CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize);
+    CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint);
+    CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -371,6 +386,21 @@ inline CHIP_ERROR ConfigurationManager::GetLifetimeCounter(uint16_t & lifetimeCo
 }
 #endif
 
+inline CHIP_ERROR ConfigurationManager::GetRegulatoryLocation(uint32_t & location)
+{
+    return static_cast<ImplClass *>(this)->_GetRegulatoryLocation(location);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
+{
+    return static_cast<ImplClass *>(this)->_GetCountryCode(buf, bufSize, codeLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetBreadcrumb(uint64_t & breadcrumb)
+{
+    return static_cast<ImplClass *>(this)->_GetBreadcrumb(breadcrumb);
+}
+
 inline CHIP_ERROR ConfigurationManager::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
 {
     return static_cast<ImplClass *>(this)->_StoreSerialNumber(serialNum, serialNumLen);
@@ -461,6 +491,21 @@ inline CHIP_ERROR ConfigurationManager::StoreServiceProvisioningData(uint64_t se
 {
     return static_cast<ImplClass *>(this)->_StoreServiceProvisioningData(serviceId, serviceConfig, serviceConfigLen, accountId,
                                                                          accountIdLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::StoreRegulatoryLocation(uint32_t location)
+{
+    return static_cast<ImplClass *>(this)->_StoreRegulatoryLocation(location);
+}
+
+inline CHIP_ERROR ConfigurationManager::StoreCountryCode(const char * code, size_t codeLen)
+{
+    return static_cast<ImplClass *>(this)->_StoreCountryCode(code, codeLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::StoreBreadcrumb(uint64_t breadcrumb)
+{
+    return static_cast<ImplClass *>(this)->_StoreBreadcrumb(breadcrumb);
 }
 
 inline CHIP_ERROR ConfigurationManager::ClearServiceProvisioningData()
@@ -590,6 +635,70 @@ inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool v
 inline void ConfigurationManager::LogDeviceConfig()
 {
     static_cast<ImplClass *>(this)->_LogDeviceConfig();
+}
+
+/**
+ * True if device type in DNS-SD advertisement is enabled
+ */
+inline bool ConfigurationManager::IsCommissionableDeviceTypeEnabled()
+{
+    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceNameEnabled();
+}
+
+/**
+ * Device type id.
+ */
+inline CHIP_ERROR ConfigurationManager::GetDeviceType(uint16_t & deviceType)
+{
+    return static_cast<ImplClass *>(this)->_GetDeviceType(deviceType);
+}
+
+/**
+ * True if device name in DNS-SD advertisement is enabled
+ */
+inline bool ConfigurationManager::IsCommissionableDeviceNameEnabled()
+{
+    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceNameEnabled();
+}
+
+/**
+ * Name of the device.
+ */
+inline CHIP_ERROR ConfigurationManager::GetDeviceName(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetDeviceName(buf, bufSize);
+}
+
+/**
+ * Initial pairing hint.
+ */
+inline CHIP_ERROR ConfigurationManager::GetInitialPairingHint(uint16_t & pairingHint)
+{
+    return static_cast<ImplClass *>(this)->_GetInitialPairingHint(pairingHint);
+}
+
+/**
+ * Secondary pairing hint.
+ */
+inline CHIP_ERROR ConfigurationManager::GetSecondaryPairingHint(uint16_t & pairingHint)
+{
+    return static_cast<ImplClass *>(this)->_GetSecondaryPairingHint(pairingHint);
+}
+
+/**
+ * Initial pairing instruction.
+ */
+inline CHIP_ERROR ConfigurationManager::GetInitialPairingInstruction(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetInitialPairingInstruction(buf, bufSize);
+}
+
+/**
+ * Secondary pairing instruction.
+ */
+inline CHIP_ERROR ConfigurationManager::GetSecondaryPairingInstruction(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetSecondaryPairingInstruction(buf, bufSize);
 }
 
 } // namespace DeviceLayer

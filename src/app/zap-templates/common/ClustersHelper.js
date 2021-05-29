@@ -198,9 +198,11 @@ function handleString(item, [ atomics, enums, bitmaps, structs ])
     return false;
   }
 
+  const kLengthSizeInBytes = 2;
+
   item.atomicTypeId = atomic.atomicId;
   item.chipType     = 'chip::ByteSpan';
-  item.size         = item.maxLength;
+  item.size         = kLengthSizeInBytes + item.maxLength;
   item.name         = item.name || item.label;
   return true;
 }
@@ -261,7 +263,7 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
     item.name         = item.name || item.label;
     item.isStruct     = false;
     item.atomicTypeId = atomic.atomicId;
-    item.discrete     = atomic.discrete;
+    item.discrete     = atomic.isDiscrete;
     item.size         = atomic.size;
     item.chipType     = atomic.chipType;
     // For the moment, SECURITY_KEY is unhandled.
@@ -320,6 +322,33 @@ function enhancedCommands(commands, types)
     command.arguments.forEach(argument => {
       enhancedItem(argument, types);
     });
+  });
+
+  // This filter uses the assumption that a response to a command has a well defined name, such as
+  // (response name) == (command name + 'Response') or s/Request/Response. This is very often the case,
+  // but this is not always true since some clusters use the same response to answer different commands, such as the
+  // operational cluster.
+  commands.forEach(command => {
+    const automaticFilter = response => (response.name == (command.name + 'Response')
+        || (command.name.includes('Request') && response.name == (command.name.replace('Request', 'Response'))));
+    const manualFilter = response => {
+      switch (command.name) {
+      case 'AddOpCert':
+      case 'UpdateOpCert':
+      case 'UpdateFabricLabel':
+      case 'RemoveFabric':
+        return response.name == 'OpCertResponse';
+      default:
+        return false;
+      }
+    };
+    const filter = response => automaticFilter(response) || manualFilter(response);
+
+    const response = commands.find(filter);
+    if (response) {
+      command.hasSpecificResponse = true;
+      command.responseName        = response.name;
+    }
   });
 
   // At this stage, 'command.arguments' may contains 'struct'. But controllers does not know (yet) how

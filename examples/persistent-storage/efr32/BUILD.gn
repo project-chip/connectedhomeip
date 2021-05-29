@@ -75,6 +75,8 @@ efr32_executable("persistent_storage") {
     ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
   }
 
+  inputs = [ ldscript ]
+
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 
   output_dir = root_out_dir

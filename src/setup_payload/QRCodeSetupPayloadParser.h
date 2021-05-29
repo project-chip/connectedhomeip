@@ -33,15 +33,15 @@ namespace chip {
 
 /**
  * @class QRCodeSetupPayloadParser
- * A class that can be used to convert a base41 encoded payload to a SetupPayload object
+ * A class that can be used to convert a base38 encoded payload to a SetupPayload object
  * */
 class QRCodeSetupPayloadParser
 {
 private:
-    std::string mBase41Representation;
+    std::string mBase38Representation;
 
 public:
-    QRCodeSetupPayloadParser(std::string base41Representation) : mBase41Representation(std::move(base41Representation)) {}
+    QRCodeSetupPayloadParser(std::string base38Representation) : mBase38Representation(std::move(base38Representation)) {}
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
 
 private:

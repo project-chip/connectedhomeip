@@ -1,7 +1,7 @@
 [
     {
         "path": "gn/gn/${os}-${arch=amd64,arm64}",
-        "tags": ["git_revision:64b3b9401c1c3ed5f3c43c1cac00b91f83597ab8"]
+        "tags": ["git_revision:dba01723a441c358d843a575cb7720d54ddcdf92"]
     },
     {
         "path": "infra/ninja/${os}-${arch=amd64}",
@@ -31,7 +31,7 @@
     {
         "_comment": "TODO(pwbug/70) Put clang in cipd for Windows.",
         "path": "fuchsia/third_party/clang/${os=linux,mac}-${arch}",
-        "tags": ["git_revision:8af160b0b8ca8102b9490a287244af75727872f5"]
+        "tags": ["git_revision:3dc24bc31edbc01dea085b24a6a6b024d7ae531c"]
     },
     {
         "_comment": "When bumping the minor version (e.g., to 3.9.x) also update env_setup/virtualenv/init.py to check for the new version.",
@@ -49,11 +49,11 @@
     },
     {
         "path": "pigweed/host_tools/${os}-${arch=amd64}",
-        "tags": ["git_revision:2f56efcee3192685898200f6049538ebd809ae36"]
+        "tags": ["git_revision:1220aa869e7bed8d564edd8d404e08720603386e"]
     },
     {
         "path": "infra/rbe/client/${os=linux,windows}-${arch=amd64}",
-        "tags": ["git_revision:3b3042c16accd40f0d3f7e40002f9ad2099cfe94"]
+        "tags": ["git_revision:bbfff8b0a8701cebd503d961c99e9587605b19e2"]
     },
     {
         "path": "fuchsia/third_party/qemu/${os=linux,mac}-${arch}",
@@ -62,7 +62,7 @@
     {
         "path": "fuchsia/third_party/kythe",
         "subdir": "kythe",
-        "tags": ["version:1.0.1"]
+        "tags": ["version:1.0.2"]
     },
     {
         "path": "fuchsia/third_party/kythe-libs/${os=linux}-${arch=amd64}",

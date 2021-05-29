@@ -33,8 +33,35 @@
  */
 #define ENABLE_HSM_SPAKE_PROVER 1
 
+/*
+ * Enable HSM for Generate EC Key
+ */
+#define ENABLE_HSM_GENERATE_EC_KEY 0
+
+/*
+ * Enable HSM for PBKDF SHA256
+ */
+#define ENABLE_HSM_PBKDF2_SHA256 1
+
+/*
+ * Enable HSM for HKDF SHA256
+ */
+#define ENABLE_HSM_HKDF_SHA256 1
+
 #if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
 #define ENABLE_HSM_SPAKE
+#endif
+
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
+#define ENABLE_HSM_EC_KEY
+#endif
+
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_PBKDF2_SHA256))
+#define ENABLE_HSM_PBKDF2
+#endif
+
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_HKDF_SHA256))
+#define ENABLE_HSM_HKDF
 #endif
 
 #endif //#ifndef _CHIP_CRYPTO_PAL_HSM_CONFIG_H_

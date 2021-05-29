@@ -21,14 +21,17 @@ static_library("controller") {
     "${chip_root}/src/app/util/CHIPDeviceCallbacksMgr.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
-    "CHIPClusters.cpp",
-    "CHIPClusters.h",
     "CHIPDevice.cpp",
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
+    "CHIPOperationalCredentialsProvisioner.cpp",
+    "CHIPOperationalCredentialsProvisioner.h",
     "DeviceAddressUpdateDelegate.h",
     "EmptyDataModelHandler.cpp",
+    "ExampleOperationalCredentialsIssuer.cpp",
+    "ExampleOperationalCredentialsIssuer.h",
+    "data_model/gen/chip-zcl-zpro-codec-api.h",
   ]
 
   cflags = [ "-Wconversion" ]

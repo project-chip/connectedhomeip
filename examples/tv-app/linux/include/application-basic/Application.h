@@ -18,9 +18,7 @@
 
 #pragma once
 
-#include "gen/enums.h"
-#include <cstdint>
-#include <string>
+#include <app/common/gen/enums.h>
 
 struct Application
 {

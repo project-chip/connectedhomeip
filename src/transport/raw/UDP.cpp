@@ -85,7 +85,7 @@ void UDP::Close()
     mState = State::kNotReady;
 }
 
-CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
+CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     VerifyOrReturnError(address.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -98,24 +98,17 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAd
     addrInfo.DestPort    = address.GetPort();
     addrInfo.Interface   = address.GetInterface();
 
-    ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
-
     return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf));
 }
 
-void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer, const Inet::IPPacketInfo * pktInfo)
+void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer, const Inet::IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
 
-    PacketHeader header;
-    err = header.DecodeAndConsume(buffer);
-    SuccessOrExit(err);
+    udp->HandleMessageReceived(peerAddress, std::move(buffer));
 
-    udp->HandleMessageReceived(header, peerAddress, std::move(buffer));
-
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));

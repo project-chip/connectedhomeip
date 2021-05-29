@@ -23,11 +23,11 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <util/basic-types.h>
 
 namespace chip {
 namespace app {
@@ -57,7 +57,7 @@ public:
     /**
      *  @brief Get the TLV Reader
      *
-     *  @param [in] aReader A pointer to a TLVReader
+     *  @param [in] apReader A pointer to a TLVReader
      *
      */
     void GetReader(chip::TLV::TLVReader * const apReader);

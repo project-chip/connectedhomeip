@@ -25,6 +25,7 @@ mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 openthread_external_mbedtls = mbedtls_target
 
 chip_device_platform = "efr32"
+chip_mdns = "platform"
 
 lwip_platform = "efr32"
 lwip_ipv6 = true

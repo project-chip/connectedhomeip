@@ -41,12 +41,11 @@
 #include "scenes.h"
 #include "app/util/common.h"
 #include <app/Command.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
-
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -217,19 +216,20 @@ void emAfPluginScenesServerPrintInfo(void)
 bool emberAfScenesClusterAddSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId,
                                           uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
 {
-    return emberAfPluginScenesServerParseAddScene(emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
+    return emberAfPluginScenesServerParseAddScene(commandObj, emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
 }
 
 bool emberAfScenesClusterViewSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId)
 {
-    return emberAfPluginScenesServerParseViewScene(emberAfCurrentCommand(), groupId, sceneId);
+    return emberAfPluginScenesServerParseViewScene(commandObj, emberAfCurrentCommand(), groupId, sceneId);
 }
 
 bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
-    EmberStatus sendStatus;
+    EmberAfStatus status   = EMBER_ZCL_STATUS_NOT_FOUND;
+    EmberStatus sendStatus = EMBER_SUCCESS;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
 
     emberAfScenesClusterPrintln("RX: RemoveScene 0x%2x, 0x%x", groupId, sceneId);
 
@@ -260,21 +260,43 @@ bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, Gr
     // single device.
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
-                                  ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID, "uvu", status, groupId, sceneId);
-        sendStatus = emberAfSendResponse();
+        if (commandObj == nullptr)
+        {
+            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
+                                      ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID, "uvu", status, groupId, sceneId);
+            sendStatus = emberAfSendResponse();
+        }
+        else
+        {
+            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
+                                                 ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID,
+                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+            TLV::TLVWriter * writer          = nullptr;
+            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
+            SuccessOrExit(err = commandObj->FinishCommand());
+        }
         if (EMBER_SUCCESS != sendStatus)
         {
             emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "remove_scene", sendStatus);
         }
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
 
 bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj, GroupId groupId)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
-    EmberStatus sendStatus;
+    EmberAfStatus status   = EMBER_ZCL_STATUS_INVALID_FIELD;
+    EmberStatus sendStatus = EMBER_SUCCESS;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
 
     emberAfScenesClusterPrintln("RX: RemoveAllScenes 0x%2x", groupId);
 
@@ -300,14 +322,35 @@ bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj
     // to a single device.
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
-                                  ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID, "uv", status, groupId);
 
-        sendStatus = emberAfSendResponse();
+        if (commandObj == nullptr)
+        {
+            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
+                                      ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID, "uv", status, groupId);
+
+            sendStatus = emberAfSendResponse();
+        }
+        else
+        {
+            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
+                                                 ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID,
+                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+            TLV::TLVWriter * writer          = nullptr;
+            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+            SuccessOrExit(err = commandObj->FinishCommand());
+        }
         if (EMBER_SUCCESS != sendStatus)
         {
             emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "remove_all_scenes", sendStatus);
         }
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
@@ -315,7 +358,8 @@ bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj
 bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId)
 {
     EmberAfStatus status;
-    EmberStatus sendStatus;
+    EmberStatus sendStatus = EMBER_SUCCESS;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
     emberAfScenesClusterPrintln("RX: StoreScene 0x%2x, 0x%x", groupId, sceneId);
     status = emberAfScenesClusterStoreCurrentSceneCallback(emberAfCurrentEndpoint(), groupId, sceneId);
 
@@ -323,13 +367,35 @@ bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, Gro
     // single device.
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
-                                  ZCL_STORE_SCENE_RESPONSE_COMMAND_ID, "uvu", status, groupId, sceneId);
-        sendStatus = emberAfSendResponse();
+
+        if (commandObj == nullptr)
+        {
+            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
+                                      ZCL_STORE_SCENE_RESPONSE_COMMAND_ID, "uvu", status, groupId, sceneId);
+            sendStatus = emberAfSendResponse();
+        }
+        else
+        {
+            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
+                                                 ZCL_STORE_SCENE_RESPONSE_COMMAND_ID,
+                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+            TLV::TLVWriter * writer          = nullptr;
+            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
+            SuccessOrExit(err = commandObj->FinishCommand());
+        }
         if (EMBER_SUCCESS != sendStatus)
         {
             emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "store_scene", sendStatus);
         }
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
@@ -351,7 +417,7 @@ bool emberAfScenesClusterRecallSceneCallback(chip::app::Command * commandObj, Gr
     // value of TransitionTime.
 
     EmberAfStatus status;
-    EmberStatus sendStatus;
+    EmberStatus sendStatus = EMBER_SUCCESS;
     emberAfScenesClusterPrintln("RX: RecallScene 0x%2x, 0x%x", groupId, sceneId);
     status = emberAfScenesClusterRecallSavedSceneCallback(emberAfCurrentEndpoint(), groupId, sceneId);
 #ifdef EMBER_AF_PLUGIN_ZLL_SCENES_SERVER
@@ -370,9 +436,11 @@ bool emberAfScenesClusterRecallSceneCallback(chip::app::Command * commandObj, Gr
 
 bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * commandObj, GroupId groupId)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    EmberStatus sendStatus;
-    uint8_t sceneCount = 0;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
+    EmberStatus sendStatus = EMBER_SUCCESS;
+    uint8_t sceneCount     = 0;
+    uint8_t sceneList[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
 
     emberAfScenesClusterPrintln("RX: GetSceneMembership 0x%2x", groupId);
 
@@ -381,16 +449,9 @@ bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * command
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
     }
 
-    // The status, capacity, and group id are always included in the response, but
-    // the scene count and scene list are only included if the group id matched.
-    emberAfFillExternalBuffer(
-        (ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT | EMBER_AF_DEFAULT_RESPONSE_POLICY_RESPONSES),
-        ZCL_SCENES_CLUSTER_ID, ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID, "uuv", status,
-        (EMBER_AF_PLUGIN_SCENES_TABLE_SIZE - emberAfPluginScenesServerNumSceneEntriesInUse()), // capacity
-        groupId);
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
-        uint8_t i, sceneList[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
+        uint8_t i;
         for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
         {
             EmberAfSceneTableEntry entry;
@@ -408,16 +469,49 @@ bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * command
         }
     }
 
-    // Get Scene Membership commands are only responded to when they are
-    // addressed to a single device or when an entry in the table matches.
-    if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY ||
-        sceneCount != 0)
+    if (commandObj == nullptr)
     {
-        sendStatus = emberAfSendResponse();
-        if (EMBER_SUCCESS != sendStatus)
+        // The status, capacity, and group id are always included in the response, but
+        // the scene count and scene list are only included if the group id matched.
+        emberAfFillExternalBuffer(
+            (ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT | EMBER_AF_DEFAULT_RESPONSE_POLICY_RESPONSES),
+            ZCL_SCENES_CLUSTER_ID, ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID, "uuv", status,
+            (EMBER_AF_PLUGIN_SCENES_TABLE_SIZE - emberAfPluginScenesServerNumSceneEntriesInUse()), // capacity
+            groupId);
+
+        // Get Scene Membership commands are only responded to when they are
+        // addressed to a single device or when an entry in the table matches.
+        if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST ||
+            emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY || sceneCount != 0)
         {
-            emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "get_scene_membership", sendStatus);
+            sendStatus = emberAfSendResponse();
+            if (EMBER_SUCCESS != sendStatus)
+            {
+                emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "get_scene_membership", sendStatus);
+            }
         }
+    }
+    else
+    {
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
+                                             ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID,
+                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
+        TLV::TLVWriter * writer          = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(1),
+                                        (EMBER_AF_PLUGIN_SCENES_TABLE_SIZE - emberAfPluginScenesServerNumSceneEntriesInUse())));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(2), groupId));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(3), sceneCount));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(4), chip::ByteSpan(sceneList, sceneCount)));
+        SuccessOrExit(err = commandObj->FinishCommand());
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
@@ -661,12 +755,14 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId,
-                                            uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
+bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId,
+                                            uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+                                            uint8_t * extensionFieldSets)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfSceneTableEntry entry;
     EmberAfStatus status;
-    EmberStatus sendStatus;
+    EmberStatus sendStatus         = EMBER_SUCCESS;
     bool enhanced                  = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
     uint16_t extensionFieldSetsLen = static_cast<uint16_t>(
         cmd->bufLen -
@@ -975,24 +1071,51 @@ kickout:
     {
         return true;
     }
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
-                              (enhanced ? ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID : ZCL_ADD_SCENE_RESPONSE_COMMAND_ID), "uvu",
-                              status, groupId, sceneId);
-    sendStatus = emberAfSendResponse();
+
+    if (commandObj == nullptr)
+    {
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
+                                  (enhanced ? ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID : ZCL_ADD_SCENE_RESPONSE_COMMAND_ID),
+                                  "uvu", status, groupId, sceneId);
+        sendStatus = emberAfSendResponse();
+    }
+    else
+    {
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
+                                             ZCL_ADD_SCENE_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+        if (enhanced)
+        {
+            cmdParams.mCommandId = ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID;
+        }
+        TLV::TLVWriter * writer = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
+        SuccessOrExit(err = commandObj->FinishCommand());
+    }
     if (EMBER_SUCCESS != sendStatus)
     {
         emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "add_scene", sendStatus);
     }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
+    }
     return true;
 }
 
-bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId)
+bool emberAfPluginScenesServerParseViewScene(chip::app::Command * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId,
+                                             uint8_t sceneId)
 {
+    CHIP_ERROR err               = CHIP_NO_ERROR;
     EmberAfSceneTableEntry entry = {};
     EmberAfStatus status         = EMBER_ZCL_STATUS_NOT_FOUND;
-    EmberStatus sendStatus;
-    bool enhanced       = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
-    EndpointId endpoint = cmd->apsFrame->destinationEndpoint;
+    bool enhanced                = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
+    EndpointId endpoint          = cmd->apsFrame->destinationEndpoint;
 
     emberAfScenesClusterPrintln("RX: %pViewScene 0x%2x, 0x%x", (enhanced ? "Enhanced" : ""), groupId, sceneId);
 
@@ -1018,97 +1141,119 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
     // The status, group id, and scene id are always included in the response, but
     // the transition time, name, and extension fields are only included if the
     // scene was found.
-    emberAfFillExternalBuffer(
-        (ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT | EMBER_AF_DEFAULT_RESPONSE_POLICY_RESPONSES),
-        ZCL_SCENES_CLUSTER_ID, (enhanced ? ZCL_ENHANCED_VIEW_SCENE_RESPONSE_COMMAND_ID : ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID), "uvu",
-        status, groupId, sceneId);
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
+                                         ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+    if (enhanced)
     {
-        // The transition time is returned in seconds in the regular version of the
-        // command and tenths of a second in the enhanced version.
-        emberAfPutInt16uInResp(
-            static_cast<uint16_t>(enhanced ? entry.transitionTime * 10 + entry.transitionTime100ms : entry.transitionTime));
+        cmdParams.mCommandId = ZCL_ENHANCED_VIEW_SCENE_RESPONSE_COMMAND_ID;
+    }
+    TLV::TLVWriter * writer = nullptr;
+    SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+    VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(3),
+                                    static_cast<uint16_t>(enhanced ? entry.transitionTime * 10 + entry.transitionTime100ms
+                                                                   : entry.transitionTime)));
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
-        emberAfPutStringInResp(entry.name);
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(4), entry.name));
 #else
-        emberAfPutInt8uInResp(0); // name length
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(4), ""));
 #endif
-#ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
-        if (entry.hasOnOffValue)
+    // #6620: Need the build the array for response.
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(5), chip::ByteSpan(nullptr, 0)));
+    SuccessOrExit(err = commandObj->FinishCommand());
+
+    /*
+        if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
-            emberAfPutInt16uInResp(ZCL_ON_OFF_CLUSTER_ID);
-            emberAfPutInt8uInResp(1); // length
-            emberAfPutInt8uInResp(entry.onOffValue);
-        }
-#endif
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-        if (entry.hasCurrentLevelValue)
-        {
-            emberAfPutInt16uInResp(ZCL_LEVEL_CONTROL_CLUSTER_ID);
-            emberAfPutInt8uInResp(1); // length
-            emberAfPutInt8uInResp(entry.currentLevelValue);
-        }
-#endif
-#ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-        if (entry.hasOccupiedCoolingSetpointValue)
-        {
-            uint8_t * length;
-            emberAfPutInt16uInResp(ZCL_THERMOSTAT_CLUSTER_ID);
-            length = &appResponseData[appResponseLength];
-            emberAfPutInt8uInResp(0); // temporary length
-            emberAfPutInt16sInResp(entry.occupiedCoolingSetpointValue);
-            *length += 2;
-            if (entry.hasOccupiedHeatingSetpointValue)
+            // The transition time is returned in seconds in the regular version of the
+            // command and tenths of a second in the enhanced version.
+            emberAfPutInt16uInResp(
+                static_cast<uint16_t>(enhanced ? entry.transitionTime * 10 + entry.transitionTime100ms : entry.transitionTime));
+    #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
+            emberAfPutStringInResp(entry.name);
+    #else
+            emberAfPutInt8uInResp(0); // name length
+    #endif
+    #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
+            if (entry.hasOnOffValue)
             {
-                emberAfPutInt16sInResp(entry.occupiedHeatingSetpointValue);
+                emberAfPutInt16uInResp(ZCL_ON_OFF_CLUSTER_ID);
+                emberAfPutInt8uInResp(1); // length
+                emberAfPutInt8uInResp(entry.onOffValue);
+            }
+    #endif
+    #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
+            if (entry.hasCurrentLevelValue)
+            {
+                emberAfPutInt16uInResp(ZCL_LEVEL_CONTROL_CLUSTER_ID);
+                emberAfPutInt8uInResp(1); // length
+                emberAfPutInt8uInResp(entry.currentLevelValue);
+            }
+    #endif
+    #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
+            if (entry.hasOccupiedCoolingSetpointValue)
+            {
+                uint8_t * length;
+                emberAfPutInt16uInResp(ZCL_THERMOSTAT_CLUSTER_ID);
+                length = &appResponseData[appResponseLength];
+                emberAfPutInt8uInResp(0); // temporary length
+                emberAfPutInt16sInResp(entry.occupiedCoolingSetpointValue);
                 *length += 2;
-                if (entry.hasSystemModeValue)
+                if (entry.hasOccupiedHeatingSetpointValue)
                 {
-                    emberAfPutInt8uInResp(entry.systemModeValue);
-                    (*length)++;
+                    emberAfPutInt16sInResp(entry.occupiedHeatingSetpointValue);
+                    *length += 2;
+                    if (entry.hasSystemModeValue)
+                    {
+                        emberAfPutInt8uInResp(entry.systemModeValue);
+                        (*length)++;
+                    }
                 }
             }
-        }
-#endif
-#ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-        if (entry.hasCurrentXValue)
-        {
-            uint8_t * length;
-            emberAfPutInt16uInResp(ZCL_COLOR_CONTROL_CLUSTER_ID);
-            length = &appResponseData[appResponseLength];
-            emberAfPutInt8uInResp(0); // temporary length
-            emberAfPutInt16uInResp(entry.currentXValue);
-            *length = static_cast<uint8_t>(*length + 2);
-            if (entry.hasCurrentYValue)
+    #endif
+    #ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
+            if (entry.hasCurrentXValue)
             {
-                emberAfPutInt16uInResp(entry.currentYValue);
+                uint8_t * length;
+                emberAfPutInt16uInResp(ZCL_COLOR_CONTROL_CLUSTER_ID);
+                length = &appResponseData[appResponseLength];
+                emberAfPutInt8uInResp(0); // temporary length
+                emberAfPutInt16uInResp(entry.currentXValue);
                 *length = static_cast<uint8_t>(*length + 2);
-                if (enhanced)
+                if (entry.hasCurrentYValue)
                 {
-                    if (entry.hasEnhancedCurrentHueValue)
+                    emberAfPutInt16uInResp(entry.currentYValue);
+                    *length = static_cast<uint8_t>(*length + 2);
+                    if (enhanced)
                     {
-                        emberAfPutInt16uInResp(entry.enhancedCurrentHueValue);
-                        *length = static_cast<uint8_t>(*length + 2);
-                        if (entry.hasCurrentSaturationValue)
+                        if (entry.hasEnhancedCurrentHueValue)
                         {
-                            emberAfPutInt8uInResp(entry.currentSaturationValue);
-                            (*length)++;
-                            if (entry.hasColorLoopActiveValue)
+                            emberAfPutInt16uInResp(entry.enhancedCurrentHueValue);
+                            *length = static_cast<uint8_t>(*length + 2);
+                            if (entry.hasCurrentSaturationValue)
                             {
-                                emberAfPutInt8uInResp(entry.colorLoopActiveValue);
+                                emberAfPutInt8uInResp(entry.currentSaturationValue);
                                 (*length)++;
-                                if (entry.hasColorLoopDirectionValue)
+                                if (entry.hasColorLoopActiveValue)
                                 {
-                                    emberAfPutInt8uInResp(entry.colorLoopDirectionValue);
+                                    emberAfPutInt8uInResp(entry.colorLoopActiveValue);
                                     (*length)++;
-                                    if (entry.hasColorLoopTimeValue)
+                                    if (entry.hasColorLoopDirectionValue)
                                     {
-                                        emberAfPutInt16uInResp(entry.colorLoopTimeValue);
-                                        *length = static_cast<uint8_t>(*length + 2);
-                                        if (entry.hasColorTemperatureMiredsValue)
+                                        emberAfPutInt8uInResp(entry.colorLoopDirectionValue);
+                                        (*length)++;
+                                        if (entry.hasColorLoopTimeValue)
                                         {
-                                            emberAfPutInt16uInResp(entry.colorTemperatureMiredsValue);
+                                            emberAfPutInt16uInResp(entry.colorLoopTimeValue);
                                             *length = static_cast<uint8_t>(*length + 2);
+                                            if (entry.hasColorTemperatureMiredsValue)
+                                            {
+                                                emberAfPutInt16uInResp(entry.colorTemperatureMiredsValue);
+                                                *length = static_cast<uint8_t>(*length + 2);
+                                            }
                                         }
                                     }
                                 }
@@ -1117,33 +1262,32 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
                     }
                 }
             }
-        }
-#endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-#ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-        if (entry.hasLockStateValue)
-        {
-            emberAfPutInt16uInResp(ZCL_DOOR_LOCK_CLUSTER_ID);
-            emberAfPutInt8uInResp(1); // length
-            emberAfPutInt8uInResp(entry.lockStateValue);
-        }
-#endif
-#ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-        if (entry.hasCurrentPositionLiftPercentageValue)
-        {
-            uint8_t * length;
-            emberAfPutInt16uInResp(ZCL_WINDOW_COVERING_CLUSTER_ID);
-            length = &appResponseData[appResponseLength];
-            emberAfPutInt8uInResp(0); // temporary length
-            emberAfPutInt8uInResp(entry.currentPositionLiftPercentageValue);
-            (*length)++;
-            if (entry.hasCurrentPositionTiltPercentageValue)
+    #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
+    #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
+            if (entry.hasLockStateValue)
             {
-                emberAfPutInt8uInResp(entry.currentPositionTiltPercentageValue);
-                (*length)++;
+                emberAfPutInt16uInResp(ZCL_DOOR_LOCK_CLUSTER_ID);
+                emberAfPutInt8uInResp(1); // length
+                emberAfPutInt8uInResp(entry.lockStateValue);
             }
+    #endif
+    #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
+            if (entry.hasCurrentPositionLiftPercentageValue)
+            {
+                uint8_t * length;
+                emberAfPutInt16uInResp(ZCL_WINDOW_COVERING_CLUSTER_ID);
+                length = &appResponseData[appResponseLength];
+                emberAfPutInt8uInResp(0); // temporary length
+                emberAfPutInt8uInResp(entry.currentPositionLiftPercentageValue);
+                (*length)++;
+                if (entry.hasCurrentPositionTiltPercentageValue)
+                {
+                    emberAfPutInt8uInResp(entry.currentPositionTiltPercentageValue);
+                    (*length)++;
+                }
+            }
+    #endif
         }
-#endif
-    }
 
     // View Scene commands are only responded to when they are addressed to a
     // single device.
@@ -1155,6 +1299,13 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
     if (EMBER_SUCCESS != sendStatus)
     {
         emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "view_scene", sendStatus);
+    }
+    */
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }

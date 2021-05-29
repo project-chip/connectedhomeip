@@ -33,11 +33,18 @@
 // Enable use of external heap allocator (calloc/free) for OpenThread.
 #define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 1
 
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 22
+#else
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 10
+#endif
 
 #define OPENTHREAD_CONFIG_JOINER_ENABLE 1
 #define OPENTHREAD_CONFIG_NCP_UART_ENABLE 1
 #define OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE 1
+
+#define OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE 1
+#define OPENTHREAD_CONFIG_ECDSA_ENABLE 1
 
 // Use the Qorvo-supplied default platform configuration for remainder
 // of OpenThread config options.

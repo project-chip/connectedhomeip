@@ -39,17 +39,17 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af.h"
+#include <app/util/af.h>
 
 #include <app/clusters/ias-zone-client/ias-zone-client.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/reporting/reporting.h>
 #include <app/util/common.h>
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
 #include "gen/callback.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 #ifdef EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_SUB_GHZ
 #include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz.h"
@@ -73,13 +73,13 @@ bool emAfSyncingTime = false;
 #endif
 
 #define DISC_ATTR_RSP_MAX_ATTRIBUTES                                                                                               \
-    (((EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH - EMBER_AF_ZCL_MANUFACTURER_SPECIFIC_OVERHEAD /* max ZCL header size */                 \
-       - 1)                                                                              /* discovery is complete boolean */       \
+    (((EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH - EMBER_AF_ZCL_MANUFACTURER_SPECIFIC_OVERHEAD /* max ZCL header size */                \
+       - 1)                                                                               /* discovery is complete boolean */      \
       / 3)        /* size of one discover attributes response entry */                                                             \
      % UINT8_MAX) /* make count fit in an 8 bit integer */
 #define DISC_ATTR_EXT_RSP_MAX_ATTRIBUTES                                                                                           \
-    (((EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH - EMBER_AF_ZCL_MANUFACTURER_SPECIFIC_OVERHEAD /* max ZCL header size */                 \
-       - 1)                                                                              /* discovery is complete boolean */       \
+    (((EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH - EMBER_AF_ZCL_MANUFACTURER_SPECIFIC_OVERHEAD /* max ZCL header size */                \
+       - 1)                                                                               /* discovery is complete boolean */      \
       / 4)        /* size of one discover attributes extended response entry */                                                    \
      % UINT8_MAX) /* make count fit in an 8 bit integer */
 

@@ -41,7 +41,7 @@ namespace Messaging {
 
 CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
                                                 ReliableMessageContext * reliableMessageContext, bool isReliableTransmission,
-                                                Protocols::Id protocol, uint8_t type, System::PacketBufferHandle message)
+                                                Protocols::Id protocol, uint8_t type, System::PacketBufferHandle && message)
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -59,13 +59,13 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
 #if !defined(NDEBUG)
         if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
         {
-            ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
-                            reliableMessageContext->GetPendingPeerAckId());
+            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
+                          reliableMessageContext->GetPendingPeerAckId());
         }
 #endif
     }
 
-    if (!IsTransportReliable() && reliableMessageContext->AutoRequestAck() && mReliableMessageMgr != nullptr &&
+    if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() && mReliableMessageMgr != nullptr &&
         isReliableTransmission)
     {
         payloadHeader.SetNeedsAck(true);
@@ -105,7 +105,7 @@ CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(const PayloadHeader & payl
     ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
                       CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (!IsTransportReliable())
+    if (IsReliableTransmissionAllowed())
     {
         if (payloadHeader.IsAckMsg() && payloadHeader.GetAckId().HasValue())
         {

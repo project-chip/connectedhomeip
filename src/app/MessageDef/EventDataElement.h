@@ -27,11 +27,11 @@
 #include "EventPath.h"
 
 #include "Parser.h"
+#include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <util/basic-types.h>
 
 namespace chip {
 namespace app {
@@ -135,7 +135,7 @@ public:
     /**
      *  @brief Get a TLVReader for the DeltaUTCTimestamp. Next() must be called before accessing them.
      *
-     *  @param [in] apDeltaUTCTimestampstamp   A pointer to apDeltaUTCTimestamp
+     *  @param [in] apDeltaUTCTimestamp   A pointer to apDeltaUTCTimestamp
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
@@ -245,7 +245,7 @@ public:
      *  This field is present if delta encoding of the System timestamp relative to a prior event is desired for compression
      * reasons. When this field is present, the System Timestamp field SHALL be omitted.
      *
-     *  @param [in] DeltaSystemTimestamp The uint64_t variable to reflect DeltaSystemTimestamp
+     *  @param [in] aDeltaSystemTimestamp The uint64_t variable to reflect DeltaSystemTimestamp
      *
      *  @return A reference to *this
      */

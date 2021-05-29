@@ -4,8 +4,15 @@
 #pragma once
 
 #include <inttypes.h>
-#include <gen/af-structs.h>
+#include <app/common/gen/af-structs.h>
+#include <app/util/af-enums.h>
 #include <lib/support/Span.h>
+#include <app/Command.h>
+
+// Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
+// instead of IM status code.
+// #6308 should handle IM error code on the application side, either modify this function or remove this.
+bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status);
 
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
@@ -29,7 +36,7 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
-typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}});
+typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}});
 {{/if}}
 {{/if}}
 {{/all_user_cluster_commands}}

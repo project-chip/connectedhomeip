@@ -365,13 +365,38 @@
     _session = nil;
 }
 
+- (void)setVendorIDOnAccessory
+{
+    NSLog(@"Call to setVendorIDOnAccessory");
+    CHIPDevice * device = CHIPGetPairedDevice();
+    if (device) {
+        CHIPOperationalCredentials * opCreds = [[CHIPOperationalCredentials alloc] initWithDevice:device
+                                                                                         endpoint:0
+                                                                                            queue:dispatch_get_main_queue()];
+        [opCreds setFabric:kCHIPToolTmpVendorId
+            responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                if (error.code != CHIPSuccess) {
+                    NSLog(@"Got back error trying to getFabricId %@", error);
+                } else {
+                    NSLog(@"Got back fabricID values %@, storing it", values);
+                    NSNumber * fabricID = [values objectForKey:@"FabricId"];
+                    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey, fabricID);
+                }
+            }];
+    }
+}
+
 // MARK: CHIPDevicePairingDelegate
 - (void)onPairingComplete:(NSError *)error
 {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
-        [self->_deviceList refreshDeviceList];
-        [self retrieveAndSendWifiCredentials];
-    });
+    if (error.code != CHIPSuccess) {
+        NSLog(@"Got pairing error back %@", error);
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self->_deviceList refreshDeviceList];
+            [self retrieveAndSendWifiCredentials];
+        });
+    }
 }
 
 // MARK: UI Helper methods
@@ -531,9 +556,9 @@
                  credentials:credentials
                   breadcrumb:breadcrumb
                    timeoutMs:timeoutMs
-           completionHandler:^(NSError * error, NSDictionary * values) {
-               [weakSelf onAddNetworkResponse:error isWiFi:YES];
-           }];
+             responseHandler:^(NSError * error, NSDictionary * values) {
+                 [weakSelf onAddNetworkResponse:error isWiFi:YES];
+             }];
 }
 
 - (void)addThreadNetwork:(NSData *)threadDataSet
@@ -548,9 +573,9 @@
     [_cluster addThreadNetwork:threadDataSet
                     breadcrumb:breadcrumb
                      timeoutMs:timeoutMs
-             completionHandler:^(NSError * error, NSDictionary * values) {
-                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
-             }];
+               responseHandler:^(NSError * error, NSDictionary * values) {
+                   [weakSelf onAddNetworkResponse:error isWiFi:NO];
+               }];
 }
 
 - (void)onAddNetworkResponse:(NSError *)error isWiFi:(BOOL)isWiFi
@@ -575,9 +600,9 @@
     [_cluster enableNetwork:networkId
                  breadcrumb:breadcrumb
                   timeoutMs:timeoutMs
-          completionHandler:^(NSError * err, NSDictionary * values) {
-              [weakSelf onEnableNetworkResponse:err];
-          }];
+            responseHandler:^(NSError * err, NSDictionary * values) {
+                [weakSelf onEnableNetworkResponse:err];
+            }];
 }
 
 - (void)onEnableNetworkResponse:(NSError *)error
@@ -597,10 +622,7 @@
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
-}
-
-- (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type
-{
+    [self setVendorIDOnAccessory];
 }
 
 - (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
@@ -760,7 +782,7 @@
         [self->_captureSession stopRunning];
         [self->_session invalidateSession];
     });
-    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:qrCode];
+    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:qrCode];
     NSError * error;
     _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{

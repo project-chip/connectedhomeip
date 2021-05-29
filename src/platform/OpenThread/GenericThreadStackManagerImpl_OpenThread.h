@@ -32,6 +32,7 @@
 #include <openthread/srp_client.h>
 #endif
 
+#include <lib/mdns/Advertiser.h>
 #include <lib/mdns/platform/Mdns.h>
 
 namespace chip {
@@ -86,7 +87,6 @@ protected:
     CHIP_ERROR _GetAndLogThreadTopologyMinimal(void);
     CHIP_ERROR _GetAndLogThreadTopologyFull(void);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart(void);
@@ -119,26 +119,26 @@ private:
 
     struct SrpClient
     {
-        static constexpr uint8_t kServiceId           = 0x5d;
-        static constexpr uint8_t kMaxServicesNumber   = 3;
-        static constexpr uint8_t kMaxInstanceNameSize = 64;
-        static constexpr uint8_t kMaxNameSize         = 16;
-        static constexpr uint8_t kMaxHostNameSize     = 32;
-        static constexpr uint8_t kMaxTxtEntriesNumber = 4;
-        static constexpr uint8_t kMaxTxtValueSize     = 255;
-        static constexpr uint8_t kMaxTxtKeySize       = 16;
+        static constexpr uint8_t kMaxServicesNumber   = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
+        static constexpr uint8_t kMaxInstanceNameSize = chip::Mdns::kMdnsNameMaxSize;
+        static constexpr uint8_t kMaxNameSize         = chip::Mdns::kMdnsTypeAndProtocolMaxSize;
+        static constexpr uint8_t kMaxHostNameSize     = 16;
+        // Thread only supports operational discovery
+        static constexpr uint8_t kMaxTxtEntriesNumber = chip::Mdns::OperationalAdvertisingParameters::kNumAdvertisingTxtEntries;
+        static constexpr uint8_t kMaxTxtValueSize     = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxValueSize;
+        static constexpr uint8_t kMaxTxtKeySize       = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
 
         struct Service
         {
             otSrpClientService mService;
-            char mInstanceName[kMaxInstanceNameSize];
-            char mName[kMaxNameSize];
+            char mInstanceName[kMaxInstanceNameSize + 1];
+            char mName[kMaxNameSize + 1];
             otDnsTxtEntry mTxtEntries[kMaxTxtEntriesNumber];
             uint8_t mTxtValueBuffers[kMaxTxtEntriesNumber][kMaxTxtValueSize];
             char mTxtKeyBuffers[kMaxTxtEntriesNumber][kMaxTxtKeySize];
         };
 
-        char mHostName[kMaxHostNameSize];
+        char mHostName[kMaxHostNameSize + 1];
         otIp6Address mHostAddress;
         Service mServices[kMaxServicesNumber];
     };

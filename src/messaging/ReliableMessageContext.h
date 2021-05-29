@@ -184,11 +184,10 @@ public:
     bool IsOccupied() const;
 
     /**
-     *  Set if an acknowledgment needs to be sent back to the peer on this exchange.
+     *  Set whether there is an acknowledgment panding to be send to the peer on
+     *  this exchange.
      *
-     *  @param[in]  inAckPending A Boolean indicating whether (true) or not
-     *                          (false) an acknowledgment should be sent back
-     *                          in response to a received message.
+     *  @param[in]  inOccupied Whether there is a pending acknowledgment.
      */
     void SetOccupied(bool inOccupied);
 

@@ -27,6 +27,7 @@
 
 #include <core/CHIPCore.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -41,36 +42,47 @@ public:
     SecureSession & operator=(SecureSession &&) = default;
 
     /**
-     * @brief
-     *   Derive a shared key. The derived key will be used for encryting/decrypting
-     *   data exchanged on the secure channel.
-     *
-     * @param local_keypair      A pointer to local ECP keypair
-     * @param remote_public_key  A pointer to peer's public key
-     * @param salt               A pointer to the initial salt used for deriving the keys
-     * @param salt_length        Length of the initial salt
-     * @param info               A pointer to the initial info
-     * @param info_length        Length of the initial info
-     * @return CHIP_ERROR        The result of key derivation
+     *    Whether the current node initiated the session, or it is responded to a session request.
      */
-    CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                    const uint8_t * salt, size_t salt_length, const uint8_t * info, size_t info_length);
+    enum class SessionRole
+    {
+        kInitiator, /**< We initiated the session. */
+        kResponder, /**< We responded to the session request. */
+    };
+
+    enum class SessionInfoType
+    {
+        kSessionEstablishment, /**< A new secure session is established. */
+        kSessionResumption,    /**< An old session is being resumed. */
+    };
 
     /**
      * @brief
-     *   Derive a shared key. The derived key will be used for encryting/decrypting
+     *   Derive a shared key. The derived key will be used for encrypting/decrypting
      *   data exchanged on the secure channel.
      *
-     * @param secret             A pointer to the shared secret
-     * @param secret_length      Length of the shared secret
-     * @param salt               A pointer to the initial salt used for deriving the keys
-     * @param salt_length        Length of the initial salt
-     * @param info               A pointer to the initial info
-     * @param info_length        Length of the initial info
+     * @param local_keypair      A reference to local ECP keypair
+     * @param remote_public_key  A reference to peer's public key
+     * @param salt               A reference to the initial salt used for deriving the keys
+     * @param infoType           The info buffer to use for deriving session keys
+     * @param role               Role of the new session (initiator or responder)
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR InitFromSecret(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
-                              const uint8_t * info, size_t info_length);
+    CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
+                    const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
+
+    /**
+     * @brief
+     *   Derive a shared key. The derived key will be used for encrypting/decrypting
+     *   data exchanged on the secure channel.
+     *
+     * @param secret             A reference to the shared secret
+     * @param salt               A reference to the initial salt used for deriving the keys
+     * @param infoType           The info buffer to use for deriving session keys
+     * @param role               Role of the new session (initiator or responder)
+     * @return CHIP_ERROR        The result of key derivation
+     */
+    CHIP_ERROR InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
 
     /**
      * @brief
@@ -103,7 +115,7 @@ public:
 
     /**
      * @brief
-     *   Memory overhead of encrypting data. The overhead is indepedent of size of
+     *   Memory overhead of encrypting data. The overhead is independent of size of
      *   the data being encrypted. The extra space is used for storing the common header.
      *
      * @return number of bytes.
@@ -118,8 +130,20 @@ public:
 private:
     static constexpr size_t kAES_CCM128_Key_Length = 16;
 
+    typedef uint8_t CryptoKey[kAES_CCM128_Key_Length];
+
+    enum KeyUsage
+    {
+        kI2RKey                  = 0,
+        kR2IKey                  = 1,
+        kAttestationChallengeKey = 2,
+        kNumCryptoKeys           = 3
+    };
+
+    SessionRole mSessionRole;
+
     bool mKeyAvailable;
-    uint8_t mKey[kAES_CCM128_Key_Length];
+    CryptoKey mKeys[KeyUsage::kNumCryptoKeys];
 
     static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
 

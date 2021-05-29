@@ -576,7 +576,7 @@ INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip:
  * @details
  *      Send the ICMP message \c msg using the destination information given in \c addr.
  */
-INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg, uint16_t sendFlags)
 {
     INET_ERROR res         = INET_NO_ERROR;
     const IPAddress & addr = pktInfo->DestAddress;

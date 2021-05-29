@@ -66,15 +66,12 @@ public:
      *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReportError
      *  call happens with guarantee.
      *
-     *  @param[in]    aNodeId    Node Id
-     *  @param[in]    aAdminId   Admin ID
-     *  @param[in]    apEventPathParamsList       a list of event paths the read client is interested in
-     *  @param[in]    aEventPathParamsListSize    Number of event paths in apEventPathParamsList
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
-                               size_t aEventPathParamsListSize);
+                               size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
+                               size_t aAttributePathParamsListSize, EventNumber aEventNumber);
 
 private:
     friend class TestReadInteraction;
@@ -82,9 +79,9 @@ private:
 
     enum class ClientState
     {
-        Uninitialized = 0, //< The client has not been initialized
-        Initialized,       //< The client has been initialized and is ready for a SendReadRequest
-        AwaitingResponse,  //< The client has sent out the read request message
+        Uninitialized = 0, ///< The client has not been initialized
+        Initialized,       ///< The client has been initialized and is ready for a SendReadRequest
+        AwaitingResponse,  ///< The client has sent out the read request message
     };
 
     /**
@@ -105,7 +102,7 @@ private:
     virtual ~ReadClient() = default;
 
     void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload) override;
+                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
@@ -114,9 +111,11 @@ private:
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; };
 
+    CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+
     void MoveToState(const ClientState aTargetState);
-    CHIP_ERROR ProcessReportData(System::PacketBufferHandle aPayload);
-    CHIP_ERROR ClearExistingExchangeContext();
+    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;

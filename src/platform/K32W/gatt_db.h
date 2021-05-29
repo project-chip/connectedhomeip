@@ -9,7 +9,7 @@ VALUE(value_device_name, gBleSig_GapDeviceName_d, (gPermissionFlagReadable_c), 1
 CHARACTERISTIC(char_appearance, gBleSig_GapAppearance_d, (gGattCharPropRead_c))
 VALUE(value_appearance, gBleSig_GapAppearance_d, (gPermissionFlagReadable_c), 2, 0x00, 0x00)
 
-PRIMARY_SERVICE(service_chipoble, gBleSig_BtpService_d)
+PRIMARY_SERVICE(service_chipoble, gChipoBleService_d)
 CHARACTERISTIC_UUID128(chipoble_rx, uuid_chipoble_rx, (gGattCharPropWrite_c))
 VALUE_UUID128_VARLEN(value_chipoble_rx, uuid_chipoble_rx, (gPermissionFlagWritable_c), gAttMaxMtu_c - 3, gAttMaxMtu_c - 3, 0x00)
 CHARACTERISTIC_UUID128(chipoble_tx, uuid_chipoble_tx, (gGattCharPropIndicate_c | gGattCharPropRead_c))

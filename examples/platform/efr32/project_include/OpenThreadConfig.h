@@ -38,13 +38,16 @@
 
 // EFR32MG21A020F1024IM32 has 96k of RAM. Reduce the number of buffers to
 // conserve RAM for this Series 2 part.
-#if defined(EFR32MG21A020F1024IM32)
+#if defined(EFR32MG21)
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 22
 #endif
 
 #define OPENTHREAD_CONFIG_JOINER_ENABLE 1
 #define OPENTHREAD_CONFIG_NCP_UART_ENABLE 1
 #define OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE 1
+
+#define OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE 1
+#define OPENTHREAD_CONFIG_ECDSA_ENABLE 1
 
 // Use the SiLabs-supplied default platform configuration for remainder
 // of OpenThread config options.

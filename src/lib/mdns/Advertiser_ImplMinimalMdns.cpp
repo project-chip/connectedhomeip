@@ -37,6 +37,7 @@
 
 // Enable detailed mDNS logging for received queries
 #undef DETAIL_LOGGING
+// #define DETAIL_LOGGING
 
 namespace chip {
 namespace Mdns {
@@ -119,6 +120,7 @@ public:
     CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
+    CHIP_ERROR StopPublishDevice() override;
 
     // MdnsPacketDelegate
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -200,9 +202,9 @@ private:
 
     FullQName GetCommisioningTextEntries(const CommissionAdvertisingParameters & params);
 
-    static constexpr size_t kMaxRecords             = 16;
-    static constexpr size_t kMaxAllocatedResponders = 16;
-    static constexpr size_t kMaxAllocatedQNameData  = 8;
+    static constexpr size_t kMaxRecords             = 32;
+    static constexpr size_t kMaxAllocatedResponders = 64;
+    static constexpr size_t kMaxAllocatedQNameData  = 32;
 
     QueryResponder<kMaxRecords> mQueryResponder;
     ResponseSender mResponseSender;
@@ -264,6 +266,13 @@ CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t 
     return CHIP_NO_ERROR;
 }
 
+/// Stops the advertiser.
+CHIP_ERROR AdvertiserMinMdns::StopPublishDevice()
+{
+    Clear();
+    return CHIP_NO_ERROR;
+}
+
 void AdvertiserMinMdns::Clear()
 {
     // Init clears all responders, so that data can be freed
@@ -291,8 +300,6 @@ void AdvertiserMinMdns::Clear()
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
-    Clear();
-
     char nameBuffer[64] = "";
 
     /// need to set server name
@@ -356,16 +363,15 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
-    Clear();
-
     // TODO: need to detect colisions here
     char nameBuffer[64] = "";
-    size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), "%016" PRIX64, GetRandU64());
+    size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), ChipLogFormatX64, GetRandU32(), GetRandU32());
     if (len >= sizeof(nameBuffer))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    const char * serviceType = params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning ? "_chipc" : "_chipd";
+    const char * serviceType =
+        params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode ? "_chipc" : "_chipd";
 
     FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
     FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
@@ -410,35 +416,6 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
     }
 
-    {
-        sprintf(nameBuffer, "_S%03d", params.GetShortDiscriminator());
-        FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
-        ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
-
-        if (!AddResponder<PtrResponder>(shortServiceName, operationalServerName)
-                 .SetReportAdditional(operationalServerName)
-                 .SetReportInServiceListing(true)
-                 .IsValid())
-        {
-            ChipLogError(Discovery, "Failed to add short discriminator PTR record mDNS responder");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
-    {
-        sprintf(nameBuffer, "_L%04d", params.GetLongDiscriminator());
-        FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
-        ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
-        if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
-                 .SetReportAdditional(operationalServerName)
-                 .SetReportInServiceListing(true)
-                 .IsValid())
-        {
-            ChipLogError(Discovery, "Failed to add long discriminator PTR record mDNS responder");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
     if (params.GetVendorId().HasValue())
     {
         sprintf(nameBuffer, "_V%d", params.GetVendorId().Value());
@@ -450,8 +427,86 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
                  .SetReportInServiceListing(true)
                  .IsValid())
         {
-            ChipLogError(Discovery, "Failed to add vendor discriminator PTR record mDNS responder");
+            ChipLogError(Discovery, "Failed to add vendor PTR record mDNS responder");
             return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    if (params.GetDeviceType().HasValue())
+    {
+        sprintf(nameBuffer, "_T%d", params.GetDeviceType().Value());
+        FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+        ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+
+        if (!AddResponder<PtrResponder>(vendorServiceName, operationalServerName)
+                 .SetReportAdditional(operationalServerName)
+                 .SetReportInServiceListing(true)
+                 .IsValid())
+        {
+            ChipLogError(Discovery, "Failed to add device type PTR record mDNS responder");
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    // the following sub types only apply to commissionable node advertisements
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
+    {
+        {
+            sprintf(nameBuffer, "_S%03d", params.GetShortDiscriminator());
+            FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+
+            if (!AddResponder<PtrResponder>(shortServiceName, operationalServerName)
+                     .SetReportAdditional(operationalServerName)
+                     .SetReportInServiceListing(true)
+                     .IsValid())
+            {
+                ChipLogError(Discovery, "Failed to add short discriminator PTR record mDNS responder");
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        {
+            sprintf(nameBuffer, "_L%04d", params.GetLongDiscriminator());
+            FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
+                     .SetReportAdditional(operationalServerName)
+                     .SetReportInServiceListing(true)
+                     .IsValid())
+            {
+                ChipLogError(Discovery, "Failed to add long discriminator PTR record mDNS responder");
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        {
+            sprintf(nameBuffer, "_C%d", params.GetCommissioningMode() ? 1 : 0);
+            FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
+                     .SetReportAdditional(operationalServerName)
+                     .SetReportInServiceListing(true)
+                     .IsValid())
+            {
+                ChipLogError(Discovery, "Failed to add commissioning mode PTR record mDNS responder");
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        {
+            sprintf(nameBuffer, "_A1");
+            FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
+                     .SetReportAdditional(operationalServerName)
+                     .SetReportInServiceListing(true)
+                     .IsValid())
+            {
+                ChipLogError(Discovery, "Failed to add open window commissioning mode PTR record mDNS responder");
+                return CHIP_ERROR_NO_MEMORY;
+            }
         }
     }
 
@@ -463,24 +518,21 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commisioning device'.");
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
+    {
+        ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissionable node device'.");
+    }
+    else
+    {
+        ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissioner device'.");
+    }
 
     return CHIP_NO_ERROR;
 }
 
 FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertisingParameters & params)
 {
-    // a discriminator always exists
-    char txtDiscriminator[32];
-    sprintf(txtDiscriminator, "D=%d", params.GetLongDiscriminator());
-
-    if (!params.GetVendorId().HasValue())
-    {
-        return AllocateQName(txtDiscriminator);
-    }
-
-    // Need to also set a vid/pid string
-    char txtVidPid[64];
+    char txtVidPid[chip::Mdns::kKeyVendorProductMaxLength + 4];
     if (params.GetProductId().HasValue())
     {
         sprintf(txtVidPid, "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
@@ -490,15 +542,87 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
     }
 
-    char txtPairingInstrHint[128];
-    if (params.GetPairingInstr().HasValue() && params.GetPairingHint().HasValue())
+    char txtDeviceType[chip::Mdns::kKeyDeviceTypeMaxLength + 4];
+    if (params.GetDeviceType().HasValue())
     {
-        sprintf(txtPairingInstrHint, "P=%s+%d", params.GetPairingInstr().Value(), params.GetPairingHint().Value());
-        return AllocateQName(txtDiscriminator, txtVidPid, txtPairingInstrHint);
+        sprintf(txtDeviceType, "DT=%d", params.GetDeviceType().Value());
     }
     else
     {
-        return AllocateQName(txtDiscriminator, txtVidPid);
+        txtDeviceType[0] = '\0';
+    }
+
+    char txtDeviceName[chip::Mdns::kKeyDeviceNameMaxLength + 4];
+    if (params.GetDeviceName().HasValue())
+    {
+        sprintf(txtDeviceName, "DN=%s", params.GetDeviceName().Value());
+    }
+    else
+    {
+        txtDeviceName[0] = '\0';
+    }
+
+    // the following sub types only apply to commissionable node advertisements
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
+    {
+        // a discriminator always exists
+        char txtDiscriminator[chip::Mdns::kKeyDiscriminatorMaxLength + 3];
+        sprintf(txtDiscriminator, "D=%d", params.GetLongDiscriminator());
+
+        if (!params.GetVendorId().HasValue())
+        {
+            return AllocateQName(txtDiscriminator);
+        }
+
+        char txtCommissioningMode[chip::Mdns::kKeyCommissioningModeMaxLength + 4];
+        sprintf(txtCommissioningMode, "CM=%d", params.GetCommissioningMode() ? 1 : 0);
+
+        char txtOpenWindowCommissioningMode[chip::Mdns::kKeyAdditionalPairingMaxLength + 4];
+        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        {
+            sprintf(txtOpenWindowCommissioningMode, "AP=1");
+        }
+        else
+        {
+            txtOpenWindowCommissioningMode[0] = '\0';
+        }
+
+        char txtRotatingDeviceId[chip::Mdns::kKeyRotatingIdMaxLength + 4];
+        if (params.GetRotatingId().HasValue())
+        {
+            sprintf(txtRotatingDeviceId, "RI=%s", params.GetRotatingId().Value());
+        }
+        else
+        {
+            txtRotatingDeviceId[0] = '\0';
+        }
+
+        char txtPairingHint[chip::Mdns::kKeyPairingInstructionMaxLength + 4];
+        if (params.GetPairingHint().HasValue())
+        {
+            sprintf(txtPairingHint, "PH=%d", params.GetPairingHint().Value());
+        }
+        else
+        {
+            txtPairingHint[0] = '\0';
+        }
+
+        char txtPairingInstr[chip::Mdns::kKeyPairingInstructionMaxLength + 4];
+        if (params.GetPairingInstr().HasValue())
+        {
+            sprintf(txtPairingInstr, "PI=%s", params.GetPairingInstr().Value());
+        }
+        else
+        {
+            txtPairingInstr[0] = '\0';
+        }
+
+        return AllocateQName(txtDiscriminator, txtVidPid, txtCommissioningMode, txtOpenWindowCommissioningMode, txtDeviceType,
+                             txtDeviceName, txtRotatingDeviceId, txtPairingHint, txtPairingInstr);
+    }
+    else
+    {
+        return AllocateQName(txtVidPid, txtDeviceType, txtDeviceName);
     }
 }
 

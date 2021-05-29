@@ -19,11 +19,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include "af.h"
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/af-types.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <core/CHIPError.h>
@@ -34,7 +34,7 @@
 
 #include "LightingManager.h"
 #include "Options.h"
-#include "Server.h"
+#include <app/server/Server.h>
 
 #include <cassert>
 #include <iostream>
@@ -45,7 +45,7 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
@@ -131,7 +131,7 @@ CHIP_ERROR PrintQRCodeContent()
     // Wrap it so SuccessOrExit can work
     {
         chip::QRCodeSetupPayloadGenerator generator(payload);
-        err = generator.payloadBase41Representation(result);
+        err = generator.payloadBase38Representation(result);
         SuccessOrExit(err);
     }
 

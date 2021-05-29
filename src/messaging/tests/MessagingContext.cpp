@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <messaging/tests/MessagingContext.h>
+#include "MessagingContext.h"
 
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -35,15 +35,17 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     chip::Transport::AdminPairingInfo * destNodeAdmin = mAdmins.AssignAdminId(mDestAdminId, GetDestinationNodeId());
     VerifyOrReturnError(destNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins));
+    ReturnErrorOnFailure(
+        mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
+    ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
     ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
-                                                      SecureSessionMgr::PairingDirection::kInitiator, mSrcAdminId));
+                                                      SecureSession::SessionRole::kInitiator, mSrcAdminId));
 
-    return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal,
-                                        SecureSessionMgr::PairingDirection::kResponder, mDestAdminId);
+    return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder,
+                                        mDestAdminId);
 }
 
 // Shutdown all layers, finalize operations
@@ -53,16 +55,28 @@ CHIP_ERROR MessagingContext::Shutdown()
     return IOContext::Shutdown();
 }
 
+SecureSessionHandle MessagingContext::GetSessionLocalToPeer()
+{
+    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
+    return { GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() };
+}
+
+SecureSessionHandle MessagingContext::GetSessionPeerToLocal()
+{
+    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
+    return { GetSourceNodeId(), GetLocalKeyId(), GetAdminId() };
+}
+
 Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() }, delegate);
+    return mExchangeManager.NewContext(GetSessionLocalToPeer(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetSourceNodeId(), GetLocalKeyId(), GetAdminId() }, delegate);
+    return mExchangeManager.NewContext(GetSessionPeerToLocal(), delegate);
 }
 
 } // namespace Test

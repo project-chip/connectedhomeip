@@ -39,9 +39,6 @@ k32w_sdk("sdk") {
     "main",
     "${k32w_platform_dir}/app/project_include",
     "${k32w_platform_dir}/app/support",
-    "${chip_root}/examples/lighting-app/lighting-common",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
     "${k32w_platform_dir}/util/include",
   ]
 
@@ -75,13 +72,15 @@ k32w_executable("light_app") {
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w_platform_dir}/app/support:freertos_mbedtls_utils",
-    "${openthread_root}:libopenthread-cli-ftd",
-    "${openthread_root}:libopenthread-ftd",
+    "${openthread_root}:libopenthread-cli-mtd",
+    "${openthread_root}:libopenthread-mtd",
   ]
 
   cflags = [ "-Wconversion" ]
 
   ldscript = "${k32w_platform_dir}/app/ldscripts/chip-k32w061-linker.ld"
+
+  inputs = [ ldscript ]
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 

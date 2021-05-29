@@ -22,6 +22,7 @@
 #include <jni.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 /**
@@ -38,36 +39,26 @@ public:
     ~AndroidDeviceControllerWrapper();
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
+    chip::Controller::ExampleOperationalCredentialsIssuer & OpCredsIssuer() { return mOpCredsIssuer; }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
+    jobject JavaObjectRef() { return mJavaObjectRef; }
+    jlong ToJNIHandle();
 
-    void SendNetworkCredentials(const char * ssid, const char * password);
-    void SendThreadCredentials(chip::ByteSpan threadData);
+    void CallJavaMethod(const char * methodName, jint argument);
 
     // DevicePairingDelegate implementation
-    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           chip::RendezvousDeviceCredentialsDelegate * callback) override;
-    void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
+    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
 
     // DeviceStatusDelegate implementation
-    void OnMessage(chip::System::PacketBufferHandle msg) override;
+    void OnMessage(chip::System::PacketBufferHandle && msg) override;
     void OnStatusChange(void) override;
 
     // PersistentStorageDelegate implementation
-    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
-    CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
-    void AsyncSetKeyValue(const char * key, const char * value) override;
-    void AsyncDeleteKeyValue(const char * key) override;
-
-    jlong ToJNIHandle()
-    {
-        static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
-        return reinterpret_cast<jlong>(this);
-    }
-
-    jobject JavaObjectRef() { return mJavaObjectRef; }
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
+    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
@@ -82,8 +73,7 @@ private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;
-    chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
-    chip::PersistentStorageResultDelegate * mStorageResultDelegate   = nullptr;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
@@ -94,3 +84,9 @@ private:
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller)) {}
 };
+
+inline jlong AndroidDeviceControllerWrapper::ToJNIHandle()
+{
+    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
+    return reinterpret_cast<jlong>(this);
+}

@@ -20,17 +20,31 @@
 #include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
-#include "OnboardingCodesUtil.h"
-#include "Server.h"
 #include "Service.h"
 #include "ThreadUtil.h"
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 
-#include "attribute-storage.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/util/attribute-storage.h>
 
 #include <platform/CHIPDeviceLayer.h>
+
+// MCUMgr BT FOTA includes
+#ifdef CONFIG_MCUMGR_CMD_OS_MGMT
+#include "os_mgmt/os_mgmt.h"
+#endif
+#ifdef CONFIG_MCUMGR_CMD_IMG_MGMT
+#include "img_mgmt/img_mgmt.h"
+#endif
+#ifdef CONFIG_MCUMGR_SMP_BT
+#include <mgmt/mcumgr/smp_bt.h>
+#endif
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+#include <dfu/mcuboot.h>
+#endif
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
@@ -86,6 +100,22 @@ int AppTask::Init()
     // Initialize timer user data
     k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
+
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+    // Check if the image is run in the REVERT mode and eventually
+    // confirm it to prevent reverting on the next boot.
+    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
+    {
+        if (boot_write_img_confirmed())
+        {
+            LOG_ERR("Confirming firmware image failed, it will be reverted on the next boot.");
+        }
+        else
+        {
+            LOG_INF("New firmware image confirmed.");
+        }
+    }
+#endif
 
     BoltLockMgr().Init();
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
@@ -287,6 +317,14 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     }
 }
 
+int AppTask::SoftwareUpdateConfirmationHandler(uint32_t offset, uint32_t size, void * arg)
+{
+    // For now just print update progress and confirm data chunk without any additional checks.
+    LOG_INF("Software update progress %d B / %d B", offset, size);
+
+    return 0;
+}
+
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
     if (aEvent->ButtonEvent.PinNo != FUNCTION_BUTTON)
@@ -313,7 +351,26 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         {
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
-            LOG_INF("Software update is not implemented");
+
+#if defined(CONFIG_MCUMGR_SMP_BT) && defined(CONFIG_MCUMGR_CMD_IMG_MGMT) && defined(CONFIG_MCUMGR_CMD_OS_MGMT)
+            if (!sAppTask.mSoftwareUpdateEnabled)
+            {
+                sAppTask.mSoftwareUpdateEnabled = true;
+                os_mgmt_register_group();
+                img_mgmt_register_group();
+                img_mgmt_set_upload_cb(SoftwareUpdateConfirmationHandler, NULL);
+                smp_bt_register();
+
+                LOG_INF("Enabled software update");
+            }
+            else
+            {
+                LOG_INF("Software update is already enabled");
+            }
+
+#else
+            LOG_INF("Software update is disabled");
+#endif
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
@@ -359,7 +416,8 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
-    if (ConnectivityMgr().IsThreadProvisioned())
+    // In case of having software update enabled, allow on starting BLE advertising after Thread provisioning.
+    if (ConnectivityMgr().IsThreadProvisioned() && !sAppTask.mSoftwareUpdateEnabled)
     {
         LOG_INF("NFC Tag emulation and BLE advertisement not started - device is commissioned to a Thread network.");
         return;

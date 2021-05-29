@@ -23,15 +23,13 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#include "OnboardingCodesUtil.h"
+#include <app/server/OnboardingCodesUtil.h>
 
-#include "Server.h"
-#include "attribute-storage.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-
-#include "Service.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -114,7 +112,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     int err;
     AppEvent event;
-    uint64_t mLastChangeTimeUS = 0;
 
     err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -124,7 +121,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     ChipLogProgress(NotSpecified, "App Task started");
-    SetDeviceName("QPG6100LockDemo._chip._udp.local.");
 
     while (true)
     {
@@ -181,15 +177,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 qvCHIP_LedBlink(SYSTEM_STATE_LED, 50, 950);
             }
-        }
-
-        uint64_t nowUS            = chip::System::Layer::GetClock_Monotonic();
-        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            PublishService();
-            mLastChangeTimeUS = nowUS;
         }
     }
 }
@@ -276,7 +263,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
     // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
     {
 #if CHIP_ENABLE_OPENTHREAD
         ChipLogProgress(NotSpecified, "Release button now to Start Thread Joiner");
@@ -319,7 +306,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         return;
     }
 
-    // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
+    // To trigger BLE advertising: press the APP_FUNCTION_BUTTON button briefly (<
     // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
     // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
     // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
@@ -336,20 +323,36 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
 #endif
 
-            sAppTask.mFunction = kFunction_SoftwareUpdate;
+            sAppTask.mFunction = kFunction_StartBleAdv;
         }
     }
     else
     {
-        // If the button was released before factory reset got initiated, trigger a
-        // software update.
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+        // If the button was released before factory reset got initiated, trigger BLE advertising.
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
             sAppTask.CancelTimer();
-
             sAppTask.mFunction = kFunction_NoneSelected;
 
-            ChipLogError(NotSpecified, "Software Update currently not supported.");
+            if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+            {
+                ChipLogProgress(NotSpecified, "BLE advertising already in progress.");
+            }
+            else
+            {
+                if (!ConnectivityMgr().IsThreadProvisioned())
+                {
+                    // Enable BLE advertisements and pairing window
+                    if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+                    }
+                }
+                else
+                {
+                    ChipLogError(NotSpecified, "Network is already provisioned, BLE advertisement not enabled");
+                }
+            }
         }
 #if CHIP_ENABLE_OPENTHREAD
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Joiner)

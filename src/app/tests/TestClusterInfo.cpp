@@ -29,28 +29,9 @@
 namespace chip {
 namespace app {
 namespace TestClusterInfo {
-void TestSamePath(nlTestSuite * apSuite, void * apContext)
-{
-    AttributePathParams attributePathParams1(1, 2, 3, 4, 5, AttributePathFlags::kFieldIdValid);
-    AttributePathParams attributePathParams2(1, 2, 3, 4, 5, AttributePathFlags::kFieldIdValid);
-    ClusterInfo clusterInfo1(attributePathParams1, false);
-    ClusterInfo clusterInfo2(attributePathParams2, false);
-    NL_TEST_ASSERT(apSuite, clusterInfo1.IsSamePath(clusterInfo2));
-}
-
-void TestDifferentPath(nlTestSuite * apSuite, void * apContext)
-{
-    AttributePathParams attributePathParams1(1, 2, 3, 4, 5, AttributePathFlags::kFieldIdValid);
-    AttributePathParams attributePathParams2(6, 2, 3, 4, 5, AttributePathFlags::kFieldIdValid);
-    ClusterInfo clusterInfo1(attributePathParams1, false);
-    ClusterInfo clusterInfo2(attributePathParams2, false);
-    NL_TEST_ASSERT(apSuite, !clusterInfo1.IsSamePath(clusterInfo2));
-}
-
 void TestDirty(nlTestSuite * apSuite, void * apContext)
 {
-    AttributePathParams attributePathParams1(1, 2, 3, 4, 5, AttributePathFlags::kFieldIdValid);
-    ClusterInfo clusterInfo1(attributePathParams1, false);
+    ClusterInfo clusterInfo1;
     clusterInfo1.SetDirty();
     NL_TEST_ASSERT(apSuite, clusterInfo1.IsDirty());
     clusterInfo1.ClearDirty();
@@ -61,9 +42,7 @@ void TestDirty(nlTestSuite * apSuite, void * apContext)
 } // namespace chip
 
 namespace {
-const nlTest sTests[] = { NL_TEST_DEF("TestSamePath", chip::app::TestClusterInfo::TestSamePath),
-                          NL_TEST_DEF("TestDifferentPath", chip::app::TestClusterInfo::TestDifferentPath),
-                          NL_TEST_DEF("TestDirtiness", chip::app::TestClusterInfo::TestDirty), NL_TEST_SENTINEL() };
+const nlTest sTests[] = { NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty), NL_TEST_SENTINEL() };
 }
 
 int TestClusterInfo()

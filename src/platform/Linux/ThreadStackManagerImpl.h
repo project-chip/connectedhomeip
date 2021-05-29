@@ -82,8 +82,6 @@ public:
 
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
-    CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
-
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
 
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);

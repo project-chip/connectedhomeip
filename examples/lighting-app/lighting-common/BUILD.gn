@@ -28,13 +28,8 @@ if (chip_enable_pw_rpc) {
 }
 
 chip_data_model("lighting-common") {
-  cluster_sources = [
-    "basic",
-    "bindings",
-    "level-control",
-    "network-commissioning",
-    "on-off-server",
-  ]
+  zap_file = "lighting-app.zap"
 
   zap_pregenerated_dir = "gen"
+  is_server = true
 }

@@ -47,12 +47,10 @@ public:
      * @brief
      *   Handle received secure message.
      *
-     * @param header    the received message header
      * @param source    the source address of the package
-     * @param msgBuf    the buffer of (encrypted) payload
+     * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
      */
-    virtual void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                   System::PacketBufferHandle msgBuf) = 0;
+    virtual void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) = 0;
 };
 
 template <typename... TransportTypes>

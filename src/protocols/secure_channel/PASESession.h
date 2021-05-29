@@ -68,7 +68,7 @@ struct PASESessionSerializable
 
 typedef uint8_t PASEVerifier[2][kSpake2p_WS_Length];
 
-class DLL_EXPORT PASESession : public Messaging::ExchangeDelegateBase, public PairingSession
+class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
     PASESession();
@@ -85,7 +85,7 @@ public:
      *
      * @param mySetUpPINCode  Setup PIN code of the local device
      * @param pbkdf2IterCount Iteration count for PBKDF2 function
-     * @param salt            Salt to be used for SPAKE2P opertation
+     * @param salt            Salt to be used for SPAKE2P operation
      * @param saltLen         Length of salt
      * @param myKeyId         Key ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
@@ -115,6 +115,9 @@ public:
      * @param peerSetUpPINCode Setup PIN code of the peer device
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt     The exchange context to send and receive messages with the peer
+     *                         Note: It's expected that the caller of this API hands over the
+     *                         ownership of the exchangeCtxt to PASESession object. PASESession
+     *                         will close the exchange on (successful/failed) handshake completion.
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
@@ -139,13 +142,12 @@ public:
      *   Derive a secure session from the paired session. The API will return error
      *   if called before pairing is established.
      *
-     * @param info        Information string used for key derivation
-     * @param info_len    Length of info string
-     * @param session     Referene to the sescure session that will be
+     * @param session     Referene to the secure session that will be
      *                    initialized once pairing is complete
+     * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override;
+    CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override;
 
     /**
      * @brief
@@ -200,9 +202,32 @@ public:
     SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
 
     //// ExchangeDelegate Implementation ////
+    /**
+     * @brief
+     *   This function is the called by exchange context or exchange manager when it receives
+     *   a CHIP message corresponding to the context, or registered unsolicited message handler.
+     *
+     *   Note: If the function is called by unsolicited message handler, the ownership of the
+     *         provide exchange context is handed over to PASE Session object. The PASE Session
+     *         object ensures that the exchange will be closed on completion of the handshake.
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     *  @param[in]    packetHeader  A reference to the PacketHeader object.
+     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
+     *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
+     */
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle && payload) override;
+
+    /**
+     * @brief
+     *   This function is the protocol callback to invoke when the timeout for the receipt
+     *   of a response message has expired.
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     */
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
     {
@@ -217,6 +242,9 @@ private:
     };
 
     CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
+
+    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PacketHeader & packetHeader,
+                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg);
 
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                           PASEVerifier & verifier);
@@ -236,7 +264,9 @@ private:
     CHIP_ERROR HandleMsg3(const System::PacketBufferHandle & msg);
 
     void SendErrorMsg(Spake2pErrorType errorCode);
-    void HandleErrorMsg(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
+
+    void CloseExchange();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
@@ -301,14 +331,11 @@ public:
 
     SecurePairingUsingTestSecret(uint16_t peerKeyId, uint16_t localKeyId) : mPeerKeyID(peerKeyId), mLocalKeyID(localKeyId) {}
 
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override
+    CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override
     {
-        VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(info_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
-
         size_t secretLen = strlen(kTestSecret);
-
-        return session.InitFromSecret(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen, nullptr, 0, info, info_len);
+        return session.InitFromSecret(ByteSpan(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen), ByteSpan(nullptr, 0),
+                                      SecureSession::SessionInfoType::kSessionEstablishment, role);
     }
 
     CHIP_ERROR ToSerializable(PASESessionSerializable & serializable)

@@ -52,6 +52,9 @@ enum TestCert
     kNode02_02 = 10,
     kNode02_03 = 11,
     kNode02_04 = 12,
+    kNode02_05 = 13,
+    kNode02_06 = 14,
+    kNode02_07 = 15,
 };
 
 // Special flags to alter how certificates are fetched/loaded.
@@ -207,6 +210,39 @@ extern const uint8_t sTestCert_Node02_04_PrivateKey[];
 extern const uint8_t sTestCert_Node02_04_PrivateKey_Len;
 extern const uint8_t sTestCert_Node02_04_SubjectKeyId[];
 extern const uint8_t sTestCert_Node02_04_SubjectKeyId_Len;
+
+extern const uint8_t sTestCert_Node02_05_Chip[];
+extern const uint32_t sTestCert_Node02_05_Chip_Len;
+extern const uint8_t sTestCert_Node02_05_DER[];
+extern const uint32_t sTestCert_Node02_05_DER_Len;
+extern const uint8_t sTestCert_Node02_05_PublicKey[];
+extern const uint8_t sTestCert_Node02_05_PublicKey_Len;
+extern const uint8_t sTestCert_Node02_05_PrivateKey[];
+extern const uint8_t sTestCert_Node02_05_PrivateKey_Len;
+extern const uint8_t sTestCert_Node02_05_SubjectKeyId[];
+extern const uint8_t sTestCert_Node02_05_SubjectKeyId_Len;
+
+extern const uint8_t sTestCert_Node02_06_Chip[];
+extern const uint32_t sTestCert_Node02_06_Chip_Len;
+extern const uint8_t sTestCert_Node02_06_DER[];
+extern const uint32_t sTestCert_Node02_06_DER_Len;
+extern const uint8_t sTestCert_Node02_06_PublicKey[];
+extern const uint8_t sTestCert_Node02_06_PublicKey_Len;
+extern const uint8_t sTestCert_Node02_06_PrivateKey[];
+extern const uint8_t sTestCert_Node02_06_PrivateKey_Len;
+extern const uint8_t sTestCert_Node02_06_SubjectKeyId[];
+extern const uint8_t sTestCert_Node02_06_SubjectKeyId_Len;
+
+extern const uint8_t sTestCert_Node02_07_Chip[];
+extern const uint32_t sTestCert_Node02_07_Chip_Len;
+extern const uint8_t sTestCert_Node02_07_DER[];
+extern const uint32_t sTestCert_Node02_07_DER_Len;
+extern const uint8_t sTestCert_Node02_07_PublicKey[];
+extern const uint8_t sTestCert_Node02_07_PublicKey_Len;
+extern const uint8_t sTestCert_Node02_07_PrivateKey[];
+extern const uint8_t sTestCert_Node02_07_PrivateKey_Len;
+extern const uint8_t sTestCert_Node02_07_SubjectKeyId[];
+extern const uint8_t sTestCert_Node02_07_SubjectKeyId_Len;
 
 } // namespace TestCerts
 } // namespace chip

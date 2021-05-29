@@ -72,7 +72,7 @@ m_fsl_prodInfo_size = m_sector_size;
 m_fsl_prodInfo_end                             = m_flash_size - 17 * m_sector_size - 1;
 m_fsl_prodInfo_start                           = m_fsl_prodInfo_end - m_fsl_prodInfo_size + 1;
 
-NV_STORAGE_MAX_SECTORS                         = 16;
+NV_STORAGE_MAX_SECTORS                         = 63;
 NV_STORAGE_SIZE                                = NV_STORAGE_MAX_SECTORS * m_sector_size;
 NV_STORAGE_START_ADDRESS                       = m_fsl_prodInfo_start - 1;
 NV_STORAGE_END_ADDRESS                         = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;

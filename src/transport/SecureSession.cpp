@@ -37,49 +37,67 @@ namespace {
 constexpr size_t kAESCCMIVLen = 12;
 constexpr size_t kMaxAADLen   = 128;
 
+/* Session Establish Key Info */
+constexpr uint8_t SEKeysInfo[] = { 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79, 0x73 };
+
+/* Session Resumption Key Info */
+constexpr uint8_t RSEKeysInfo[] = { 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x75,
+                                    0x6d, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79, 0x73 };
+
 } // namespace
 
 using namespace Crypto;
 
+#ifdef ENABLE_HSM_HKDF
+using HKDF_sha_crypto = HKDF_shaHSM;
+#else
+using HKDF_sha_crypto = HKDF_sha;
+#endif
+
 SecureSession::SecureSession() : mKeyAvailable(false) {}
 
-CHIP_ERROR SecureSession::InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
-                                         const size_t salt_length, const uint8_t * info, const size_t info_length)
+CHIP_ERROR SecureSession::InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
 {
-
+    HKDF_sha_crypto mHKDF;
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(secret != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(secret_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((salt_length == 0) || (salt != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(info_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(secret.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(secret.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((salt.size() == 0) || (salt.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(HKDF_SHA256(secret, secret_length, salt, salt_length, info, info_length, mKey, sizeof(mKey)));
+    const uint8_t * info = SEKeysInfo;
+    size_t infoLen       = sizeof(SEKeysInfo);
+
+    if (infoType == SessionInfoType::kSessionResumption)
+    {
+        info    = RSEKeysInfo;
+        infoLen = sizeof(RSEKeysInfo);
+    }
+
+    ReturnErrorOnFailure(
+        mHKDF.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info, infoLen, &mKeys[0][0], sizeof(mKeys)));
 
     mKeyAvailable = true;
+    mSessionRole  = role;
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                               const uint8_t * salt, const size_t salt_length, const uint8_t * info, const size_t info_length)
+                               const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
 {
 
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError((salt_length == 0) || (salt != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(info_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     P256ECDHDerivedSecret secret;
     ReturnErrorOnFailure(local_keypair.ECDH_derive_secret(remote_public_key, secret));
 
-    return InitFromSecret(secret, secret.Length(), salt, salt_length, info, info_length);
+    return InitFromSecret(ByteSpan(secret, secret.Length()), salt, infoType, role);
 }
 
 void SecureSession::Reset()
 {
     mKeyAvailable = false;
-    memset(mKey, 0, sizeof(mKey));
+    memset(mKeys, 0, sizeof(mKeys));
 }
 
 CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_t len)
@@ -132,8 +150,19 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
 
     ReturnErrorOnFailure(GetIV(header, IV, sizeof(IV)));
     ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
-    ReturnErrorOnFailure(
-        AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen));
+
+    KeyUsage usage = kR2IKey;
+
+    // Message is encrypted before sending. If the secure session was created by session
+    // initiator, we'll use I2R key to encrypt the message that's being transmittted.
+    // Otherwise, we'll use R2I key, as the responder is sending the message.
+    if (mSessionRole == SessionRole::kInitiator)
+    {
+        usage = kI2RKey;
+    }
+
+    ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], kAES_CCM128_Key_Length, IV, sizeof(IV),
+                                         output, tag, taglen));
 
     mac.SetTag(&header, encType, tag, taglen);
 
@@ -157,7 +186,18 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     ReturnErrorOnFailure(GetIV(header, IV, sizeof(IV)));
     ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
 
-    return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);
+    KeyUsage usage = kI2RKey;
+
+    // Message is decrypted on receive. If the secure session was created by session
+    // initiator, we'll use R2I key to decrypt the message (as it was sent by responder).
+    // Otherwise, we'll use I2R key, as the responder is sending the message.
+    if (mSessionRole == SessionRole::kInitiator)
+    {
+        usage = kR2IKey;
+    }
+
+    return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage], kAES_CCM128_Key_Length, IV, sizeof(IV),
+                           output);
 }
 
 } // namespace chip

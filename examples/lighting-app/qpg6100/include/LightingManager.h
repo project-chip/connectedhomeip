@@ -48,7 +48,7 @@ public:
     int Init();
     bool IsTurnedOn();
     uint8_t GetLevel();
-    bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value);
+    bool InitiateAction(Action_t aAction, int32_t aActor, uint16_t size, uint8_t * value);
 
     using LightingCallback_fn = std::function<void(Action_t)>;
 

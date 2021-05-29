@@ -34,31 +34,43 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
-CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId)
+CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = FinalizeCommandsMessage();
     SuccessOrExit(err);
 
-    ClearExistingExchangeContext();
+    // Discard any existing exchange context. Effectively we can only have one exchange per CommandSender
+    // at any one time.
+    AbortExistingExchangeContext();
 
     // Create a new exchange context.
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
-    mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
+    if (secureSession == nullptr)
+    {
+        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
+    }
+    else
+    {
+        mpExchangeCtx = mpExchangeMgr->NewContext(*secureSession, this);
+    }
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+    err = mpExchangeCtx->SendMessage(
+        Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
+        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
     SuccessOrExit(err);
     MoveToState(CommandState::Sending);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ClearExistingExchangeContext();
+        AbortExistingExchangeContext();
     }
     ChipLogFunctError(err);
 
@@ -66,35 +78,25 @@ exit:
 }
 
 void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
+                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    // Assert that the exchange context matches the client's current context.
-    // This should never fail because even if SendCommandRequest is called
-    // back-to-back, the second call will call Close() on the first exchange,
-    // which clears the OnMessageReceived callback.
 
-    VerifyOrDie(apExchangeContext == mpExchangeCtx);
-
-    // Verify that the message is an Invoke Command Response.
-    // If not, close the exchange and free the payload.
-    if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
-    {
-        apExchangeContext->Close();
-        mpExchangeCtx = nullptr;
-        goto exit;
-    }
-
-    // Close the current exchange after receiving the response since the response message marks the
-    // end of conversation represented by the exchange. We should create an new exchange for a new
-    // conversation defined in Interaction Model protocol.
-    ClearExistingExchangeContext();
+    VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse),
+                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId);
     SuccessOrExit(err);
 
 exit:
-    Reset();
+    ChipLogFunctError(err);
+
+    // Close the exchange cleanly so that the ExchangeManager will send an ack for the message we just received.
+    // This needs to be done before the Reset() call, because Reset() aborts mpExchangeCtx if its not null.
+    mpExchangeCtx->Close();
+    mpExchangeCtx = nullptr;
+
     if (mpDelegate != nullptr)
     {
         if (err != CHIP_NO_ERROR)
@@ -106,18 +108,21 @@ exit:
             mpDelegate->CommandResponseProcessed(this);
         }
     }
+
+    Shutdown();
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
-    Reset();
 
     if (mpDelegate != nullptr)
     {
         mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
     }
+
+    Shutdown();
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
@@ -158,6 +163,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     }
     else if (CHIP_END_OF_TLV == err)
     {
+        // TODO(Spec#3258): The endpoint id in response command is not clear, so we cannot do "ClientClusterCommandExists" check.
         err = aCommandElement.GetData(&commandDataReader);
         SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.

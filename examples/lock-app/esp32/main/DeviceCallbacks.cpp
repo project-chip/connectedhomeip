@@ -24,11 +24,13 @@
  **/
 
 #include "DeviceCallbacks.h"
+#include "AppConfig.h"
+#include "BoltLockManager.h"
 
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <support/CodeUtils.h>
 
 static const char * TAG = "lock-devicecallbacks";
@@ -54,12 +56,21 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);
 
-    ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
+    switch (clusterId)
+    {
+    case ZCL_ON_OFF_CLUSTER_ID:
+        OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
+        break;
+
+    default:
+        ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
+        break;
+    }
 
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
@@ -90,4 +101,20 @@ void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
     {
         ESP_LOGI(TAG, "Commissioner detected!");
     }
+}
+
+void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    if (*value)
+    {
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::LOCK_ACTION);
+    }
+    else
+    {
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::UNLOCK_ACTION);
+    }
+exit:
+    return;
 }

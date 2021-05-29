@@ -17,6 +17,7 @@
 #include <platform/KeyValueStoreManager.h>
 
 #include <algorithm>
+#include <memory>
 #include <string.h>
 
 #include "CHIPJNIError.h"
@@ -32,7 +33,7 @@ namespace DeviceLayer {
 namespace PersistedStorage {
 namespace {
 
-constexpr size_t kMaxKvsValueBytes        = 1024;
+constexpr size_t kMaxKvsValueBytes        = 4096;
 constexpr size_t kMaxKvsValueEncodedChars = BASE64_ENCODED_LEN(kMaxKvsValueBytes) + 1;
 
 } // namespace
@@ -42,18 +43,20 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset)
 {
-    ReturnErrorCodeIf(mEnv == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mKeyValueStoreManagerClass == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mGetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(offset != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    UtfString javaKey(mEnv, key);
+    JNIEnv * env = GetEnvForCurrentThread();
+    ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
-    jobject javaValue = mEnv->CallStaticObjectMethod(mKeyValueStoreManagerClass, mGetMethod, javaKey.jniValue());
-    if (mEnv->ExceptionCheck())
+    UtfString javaKey(env, key);
+
+    jobject javaValue = env->CallStaticObjectMethod(mKeyValueStoreManagerClass, mGetMethod, javaKey.jniValue());
+    if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in KVS::Get");
-        mEnv->ExceptionDescribe();
+        env->ExceptionDescribe();
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
@@ -62,15 +65,17 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    JniUtfString utfValue(mEnv, (jstring) javaValue);
-    if (strlen(utfValue.c_str()) > kMaxKvsValueEncodedChars)
+    JniUtfString utfValue(env, (jstring) javaValue);
+    const size_t utfValueLen = strlen(utfValue.c_str());
+
+    if (utfValueLen > kMaxKvsValueEncodedChars)
     {
         ChipLogError(DeviceLayer, "Unexpected large value received from KVS");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    uint8_t buffer[kMaxKvsValueBytes];
-    uint16_t decodedLength = chip::Base64Decode(utfValue.c_str(), strlen(utfValue.c_str()), buffer);
+    std::unique_ptr<uint8_t[]> buffer(new uint8_t[BASE64_MAX_DECODED_LEN(utfValueLen)]);
+    uint16_t decodedLength = chip::Base64Decode(utfValue.c_str(), utfValueLen, buffer.get());
     if (decodedLength == UINT16_MAX)
     {
         ChipLogError(DeviceLayer, "KVS base64 decoding failed");
@@ -84,7 +89,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     if (value != nullptr)
     {
-        memcpy(value, buffer, std::min<size_t>(value_size, decodedLength));
+        memcpy(value, buffer.get(), std::min<size_t>(value_size, decodedLength));
     }
 
     return CHIP_NO_ERROR;
@@ -92,19 +97,21 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    ReturnErrorCodeIf(mEnv == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mKeyValueStoreManagerClass == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mDeleteMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    UtfString javaKey(mEnv, key);
+    JNIEnv * env = GetEnvForCurrentThread();
+    ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
-    mEnv->CallStaticVoidMethod(mKeyValueStoreManagerClass, mDeleteMethod, javaKey.jniValue());
+    UtfString javaKey(env, key);
 
-    if (mEnv->ExceptionCheck())
+    env->CallStaticVoidMethod(mKeyValueStoreManagerClass, mDeleteMethod, javaKey.jniValue());
+
+    if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in KVS::Delete");
-        mEnv->ExceptionDescribe();
-        mEnv->ExceptionClear();
+        env->ExceptionDescribe();
+        env->ExceptionClear();
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
@@ -113,36 +120,57 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    ReturnErrorCodeIf(mEnv == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mKeyValueStoreManagerClass == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mSetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(value_size > kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
-    char base64Buffer[kMaxKvsValueEncodedChars];
+    JNIEnv * env = GetEnvForCurrentThread();
+    ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
-    size_t length = chip::Base64Encode(static_cast<const uint8_t *>(value), value_size, base64Buffer);
+    std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value_size) + 1]);
 
-    base64Buffer[length] = 0;
+    size_t length        = chip::Base64Encode(static_cast<const uint8_t *>(value), value_size, buffer.get());
+    buffer.get()[length] = 0;
 
-    UtfString utfKey(mEnv, key);
-    UtfString utfBase64Value(mEnv, base64Buffer);
+    UtfString utfKey(env, key);
+    UtfString utfBase64Value(env, buffer.get());
 
-    mEnv->CallStaticVoidMethod(mKeyValueStoreManagerClass, mSetMethod, utfKey.jniValue(), utfBase64Value.jniValue());
+    env->CallStaticVoidMethod(mKeyValueStoreManagerClass, mSetMethod, utfKey.jniValue(), utfBase64Value.jniValue());
 
-    if (mEnv->ExceptionCheck())
+    if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in KVS::Delete");
-        mEnv->ExceptionDescribe();
-        mEnv->ExceptionClear();
+        env->ExceptionDescribe();
+        env->ExceptionClear();
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
     return CHIP_NO_ERROR;
 }
 
-void KeyValueStoreManagerImpl::InitializeMethodForward(JNIEnv * env)
+JNIEnv * KeyValueStoreManagerImpl::GetEnvForCurrentThread()
 {
-    mEnv = env;
+    if (mJvm == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Missing Java VM in persistent storage");
+        return nullptr;
+    }
+
+    JNIEnv * env = nullptr;
+
+    jint err = mJvm->AttachCurrentThread(&env, nullptr);
+    if (err != JNI_OK)
+    {
+        ChipLogError(DeviceLayer, "Failed to get JNIEnv for the current thread");
+        return nullptr;
+    }
+
+    return env;
+}
+
+void KeyValueStoreManagerImpl::InitializeMethodForward(JavaVM * vm, JNIEnv * env)
+{
+    mJvm = vm;
 
     CHIP_ERROR err = GetClassRef(env, "chip/devicecontroller/KeyValueStoreManager", mKeyValueStoreManagerClass);
     if (err != CHIP_NO_ERROR)

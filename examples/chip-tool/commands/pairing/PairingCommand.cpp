@@ -17,7 +17,6 @@
  */
 
 #include "PairingCommand.h"
-#include "gen/enums.h"
 #include <lib/core/CHIPSafeCasts.h>
 
 using namespace ::chip;
@@ -31,12 +30,20 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Controller::ControllerInitParams params{
-        .storageDelegate              = &storage,
-        .mDeviceAddressUpdateDelegate = this,
-    };
+    chip::Controller::CommissionerInitParams params;
+    params.storageDelegate              = &storage;
+    params.mDeviceAddressUpdateDelegate = this;
+    params.pairingDelegate              = this;
 
-    err = mCommissioner.Init(localId, params, this);
+    err = mOpCredsIssuer.Initialize(storage);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", ErrorStr(err)));
+
+    params.operationalCredentialsDelegate = &mOpCredsIssuer;
+
+    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
+
+    err = mCommissioner.Init(localId, params);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
 
     err = mCommissioner.ServiceEvents();
@@ -70,6 +77,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
         break;
+    case PairingMode::OnNetwork:
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
@@ -103,36 +111,17 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
     return mCommissioner.UnpairDevice(remoteId);
 }
 
-void PairingCommand::OnStatusUpdate(RendezvousSessionDelegate::Status status)
+void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     switch (status)
     {
-    case RendezvousSessionDelegate::Status::SecurePairingSuccess:
+    case DevicePairingDelegate::Status::SecurePairingSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         break;
-    case RendezvousSessionDelegate::Status::SecurePairingFailed:
+    case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         break;
-    case RendezvousSessionDelegate::Status::NetworkProvisioningSuccess:
-        ChipLogProgress(chipTool, "Network Provisioning Success");
-        break;
-    case RendezvousSessionDelegate::Status::NetworkProvisioningFailed:
-        ChipLogError(chipTool, "Network Provisioning Failed");
-        break;
     }
-}
-
-void PairingCommand::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
-{
-    ChipLogProgress(chipTool, "OnNetworkCredentialsRequested");
-    callback->SendNetworkCredentials(mSSID, mPassword);
-}
-
-void PairingCommand::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                                       RendezvousDeviceCredentialsDelegate * callback)
-{
-    // TODO Implement this
-    ChipLogProgress(chipTool, "OnOperationalCredentialsRequested");
 }
 
 void PairingCommand::OnPairingComplete(CHIP_ERROR err)
@@ -321,6 +310,7 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
 CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
     ReturnErrorOnFailure(mCommissioner.GetDevice(mRemoteId, &mDevice));
+    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", mRemoteId, mFabricId);
     return mCommissioner.UpdateDevice(mDevice, mFabricId);
 }
 

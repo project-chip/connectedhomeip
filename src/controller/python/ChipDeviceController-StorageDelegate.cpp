@@ -29,12 +29,7 @@
 namespace chip {
 namespace Controller {
 
-void PythonPersistentStorageDelegate::SetStorageDelegate(PersistentStorageResultDelegate * delegate)
-{
-    mDelegate = delegate;
-}
-
-CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
+CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
     auto val = mStorage.find(key);
     if (val == mStorage.end())
@@ -47,7 +42,7 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, ch
         size = 0;
     }
 
-    uint16_t neededSize = val->second.size() + 1;
+    uint16_t neededSize = val->second.size();
     if (size == 0)
     {
         size = neededSize;
@@ -56,28 +51,28 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, ch
 
     if (size < neededSize)
     {
-        memcpy(value, val->second.c_str(), size - 1);
-        value[size - 1] = '\0';
-        size            = neededSize;
+        memcpy(value, val->second.data(), size);
+        size = neededSize;
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    memcpy(value, val->second.c_str(), neededSize);
+    memcpy(value, val->second.data(), neededSize);
     size = neededSize;
     return CHIP_NO_ERROR;
 }
 
-void PythonPersistentStorageDelegate::AsyncSetKeyValue(const char * key, const char * value)
+CHIP_ERROR PythonPersistentStorageDelegate::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    mStorage[key] = value;
-    ChipLogDetail(Controller, "AsyncSetKeyValue: %s=%s", key, value);
-    mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
+    mStorage[key] = std::string(static_cast<const char *>(value), size);
+    ChipLogDetail(Controller, "SyncSetKeyValue on %s", key);
+
+    return CHIP_NO_ERROR;
 }
 
-void PythonPersistentStorageDelegate::AsyncDeleteKeyValue(const char * key)
+CHIP_ERROR PythonPersistentStorageDelegate::SyncDeleteKeyValue(const char * key)
 {
     mStorage.erase(key);
-    mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller
