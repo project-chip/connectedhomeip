@@ -47,27 +47,6 @@
     <string name="rendezvous_over_ble_commissioning_success_text">Network commissioning completed</string>
     <string name="rendezvous_over_ble_commissioning_failure_text">Network commissioning failed</string>
 
-    <string name="commissioner_openthread_commissioning">Open Thread Commissioning</string>
-    <string name="commissioner_name">Commissioner</string>
-    <string name="commissioner_scan_device">Scan Device</string>
-    <string name="commissioner_cancel">Cancel</string>
-    <string name="commissioner_done">Done</string>
-    <string name="commissioner_scan_instruction">Please scan the QR code on the device</string>
-    <string name="commissioner_your_device">Your Device</string>
-    <string name="commissioner_select_network">Select Network</string>
-    <string name="commissioner_add_device">Add Device</string>
-    <string name="commissioner_scan_qrcode_fragment_label">Scan QR Code</string>
-    <string name="commissioner_select_network_fragment_label">Select Network</string>
-    <string name="commissioner_password">password</string>
-    <string name="commissioner_password_connect">connect</string>
-    <string name="commissioner_password_cancel">cancel</string>
-    <string name="commissioner_fetch_credential_done">done</string>
-    <string name="commissioner_fetch_credential_cancel">cancel</string>
-    <string name="commissioner_commissioning_fragment_label">Commissioning</string>
-    <string name="commissioner_location_permission_missing_alert_title">Location permission missing</string>
-    <string name="commissioner_location_permission_missing_alert_message">Location permission is required to scan BLE devices.</string>
-    <string name="commissioner_location_permission_missing_alert_try_again">Try again</string>
-
     <string name="attestation_test_btn_text">Attestation Test</string>
     <string name="attestation_fetching_status">Fetching…</string>
     <string name="attestation_app_not_found">No attestation app found</string>

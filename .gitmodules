@@ -42,10 +42,6 @@
 	path = third_party/bluez/repo
 	url = https://github.com/bluez/bluez.git
 	branch = master
-[submodule "ot-commissioner"]
-	path = third_party/ot-commissioner/repo
-	url = https://github.com/openthread/ot-commissioner
-	branch = main
 [submodule "cirque"]
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
