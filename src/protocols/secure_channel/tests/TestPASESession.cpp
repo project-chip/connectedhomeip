@@ -63,6 +63,10 @@ public:
 
         if (mNumMessagesToDrop == 0)
         {
+            // The msgBuf is also being used for retransmission. So we cannot hand over the same buffer
+            // to the receive handler. The receive handler modifies the buffer for extracting headers etc.
+            // So the buffer passed to receive handler cannot be used for retransmission afterwards.
+            // Let's clone the message, and provide cloned message to the receive handler.
             System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
             HandleMessageReceived(address, std::move(receivedMessage));
         }
@@ -209,6 +213,10 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, contextCommissioner,
                                             &delegateCommissioner) == CHIP_NO_ERROR);
 
+    // Standalone acks also increment the mSentMessageCount. But some messages could be acked
+    // via piggybacked acks. So we cannot check for a specific value of mSentMessageCount.
+    // Let's make sure atleast number is >= than the minimum messages required to complete the
+    // handshake.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 5);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
