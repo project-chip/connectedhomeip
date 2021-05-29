@@ -14,24 +14,23 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
-import("//build_overrides/ot_qorvo.gni")
 import("//build_overrides/qpg6100_sdk.gni")
 
 import("${qpg6100_sdk_build_root}/qpg6100_sdk.gni")
 
-# QPG6095 and QPG6100 share settings and OT glue code
 openthread_qpg_family = "qpg6100"
+openthread_qpg_root = "${chip_root}/third_party/openthread/ot-qorvo"
 
 config("openthread_qpg6100_config") {
-  include_dirs = [ "${openthread_qorvo_root}/src/${openthread_qpg_family}" ]
+  include_dirs = [ "${openthread_qpg_root}/src/${openthread_qpg_family}" ]
 
   include_dirs += [ "${chip_root}/examples/platform/qpg6100" ]
 }
 
 source_set("openthread_core_config_qpg6100") {
   sources = [
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/openthread-core-${openthread_qpg_family}-config-check.h",
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/openthread-core-${openthread_qpg_family}-config.h",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/openthread-core-${openthread_qpg_family}-config-check.h",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/openthread-core-${openthread_qpg_family}-config.h",
   ]
 
   public_deps = [ "${qpg6100_sdk_build_root}:qpg6100_sdk" ]
@@ -40,23 +39,29 @@ source_set("openthread_core_config_qpg6100") {
 }
 
 source_set("openthread_mbedtls_config_qpg6100") {
-  sources = [ "${openthread_qorvo_root}/src/${openthread_qpg_family}/crypto/${openthread_qpg_family}-mbedtls-config.h" ]
+  sources = [ "${openthread_qpg_root}/src/${openthread_qpg_family}/crypto/${openthread_qpg_family}-mbedtls-config.h" ]
 }
 
 source_set("libopenthread-qpg6100") {
   sources = [
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/alarm.c",
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/diag.c",
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/entropy.c",
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/logging.c",
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/misc.c",
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/platform.c",
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/radio.c",
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/settings.cpp",
-    "${openthread_qorvo_root}/src/${openthread_qpg_family}/uart.c",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/alarm.c",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/diag.c",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/entropy.c",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/logging.c",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/misc.c",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/platform.c",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/radio.c",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/settings.cpp",
+    "${openthread_qpg_root}/src/${openthread_qpg_family}/uart.c",
   ]
 
-  include_dirs = [ "${openthread_qorvo_root}/src/${openthread_qpg_family}" ]
+  include_dirs = [ "${openthread_qpg_root}/src/${openthread_qpg_family}" ]
+
+  sources += [
+    "${openthread_root}/examples/apps/cli/cli_uart.cpp",
+    "${openthread_root}/src/cli/cli_config.h",
+  ]
+  include_dirs += [ "${openthread_root}/examples/apps" ]
 
   libs = [ "${qpg6100_sdk_root}/qpg6100/lib/libOpenThread_qpg6100.a" ]
 
