@@ -414,6 +414,29 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
     return env->NewStringUTF(addrStr);
 }
 
+JNI_METHOD(void, updateAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port)
+{
+    ScopedPthreadLock lock(&sStackLock);
+    Device * chipDevice = nullptr;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+
+    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+
+    Inet::IPAddress ipAddress = {};
+    JniUtfString addressAccessor(env, address);
+    VerifyOrExit(Inet::IPAddress::FromString(addressAccessor.c_str(), ipAddress), err = CHIP_ERROR_INVALID_ADDRESS);
+    VerifyOrExit(CanCastTo<uint16_t>(port), err = CHIP_ERROR_INVALID_ADDRESS);
+
+    err = chipDevice->UpdateAddress(Transport::PeerAddress::UDP(ipAddress, port));
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to update address");
+        ThrowError(env, err);
+    }
+}
+
 JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring messageObj)
 {
     ScopedPthreadLock lock(&sStackLock);

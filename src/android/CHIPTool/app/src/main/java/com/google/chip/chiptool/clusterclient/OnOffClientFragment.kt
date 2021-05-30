@@ -1,5 +1,8 @@
 package com.google.chip.chiptool.clusterclient
 
+import android.content.Context
+import android.net.nsd.NsdManager
+import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,6 +36,7 @@ class OnOffClientFragment : Fragment() {
     return inflater.inflate(R.layout.on_off_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
+      updateAddressBtn.setOnClickListener{ updateAddressClick() }
       onBtn.setOnClickListener { sendOnCommandClick() }
       offBtn.setOnClickListener { sendOffCommandClick() }
       toggleBtn.setOnClickListener { sendToggleCommandClick() }
@@ -59,6 +63,7 @@ class OnOffClientFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
+    fabricIdEd.setText(5544332211.toString())
     deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
 
@@ -81,6 +86,39 @@ class OnOffClientFragment : Fragment() {
 
     override fun onError(error: Throwable?) {
       Log.d(TAG, "onError: $error")
+    }
+  }
+
+  private fun updateAddressClick() {
+    val serviceInfo = NsdServiceInfo().apply {
+      serviceName = "%016X-%016X".format(fabricIdEd.text.toString().toLong(), deviceIdEd.text.toString().toLong())
+      serviceType = "_chip._tcp"
+    }
+
+    val resolverListener = object : NsdManager.ResolveListener {
+      override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
+        showMessage("Address resolution failed: $errorCode")
+      }
+
+      override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
+        val hostAddress = serviceInfo?.host?.hostAddress ?: ""
+        val port = serviceInfo?.port ?: 0
+
+        showMessage("Address: ${hostAddress}:${port}")
+
+        if (hostAddress == "" || port == 0)
+          return
+
+        try {
+          deviceController.updateAddress(deviceIdEd.text.toString().toLong(), hostAddress, port)
+        } catch (e: ChipDeviceControllerException) {
+          showMessage(e.toString())
+        }
+      }
+    }
+
+    (requireContext().getSystemService(Context.NSD_SERVICE) as NsdManager).apply {
+      resolveService(serviceInfo, resolverListener)
     }
   }
 
@@ -119,7 +157,13 @@ class OnOffClientFragment : Fragment() {
         ( 0xff and (levelValue ?: 0))
       )
     } catch (e: ChipDeviceControllerException) {
-      commandStatusTv.text = e.toString()
+      showMessage(e.toString())
+    }
+  }
+
+  private fun showMessage(msg: String) {
+    requireActivity().runOnUiThread {
+      commandStatusTv.text = msg
     }
   }
 
