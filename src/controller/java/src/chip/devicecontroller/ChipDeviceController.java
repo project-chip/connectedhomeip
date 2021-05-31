@@ -203,9 +203,7 @@ public class ChipDeviceController {
       long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
 
   private native void enableThreadNetwork(
-      long deviceControllerPtr,
-      long deviceId,
-      byte[] operationalDataset);
+      long deviceControllerPtr, long deviceId, byte[] operationalDataset);
 
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 
