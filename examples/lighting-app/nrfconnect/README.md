@@ -462,4 +462,6 @@ CHIP-enabled Thread network.
 
 ### Testing Device Firmware Upgrade
 
-Read the [DFU tutorial](../../../docs/guides/nrfconnect_examples_software_update.md) to see how to upgrade your device firmware.
+Read the
+[DFU tutorial](../../../docs/guides/nrfconnect_examples_software_update.md) to
+see how to upgrade your device firmware.

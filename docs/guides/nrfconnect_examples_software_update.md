@@ -10,50 +10,66 @@ The
 [CHIP nRF Connect Pigweed Example Application](../../examples/pigweed-app/nrfconnect/README.md)
 does not support DFU.
 
-Currently, the Bluetooth LE is the only available transport for performing the DFU operation and it uses [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt).
-The upgrade can be done either using a smartphone application or a PC command line tool.
+Currently, the Bluetooth LE is the only available transport for performing the
+DFU operation and it uses
+[Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt).
+The upgrade can be done either using a smartphone application or a PC command
+line tool.
 
 ## Device Firmware Upgrade using smartphone
 
-To upgrade your device firmware over Bluetooth LE using smartphone, complete the following steps:
+To upgrade your device firmware over Bluetooth LE using smartphone, complete the
+following steps:
 
 1. Install one of the following applications on your smartphone:
 
-   - [nRF Connect for Mobile](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Connect-for-mobile)
-   - [nRF Toolbox](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Toolbox)
+    - [nRF Connect for Mobile](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Connect-for-mobile)
+    - [nRF Toolbox](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Toolbox)
 
 2. Push **Button 1** on the device to enable the software update functionality.
 3. Push **Button 4** on the device to start the Bluetooth LE advertising.
 4. Follow the instructions about downloading the new image to a device on the
-[FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
-page in the nRF Connect documentation.
+   [FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
+   page in the nRF Connect documentation.
 
 ## Device Firmware Upgrade using PC command line tool
 
-To upgrade your device firmware over Bluetooth LE, you can use the PC command line tool provided by the [mcumgr](https://github.com/zephyrproject-rtos/mcumgr) project.
+To upgrade your device firmware over Bluetooth LE, you can use the PC command
+line tool provided by the [mcumgr](https://github.com/zephyrproject-rtos/mcumgr)
+project.
 
-> **_WARNING:_** mcumgr tool using Bluetooth LE is available only for Linux and macOS systems.
-> On Windows, there is no support for Device Firmware Upgrade over Bluetooth LE yet.
+> **_WARNING:_** mcumgr tool using Bluetooth LE is available only for Linux and
+> macOS systems. On Windows, there is no support for Device Firmware Upgrade
+> over Bluetooth LE yet.
 
 Complete the following steps to perform DFU using mcumgr:
 
-1. Install the tool by following the [mcumgr command line tool installation instructions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#command-line-tool).
+1. Install the tool by following the
+   [mcumgr command line tool installation instructions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#command-line-tool).
 2. Push **Button 1** on the device to enable software update functionality.
 3. Push **Button 4** on the device to start the Bluetooth LE advertising.
 
-> **_NOTE:_** In all of the commands listed in the following steps, replace `ble-hci-number` with the Bluetooth hci integer value (for example, `0`) and `ble-device-name` with the CHIP device name advertised over Bluetooth LE (for example, `ChipLock`).
+> **_NOTE:_** In all of the commands listed in the following steps, replace
+> `ble-hci-number` with the Bluetooth hci integer value (for example, `0`) and
+> `ble-device-name` with the CHIP device name advertised over Bluetooth LE (for
+> example, `ChipLock`).
 
-4. Upload the firmware image to the device by running the following command in your example directory:
+4.  Upload the firmware image to the device by running the following command in
+    your example directory:
 
         $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/app_update.bin
 
-    The operation can take few minutes.
-    Wait until the progress bar reaches 100%.
-5. Obtain the list of images present in the device memory by running following command:
+    The operation can take few minutes. Wait until the progress bar reaches
+    100%.
+
+5.  Obtain the list of images present in the device memory by running following
+    command:
 
         $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image list
 
-    The displayed output contains the old image in slot 0 that is currently active and the new image in slot 1, which is not active yet (flags field empty):
+    The displayed output contains the old image in slot 0 that is currently
+    active and the new image in slot 1, which is not active yet (flags field
+    empty):
 
         Images:
         image=0 slot=0
@@ -64,15 +80,18 @@ Complete the following steps to perform DFU using mcumgr:
         image=0 slot=1
             version: 0.0.0
             bootable: true
-            flags: 
+            flags:
             hash: cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1
         Split status: N/A (0)
 
-6. Swap the firmware images by calling the following method with `image-hash` replaced by the image present in the slot 1 hash (for example, `cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1`):
+6.  Swap the firmware images by calling the following method with `image-hash`
+    replaced by the image present in the slot 1 hash (for example,
+    `cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1`):
 
         $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image test image-hash
 
-    You can observe that the `flags:` field in the image for slot 1 changes value to `pending`:
+    You can observe that the `flags:` field in the image for slot 1 changes
+    value to `pending`:
 
         Images:
         image=0 slot=0
@@ -87,7 +106,8 @@ Complete the following steps to perform DFU using mcumgr:
             hash: cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1
         Split status: N/A (0)
 
-7. Reset the device with the following command to let the bootloader swap images:
+7.  Reset the device with the following command to let the bootloader swap
+    images:
 
         $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' reset
 
@@ -100,6 +120,10 @@ Complete the following steps to perform DFU using mcumgr:
         I: Boot source: none
         I: Swap type: test
 
-    Swapping operation can take some time, and after it completes, the new firmware is booted.
+    Swapping operation can take some time, and after it completes, the new
+    firmware is booted.
 
-Visit the [mcumgr image management](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/indexhtml#image-management) section to get familiar with all image management commands supported by the tool.
+Visit the
+[mcumgr image management](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/indexhtml#image-management)
+section to get familiar with all image management commands supported by the
+tool.
