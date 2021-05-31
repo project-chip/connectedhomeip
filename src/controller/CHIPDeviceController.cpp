@@ -1527,15 +1527,13 @@ void BasicFailure(void * context, uint8_t status)
 void DeviceCommissioner::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
     Device * device = nullptr;
-    if (mDeviceBeingPaired >= kNumMaxActiveDevices)
+    if (mDeviceBeingPaired < kNumMaxActiveDevices)
     {
-        return;
-    }
-
-    device = &mActiveDevices[mDeviceBeingPaired];
-    if (device->GetDeviceId() == nodeData.mPeerId.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
-    {
-        AdvanceCommissioningStage(CHIP_NO_ERROR);
+        device = &mActiveDevices[mDeviceBeingPaired];
+        if (device->GetDeviceId() == nodeData.mPeerId.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
+        {
+            AdvanceCommissioningStage(CHIP_NO_ERROR);
+        }
     }
     DeviceController::OnNodeIdResolved(nodeData);
 }
