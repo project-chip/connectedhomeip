@@ -45,14 +45,6 @@ EmberAfStatus emberAfAirPressureMeasurementClusterSetAltitudeValue(chip::Endpoin
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
-void emberAfAirPressureMeasurementClusterServerInitCallback(chip::EndpointId endpoint)
-{
-    /**
-     * nothing to do here - default values set by attribute storage
-     */
-    (void) endpoint;
-}
-
 EmberAfStatus emberAfAirPressureMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, uint16_t measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID,

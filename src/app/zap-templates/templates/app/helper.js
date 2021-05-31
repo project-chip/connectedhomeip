@@ -196,7 +196,7 @@ function asChipUnderlyingType(label, type)
 
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
-  'Basic', 'Air Pressure Measurement', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control',
+  'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control',
   'Color Control', 'IAS Zone'
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock' ];
