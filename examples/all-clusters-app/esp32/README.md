@@ -191,7 +191,7 @@ commissioning and cluster control.
 
 -   Close the BLE connection to ESP32, as it is not required hereafter.
 
-         - chip-device-ctrl > close-ble 
+         - chip-device-ctrl > close-ble
 
 -   Resolve DNS-SD name and update address of the node in the device controller.
 
