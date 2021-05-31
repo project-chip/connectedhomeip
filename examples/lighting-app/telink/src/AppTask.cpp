@@ -28,10 +28,10 @@
 
 #include "ThreadUtil.h"
 
-#include <app/util/attribute-storage.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
+#include <app/util/attribute-storage.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -49,9 +49,9 @@ LOG_MODULE_DECLARE(app);
 
 namespace {
 
-constexpr int kAppEventQueueSize           = 10;
-constexpr uint8_t kButtonPushEvent         = 1;
-constexpr uint8_t kButtonReleaseEvent      = 0;
+constexpr int kAppEventQueueSize      = 10;
+constexpr uint8_t kButtonPushEvent    = 1;
+constexpr uint8_t kButtonReleaseEvent = 0;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 
@@ -112,7 +112,7 @@ int AppTask::Init()
 
 int AppTask::StartApp()
 {
-    int ret                            = Init();
+    int ret = Init();
 
     if (ret)
     {
