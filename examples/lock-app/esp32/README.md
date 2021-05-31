@@ -104,8 +104,8 @@ menuconfig).
 
           $ idf.py flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
-3.  The device should boot up. When device connects to your network, you
-    will see a log like this in the monitor.
+3.  The device should boot up. When device connects to your network, you will
+    see a log like this in the monitor.
 
           I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
           I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
