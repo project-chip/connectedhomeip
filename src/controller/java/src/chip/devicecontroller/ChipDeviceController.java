@@ -202,7 +202,8 @@ public class ChipDeviceController {
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
 
-  private native void updateAddress(long deviceControllerPtr, long deviceId, String address, int port);
+  private native void updateAddress(
+      long deviceControllerPtr, long deviceId, String address, int port);
 
   private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
 
