@@ -125,3 +125,23 @@ RUN set -x \
     && cd .. \
     && rm -rf node_js \
     && : # last line
+
+# Installing npm packages under /root will cause lots of trouble
+RUN groupadd --gid 1000 node \
+  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
+
+ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+ENV PATH=$PATH:/home/node/.npm-global/bin
+USER node
+
+# Directly running npm install -g will lead to errors so we have to keep the local build
+RUN set -x \
+    && cd /home/node \
+    && git clone https://github.com/project-chip/zap.git \
+    && cd zap \
+    && npm install \
+    && npm install -g
+
+ENV NODE_PATH=/home/node/.npm-global/lib/node_modules/zap/node_modules/
+
+USER root

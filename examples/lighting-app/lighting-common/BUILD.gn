@@ -29,7 +29,5 @@ if (chip_enable_pw_rpc) {
 
 chip_data_model("lighting-common") {
   zap_file = "lighting-app.zap"
-
-  zap_pregenerated_dir = "gen"
   is_server = true
 }

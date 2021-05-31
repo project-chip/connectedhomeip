@@ -50,31 +50,30 @@ def getDirPath(name):
     return fullpath
 
 def runArgumentsParser():
-    default_templates = 'src/app/zap-templates/app-templates.json'
-    default_zcl = 'src/app/zap-templates/zcl/zcl.json'
+    default_templates = os.path.join(CHIP_ROOT_DIR, 'src/app/zap-templates/app-templates.json')
+    default_zcl = os.path.join(CHIP_ROOT_DIR, 'src/app/zap-templates/zcl/zcl.json')
     default_output_dir = 'gen/'
 
     parser = argparse.ArgumentParser(description='Generate artifacts from .zapt templates')
     parser.add_argument('zap', help='Path to the application .zap file')
     parser.add_argument('-t', '--templates', default=default_templates, help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
     parser.add_argument('-z', '--zcl', default=default_zcl, help='Path to the zcl templates records to use for generating artifacts (default: "' + default_zcl + '")')
+    parser.add_argument('-o', '--output-dir', help='Path of the output files')
     args = parser.parse_args()
 
     # By default, this script assumes that the global CHIP template is used with
     # a default 'gen/' output folder relative to APP_ROOT_DIR.
     # If needed, the user may specify a specific template as a second argument. In
     # this case the output folder is relative to CHIP_ROOT_DIR.
-    if args.templates == default_templates:
+    if args.output_dir:
+        output_dir = args.output_dir
+    elif args.templates == default_templates:
         output_dir = os.path.join(Path(args.zap).parent, default_output_dir)
+        output_dir = getDirPath(output_dir)
     else:
-        output_dir = ''
+        output_dir = getDirPath('')
 
-    zap_file = getFilePath(args.zap)
-    zcl_file = getFilePath(args.zcl)
-    templates_file = getFilePath(args.templates)
-    output_dir = getDirPath(output_dir)
-
-    return (zap_file, zcl_file, templates_file, output_dir)
+    return map(os.path.abspath, (args.zap, args.zcl, args.templates, output_dir))
 
 def runGeneration(zap_file, zcl_file, templates_file, output_dir):
     generator_dir = getDirPath('third_party/zap/repo')
