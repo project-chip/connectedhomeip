@@ -1112,7 +1112,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
 {
     ChipLogDetail(Controller, "Sending OpCSR request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::OperationalCredentialsProvisioner cluster;
+    chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
@@ -1212,7 +1212,7 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::OperationalCredentialsProvisioner cluster;
+    chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
     Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
@@ -1289,7 +1289,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
 
     ChipLogProgress(Controller, "Sending root certificate to the device");
 
-    chip::Controller::TrustedRootCertificatesProvisioner cluster;
+    chip::Controller::TrustedRootCertificatesCluster cluster;
     cluster.Associate(device, 0);
 
     Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
