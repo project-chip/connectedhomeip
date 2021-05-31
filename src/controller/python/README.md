@@ -86,7 +86,7 @@ To build and run the Python CHIP controller:
 
 In this tutorial, the [Matter: Light Bulb](/examples/lighting-app) example with Bluetooth LE commissioning will be used, but similar steps can be executed with the rest of the examples. Check [Matter examples](/examples) for the list of available samples.
 
-Build and program the device with the Matter accessory firmware by following the example's documentation, for example [nRF Connect Lighting Example Application](/examples/lightigng-app/nrfconnect).
+Build and program the device with the Matter accessory firmware by following the example's documentation.
 
 ### 2. Enable Bluetooth LE advertising on Matter accessory device.
 
@@ -102,7 +102,7 @@ chip-device-ctrl > ble-scan
 
 ### 4. Connect to Matter accessory device over Bluetooth LE
 
-The controller uses a 12-bit value to discern between multiple commissionable device advertisements which is called **Discriminator**. The Matter accessory verifies the Controller by checking if the setup code is in his possession. You can find those values in the logging terminal of the device (e.g. UART), as listed below.
+The controller uses a 12-bit value called **discriminator** to discern between multiple commissionable device advertisements. Moreover, a 27-bit **PIN code** is used by the controller to authenticate in the device. You can find those values in the logging terminal of the device (e.g. UART), as listed below.
 
 ```
 I: 254 [DL]Device Configuration:
@@ -137,7 +137,7 @@ This means that the PASE (Password-Authenticated Session Establishment) session 
 
 ### 5. Commission Matter accessory to the underlying network
 
-One of the commissioning steps is Network Commissioning. The main goal of this step is to configure network interface, such as Thread or Wifi, and to provide network credentials.
+One of the commissioning steps is Network Commissioning. The main goal of this step is to configure a network interface, such as Thread or Wifi, on the device and to provide it with network credentials.
 
 #### Commissioning of Thread device
 
@@ -174,8 +174,6 @@ One of the commissioning steps is Network Commissioning. The main goal of this s
 
    > Each ZCL command has a following format:
       `zcl <Cluster> <Command> <Node Id> <Endpoint Id> <Group Id> [arguments]`
-   >
-   > Use the `zcl ? <Cluster>` command to list all available commands for given ZCL cluster.
 
    ```
    chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 breadcrumb=0 timeoutMs=3000
@@ -247,6 +245,8 @@ chip-device-ctrl > zclread Basic ProductName 1234 1 0
 chip-device-ctrl > zclread Basic SoftwareVersion 1234 1 0
 ```
 
+> Use the `zcl ? Basic` command to list all available commands for Basic Cluster.
+
 ## List of commands
 
 ### `ble-adapter-print`
@@ -268,7 +268,7 @@ chip-device-ctrl > ble-debug-log 1
 
 ### `ble-scan [-t <timeout>] [identifier]`
 
-Start a ble-scan action for searching valid CHIP devices over BLE [for at most
+Start a ble-scan action for searching valid CHIP devices over Bluetooth LE [for at most
 *timeout* seconds], stop when device matching the identifier or timeout.
 
 ```
@@ -302,7 +302,7 @@ If no nodeid given, a random node id will be used.
 ### `connect -ble <discriminator> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
-using BLE transport.
+using Bluetooth LE transport.
 
 The node id will be used by controller to distinguish multiple devices. This
 does not match the spec and will be removed later. The nodeid will not be
@@ -358,7 +358,7 @@ SetUpPINCode: 20202021
 
 ### `zcl <Cluster> <Command> <NodeId> <EndpointId> <GroupId> [arguments]`
 
-Send a ZCL command the device. For example:
+Send a ZCL command to the device. For example:
 
 ```
 chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
@@ -381,7 +381,46 @@ List available clusters.
 
 ```
 chip-device-ctrl > zcl ?
-dict_keys(['BarrierControl', 'Basic', 'ColorControl', 'DoorLock', 'Groups', 'IasZone', 'Identify', 'LevelControl', 'NetworkProvisioning', 'OnOff', 'Scenes', 'TemperatureMeasurement'])
+AccountLogin
+ApplicationBasic
+ApplicationLauncher
+AudioOutput
+BarrierControl
+Basic
+Binding
+BridgedDeviceBasic
+ColorControl
+ContentLaunch
+Descriptor
+DoorLock
+EthernetNetworkDiagnostics
+FixedLabel
+GeneralCommissioning
+GeneralDiagnostics
+GroupKeyManagement
+Groups
+Identify
+KeypadInput
+LevelControl
+LowPower
+MediaInput
+MediaPlayback
+NetworkCommissioning
+OnOff
+OperationalCredentials
+PumpConfigurationAndControl
+RelativeHumidityMeasurement
+Scenes
+SoftwareDiagnostics
+Switch
+TvChannel
+TargetNavigator
+TemperatureMeasurement
+TestCluster
+Thermostat
+TrustedRootCertificates
+WakeOnLan
+WindowCovering
 ```
 
 ### `zcl ? <Cluster>`
@@ -389,23 +428,25 @@ dict_keys(['BarrierControl', 'Basic', 'ColorControl', 'DoorLock', 'Groups', 'Ias
 List available commands in cluster. For example, for *LevlControl* cluster:
 
 ```
-chip-device-ctrl > zcl ? LevelControl
-Move
-   moveMode: int, rate: int, optionMask: int, optionOverride: int
-MoveToLevel
-   level: int, transitionTime: int, optionMask: int, optionOverride: int
-MoveToLevelWithOnOff
-   level: int, transitionTime: int
-MoveWithOnOff
-   moveMode: int, rate: int
-Step
-   stepMode: int, stepSize: int, transitionTime: int, optionMask: int, optionOverride: int
-StepWithOnOff
-   stepMode: int, stepSize: int, transitionTime: int
-Stop
-   optionMask: int, optionOverride: int
-StopWithOnOff
-  <no arguments>
+chip-device-ctrl > zcl ? Basic
+InteractionModelVersion
+VendorName
+VendorID
+ProductName
+ProductID
+UserLabel
+Location
+HardwareVersion
+HardwareVersionString
+SoftwareVersion
+SoftwareVersionString
+ManufacturingDate
+PartNumber
+ProductURL
+ProductLabel
+SerialNumber
+LocalConfigDisabled
+ClusterRevision
 ```
 
 ### `zclread <Cluster> <Attribute> <NodeId> <EndpointId> <GroupId> [arguments]`
@@ -416,7 +457,7 @@ Read the value of ZCL attribute. For example:
 chip-device-ctrl > zclread Basic VendorName 1234 1 0
 ```
 
-#### `zclconfigure <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval> <Change>`
+### `zclconfigure <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval> <Change>`
 
 Configure ZCL attribute reporting settings. For example:
 

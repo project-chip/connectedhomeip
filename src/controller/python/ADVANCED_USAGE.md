@@ -1,63 +1,61 @@
 # Python CHIP Device Controller - Advanced usage
 
-## BLE Virtualization on Linux (Optional)
+This document extends the [basic documentation](README.md) with the useful information when developing Python CHIP controller tool or Matter accessories on Linux.
 
-If you would like to setup virtual BLE central and peripheral in the same
-machine, then follow below steps:
+## Bluetooth LE virtualization on Linux
 
-```
-cd third_party/bluez/repo
-./bootstrap
-third_party/bluez/repo/configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd --enable-deprecated --enable-testing --enable-tools
-make
-```
+Commissioning over Bluetooth LE can be tested even if the controller and the device run on the same machine. To that end, you will need to set up two virtual interfaces working as Bluetooth LE central and peripheral, respectively.
 
-Note: You also need to install several packages on RPi if you want to build
-bluez
+1. Build `bluez` project from sources by completing the following steps:
 
-```
-sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
-```
+   ```
+   sudo apt-get update
+   sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
 
-Run bluetoothd:
+   cd third_party/bluez/repo
+   ./bootstrap
+   third_party/bluez/repo/configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd --enable-deprecated --enable-testing --enable-tools
+   make
+   ```
 
-```
-sudo third_party/bluez/repo/src/bluetoothd --experimental --debug &
-```
+2. Run bluetoothd:
 
-Bring up two virtual ble interface:
+   ```
+   sudo third_party/bluez/repo/src/bluetoothd --experimental --debug &
+   ```
 
-```
-sudo third_party/bluez/repo/emulator/btvirt -L -l2
-```
+3. Bring up two virtual Bluetooth LE interfaces:
 
-You can find the virtual interface by `hciconfig` command:
+   ```
+   sudo third_party/bluez/repo/emulator/btvirt -L -l2
+   ```
 
-```
-$ hciconfig
+   You can find the virtual interface by running `hciconfig` command:
 
-hci2:	Type: Primary  Bus: Virtual
-	BD Address: 00:AA:01:01:00:24  ACL MTU: 192:1  SCO MTU: 0:0
-	UP RUNNING
-	RX bytes:0 acl:95 sco:0 events:205 errors:0
-	TX bytes:2691 acl:95 sco:0 commands:98 errors:0
+   ```
+   $ hciconfig
 
-hci1:	Type: Primary  Bus: Virtual
-	BD Address: 00:AA:01:00:00:23  ACL MTU: 192:1  SCO MTU: 0:0
-	UP RUNNING
-	RX bytes:0 acl:95 sco:0 events:208 errors:0
-	TX bytes:3488 acl:95 sco:0 commands:110 errors:0
-```
+   hci2:	Type: Primary  Bus: Virtual
+      BD Address: 00:AA:01:01:00:24  ACL MTU: 192:1  SCO MTU: 0:0
+      UP RUNNING
+      RX bytes:0 acl:95 sco:0 events:205 errors:0
+      TX bytes:2691 acl:95 sco:0 commands:98 errors:0
 
-Then you can choose the adapter to use in command line arguments of the device
-controller:
+   hci1:	Type: Primary  Bus: Virtual
+      BD Address: 00:AA:01:00:00:23  ACL MTU: 192:1  SCO MTU: 0:0
+      UP RUNNING
+      RX bytes:0 acl:95 sco:0 events:208 errors:0
+      TX bytes:3488 acl:95 sco:0 commands:110 errors:0
+   ```
 
-For example, add `--bluetooth-adapter=hci2` to use the virtual interface `hci2`
-listed above.
+4. Run the Python CHIP Controller with Bluetooth LE adapter defined from a command line:
 
-```
-chip-device-ctrl --bluetooth-adapter=hci2
-```
+   For example, add `--bluetooth-adapter=hci2` to use the virtual interface `hci2`
+   listed above.
+
+   ```
+   chip-device-ctrl --bluetooth-adapter=hci2
+   ```
 
 ## Debugging with gdb
 
@@ -65,7 +63,7 @@ You can run the chip-device-ctrl under GDB for debugging, however, since the
 CHIP core support library is a dynamic library, you cannot read the symbols
 unless it is fully loaded.
 
-The following block is a example debug session using GDB
+The following block is a example debug session using GDB:
 
 ```
 # GDB cannot run scripts directly
@@ -93,11 +91,10 @@ Reading symbols from python3...
 ```
 
 The Python will create lots of threads due to main loop, so you may want to
-supress thread related outputs first by `set print thread-events off`
+supress thread related outputs first by running the following command:
 
 ```
 (gdb) set print thread-events off
-(gdb)
 ```
 
 We cannot set breakpoints here, since the GDB knows nothing about the CHIP
@@ -230,5 +227,5 @@ then you can use `bt` (for `backtrace`) to see the backtrace of the call stack.
 (gdb)
 ```
 
-The frame #0 and frame #1 are the function frame in the CHIP C++ library, the
-other frames lives in the Python intepreter so you can ignore it.
+The frame #0 and frame #1 are the function frames in the CHIP C++ library, the
+other frames live in the Python intepreter so you can ignore it.
