@@ -329,12 +329,6 @@
 #define CHIP_PRINTCLUSTER_TEMP_MEASUREMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_PRESSURE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_PRESSURE_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_PRESSURE_MEASUREMENT_CLUSTER { ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID, 1027, "Pressure Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_PRESSURE_MEASUREMENT_CLUSTER
-#endif
-
 #if defined(ZCL_USING_FLOW_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_FLOW_MEASUREMENT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_FLOW_MEASUREMENT_CLUSTER { ZCL_FLOW_MEASUREMENT_CLUSTER_ID, 1028, "Flow Measurement" },
 #else
@@ -982,7 +976,6 @@
     CHIP_PRINTCLUSTER_ILLUM_MEASUREMENT_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ILLUM_LEVEL_SENSING_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_TEMP_MEASUREMENT_CLUSTER                                                                                     \
-    CHIP_PRINTCLUSTER_PRESSURE_MEASUREMENT_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_FLOW_MEASUREMENT_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER                                                                                    \
