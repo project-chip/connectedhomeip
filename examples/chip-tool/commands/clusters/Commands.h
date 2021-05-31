@@ -964,6 +964,7 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(void * conte
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
 | AccountLogin                                                        | 0x050E |
+| AirPressureMeasurement                                              | 0x0407 |
 | ApplicationBasic                                                    | 0x050D |
 | ApplicationLauncher                                                 | 0x050C |
 | AudioOutput                                                         | 0x050B |
@@ -1006,6 +1007,7 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(void * conte
 \*----------------------------------------------------------------------------*/
 
 constexpr chip::ClusterId kAccountLoginClusterId                = 0x050E;
+constexpr chip::ClusterId kAirPressureMeasurementClusterId      = 0x0407;
 constexpr chip::ClusterId kApplicationBasicClusterId            = 0x050D;
 constexpr chip::ClusterId kApplicationLauncherClusterId         = 0x050C;
 constexpr chip::ClusterId kAudioOutputClusterId                 = 0x050B;
@@ -1184,6 +1186,182 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x050E) command (0x00) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::AccountLoginCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster AirPressureMeasurement                                      | 0x0407 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * Altitude                                                          | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverAirPressureMeasurementAttributes : public ModelCommand
+{
+public:
+    DiscoverAirPressureMeasurementAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverAirPressureMeasurementAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::AirPressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute MeasuredValue
+ */
+class ReadAirPressureMeasurementMeasuredValue : public ModelCommand
+{
+public:
+    ReadAirPressureMeasurementMeasuredValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "measured-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAirPressureMeasurementMeasuredValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0407) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::AirPressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Altitude
+ */
+class ReadAirPressureMeasurementAltitude : public ModelCommand
+{
+public:
+    ReadAirPressureMeasurementAltitude() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "altitude");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAirPressureMeasurementAltitude()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0407) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::AirPressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeAltitude(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteAirPressureMeasurementAltitude : public ModelCommand
+{
+public:
+    WriteAirPressureMeasurementAltitude() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "altitude");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteAirPressureMeasurementAltitude()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0407) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::AirPressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeAltitude(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int16_t mValue;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadAirPressureMeasurementClusterRevision : public ModelCommand
+{
+public:
+    ReadAirPressureMeasurementClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAirPressureMeasurementClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0407) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::AirPressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -17370,6 +17548,18 @@ void registerClusterAccountLogin(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterAirPressureMeasurement(Commands & commands)
+{
+    const char * clusterName = "AirPressureMeasurement";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverAirPressureMeasurementAttributes>(),  make_unique<ReadAirPressureMeasurementMeasuredValue>(),
+        make_unique<ReadAirPressureMeasurementAltitude>(),        make_unique<WriteAirPressureMeasurementAltitude>(),
+        make_unique<ReadAirPressureMeasurementClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterApplicationBasic(Commands & commands)
 {
     const char * clusterName = "ApplicationBasic";
@@ -18109,6 +18299,7 @@ void registerClusterWindowCovering(Commands & commands)
 void registerClusters(Commands & commands)
 {
     registerClusterAccountLogin(commands);
+    registerClusterAirPressureMeasurement(commands);
     registerClusterApplicationBasic(commands);
     registerClusterApplicationLauncher(commands);
     registerClusterAudioOutput(commands);

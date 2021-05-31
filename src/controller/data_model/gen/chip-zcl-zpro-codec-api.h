@@ -29,6 +29,7 @@
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
 | AccountLogin                                                        | 0x050E |
+| AirPressureMeasurement                                              | 0x0407 |
 | ApplicationBasic                                                    | 0x050D |
 | ApplicationLauncher                                                 | 0x050C |
 | AudioOutput                                                         | 0x050B |
@@ -93,6 +94,52 @@ chip::System::PacketBufferHandle encodeAccountLoginClusterDiscoverAttributes(uin
  */
 chip::System::PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                        chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster AirPressureMeasurement                                      | 0x0407 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * Altitude                                                          | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Air Pressure Measurement server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAirPressureMeasurementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Air Pressure Measurement server read command for the measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeAirPressureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Air Pressure Measurement server read command for the altitude attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAirPressureMeasurementClusterReadAltitudeAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Air Pressure Measurement server write command for the altitude attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeAirPressureMeasurementClusterWriteAltitudeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, int16_t altitude);
+
+/**
+ * @brief
+ *    Encode a Air Pressure Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeAirPressureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster ApplicationBasic                                            | 0x050D |

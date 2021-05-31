@@ -56,6 +56,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Air Pressure Measurement
+ *
+ */
+@interface CHIPAirPressureMeasurement : CHIPCluster
+
+- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAltitudeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeAltitudeWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Application Basic
  *
  */

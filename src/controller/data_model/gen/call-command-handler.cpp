@@ -29,6 +29,7 @@
 using namespace chip;
 
 EmberAfStatus emberAfAccountLoginClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfAirPressureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfApplicationBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfApplicationLauncherClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfAudioOutputClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -100,6 +101,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         {
         case ZCL_ACCOUNT_LOGIN_CLUSTER_ID:
             result = emberAfAccountLoginClusterClientCommandParse(cmd);
+            break;
+        case ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID:
+            // No commands are enabled for cluster Air Pressure Measurement
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_APPLICATION_BASIC_CLUSTER_ID:
             // No commands are enabled for cluster Application Basic

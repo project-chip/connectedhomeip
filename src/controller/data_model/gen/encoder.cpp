@@ -55,6 +55,7 @@ using namespace chip::Encoding::LittleEndian;
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
 | AccountLogin                                                        | 0x050E |
+| AirPressureMeasurement                                              | 0x0407 |
 | ApplicationBasic                                                    | 0x050D |
 | ApplicationLauncher                                                 | 0x050C |
 | AudioOutput                                                         | 0x050B |
@@ -125,6 +126,8 @@ using namespace chip::Encoding::LittleEndian;
 #define ACCOUNT_LOGIN_CLUSTER_ID 0x050E
 #define ZCL_GET_SETUP_PIN_COMMAND_ID (0x00)
 #define ZCL_LOGIN_COMMAND_ID (0x01)
+
+#define AIR_PRESSURE_MEASUREMENT_CLUSTER_ID 0x0407
 
 #define APPLICATION_BASIC_CLUSTER_ID 0x050D
 
@@ -371,6 +374,67 @@ PacketBufferHandle encodeAccountLoginClusterDiscoverAttributes(uint8_t seqNum, E
 PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadAccountLoginClusterRevision", ACCOUNT_LOGIN_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster AirPressureMeasurement                                      | 0x0407 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * Altitude                                                          | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeAirPressureMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverAirPressureMeasurementAttributes", AIR_PRESSURE_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MeasuredValue
+ */
+PacketBufferHandle encodeAirPressureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadAirPressureMeasurementMeasuredValue", AIR_PRESSURE_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Altitude
+ */
+PacketBufferHandle encodeAirPressureMeasurementClusterReadAltitudeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadAirPressureMeasurementAltitude", AIR_PRESSURE_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeAirPressureMeasurementClusterWriteAltitudeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                             int16_t altitude)
+{
+    COMMAND_HEADER("WriteAirPressureMeasurementAltitude", AIR_PRESSURE_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0001)
+        .Put8(41)
+        .Put16(static_cast<uint16_t>(altitude));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeAirPressureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadAirPressureMeasurementClusterRevision", AIR_PRESSURE_MEASUREMENT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

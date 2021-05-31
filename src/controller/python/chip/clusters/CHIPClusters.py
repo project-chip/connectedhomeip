@@ -47,6 +47,8 @@ class ChipClusters:
                     "setupPIN": "str",
                 },
             },
+            "AirPressureMeasurement": {
+            },
             "ApplicationBasic": {
             },
             "ApplicationLauncher": {
@@ -642,6 +644,11 @@ class ChipClusters:
     def ListClusterAttributes(self):
         return {
             "AccountLogin": [
+                "ClusterRevision",
+            ],
+            "AirPressureMeasurement": [
+                "MeasuredValue",
+                "Altitude",
                 "ClusterRevision",
             ],
             "ApplicationBasic": [
@@ -1506,6 +1513,12 @@ class ChipClusters:
 
     def ClusterAccountLogin_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_AccountLogin_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterAirPressureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_AirPressureMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterAirPressureMeasurement_ReadAttributeAltitude(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_AirPressureMeasurement_Altitude(device, ZCLendpoint, ZCLgroupid)
+    def ClusterAirPressureMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_AirPressureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1960,6 +1973,16 @@ class ChipClusters:
         # Cluster AccountLogin ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_AccountLogin_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_AccountLogin_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster AirPressureMeasurement
+        # Cluster AirPressureMeasurement ReadAttribute MeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_AirPressureMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_AirPressureMeasurement_MeasuredValue.restype = ctypes.c_uint32
+        # Cluster AirPressureMeasurement ReadAttribute Altitude
+        self._chipLib.chip_ime_ReadAttribute_AirPressureMeasurement_Altitude.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_AirPressureMeasurement_Altitude.restype = ctypes.c_uint32
+        # Cluster AirPressureMeasurement ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_AirPressureMeasurement_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_AirPressureMeasurement_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ApplicationBasic
         # Cluster ApplicationBasic ReadAttribute VendorName
         self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorName.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
