@@ -272,12 +272,12 @@ protected:
     bool mPairedDevicesInitialized;
 
     NodeId mLocalDeviceId;
-    DeviceTransportMgr * mTransportMgr = nullptr;
-    SecureSessionMgr * mSessionMgr = nullptr;
-    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+    DeviceTransportMgr * mTransportMgr                             = nullptr;
+    SecureSessionMgr * mSessionMgr                                 = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
-    PersistentStorageDelegate * mStorageDelegate = nullptr;
-    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate = nullptr;
+    PersistentStorageDelegate * mStorageDelegate                   = nullptr;
+    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate  = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
