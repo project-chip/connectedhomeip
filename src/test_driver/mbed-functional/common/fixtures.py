@@ -201,7 +201,10 @@ def connected_device(device, network):
         assert is_network_visible(ret, network_ssid)
 
         # Connect to network
-        ret = device.send(command="device connect {} {}".format(network_ssid, network_pass), expected_output="Done", wait_before_read=5)
+        ret = device.send(command="device connect {} {}".format(network_ssid, network_pass), expected_output="Done")
+        assert ret != None
+
+        ret = device.wait_for_output("Internet connectivity ESTABLISHED")
         assert ret != None
 
         # Check connection status
@@ -213,7 +216,10 @@ def connected_device(device, network):
 
     if not device_connected:
         # Network disconnect
-        ret = device.send(command="device sta clear_provision", expected_output="Done", wait_before_read=5)
+        ret = device.send(command="device sta clear_provision", expected_output="Done")
+        assert ret != None
+
+        ret = device.wait_for_output("Internet connectivity LOST")
         assert ret != None
 
         # Check connection status
@@ -226,4 +232,4 @@ def connected_device(device, network):
 def device_controller():
     devCtrl = ChipDeviceCtrl.ChipDeviceController()
     yield devCtrl
-    devCtrl.Close()
+    devCtrl.__del__

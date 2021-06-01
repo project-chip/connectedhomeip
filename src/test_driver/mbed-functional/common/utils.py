@@ -55,7 +55,7 @@ def run_wifi_provisioning(devCtrl, ssid, password, discriminator, pinCode, nodeI
 
     try:
         devCtrl.SetWifiCredential(ssid, password)
-        devCtrl.ConnectBLE(discriminator, pinCode, nodeId)
+        devCtrl.ConnectBLE(int(discriminator), int(pinCode), int(nodeId))
     except exceptions.ChipStackException as ex:
         log.error("WiFi provisioning failed: {}".format(str(ex)))
         return None

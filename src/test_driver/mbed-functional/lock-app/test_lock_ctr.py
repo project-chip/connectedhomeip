@@ -14,8 +14,10 @@
 # limitations under the License.
 
 import pytest
+import subprocess
 
 from chip.setup_payload import SetupPayload
+from chip import exceptions
 
 from common.utils import scan_chip_ble_devices, run_wifi_provisioning
 
@@ -36,45 +38,41 @@ def test_lock_ctrl_dev_ctrl(device, network, device_controller):
     device_details = dict(SetupPayload().ParseQrCode("VP:vendorpayload%{}".format(qr_code)).attributes)
     assert device_details != None and len(device_details) != 0
 
-    ble_chip_device = scan_chip_ble_devices(device_controller)
-    assert ble_chip_device != None and len(ble_chip_device) != 0
-
-    chip_device_found = False
-
-    for ble_device in ble_chip_device:
-        if (int(ble_device.discriminator) == int(device_details["Discriminator"]) and
-            int(ble_device.vendorId) == int(device_details["VendorID"]) and
-            int(ble_device.productId) == int(device_details["ProductID"])):
-            chip_device_found = True
-            break
-
-    assert chip_device_found
-
     ret = run_wifi_provisioning(device_controller, network_ssid, network_pass, int(device_details["Discriminator"]), int(device_details["SetUpPINCode"]), DEVICE_NODE_ID)
-    assert ret != None and ret == DEVICE_NODE_ID
+    assert ret == DEVICE_NODE_ID
+
+    device.flush(5)
 
     args = {}
+    
+    try:
+        # Check on command
+        err, res = device_controller.ZCLSend("OnOff", "On", DEVICE_NODE_ID, 1, 0, args, blocking=True)
+        assert err == 0
 
-    # Check on command
-    err, res = device_controller.ZCLSend("OnOff", "On", DEVICE_NODE_ID, 1, 0, args, blocking=false)
-    assert err == 0
+        ret = device.wait_for_output("Lock Action has been completed")
+        assert ret != None and len(ret) > 1
 
-    ret = device.wait_for_output("Lock Action has been completed")
-    assert ret != None and len(ret) > 1
+        # Check off command
+        err, res = device_controller.ZCLSend("OnOff", "Off", DEVICE_NODE_ID, 1, 0, args, blocking=True)
+        assert err == 0
 
-    # Check off command
-    err, res = device_controller.ZCLSend("OnOff", "Off", nodeId, 1, 0, None, blocking=True)
-    assert err == 0
+        ret = device.wait_for_output("Unlock Action has been completed")
+        assert ret != None and len(ret) > 1
 
-    ret = device.wait_for_output("Unlock Action has been completed")
-    assert ret != None and len(ret) > 1
+        # Check toggle command
+        err, res = device_controller.ZCLSend("OnOff", "Toggle", DEVICE_NODE_ID, 1, 0, args, blocking=True)
+        assert err == 0
 
-    # Check toggle command
-    err, res = device_controller.ZCLSend("OnOff", "Toggle", nodeId, 1, 0, None, blocking=True)
-    assert err == 0
+        ret = device.wait_for_output("Lock Action has been completed")
+        assert ret != None and len(ret) > 1
 
-    ret = device.wait_for_output("Lock Action has been completed")
-    assert ret != None and len(ret) > 1
+    except exceptions.ChipStackException as ex:
+        log.error("Exception occurred during process ZCL command: {}".format(str(ex)))
+        assert False
+    except Exception as ex:
+        log.error("Exception occurred during processing input: {}".format(str(ex)))
+        assert False
 
 @pytest.mark.chipToolTest
 def test_lock_ctrl_chip_tool(device, network, chip_tools_dir):
@@ -92,9 +90,12 @@ def test_lock_ctrl_chip_tool(device, network, chip_tools_dir):
     out = process.stdout.read()
     process.wait()
     assert process.returncode == 0
-    assert "ConnectDevice complete" in out and "Network Provisioning Success" in out
+    device_connected = "ConnectDevice complete" in out
+    assert device_connected
+    device_provisioned = "Network Provisioning Success" in out
+    assert device_provisioned
 
-    process = subprocess.Popen(["./chip-tool", "onoff", "on", "1", cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
+    process = subprocess.Popen(["./chip-tool", "onoff", "on", "1"], cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
     out = process.stdout.read()
     process.wait()
     assert process.returncode == 0
@@ -103,7 +104,7 @@ def test_lock_ctrl_chip_tool(device, network, chip_tools_dir):
     ret = device.wait_for_output("Lock Action has been completed")
     assert ret != None and len(ret) > 1
 
-    process = subprocess.Popen(["./chip-tool", "onoff", "off", "1", cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
+    process = subprocess.Popen(["./chip-tool", "onoff", "off", "1"], cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
     out = process.stdout.read()
     process.wait()
     assert process.returncode == 0
@@ -112,7 +113,7 @@ def test_lock_ctrl_chip_tool(device, network, chip_tools_dir):
     ret = device.wait_for_output("Unlock Action has been completed")
     assert ret != None and len(ret) > 1
 
-    process = subprocess.Popen(["./chip-tool", "onoff", "toggle", "1", cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
+    process = subprocess.Popen(["./chip-tool", "onoff", "toggle", "1"], cwd=chip_tools_dir, stdout=subprocess.PIPE, universal_newlines=True)
     out = process.stdout.read()
     process.wait()
     assert process.returncode == 0
