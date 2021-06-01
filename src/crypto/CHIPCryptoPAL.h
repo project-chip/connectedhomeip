@@ -36,6 +36,8 @@
 namespace chip {
 namespace Crypto {
 
+const size_t kMax_x509_Certificate_Length = 1024;
+
 const size_t kP256_FE_Length     = 32;
 const size_t kP256_Point_Length  = (2 * kP256_FE_Length + 1);
 const size_t kSHA256_Hash_Length = 32;
@@ -897,6 +899,17 @@ private:
  * @param len Specifies secret data size in bytes.
  **/
 void ClearSecretData(uint8_t * buf, uint32_t len);
+
+typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
+
+CHIP_ERROR LoadCertsFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs);
+
+CHIP_ERROR LoadCertFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t n_cert);
+
+CHIP_ERROR GetNumberOfCertsFromPKCS7(const uint8_t * pkcs7, uint32_t * n_certs);
+
+CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
 
 } // namespace Crypto
 } // namespace chip
