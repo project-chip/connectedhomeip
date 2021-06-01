@@ -1,61 +1,66 @@
 # Python CHIP Device Controller - Advanced usage
 
-This document extends the [basic documentation](README.md) with the useful information when developing Python CHIP controller tool or Matter accessories on Linux.
+This document extends the [basic documentation](README.md) with the useful
+information when developing Python CHIP controller tool or Matter accessories on
+Linux.
 
 ## Bluetooth LE virtualization on Linux
 
-Commissioning over Bluetooth LE can be tested even if the controller and the device run on the same machine. To that end, you will need to set up two virtual interfaces working as Bluetooth LE central and peripheral, respectively.
+Commissioning over Bluetooth LE can be tested even if the controller and the
+device run on the same machine. To that end, you will need to set up two virtual
+interfaces working as Bluetooth LE central and peripheral, respectively.
 
 1. Build `bluez` project from sources by completing the following steps:
 
-   ```
-   sudo apt-get update
-   sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
+    ```
+    sudo apt-get update
+    sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
 
-   cd third_party/bluez/repo
-   ./bootstrap
-   third_party/bluez/repo/configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd --enable-deprecated --enable-testing --enable-tools
-   make
-   ```
+    cd third_party/bluez/repo
+    ./bootstrap
+    third_party/bluez/repo/configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd --enable-deprecated --enable-testing --enable-tools
+    make
+    ```
 
 2. Run bluetoothd:
 
-   ```
-   sudo third_party/bluez/repo/src/bluetoothd --experimental --debug &
-   ```
+    ```
+    sudo third_party/bluez/repo/src/bluetoothd --experimental --debug &
+    ```
 
 3. Bring up two virtual Bluetooth LE interfaces:
 
-   ```
-   sudo third_party/bluez/repo/emulator/btvirt -L -l2
-   ```
+    ```
+    sudo third_party/bluez/repo/emulator/btvirt -L -l2
+    ```
 
-   You can find the virtual interface by running `hciconfig` command:
+    You can find the virtual interface by running `hciconfig` command:
 
-   ```
-   $ hciconfig
+    ```
+    $ hciconfig
 
-   hci2:	Type: Primary  Bus: Virtual
-      BD Address: 00:AA:01:01:00:24  ACL MTU: 192:1  SCO MTU: 0:0
-      UP RUNNING
-      RX bytes:0 acl:95 sco:0 events:205 errors:0
-      TX bytes:2691 acl:95 sco:0 commands:98 errors:0
+    hci2:	Type: Primary  Bus: Virtual
+       BD Address: 00:AA:01:01:00:24  ACL MTU: 192:1  SCO MTU: 0:0
+       UP RUNNING
+       RX bytes:0 acl:95 sco:0 events:205 errors:0
+       TX bytes:2691 acl:95 sco:0 commands:98 errors:0
 
-   hci1:	Type: Primary  Bus: Virtual
-      BD Address: 00:AA:01:00:00:23  ACL MTU: 192:1  SCO MTU: 0:0
-      UP RUNNING
-      RX bytes:0 acl:95 sco:0 events:208 errors:0
-      TX bytes:3488 acl:95 sco:0 commands:110 errors:0
-   ```
+    hci1:	Type: Primary  Bus: Virtual
+       BD Address: 00:AA:01:00:00:23  ACL MTU: 192:1  SCO MTU: 0:0
+       UP RUNNING
+       RX bytes:0 acl:95 sco:0 events:208 errors:0
+       TX bytes:3488 acl:95 sco:0 commands:110 errors:0
+    ```
 
-4. Run the Python CHIP Controller with Bluetooth LE adapter defined from a command line:
+4. Run the Python CHIP Controller with Bluetooth LE adapter defined from a
+   command line:
 
-   For example, add `--bluetooth-adapter=hci2` to use the virtual interface `hci2`
-   listed above.
+    For example, add `--bluetooth-adapter=hci2` to use the virtual interface
+    `hci2` listed above.
 
-   ```
-   chip-device-ctrl --bluetooth-adapter=hci2
-   ```
+    ```
+    chip-device-ctrl --bluetooth-adapter=hci2
+    ```
 
 ## Debugging with gdb
 
