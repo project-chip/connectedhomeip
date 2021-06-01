@@ -24,9 +24,9 @@
 
 #pragma once
 
-// Disable the Nxp-supplied OpenThread logging facilities and use
-// the facilities provided by the Device Layer (see
-// src/platform/K32W/Logging.cpp).
+// Disable the Nxp-supplied OpenThread logging facilities
+// and use the facilities provided by the Device Layer
+// (see src/platform/K32W/Logging.cpp).
 #define OPENTHREAD_CONFIG_LOG_OUTPUT OPENTHREAD_CONFIG_LOG_OUTPUT_APP
 
 // When operating in a less than ideal RF environment, having a more forgiving configuration
@@ -43,6 +43,15 @@
 
 // Use smaller maximum interval to speed up reattaching.
 #define OPENTHREAD_CONFIG_MLE_ATTACH_BACKOFF_MAXIMUM_INTERVAL (60 * 10 * 1000) // default 1200000 ms
+
+// disable unused features
+#define OPENTHREAD_CONFIG_COAP_API_ENABLE 0
+#define OPENTHREAD_CONFIG_JOINER_ENABLE 0
+#define OPENTHREAD_CONFIG_COMMISSIONER_ENABLE 0
+#define OPENTHREAD_CONFIG_UDP_FORWARD_ENABLE 0
+#define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE 0
+#define OPENTHREAD_CONFIG_DHCP6_CLIENT_ENABLE 0
+#define OPENTHREAD_CONFIG_DHCP6_SERVER_ENABLE 0
 
 // Use the NXP-supplied default platform configuration for remainder
 // of OpenThread config options.

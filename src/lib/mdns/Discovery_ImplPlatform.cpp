@@ -159,11 +159,11 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
              static_cast<uint32_t>(mCommissionInstanceName));
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
-        strncpy(service.mType, "_chipc", sizeof(service.mType));
+        strncpy(service.mType, kCommissionableServiceName, sizeof(service.mType));
     }
     else
     {
-        strncpy(service.mType, "_chipd", sizeof(service.mType));
+        strncpy(service.mType, kCommissionerServiceName, sizeof(service.mType));
     }
     service.mProtocol = MdnsServiceProtocol::kMdnsProtocolUdp;
 
@@ -391,7 +391,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 
     ReturnErrorOnFailure(SetupHostname(params.GetMac()));
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetPeerId()));
-    strncpy(service.mType, "_chip", sizeof(service.mType));
+    strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
     service.mTextEntries   = crmpRetryIntervalEntries;
@@ -436,7 +436,7 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     MdnsService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
-    strncpy(service.mType, "_chip", sizeof(service.mType));
+    strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
     return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
