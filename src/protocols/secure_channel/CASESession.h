@@ -227,7 +227,7 @@ private:
 
     // This function always returns an error. The error value corresponds to the error in the received message.
     // The returned error value helps top level message receiver/dispatcher to close the exchange context
-    // in a more seemless manner.
+    // in a more seamless manner.
     CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
 
     void CloseExchange();
