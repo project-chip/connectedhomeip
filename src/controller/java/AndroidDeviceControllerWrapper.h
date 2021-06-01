@@ -53,8 +53,8 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
 
     // OperationalCredentialsDelegate implementation
-    CHIP_ERROR GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr, int64_t serialNumber,
-                                                      uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr, int64_t serialNumber,
+                                                              uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen)
 
 
 
