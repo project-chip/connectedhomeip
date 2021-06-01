@@ -734,6 +734,15 @@
 #define CHIP_DEVICE_CONFIG_THREAD_CONNECTIVITY_TIMEOUT 30000
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+ *
+ * Enable Thread CLI interface at initialisation.
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#define CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI 0
+#endif
+
 // -------------------- Trait Manager Configuration --------------------
 
 /**
