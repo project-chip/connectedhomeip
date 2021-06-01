@@ -172,7 +172,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
     // Must be positioned on the structure element representing the certificate.
     VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_INVALID_ARGUMENT);
 
-    cert->mCertificate = chipCert;
+    cert.mCertificate = chipCert;
 
     {
         TLVType containerType;
