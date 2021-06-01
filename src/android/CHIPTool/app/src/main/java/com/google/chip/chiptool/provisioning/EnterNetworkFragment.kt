@@ -18,7 +18,6 @@
 package com.google.chip.chiptool.provisioning
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +34,6 @@ import kotlinx.android.synthetic.main.enter_thread_network_fragment.panIdEd
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.xpanIdEd
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.*
 import kotlinx.android.synthetic.main.enter_wifi_network_fragment.view.*
-import kotlinx.android.synthetic.main.on_off_client_fragment.*
 
 /**
  * Fragment to collect Wi-Fi network information from user and send it to device being provisioned.
@@ -121,15 +119,47 @@ class EnterNetworkFragment : Fragment() {
     try {
       ChipClient.getDeviceController().enableThreadNetwork(
           DeviceIdUtil.getLastDeviceId(requireContext()),
-          channelStr.toString().toInt(),
-          panIdStr.toString().toInt(16),
-          xpanIdStr.hexToByteArray(),
-          masterKeyStr.hexToByteArray())
+          MakeThreadOperationalDataset(
+            channelStr.toString().toInt(),
+            panIdStr.toString().toInt(16),
+            xpanIdStr.hexToByteArray(),
+            masterKeyStr.hexToByteArray()
+          ))
     } catch (e: ChipDeviceControllerException) {
       Toast.makeText(requireContext(), R.string.rendezvous_over_ble_commissioning_failure_text, Toast.LENGTH_SHORT).show()
       FragmentUtil.getHost(this, DeviceProvisioningFragment.Callback::class.java)
           ?.onCommissioningComplete(e.errorCode)
     }
+  }
+
+  private fun MakeThreadOperationalDataset(
+      channel: Int,
+      panId: Int,
+      xpanId: ByteArray,
+      masterKey: ByteArray): ByteArray {
+    // channel
+    var dataset = byteArrayOf(TYPE_CHANNEL.toByte(), NUM_CHANNEL_BYTES.toByte())
+    dataset += 0x00.toByte() // Channel Page 0.
+    dataset += (channel.shr(8) and 0xFF).toByte()
+    dataset += (channel and 0xFF).toByte()
+
+    // PAN ID
+    dataset += TYPE_PANID.toByte()
+    dataset += NUM_PANID_BYTES.toByte()
+    dataset += (panId.shr(8) and 0xFF).toByte()
+    dataset += (panId and 0xFF).toByte()
+
+    // Extended PAN ID
+    dataset += TYPE_XPANID.toByte()
+    dataset += NUM_XPANID_BYTES.toByte()
+    dataset += xpanId
+
+    // Network Master Key
+    dataset += TYPE_MASTER_KEY.toByte()
+    dataset += NUM_MASTER_KEY_BYTES.toByte()
+    dataset += masterKey
+
+    return dataset
   }
 
   private fun String.hexToByteArray(): ByteArray {
@@ -139,8 +169,14 @@ class EnterNetworkFragment : Fragment() {
   companion object {
     private const val TAG = "EnterNetworkFragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
+    private const val NUM_CHANNEL_BYTES = 3
+    private const val NUM_PANID_BYTES = 2
     private const val NUM_XPANID_BYTES = 8
     private const val NUM_MASTER_KEY_BYTES = 16
+    private const val TYPE_CHANNEL = 0; // Type of Thread Channel TLV.
+    private const val TYPE_PANID = 1; // Type of Thread PAN ID TLV.
+    private const val TYPE_XPANID = 2; // Type of Thread Extended PAN ID TLV.
+    private const val TYPE_MASTER_KEY = 5; // Type of Thread Network Master Key TLV.
 
     fun newInstance(provisionNetworkType: ProvisionNetworkType): EnterNetworkFragment {
       return EnterNetworkFragment().apply {
