@@ -22,6 +22,7 @@
 #include <cstdio>
 #include <inttypes.h>
 #include <limits>
+#include <stdlib.h>
 #include <string.h>
 
 #include <mdns/Resolver.h>
@@ -57,23 +58,22 @@ bool IsKey(const ByteSpan & key, const char * desired)
 
 uint16_t MakeU16FromAsciiDecimal(const ByteSpan & val)
 {
-    uint32_t u32          = 0;
-    const uint16_t errval = 0x0;
-    for (size_t i = 0; i < val.size(); ++i)
+    // Largest u16 number if 65536, so 5 chars.a
+    constexpr size_t kMaxUint16StrLen = 5;
+    // Add a space for null
+    char temp[kMaxUint16StrLen + 1];
+    if (val.size() > kMaxUint16StrLen)
     {
-        char c = static_cast<char>(val.data()[i]);
-        if (c < '0' || c > '9')
-        {
-            return errval;
-        }
-        u32 = u32 * 10;
-        u32 += val.data()[i] - static_cast<uint8_t>('0');
-        if (u32 > std::numeric_limits<uint16_t>::max())
-        {
-            return errval;
-        }
+        return 0;
     }
-    return static_cast<uint16_t>(u32);
+    Platform::CopyString(temp, sizeof(temp), val);
+    char * end;
+    unsigned long num = strtoul(temp, &end, 10);
+    if (num > std::numeric_limits<uint16_t>::max())
+    {
+        return 0;
+    }
+    return static_cast<uint16_t>(num);
 }
 
 uint8_t MakeU8FromAsciiDecimal(const ByteSpan & val)
