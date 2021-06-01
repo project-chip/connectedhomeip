@@ -73,6 +73,7 @@ if platform.system() == 'Darwin':
 elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
+
 class StatusCodeEnum(Enum):
     SUCCESS = 0
     FAILED =  1
@@ -81,7 +82,6 @@ class RPCResponseKeyEnum(Enum):
     STATUS = "status"
     RESULT = "result"
     ERROR  = "error"
-
 
 # The exceptions for CHIP Device Controller CLI
 
@@ -744,7 +744,6 @@ def start_rpc_server():
     with SimpleXMLRPCServer(("0.0.0.0", 5000), allow_none=True) as server:
         server.register_function(echo_alive)
         server.register_function(ble_scan)
-        server.register_function(resolve)
         server.register_function(ble_connect)
         server.register_function(ip_connect)
         server.register_function(zcl_add_network)
