@@ -224,6 +224,10 @@ private:
     CHIP_ERROR ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen);
 
     void SendErrorMsg(SigmaErrorType errorCode);
+
+    // This function always returns an error. The error value corresponds to the error in the received message.
+    // The returned error value helps top level message receiver/dispatcher to close the exchange context
+    // in a more seemless manner.
     CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
 
     void CloseExchange();
