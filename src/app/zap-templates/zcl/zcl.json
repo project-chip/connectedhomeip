@@ -42,6 +42,7 @@
         "ami-devices.xml",
         "zll.xml",
         "zll-devices.xml",
+        "temperature-measurement-cluster.xml",
         "ta.xml",
         "ta-devices.xml",
         "thread-network-diagnostics-cluster.xml",
