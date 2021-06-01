@@ -118,7 +118,7 @@ exit:
         // TODO: The error code should be updated after #7072 added error codes required by IM.
         if (err == CHIP_ERROR_INVALID_PROFILE_ID)
         {
-            ChipLogDetail(DataManagement, "Cannot found cluster 0x%" PRIx16 " on endpoint 0x%" PRIx8, clusterId, endpointId);
+            ChipLogDetail(DataManagement, "No Cluster 0x%" PRIx16 " on Endpoint 0x%" PRIx8, clusterId, endpointId);
         }
 
         AddStatusCode(&returnStatusParam,
