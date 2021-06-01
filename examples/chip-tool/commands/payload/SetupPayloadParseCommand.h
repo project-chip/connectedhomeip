@@ -32,5 +32,4 @@ private:
     CHIP_ERROR Parse(std::string codeString, chip::SetupPayload & payload);
     CHIP_ERROR Print(chip::SetupPayload payload);
     bool IsQRCode(std::string codeString);
-    const std::string QRCODE_PREFIX = "CH:";
 };
