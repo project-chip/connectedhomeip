@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <platform/DeviceSafeQueue.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <fcntl.h>
@@ -33,7 +34,6 @@
 #include <unistd.h>
 
 #include <atomic>
-#include <mutex>
 #include <pthread.h>
 #include <queue>
 
@@ -122,7 +122,7 @@ private:
 
     void ProcessDeviceEvents();
 
-    std::mutex mEventQueueLock;
+    DeviceSafeQueue mChipEventQueue;
     std::atomic<bool> mShouldRunEventLoop;
     static void * EventLoopTaskMain(void * arg);
 };

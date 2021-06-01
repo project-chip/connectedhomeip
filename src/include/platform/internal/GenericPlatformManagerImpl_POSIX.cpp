@@ -147,22 +147,17 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-    // Critical section
-    {
-        std::unique_lock<std::mutex> lock(mEventQueueLock);
-        mChipEventQueue.push(*event);
-    }
+    mChipEventQueue.Push(event);
     SysOnEventSignal(this); // Trigger wake select on CHIP thread
 }
 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
 {
-    std::unique_lock<std::mutex> lock(mEventQueueLock);
-    while (!mChipEventQueue.empty())
+    while (!mChipEventQueue.Empty())
     {
-        Impl()->DispatchEvent(&mChipEventQueue.front());
-        mChipEventQueue.pop();
+        Impl()->DispatchEvent(mChipEventQueue.Front());
+        mChipEventQueue.Pop();
     }
 }
 
