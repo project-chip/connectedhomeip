@@ -71,26 +71,26 @@ function run_cleanup() {
     if [ $have_ebtables_legacy = true ]; then
       # Just try to drop the additional rule - it references our interface
       # so if it's there, we added it.
-      ebtables-legacy -t broute -D BROUTING -p ipv6 -j DROP -i ${HOST_SIDE_IF_NAME} > /dev/null
+      ebtables-legacy -t broute -D BROUTING -p ipv6 -j DROP -i ${HOST_SIDE_IF_NAME} >/dev/null
     fi
     ip link delete dev ${BRIDGE_NAME} type bridge
   fi
 }
 
 function help() {
-    echo "Usage: $file_name [ options ... ]"
-    echo ""
+  echo "Usage: $file_name [ options ... ]"
+  echo ""
 
-    echo "This script is used to set up linux namespaces for Matter device testing."
-    echo "To use this script, set up a namespace then run the Matter device example"
-    echo "using the -r command. Run the controller in another terminal to send"
-    echo "commands to and from the device."
-    echo ""
-    echo "This script requires sudo for setup and requires access to ebtables-legacy"
-    echo "to set up dual ipv4/ipv6 namespaces. Defaults to ipv6 only."
-    echo ""
+  echo "This script is used to set up linux namespaces for Matter device testing."
+  echo "To use this script, set up a namespace then run the Matter device example"
+  echo "using the -r command. Run the controller in another terminal to send"
+  echo "commands to and from the device."
+  echo ""
+  echo "This script requires sudo for setup and requires access to ebtables-legacy"
+  echo "to set up dual ipv4/ipv6 namespaces. Defaults to ipv6 only."
+  echo ""
 
-    echo "Options:
+  echo "Options:
   -h, --help                Display this information.
   -s, --setup               Setup an IP namespace. Will run cleanup if namespace exists.
   -4, --ipv4                Add ipv4 support.
@@ -108,37 +108,37 @@ declare ipv4=false
 file_name=${0##*/}
 
 while (($#)); do
-    case $1 in
-        --help | -h)
-            help
-            exit 1
-            ;;
-        --setup | -s)
-            setup=true
-            ;;
-        --run | -r)
-            run=true
-            filename=$2
-            shift
-            ;;
-        --cleanup | -c)
-            cleanup=true
-            ;;
-        --ipv4 | -4)
-            ipv4=true
-            ;;
-        -*)
-            help
-            echo "Unknown Option \"$1\""
-            exit 1
-            ;;
-    esac
+  case $1 in
+  --help | -h)
+    help
+    exit 1
+    ;;
+  --setup | -s)
+    setup=true
+    ;;
+  --run | -r)
+    run=true
+    filename=$2
     shift
+    ;;
+  --cleanup | -c)
+    cleanup=true
+    ;;
+  --ipv4 | -4)
+    ipv4=true
+    ;;
+  -*)
+    help
+    echo "Unknown Option \"$1\""
+    exit 1
+    ;;
+  esac
+  shift
 done
 
 if [[ $EUID -ne 0 ]]; then
-   echo "You must run this script with superuser privileges."
-   exit 1
+  echo "You must run this script with superuser privileges."
+  exit 1
 fi
 
 if ifconfig | grep "${HOST_SIDE_IF_NAME}"; then
@@ -152,7 +152,7 @@ if [ $setup = false ] && [ $run = false ] && [ $cleanup = false ]; then
   exit 1
 fi
 
-if command -v ebtables-legacy > /dev/null; then
+if command -v ebtables-legacy >/dev/null; then
   have_ebtables_legacy=true
 else
   have_ebtables_legacy=false
