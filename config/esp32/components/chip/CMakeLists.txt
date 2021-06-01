@@ -75,6 +75,9 @@ if (CONFIG_ENABLE_CHIP_SHELL)
     chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
+if (CONFIG_ENABLE_CHIP_GEN_ZAP)
+    chip_gn_arg_append("chip_gen_zap"                       "true")
+endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
@@ -125,6 +128,12 @@ set(GN_ROOT_TARGET ${CHIP_ROOT}/config/esp32)
 
 set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
 
+if (CONFIG_ENABLE_CHIP_GEN_ZAP)
+    list(APPEND chip_libraries
+        "${CMAKE_CURRENT_BINARY_DIR}/obj/third_party/connectedhomeip/src/app/server/lib/libCHIPAppServer.a"
+        "${CMAKE_CURRENT_BINARY_DIR}/obj/zap_gen/lib/zap_gen.a")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
     list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
 endif()
@@ -159,6 +168,7 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CMAKE_CURRENT_BINARY_DIR}/src/include"
     "${CMAKE_CURRENT_BINARY_DIR}/include"
     "${CMAKE_CURRENT_BINARY_DIR}/gen/include"
+    "${CMAKE_CURRENT_BINARY_DIR}/gen/zap_gen/"
 )
 
 idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)

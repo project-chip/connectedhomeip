@@ -22,10 +22,18 @@ import("${chip_root}/build/chip/tests.gni")
 
 declare_args() {
   chip_build_pw_rpc_lib = false
+  chip_gen_zap = false
 }
 
 group("esp32") {
-  deps = [ "${chip_root}/src/lib" ]
+  deps = [
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
+  ]
+
+  if (chip_gen_zap) {
+    deps += [ "//zap_gen" ]
+  }
 
   if (chip_build_pw_rpc_lib) {
     deps += [ "//lib/pw_rpc" ]

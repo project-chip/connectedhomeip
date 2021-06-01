@@ -97,6 +97,12 @@ menu "CHIP Core"
             help
                 Link the application against CHIP interactive shell.
 
+        config ENABLE_CHIP_GEN_ZAP
+            bool "Generate data model handlers from ZAP file"
+            default n
+            help
+                The data model handlers is required for applications that handle clusters.
+
         # TODO: add log level selection
 
     endmenu # "General Options"

@@ -19,6 +19,9 @@
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
+get_filename_component(APP_ZAP_FILE ${CMAKE_CURRENT_LIST_DIR}/../lock-common/lock-app.zap ABSOLUTE)
+configure_file(${APP_ZAP_FILE} ${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/zap_gen/app.zap COPYONLY)
+
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
     "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components"

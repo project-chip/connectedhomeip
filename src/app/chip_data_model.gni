@@ -34,6 +34,9 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 #  use_default_client_callbacks
 #    Include CHIPClientCallbacks.cpp.
 #
+#  generate_library
+#    Generate static library.
+#
 # Forwards all the remaining variables to the source_set.
 #
 template("chip_data_model") {
@@ -49,6 +52,12 @@ template("chip_data_model") {
   _use_default_client_callbacks =
       defined(invoker.use_default_client_callbacks) &&
       invoker.use_default_client_callbacks
+
+  if (defined(invoker.generate_library) && invoker.generate_library) {
+    _link_target_type = "static_library"
+  } else {
+    _link_target_type = "source_set"
+  }
 
   _gen_out_dir = "$root_gen_dir/" + rebase_path(".", "//") + "/gen"
 
@@ -87,7 +96,7 @@ template("chip_data_model") {
     include_dirs = [ _gen_out_dir + "/.." ]
   }
 
-  source_set(_data_model_name) {
+  target(_link_target_type, _data_model_name) {
     forward_variables_from(invoker,
                            "*",
                            [
