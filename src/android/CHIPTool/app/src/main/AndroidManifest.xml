@@ -31,11 +31,6 @@
                 <data android:scheme="ch" /><!-- Process CHIP URIs -->
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.google.chip.chiptool.commissioner.CommissionerActivity"
-            android:label="@string/commissioner_name"
-            android:exported="false">
-        </activity>
     </application>
 
     <queries>
