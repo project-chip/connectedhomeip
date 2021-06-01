@@ -23,46 +23,26 @@
 
 namespace chip {
 namespace app {
-enum class AttributePathFlags : uint8_t
-{
-    kFieldIdValid   = 0x01,
-    kListIndexValid = 0x02,
-};
-
 struct AttributePathParams
 {
+    enum class Flags : uint8_t
+    {
+        kFieldIdValid   = 0x01,
+        kListIndexValid = 0x02,
+    };
+
     AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, FieldId aFieldId, ListIndex aListIndex,
-                        const BitFlags<AttributePathFlags> aFlags) :
+                        const BitFlags<Flags> aFlags) :
         mNodeId(aNodeId),
         mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
     {}
     AttributePathParams() {}
-    bool IsSamePath(const AttributePathParams & other) const
-    {
-        if (other.mNodeId != mNodeId || other.mEndpointId != mEndpointId || other.mClusterId != mClusterId)
-        {
-            return false;
-        }
-        if (mFlags != other.mFlags)
-        {
-            return false;
-        }
-        if (mFlags == AttributePathFlags::kFieldIdValid && other.mFieldId != mFieldId)
-        {
-            return false;
-        }
-        if (mFlags == AttributePathFlags::kListIndexValid && other.mListIndex != mListIndex)
-        {
-            return false;
-        }
-        return true;
-    }
-    chip::NodeId mNodeId         = 0;
-    chip::EndpointId mEndpointId = 0;
-    chip::ClusterId mClusterId   = 0;
-    chip::FieldId mFieldId       = 0;
-    chip::ListIndex mListIndex   = 0;
-    BitFlags<AttributePathFlags> mFlags;
+    NodeId mNodeId         = 0;
+    EndpointId mEndpointId = 0;
+    ClusterId mClusterId   = 0;
+    FieldId mFieldId       = 0;
+    ListIndex mListIndex   = 0;
+    BitFlags<Flags> mFlags;
 };
 } // namespace app
 } // namespace chip

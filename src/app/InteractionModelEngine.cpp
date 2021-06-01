@@ -286,7 +286,7 @@ void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
         lastClusterInfo = lastClusterInfo->mpNext;
     }
     lastClusterInfo->ClearDirty();
-    lastClusterInfo->mType     = ClusterInfo::Type::kInvalid;
+    lastClusterInfo->mFlags.ClearAll();
     lastClusterInfo->mpNext    = mpNextAvailableClusterInfo;
     mpNextAvailableClusterInfo = aClusterInfo;
     aClusterInfo               = nullptr;
