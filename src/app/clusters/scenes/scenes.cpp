@@ -501,7 +501,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * command
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<int32_t>(status)));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1),
-                                        static_cast<int32_t>(EMBER_AF_PLUGIN_SCENES_TABLE_SIZE - 
+                                        static_cast<int32_t>(EMBER_AF_PLUGIN_SCENES_TABLE_SIZE -
                                                              emberAfPluginScenesServerNumSceneEntriesInUse())));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(2), static_cast<int32_t>(groupId)));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(3), sceneCount));
