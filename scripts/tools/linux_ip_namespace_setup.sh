@@ -137,7 +137,7 @@ while (($#)); do
 done
 
 if [[ $EUID -ne 0 ]]; then
-   echo "You must run this script as root."
+   echo "You must run this script with superuser privileges."
    exit 1
 fi
 
@@ -148,7 +148,7 @@ else
 fi
 
 if [ $setup = false ] && [ $run = false ] && [ $cleanup = false ]; then
-  echo "Must specify one or more of -s -r -c."
+  echo "Must specify one or more of -s, -r, -c."
   exit 1
 fi
 
@@ -159,9 +159,9 @@ else
 fi
 
 if [ $ipv4 = true ] && [ $have_ebtables_legacy = false ]; then
-  echo "To set up namesapces with ipv4/ipv6 connectivity, ebtables-legacy"
-  echo "is required. To install please use:"
-  echo "apt-get install ebtables"
+  echo "To set up namespaces with ipv4/ipv6 connectivity, ebtables-legacy"
+  echo "is required. For example, to install on machines using APT:"
+  echo "sudo apt-get install ebtables"
   exit 1
 fi
 
@@ -191,4 +191,3 @@ fi
 if [ $run = true ]; then
   run_cmd $filename
 fi
-
