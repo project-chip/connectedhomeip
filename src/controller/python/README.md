@@ -403,17 +403,17 @@ example, `networkId=hex:0123456789abcdef` (for
 > Skip this part if your device does not support WiFi.
 >
 > ```
-> chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 4546 1 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
+> chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 4546 0 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
 >
-> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
+> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
 > ```
 
 > Skip this part if your device does not support Thread.
 >
 > ```
-> chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 4546 1 0 operationalDataset=hex:0e080000000000010000000300001435060004001fffe00208577c1f5384d9e9090708fdca4e253816ae9d0510bb53ac7bf2133f0f686759ad9969255c030f4f70656e5468726561642d31343937010214970410420111ea791a892d28e3160f20eea3960c030000ff breadcrumb=0 timeoutMs=1000
+> chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 4546 0 0 operationalDataset=hex:0e080000000000010000000300001435060004001fffe00208577c1f5384d9e9090708fdca4e253816ae9d0510bb53ac7bf2133f0f686759ad9969255c030f4f70656e5468726561642d31343937010214970410420111ea791a892d28e3160f20eea3960c030000ff breadcrumb=0 timeoutMs=1000
 >
-> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkID=hex:577c1f5384d9e909 breadcrumb=0 timeoutMs=1000
+> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 0 0 networkID=hex:577c1f5384d9e909 breadcrumb=0 timeoutMs=1000
 > ```
 
 > If you are using BLE connection, release BLE connection

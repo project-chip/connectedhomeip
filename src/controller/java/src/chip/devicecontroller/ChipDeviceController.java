@@ -170,9 +170,8 @@ public class ChipDeviceController {
     sendCommand(deviceControllerPtr, deviceId, command, value);
   }
 
-  public void enableThreadNetwork(
-      long deviceId, int channel, int panId, byte[] extPanId, byte[] masterKey) {
-    enableThreadNetwork(deviceControllerPtr, deviceId, channel, panId, extPanId, masterKey);
+  public void enableThreadNetwork(long deviceId, byte[] operationalDataset) {
+    enableThreadNetwork(deviceControllerPtr, deviceId, operationalDataset);
   }
 
   public boolean openPairingWindow(long deviceId, int duration) {
@@ -204,12 +203,7 @@ public class ChipDeviceController {
       long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
 
   private native void enableThreadNetwork(
-      long deviceControllerPtr,
-      long deviceId,
-      int channel,
-      int panId,
-      byte[] extPanId,
-      byte[] masterKey);
+      long deviceControllerPtr, long deviceId, byte[] operationalDataset);
 
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 

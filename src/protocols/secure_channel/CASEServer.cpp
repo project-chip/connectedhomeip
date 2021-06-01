@@ -41,7 +41,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     mAdmins          = admins;
     mExchangeManager = exchangeManager;
 
-    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
+    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(mExchangeManager->GetReliableMessageMgr(), transportMgr));
 
     ExchangeDelegate * delegate = this;
     ReturnErrorOnFailure(

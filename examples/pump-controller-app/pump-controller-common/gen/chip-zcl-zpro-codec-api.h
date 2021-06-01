@@ -29,14 +29,68 @@
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
 | Basic                                                               | 0x0028 |
+| EthernetNetworkDiagnostics                                          | 0x0037 |
 | GeneralCommissioning                                                | 0x0030 |
+| GeneralDiagnostics                                                  | 0x0033 |
+| LevelControl                                                        | 0x0008 |
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
+| SoftwareDiagnostics                                                 | 0x0034 |
+| TemperatureMeasurement                                              | 0x0402 |
+| TemperatureMeasurement                                              | 0x0402 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
 | TrustedRootCertificates                                             | 0x003F |
+| WiFiNetworkDiagnostics                                              | 0x0036 |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster LevelControl                                                | 0x0008 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * Move                                                              |   0x01 |
+| * MoveToLevel                                                       |   0x00 |
+| * MoveToLevelWithOnOff                                              |   0x04 |
+| * MoveWithOnOff                                                     |   0x05 |
+| * Step                                                              |   0x02 |
+| * StepWithOnOff                                                     |   0x06 |
+| * Stop                                                              |   0x03 |
+| * StopWithOnOff                                                     |   0x07 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * CurrentLevel                                                      | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Level Control server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeLevelControlClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Level Control server read command for the current level attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeLevelControlClusterReadCurrentLevelAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Level Control server configure report command for the current level attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint,
+                                                                                         uint16_t minInterval, uint16_t maxInterval,
+                                                                                         uint8_t change);
+
+/**
+ * @brief
+ *    Encode a Level Control server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
@@ -62,13 +116,6 @@ chip::System::PacketBufferHandle encodeOnOffClusterDiscoverAttributes(uint8_t se
  *    Encode a On/off server read command for the on/off attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeOnOffClusterReadOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a On/off server configure report command for the on/off attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                                           uint16_t minInterval, uint16_t maxInterval);
 
 /**
  * @brief
@@ -177,3 +224,59 @@ encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqN
  */
 chip::System::PacketBufferHandle
 encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster TemperatureMeasurement                                      | 0x0402 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Temperature Measurement server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Temperature Measurement server read command for the measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Temperature Measurement server configure report command for the measured value attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                   uint16_t minInterval, uint16_t maxInterval, int16_t change);
+
+/**
+ * @brief
+ *    Encode a Temperature Measurement server read command for the min measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Temperature Measurement server read command for the max measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Temperature Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);

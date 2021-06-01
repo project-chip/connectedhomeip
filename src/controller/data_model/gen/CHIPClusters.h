@@ -33,6 +33,7 @@ constexpr ClusterId kApplicationLauncherClusterId         = 0x050C;
 constexpr ClusterId kAudioOutputClusterId                 = 0x050B;
 constexpr ClusterId kBarrierControlClusterId              = 0x0103;
 constexpr ClusterId kBasicClusterId                       = 0x0028;
+constexpr ClusterId kBinaryInputBasicClusterId            = 0x000F;
 constexpr ClusterId kBindingClusterId                     = 0xF000;
 constexpr ClusterId kBridgedDeviceBasicClusterId          = 0x0039;
 constexpr ClusterId kColorControlClusterId                = 0x0300;
@@ -56,6 +57,7 @@ constexpr ClusterId kOtaSoftwareUpdateServerClusterId     = 0x0029;
 constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
 constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
+constexpr ClusterId kRelativeHumidityMeasurementClusterId = 0x0405;
 constexpr ClusterId kScenesClusterId                      = 0x0005;
 constexpr ClusterId kSoftwareDiagnosticsClusterId         = 0x0034;
 constexpr ClusterId kSwitchClusterId                      = 0x003B;
@@ -213,6 +215,30 @@ public:
 
 private:
     static constexpr CommandId kMfgSpecificPingCommandId = 0x00;
+};
+
+class DLL_EXPORT BinaryInputBasicCluster : public ClusterBase
+{
+public:
+    BinaryInputBasicCluster() : ClusterBase(kBinaryInputBasicClusterId) {}
+    ~BinaryInputBasicCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOutOfService(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePresentValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeStatusFlags(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeOutOfService(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t value);
+    CHIP_ERROR WriteAttributePresentValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t value);
+    CHIP_ERROR ConfigureAttributePresentValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributePresentValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeStatusFlags(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeStatusFlags(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT BindingCluster : public ClusterBase
@@ -976,6 +1002,23 @@ public:
     CHIP_ERROR ConfigureAttributeCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint16_t minInterval, uint16_t maxInterval, int16_t change);
     CHIP_ERROR ReportAttributeCapacity(Callback::Cancelable * onReportCallback);
+};
+
+class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
+{
+public:
+    RelativeHumidityMeasurementCluster() : ClusterBase(kRelativeHumidityMeasurementClusterId) {}
+    ~RelativeHumidityMeasurementCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT ScenesCluster : public ClusterBase

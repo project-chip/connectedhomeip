@@ -21,7 +21,6 @@
 // ================================================================================
 
 #include "openthread/platform/logging.h"
-#include "openthread/platform/uart.h"
 #include <mbedtls/platform.h>
 #include <openthread-system.h>
 #include <openthread/cli.h>
@@ -69,11 +68,6 @@ extern "C" void main_task(void const * argument)
 
     /* Used for HW initializations */
     otSysInit(0, NULL);
-
-    /* UART needs to be enabled so early for getting the Weave Init Logs.
-     * Otherwise, some logs are lost because the UART gets enabled later
-     * during the initialization of the Thread stack */
-    otPlatUartEnable();
 
     K32W_LOG("Welcome to NXP Lighting Demo App");
 

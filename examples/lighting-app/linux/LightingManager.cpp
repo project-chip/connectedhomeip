@@ -50,13 +50,13 @@ bool LightingManager::InitiateAction(Action_t aAction)
     switch (aAction)
     {
     case ON_ACTION:
-        ChipLogDetail(AppServer, "LightingManager::InitiateAction(ON_ACTION)");
+        ChipLogProgress(AppServer, "LightingManager::InitiateAction(ON_ACTION)");
         break;
     case OFF_ACTION:
-        ChipLogDetail(AppServer, "LightingManager::InitiateAction(OFF_ACTION)");
+        ChipLogProgress(AppServer, "LightingManager::InitiateAction(OFF_ACTION)");
         break;
     default:
-        ChipLogDetail(AppServer, "LightingManager::InitiateAction(unknown)");
+        ChipLogProgress(AppServer, "LightingManager::InitiateAction(unknown)");
         break;
     }
 

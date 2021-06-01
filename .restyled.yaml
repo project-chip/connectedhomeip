@@ -63,7 +63,6 @@ exclude:
     - "third_party/openthread/repo/**/*"
     - "third_party/ot-br-posix/repo/**/*"
     - "third_party/bluez/repo/**/*"
-    - "third_party/ot-commissioner/repo/**/*"
     - "third_party/cirque/repo/**/*"
     - "third_party/nanopb/repo/**/*"
 

@@ -34,6 +34,7 @@
 | AudioOutput                                                         | 0x050B |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
+| BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
@@ -57,6 +58,7 @@
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
+| RelativeHumidityMeasurement                                         | 0x0405 |
 | Scenes                                                              | 0x0005 |
 | SoftwareDiagnostics                                                 | 0x0034 |
 | Switch                                                              | 0x003B |
@@ -465,6 +467,87 @@ chip::System::PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttri
  */
 chip::System::PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                 chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster BinaryInputBasic                                            | 0x000F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * OutOfService                                                      | 0x0051 |
+| * PresentValue                                                      | 0x0055 |
+| * StatusFlags                                                       | 0x006F |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server read command for the out of service attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterReadOutOfServiceAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server write command for the out of service attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeBinaryInputBasicClusterWriteOutOfServiceAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t outOfService);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server read command for the present value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterReadPresentValueAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server write command for the present value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeBinaryInputBasicClusterWritePresentValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t presentValue);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server configure report command for the present value attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterConfigurePresentValueAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             uint16_t minInterval,
+                                                                                             uint16_t maxInterval);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server read command for the status flags attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterReadStatusFlagsAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server configure report command for the status flags attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterConfigureStatusFlagsAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint,
+                                                                                            uint16_t minInterval,
+                                                                                            uint16_t maxInterval);
+
+/**
+ * @brief
+ *    Encode a Binary Input (Basic) server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBinaryInputBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Binding                                                     | 0xF000 |
@@ -2074,6 +2157,65 @@ encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqN
  */
 chip::System::PacketBufferHandle
 encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster RelativeHumidityMeasurement                                 | 0x0405 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Relative Humidity Measurement server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeRelativeHumidityMeasurementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Relative Humidity Measurement server read command for the measured value attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeRelativeHumidityMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Relative Humidity Measurement server configure report command for the measured value attribute into buffer including
+ * the APS frame
+ */
+chip::System::PacketBufferHandle encodeRelativeHumidityMeasurementClusterConfigureMeasuredValueAttribute(
+    uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+
+/**
+ * @brief
+ *    Encode a Relative Humidity Measurement server read command for the min measured value attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeRelativeHumidityMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Relative Humidity Measurement server read command for the max measured value attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeRelativeHumidityMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Relative Humidity Measurement server read command for the cluster revision attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeRelativeHumidityMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |

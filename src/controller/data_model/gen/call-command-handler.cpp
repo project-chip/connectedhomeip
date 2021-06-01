@@ -34,6 +34,7 @@ EmberAfStatus emberAfApplicationLauncherClusterClientCommandParse(EmberAfCluster
 EmberAfStatus emberAfAudioOutputClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBarrierControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfBinaryInputBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBindingClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBridgedDeviceBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfColorControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -57,6 +58,7 @@ EmberAfStatus emberAfOtaSoftwareUpdateServerClusterClientCommandParse(EmberAfClu
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfPumpConfigurationAndControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfRelativeHumidityMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfSoftwareDiagnosticsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfSwitchClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -118,6 +120,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_BASIC_CLUSTER_ID:
             // No commands are enabled for cluster Basic
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_BINARY_INPUT_BASIC_CLUSTER_ID:
+            // No commands are enabled for cluster Binary Input (Basic)
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_BINDING_CLUSTER_ID:
@@ -200,6 +206,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Pump Configuration and Control
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID:
+            // No commands are enabled for cluster Relative Humidity Measurement
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_SCENES_CLUSTER_ID:

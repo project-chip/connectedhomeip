@@ -42,10 +42,6 @@
 	path = third_party/bluez/repo
 	url = https://github.com/bluez/bluez.git
 	branch = master
-[submodule "ot-commissioner"]
-	path = third_party/ot-commissioner/repo
-	url = https://github.com/openthread/ot-commissioner
-	branch = main
 [submodule "cirque"]
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
@@ -78,3 +74,12 @@
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
 	branch = int/CHIPSE_Release
+[submodule "third_party/openthread/ot-nxp"]
+	path = third_party/openthread/ot-nxp
+	url = https://github.com/openthread/ot-nxp.git
+[submodule "third_party/openthread/ot-qorvo"]
+	path = third_party/openthread/ot-qorvo
+	url = https://github.com/openthread/ot-qorvo.git
+[submodule "third_party/openthread/ot-efr32"]
+	path = third_party/openthread/ot-efr32
+	url = https://github.com/openthread/ot-efr32.git

@@ -47,6 +47,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BASIC_CLUSTER_ID:
         emberAfBasicClusterInitCallback(endpoint);
         break;
+    case ZCL_BINARY_INPUT_BASIC_CLUSTER_ID:
+        emberAfBinaryInputBasicClusterInitCallback(endpoint);
+        break;
     case ZCL_BINDING_CLUSTER_ID:
         emberAfBindingClusterInitCallback(endpoint);
         break;
@@ -122,6 +125,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
         emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
         break;
+    case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID:
+        emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
+        break;
     case ZCL_SCENES_CLUSTER_ID:
         emberAfScenesClusterInitCallback(endpoint);
         break;
@@ -193,6 +199,11 @@ void __attribute__((weak)) emberAfBarrierControlClusterInitCallback(EndpointId e
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfBinaryInputBasicClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -318,6 +329,11 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfPumpConfigurationAndControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfRelativeHumidityMeasurementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

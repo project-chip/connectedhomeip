@@ -52,7 +52,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Logging;
 using namespace chip::ArgParser;
 
-static chip::Shell::Shell sShellOtcliSubcommands;
+static chip::Shell::Engine sShellOtcliSubcommands;
 
 int cmd_otcli_help_iterator(shell_command_t * command, void * arg)
 {
@@ -172,6 +172,6 @@ void cmd_otcli_init()
 #endif
 
     // Register the root otcli command with the top-level shell.
-    shell_register(&cmds_otcli_root, 1);
+    Engine::Root().RegisterCommands(&cmds_otcli_root, 1);
 #endif // CHIP_ENABLE_OPENTHREAD
 }

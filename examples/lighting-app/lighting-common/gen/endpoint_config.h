@@ -581,16 +581,8 @@
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: On/off (server) */                                                                                \
-        { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* on/off */                                                \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* cluster revision */                                      \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: Level Control (server) */                                                                     \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* current level */                                       \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },   /* cluster revision */                                    \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: Basic (server) */                                                                             \
-            { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* InteractionModelVersion */     \
+        /* Endpoint: 0, Cluster: Basic (server) */                                                                                 \
+        { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* InteractionModelVersion */         \
             { 0x0001, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_LONG_DEFAULTS_INDEX(0) },  /* VendorName */    \
             { 0x0002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() },               /* VendorID */      \
             { 0x0003, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_LONG_DEFAULTS_INDEX(32) }, /* ProductName */   \
@@ -709,6 +701,14 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Trusted Root Certificates (server) */                                                         \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: On/off (server) */                                                                            \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* on/off */                                            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },     /* cluster revision */                                  \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* current level */                                       \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },   /* cluster revision */                                    \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -716,67 +716,65 @@
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
+    const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {                                                             \
+        (EmberAfGenericClusterFunction) emberAfBasicClusterServerInitCallback,                                                     \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
         (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {                                                             \
-        (EmberAfGenericClusterFunction) emberAfBasicClusterServerInitCallback,                                                     \
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
 #define GENERATED_CLUSTER_COUNT 12
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
-        {                                                                                                                          \
-            0x0006,                                                                                                                \
-            ZAP_ATTRIBUTE_INDEX(0),                                                                                                \
-            2,                                                                                                                     \
-            3,                                                                                                                     \
-            ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                            \
-            chipFuncArrayOnOffServer                                                                                               \
-        }, /* Endpoint: 0, Cluster: On/off (server) */                                                                             \
-            { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(2),                                                                                              \
+        { 0x0028,                                                                                                                  \
+          ZAP_ATTRIBUTE_INDEX(0),                                                                                                  \
+          12,                                                                                                                      \
+          254,                                                                                                                     \
+          ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                              \
+          chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                                   \
+            {                                                                                                                      \
+                0x0030, ZAP_ATTRIBUTE_INDEX(12), 3, 18, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x0031, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x0033, ZAP_ATTRIBUTE_INDEX(16), 3, 258, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                            \
+            {                                                                                                                      \
+                0x0034, ZAP_ATTRIBUTE_INDEX(19), 2, 10, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                           \
+            {                                                                                                                      \
+                0x0035, ZAP_ATTRIBUTE_INDEX(21), 61, 730, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+            }, /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                     \
+            {                                                                                                                      \
+                0x0036, ZAP_ATTRIBUTE_INDEX(82), 6, 13, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                       \
+            {                                                                                                                      \
+                0x0037, ZAP_ATTRIBUTE_INDEX(88), 6, 42, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                   \
+            {                                                                                                                      \
+                0x003E, ZAP_ATTRIBUTE_INDEX(94), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
+            {                                                                                                                      \
+                0x003F, ZAP_ATTRIBUTE_INDEX(96), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: Trusted Root Certificates (server) */                                                      \
+            { 0x0006,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(97),                                                                                             \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayLevelControlServer }, /* Endpoint: 0, Cluster: Level Control (server) */                                \
-            { 0x0028,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(4),                                                                                              \
-              12,                                                                                                                  \
-              254,                                                                                                                 \
+              chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/off (server) */                                              \
+            { 0x0008,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(99),                                                                                             \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                               \
-            {                                                                                                                      \
-                0x0030, ZAP_ATTRIBUTE_INDEX(16), 3, 18, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
-            {                                                                                                                      \
-                0x0031, ZAP_ATTRIBUTE_INDEX(19), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
-            }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
-            {                                                                                                                      \
-                0x0033, ZAP_ATTRIBUTE_INDEX(20), 3, 258, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
-            }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                            \
-            {                                                                                                                      \
-                0x0034, ZAP_ATTRIBUTE_INDEX(23), 2, 10, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                           \
-            {                                                                                                                      \
-                0x0035, ZAP_ATTRIBUTE_INDEX(25), 61, 730, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
-            }, /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                     \
-            {                                                                                                                      \
-                0x0036, ZAP_ATTRIBUTE_INDEX(86), 6, 13, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                       \
-            {                                                                                                                      \
-                0x0037, ZAP_ATTRIBUTE_INDEX(92), 6, 42, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                   \
-            {                                                                                                                      \
-                0x003E, ZAP_ATTRIBUTE_INDEX(98), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
-            }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
-            {                                                                                                                      \
-                0x003F, ZAP_ATTRIBUTE_INDEX(100), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 0, Cluster: Trusted Root Certificates (server) */                                                      \
+              chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -784,7 +782,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 12, 1591 },                                                                                        \
+        { ZAP_CLUSTER_INDEX(0), 10, 1585 }, { ZAP_CLUSTER_INDEX(10), 2, 6 },                                                       \
     }
 
 // Largest attribute size is needed for various buffers
@@ -797,68 +795,53 @@
 #define ATTRIBUTE_MAX_SIZE (1591)
 
 // Number of fixed endpoints
-#define FIXED_ENDPOINT_COUNT (1)
+#define FIXED_ENDPOINT_COUNT (2)
 
 // Array of endpoints that are supported, the data inside
 // the array is the endpoint number.
 #define FIXED_ENDPOINT_ARRAY                                                                                                       \
     {                                                                                                                              \
-        0x0000                                                                                                                     \
+        0x0000, 0x0001                                                                                                             \
     }
 
 // Array of profile ids
 #define FIXED_PROFILE_IDS                                                                                                          \
     {                                                                                                                              \
-        0x0104                                                                                                                     \
+        0x0104, 0x0104                                                                                                             \
     }
 
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 0                                                                                                                       \
     }
 
 // Array of device versions
 #define FIXED_DEVICE_VERSIONS                                                                                                      \
     {                                                                                                                              \
-        1                                                                                                                          \
+        1, 1                                                                                                                       \
     }
 
 // Array of endpoint types supported on each endpoint
 #define FIXED_ENDPOINT_TYPES                                                                                                       \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 1                                                                                                                       \
     }
 
 // Array of networks supported on each endpoint
 #define FIXED_NETWORKS                                                                                                             \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 0                                                                                                                       \
     }
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (50)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (53)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: On/off (server) */                                                                                \
-        { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Off */                                                         \
-            { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On */                                                          \
-            { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Toggle */                                                      \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: Level Control (server) */                                                                     \
-            { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MoveToLevel */                                                 \
-            { 0x0008, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Move */                                                        \
-            { 0x0008, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Step */                                                        \
-            { 0x0008, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Stop */                                                        \
-            { 0x0008, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MoveToLevelWithOnOff */                                        \
-            { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MoveWithOnOff */                                               \
-            { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* StepWithOnOff */                                               \
-            { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* StopWithOnOff */                                               \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: Basic (server) */                                                                             \
-            { 0x0028, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* StartUp */                                                     \
+        /* Endpoint: 0, Cluster: Basic (server) */                                                                                 \
+        { 0x0028, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) },     /* StartUp */                                                     \
             { 0x0028, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* ShutDown */                                                    \
             { 0x0028, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Leave */                                                       \
                                                                                                                                    \
@@ -909,6 +892,24 @@
             /* Endpoint: 0, Cluster: Trusted Root Certificates (server) */                                                         \
             { 0x003F, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddTrustedRootCertificate */                                   \
             { 0x003F, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveTrustedRootCertificate */                                \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: On/off (server) */                                                                            \
+            { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Off */                                                         \
+            { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On */                                                          \
+            { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Toggle */                                                      \
+            { 0x0006, 0x40, 0 },                                 /* OffWithEffect */                                               \
+            { 0x0006, 0x41, 0 },                                 /* OnWithRecallGlobalScene */                                     \
+            { 0x0006, 0x42, 0 },                                 /* OnWithTimedOff */                                              \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
+            { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MoveToLevel */                                                 \
+            { 0x0008, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Move */                                                        \
+            { 0x0008, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Step */                                                        \
+            { 0x0008, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Stop */                                                        \
+            { 0x0008, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MoveToLevelWithOnOff */                                        \
+            { 0x0008, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MoveWithOnOff */                                               \
+            { 0x0008, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* StepWithOnOff */                                               \
+            { 0x0008, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* StopWithOnOff */                                               \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
@@ -943,20 +944,10 @@
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
 // User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (2)
+#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (0)
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
 
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (2)
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (0)
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
     {                                                                                                                              \
-                                                                                                                                   \
-        /* Endpoint: 0, Cluster: On/off (server) */                                                                                \
-        {                                                                                                                          \
-            ZAP_REPORT_DIRECTION(REPORTED), 0x0000, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }          \
-        }, /* on/off */                                                                                                            \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: Level Control (server) */                                                                     \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0000, 0x0008, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* current level */                                                                                                 \
     }

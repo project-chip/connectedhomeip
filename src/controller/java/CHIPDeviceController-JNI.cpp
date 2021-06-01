@@ -553,32 +553,24 @@ void OnNetworkCommissioningFailed(void * context, uint8_t errorCode)
 } // namespace
 
 JNI_METHOD(void, enableThreadNetwork)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint channel, jint panId, jbyteArray extPanId, jbyteArray masterKey)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray operationalDataset)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
     Device * chipDevice        = nullptr;
     OperationalDataset dataset = {};
+    JniByteArray datasetAccessor(env, operationalDataset);
+    size_t datasetLength = datasetAccessor.size();
+    uint8_t datasetBytes[kSizeOperationalDataset];
+    uint8_t extPanId[kSizeExtendedPanId];
 
-    JniByteArray extPanIdAccessor(env, extPanId);
-    JniByteArray masterKeyAccessor(env, masterKey);
-    uint8_t extPanIdBytes[kSizeExtendedPanId];
-    uint8_t masterKeyBytes[kSizeMasterKey];
-
-    VerifyOrExit(CanCastTo<uint16_t>(channel), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(CanCastTo<uint16_t>(panId), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(extPanIdAccessor.size() == kSizeExtendedPanId, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(masterKeyAccessor.size() == kSizeMasterKey, err = CHIP_ERROR_INVALID_ARGUMENT);
-
+    VerifyOrExit(datasetLength <= sizeof(datasetBytes), err = CHIP_ERROR_INVALID_ARGUMENT);
+    memcpy(datasetBytes, datasetAccessor.data(), datasetLength);
+    SuccessOrExit(err = dataset.Init(ByteSpan(datasetBytes, datasetLength)));
+    SuccessOrExit(err = dataset.GetExtendedPanId(extPanId));
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
-    memcpy(extPanIdBytes, extPanIdAccessor.data(), kSizeExtendedPanId);
-    memcpy(masterKeyBytes, masterKeyAccessor.data(), kSizeMasterKey);
-    dataset.SetChannel(channel);
-    dataset.SetPanId(panId);
-    dataset.SetExtendedPanId(extPanIdBytes);
-    dataset.SetMasterKey(masterKeyBytes);
 
     {
-        auto ctx = std::make_unique<NetworkCommissioningCtx>(env, handle, deviceId, ByteSpan(extPanIdBytes, kSizeExtendedPanId));
+        auto ctx = std::make_unique<NetworkCommissioningCtx>(env, handle, deviceId, ByteSpan(extPanId, sizeof(extPanId)));
         ScopedPthreadLock lock(&sStackLock);
         NetworkCommissioningCluster cluster;
         cluster.Associate(chipDevice, kNodeEndpoint);

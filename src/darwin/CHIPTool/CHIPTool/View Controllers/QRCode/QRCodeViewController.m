@@ -392,10 +392,9 @@
     if (error.code != CHIPSuccess) {
         NSLog(@"Got pairing error back %@", error);
     } else {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self->_deviceList refreshDeviceList];
             [self retrieveAndSendWifiCredentials];
-            [self setVendorIDOnAccessory];
         });
     }
 }
@@ -623,6 +622,7 @@
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
+    [self setVendorIDOnAccessory];
 }
 
 - (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
