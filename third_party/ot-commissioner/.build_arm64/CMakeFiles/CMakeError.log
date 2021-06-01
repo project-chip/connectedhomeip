@@ -1,0 +1,633 @@
+Performing C SOURCE FILE Test check_c_compiler_flag__Wnormalized_id failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_9df36 && [1/2] Building C object CMakeFiles/cmTC_9df36.dir/src.c.o
+warning: unknown warning option '-Wnormalized=id' [-Wunknown-warning-option]
+1 warning generated.
+[2/2] Linking C executable cmTC_9df36
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wlogical_op failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_80659 && [1/2] Building C object CMakeFiles/cmTC_80659.dir/src.c.o
+warning: unknown warning option '-Wlogical-op'; did you mean '-Wlong-long'? [-Wunknown-warning-option]
+1 warning generated.
+[2/2] Linking C executable cmTC_80659
+
+
+Source file was:
+int main(void) { return 0; }
+Determining if the __GNU_LIBRARY__ exist failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_1e782 && [1/2] Building C object CMakeFiles/cmTC_1e782.dir/CheckSymbolExists.c.o
+FAILED: CMakeFiles/cmTC_1e782.dir/CheckSymbolExists.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_1e782.dir/CheckSymbolExists.c.o   -c CheckSymbolExists.c
+CheckSymbolExists.c:8:19: error: use of undeclared identifier '__GNU_LIBRARY__'
+  return ((int*)(&__GNU_LIBRARY__))[argc];
+                  ^
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+File /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <features.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef __GNU_LIBRARY__
+  return ((int*)(&__GNU_LIBRARY__))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the _GNU_SOURCE exist failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_952ef && [1/2] Building C object CMakeFiles/cmTC_952ef.dir/CheckSymbolExists.c.o
+FAILED: CMakeFiles/cmTC_952ef.dir/CheckSymbolExists.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_952ef.dir/CheckSymbolExists.c.o   -c CheckSymbolExists.c
+CheckSymbolExists.c:8:19: error: use of undeclared identifier '_GNU_SOURCE'
+  return ((int*)(&_GNU_SOURCE))[argc];
+                  ^
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+File /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <features.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef _GNU_SOURCE
+  return ((int*)(&_GNU_SOURCE))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the include file port.h exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_fcf1f && [1/2] Building C object CMakeFiles/cmTC_fcf1f.dir/CheckIncludeFile.c.o
+FAILED: CMakeFiles/cmTC_fcf1f.dir/CheckIncludeFile.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_fcf1f.dir/CheckIncludeFile.c.o   -c CheckIncludeFile.c
+CheckIncludeFile.c:1:10: fatal error: 'port.h' file not found
+#include <port.h>
+         ^~~~~~~~
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the include file sys/devpoll.h exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_47d14 && [1/2] Building C object CMakeFiles/cmTC_47d14.dir/CheckIncludeFile.c.o
+FAILED: CMakeFiles/cmTC_47d14.dir/CheckIncludeFile.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_47d14.dir/CheckIncludeFile.c.o   -c CheckIncludeFile.c
+CheckIncludeFile.c:1:10: fatal error: 'sys/devpoll.h' file not found
+#include <sys/devpoll.h>
+         ^~~~~~~~~~~~~~~
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the include file sys/event.h exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_6fc68 && [1/2] Building C object CMakeFiles/cmTC_6fc68.dir/CheckIncludeFile.c.o
+FAILED: CMakeFiles/cmTC_6fc68.dir/CheckIncludeFile.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_6fc68.dir/CheckIncludeFile.c.o   -c CheckIncludeFile.c
+CheckIncludeFile.c:1:10: fatal error: 'sys/event.h' file not found
+#include <sys/event.h>
+         ^~~~~~~~~~~~~
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the include file mach/mach_time.h exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4400b && [1/2] Building C object CMakeFiles/cmTC_4400b.dir/CheckIncludeFile.c.o
+FAILED: CMakeFiles/cmTC_4400b.dir/CheckIncludeFile.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_4400b.dir/CheckIncludeFile.c.o   -c CheckIncludeFile.c
+CheckIncludeFile.c:1:10: fatal error: 'mach/mach_time.h' file not found
+#include <mach/mach_time.h>
+         ^~~~~~~~~~~~~~~~~~
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the include file sys/sysctl.h exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_1916e && [1/2] Building C object CMakeFiles/cmTC_1916e.dir/CheckIncludeFile.c.o
+FAILED: CMakeFiles/cmTC_1916e.dir/CheckIncludeFile.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_1916e.dir/CheckIncludeFile.c.o   -c CheckIncludeFile.c
+CheckIncludeFile.c:1:10: fatal error: 'sys/sysctl.h' file not found
+#include <sys/sysctl.h>
+         ^~~~~~~~~~~~~~
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function kqueue exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_e78d7 && [1/2] Building C object CMakeFiles/cmTC_e78d7.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_e78d7
+FAILED: cmTC_e78d7 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=kqueue  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_e78d7.dir/CheckFunctionExistsEx.c.o  -o cmTC_e78d7  -latomic -lm && :
+CMakeFiles/cmTC_e78d7.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `kqueue'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function port_create exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_547c1 && [1/2] Building C object CMakeFiles/cmTC_547c1.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_547c1
+FAILED: cmTC_547c1 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=port_create  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_547c1.dir/CheckFunctionExistsEx.c.o  -o cmTC_547c1  -latomic -lm && :
+CMakeFiles/cmTC_547c1.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `port_create'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function sysctl exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_f3022 && [1/2] Building C object CMakeFiles/cmTC_f3022.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_f3022
+FAILED: cmTC_f3022 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=sysctl  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_f3022.dir/CheckFunctionExistsEx.c.o  -o cmTC_f3022  -latomic -lm && :
+CMakeFiles/cmTC_f3022.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `sysctl'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function arc4random_addrandom exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_b0739 && [1/2] Building C object CMakeFiles/cmTC_b0739.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_b0739
+FAILED: cmTC_b0739 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=arc4random_addrandom  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_b0739.dir/CheckFunctionExistsEx.c.o  -o cmTC_b0739  -latomic -lm && :
+CMakeFiles/cmTC_b0739.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `arc4random_addrandom'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function issetugid exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_e996f && [1/2] Building C object CMakeFiles/cmTC_e996f.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_e996f
+FAILED: cmTC_e996f 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=issetugid  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_e996f.dir/CheckFunctionExistsEx.c.o  -o cmTC_e996f  -latomic -lm && :
+CMakeFiles/cmTC_e996f.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `issetugid'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function mach_absolute_time exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_6adc6 && [1/2] Building C object CMakeFiles/cmTC_6adc6.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_6adc6
+FAILED: cmTC_6adc6 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=mach_absolute_time  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_6adc6.dir/CheckFunctionExistsEx.c.o  -o cmTC_6adc6  -latomic -lm && :
+CMakeFiles/cmTC_6adc6.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `mach_absolute_time'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function timeradd exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_f3a16 && [1/2] Building C object CMakeFiles/cmTC_f3a16.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_f3a16
+FAILED: cmTC_f3a16 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=timeradd  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_f3a16.dir/CheckFunctionExistsEx.c.o  -o cmTC_f3a16  -latomic -lm && :
+CMakeFiles/cmTC_f3a16.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `timeradd'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function timerclear exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_fec78 && [1/2] Building C object CMakeFiles/cmTC_fec78.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_fec78
+FAILED: cmTC_fec78 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=timerclear  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_fec78.dir/CheckFunctionExistsEx.c.o  -o cmTC_fec78  -latomic -lm && :
+CMakeFiles/cmTC_fec78.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `timerclear'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function timercmp exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_63033 && [1/2] Building C object CMakeFiles/cmTC_63033.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_63033
+FAILED: cmTC_63033 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=timercmp  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_63033.dir/CheckFunctionExistsEx.c.o  -o cmTC_63033  -latomic -lm && :
+CMakeFiles/cmTC_63033.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `timercmp'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the function timerisset exists failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_dcd24 && [1/2] Building C object CMakeFiles/cmTC_dcd24.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_dcd24
+FAILED: cmTC_dcd24 
+: && /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DCHECK_FUNCTION_EXISTS=timerisset  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,--gc-sections CMakeFiles/cmTC_dcd24.dir/CheckFunctionExistsEx.c.o  -o cmTC_dcd24  -latomic -lm && :
+CMakeFiles/cmTC_dcd24.dir/CheckFunctionExistsEx.c.o: In function `main':
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17: undefined reference to `timerisset'
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+ninja: build stopped: subcommand failed.
+
+
+
+Determining if the prototype gethostbyname_r exists for EVENT__HAVE_GETHOSTBYNAME_R_3_ARG failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ac826 && [1/2] Building C object CMakeFiles/cmTC_ac826.dir/CheckPrototypeDefinition.c.o
+FAILED: CMakeFiles/cmTC_ac826.dir/CheckPrototypeDefinition.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_ac826.dir/CheckPrototypeDefinition.c.o   -c CheckPrototypeDefinition.c
+CheckPrototypeDefinition.c:14:66: warning: declaration of 'struct hostent_data' will not be visible outside of this function [-Wvisibility]
+int gethostbyname_r(const char *name, struct hostent *hp, struct hostent_data *hdata) {
+                                                                 ^
+CheckPrototypeDefinition.c:14:5: error: conflicting types for 'gethostbyname_r'
+int gethostbyname_r(const char *name, struct hostent *hp, struct hostent_data *hdata) {
+    ^
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/netdb.h:218:5: note: previous declaration is here
+int gethostbyname_r(const char* __name, struct hostent* __ret, char* __buf, size_t __buf_size, struct hostent** __result, int* __h_errno_ptr);
+    ^
+1 warning and 1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+
+#include <netdb.h>
+
+
+static void cmakeRequireSymbol(int dummy, ...) {
+  (void) dummy;
+}
+
+static void checkSymbol(void) {
+#ifndef gethostbyname_r
+  cmakeRequireSymbol(0, &gethostbyname_r);
+#endif
+}
+
+int gethostbyname_r(const char *name, struct hostent *hp, struct hostent_data *hdata) {
+  return 0;
+}
+
+#ifdef __CLASSIC_C__
+int main() {
+  int ac;
+  char*av[];
+#else
+int main(int ac, char *av[]) {
+#endif
+  checkSymbol();
+  if (ac > 1000) {
+    return *av[0];
+  }
+  return 0;
+}
+
+
+Determining if the prototype gethostbyname_r exists for EVENT__HAVE_GETHOSTBYNAME_R_5_ARG failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_3d51c && [1/2] Building C object CMakeFiles/cmTC_3d51c.dir/CheckPrototypeDefinition.c.o
+FAILED: CMakeFiles/cmTC_3d51c.dir/CheckPrototypeDefinition.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_3d51c.dir/CheckPrototypeDefinition.c.o   -c CheckPrototypeDefinition.c
+CheckPrototypeDefinition.c:14:17: error: conflicting types for 'gethostbyname_r'
+struct hostent *gethostbyname_r(const char *name, struct hostent *hp, char *buf, size_t buflen, int *herr) {
+                ^
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/netdb.h:218:5: note: previous declaration is here
+int gethostbyname_r(const char* __name, struct hostent* __ret, char* __buf, size_t __buf_size, struct hostent** __result, int* __h_errno_ptr);
+    ^
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+
+#include <netdb.h>
+
+
+static void cmakeRequireSymbol(int dummy, ...) {
+  (void) dummy;
+}
+
+static void checkSymbol(void) {
+#ifndef gethostbyname_r
+  cmakeRequireSymbol(0, &gethostbyname_r);
+#endif
+}
+
+struct hostent *gethostbyname_r(const char *name, struct hostent *hp, char *buf, size_t buflen, int *herr) {
+  return NULL;
+}
+
+#ifdef __CLASSIC_C__
+int main() {
+  int ac;
+  char*av[];
+#else
+int main(int ac, char *av[]) {
+#endif
+  checkSymbol();
+  if (ac > 1000) {
+    return *av[0];
+  }
+  return 0;
+}
+
+
+Performing C SOURCE FILE Test EVENT__HAVE_DECL_CTL_KERN failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_bdf55 && [1/2] Building C object CMakeFiles/cmTC_bdf55.dir/src.c.o
+FAILED: CMakeFiles/cmTC_bdf55.dir/src.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DEVENT__HAVE_DECL_CTL_KERN -fPIE -o CMakeFiles/cmTC_bdf55.dir/src.c.o   -c src.c
+src.c:2:20: fatal error: 'sys/sysctl.h' file not found
+          #include <sys/sysctl.h>
+                   ^~~~~~~~~~~~~~
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+Source file was:
+
+          #include <sys/sysctl.h>
+        int main() { (void)CTL_KERN; return 0; }
+Performing C SOURCE FILE Test EVENT__HAVE_DECL_KERN_ARND failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_16bf3 && [1/2] Building C object CMakeFiles/cmTC_16bf3.dir/src.c.o
+FAILED: CMakeFiles/cmTC_16bf3.dir/src.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DEVENT__HAVE_DECL_KERN_ARND -fPIE -o CMakeFiles/cmTC_16bf3.dir/src.c.o   -c src.c
+src.c:2:20: fatal error: 'sys/sysctl.h' file not found
+          #include <sys/sysctl.h>
+                   ^~~~~~~~~~~~~~
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+Source file was:
+
+          #include <sys/sysctl.h>
+        int main() { (void)KERN_ARND; return 0; }
+Performing C SOURCE FILE Test EVENT__HAVE_DECL_KERN_RANDOM failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_f9dd0 && [1/2] Building C object CMakeFiles/cmTC_f9dd0.dir/src.c.o
+FAILED: CMakeFiles/cmTC_f9dd0.dir/src.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DEVENT__HAVE_DECL_KERN_RANDOM -fPIE -o CMakeFiles/cmTC_f9dd0.dir/src.c.o   -c src.c
+src.c:2:20: fatal error: 'sys/sysctl.h' file not found
+          #include <sys/sysctl.h>
+                   ^~~~~~~~~~~~~~
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+Source file was:
+
+          #include <sys/sysctl.h>
+        int main() { (void)KERN_RANDOM; return 0; }
+Performing C SOURCE FILE Test EVENT__HAVE_DECL_RANDOM_UUID failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_b84af && [1/2] Building C object CMakeFiles/cmTC_b84af.dir/src.c.o
+FAILED: CMakeFiles/cmTC_b84af.dir/src.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DEVENT__HAVE_DECL_RANDOM_UUID -fPIE -o CMakeFiles/cmTC_b84af.dir/src.c.o   -c src.c
+src.c:2:20: fatal error: 'sys/sysctl.h' file not found
+          #include <sys/sysctl.h>
+                   ^~~~~~~~~~~~~~
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+Source file was:
+
+          #include <sys/sysctl.h>
+        int main() { (void)RANDOM_UUID; return 0; }
+Determining size of SSIZE_T failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_77337 && [1/2] Building C object CMakeFiles/cmTC_77337.dir/EVENT__SIZEOF_SSIZE_T_UPPER.c.o
+FAILED: CMakeFiles/cmTC_77337.dir/EVENT__SIZEOF_SSIZE_T_UPPER.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function  -fPIE -o CMakeFiles/cmTC_77337.dir/EVENT__SIZEOF_SSIZE_T_UPPER.c.o   -c /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:32:12: error: use of undeclared identifier 'SSIZE_T'
+  ('0' + ((SIZE / 10000)%10)),
+           ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:30:22: note: expanded from macro 'SIZE'
+#define SIZE (sizeof(SSIZE_T))
+                     ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:33:12: error: use of undeclared identifier 'SSIZE_T'
+  ('0' + ((SIZE / 1000)%10)),
+           ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:30:22: note: expanded from macro 'SIZE'
+#define SIZE (sizeof(SSIZE_T))
+                     ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:34:12: error: use of undeclared identifier 'SSIZE_T'
+  ('0' + ((SIZE / 100)%10)),
+           ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:30:22: note: expanded from macro 'SIZE'
+#define SIZE (sizeof(SSIZE_T))
+                     ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:35:12: error: use of undeclared identifier 'SSIZE_T'
+  ('0' + ((SIZE / 10)%10)),
+           ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:30:22: note: expanded from macro 'SIZE'
+#define SIZE (sizeof(SSIZE_T))
+                     ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:36:12: error: use of undeclared identifier 'SSIZE_T'
+  ('0' +  (SIZE    % 10)),
+           ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:30:22: note: expanded from macro 'SIZE'
+#define SIZE (sizeof(SSIZE_T))
+                     ^
+5 errors generated.
+ninja: build stopped: subcommand failed.
+
+
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CheckTypeSize/EVENT__SIZEOF_SSIZE_T_UPPER.c:
+#include <sys/types.h>
+#include <stdint.h>
+#include <stddef.h>
+#include "sys/types.h"
+#include "sys/socket.h"
+#include "netinet/in.h"
+#include "sys/un.h"
+#include "netinet/in6.h"
+#include "fcntl.h"
+#include "sys/time.h"
+
+
+#undef KEY
+#if defined(__i386)
+# define KEY '_','_','i','3','8','6'
+#elif defined(__x86_64)
+# define KEY '_','_','x','8','6','_','6','4'
+#elif defined(__ppc__)
+# define KEY '_','_','p','p','c','_','_'
+#elif defined(__ppc64__)
+# define KEY '_','_','p','p','c','6','4','_','_'
+#elif defined(__aarch64__)
+# define KEY '_','_','a','a','r','c','h','6','4','_','_'
+#elif defined(__ARM_ARCH_7A__)
+# define KEY '_','_','A','R','M','_','A','R','C','H','_','7','A','_','_'
+#elif defined(__ARM_ARCH_7S__)
+# define KEY '_','_','A','R','M','_','A','R','C','H','_','7','S','_','_'
+#endif
+
+#define SIZE (sizeof(SSIZE_T))
+static char info_size[] =  {'I', 'N', 'F', 'O', ':', 's','i','z','e','[',
+  ('0' + ((SIZE / 10000)%10)),
+  ('0' + ((SIZE / 1000)%10)),
+  ('0' + ((SIZE / 100)%10)),
+  ('0' + ((SIZE / 10)%10)),
+  ('0' +  (SIZE    % 10)),
+  ']',
+#ifdef KEY
+  ' ','k','e','y','[', KEY, ']',
+#endif
+  '\0'};
+
+#ifdef __CLASSIC_C__
+int main(argc, argv) int argc; char *argv[];
+#else
+int main(int argc, char *argv[])
+#endif
+{
+  int require = 0;
+  require += info_size[argc];
+  (void)argv;
+  return require;
+}
+
+
+Performing C SOURCE FILE Test EVENT__HAVE_STRUCT_SOCKADDR_IN6_SIN6_LEN failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_9e4ca && [1/2] Building C object CMakeFiles/cmTC_9e4ca.dir/src.c.o
+FAILED: CMakeFiles/cmTC_9e4ca.dir/src.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DEVENT__HAVE_STRUCT_SOCKADDR_IN6_SIN6_LEN -fPIE -o CMakeFiles/cmTC_9e4ca.dir/src.c.o   -c src.c
+src.c:9:44: error: no member named 'sin6_len' in 'struct sockaddr_in6'
+  (void)sizeof(((struct sockaddr_in6 *)0)->sin6_len);
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~  ^
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+Source file was:
+
+#include <netinet/in.h>
+#include <netinet/in6.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int main()
+{
+  (void)sizeof(((struct sockaddr_in6 *)0)->sin6_len);
+  return 0;
+}
+
+Performing C SOURCE FILE Test EVENT__HAVE_STRUCT_SOCKADDR_IN_SIN_LEN failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_29368 && [1/2] Building C object CMakeFiles/cmTC_29368.dir/src.c.o
+FAILED: CMakeFiles/cmTC_29368.dir/src.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DEVENT__HAVE_STRUCT_SOCKADDR_IN_SIN_LEN -fPIE -o CMakeFiles/cmTC_29368.dir/src.c.o   -c src.c
+src.c:9:44: error: no member named 'sin_len' in 'struct sockaddr_in6'
+  (void)sizeof(((struct sockaddr_in6 *)0)->sin_len);
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~  ^
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+Source file was:
+
+#include <netinet/in.h>
+#include <netinet/in6.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int main()
+{
+  (void)sizeof(((struct sockaddr_in6 *)0)->sin_len);
+  return 0;
+}
+
+Performing C SOURCE FILE Test EVENT__HAVE_STRUCT_SOCKADDR_STORAGE___SS_FAMILY failed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4854f && [1/2] Building C object CMakeFiles/cmTC_4854f.dir/src.c.o
+FAILED: CMakeFiles/cmTC_4854f.dir/src.c.o 
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android24 --gcc-toolchain=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot   -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fdiagnostics-color=always -Wall -Wextra -Wno-unused-parameter -Wstrict-aliasing -Wstrict-prototypes -fno-strict-aliasing -Wmissing-prototypes -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Waddress -Woverride-init -Wwrite-strings -Wno-unused-function -DEVENT__HAVE_STRUCT_SOCKADDR_STORAGE___SS_FAMILY -fPIE -o CMakeFiles/cmTC_4854f.dir/src.c.o   -c src.c
+src.c:9:48: error: no member named '__ss_family' in 'struct sockaddr_storage'; did you mean 'ss_family'?
+  (void)sizeof(((struct sockaddr_storage *)0)->__ss_family);
+                                               ^~~~~~~~~~~
+                                               ss_family
+/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/linux/socket.h:26:28: note: 'ss_family' declared here
+      __kernel_sa_family_t ss_family;
+                           ^
+1 error generated.
+ninja: build stopped: subcommand failed.
+
+
+Source file was:
+
+#include <netinet/in.h>
+#include <netinet/in6.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int main()
+{
+  (void)sizeof(((struct sockaddr_storage *)0)->__ss_family);
+  return 0;
+}
+

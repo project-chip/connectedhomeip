@@ -1,0 +1,1634 @@
+The target system is: Android - 1 - aarch64
+The host system is: Darwin - 20.4.0 - x86_64
+Determining if the C compiler works passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_d749c && [1/2] Building C object CMakeFiles/cmTC_d749c.dir/testCCompiler.c.o
+[2/2] Linking C executable cmTC_d749c
+
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_e53e0 && [1/2] Building C object CMakeFiles/cmTC_e53e0.dir/CMakeCCompilerABI.c.o
+Android (6454773 based on r365631c2) clang version 9.0.8 (https://android.googlesource.com/toolchain/llvm-project 98c855489587874b2a325e7a516b99d838599c6f) (based on LLVM 9.0.8svn)
+Target: aarch64-none-linux-android24
+Thread model: posix
+InstalledDir: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin
+Found candidate GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x
+Selected GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang" -cc1 -triple aarch64-none-linux-android24 -emit-obj -mrelax-all -mnoexecstack -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mthread-model posix -mdisable-fp-elim -masm-verbose -mconstructor-aliases -munwind-tables -fuse-init-array -target-cpu generic -target-feature +neon -target-abi aapcs -mllvm -aarch64-fix-cortex-a53-835769=1 -fallow-half-arguments-and-returns -dwarf-column-info -debug-info-kind=limited -dwarf-version=4 -debugger-tuning=gdb -target-linker-version 305 -v -ffunction-sections -fdata-sections -coverage-notes-file /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_e53e0.dir/CMakeCCompilerABI.c.gcno -resource-dir /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8 -D ANDROID -D _FORTIFY_SOURCE=2 -isysroot /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/include -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include -Wformat -Werror=format-security -fdebug-compilation-dir /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp -ferror-limit 19 -fmessage-length 0 -stack-protector 2 -fno-signed-char -fobjc-runtime=gcc -fdiagnostics-show-option -o CMakeFiles/cmTC_e53e0.dir/CMakeCCompilerABI.c.o -x c /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/share/cmake-3.16/Modules/CMakeCCompilerABI.c
+clang -cc1 version 9.0.8 based upon LLVM 9.0.8svn default target x86_64-apple-darwin20.4.0
+ignoring nonexistent directory "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include
+ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include
+ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android
+ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include
+End of search list.
+[2/2] Linking C executable cmTC_e53e0
+Android (6454773 based on r365631c2) clang version 9.0.8 (https://android.googlesource.com/toolchain/llvm-project 98c855489587874b2a325e7a516b99d838599c6f) (based on LLVM 9.0.8svn)
+Target: aarch64-none-linux-android24
+Thread model: posix
+InstalledDir: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin
+Found candidate GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x
+Selected GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/bin/ld" --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -pie -z noexecstack -EL --fix-cortex-a53-843419 --warn-shared-textrel -z now -z relro -z max-page-size=4096 --hash-style=gnu --enable-new-dtags --eh-frame-hdr -m aarch64linux -dynamic-linker /system/bin/linker64 -o cmTC_e53e0 /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtbegin_dynamic.o -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib --exclude-libs libgcc.a --exclude-libs libgcc_real.a --exclude-libs libatomic.a --build-id --fatal-warnings --no-undefined --gc-sections CMakeFiles/cmTC_e53e0.dir/CMakeCCompilerABI.c.o -lgcc -ldl -lc -lgcc -ldl /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtend_android.o
+
+
+
+Parsed C implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include]
+    add: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include]
+    add: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android]
+    add: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include]
+  end of search list found
+  collapse include dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include]
+  collapse include dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include]
+  collapse include dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android]
+  collapse include dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include]
+  implicit include dirs: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include]
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(aarch64-linux-android-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_e53e0 && [1/2] Building C object CMakeFiles/cmTC_e53e0.dir/CMakeCCompilerABI.c.o]
+  ignore line: [Android (6454773 based on r365631c2) clang version 9.0.8 (https://android.googlesource.com/toolchain/llvm-project 98c855489587874b2a325e7a516b99d838599c6f) (based on LLVM 9.0.8svn)]
+  ignore line: [Target: aarch64-none-linux-android24]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin]
+  ignore line: [Found candidate GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  ignore line: [Selected GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  ignore line: [ "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang" -cc1 -triple aarch64-none-linux-android24 -emit-obj -mrelax-all -mnoexecstack -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mthread-model posix -mdisable-fp-elim -masm-verbose -mconstructor-aliases -munwind-tables -fuse-init-array -target-cpu generic -target-feature +neon -target-abi aapcs -mllvm -aarch64-fix-cortex-a53-835769=1 -fallow-half-arguments-and-returns -dwarf-column-info -debug-info-kind=limited -dwarf-version=4 -debugger-tuning=gdb -target-linker-version 305 -v -ffunction-sections -fdata-sections -coverage-notes-file /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_e53e0.dir/CMakeCCompilerABI.c.gcno -resource-dir /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8 -D ANDROID -D _FORTIFY_SOURCE=2 -isysroot /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/include -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include -Wformat -Werror=format-security -fdebug-compilation-dir /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp -ferror-limit 19 -fmessage-length 0 -stack-protector 2 -fno-signed-char -fobjc-runtime=gcc -fdiagnostics-show-option -o CMakeFiles/cmTC_e53e0.dir/CMakeCCompilerABI.c.o -x c /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/share/cmake-3.16/Modules/CMakeCCompilerABI.c]
+  ignore line: [clang -cc1 version 9.0.8 based upon LLVM 9.0.8svn default target x86_64-apple-darwin20.4.0]
+  ignore line: [ignoring nonexistent directory "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include]
+  ignore line: [ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include]
+  ignore line: [ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android]
+  ignore line: [ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include]
+  ignore line: [End of search list.]
+  ignore line: [[2/2] Linking C executable cmTC_e53e0]
+  ignore line: [Android (6454773 based on r365631c2) clang version 9.0.8 (https://android.googlesource.com/toolchain/llvm-project 98c855489587874b2a325e7a516b99d838599c6f) (based on LLVM 9.0.8svn)]
+  ignore line: [Target: aarch64-none-linux-android24]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin]
+  ignore line: [Found candidate GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  ignore line: [Selected GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  link line: [ "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/bin/ld" --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -pie -z noexecstack -EL --fix-cortex-a53-843419 --warn-shared-textrel -z now -z relro -z max-page-size=4096 --hash-style=gnu --enable-new-dtags --eh-frame-hdr -m aarch64linux -dynamic-linker /system/bin/linker64 -o cmTC_e53e0 /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtbegin_dynamic.o -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib --exclude-libs libgcc.a --exclude-libs libgcc_real.a --exclude-libs libatomic.a --build-id --fatal-warnings --no-undefined --gc-sections CMakeFiles/cmTC_e53e0.dir/CMakeCCompilerABI.c.o -lgcc -ldl -lc -lgcc -ldl /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtend_android.o]
+    arg [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/bin/ld] ==> ignore
+    arg [--sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znoexecstack] ==> ignore
+    arg [-EL] ==> ignore
+    arg [--fix-cortex-a53-843419] ==> ignore
+    arg [--warn-shared-textrel] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-zmax-page-size=4096] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--enable-new-dtags] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [aarch64linux] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/system/bin/linker64] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_e53e0] ==> ignore
+    arg [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtbegin_dynamic.o] ==> ignore
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib]
+    arg [--exclude-libs] ==> ignore
+    arg [libgcc.a] ==> ignore
+    arg [--exclude-libs] ==> ignore
+    arg [libgcc_real.a] ==> ignore
+    arg [--exclude-libs] ==> ignore
+    arg [libatomic.a] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--fatal-warnings] ==> ignore
+    arg [--no-undefined] ==> ignore
+    arg [--gc-sections] ==> ignore
+    arg [CMakeFiles/cmTC_e53e0.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [-ldl] ==> lib [dl]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-ldl] ==> lib [dl]
+    arg [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtend_android.o] ==> ignore
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/aarch64-linux-android/lib64]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/aarch64-linux-android/lib]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib]
+  implicit libs: [gcc;dl;c;gcc;dl]
+  implicit dirs: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/aarch64-linux-android/lib64;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/aarch64-linux-android/lib;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib]
+  implicit fwks: []
+
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_40994 && [1/2] Building CXX object CMakeFiles/cmTC_40994.dir/testCXXCompiler.cxx.o
+[2/2] Linking CXX executable cmTC_40994
+
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_c3630 && [1/2] Building CXX object CMakeFiles/cmTC_c3630.dir/CMakeCXXCompilerABI.cpp.o
+Android (6454773 based on r365631c2) clang version 9.0.8 (https://android.googlesource.com/toolchain/llvm-project 98c855489587874b2a325e7a516b99d838599c6f) (based on LLVM 9.0.8svn)
+Target: aarch64-none-linux-android24
+Thread model: posix
+InstalledDir: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin
+Found candidate GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x
+Selected GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++" -cc1 -triple aarch64-none-linux-android24 -emit-obj -mrelax-all -mnoexecstack -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mthread-model posix -mdisable-fp-elim -masm-verbose -mconstructor-aliases -munwind-tables -fuse-init-array -target-cpu generic -target-feature +neon -target-abi aapcs -mllvm -aarch64-fix-cortex-a53-835769=1 -fallow-half-arguments-and-returns -dwarf-column-info -debug-info-kind=limited -dwarf-version=4 -debugger-tuning=gdb -target-linker-version 305 -v -ffunction-sections -fdata-sections -coverage-notes-file /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_c3630.dir/CMakeCXXCompilerABI.cpp.gcno -resource-dir /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8 -D ANDROID -D _FORTIFY_SOURCE=2 -isysroot /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/c++/v1 -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/include -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include -Wformat -Werror=format-security -std=gnu++11 -fdeprecated-macro -fdebug-compilation-dir /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp -ferror-limit 19 -fmessage-length 0 -stack-protector 2 -fno-signed-char -fobjc-runtime=gcc -fcxx-exceptions -fexceptions -fdiagnostics-show-option -o CMakeFiles/cmTC_c3630.dir/CMakeCXXCompilerABI.cpp.o -x c++ /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp
+clang -cc1 version 9.0.8 based upon LLVM 9.0.8svn default target x86_64-apple-darwin20.4.0
+ignoring nonexistent directory "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/c++/v1
+ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include
+ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include
+ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android
+ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include
+End of search list.
+[2/2] Linking CXX executable cmTC_c3630
+Android (6454773 based on r365631c2) clang version 9.0.8 (https://android.googlesource.com/toolchain/llvm-project 98c855489587874b2a325e7a516b99d838599c6f) (based on LLVM 9.0.8svn)
+Target: aarch64-none-linux-android24
+Thread model: posix
+InstalledDir: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin
+Found candidate GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x
+Selected GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+ "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/bin/ld" --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -pie -z noexecstack -EL --fix-cortex-a53-843419 --warn-shared-textrel -z now -z relro -z max-page-size=4096 --hash-style=gnu --enable-new-dtags --eh-frame-hdr -m aarch64linux -dynamic-linker /system/bin/linker64 -o cmTC_c3630 /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtbegin_dynamic.o -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib --exclude-libs libgcc.a --exclude-libs libgcc_real.a --exclude-libs libatomic.a --build-id --fatal-warnings --no-undefined --gc-sections CMakeFiles/cmTC_c3630.dir/CMakeCXXCompilerABI.cpp.o -Bstatic -lc++ -Bdynamic -lm -lgcc -ldl -lc -lgcc -ldl /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtend_android.o
+
+
+
+Parsed CXX implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/c++/v1]
+    add: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include]
+    add: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include]
+    add: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android]
+    add: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include]
+  end of search list found
+  collapse include dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/c++/v1] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/c++/v1]
+  collapse include dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include]
+  collapse include dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include]
+  collapse include dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android]
+  collapse include dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include]
+  implicit include dirs: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/c++/v1;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include]
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(aarch64-linux-android-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_c3630 && [1/2] Building CXX object CMakeFiles/cmTC_c3630.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [Android (6454773 based on r365631c2) clang version 9.0.8 (https://android.googlesource.com/toolchain/llvm-project 98c855489587874b2a325e7a516b99d838599c6f) (based on LLVM 9.0.8svn)]
+  ignore line: [Target: aarch64-none-linux-android24]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin]
+  ignore line: [Found candidate GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  ignore line: [Selected GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  ignore line: [ "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++" -cc1 -triple aarch64-none-linux-android24 -emit-obj -mrelax-all -mnoexecstack -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mthread-model posix -mdisable-fp-elim -masm-verbose -mconstructor-aliases -munwind-tables -fuse-init-array -target-cpu generic -target-feature +neon -target-abi aapcs -mllvm -aarch64-fix-cortex-a53-835769=1 -fallow-half-arguments-and-returns -dwarf-column-info -debug-info-kind=limited -dwarf-version=4 -debugger-tuning=gdb -target-linker-version 305 -v -ffunction-sections -fdata-sections -coverage-notes-file /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_c3630.dir/CMakeCXXCompilerABI.cpp.gcno -resource-dir /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8 -D ANDROID -D _FORTIFY_SOURCE=2 -isysroot /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/c++/v1 -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include -internal-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/include -internal-externc-isystem /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include -Wformat -Werror=format-security -std=gnu++11 -fdeprecated-macro -fdebug-compilation-dir /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp -ferror-limit 19 -fmessage-length 0 -stack-protector 2 -fno-signed-char -fobjc-runtime=gcc -fcxx-exceptions -fexceptions -fdiagnostics-show-option -o CMakeFiles/cmTC_c3630.dir/CMakeCXXCompilerABI.cpp.o -x c++ /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [clang -cc1 version 9.0.8 based upon LLVM 9.0.8svn default target x86_64-apple-darwin20.4.0]
+  ignore line: [ignoring nonexistent directory "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/c++/v1]
+  ignore line: [ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/local/include]
+  ignore line: [ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/include]
+  ignore line: [ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android]
+  ignore line: [ /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include]
+  ignore line: [End of search list.]
+  ignore line: [[2/2] Linking CXX executable cmTC_c3630]
+  ignore line: [Android (6454773 based on r365631c2) clang version 9.0.8 (https://android.googlesource.com/toolchain/llvm-project 98c855489587874b2a325e7a516b99d838599c6f) (based on LLVM 9.0.8svn)]
+  ignore line: [Target: aarch64-none-linux-android24]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/bin]
+  ignore line: [Found candidate GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  ignore line: [Selected GCC installation: /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  ignore line: [Candidate multilib: .]
+  ignore line: [@m64]
+  ignore line: [Selected multilib: .]
+  ignore line: [@m64]
+  link line: [ "/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/bin/ld" --sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -pie -z noexecstack -EL --fix-cortex-a53-843419 --warn-shared-textrel -z now -z relro -z max-page-size=4096 --hash-style=gnu --enable-new-dtags --eh-frame-hdr -m aarch64linux -dynamic-linker /system/bin/linker64 -o cmTC_c3630 /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtbegin_dynamic.o -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24 -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib -L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib --exclude-libs libgcc.a --exclude-libs libgcc_real.a --exclude-libs libatomic.a --build-id --fatal-warnings --no-undefined --gc-sections CMakeFiles/cmTC_c3630.dir/CMakeCXXCompilerABI.cpp.o -Bstatic -lc++ -Bdynamic -lm -lgcc -ldl -lc -lgcc -ldl /Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtend_android.o]
+    arg [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/bin/ld] ==> ignore
+    arg [--sysroot=/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-znoexecstack] ==> ignore
+    arg [-EL] ==> ignore
+    arg [--fix-cortex-a53-843419] ==> ignore
+    arg [--warn-shared-textrel] ==> ignore
+    arg [-znow] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-zmax-page-size=4096] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--enable-new-dtags] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [aarch64linux] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/system/bin/linker64] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_c3630] ==> ignore
+    arg [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtbegin_dynamic.o] ==> ignore
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib]
+    arg [-L/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib] ==> dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib]
+    arg [--exclude-libs] ==> ignore
+    arg [libgcc.a] ==> ignore
+    arg [--exclude-libs] ==> ignore
+    arg [libgcc_real.a] ==> ignore
+    arg [--exclude-libs] ==> ignore
+    arg [libatomic.a] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--fatal-warnings] ==> ignore
+    arg [--no-undefined] ==> ignore
+    arg [--gc-sections] ==> ignore
+    arg [CMakeFiles/cmTC_c3630.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-Bstatic] ==> ignore
+    arg [-lc++] ==> lib [c++]
+    arg [-Bdynamic] ==> ignore
+    arg [-lm] ==> lib [m]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-ldl] ==> lib [dl]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-ldl] ==> lib [dl]
+    arg [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24/crtend_android.o] ==> ignore
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib/../lib64] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/aarch64-linux-android/lib64]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x/../../../../aarch64-linux-android/lib] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/aarch64-linux-android/lib]
+  collapse library dir [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib] ==> [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib]
+  implicit libs: [c++;m;gcc;dl;c;gcc;dl]
+  implicit dirs: [/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib64/clang/9.0.8/lib/linux/aarch64;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/lib/gcc/aarch64-linux-android/4.9.x;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/aarch64-linux-android/lib64;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/24;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/aarch64-linux-android/lib;/Users/ritikananda/Library/Android/sdk/ndk/21.3.6528147/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib]
+  implicit fwks: []
+
+
+Performing C++ SOURCE FILE Test has_std_11_flag succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_52722 && [1/2] Building CXX object CMakeFiles/cmTC_52722.dir/src.cxx.o
+[2/2] Linking CXX executable cmTC_52722
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test has_std_0x_flag succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ee303 && [1/2] Building CXX object CMakeFiles/cmTC_ee303.dir/src.cxx.o
+[2/2] Linking CXX executable cmTC_ee303
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test SUPPORTS_VARIADIC_TEMPLATES succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_a77b0 && [1/2] Building CXX object CMakeFiles/cmTC_a77b0.dir/src.cxx.o
+[2/2] Linking CXX executable cmTC_a77b0
+
+
+Source file was:
+
+  template <class T, class ...Types>
+  struct S { typedef typename S<Types...>::type type; };
+  int main() {}
+Performing C++ SOURCE FILE Test SUPPORTS_USER_DEFINED_LITERALS succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_3ca8a && [1/2] Building CXX object CMakeFiles/cmTC_3ca8a.dir/src.cxx.o
+[2/2] Linking CXX executable cmTC_3ca8a
+
+
+Source file was:
+
+  void operator"" _udl(long double);
+  int main() {}
+Performing C++ SOURCE FILE Test FMT_HAS_VARIANT succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_225c8 && [1/2] Building CXX object CMakeFiles/cmTC_225c8.dir/src.cxx.o
+[2/2] Linking CXX executable cmTC_225c8
+
+
+Source file was:
+
+  #include <variant>
+  int main() {}
+Performing C++ SOURCE FILE Test HAS_NULLPTR_WARNING succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_f5b19 && [1/2] Building CXX object CMakeFiles/cmTC_f5b19.dir/src.cxx.o
+[2/2] Linking CXX executable cmTC_f5b19
+
+
+Source file was:
+int main() { return 0; }
+Determining if the strtod_l exist passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_592bf && [1/2] Building C object CMakeFiles/cmTC_592bf.dir/CheckSymbolExists.c.o
+[2/2] Linking C executable cmTC_592bf
+
+
+File /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <stdlib.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef strtod_l
+  return ((int*)(&strtod_l))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Performing C SOURCE FILE Test check_c_compiler_flag__fdiagnostics_color_always succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_0a445 && [1/2] Building C object CMakeFiles/cmTC_0a445.dir/src.c.o
+[2/2] Linking C executable cmTC_0a445
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wall succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_2ba03 && [1/2] Building C object CMakeFiles/cmTC_2ba03.dir/src.c.o
+[2/2] Linking C executable cmTC_2ba03
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wextra succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_3dc3b && [1/2] Building C object CMakeFiles/cmTC_3dc3b.dir/src.c.o
+[2/2] Linking C executable cmTC_3dc3b
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wno_unused_parameter succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_00eb5 && [1/2] Building C object CMakeFiles/cmTC_00eb5.dir/src.c.o
+[2/2] Linking C executable cmTC_00eb5
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wstrict_aliasing succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_2f689 && [1/2] Building C object CMakeFiles/cmTC_2f689.dir/src.c.o
+[2/2] Linking C executable cmTC_2f689
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wstrict_prototypes succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_be278 && [1/2] Building C object CMakeFiles/cmTC_be278.dir/src.c.o
+[2/2] Linking C executable cmTC_be278
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__fno_strict_aliasing succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_6f409 && [1/2] Building C object CMakeFiles/cmTC_6f409.dir/src.c.o
+[2/2] Linking C executable cmTC_6f409
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wmissing_prototypes succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4ddc2 && [1/2] Building C object CMakeFiles/cmTC_4ddc2.dir/src.c.o
+[2/2] Linking C executable cmTC_4ddc2
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Winit_self succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_a3be6 && [1/2] Building C object CMakeFiles/cmTC_a3be6.dir/src.c.o
+[2/2] Linking C executable cmTC_a3be6
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wmissing_field_initializers succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_404f9 && [1/2] Building C object CMakeFiles/cmTC_404f9.dir/src.c.o
+[2/2] Linking C executable cmTC_404f9
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wdeclaration_after_statement succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_8ec82 && [1/2] Building C object CMakeFiles/cmTC_8ec82.dir/src.c.o
+[2/2] Linking C executable cmTC_8ec82
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Waddress succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_adda2 && [1/2] Building C object CMakeFiles/cmTC_adda2.dir/src.c.o
+[2/2] Linking C executable cmTC_adda2
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Woverride_init succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_8ca16 && [1/2] Building C object CMakeFiles/cmTC_8ca16.dir/src.c.o
+[2/2] Linking C executable cmTC_8ca16
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wwrite_strings succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_11321 && [1/2] Building C object CMakeFiles/cmTC_11321.dir/src.c.o
+[2/2] Linking C executable cmTC_11321
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test check_c_compiler_flag__Wno_unused_function succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_53bb6 && [1/2] Building C object CMakeFiles/cmTC_53bb6.dir/src.c.o
+[2/2] Linking C executable cmTC_53bb6
+
+
+Source file was:
+int main(void) { return 0; }
+Determining if the include file sys/types.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_7c6d8 && [1/2] Building C object CMakeFiles/cmTC_7c6d8.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_7c6d8
+
+
+
+Determining if the include file sys/socket.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_06499 && [1/2] Building C object CMakeFiles/cmTC_06499.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_06499
+
+
+
+Determining if the include file netinet/in.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ecbf0 && [1/2] Building C object CMakeFiles/cmTC_ecbf0.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_ecbf0
+
+
+
+Determining if the include file sys/un.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_36542 && [1/2] Building C object CMakeFiles/cmTC_36542.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_36542
+
+
+
+Determining if the include file sys/types.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_67807 && [1/2] Building C object CMakeFiles/cmTC_67807.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_67807
+
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_dc1a2 && [1/2] Building C object CMakeFiles/cmTC_dc1a2.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_dc1a2
+
+
+
+Determining if the include file stddef.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_b85e7 && [1/2] Building C object CMakeFiles/cmTC_b85e7.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_b85e7
+
+
+
+Determining size of struct sockaddr_un passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_580d6 && [1/2] Building C object CMakeFiles/cmTC_580d6.dir/EVENT__HAVE_STRUCT_SOCKADDR_UN.c.o
+[2/2] Linking C executable cmTC_580d6
+
+
+
+Determining if the include file netinet/in6.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_7cd2a && [1/2] Building C object CMakeFiles/cmTC_7cd2a.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_7cd2a
+
+
+
+Determining if the include file unistd.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_b9bcf && [1/2] Building C object CMakeFiles/cmTC_b9bcf.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_b9bcf
+
+
+
+Determining if the include file netdb.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_635ca && [1/2] Building C object CMakeFiles/cmTC_635ca.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_635ca
+
+
+
+Determining if the include file dlfcn.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_7c864 && [1/2] Building C object CMakeFiles/cmTC_7c864.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_7c864
+
+
+
+Determining if the include file arpa/inet.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_cd2ba && [1/2] Building C object CMakeFiles/cmTC_cd2ba.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_cd2ba
+
+
+
+Determining if the include file fcntl.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_12d6f && [1/2] Building C object CMakeFiles/cmTC_12d6f.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_12d6f
+
+
+
+Determining if the include file inttypes.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_1fe90 && [1/2] Building C object CMakeFiles/cmTC_1fe90.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_1fe90
+
+
+
+Determining if the include file memory.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_31932 && [1/2] Building C object CMakeFiles/cmTC_31932.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_31932
+
+
+
+Determining if the include file poll.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_eac04 && [1/2] Building C object CMakeFiles/cmTC_eac04.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_eac04
+
+
+
+Determining if the include file signal.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4bdf3 && [1/2] Building C object CMakeFiles/cmTC_4bdf3.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_4bdf3
+
+
+
+Determining if the include file stdarg.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4a5a3 && [1/2] Building C object CMakeFiles/cmTC_4a5a3.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_4a5a3
+
+
+
+Determining if the include file stddef.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_0a7b0 && [1/2] Building C object CMakeFiles/cmTC_0a7b0.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_0a7b0
+
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_52cdc && [1/2] Building C object CMakeFiles/cmTC_52cdc.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_52cdc
+
+
+
+Determining if the include file stdlib.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4cc97 && [1/2] Building C object CMakeFiles/cmTC_4cc97.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_4cc97
+
+
+
+Determining if the include file strings.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_c746a && [1/2] Building C object CMakeFiles/cmTC_c746a.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_c746a
+
+
+
+Determining if the include file string.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_fc97b && [1/2] Building C object CMakeFiles/cmTC_fc97b.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_fc97b
+
+
+
+Determining if the include file sys/epoll.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_6c700 && [1/2] Building C object CMakeFiles/cmTC_6c700.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_6c700
+
+
+
+Determining if the include file sys/eventfd.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_e40c8 && [1/2] Building C object CMakeFiles/cmTC_e40c8.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_e40c8
+
+
+
+Determining if the include file sys/ioctl.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_3d8e9 && [1/2] Building C object CMakeFiles/cmTC_3d8e9.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_3d8e9
+
+
+
+Determining if the include file sys/mman.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_da414 && [1/2] Building C object CMakeFiles/cmTC_da414.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_da414
+
+
+
+Determining if the include file sys/param.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_1802f && [1/2] Building C object CMakeFiles/cmTC_1802f.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_1802f
+
+
+
+Determining if the include file sys/queue.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_6afbf && [1/2] Building C object CMakeFiles/cmTC_6afbf.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_6afbf
+
+
+
+Determining if the include file sys/select.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_483f2 && [1/2] Building C object CMakeFiles/cmTC_483f2.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_483f2
+
+
+
+Determining if the include file sys/sendfile.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_f4181 && [1/2] Building C object CMakeFiles/cmTC_f4181.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_f4181
+
+
+
+Determining if the include file sys/stat.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_67cf4 && [1/2] Building C object CMakeFiles/cmTC_67cf4.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_67cf4
+
+
+
+Determining if the include file sys/time.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_3b2c5 && [1/2] Building C object CMakeFiles/cmTC_3b2c5.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_3b2c5
+
+
+
+Determining if the include file sys/uio.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_0e55b && [1/2] Building C object CMakeFiles/cmTC_0e55b.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_0e55b
+
+
+
+Determining if files sys/types.h;ifaddrs.h exist passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_40d6c && [1/2] Building C object CMakeFiles/cmTC_40d6c.dir/EVENT__HAVE_IFADDRS_H.c.o
+[2/2] Linking C executable cmTC_40d6c
+
+
+
+Determining if the include file netinet/tcp.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_11d85 && [1/2] Building C object CMakeFiles/cmTC_11d85.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_11d85
+
+
+
+Determining if the include file sys/wait.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_fcff9 && [1/2] Building C object CMakeFiles/cmTC_fcff9.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_fcff9
+
+
+
+Determining if the include file sys/resource.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ddffa && [1/2] Building C object CMakeFiles/cmTC_ddffa.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_ddffa
+
+
+
+Determining if the include file sys/timerfd.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_bd253 && [1/2] Building C object CMakeFiles/cmTC_bd253.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_bd253
+
+
+
+Determining if the include file errno.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_0ab80 && [1/2] Building C object CMakeFiles/cmTC_0ab80.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_0ab80
+
+
+
+Determining if the function epoll_create exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_c6174 && [1/2] Building C object CMakeFiles/cmTC_c6174.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_c6174
+
+
+
+Determining if the function epoll_ctl exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ba907 && [1/2] Building C object CMakeFiles/cmTC_ba907.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_ba907
+
+
+
+Determining if the function eventfd exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_78427 && [1/2] Building C object CMakeFiles/cmTC_78427.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_78427
+
+
+
+Determining if the function clock_gettime exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_2bf2e && [1/2] Building C object CMakeFiles/cmTC_2bf2e.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_2bf2e
+
+
+
+Determining if the function fcntl exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_e0fab && [1/2] Building C object CMakeFiles/cmTC_e0fab.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_e0fab
+
+
+
+Determining if the function getaddrinfo exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_0a4b0 && [1/2] Building C object CMakeFiles/cmTC_0a4b0.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_0a4b0
+
+
+
+Determining if the function getnameinfo exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_f5667 && [1/2] Building C object CMakeFiles/cmTC_f5667.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_f5667
+
+
+
+Determining if the function gettimeofday exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_481a0 && [1/2] Building C object CMakeFiles/cmTC_481a0.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_481a0
+
+
+
+Determining if the function getprotobynumber exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_1e6eb && [1/2] Building C object CMakeFiles/cmTC_1e6eb.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_1e6eb
+
+
+
+Determining if the function getservbyname exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_319d1 && [1/2] Building C object CMakeFiles/cmTC_319d1.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_319d1
+
+
+
+Determining if the function inet_ntop exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_9f7d9 && [1/2] Building C object CMakeFiles/cmTC_9f7d9.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_9f7d9
+
+
+
+Determining if the function inet_pton exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4c773 && [1/2] Building C object CMakeFiles/cmTC_4c773.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_4c773
+
+
+
+Determining if the function mmap exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_afaf5 && [1/2] Building C object CMakeFiles/cmTC_afaf5.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_afaf5
+
+
+
+Determining if the function pipe exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_9fdc5 && [1/2] Building C object CMakeFiles/cmTC_9fdc5.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_9fdc5
+
+
+
+Determining if the function pipe2 exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_1b220 && [1/2] Building C object CMakeFiles/cmTC_1b220.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_1b220
+
+
+
+Determining if the function poll exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_d9a80 && [1/2] Building C object CMakeFiles/cmTC_d9a80.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_d9a80
+
+
+
+Determining if the function sendfile exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_b57b1 && [1/2] Building C object CMakeFiles/cmTC_b57b1.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_b57b1
+
+
+
+Determining if the function sigaction exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_61be1 && [1/2] Building C object CMakeFiles/cmTC_61be1.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_61be1
+
+
+
+Determining if the function signal exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_93efb && [1/2] Building C object CMakeFiles/cmTC_93efb.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_93efb
+
+
+
+Determining if the function splice exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4e9b6 && [1/2] Building C object CMakeFiles/cmTC_4e9b6.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_4e9b6
+
+
+
+Determining if the function strlcpy exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ec799 && [1/2] Building C object CMakeFiles/cmTC_ec799.dir/CheckFunctionExistsEx.c.o
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:7:3: warning: incompatible redeclaration of library function 'strlcpy' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:3:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS strlcpy
+                              ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:7:3: note: 'strlcpy' is a builtin with type 'unsigned long (char *, const char *, unsigned long)'
+<command line>:3:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS strlcpy
+                              ^
+1 warning generated.
+[2/2] Linking C executable cmTC_ec799
+
+
+
+Determining if the function strsep exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_928ca && [1/2] Building C object CMakeFiles/cmTC_928ca.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_928ca
+
+
+
+Determining if the function strtok_r exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_303b6 && [1/2] Building C object CMakeFiles/cmTC_303b6.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_303b6
+
+
+
+Determining if the function strtoll exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ab4a4 && [1/2] Building C object CMakeFiles/cmTC_ab4a4.dir/CheckFunctionExistsEx.c.o
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:7:3: warning: incompatible redeclaration of library function 'strtoll' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:3:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS strtoll
+                              ^
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:7:3: note: 'strtoll' is a builtin with type 'long long (const char *, char **, int)'
+<command line>:3:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS strtoll
+                              ^
+1 warning generated.
+[2/2] Linking C executable cmTC_ab4a4
+
+
+
+Determining if the function vasprintf exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_de4e6 && [1/2] Building C object CMakeFiles/cmTC_de4e6.dir/CheckFunctionExistsEx.c.o
+/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/repo/third_party/libevent/repo/cmake/CheckFunctionExistsEx.c:17:25: warning: format string missing [-Wformat]
+  CHECK_FUNCTION_EXISTS();
+  ~~~~~~~~~~~~~~~~~~~~~ ^
+1 warning generated.
+[2/2] Linking C executable cmTC_de4e6
+
+
+
+Determining if the function accept4 exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_a6365 && [1/2] Building C object CMakeFiles/cmTC_a6365.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_a6365
+
+
+
+Determining if the function arc4random exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_a7bd0 && [1/2] Building C object CMakeFiles/cmTC_a7bd0.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_a7bd0
+
+
+
+Determining if the function arc4random_buf exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_0d4c8 && [1/2] Building C object CMakeFiles/cmTC_0d4c8.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_0d4c8
+
+
+
+Determining if the function epoll_create1 exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ce317 && [1/2] Building C object CMakeFiles/cmTC_ce317.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_ce317
+
+
+
+Determining if the function getegid exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4f996 && [1/2] Building C object CMakeFiles/cmTC_4f996.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_4f996
+
+
+
+Determining if the function geteuid exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_65ed4 && [1/2] Building C object CMakeFiles/cmTC_65ed4.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_65ed4
+
+
+
+Determining if the function getifaddrs exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_c655f && [1/2] Building C object CMakeFiles/cmTC_c655f.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_c655f
+
+
+
+Determining if the function nanosleep exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_9cc57 && [1/2] Building C object CMakeFiles/cmTC_9cc57.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_9cc57
+
+
+
+Determining if the function usleep exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_8e440 && [1/2] Building C object CMakeFiles/cmTC_8e440.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_8e440
+
+
+
+Determining if the function timerfd_create exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_6b40e && [1/2] Building C object CMakeFiles/cmTC_6b40e.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_6b40e
+
+
+
+Determining if the function putenv exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_409b1 && [1/2] Building C object CMakeFiles/cmTC_409b1.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_409b1
+
+
+
+Determining if the function setenv exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4c084 && [1/2] Building C object CMakeFiles/cmTC_4c084.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_4c084
+
+
+
+Determining if the function setrlimit exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_6f516 && [1/2] Building C object CMakeFiles/cmTC_6f516.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_6f516
+
+
+
+Determining if the function umask exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_97424 && [1/2] Building C object CMakeFiles/cmTC_97424.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_97424
+
+
+
+Determining if the function unsetenv exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_2bb2e && [1/2] Building C object CMakeFiles/cmTC_2bb2e.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_2bb2e
+
+
+
+Determining if the function gethostbyname_r exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_945f7 && [1/2] Building C object CMakeFiles/cmTC_945f7.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_945f7
+
+
+
+Determining if the prototype gethostbyname_r exists for EVENT__HAVE_GETHOSTBYNAME_R_6_ARG passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_f5999 && [1/2] Building C object CMakeFiles/cmTC_f5999.dir/CheckPrototypeDefinition.c.o
+[2/2] Linking C executable cmTC_f5999
+
+
+
+Determining if the function select exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_57c99 && [1/2] Building C object CMakeFiles/cmTC_57c99.dir/CheckFunctionExistsEx.c.o
+[2/2] Linking C executable cmTC_57c99
+
+
+
+Determining size of uint8_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_81360 && [1/2] Building C object CMakeFiles/cmTC_81360.dir/EVENT__HAVE_UINT8_T.c.o
+[2/2] Linking C executable cmTC_81360
+
+
+
+Determining size of uint16_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_8d33f && [1/2] Building C object CMakeFiles/cmTC_8d33f.dir/EVENT__HAVE_UINT16_T.c.o
+[2/2] Linking C executable cmTC_8d33f
+
+
+
+Determining size of uint32_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_0b27f && [1/2] Building C object CMakeFiles/cmTC_0b27f.dir/EVENT__HAVE_UINT32_T.c.o
+[2/2] Linking C executable cmTC_0b27f
+
+
+
+Determining size of uint64_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_8b170 && [1/2] Building C object CMakeFiles/cmTC_8b170.dir/EVENT__HAVE_UINT64_T.c.o
+[2/2] Linking C executable cmTC_8b170
+
+
+
+Determining size of short passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_b471e && [1/2] Building C object CMakeFiles/cmTC_b471e.dir/EVENT__SIZEOF_SHORT.c.o
+[2/2] Linking C executable cmTC_b471e
+
+
+
+Determining size of int passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_e0cf4 && [1/2] Building C object CMakeFiles/cmTC_e0cf4.dir/EVENT__SIZEOF_INT.c.o
+[2/2] Linking C executable cmTC_e0cf4
+
+
+
+Determining size of unsigned passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_9a1c8 && [1/2] Building C object CMakeFiles/cmTC_9a1c8.dir/EVENT__SIZEOF_UNSIGNED.c.o
+[2/2] Linking C executable cmTC_9a1c8
+
+
+
+Determining size of unsigned int passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_1db47 && [1/2] Building C object CMakeFiles/cmTC_1db47.dir/EVENT__SIZEOF_UNSIGNED_INT.c.o
+[2/2] Linking C executable cmTC_1db47
+
+
+
+Determining size of long passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_041ac && [1/2] Building C object CMakeFiles/cmTC_041ac.dir/EVENT__SIZEOF_LONG.c.o
+[2/2] Linking C executable cmTC_041ac
+
+
+
+Determining size of long long passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_1982f && [1/2] Building C object CMakeFiles/cmTC_1982f.dir/EVENT__SIZEOF_LONG_LONG.c.o
+[2/2] Linking C executable cmTC_1982f
+
+
+
+Performing C SOURCE FILE Test HAVE_INLINE succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_a9f70 && [1/2] Building C object CMakeFiles/cmTC_a9f70.dir/src.c.o
+src.c:1:17: warning: this function declaration is not a prototype [-Wstrict-prototypes]
+inline void func(); void func() { } int main() { func(); return 0; }
+                ^
+                 void
+1 warning generated.
+[2/2] Linking C executable cmTC_a9f70
+
+
+Source file was:
+inline void func(); void func() { } int main() { func(); return 0; }
+Determining if the __func__ exist passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_effe4 && [1/2] Building C object CMakeFiles/cmTC_effe4.dir/CheckSymbolExists.c.o
+[2/2] Linking C executable cmTC_effe4
+
+
+File /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef __func__
+  return ((int*)(&__func__))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the __FUNCTION__ exist passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_966f1 && [1/2] Building C object CMakeFiles/cmTC_966f1.dir/CheckSymbolExists.c.o
+[2/2] Linking C executable cmTC_966f1
+
+
+File /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef __FUNCTION__
+  return ((int*)(&__FUNCTION__))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the TAILQ_FOREACH exist passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_92b6a && [1/2] Building C object CMakeFiles/cmTC_92b6a.dir/CheckSymbolExists.c.o
+[2/2] Linking C executable cmTC_92b6a
+
+
+File /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <sys/queue.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef TAILQ_FOREACH
+  return ((int*)(&TAILQ_FOREACH))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining if the F_SETFD exist passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_07c1c && [1/2] Building C object CMakeFiles/cmTC_07c1c.dir/CheckSymbolExists.c.o
+[2/2] Linking C executable cmTC_07c1c
+
+
+File /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <fcntl.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef F_SETFD
+  return ((int*)(&F_SETFD))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+Determining size of fd_mask passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_4ec42 && [1/2] Building C object CMakeFiles/cmTC_4ec42.dir/EVENT__HAVE_FD_MASK.c.o
+[2/2] Linking C executable cmTC_4ec42
+
+
+
+Determining size of size_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_b2202 && [1/2] Building C object CMakeFiles/cmTC_b2202.dir/EVENT__SIZEOF_SIZE_T.c.o
+[2/2] Linking C executable cmTC_b2202
+
+
+
+Determining size of off_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_856c9 && [1/2] Building C object CMakeFiles/cmTC_856c9.dir/EVENT__SIZEOF_OFF_T.c.o
+[2/2] Linking C executable cmTC_856c9
+
+
+
+Determining size of ssize_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_8e10b && [1/2] Building C object CMakeFiles/cmTC_8e10b.dir/EVENT__SIZEOF_SSIZE_T_LOWER.c.o
+[2/2] Linking C executable cmTC_8e10b
+
+
+
+Determining size of socklen_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_f714d && [1/2] Building C object CMakeFiles/cmTC_f714d.dir/EVENT__SIZEOF_SOCKLEN_T.c.o
+[2/2] Linking C executable cmTC_f714d
+
+
+
+Determining size of pid_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ab1b4 && [1/2] Building C object CMakeFiles/cmTC_ab1b4.dir/EVENT__SIZEOF_PID_T.c.o
+[2/2] Linking C executable cmTC_ab1b4
+
+
+
+Determining size of pthread_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_75563 && [1/2] Building C object CMakeFiles/cmTC_75563.dir/EVENT__SIZEOF_PTHREAD_T.c.o
+[2/2] Linking C executable cmTC_75563
+
+
+
+Determining size of uintptr_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_b6d81 && [1/2] Building C object CMakeFiles/cmTC_b6d81.dir/EVENT__HAVE_UINTPTR_T.c.o
+[2/2] Linking C executable cmTC_b6d81
+
+
+
+Determining size of void * passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_5507d && [1/2] Building C object CMakeFiles/cmTC_5507d.dir/EVENT__SIZEOF_VOID_P.c.o
+[2/2] Linking C executable cmTC_5507d
+
+
+
+Determining size of time_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_5dbd1 && [1/2] Building C object CMakeFiles/cmTC_5dbd1.dir/EVENT__SIZEOF_TIME_T.c.o
+[2/2] Linking C executable cmTC_5dbd1
+
+
+
+Determining size of struct addrinfo passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_ade89 && [1/2] Building C object CMakeFiles/cmTC_ade89.dir/EVENT__HAVE_STRUCT_ADDRINFO.c.o
+[2/2] Linking C executable cmTC_ade89
+
+
+
+Determining size of struct in6_addr passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_65727 && [1/2] Building C object CMakeFiles/cmTC_65727.dir/EVENT__HAVE_STRUCT_IN6_ADDR.c.o
+[2/2] Linking C executable cmTC_65727
+
+
+
+Performing C SOURCE FILE Test EVENT__HAVE_STRUCT_IN6_ADDR_S6_ADDR16 succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_1f832 && [1/2] Building C object CMakeFiles/cmTC_1f832.dir/src.c.o
+[2/2] Linking C executable cmTC_1f832
+
+
+Source file was:
+
+#include <netinet/in.h>
+#include <netinet/in6.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int main()
+{
+  (void)sizeof(((struct in6_addr *)0)->s6_addr16);
+  return 0;
+}
+
+Performing C SOURCE FILE Test EVENT__HAVE_STRUCT_IN6_ADDR_S6_ADDR32 succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_45c2a && [1/2] Building C object CMakeFiles/cmTC_45c2a.dir/src.c.o
+[2/2] Linking C executable cmTC_45c2a
+
+
+Source file was:
+
+#include <netinet/in.h>
+#include <netinet/in6.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int main()
+{
+  (void)sizeof(((struct in6_addr *)0)->s6_addr32);
+  return 0;
+}
+
+Determining size of sa_family_t passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_f9043 && [1/2] Building C object CMakeFiles/cmTC_f9043.dir/EVENT__HAVE_SA_FAMILY_T.c.o
+[2/2] Linking C executable cmTC_f9043
+
+
+
+Determining size of struct sockaddr_in6 passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_feac6 && [1/2] Building C object CMakeFiles/cmTC_feac6.dir/EVENT__HAVE_STRUCT_SOCKADDR_IN6.c.o
+[2/2] Linking C executable cmTC_feac6
+
+
+
+Determining size of struct sockaddr_storage passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_7a971 && [1/2] Building C object CMakeFiles/cmTC_7a971.dir/EVENT__HAVE_STRUCT_SOCKADDR_STORAGE.c.o
+[2/2] Linking C executable cmTC_7a971
+
+
+
+Performing C SOURCE FILE Test EVENT__HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_0c15e && [1/2] Building C object CMakeFiles/cmTC_0c15e.dir/src.c.o
+[2/2] Linking C executable cmTC_0c15e
+
+
+Source file was:
+
+#include <netinet/in.h>
+#include <netinet/in6.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int main()
+{
+  (void)sizeof(((struct sockaddr_storage *)0)->ss_family);
+  return 0;
+}
+
+Determining size of struct linger passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_0b99a && [1/2] Building C object CMakeFiles/cmTC_0b99a.dir/EVENT__HAVE_STRUCT_LINGER.c.o
+[2/2] Linking C executable cmTC_0b99a
+
+
+
+Determining if the include file pthread.h exists passed with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_d2ef3 && [1/2] Building C object CMakeFiles/cmTC_d2ef3.dir/CheckIncludeFile.c.o
+[2/2] Linking C executable cmTC_d2ef3
+
+
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD succeeded with the following output:
+Change Dir: /Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/third_party/ot-commissioner/.build_arm64/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/Users/ritikananda/AndroidStudioProjects/connectedhomeipproject/.environment/cipd/pigweed/ninja cmTC_c103d && [1/2] Building C object CMakeFiles/cmTC_c103d.dir/src.c.o
+src.c:3:7: warning: no previous prototype for function 'test_func' [-Wmissing-prototypes]
+void* test_func(void* data)
+      ^
+src.c:3:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+void* test_func(void* data)
+^
+static 
+1 warning generated.
+[2/2] Linking C executable cmTC_c103d
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+

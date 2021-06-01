@@ -102,6 +102,12 @@ public class ChipDeviceController {
     }
   }
 
+  public void onOpCSRGenerationComplete(byte[] errorCode) {
+    if(completionListener !=null) {
+      completionListener.onOpCSRGenerationComplete(errorCode);
+    }
+  }
+
   public void onPairingDeleted(int errorCode) {
     if (completionListener != null) {
       completionListener.onPairingDeleted(errorCode);
@@ -258,5 +264,9 @@ public class ChipDeviceController {
 
     /** Notifies the listener of the error. */
     void onError(Throwable error);
+
+    /** Notifies the Commissioner when the OpCSR for the Comissionee is generated. */
+    void onOpCSRGenerationComplete(byte[] errorCode)
+
   }
 }

@@ -1,0 +1,1 @@
+/Users/ritikananda/homebrew/Cellar/openssl@1.1/1.1.1k/lib/pkgconfig/libssl.pc

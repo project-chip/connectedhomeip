@@ -33,6 +33,7 @@
  */
 class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
                                        public chip::Controller::DeviceStatusDelegate,
+                                       public chip::Controller::OperationalCredentialsDelegate,
                                        public chip::PersistentStorageDelegate
 {
 public:
@@ -50,6 +51,12 @@ public:
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
+
+    // OperationalCredentialsDelegate implementation
+    CHIP_ERROR GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr, int64_t serialNumber,
+                                                      uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+
+
 
     // DeviceStatusDelegate implementation
     void OnMessage(chip::System::PacketBufferHandle && msg) override;

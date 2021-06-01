@@ -144,6 +144,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
     initParams.storageDelegate = wrapper.get();
     initParams.pairingDelegate = wrapper.get();
+    initParams.operationalCredentialsDelegate = wrapper.get();
     initParams.systemLayer     = systemLayer;
     initParams.inetLayer       = inetLayer;
     initParams.bleLayer        = GetJNIBleLayer();
@@ -153,8 +154,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     {
         return nullptr;
     }
-
-    initParams.operationalCredentialsDelegate = &wrapper->OpCredsIssuer();
 
     *errInfoOnFailure = wrapper->Controller()->Init(nodeId, initParams);
 
@@ -181,6 +180,14 @@ void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePair
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
     CallJavaMethod("onPairingComplete", static_cast<jint>(error));
+}
+
+
+CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr,
+                                                                                int64_t serialNumber, uint8_t * certBuf,
+                                                                                uint32_t certBufSize, uint32_t & outCertLen)
+{
+   CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onOpCSRGenerationComplete", static_cast<jint>(error));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)

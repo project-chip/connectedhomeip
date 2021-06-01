@@ -1,0 +1,16 @@
+#libevent pkg-config source file
+
+prefix=/usr/local
+exec_prefix=/usr/local
+libdir=/usr/local/lib
+includedir=/usr/local/include
+
+Name: libevent
+Description: libevent is an asynchronous notification event loop library
+Version: 2.1.11
+Requires:
+Conflicts:
+Libs: -L${libdir} -levent
+Libs.private: 
+Cflags: -I${includedir}
+
