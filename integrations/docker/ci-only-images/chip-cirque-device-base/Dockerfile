@@ -16,7 +16,7 @@ WORKDIR /app
 RUN apt-get update \
   && apt-get install --no-install-recommends -y sudo git ca-certificates psmisc dhcpcd5 wpasupplicant wireless-tools \
                                                 gdb python3 python3-pip libcairo2-dev libjpeg-dev libgif-dev python3-dev \
-  && apt-get install -y libglib2.0 avahi-daemon libavahi-client3 \
+  && apt-get install -y libglib2.0 avahi-daemon libavahi-client3 avahi-utils \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
   && git clone https://github.com/openthread/ot-br-posix . \
   && git checkout $OT_BR_POSIX_CHECKOUT \
