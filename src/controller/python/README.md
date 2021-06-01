@@ -2,14 +2,14 @@
 
 ## Overview
 
-The Python CHIP controller allows to commission the Matter device into
-the network as well as communicate with it using the Zigbee Cluster Library (ZCL) messages. The tool utilizes the generic [Chip Device Controller](../) library.
+The Python CHIP controller is a tool that allows to commission a Matter device into
+the network and to communicate with it using the Zigbee Cluster Library (ZCL) messages. The tool uses the generic [Chip Device Controller](../) library.
 
-Below instruction presents how to build and test Python CHIP controller. The sample test flow may vary depending on the application clusters implemented on the device side.
+The following instruction describes how to build and test the Python CHIP controller.
 
-To learn more about advanced usage of the tool, check [extended documentation](ADVANCED_USAGE.md).
+To learn more about advanced usage of the tool, read the [advanced usage page](ADVANCED_USAGE.md).
 
-## Checkout / Build / Install
+## Building and installing
 
 Before you can use the Python controller, you must compile it from the source on Linux (amd64 / aarch64) or macOS.
 
@@ -17,7 +17,7 @@ Before you can use the Python controller, you must compile it from the source on
 
 To build and run the Python CHIP controller:
 
-1. Install all necessary packages and prepare the build system. For more details, see the [BUILDING.md](/docs/BUILDING.md) documentation.
+1. Install all necessary packages and prepare the build system. For more details, see the [BUILDING.md](/docs/BUILDING.md) documentation:
 
    ```
    sudo apt-get update
@@ -33,25 +33,25 @@ To build and run the Python CHIP controller:
    sudo reboot
    ```
 
-2. Clone the Project CHIP repository.
+2. Clone the Project CHIP repository:
 
    ```
    git clone https://github.com/project-chip/connectedhomeip.git
    ```
 
-3. Enter the `connectedhomeip` directory.
+3. Enter the `connectedhomeip` directory:
 
    ```
    cd connectedhomeip
    ```
 
-4. Initialize the git submodules.
+4. Initialize the git submodules:
 
    ```
    git submodule update --init
    ```
 
-5. Build and install the Python CHIP controller.
+5. Build and install the Python CHIP controller:
 
    ```
    scripts/build_python.sh -m platform
@@ -60,15 +60,15 @@ To build and run the Python CHIP controller:
    > Note: To get more details about available build configurations, run the following command:
    > ```scripts/build_python.sh --help```
 
-6. Activate the Python virtual environment.
+## Running the tool
+
+1. Activate the Python virtual environment:
 
    ```
    source out/python_env/bin/activate
    ```
 
-7. Run the Python CHIP controller.
-
-   > Running as root is necessary to obtain access to the Bluetooth interface.
+2. Run the Python CHIP controller with root privileges, which is required to obtain access to the Bluetooth interface:
 
    ```
    sudo out/python_env/bin/chip-device-ctrl
@@ -82,17 +82,19 @@ To build and run the Python CHIP controller:
 
 ## Working with Python CHIP Controller
 
-### 1. Prepare the Matter accessory.
+This section describes how to use Python CHIP controller to test the Matter accessory. Below steps depends on the application clusters that you implemented on the device side and may be different for your accessory.
 
-In this tutorial, the [Matter: Light Bulb](/examples/lighting-app) example with Bluetooth LE commissioning will be used, but similar steps can be executed with the rest of the examples. Check [Matter examples](/examples) for the list of available samples.
+### Step 1: Prepare the Matter accessory.
+
+This tutorial is using the [Matter Light Bulb](/examples/lighting-app) example with the Bluetooth LE commissioning. However, you can adapt this procedure to other available [Matter examples](/examples).
 
 Build and program the device with the Matter accessory firmware by following the example's documentation.
 
-### 2. Enable Bluetooth LE advertising on Matter accessory device.
+### Step 2: Enable Bluetooth LE advertising on Matter accessory device.
 
-Some examples are configured to advertise automatically on boot, others require physical trigger like pushing the button. Follow the Matter accessory example's documentation to learn how Bluetooth LE advertising is enabled.
+Some examples are configured to advertise automatically on boot. Other examples require physical trigger, for example pushing a button. Follow the documentation of the Matter accessory example to learn how Bluetooth LE advertising is enabled for the given example.
 
-### 3. Discover Matter accessory device over Bluetooth LE
+### Step 3: Discover Matter accessory device over Bluetooth LE
 
 An uncommissioned accessory device advertises over Bluetooth LE. Run the following command to scan all advertised Matter devices:
 
@@ -100,9 +102,9 @@ An uncommissioned accessory device advertises over Bluetooth LE. Run the followi
 chip-device-ctrl > ble-scan
 ```
 
-### 4. Connect to Matter accessory device over Bluetooth LE
+### Step 4: Connect to Matter accessory device over Bluetooth LE
 
-The controller uses a 12-bit value called **discriminator** to discern between multiple commissionable device advertisements. Moreover, a 27-bit **PIN code** is used by the controller to authenticate in the device. You can find those values in the logging terminal of the device (e.g. UART), as listed below.
+The controller uses a 12-bit value called **discriminator** to discern between multiple commissionable device advertisements. Moreover, a 27-bit **PIN code** is used by the controller to authenticate in the device. You can find those values in the logging terminal of the device (for example, UART). For example:
 
 ```
 I: 254 [DL]Device Configuration:
@@ -116,18 +118,18 @@ I: 278 [DL] Manufacturing Date: (not set)
 I: 281 [DL] Device Type: 65535 (0xFFFF)
 ```
 
-Run the following command to establish secure connection over Bluetooth LE, with the following assumptions for the Matter accessory device:
- - The discriminator of the device is 3840
- - The setup pin code of the device is 20202021
- - The temporary Node ID is 1234
+Run the following command to establish the secure connection over Bluetooth LE, with the following assumptions for the Matter accessory device:
+ - The discriminator of the device is *3840*
+ - The setup pin code of the device is *20202021*
+ - The temporary Node ID is *1234*
 
 ```
 chip-device-ctrl > connect -ble 3840 20202021 1234
 ```
 
-You may skip providing the last parameter which is a Node ID. In such case, the controller will randomly assign it. However, note the Node ID down, because it is required later in the configuration process.
+You can skip the last parameter, that is the Node ID. If you skip it, the controller will assign it randomly. However, note the Node ID down, because it is required later in the configuration process.
 
-At the end of the secure connection establishment, the Python controller will indicate this by printing the following log:
+At the end of the secure connection establishment, the Python controller prints the following log:
 
 ```
 Secure Session to Device Established
@@ -135,42 +137,41 @@ Secure Session to Device Established
 
 This means that the PASE (Password-Authenticated Session Establishment) session using SPAKE2+ protocol is completed.
 
-### 5. Commission Matter accessory to the underlying network
+### Step 5: Commission Matter accessory to the underlying network
 
-One of the commissioning steps is Network Commissioning. The main goal of this step is to configure a network interface, such as Thread or Wifi, on the device and to provide it with network credentials.
+The main goal of the network commissioning step is to configure the device with a network interface, such as Thread or Wi-Fi. This process provides the device with network credentials.
 
-#### Commissioning of Thread device
+#### Commissioning a Thread device
 
 1. Fetch and store the current Active Operational Dataset and Extended PAN ID from the Thread Border Router.
-
    Depending if Thread Border Router is running on Docker or natively on Raspberry Pi, execute the following commands:
 
-   For Docker:
-   ```
-   sudo docker exec -it otbr sh -c "sudo ot-ctl dataset active -x"
-   0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
-   Done
+   - For Docker:
 
-   sudo docker exec -it otbr sh -c "sudo ot-ctl dataset extpanid”
-   4fe76e9a8b5edaf5
-   Done
-   ```
+      ```
+      sudo docker exec -it otbr sh -c "sudo ot-ctl dataset active -x"
+      0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
+      Done
 
-   For native installation:
+      sudo docker exec -it otbr sh -c "sudo ot-ctl dataset extpanid”
+      4fe76e9a8b5edaf5
+      Done
+      ```
 
-   ```
-   sudo ot-ctl dataset active -x
-   0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
-   Done
+   - For native installation:
 
-   sudo ot-ctl dataset extpanid
-   4fe76e9a8b5edaf5
-   Done
-   ```
+      ```
+      sudo ot-ctl dataset active -x
+      0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
+      Done
 
-   Matter specifiction does not define how the Thread or Wi-Fi credentials are obtained by Controller. For example, for Thread, instead of fetching datasets directly from the Thread Border Router, you may also use different out-of-band method.
+      sudo ot-ctl dataset extpanid
+      4fe76e9a8b5edaf5
+      Done
+      ```
 
-2. Inject the previously obtained Active Operational Dataset as hex-encoded value using ZCL Network Commissioning cluster.
+   Matter specifiction does not define how the Thread or Wi-Fi credentials are obtained by Controller. For example, for Thread, instead of fetching datasets directly from the Thread Border Router, you might also use a different out-of-band method.
+2. Inject the previously obtained Active Operational Dataset as hex-encoded value using ZCL Network Commissioning cluster:
 
    > Each ZCL command has a following format:
       `zcl <Cluster> <Command> <Node Id> <Endpoint Id> <Group Id> [arguments]`
@@ -179,65 +180,65 @@ One of the commissioning steps is Network Commissioning. The main goal of this s
    chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 breadcrumb=0 timeoutMs=3000
    ```
 
-3. Enable Thread interface in the device by executing the following command with `networkID` equal to Extended PAN Id of the Thread network.
+3. Enable Thread interface on the device by executing the following command with `networkID` equal to Extended PAN Id of the Thread network:
 
    ```
    chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=hex:4fe76e9a8b5edaf5 breadcrumb=0 timeoutMs=3000
    ```
 
-#### Commissioning of Wi-Fi device
+#### Commissioning a Wi-Fi device
 
-1. Assuming your Wi-Fi SSID is *TESTSSID*, and your Wi-Fi password is *P455W4RD*, inject the credentials to the device by excuting the following command.
+1. Assuming your Wi-Fi SSID is `TESTSSID`, and your Wi-Fi password is `P455W4RD`, inject the credentials to the device by excuting the following command:
 
    ```
    chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 1234 0 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
    ```
 
-2. Enable Wi-Fi interface in the device by executing the following command:
+2. Enable the Wi-Fi interface on the device by executing the following command:
 
    ```
    chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
    ```
 
-### 6. Close Bluetooth LE connection.
+### Step 6: Close Bluetooth LE connection.
 
-After Matter accessory was provisioned with Thread and/or Wi-Fi credentials, the commissioning process is finished. Python CHIP controller will now use only IPv6 traffic to reach the device, so Bluetooth LE connection can be closed.
+After the Matter accessory device was provisioned with Thread or Wi-Fi credentials (or both), the commissioning process is finished. The Python CHIP controller is now using only the IPv6 traffic to reach the device, so you can close the Bluetooth LE connection. To close the connection, run the following command:
 
 ```
 chip-device-ctrl > close-ble
 ```
 
-### 7. Discover IPv6 address of the Matter accessory.
+### Step 7: Discover IPv6 address of the Matter accessory.
 
-The Matter controller needs to discover IPv6 address of the node that it previously commissioned. For Thread, the Matter accessory uses SRP (Service Registration Protocol) to register its presence on the Thread Border Router’s SRP Server, for Wi-Fi or Ethernet devices, the mDNS (Multicast Domain Name System) protocol is used instead.
+The Matter controller must discover the IPv6 address of the node that it previously commissioned. Depending on the network type:
+- For Thread, the Matter accessory uses SRP (Service Registration Protocol) to register its presence on the Thread Border Router’s SRP Server.
+- For Wi-Fi or Ethernet devices, the Matter accessory uses the mDNS (Multicast Domain Name System) protocol.
 
-Run the following command, assuming that:
- - The Fabric ID of the device is 5544332211
- - The Node ID is 1234
+Assuming your Fabric ID is *5544332211* and Node ID is *1234* (use the Node ID you noted down when you established the secure connection over Bluetooth LE)), run the following command:
 
 ```
 chip-device-ctrl > resolve 5544332211 1234
 ```
 
-After successful resolution, you should see the log indicating that node address has been updated. The IPv6 address of the device will be cached in the controller for later usage.
+A notification in the log indicates that the node address has been updated. The IPv6 address of the device is cached in the controller for later usage.
 
-### 8. Control application ZCL clusters.
+### Step 8: Control application ZCL clusters.
 
-For Light Bulb example, execute the following command to toggle the LED state:
+For the light bulb example, execute the following command to toggle the LED state:
 
 ```
 chip-device-ctrl > zcl OnOff Toggle 1234 1 0
 ```
 
-To change the brightness of the LED, use the following command, with level changed to the value between 0 and 255.
+To change the brightness of the LED, use the following command, with the level value somewhere between 0 and 255.
 
 ```
 chip-device-ctrl > zcl LevelControl MoveToLevel 1234 1 0 level=50
 ```
 
-### 9. Read basic information out of the accessory.
+### Step 9: Read basic information out of the accessory.
 
-Every Matter accessory device supports Basic Cluster which maintains collection of attributes that a controller may obtain from a device, such as the vendor name, the product name, or software version. Use `zclread` command to read those values out of the device:
+Every Matter accessory device supports a Basic Cluster, which maintains collection of attributes that a controller can obtain from a device, such as the vendor name, the product name, or software version. Use `zclread` command to read those values from the device:
 
 ```
 chip-device-ctrl > zclread Basic VendorName 1234 1 0
@@ -251,7 +252,7 @@ chip-device-ctrl > zclread Basic SoftwareVersion 1234 1 0
 
 ### `ble-adapter-print`
 
-Print the available Bluetooth adapters on device. Takes no arguments.
+Print the available Bluetooth adapters on device. Takes no arguments:
 
 ```
 chip-device-ctrl > ble-adapter-print
@@ -260,7 +261,7 @@ chip-device-ctrl > ble-adapter-print
 
 ### `ble-debug-log`
 
-Enable Bluetooth LE debug logs.
+Enable the Bluetooth LE debug logs.
 
 ```
 chip-device-ctrl > ble-debug-log 1
@@ -268,8 +269,8 @@ chip-device-ctrl > ble-debug-log 1
 
 ### `ble-scan [-t <timeout>] [identifier]`
 
-Start a ble-scan action for searching valid CHIP devices over Bluetooth LE [for at most
-*timeout* seconds], stop when device matching the identifier or timeout.
+Start a scan action to search for valid CHIP devices over Bluetooth LE (for at most *timeout* seconds).
+Stop when the device is matching the identifier or the counter times out.
 
 ```
 chip-device-ctrl > ble-scan
@@ -293,26 +294,26 @@ chip-device-ctrl > ble-scan
 Do key exchange and establish a secure session between controller and device
 using IP transport.
 
-The node id will be used by controller to distinguish multiple devices. This
+The Node ID will be used by controller to distinguish multiple devices. This
 does not match the spec and will be removed later. The nodeid will not be
 persisted by controller / device.
 
-If no nodeid given, a random node id will be used.
+If no nodeid given, a random Node ID will be used.
 
 ### `connect -ble <discriminator> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
 using Bluetooth LE transport.
 
-The node id will be used by controller to distinguish multiple devices. This
+The Node ID will be used by controller to distinguish multiple devices. This
 does not match the spec and will be removed later. The nodeid will not be
 persisted by controller / device.
 
-If no nodeid given, a random node id will be used.
+If no nodeid given, a random Node ID will be used.
 
 ### `discover`
 
-Discover available Matter accessory devices.
+Discover available Matter accessory devices:
 
 ```
 chip-device-ctrl > discover -all
@@ -320,7 +321,7 @@ chip-device-ctrl > discover -all
 
 ### `resolve <fabric_id> <node_id>`
 
-Resolve DNS-SD name corresponding with the given fabric and node IDs and update address of the node in the device controller.
+Resolve DNS-SD name corresponding with the given fabric and Node IDs and update address of the node in the device controller:
 
 ```
 chip-device-ctrl > resolve 5544332211 1234
@@ -328,7 +329,7 @@ chip-device-ctrl > resolve 5544332211 1234
 
 ### `setup-payload parse-manual <manual-pairing-code>`
 
-Print the commissioning information encoded in the Manual Pairing Code.
+Print the commissioning information encoded in the Manual Pairing Code:
 
 ```
 chip-device-ctrl > setup-payload parse-manual 35767807533
@@ -343,7 +344,7 @@ SetUpPINCode: 20202021
 
 ### `setup-payload parse-qr <qr-code>`
 
-Print the commissioning information encoded in the QR Code payload.
+Print the commissioning information encoded in the QR Code payload:
 
 ```
 chip-device-ctrl > setup-payload parse-qr "VP:vendorpayload%CH:H34.GHY00 0C9SS0"
@@ -377,7 +378,7 @@ example, `networkId=hex:0123456789abcdef` (for
 
 ### `zcl ?`
 
-List available clusters.
+List available clusters:
 
 ```
 chip-device-ctrl > zcl ?
@@ -425,7 +426,7 @@ WindowCovering
 
 ### `zcl ? <Cluster>`
 
-List available commands in cluster. For example, for *LevlControl* cluster:
+List available commands in cluster. For example, for *Basic* cluster:
 
 ```
 chip-device-ctrl > zcl ? Basic
