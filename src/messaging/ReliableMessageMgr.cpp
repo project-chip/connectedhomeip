@@ -296,7 +296,8 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
-    VerifyOrDie(entry != nullptr && entry->rc != nullptr);
+    VerifyOrReturn(entry != nullptr && entry->rc != nullptr,
+                   ChipLogError(ExchangeManager, "StartRetransmission was called for invalid entry"));
 
     entry->nextRetransTimeTick = static_cast<uint16_t>(entry->rc->GetInitialRetransmitTimeoutTick() +
                                                        GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
