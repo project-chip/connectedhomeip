@@ -34,15 +34,15 @@
 namespace chip {
 
 // See section 5.1.2. QR Code in the Matter specification
-const int kVersionFieldLengthInBits                   = 3;
-const int kVendorIDFieldLengthInBits                  = 16;
-const int kProductIDFieldLengthInBits                 = 16;
-const int kCommissioningFlowFieldLengthInBits         = 2;
-const int kRendezvousInfoFieldLengthInBits            = 8;
-const int kPayloadDiscriminatorFieldLengthInBits      = 12;
-const int kSetupPINCodeFieldLengthInBits              = 27;
-const int kPaddingFieldLengthInBits                   = 4;
-const int kRawVendorTagLengthInBits                   = 7;
+const int kVersionFieldLengthInBits              = 3;
+const int kVendorIDFieldLengthInBits             = 16;
+const int kProductIDFieldLengthInBits            = 16;
+const int kCommissioningFlowFieldLengthInBits    = 2;
+const int kRendezvousInfoFieldLengthInBits       = 8;
+const int kPayloadDiscriminatorFieldLengthInBits = 12;
+const int kSetupPINCodeFieldLengthInBits         = 27;
+const int kPaddingFieldLengthInBits              = 4;
+const int kRawVendorTagLengthInBits              = 7;
 
 // See section 5.1.3. Manual Pairing Code in the Matter specification
 const int kManualSetupDiscriminatorFieldLengthInBits  = 4;
