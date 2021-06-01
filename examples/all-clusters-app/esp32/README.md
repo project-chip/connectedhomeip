@@ -26,8 +26,8 @@ the
 [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
 and the [M5Stack](http://m5stack.com).
 
-Note:  M5Stack Core 2 display is not supported in the tft component,
-while other functionality can still work fine.
+Note: M5Stack Core 2 display is not supported in the tft component, while other
+functionality can still work fine.
 
 ## Building the Example Application
 
