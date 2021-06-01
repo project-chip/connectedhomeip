@@ -27,7 +27,7 @@ the clusters and attributes they contain) in a .zap file which then generates
 code and static structures to define the endpoints.
 
 To support endpoints that are not statically defined, the ZCL attribute storage
-mechanisms will hold additional enpoint information for `NUM_DYNAMIC_ENDPOINTS`
+mechanisms will hold additional endpoint information for `NUM_DYNAMIC_ENDPOINTS`
 additional endpoints. These additional endpoint structures must be defined by
 the application and can change at runtime.
 
@@ -49,7 +49,7 @@ defined:
 -   All attributes defined with these macros will be configured as
     `ATTRIBUTE_MASK_EXTERNAL_STORAGE` in the ZCL database and therefore will
     rely on the application to maintain storage for the attribute. Consequently,
-    reads pr writes to these attributes must be handled within the application
+    reads or writes to these attributes must be handled within the application
     by the `emberAfExternalAttributeWriteCallback` and
     `emberAfExternalAttributeReadCallback` functions. See the bridge
     application's `main.cpp` for an example of this implementation.
