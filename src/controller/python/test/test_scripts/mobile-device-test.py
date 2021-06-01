@@ -21,6 +21,7 @@ TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
 TEST_THREAD_NETWORK_ID = "fedcba9876543210"
 
 ENDPOINT_ID = 0
+LIGHTING_ENDPOINT_ID = 1
 GROUP_ID = 0
 
 
@@ -67,9 +68,12 @@ def main():
               "Failed to finish network commissioning")
 
     FailIfNot(test.TestOnOffCluster(nodeid=1,
-                                    endpoint=ENDPOINT_ID,
-                                    group=GROUP_ID)
-              , "Failed to test on off cluster")
+                                    endpoint=LIGHTING_ENDPOINT_ID,
+                                    group=GROUP_ID), "Failed to test on off cluster")
+
+    FailIfNot(test.TestOnOffCluster(nodeid=1,
+                                    endpoint=233,
+                                    group=GROUP_ID), "Failed to test on off cluster on non-exist endpoint")
 
     FailIfNot(test.TestReadBasicAttribiutes(nodeid=1,
                                             endpoint=ENDPOINT_ID,

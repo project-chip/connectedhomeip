@@ -116,6 +116,11 @@ exit:
         // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
         // TODO: The behavior when receiving a malformed message is not clear in the Spec. (Spec#3259)
         // TODO: The error code should be updated after #7072 added error codes required by IM.
+        if (err == CHIP_ERROR_INVALID_PROFILE_ID)
+        {
+            ChipLogDetail(DataManagement, "Cannot found cluster 0x%" PRIx16 " on endpoint 0x%" PRIx8, clusterId, endpointId);
+        }
+
         AddStatusCode(&returnStatusParam,
                       err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
                       Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
