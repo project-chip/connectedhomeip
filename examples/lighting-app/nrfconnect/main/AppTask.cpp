@@ -27,9 +27,9 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -415,7 +415,8 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
-    if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    // In case of having software update enabled, allow on starting BLE advertising after Thread provisioning.
+    if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() && !sAppTask.mSoftwareUpdateEnabled)
     {
         LOG_INF("NFC Tag emulation and BLE advertisement not started - device is commissioned to a Thread network.");
         return;
@@ -541,7 +542,7 @@ void AppTask::UpdateClusterState()
     uint8_t onoff = LightingMgr().IsTurnedOn();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(0, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &onoff,
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &onoff,
                                                  ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -550,7 +551,7 @@ void AppTask::UpdateClusterState()
 
     uint8_t level = LightingMgr().GetLevel();
 
-    status = emberAfWriteAttribute(0, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
+    status = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
                                    ZCL_DATA8_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)

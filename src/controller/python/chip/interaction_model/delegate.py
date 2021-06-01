@@ -43,6 +43,9 @@ _commandIndexStatusDict = dict()
 _commandStatusLock = threading.RLock()
 _commandStatusCV = threading.Condition(_commandStatusLock)
 
+# A placeholder commandHandle, will be removed once we decouple CommandSender with CHIPClusters
+PLACEHOLDER_COMMAND_HANDLE = 1
+
 def _GetCommandStatus(commandHandle: int):
     with _commandStatusLock:
         return _commandStatusDict.get(commandHandle, None)
@@ -67,7 +70,7 @@ def _SetCommandIndexStatus(commandHandle: int, commandIndex: int, status):
 @_OnCommandResponseStatusCodeReceivedFunct
 def _OnCommandResponseStatusCodeReceived(commandHandle: int, IMCommandStatusBuf, IMCommandStatusBufLen):
     status = IMCommandStatus.parse(ctypes.string_at(IMCommandStatusBuf, IMCommandStatusBufLen))
-    _SetCommandIndexStatus(commandHandle, status["CommandIndex"], status)
+    _SetCommandIndexStatus(PLACEHOLDER_COMMAND_HANDLE, status["CommandIndex"], status)
 
 @_OnCommandResponseProtocolErrorFunct
 def _OnCommandResponseProtocolError(commandHandle: int, errorcode: int):
@@ -75,7 +78,7 @@ def _OnCommandResponseProtocolError(commandHandle: int, errorcode: int):
 
 @_OnCommandResponseFunct
 def _OnCommandResponse(commandHandle: int, errorcode: int):
-    _SetCommandStatus(commandHandle, errorcode)
+    _SetCommandStatus(PLACEHOLDER_COMMAND_HANDLE, errorcode)
 
 def InitIMDelegate():
     handle = chip.native.GetLibraryHandle()

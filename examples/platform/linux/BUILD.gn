@@ -27,14 +27,21 @@ source_set("app-main") {
     "Options.h",
   ]
 
+  defines = []
+
   if (chip_enable_pw_rpc) {
-    defines = [ "PW_RPC_ENABLED" ]
+    defines += [ "PW_RPC_ENABLED" ]
   }
 
   public_deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/lib/shell:shell_core",
   ]
+
+    public_deps += [ 
+    ]
 
   public_configs = [ ":app-main-config" ]
 }

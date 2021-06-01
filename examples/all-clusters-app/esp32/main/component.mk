@@ -48,6 +48,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/media-input-server                \
   ../third_party/connectedhomeip/src/app/clusters/network-commissioning             \
   ../third_party/connectedhomeip/src/app/clusters/ota-server                        \
+  ../third_party/connectedhomeip/src/app/clusters/binary-input-server               \
   ../third_party/connectedhomeip/src/app/clusters/target-navigator-server           \
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server    \
   ../third_party/connectedhomeip/src/app/clusters/tv-channel-server                 \
@@ -58,6 +59,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/door-lock-server                  \
   ../third_party/connectedhomeip/src/app/clusters/occupancy-sensor-server           \
    ../third_party/connectedhomeip/src/app/clusters/ias-zone-server                  \
+   ../third_party/connectedhomeip/src/app/clusters/relative-humidity-measurement-server \
 #  ../third_party/connectedhomeip/src/app/clusters/ias-zone-client                  \
 
 

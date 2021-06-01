@@ -91,20 +91,20 @@ typedef const struct shell_command shell_command_t;
  */
 typedef int shell_command_iterator_t(shell_command_t * command, void * arg);
 
-class Shell
+class Engine
 {
 protected:
-    static Shell theShellRoot;
+    static Engine theEngineRoot;
 
     shell_command_t * _commandSet[CHIP_SHELL_MAX_MODULES];
     unsigned _commandSetSize[CHIP_SHELL_MAX_MODULES];
     unsigned _commandSetCount;
 
 public:
-    Shell() {}
+    Engine() {}
 
     /** Return the root singleton for the Shell command hierarchy. */
-    static Shell & Root() { return theShellRoot; }
+    static Engine & Root() { return theEngineRoot; }
 
     /**
      * Registers a set of defaults commands (help) for all Shell and sub-Shell instances.
@@ -143,40 +143,16 @@ public:
     void RegisterCommands(shell_command_t * command_set, unsigned count);
 
     /**
-     * Utility function for converting a raw line typed into a shell into an array of words or tokens.
+     * Runs the shell mainloop. Will display the prompt and enable interaction.
      *
-     * @param buffer                String of the raw line typed into shell.
-     * @param tokens                Array of words to be created by the tokenizer.
-     *                              This array will point to the same memory as passed in
-     *                              via buffer.  Spaces will be replaced with NULL characters.
-     * @param max_tokens            Maximum size of token array.
+     * @note This is a blocking call and will not return until user types "exit"
      *
-     * @return                      Number of tokens generated (argc).
      */
-    static int TokenizeLine(char * buffer, char ** tokens, int max_tokens);
-
-    /**
-     * Main loop for shell.
-     *
-     * @param arg                   Unused context block for shell task to comply with task function syntax.
-     */
-    static void TaskLoop(void * arg);
+    void RunMainLoop();
 
 private:
     static void ProcessShellLineTask(intptr_t context);
 };
-
-/** Utility function for running ForEachCommand on root shell. */
-void shell_command_foreach(shell_command_iterator_t * on_command, void * arg);
-
-/** Utility function for running ForEachCommand on Root shell. */
-void shell_register(shell_command_t * command_set, unsigned count);
-
-/** Utility function for to tokenize an input line. */
-int shell_line_tokenize(char * buffer, char ** tokens, int max_tokens);
-
-/** Utility function to run main shell task loop. */
-void shell_task(void * arg);
 
 } // namespace Shell
 } // namespace chip

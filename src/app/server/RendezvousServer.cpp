@@ -17,6 +17,7 @@
 
 #include <app/server/RendezvousServer.h>
 
+#include <app/server/Mdns.h>
 #include <app/server/StorablePeerConnection.h>
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
@@ -33,8 +34,37 @@ using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
 
 namespace chip {
+
+namespace {
+void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    RendezvousServer * server = reinterpret_cast<RendezvousServer *>(arg);
+    server->OnPlatformEvent(event);
+}
+} // namespace
 static constexpr uint32_t kSpake2p_Iteration_Count = 100;
 static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
+
+void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        if (event->CommissioningComplete.status == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "Commissioning completed successfully");
+        }
+        else
+        {
+            ChipLogError(Discovery, "Commissioning errored out with error %u", event->CommissioningComplete.status);
+        }
+        // TODO: Commissioning complete means we can finalize the admin in our storage
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
+    {
+        app::Mdns::AdvertiseOperational();
+        ChipLogError(Discovery, "Operational advertising enabled");
+    }
+}
 
 CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,
                                             TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
@@ -81,7 +111,7 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
                                                             strlen(kSpake2pKeyExchangeSalt), mNextKeyId++, this));
     }
 
-    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
+    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(mExchangeManager->GetReliableMessageMgr(), transportMgr));
     mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
 
     return CHIP_NO_ERROR;
@@ -129,7 +159,19 @@ void RendezvousServer::OnSessionEstablished()
         mDelegate->OnRendezvousStarted();
     }
 
-    Cleanup();
+    DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+
+    if (mPairingSession.PeerConnection().GetPeerAddress().GetTransportType() == Transport::Type::kBle)
+    {
+        Cleanup();
+    }
+    else
+    {
+        // TODO: remove this once we move all tools / examples onto cluster-based IP commissioning.
+#if CONFIG_RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE
+        Cleanup();
+#endif
+    }
 
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
     StorablePeerConnection connection(mPairingSession, mAdmin->GetAdminId());

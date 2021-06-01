@@ -34,7 +34,7 @@ static int chip_command_handler(int argc, char ** argv)
 {
     if (argc > 0)
     {
-        return chip::Shell::Shell::Root().ExecCommand(argc - 1, argv + 1);
+        return Engine::Root().ExecCommand(argc - 1, argv + 1);
     }
     else
     {
@@ -72,7 +72,6 @@ int streamer_esp32_init(streamer_t * streamer)
 
     esp_console_cmd_t command = { .command = "chip", .help = "CHIP utilities", .func = chip_command_handler };
     ESP_ERROR_CHECK(esp_console_cmd_register(&command));
-    chip::Shell::Shell::Root().RegisterDefaultCommands();
     return 0;
 }
 

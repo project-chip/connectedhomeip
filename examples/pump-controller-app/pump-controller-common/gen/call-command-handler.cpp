@@ -19,23 +19,30 @@
 
 #include <stdint.h>
 
-#include "af-structs.h"
 #include "app/util/util.h"
 #include "call-command-handler.h"
 #include "callback.h"
-#include "cluster-id.h"
-#include "command-id.h"
+#include <app/common/gen/af-structs.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 
 using namespace chip;
 
 EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfEthernetNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGeneralCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfGeneralDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfLevelControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOperationalCredentialsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfPumpConfigurationAndControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfSoftwareDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfTemperatureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfTemperatureMeasurementClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfThreadNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTrustedRootCertificatesClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfWiFiNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
@@ -66,12 +73,20 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->apsFrame->clusterId)
         {
+        case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+            // No commands are enabled for cluster Level Control
+            result = status(false, true, cmd->mfgSpecific);
+            break;
         case ZCL_ON_OFF_CLUSTER_ID:
             // No commands are enabled for cluster On/off
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Pump Configuration and Control
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
+            // No commands are enabled for cluster Temperature Measurement
             result = status(false, true, cmd->mfgSpecific);
             break;
         default:
@@ -85,11 +100,18 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         switch (cmd->apsFrame->clusterId)
         {
         case ZCL_BASIC_CLUSTER_ID:
-            // No commands are enabled for cluster Basic
+            result = emberAfBasicClusterServerCommandParse(cmd);
+            break;
+        case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster Ethernet Network Diagnostics
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
             result = emberAfGeneralCommissioningClusterServerCommandParse(cmd);
+            break;
+        case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster General Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
             result = emberAfNetworkCommissioningClusterServerCommandParse(cmd);
@@ -97,12 +119,24 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
             result = emberAfOperationalCredentialsClusterServerCommandParse(cmd);
             break;
+        case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster Software Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
+            // No commands are enabled for cluster Temperature Measurement
+            result = status(false, true, cmd->mfgSpecific);
+            break;
         case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
             // No commands are enabled for cluster Thread Network Diagnostics
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID:
             result = emberAfTrustedRootCertificatesClusterServerCommandParse(cmd);
+            break;
+        case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster WiFi Network Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
             break;
         default:
             // Unrecognized cluster ID, error status will apply.
@@ -114,6 +148,29 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 
 // Cluster specific command parsing
 
+EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (cmd->mfgSpecific)
+    {
+        if (cmd->mfgCode == 4098 && cmd->commandId == ZCL_MFG_SPECIFIC_PING_COMMAND_ID)
+        {
+            wasHandled = emberAfBasicClusterMfgSpecificPingCallback(nullptr);
+        }
+    }
+    else
+    {
+        switch (cmd->commandId)
+        {
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
 EmberAfStatus emberAfGeneralCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;

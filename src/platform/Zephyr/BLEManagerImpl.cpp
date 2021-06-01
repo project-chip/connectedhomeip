@@ -68,7 +68,7 @@ _bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerIm
 BT_GATT_SERVICE_DEFINE(CHIPoBLE_Service,
     BT_GATT_PRIMARY_SERVICE(&UUID16_CHIPoBLEService.uuid),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid,
-                               BT_GATT_CHRC_WRITE_WITHOUT_RESP,
+                               BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
                                BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
                                nullptr, BLEManagerImpl::HandleRXWrite, nullptr),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_TX.uuid,
@@ -249,13 +249,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
 
     err = bt_le_adv_start(&advParams, ad, ARRAY_SIZE(ad), nullptr, 0u);
-    if (err == -ENOMEM)
-    {
-        // No free connection objects for connectable advertiser. Advertise as non-connectable instead.
-        advParams.options &= ~BT_LE_ADV_OPT_CONNECTABLE;
-        err = bt_le_adv_start(&advParams, ad, ARRAY_SIZE(ad), nullptr, 0u);
-    }
-
     VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
 
     // Transition to the Advertising state...

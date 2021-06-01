@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <lib/core/ReferenceCounted.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -31,7 +32,7 @@ namespace Messaging {
 class ReliableMessageMgr;
 class ReliableMessageContext;
 
-class ExchangeMessageDispatch
+class ExchangeMessageDispatch : public ReferenceCounted<ExchangeMessageDispatch>
 {
 public:
     ExchangeMessageDispatch() {}
@@ -47,6 +48,11 @@ public:
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle && message);
 
+    /**
+     * The 'message' and 'retainedMessage' arguments may point to the same
+     * handle.  Therefore, callees _must_ ensure that any moving out of
+     * 'message' happens before writing to *retainedMessage.
+     */
     virtual CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
                                      EncryptedPacketBufferHandle * retainedMessage) const
     {

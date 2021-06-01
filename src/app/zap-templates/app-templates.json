@@ -33,34 +33,9 @@
     ],
     "templates": [
         {
-            "path": "templates/app/af-structs.zapt",
-            "name": "ZCL af-structs header",
-            "output": "af-structs.h"
-        },
-        {
-            "path": "templates/app/att-storage.zapt",
-            "name": "ZCL att-storage header",
-            "output": "att-storage.h"
-        },
-        {
-            "path": "templates/app/attribute-id.zapt",
-            "name": "ZCL attribute-id header",
-            "output": "attribute-id.h"
-        },
-        {
-            "path": "templates/app/attribute-type.zapt",
-            "name": "ZCL attribute-type header",
-            "output": "attribute-type.h"
-        },
-        {
             "path": "templates/app/attribute-size-src.zapt",
             "name": "ZCL attribute-size",
             "output": "attribute-size.cpp"
-        },
-        {
-            "path": "templates/app/attribute-size.zapt",
-            "name": "ZCL attribute-size header",
-            "output": "attribute-size.h"
         },
         {
             "path": "templates/app/call-command-handler-src.zapt",
@@ -93,29 +68,9 @@
             "output": "encoder.cpp"
         },
         {
-            "path": "templates/app/client-command-macro.zapt",
-            "name": "ZCL client command",
-            "output": "client-command-macro.h"
-        },
-        {
-            "path": "templates/app/cluster-id.zapt",
-            "name": "ZCL cluster-id header",
-            "output": "cluster-id.h"
-        },
-        {
-            "path": "templates/app/command-id.zapt",
-            "name": "ZCL command-id header",
-            "output": "command-id.h"
-        },
-        {
             "path": "templates/app/endpoint_config.zapt",
             "name": "ZCL endpoint configuration",
             "output": "endpoint_config.h"
-        },
-        {
-            "path": "templates/app/enums.zapt",
-            "name": "ZCL enums header",
-            "output": "enums.h"
         },
         {
             "path": "templates/app/gen_config.zapt",
@@ -126,11 +81,6 @@
             "path": "templates/app/gen_tokens.zapt",
             "name": "ZCL gen_tokens header",
             "output": "gen_tokens.h"
-        },
-        {
-            "path": "templates/app/print-cluster.zapt",
-            "name": "ZCL print-cluster header",
-            "output": "print-cluster.h"
         },
         {
             "path": "templates/app/CHIPClientCallbacks.zapt",

@@ -42,7 +42,6 @@ Complete the following steps to build CHIPTool:
 2. In the command line, run the following command from the top CHIP directory:
 
     ```shell
-    sudo apt-get install -y swig # "brew install swig" for macOS.
     TARGET_CPU=arm64 ./scripts/examples/android_app.sh
     ```
 

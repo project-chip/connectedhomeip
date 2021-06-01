@@ -33,12 +33,15 @@ constexpr ClusterId kApplicationLauncherClusterId         = 0x050C;
 constexpr ClusterId kAudioOutputClusterId                 = 0x050B;
 constexpr ClusterId kBarrierControlClusterId              = 0x0103;
 constexpr ClusterId kBasicClusterId                       = 0x0028;
+constexpr ClusterId kBinaryInputBasicClusterId            = 0x000F;
 constexpr ClusterId kBindingClusterId                     = 0xF000;
+constexpr ClusterId kBridgedDeviceBasicClusterId          = 0x0039;
 constexpr ClusterId kColorControlClusterId                = 0x0300;
 constexpr ClusterId kContentLaunchClusterId               = 0x050A;
 constexpr ClusterId kDescriptorClusterId                  = 0x001D;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
+constexpr ClusterId kFixedLabelClusterId                  = 0x0040;
 constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
 constexpr ClusterId kGeneralDiagnosticsClusterId          = 0x0033;
 constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
@@ -53,7 +56,9 @@ constexpr ClusterId kNetworkCommissioningClusterId        = 0x0031;
 constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
 constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
+constexpr ClusterId kRelativeHumidityMeasurementClusterId = 0x0405;
 constexpr ClusterId kScenesClusterId                      = 0x0005;
+constexpr ClusterId kSoftwareDiagnosticsClusterId         = 0x0034;
 constexpr ClusterId kSwitchClusterId                      = 0x003B;
 constexpr ClusterId kTvChannelClusterId                   = 0x0504;
 constexpr ClusterId kTargetNavigatorClusterId             = 0x0505;
@@ -211,6 +216,30 @@ private:
     static constexpr CommandId kMfgSpecificPingCommandId = 0x00;
 };
 
+class DLL_EXPORT BinaryInputBasicCluster : public ClusterBase
+{
+public:
+    BinaryInputBasicCluster() : ClusterBase(kBinaryInputBasicClusterId) {}
+    ~BinaryInputBasicCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOutOfService(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePresentValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeStatusFlags(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeOutOfService(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t value);
+    CHIP_ERROR WriteAttributePresentValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t value);
+    CHIP_ERROR ConfigureAttributePresentValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributePresentValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeStatusFlags(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeStatusFlags(Callback::Cancelable * onReportCallback);
+};
+
 class DLL_EXPORT BindingCluster : public ClusterBase
 {
 public:
@@ -230,6 +259,35 @@ public:
 private:
     static constexpr CommandId kBindCommandId   = 0x00;
     static constexpr CommandId kUnbindCommandId = 0x01;
+};
+
+class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
+{
+public:
+    BridgedDeviceBasicCluster() : ClusterBase(kBridgedDeviceBasicClusterId) {}
+    ~BridgedDeviceBasicCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       chip::ByteSpan value);
 };
 
 class DLL_EXPORT ColorControlCluster : public ClusterBase
@@ -534,6 +592,18 @@ public:
 
 private:
     static constexpr CommandId kResetCountsCommandId = 0x00;
+};
+
+class DLL_EXPORT FixedLabelCluster : public ClusterBase
+{
+public:
+    FixedLabelCluster() : ClusterBase(kFixedLabelClusterId) {}
+    ~FixedLabelCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLabelList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
@@ -907,6 +977,23 @@ public:
     CHIP_ERROR ReportAttributeCapacity(Callback::Cancelable * onReportCallback);
 };
 
+class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
+{
+public:
+    RelativeHumidityMeasurementCluster() : ClusterBase(kRelativeHumidityMeasurementClusterId) {}
+    ~RelativeHumidityMeasurementCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+};
+
 class DLL_EXPORT ScenesCluster : public ClusterBase
 {
 public:
@@ -947,6 +1034,25 @@ private:
     static constexpr CommandId kRemoveSceneCommandId        = 0x02;
     static constexpr CommandId kStoreSceneCommandId         = 0x04;
     static constexpr CommandId kViewSceneCommandId          = 0x01;
+};
+
+class DLL_EXPORT SoftwareDiagnosticsCluster : public ClusterBase
+{
+public:
+    SoftwareDiagnosticsCluster() : ClusterBase(kSoftwareDiagnosticsClusterId) {}
+    ~SoftwareDiagnosticsCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ResetWatermarks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kResetWatermarksCommandId = 0x00;
 };
 
 class DLL_EXPORT SwitchCluster : public ClusterBase

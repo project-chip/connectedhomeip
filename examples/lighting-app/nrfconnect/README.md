@@ -358,11 +358,11 @@ Semiconductor's kit you own.
 
 ### Building with Pigweed RPCs
 
-The RPCs in `lighting-common/pigweed-lighting.proto` can be used to control
-various functionalities of the lighting app from a USB-connected host computer.
-To build the example with the RPC server, run the following command with
-_build-target_ replaced with the build target name of the Nordic Semiconductor's
-kit you own:
+The RPCs in `lighting-common/lighting_service/lighting_service.proto` can be
+used to control various functionalities of the lighting app from a USB-connected
+host computer. To build the example with the RPC server, run the following
+command with _build-target_ replaced with the build target name of the Nordic
+Semiconductor's kit you own:
 
     $ west build -b build-target -- -DOVERLAY_CONFIG=rpc.overlay
 
@@ -462,7 +462,6 @@ CHIP-enabled Thread network.
 
 ### Testing Device Firmware Upgrade
 
-Read the section about downloading the new image to a device on the
-[FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
-page in the nRF Connect documentation to see how to upgrade your device firmware
-over Bluetooth LE using a smartphone.
+Read the
+[DFU tutorial](../../../docs/guides/nrfconnect_examples_software_update.md) to
+see how to upgrade your device firmware.

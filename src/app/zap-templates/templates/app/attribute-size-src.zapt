@@ -1,12 +1,11 @@
 {{> header}}
 
+#include <app/common/gen/af-structs.h>
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
-
-#include "gen/af-structs.h"
 
 using namespace chip;
 using namespace chip::app::List;

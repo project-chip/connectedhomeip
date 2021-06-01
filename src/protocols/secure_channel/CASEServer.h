@@ -23,7 +23,7 @@
 
 namespace chip {
 
-class CASEServer : public SessionEstablishmentDelegate, public Messaging::ExchangeDelegateBase
+class CASEServer : public SessionEstablishmentDelegate, public Messaging::ExchangeDelegate
 {
 public:
     CASEServer() {}
