@@ -53,7 +53,7 @@ static void test_os_sleep_ms(uint64_t millisecs)
     nanosleep(&sleep_time, nullptr);
 }
 
-class LoopbackTransport : public Transport::Base
+class PASETestLoopbackTransport : public Transport::Base
 {
 public:
     CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
@@ -104,7 +104,7 @@ public:
 };
 
 TransportMgrBase gTransportMgr;
-LoopbackTransport gLoopback;
+PASETestLoopbackTransport gLoopback;
 
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
