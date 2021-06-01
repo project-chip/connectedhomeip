@@ -375,7 +375,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (211)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (212)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -656,6 +656,7 @@
             { 0x050F, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* TestSpecificResponse */                                        \
             { 0x050F, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestNotHandled */                                              \
             { 0x050F, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestSpecific */                                                \
+            { 0x050F, 0x03, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* TestUnknownCommand */                                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Binding (client) */                                                                           \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Bind */                                                        \
