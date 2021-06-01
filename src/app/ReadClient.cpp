@@ -132,32 +132,8 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
 
         if (aAttributePathParamsListSize != 0 && apAttributePathParamsList != nullptr)
         {
-            AttributePathList::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
-            SuccessOrExit(err = attributePathListBuilder.GetError());
-            for (size_t index = 0; index < aAttributePathParamsListSize; index++)
-            {
-                AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
-                attributePathBuilder.NodeId(apAttributePathParamsList[index].mNodeId)
-                    .EndpointId(apAttributePathParamsList[index].mEndpointId)
-                    .ClusterId(apAttributePathParamsList[index].mClusterId);
-                if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kFieldIdValid)
-                {
-                    attributePathBuilder.FieldId(apAttributePathParamsList[index].mFieldId);
-                }
-                else if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kListIndexValid)
-                {
-                    attributePathBuilder.ListIndex(apAttributePathParamsList[index].mListIndex);
-                }
-                else
-                {
-                    err = CHIP_ERROR_INVALID_ARGUMENT;
-                    ExitNow();
-                }
-                attributePathBuilder.EndOfAttributePath();
-                SuccessOrExit(err = attributePathBuilder.GetError());
-            }
-            attributePathListBuilder.EndOfAttributePathList();
-            SuccessOrExit(err = attributePathListBuilder.GetError());
+            err = GenerateAttributePathList(request, apAttributePathParamsList, aAttributePathParamsListSize);
+            SuccessOrExit(err);
         }
 
         request.EndOfReadRequest();
@@ -185,6 +161,38 @@ exit:
     }
 
     return err;
+}
+
+CHIP_ERROR ReadClient::GenerateAttributePathList(ReadRequest::Builder & aRequest, AttributePathParams * apAttributePathParamsList,
+                                                 size_t aAttributePathParamsListSize)
+{
+    AttributePathList::Builder attributePathListBuilder = aRequest.CreateAttributePathListBuilder();
+    ReturnErrorOnFailure(attributePathListBuilder.GetError());
+    for (size_t index = 0; index < aAttributePathParamsListSize; index++)
+    {
+        AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+        attributePathBuilder.NodeId(apAttributePathParamsList[index].mNodeId)
+                .EndpointId(apAttributePathParamsList[index].mEndpointId)
+                .ClusterId(apAttributePathParamsList[index].mClusterId);
+        if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kFieldIdValid)
+        {
+            attributePathBuilder.FieldId(apAttributePathParamsList[index].mFieldId);
+        }
+        else if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kFieldIdListIndexValid)
+        {
+            attributePathBuilder.FieldId(apAttributePathParamsList[index].mFieldId);
+            attributePathBuilder.ListIndex(apAttributePathParamsList[index].mListIndex);
+        }
+        else
+        {
+            ChipLogError(DataManagement, "Invalid AttributePathFlags for Path index %d", index);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        attributePathBuilder.EndOfAttributePath();
+        ReturnErrorOnFailure(attributePathBuilder.GetError());
+    }
+    attributePathListBuilder.EndOfAttributePathList();
+    return attributePathListBuilder.GetError();
 }
 
 void ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
@@ -349,15 +357,17 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         SuccessOrExit(err);
 
         err = attributePathParser.GetFieldId(&(clusterInfo.mFieldId));
+        SuccessOrExit(err);
+        clusterInfo.mType = ClusterInfo::Type::kFieldIdValid;
+
+        err = attributePathParser.GetListIndex(&(clusterInfo.mListIndex));
         if (CHIP_NO_ERROR == err)
         {
-            clusterInfo.mType = ClusterInfo::Type::kFieldIdValid;
+            clusterInfo.mType = ClusterInfo::Type::kFieldIdListIndexValid;
         }
         else if (CHIP_END_OF_TLV == err)
         {
-            err = attributePathParser.GetListIndex(&(clusterInfo.mListIndex));
-            SuccessOrExit(err);
-            clusterInfo.mType = ClusterInfo::Type::kListIndexValid;
+            err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
 

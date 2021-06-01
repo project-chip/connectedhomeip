@@ -25,8 +25,9 @@ namespace chip {
 namespace app {
 enum class AttributePathFlags : uint8_t
 {
+    kInvalid   = 0,
     kFieldIdValid   = 0x01,
-    kListIndexValid = 0x02,
+    kFieldIdListIndexValid = 0x02,
 };
 
 struct AttributePathParams
@@ -37,32 +38,12 @@ struct AttributePathParams
         mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
     {}
     AttributePathParams() {}
-    bool IsSamePath(const AttributePathParams & other) const
-    {
-        if (other.mNodeId != mNodeId || other.mEndpointId != mEndpointId || other.mClusterId != mClusterId)
-        {
-            return false;
-        }
-        if (mFlags != other.mFlags)
-        {
-            return false;
-        }
-        if (mFlags == AttributePathFlags::kFieldIdValid && other.mFieldId != mFieldId)
-        {
-            return false;
-        }
-        if (mFlags == AttributePathFlags::kListIndexValid && other.mListIndex != mListIndex)
-        {
-            return false;
-        }
-        return true;
-    }
     chip::NodeId mNodeId         = 0;
     chip::EndpointId mEndpointId = 0;
     chip::ClusterId mClusterId   = 0;
     chip::FieldId mFieldId       = 0;
     chip::ListIndex mListIndex   = 0;
-    BitFlags<AttributePathFlags> mFlags;
+    BitFlags<AttributePathFlags> mFlags = AttributePathFlags::kInvalid;
 };
 } // namespace app
 } // namespace chip

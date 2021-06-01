@@ -27,10 +27,10 @@ struct ClusterInfo
 {
     enum class Type : uint8_t
     {
-        kInvalid        = 0,
-        kFieldIdValid   = 0x01,
-        kListIndexValid = 0x02,
-        kEventIdValid   = 0x03,
+        kInvalid               = 0,
+        kFieldIdValid          = 0x01,
+        kFieldIdListIndexValid = 0x02,
+        kEventIdValid          = 0x03,
     };
 
     ClusterInfo() {}

@@ -56,6 +56,8 @@ class TestReadInteraction
 public:
     static void TestReadClient(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientGenerateAttributePathList(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientGenerateInvalidAttributePathList(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
@@ -71,6 +73,48 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
 
     err = reportDataBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    AttributeDataList::Builder attributeDataListBuilder = reportDataBuilder.CreateAttributeDataListBuilder();
+    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
+
+    AttributeDataElement::Builder attributeDataElementBuilder = attributeDataListBuilder.CreateAttributeDataElementBuilder();
+    NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
+
+    AttributePath::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePathBuilder();
+    NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
+
+    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    err = attributePathBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    attributeDataElementBuilder.DataVersion(2);
+    err = attributeDataElementBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // Construct attribute data
+    {
+        chip::TLV::TLVWriter * pWriter = attributeDataElementBuilder.GetWriter();
+        chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
+        err = pWriter->StartContainer(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
+                                      dummyType);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = pWriter->EndContainer(dummyType);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    }
+
+    attributeDataElementBuilder.MoreClusterData(false);
+    err = attributeDataElementBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    attributeDataElementBuilder.EndOfAttributeDataElement();
+    NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
+
+    attributeDataListBuilder.EndOfAttributeDataList();
+    NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
 
     reportDataBuilder.SuppressResponse(true);
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
@@ -129,7 +173,17 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     writer.Init(std::move(readRequestbuf));
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    readRequestBuilder.EventNumber(1);
+
+    AttributePathList::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+    AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    err = attributePathBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     readRequestBuilder.EndOfReadRequest();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
@@ -138,6 +192,46 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
 
     err = readHandler.OnReadRequest(nullptr, std::move(readRequestbuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+}
+
+void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::ReadClient readClient;
+    System::PacketBufferHandle msgBuf;
+    System::PacketBufferTLVWriter writer;
+    ReadRequest::Builder request;
+    msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    writer.Init(std::move(msgBuf));
+    err = request.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    AttributePathParams attributePathParams[2];
+    attributePathParams[0].mFlags = AttributePathFlags::kFieldIdValid;
+    attributePathParams[1].mFlags = AttributePathFlags::kFieldIdListIndexValid;
+    err = readClient.GenerateAttributePathList(request, attributePathParams , 2 /*aAttributePathParamsListSize*/);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+}
+
+void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::ReadClient readClient;
+    System::PacketBufferHandle msgBuf;
+    System::PacketBufferTLVWriter writer;
+    ReadRequest::Builder request;
+    msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    writer.Init(std::move(msgBuf));
+    err = request.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    AttributePathParams attributePathParams[2];
+    attributePathParams[0].mFlags = AttributePathFlags::kFieldIdListIndexValid;
+    attributePathParams[1].mFlags = AttributePathFlags::kInvalid;
+    err = readClient.GenerateAttributePathList(request, attributePathParams , 2 /*aAttributePathParamsListSize*/);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 } // namespace app
@@ -179,6 +273,8 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("CheckReadClient", chip::app::TestReadInteraction::TestReadClient),
     NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
+    NL_TEST_DEF("TestReadClientGenerateAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateAttributePathList),
+    NL_TEST_DEF("TestReadClientGenerateInvalidAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateInvalidAttributePathList),
     NL_TEST_SENTINEL()
 };
 // clang-format on

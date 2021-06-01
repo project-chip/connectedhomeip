@@ -182,17 +182,19 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         err = path.GetClusterId(&(clusterInfo.mClusterId));
         SuccessOrExit(err);
         err = path.GetFieldId(&(clusterInfo.mFieldId));
+        SuccessOrExit(err);
+        clusterInfo.mType = ClusterInfo::Type::kFieldIdValid;
+        err = path.GetListIndex(&(clusterInfo.mListIndex));
         if (CHIP_NO_ERROR == err)
         {
-            clusterInfo.mType = ClusterInfo::Type::kFieldIdValid;
+            clusterInfo.mType = ClusterInfo::Type::kFieldIdListIndexValid;
         }
         else if (CHIP_END_OF_TLV == err)
         {
-            err = path.GetListIndex(&(clusterInfo.mListIndex));
-            SuccessOrExit(err);
-            clusterInfo.mType = ClusterInfo::Type::kListIndexValid;
+            err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
+
         err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
         SuccessOrExit(err);
         mpAttributeClusterInfoList->SetDirty();
