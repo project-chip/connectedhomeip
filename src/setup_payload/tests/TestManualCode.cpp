@@ -79,7 +79,7 @@ void TestDecimalRepresentation_PartialPayload(nlTestSuite * inSuite, void * inCo
 void TestDecimalRepresentation_PartialPayload_RequiresCustomFlow(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload       = GetDefaultPayload();
-    payload.requiresCustomFlow = true;
+    payload.commissioningFlow  = CommissioningFlow::kCustom;
 
     std::string expectedResult = "63610875350000000000";
 
@@ -89,7 +89,7 @@ void TestDecimalRepresentation_PartialPayload_RequiresCustomFlow(nlTestSuite * i
 void TestDecimalRepresentation_FullPayloadWithZeros(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload       = GetDefaultPayload();
-    payload.requiresCustomFlow = true;
+    payload.commissioningFlow  = CommissioningFlow::kCustom;
     payload.vendorID           = 1;
     payload.productID          = 1;
 
@@ -101,7 +101,7 @@ void TestDecimalRepresentation_FullPayloadWithZeros(nlTestSuite * inSuite, void 
 void TestDecimalRepresentation_FullPayloadWithoutZeros(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload       = GetDefaultPayload();
-    payload.requiresCustomFlow = true;
+    payload.commissioningFlow  = CommissioningFlow::kCustom;
     payload.vendorID           = 45367;
     payload.productID          = 14526;
 
@@ -137,7 +137,7 @@ void TestDecimalRepresentation_AllOnes(nlTestSuite * inSuite, void * inContext)
     SetupPayload payload;
     payload.setUpPINCode       = 0x7FFFFFF;
     payload.discriminator      = 0xFFF;
-    payload.requiresCustomFlow = true;
+    payload.commissioningFlow  = CommissioningFlow::kCustom;
     payload.vendorID           = 65535;
     payload.productID          = 65535;
 
@@ -168,9 +168,8 @@ void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERR
 
 void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * inSuite, void * inContext)
 {
-    SetupPayload payload       = GetDefaultPayload();
-    payload.requiresCustomFlow = false;
-    payload.discriminator      = 0xa1f;
+    SetupPayload payload  = GetDefaultPayload();
+    payload.discriminator = 0xa1f;
 
     {
         // Test short 11 digit code
@@ -186,7 +185,7 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 
     payload.vendorID           = 1;
     payload.productID          = 1;
-    payload.requiresCustomFlow = true;
+    payload.commissioningFlow  = CommissioningFlow::kCustom;
     payload.discriminator      = 0xb1f;
 
     {
@@ -236,7 +235,7 @@ void TestGenerateAndParser_FullPayload(nlTestSuite * inSuite, void * inContext)
     SetupPayload payload       = GetDefaultPayload();
     payload.vendorID           = 1;
     payload.productID          = 1;
-    payload.requiresCustomFlow = true;
+    payload.commissioningFlow  = CommissioningFlow::kCustom;
 
     ManualSetupPayloadGenerator generator(payload);
     std::string result;
@@ -324,7 +323,7 @@ void TestShortCodeReadWrite(nlTestSuite * inSuite, void * context)
 void TestLongCodeReadWrite(nlTestSuite * inSuite, void * context)
 {
     SetupPayload inPayload       = GetDefaultPayload();
-    inPayload.requiresCustomFlow = true;
+    inPayload.commissioningFlow  = CommissioningFlow::kCustom;
     inPayload.vendorID           = 1;
     inPayload.productID          = 1;
     SetupPayload outPayload;

@@ -376,13 +376,14 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     static_assert(kProductIDFieldLengthInBits <= 16, "Won't fit in uint16_t");
     outPayload.productID = static_cast<uint16_t>(dest);
 
-    err = readBits(buf, indexToReadFrom, dest, kCustomFlowRequiredFieldLengthInBits);
+    err = readBits(buf, indexToReadFrom, dest, kCommissioningFlowFieldLengthInBits);
     SuccessOrExit(err);
-    static_assert(kCustomFlowRequiredFieldLengthInBits <= 8, "Won't fit in uint8_t");
-    outPayload.requiresCustomFlow = static_cast<uint8_t>(dest);
+    static_assert(kCommissioningFlowFieldLengthInBits <= 8, "Won't fit in uint8_t");
+    outPayload.commissioningFlow = static_cast<CommissioningFlow>(dest);
 
     err = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
     SuccessOrExit(err);
+    static_assert(kRendezvousInfoFieldLengthInBits <= 8, "Won't fit in RendezvousInformationFlags");
     outPayload.rendezvousInformation = RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(dest));
 
     err = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);
