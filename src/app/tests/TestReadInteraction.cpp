@@ -210,7 +210,7 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
     AttributePathParams attributePathParams[2];
     attributePathParams[0].mFlags = AttributePathFlags::kFieldIdValid;
     attributePathParams[1].mFlags = AttributePathFlags::kFieldIdListIndexValid;
-    err = readClient.GenerateAttributePathList(request, attributePathParams , 2 /*aAttributePathParamsListSize*/);
+    err = readClient.GenerateAttributePathList(request, attributePathParams, 2 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -230,7 +230,7 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     AttributePathParams attributePathParams[2];
     attributePathParams[0].mFlags = AttributePathFlags::kFieldIdListIndexValid;
     attributePathParams[1].mFlags = AttributePathFlags::kInvalid;
-    err = readClient.GenerateAttributePathList(request, attributePathParams , 2 /*aAttributePathParamsListSize*/);
+    err = readClient.GenerateAttributePathList(request, attributePathParams, 2 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 

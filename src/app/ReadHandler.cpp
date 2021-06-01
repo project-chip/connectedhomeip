@@ -184,7 +184,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         err = path.GetFieldId(&(clusterInfo.mFieldId));
         SuccessOrExit(err);
         clusterInfo.mType = ClusterInfo::Type::kFieldIdValid;
-        err = path.GetListIndex(&(clusterInfo.mListIndex));
+        err               = path.GetListIndex(&(clusterInfo.mListIndex));
         if (CHIP_NO_ERROR == err)
         {
             clusterInfo.mType = ClusterInfo::Type::kFieldIdListIndexValid;

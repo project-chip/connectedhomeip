@@ -25,8 +25,8 @@ namespace chip {
 namespace app {
 enum class AttributePathFlags : uint8_t
 {
-    kInvalid   = 0,
-    kFieldIdValid   = 0x01,
+    kInvalid               = 0,
+    kFieldIdValid          = 0x01,
     kFieldIdListIndexValid = 0x02,
 };
 
@@ -38,11 +38,11 @@ struct AttributePathParams
         mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
     {}
     AttributePathParams() {}
-    chip::NodeId mNodeId         = 0;
-    chip::EndpointId mEndpointId = 0;
-    chip::ClusterId mClusterId   = 0;
-    chip::FieldId mFieldId       = 0;
-    chip::ListIndex mListIndex   = 0;
+    chip::NodeId mNodeId                = 0;
+    chip::EndpointId mEndpointId        = 0;
+    chip::ClusterId mClusterId          = 0;
+    chip::FieldId mFieldId              = 0;
+    chip::ListIndex mListIndex          = 0;
     BitFlags<AttributePathFlags> mFlags = AttributePathFlags::kInvalid;
 };
 } // namespace app

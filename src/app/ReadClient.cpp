@@ -172,8 +172,8 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(ReadRequest::Builder & aRequest
     {
         AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
         attributePathBuilder.NodeId(apAttributePathParamsList[index].mNodeId)
-                .EndpointId(apAttributePathParamsList[index].mEndpointId)
-                .ClusterId(apAttributePathParamsList[index].mClusterId);
+            .EndpointId(apAttributePathParamsList[index].mEndpointId)
+            .ClusterId(apAttributePathParamsList[index].mClusterId);
         if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kFieldIdValid)
         {
             attributePathBuilder.FieldId(apAttributePathParamsList[index].mFieldId);
