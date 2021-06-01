@@ -391,6 +391,36 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
     return CHIP_NO_ERROR;
 }
 
+void Device::Reset()
+{
+    if (IsActive() && mStorageDelegate != nullptr && mSessionManager != nullptr)
+    {
+        // If a session can be found, persist the device so that we track the newest message counter values
+        Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
+        if (connectionState != nullptr)
+        {
+            Persist();
+        }
+    }
+
+    SetActive(false);
+    mState          = ConnectionState::NotConnected;
+    mSessionManager = nullptr;
+    mStatusDelegate = nullptr;
+    mInetLayer      = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    mBleLayer = nullptr;
+#endif
+    if (mExchangeMgr)
+    {
+        // Ensure that any exchange contexts we have open get closed now,
+        // because we don't want them to call back in to us after this
+        // point.
+        mExchangeMgr->CloseAllContextsForDelegate(this);
+    }
+    mExchangeMgr = nullptr;
+}
+
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -527,16 +557,6 @@ Device::~Device()
         // because we don't want them to call back in to us after this
         // point.
         mExchangeMgr->CloseAllContextsForDelegate(this);
-    }
-
-    if (mStorageDelegate != nullptr && mSessionManager != nullptr)
-    {
-        // If a session can be found, persist the device so that we track the newest message counter values
-        Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
-        if (connectionState != nullptr)
-        {
-            Persist();
-        }
     }
 }
 
