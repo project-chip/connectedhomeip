@@ -44,6 +44,8 @@ from xmlrpc.server import SimpleXMLRPCServer
 from enum import Enum
 from typing import Any, Dict,Optional
 
+from enum import Enum
+from typing import Any, Dict,Optional
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
 # possible to run the device manager shell from a non-standard install location,
@@ -732,6 +734,12 @@ def ip_connect(ip_address: string, pin_code: int, node_id: int) -> Dict[str, Any
     except Exception as e:
         return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
 
+def qr_code_parse(qr_code):
+    try:
+        result = SetupPayload().ParseQrCode(qr_code).Dictionary()
+        return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = result)
+    except Exception as e:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
 
 def start_rpc_server():
     with SimpleXMLRPCServer(("0.0.0.0", 5000), allow_none=True) as server:
@@ -742,6 +750,7 @@ def start_rpc_server():
         server.register_function(zcl_add_network)
         server.register_function(zcl_enable_network)
         server.register_function(resolve)
+        server.register_function(qr_code_parse)
         server.register_multicall_functions()
         print('Serving XML-RPC on localhost port 5000')
         try:
