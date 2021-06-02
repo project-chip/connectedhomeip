@@ -120,6 +120,15 @@ static_library("app") {
     assert(false, "Unknown IM critical section implementation.")
   }
 
+  if (chip_ip_commissioning) {
+    defines = [
+      "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=1",
+      "CONFIG_RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE=1",
+      "CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY=1",
+      "CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING=1",
+    ]
+  }
+
   public_deps = [
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
