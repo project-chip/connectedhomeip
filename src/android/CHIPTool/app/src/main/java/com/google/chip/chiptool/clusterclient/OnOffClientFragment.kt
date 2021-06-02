@@ -63,7 +63,9 @@ class OnOffClientFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    fabricIdEd.setText(5544332211.toString())
+    // TODO: use the fabric ID that was used to commission the device
+    val testFabricId = "5544332211"
+    fabricIdEd.setText(testFabricId)
     deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
 
@@ -95,6 +97,7 @@ class OnOffClientFragment : Fragment() {
       serviceType = "_chip._tcp"
     }
 
+    // TODO: implement the common CHIP mDNS interface for Android and make CHIP stack call the resolver
     val resolverListener = object : NsdManager.ResolveListener {
       override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
         showMessage("Address resolution failed: $errorCode")
