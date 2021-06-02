@@ -42,7 +42,3 @@ ninja -C out/"android_$TARGET_CPU" src/setup_payload/java src/controller/java de
 
 rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs
 rsync -a out/"android_$TARGET_CPU"/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
-
-# Build ot-commissioner libs
-git submodule update --init --recursive third_party/ot-commissioner/repo
-TARGET_CPU=arm64 ./third_party/ot-commissioner/build-android-libs.sh

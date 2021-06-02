@@ -203,8 +203,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
-    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d", payloadHeader.GetMessageType(),
-                    payloadHeader.GetProtocolID());
+    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d on exchange %d", payloadHeader.GetMessageType(),
+                    payloadHeader.GetProtocolID(), payloadHeader.GetExchangeID());
 
     // Search for an existing exchange that the message applies to. If a match is found...
     bool found = false;
@@ -319,8 +319,9 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->mSecureSession == session)
         {
-            ec->Close();
-            // Continue iterate because there can be multiple contexts associated with the connection.
+            ec->OnConnectionExpired();
+            // Continue to iterate because there can be multiple exchanges
+            // associated with the connection.
         }
         return true;
     });

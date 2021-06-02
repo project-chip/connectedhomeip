@@ -15,42 +15,47 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/k32w_sdk.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/third_party/k32w_sdk/k32w_sdk.gni")
+
+openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 config("openthread_k32w_config") {
-  include_dirs = [
-    "${openthread_root}/examples/platforms/k32w/",
-    "${openthread_root}/examples/platforms/k32w/k32w061",
-  ]
+  include_dirs = [ "${openthread_nxp_root}/src/k32w/k32w061" ]
 
   include_dirs += [ "${chip_root}/examples/platform/k32w" ]
 }
 
 source_set("openthread_core_config_k32w") {
   sources = [
-    "${openthread_root}/examples/platforms/k32w/k32w061/openthread-core-k32w061-config-check.h",
-    "${openthread_root}/examples/platforms/k32w/k32w061/openthread-core-k32w061-config.h",
+    "${openthread_nxp_root}/src/k32w/k32w061/openthread-core-k32w061-config-check.h",
+    "${openthread_nxp_root}/src/k32w/k32w061/openthread-core-k32w061-config.h",
   ]
 
   public_configs = [ ":openthread_k32w_config" ]
 }
 
 source_set("openthread_mbedtls_config_k32w") {
-  sources = [ "${openthread_root}/examples/platforms/k32w/k32w061/k32w061-mbedtls-config.h" ]
+  sources =
+      [ "${openthread_nxp_root}/src/k32w/k32w061/k32w061-mbedtls-config.h" ]
 }
 
 source_set("libopenthread-k32w") {
   sources = [
-    "${openthread_root}/examples/platforms/k32w/src/alarm.c",
-    "${openthread_root}/examples/platforms/k32w/src/diag.c",
-    "${openthread_root}/examples/platforms/k32w/src/entropy.c",
-    "${openthread_root}/examples/platforms/k32w/src/flash.c",
-    "${openthread_root}/examples/platforms/k32w/src/logging.c",
-    "${openthread_root}/examples/platforms/k32w/src/misc.c",
-    "${openthread_root}/examples/platforms/k32w/src/radio.c",
-    "${openthread_root}/examples/platforms/k32w/src/settings_k32w.c",
-    "${openthread_root}/examples/platforms/k32w/src/system.c",
-    "${openthread_root}/examples/platforms/k32w/src/uart.c",
+    "${openthread_nxp_root}/src/k32w/platform/alarm.c",
+    "${openthread_nxp_root}/src/k32w/platform/diag.c",
+    "${openthread_nxp_root}/src/k32w/platform/entropy.c",
+    "${openthread_nxp_root}/src/k32w/platform/flash.c",
+    "${openthread_nxp_root}/src/k32w/platform/logging.c",
+    "${openthread_nxp_root}/src/k32w/platform/misc.c",
+    "${openthread_nxp_root}/src/k32w/platform/radio.c",
+    "${openthread_nxp_root}/src/k32w/platform/settings_k32w.c",
+    "${openthread_nxp_root}/src/k32w/platform/system.c",
+    "${openthread_nxp_root}/src/k32w/platform/uart.c",
   ]
+
+  if (chip_with_ot_cli == 1) {
+    sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]
+  }
 
   public_deps = [
     ":openthread_core_config_k32w",

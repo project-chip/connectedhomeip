@@ -53,6 +53,6 @@ int main()
     cmd_ping_init();
     cmd_send_init();
 
-    shell_task(nullptr);
+    Engine::Root().RunMainLoop();
     return 0;
 }

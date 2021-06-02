@@ -134,14 +134,18 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
                                                   EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(!msgBuf.HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    // Our send path needs a (writable) PacketBuffer (e.g. so it can encode a
+    // PacketHeader into it), so get that from the EncryptedPacketBufferHandle.
+    System::PacketBufferHandle mutableBuf(std::move(msgBuf).CastToWritable());
 
     // Advancing the start to encrypted header, since SendMessage will attach the packet header on top of it.
     PacketHeader packetHeader;
-    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
+    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(mutableBuf));
 
     PayloadHeader payloadHeader;
-    return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
+    return SendMessage(session, payloadHeader, packetHeader, std::move(mutableBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsEncrypted);
 }
 
@@ -187,7 +191,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-        (*bufferRetainSlot) = msgBuf.Retain();
+        *bufferRetainSlot = EncryptedPacketBufferHandle::MarkEncrypted(msgBuf.Retain());
     }
 
     ChipLogProgress(Inet, "Sending msg from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec",
@@ -370,11 +374,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         {
             ChipLogError(Inet, "Message counter verify failed, err = %d", err);
         }
-        // TODO - Enable exit on error for message counter verification failure.
-        //        We are now using IM messages in commissioner class to provision op creds and
-        //        other device commissioning steps. This is somehow causing issues with message counter
-        //        verification. Disabling this check for now. Enable it after debugging the cause.
-        // SuccessOrExit(err);
+        SuccessOrExit(err);
     }
 
     admin = mAdmins->FindAdminWithId(state->GetAdminId());

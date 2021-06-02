@@ -47,6 +47,7 @@ public:
 
     uint16_t GetNextKeyId() const { return mNextKeyId; }
     void SetNextKeyId(uint16_t id) { mNextKeyId = id; }
+    void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
 
 private:
     AppDelegate * mDelegate;
