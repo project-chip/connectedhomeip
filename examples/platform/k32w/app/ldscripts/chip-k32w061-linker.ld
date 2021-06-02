@@ -39,13 +39,13 @@ OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
  */
 BOOT_RESUME_STACK_SIZE = 1024;
 
-/* Set Stack size to 4K minus 32Bytes reserved for ROM code at end of BANK7 so
-   the stack fits in BANK7. In practice the active stack size at the time of
-   going to sleep is more important than the total available stack size */
-STACK_SIZE             = (4096 - 32);
+STACK_SIZE             = (4096);
 
 MEM_RAM0_BASE          = 0x4000400;
 MEM_RAM0_SIZE          = 0x0015c00;
+
+MEM_RAM1_BASE          = 0x4020000;
+MEM_RAM1_SIZE          = 0x10000;
 
 MEMORY
 {
@@ -57,9 +57,9 @@ MEMORY
 }
 
 /* Define a symbol for the top of each memory region */
-__top_RAM0      = MEM_RAM0_BASE + MEM_RAM0_SIZE; /* 87K bytes */
+__top_RAM1      = MEM_RAM1_BASE + MEM_RAM1_SIZE; /* 64K bytes */
 
-/* To be improved. At this moment the second RAM bank is dedicated entirely to heap. */
+/* To be improved. At this moment the second RAM bank is dedicated entirely to heap + stack. */
 HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0xF000;
 
 /* set external flash properties - external flash is present on the DK6 board */
@@ -311,7 +311,7 @@ SECTIONS
     __nv_storage_end_address = NV_STORAGE_END_ADDRESS;
     __nv_storage_start_address = NV_STORAGE_START_ADDRESS;
 
-    PROVIDE(_vStackTop = __top_RAM0 - 32);
+    PROVIDE(_vStackTop = __top_RAM1);
     PROVIDE(__mac_buffer_base = (__mac_buffer_start & 0xfffe0000));
     PROVIDE(BOOT_GetStartPowerMode = 0x03000e9d);
     PROVIDE(ROM_GetFlash = 0x03000e0d);
@@ -320,6 +320,5 @@ SECTIONS
     PROVIDE(Chip_LOWPOWER_ChipSoftwareReset = 0x03003fa1);
 
     __StackLimit = _vStackTop - STACK_SIZE;
-    /* ASSERT(__StackLimit >= _end_boot_resume_stack, "Possible stack corruption with data/bss/boot_stack") */
-    ASSERT(_etext < NV_STORAGE_START_ADDRESS, "Application does not fit into flash!")
+   ASSERT (LENGTH(Flash640) >= (_etext + SIZEOF(.data)), "Application does not fit into flash!")
 }
