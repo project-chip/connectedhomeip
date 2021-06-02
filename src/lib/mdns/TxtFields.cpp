@@ -58,7 +58,7 @@ bool IsKey(const ByteSpan & key, const char * desired)
 
 uint16_t MakeU16FromAsciiDecimal(const ByteSpan & val)
 {
-    // Largest u16 number if 65536, so 5 chars.a
+    // Largest u16 number if 65536, so 5 chars.
     constexpr size_t kMaxUint16StrLen = 5;
     // Add a space for null
     char temp[kMaxUint16StrLen + 1];
