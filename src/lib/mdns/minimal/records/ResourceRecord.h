@@ -53,7 +53,7 @@ public:
         mCacheFlush = set;
         return *this;
     }
-    bool GetCacheFlush() { return mCacheFlush; }
+    bool GetCacheFlush() const { return mCacheFlush; }
 
     /// Append the given record to the underlying output.
     /// Updates header item count on success, does NOT update header on failure.
