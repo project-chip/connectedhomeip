@@ -19,9 +19,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-//#include "gen/attribute-id.h"
-//#include "gen/cluster-id.h"
-//#include "gen/af-structs.h"
 #include <app/common/gen/af-structs.h>
 
 #include <app/chip-zcl-zpro-codec.h>

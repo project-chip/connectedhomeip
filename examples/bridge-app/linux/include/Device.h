@@ -68,18 +68,10 @@ public:
     void SetChangeCallback(DeviceCallback_fn aChanged_CB);
 
 private:
-    //    friend LightingManager & LightingMgr(void);
     State_t mState;
     bool mReachable;
     char mName[kDeviceNameSize];
     char mLocation[kDeviceLocationSize];
     chip::EndpointId mEndpointId;
     DeviceCallback_fn mChanged_CB;
-
-    //    static LightingManager sLight;
 };
-
-// inline LightingManager & LightingMgr(void)
-//{
-//    return LightingManager::sLight;
-//}
