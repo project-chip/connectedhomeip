@@ -1,4 +1,35 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+#
+#    Copyright (c) 2021 Project CHIP Authors
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#
+#    Description:
+#      This is a utility script that can be used by developers to do
+#    simulate a device and controller on the same linux machine. This
+#    script is not intended to be used in a testing framework as-is
+#    because it requires root access to set up network namespaces.
+#
+#    To use this script, compile the required device example, and
+#    run inside the namespace using
+#    sudo <path>/linux_ip_namespace_setup.sh -r <path_to_app>
+#
+#    The controller can then be started in a new terminal and will
+#    be able to communicate with the application as if it were on
+#    a separate network.
+#
 
 NAMESPACE="MatterTester"
 HOST_SIDE_IF_NAME="heth0"
@@ -81,10 +112,19 @@ function help() {
   echo "Usage: $file_name [ options ... ]"
   echo ""
 
-  echo "This script is used to set up linux namespaces for Matter device testing."
-  echo "To use this script, set up a namespace then run the Matter device example"
-  echo "using the -r command. Run the controller in another terminal to send"
-  echo "commands to and from the device."
+  echo "This script is used to set up linux namespaces for Matter device testing"
+  echo "between a controller and device on the same linux machine."
+  echo ""
+  echo "To use this script, run the device code in a namespace using the -r command"
+  echo "and a controller in a seperate terminal to simulate two devices communicating"
+  echo "across a network."
+  echo "Example:"
+  echo "--------"
+  echo "Terminal 1:"
+  echo "sudo <path>/$file_name -r <path>/<application_name>"
+  echo ""
+  echo "Terminal 2:"
+  echo "<path>/chip-device-ctrl"
   echo ""
   echo "This script requires sudo for setup and requires access to ebtables-legacy"
   echo "to set up dual ipv4/ipv6 namespaces. Defaults to ipv6 only."
@@ -171,7 +211,7 @@ if [ $run = true ]; then
   fi
 fi
 
-if [ $setup = true]; then
+if [ $setup = true ]; then
   if [ $issetup = true ]; then
     cleanup=true
   fi
