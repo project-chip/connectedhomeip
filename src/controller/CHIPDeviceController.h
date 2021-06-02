@@ -272,23 +272,23 @@ protected:
     bool mPairedDevicesInitialized;
 
     NodeId mLocalDeviceId;
-    DeviceTransportMgr * mTransportMgr;
-    SecureSessionMgr * mSessionMgr;
-    Messaging::ExchangeManager * mExchangeMgr;
-    secure_channel::MessageCounterManager * mMessageCounterManager;
-    PersistentStorageDelegate * mStorageDelegate;
-    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
+    DeviceTransportMgr * mTransportMgr                             = nullptr;
+    SecureSessionMgr * mSessionMgr                                 = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
+    secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
+    PersistentStorageDelegate * mStorageDelegate                   = nullptr;
+    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate  = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
-    Inet::InetLayer * mInetLayer;
+    Inet::InetLayer * mInetLayer = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
-    System::Layer * mSystemLayer;
+    System::Layer * mSystemLayer = nullptr;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
