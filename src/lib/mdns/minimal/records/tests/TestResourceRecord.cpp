@@ -245,6 +245,23 @@ void RecordCount(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == i + 1);
     }
 }
+void CacheFlushBit(nlTestSuite * inSuite, void * inContext)
+{
+    FakeResourceRecord record("somedata");
+    // No cache flush bit by default.
+    NL_TEST_ASSERT(inSuite, record.GetClass() == QClass::IN);
+    NL_TEST_ASSERT(inSuite, record.GetCacheFlush() == false);
+
+    // Check we can set flush bit and the class marker reflects that.
+    record.SetCacheFlush(true);
+    NL_TEST_ASSERT(inSuite, record.GetClass() == QClass::IN_FLUSH);
+    NL_TEST_ASSERT(inSuite, record.GetCacheFlush() == true);
+
+    // Check we can unset.
+    record.SetCacheFlush(false);
+    NL_TEST_ASSERT(inSuite, record.GetClass() == QClass::IN);
+    NL_TEST_ASSERT(inSuite, record.GetCacheFlush() == false);
+}
 
 const nlTest sTests[] = {
     NL_TEST_DEF("CanWriteSimpleRecord", CanWriteSimpleRecord),       //
@@ -252,6 +269,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("RecordOrderIsEnforced", RecordOrderIsEnforced),     //
     NL_TEST_DEF("ErrorsOutOnSmallBuffers", ErrorsOutOnSmallBuffers), //
     NL_TEST_DEF("RecordCount", RecordCount),                         //
+    NL_TEST_DEF("CacheFlushBit", CacheFlushBit),                     //
     NL_TEST_SENTINEL()                                               //
 };
 
