@@ -931,4 +931,3 @@ static ee_err_t EEPROM_WritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t *Out
 
 #endif /* gEepromWriteEnable_d */
 #endif /* gEepromType_d == gEepromDevice_MX25R8035F_c */
-
