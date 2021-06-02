@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/CriticalSection.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <core/CHIPEventLoggingConfig.h>
@@ -25,6 +24,7 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemMutex.h>
 #include <system/SystemTimer.h>
 
 using namespace chip::TLV;
@@ -32,6 +32,8 @@ using namespace chip::TLV;
 namespace chip {
 namespace app {
 static EventManagement sInstance;
+static System::Mutex sEventLock;
+
 
 /**
  * @brief
@@ -103,6 +105,11 @@ EventManagement::EventManagement(Messaging::ExchangeManager * apExchangeMgr, int
                                  const LogStorageResources * const apLogStorageResources)
 {
     Init(apExchangeMgr, aNumBuffers, apCircularEventBuffer, apLogStorageResources);
+#if CHIP_SYSTEM_CONFIG_NO_LOCKING
+    ChipLogProgress(EventLogging, "EventLock is not available");
+#else
+    chip::System::Mutex::Init(sEventLock);
+#endif
 }
 
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers,
@@ -375,11 +382,11 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
  */
 void EventManagement::DestroyEventManagement()
 {
-    CriticalSectionEnter();
+    Lock();
     sInstance.mState        = EventManagementStates::Shutdown;
     sInstance.mpEventBuffer = nullptr;
     sInstance.mpExchangeMgr = nullptr;
-    CriticalSectionExit();
+    Unlock();
 }
 
 EventNumber CircularEventBuffer::VendEventNumber()
@@ -462,7 +469,7 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CriticalSectionEnter();
+    Lock();
 
     VerifyOrExit(mState != EventManagementStates::Shutdown, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(aEventOptions.mpEventSchema != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -470,7 +477,7 @@ CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOpt
     err = LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
 
 exit:
-    CriticalSectionExit();
+    Unlock();
     ChipLogFunctError(err);
     return err;
 }
@@ -692,7 +699,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
     EventLoadOutContext context(aWriter, aPriority, aEventNumber);
 
     CircularEventBuffer * buf = mpEventBuffer;
-    CriticalSectionEnter();
+    Lock();
 
     while (!buf->IsFinalDestinationForPriority(aPriority))
     {
@@ -713,7 +720,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
 
 exit:
     aEventNumber = context.mCurrentEventNumber;
-    CriticalSectionExit();
+    Unlock();
 
     return err;
 }
@@ -832,7 +839,7 @@ void EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)
 {
     CircularEventBuffer * eventBuffer = mpEventBuffer;
 
-    CriticalSectionEnter();
+    Lock();
 
     while (eventBuffer != nullptr)
     {
@@ -843,7 +850,21 @@ void EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)
         eventBuffer = eventBuffer->GetNextCircularEventBuffer();
     }
 
-    CriticalSectionExit();
+    Unlock();
+}
+
+void EventManagement::Lock()
+{
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    sEventLock.Lock();
+#endif
+}
+
+void EventManagement::Unlock()
+{
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    sEventLock.Unlock();
+#endif
 }
 
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,

@@ -551,6 +551,9 @@ private:
      */
     static CHIP_ERROR CopyEvent(const TLV::TLVReader & aReader, TLV::TLVWriter & aWriter, EventLoadOutContext * apContext);
 
+    static void Lock();
+    static void Unlock();
+
     /**
      * @brief
      *   A function to get the circular buffer for particular priority
