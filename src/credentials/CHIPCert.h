@@ -278,9 +278,9 @@ public:
  */
 struct CertificateKeyId
 {
-    const uint8_t * mId; /**< Pointer to the key identifier. Encoded as Octet String and represented as the ASN.1 DER Integer (X.690
-                            standard). */
-    uint8_t mLen;        /**< Key identifier length. */
+    const uint8_t * mId = nullptr; /**< Pointer to the key identifier. Encoded as Octet String and represented as the ASN.1 DER
+                                        Integer (X.690 standard). */
+    uint8_t mLen = 0;              /**< Key identifier length. */
 
     bool IsEqual(const CertificateKeyId & other) const;
     bool IsEmpty() const { return mId == nullptr; }

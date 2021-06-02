@@ -263,7 +263,7 @@ private:
                                     had their constructor called, or have had
                                     their destructor called since then. */
     uint8_t mMaxCerts;             /**< Length of mOpCreds array. */
-    bool mMemoryAllocInternal;     /**< Indicates whether temporary memory buffers are allocated internally. */
+    bool mMemoryAllocInternal = false; /**< Indicates whether temporary memory buffers are allocated internally. */
     NodeCredentialMap mChipDeviceCredentials[kOperationalCredentialsMax];
     uint8_t mChipDeviceCredentialsCount;
     NodeKeypairMap mDeviceOpCredKeypair[kOperationalCredentialsMax];

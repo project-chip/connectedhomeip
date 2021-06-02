@@ -141,13 +141,13 @@ constexpr uint16_t kMaxIPAddressStringLength = INET6_ADDRSTRLEN;
 class DLL_EXPORT IPAddress
 {
 public:
-    IPAddress() = default;
+    constexpr IPAddress() = default;
 
     /**
      *  Copy constructor for the IPAddress class.
      *
      */
-    IPAddress(const IPAddress & other) = default;
+    constexpr IPAddress(const IPAddress & other) = default;
 
     /**
      * @brief   Opaque word array to contain IP addresses (independent of protocol version)
@@ -158,7 +158,7 @@ public:
      *  first three words are zero, and the fourth word contains the IPv4
      *  address in network byte order.
      */
-    uint32_t Addr[4];
+    uint32_t Addr[4] = {};
 
     /**
      * @brief   Test whether address is IPv6 compatible.
