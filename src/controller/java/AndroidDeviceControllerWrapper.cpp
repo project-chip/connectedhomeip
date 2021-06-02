@@ -104,7 +104,8 @@ JNIEnv * AndroidDeviceControllerWrapper::GetJavaEnv()
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
-                                                                             chip::NodeId nodeId, chip::System::Layer * systemLayer,
+                                                                             pthread_mutex_t * stackLock, chip::NodeId nodeId,
+                                                                             chip::System::Layer * systemLayer,
                                                                              chip::Inet::InetLayer * inetLayer,
                                                                              CHIP_ERROR * errInfoOnFailure)
 {
@@ -135,7 +136,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
         return nullptr;
     }
-    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller)));
+    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller), stackLock));
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
     wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
@@ -175,16 +176,19 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
+    StackUnlockGuard unlockGuard(mStackLock);
     CallJavaMethod("onStatusUpdate", static_cast<jint>(status));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
+    StackUnlockGuard unlockGuard(mStackLock);
     CallJavaMethod("onPairingComplete", static_cast<jint>(error));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
+    StackUnlockGuard unlockGuard(mStackLock);
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
 }
 

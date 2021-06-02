@@ -3167,7 +3167,9 @@ public:
             for (uint16_t i = 0; i < count; i++) {
                 values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedLongLong:entries[i].FabricId],
                                                   @"FabricId", [NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
-                                                  [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId", nil];
+                                                  [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId",
+                                                  [NSData dataWithBytes:entries[i].Label.data() length:entries[i].Label.size()],
+                                                  @"Label", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -13786,6 +13788,32 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.TestSpecific(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)testUnknownCommand:(ResponseHandler)responseHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.TestUnknownCommand(onSuccess->Cancel(), onFailure->Cancel());
     });
 
     if (err != CHIP_NO_ERROR) {

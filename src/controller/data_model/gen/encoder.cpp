@@ -321,6 +321,7 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_TEST_COMMAND_ID (0x00)
 #define ZCL_TEST_NOT_HANDLED_COMMAND_ID (0x01)
 #define ZCL_TEST_SPECIFIC_COMMAND_ID (0x02)
+#define ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID (0x03)
 
 #define THERMOSTAT_CLUSTER_ID 0x0201
 #define ZCL_CLEAR_WEEKLY_SCHEDULE_COMMAND_ID (0x03)
@@ -3637,6 +3638,7 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * Test                                                              |   0x00 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
+| * TestUnknownCommand                                                |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Boolean                                                           | 0x0000 |

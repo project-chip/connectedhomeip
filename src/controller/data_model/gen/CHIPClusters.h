@@ -1170,6 +1170,7 @@ public:
     CHIP_ERROR Test(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TestNotHandled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TestSpecific(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestUnknownCommand(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -1228,9 +1229,10 @@ public:
                                          chip::ByteSpan value);
 
 private:
-    static constexpr CommandId kTestCommandId           = 0x00;
-    static constexpr CommandId kTestNotHandledCommandId = 0x01;
-    static constexpr CommandId kTestSpecificCommandId   = 0x02;
+    static constexpr CommandId kTestCommandId               = 0x00;
+    static constexpr CommandId kTestNotHandledCommandId     = 0x01;
+    static constexpr CommandId kTestSpecificCommandId       = 0x02;
+    static constexpr CommandId kTestUnknownCommandCommandId = 0x03;
 };
 
 class DLL_EXPORT ThermostatCluster : public ClusterBase

@@ -897,6 +897,7 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(void * cont
         ChipLogProgress(chipTool, "  FabricId: %" PRIu64 "", entries[i].FabricId);
         ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entries[i].VendorId);
         ChipLogProgress(chipTool, "  NodeId: %" PRIu64 "", entries[i].NodeId);
+        ChipLogProgress(Zcl, "  Label: %zu", entries[i].Label.size());
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -14865,6 +14866,7 @@ private:
 | * Test                                                              |   0x00 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
+| * TestUnknownCommand                                                |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Boolean                                                           | 0x0000 |
@@ -14973,6 +14975,35 @@ private:
     chip::Callback::Callback<TestClusterClusterTestSpecificResponseCallback> * onSuccessCallback =
         new chip::Callback::Callback<TestClusterClusterTestSpecificResponseCallback>(OnTestClusterClusterTestSpecificResponse,
                                                                                      this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command TestUnknownCommand
+ */
+class TestClusterTestUnknownCommand : public ModelCommand
+{
+public:
+    TestClusterTestUnknownCommand() : ModelCommand("test-unknown-command") { ModelCommand::AddArguments(); }
+    ~TestClusterTestUnknownCommand()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x03) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.TestUnknownCommand(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -18571,6 +18602,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<TestClusterTest>(),
         make_unique<TestClusterTestNotHandled>(),
         make_unique<TestClusterTestSpecific>(),
+        make_unique<TestClusterTestUnknownCommand>(),
         make_unique<DiscoverTestClusterAttributes>(),
         make_unique<ReadTestClusterBoolean>(),
         make_unique<WriteTestClusterBoolean>(),
