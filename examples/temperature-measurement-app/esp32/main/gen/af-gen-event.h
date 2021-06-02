@@ -22,5 +22,4 @@
 #ifndef __AF_GEN_EVENT__
 #define __AF_GEN_EVENT__
 
-
 #endif // __AF_GEN_EVENT__
