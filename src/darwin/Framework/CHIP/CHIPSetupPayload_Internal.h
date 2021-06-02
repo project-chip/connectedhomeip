@@ -21,4 +21,4 @@
 - (CHIPCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value;
 #endif
 
-    @end
+@end
