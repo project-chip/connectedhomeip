@@ -32,11 +32,6 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCal
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
-{
-    return ThreadStackMgr().SetupSrpHost(hostname);
-}
-
 const char * GetProtocolString(MdnsServiceProtocol protocol)
 {
     return protocol == MdnsServiceProtocol::kMdnsProtocolUdp ? "_udp" : "_tcp";
@@ -47,6 +42,11 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     CHIP_ERROR result = CHIP_NO_ERROR;
 
     VerifyOrExit(service, result = CHIP_ERROR_INVALID_ARGUMENT);
+    if (strcmp(service->mHostName, "") != 0)
+    {
+        ChipLogProgress(Discovery, "Setting host name\n");
+        ThreadStackMgr().SetupSrpHost(service->mHostName);
+    }
 
     char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
     snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
