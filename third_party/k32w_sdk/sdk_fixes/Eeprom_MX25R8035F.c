@@ -1,23 +1,22 @@
 /*! *********************************************************************************
-* Copyright (c) 2015, Freescale Semiconductor, Inc.
-* Copyright 2016-2017, 2019 NXP
-* All rights reserved.
-*
-* \file
-*
-* This is a source file which implements the driver for the MX25R8035F memory.
-*
-* SPDX-License-Identifier: BSD-3-Clause
-********************************************************************************** */
-
+ * Copyright (c) 2015, Freescale Semiconductor, Inc.
+ * Copyright 2016-2017, 2019 NXP
+ * All rights reserved.
+ *
+ * \file
+ *
+ * This is a source file which implements the driver for the MX25R8035F memory.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ ********************************************************************************** */
 
 /*! *********************************************************************************
 *************************************************************************************
 * Include
 *************************************************************************************
 ********************************************************************************** */
-#include "EmbeddedTypes.h"
 #include "Eeprom.h"
+#include "EmbeddedTypes.h"
 #include "FunctionLib.h"
 
 #include "Panic.h"
@@ -37,98 +36,93 @@
 *************************************************************************************
 ********************************************************************************** */
 #ifndef gEepromWriteEnable_d
-#define gEepromWriteEnable_d   1
+#define gEepromWriteEnable_d 1
 #endif
 
-static osaSemaphoreId_t       mExtEepromSemaphoreId;
+static osaSemaphoreId_t mExtEepromSemaphoreId;
 
-#define IS_WORD_ALIGNED(x) (((uint32_t)(x) & 0x3) == 0)
-#define IS_PAGE_ALIGNED(x) (((uint32_t)(x) & (EEPROM_PAGE_SIZE-1)) == 0)
-#define SECTOR_ADDR(x)     ( ( (uint32_t)(x) / EEPROM_SECTOR_SIZE) * EEPROM_SECTOR_SIZE)
-#define IS_SECTOR_ALIGNED(x) (((uint32_t)(x) & (EEPROM_SECTOR_SIZE-1)) == 0)
+#define IS_WORD_ALIGNED(x) (((uint32_t)(x) &0x3) == 0)
+#define IS_PAGE_ALIGNED(x) (((uint32_t)(x) & (EEPROM_PAGE_SIZE - 1)) == 0)
+#define SECTOR_ADDR(x) (((uint32_t)(x) / EEPROM_SECTOR_SIZE) * EEPROM_SECTOR_SIZE)
+#define IS_SECTOR_ALIGNED(x) (((uint32_t)(x) & (EEPROM_SECTOR_SIZE - 1)) == 0)
 #define SECTOR_NUMBER(x) ((uint32_t)(x) / EEPROM_SECTOR_SIZE)
 
-#define BLOCK_ADDR(x)     ( ( (uint32_t)(x) / EEPROM_BLOCK_SIZE) * EEPROM_BLOCK_SIZE)
-#define IS_BLOCK_ALIGNED(x) (((uint32_t)(x) & (EEPROM_BLOCK_SIZE-1)) == 0)
+#define BLOCK_ADDR(x) (((uint32_t)(x) / EEPROM_BLOCK_SIZE) * EEPROM_BLOCK_SIZE)
+#define IS_BLOCK_ALIGNED(x) (((uint32_t)(x) & (EEPROM_BLOCK_SIZE - 1)) == 0)
 #define BLOCK_NUMBER(x) ((uint32_t)(x) / EEPROM_BLOCK_SIZE)
 
-#define EEPROM_BLOCK2_SIZE   (EEPROM_BLOCK_SIZE*2)
-#define BLOCK2_ADDR(x)     ( ( (uint32_t)(x) / EEPROM_BLOCK2_SIZE) * EEPROM_BLOCK2_SIZE)
-#define IS_BLOCK2_ALIGNED(x) (((uint32_t)(x) & (EEPROM_BLOCK2_SIZE-1)) == 0)
-
-
-
-
-
+#define EEPROM_BLOCK2_SIZE (EEPROM_BLOCK_SIZE * 2)
+#define BLOCK2_ADDR(x) (((uint32_t)(x) / EEPROM_BLOCK2_SIZE) * EEPROM_BLOCK2_SIZE)
+#define IS_BLOCK2_ALIGNED(x) (((uint32_t)(x) & (EEPROM_BLOCK2_SIZE - 1)) == 0)
 
 /* Control Commands */
-#define  EEPROM_RDSR            0x05
-#define  EEPROM_RDSFDR          0x5A
-#define  EEPROM_WREN            0x06
-#define  EEPROM_WRDI            0x04
-#define  EEPROM_RDCR            0x15
-#define  EEPROM_WRSR            0x01
-#define  EEPROM_RDID            0x9F
-#define  EEPROM_RES             0xAB
-#define  EEPROM_REMS            0x90
-#define  EEPROM_DP              0xB9
+#define EEPROM_RDSR 0x05
+#define EEPROM_RDSFDR 0x5A
+#define EEPROM_WREN 0x06
+#define EEPROM_WRDI 0x04
+#define EEPROM_RDCR 0x15
+#define EEPROM_WRSR 0x01
+#define EEPROM_RDID 0x9F
+#define EEPROM_RES 0xAB
+#define EEPROM_REMS 0x90
+#define EEPROM_DP 0xB9
 
 /* Read Commands */
-#define  EEPROM_READ            0x03
-#define  EEPROM_FAST_READ       0x0B
-#define  EEPROM_2READ           0xBB
-#define  EEPROM_DREAD           0x3B
-#define  EEPROM_4READ           0xEB
-#define  EEPROM_QREAD           0x6B
+#define EEPROM_READ 0x03
+#define EEPROM_FAST_READ 0x0B
+#define EEPROM_2READ 0xBB
+#define EEPROM_DREAD 0x3B
+#define EEPROM_4READ 0xEB
+#define EEPROM_QREAD 0x6B
 
 /* Erase Commands */
-#define  EEPROM_ERASE_4K        0x20
-#define  EEPROM_ERASE_32K       0x52
-#define  EEPROM_ERASE_64K       0xD8
-#define  EEPROM_ERASE_ALL       0x60
+#define EEPROM_ERASE_4K 0x20
+#define EEPROM_ERASE_32K 0x52
+#define EEPROM_ERASE_64K 0xD8
+#define EEPROM_ERASE_ALL 0x60
 
 /* Write Commands */
-#define  EEPROM_WRITE_PAGE      0x02
-#define  EEPROM_WRITE_QPAGE     0x38
+#define EEPROM_WRITE_PAGE 0x02
+#define EEPROM_WRITE_QPAGE 0x38
 
 /* Status Flags */
-#define  EEPROM_BUSY_FLAG_MASK  0x01
-#define  EEPROM_WEL_FLAG_MASK   0x02
+#define EEPROM_BUSY_FLAG_MASK 0x01
+#define EEPROM_WEL_FLAG_MASK 0x02
 
-#define  EEPROM_PAGE_SIZE       (256)
-#define  EEPROM_SECTOR_SIZE     (4*1024)
-#define  EEPROM_BLOCK_SIZE      (32*1024)
-#define  EEPROM_PAGE_MASK       (EEPROM_PAGE_SIZE - 1)
+#define EEPROM_PAGE_SIZE (256)
+#define EEPROM_SECTOR_SIZE (4 * 1024)
+#define EEPROM_BLOCK_SIZE (32 * 1024)
+#define EEPROM_PAGE_MASK (EEPROM_PAGE_SIZE - 1)
 
 /* address mask */
-#define  ADDRESS_MASK 0x000000FF
+#define ADDRESS_MASK 0x000000FF
 
 /* SPI config */
 #ifndef gEepromSpiInstance_c
-#define gEepromSpiInstance_c  1
+#define gEepromSpiInstance_c 1
 #endif
 
 /* Commands (see command array below) */
-#define CMD_SPIFI_DREAD              (0)
-#define CMD_SPIFI_DPROGRAM_PAGE      (1)
-#define CMD_SPIFI_QREAD              (2)
-#define CMD_SPIFI_QPROGRAM_PAGE      (3)
-#define CMD_SPIFI_GET_STATUS         (4)
-#define CMD_SPIFI_ERASE_SECTOR       (5)
-#define CMD_SPIFI_ERASE_BLOCK_32K    (6)
-#define CMD_SPIFI_ERASE_ALL          (7)
-#define CMD_SPIFI_WRITE_ENABLE       (8)
-#define CMD_SPIFI_WRITE_REGISTER     (9)
-#define CMD_SPIFI_ERASE_BLOCK_64K    (10)
-#define CMD_SPIFI_READ_ID            (11)
-#define CMD_SPIFI_DP                 (12)
-#define CMD_SPIFI_RES                (13)
-#define CMD_SPIFI_NUM                (14)
+#define CMD_SPIFI_DREAD (0)
+#define CMD_SPIFI_DPROGRAM_PAGE (1)
+#define CMD_SPIFI_QREAD (2)
+#define CMD_SPIFI_QPROGRAM_PAGE (3)
+#define CMD_SPIFI_GET_STATUS (4)
+#define CMD_SPIFI_ERASE_SECTOR (5)
+#define CMD_SPIFI_ERASE_BLOCK_32K (6)
+#define CMD_SPIFI_ERASE_ALL (7)
+#define CMD_SPIFI_WRITE_ENABLE (8)
+#define CMD_SPIFI_WRITE_REGISTER (9)
+#define CMD_SPIFI_ERASE_BLOCK_64K (10)
+#define CMD_SPIFI_READ_ID (11)
+#define CMD_SPIFI_DP (12)
+#define CMD_SPIFI_RES (13)
+#define CMD_SPIFI_NUM (14)
 
 // Flash type: including XT25F08B and MX25R8035F
-#define FLASH_MX25R8035F_ID     0x1428C2
-#define FLASH_XT25F08B_ID       0x14400B
-#define FLASH_UNKNOWN_ID        0xffffff
+#define FLASH_MX25R8035F_ID 0x1428C2
+#define FLASH_XT25F08B_ID 0x14400B
+#define FLASH_UNKNOWN_ID 0xffffff
 
 /******************************************************************************
 *******************************************************************************
@@ -139,31 +133,28 @@ static osaSemaphoreId_t       mExtEepromSemaphoreId;
 static ee_err_t EEPROM_PrepareForWrite(uint32_t NoOfBytes, uint32_t Addr);
 #endif
 #if gEepromWriteEnable_d
-static ee_err_t EEPROM_WritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t *Outbuf);
-static void     EEPROM_WriteEnable(void);
+static ee_err_t EEPROM_WritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t * Outbuf);
+static void EEPROM_WriteEnable(void);
 #endif
 static uint32_t EEPROM_ReadStatusReq(void);
 static uint32_t EEPROM_ReadIDReq(void);
 static uint32_t EEPROM_ReadResReq(void);
 
-
-
-#define MX25_SR_WIP_POS 0     /* Write In Progress */
-#define MX25_SR_WEL_POS 1     /* Write Enable Latch */
-#define MX25_SR_BP_POS 2      /* Level of Protected block  */
+#define MX25_SR_WIP_POS 0 /* Write In Progress */
+#define MX25_SR_WEL_POS 1 /* Write Enable Latch */
+#define MX25_SR_BP_POS 2  /* Level of Protected block  */
 #define MX25_SR_BP_WIDTH 4
-#define MX25_SR_BP_MASK       (((1<<MX25_SR_BP_WIDTH)-1) << MX25_SR_BP_POS)
-#define MX25_SR_QE_POS 6      /* Non Volatile  */
+#define MX25_SR_BP_MASK (((1 << MX25_SR_BP_WIDTH) - 1) << MX25_SR_BP_POS)
+#define MX25_SR_QE_POS 6 /* Non Volatile  */
 
+#define MX25_CR1_TB_POS 3 /* Top-Bottom protection selected */
+#define MX25_CR1_DC_POS 6 /* Dummy Cycle */
 
-#define MX25_CR1_TB_POS 3     /* Top-Bottom protection selected */
-#define MX25_CR1_DC_POS 6     /* Dummy Cycle */
+#define MX25_CR2_LH_POS 1 /* LowPower / HighPerformance  */
 
-#define MX25_CR2_LH_POS 1      /* LowPower / HighPerformance  */
+#define MX25R8035_CFG_STATUS_QUAD_MODE BIT(MX25_SR_QE_POS)
 
-#define MX25R8035_CFG_STATUS_QUAD_MODE   BIT(MX25_SR_QE_POS)
-
-#define MX25R8035_CFG_REG2_HI_PERF_MODE  (BIT(MX25_CR2_LH_POS) << 16)
+#define MX25R8035_CFG_REG2_HI_PERF_MODE (BIT(MX25_CR2_LH_POS) << 16)
 
 /*! *********************************************************************************
 *************************************************************************************
@@ -174,25 +165,34 @@ static uint32_t EEPROM_ReadResReq(void);
 static uint8_t initialized = 0;
 
 static spifi_command_t command[CMD_SPIFI_NUM] = {
-    {EEPROM_PAGE_SIZE, false, kSPIFI_DataInput,  1, kSPIFI_CommandDataQuad,     kSPIFI_CommandOpcodeAddrThreeBytes, EEPROM_DREAD},       /* DREAD (1I/2O)*/
-    {EEPROM_PAGE_SIZE, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeAddrThreeBytes, EEPROM_WRITE_PAGE},  /* pp  (dual page program)*/
-    {EEPROM_PAGE_SIZE, false, kSPIFI_DataInput,  1, kSPIFI_CommandDataQuad,     kSPIFI_CommandOpcodeAddrThreeBytes, EEPROM_QREAD},       /* QREAD (1I/4O) */
-    {EEPROM_PAGE_SIZE, false, kSPIFI_DataOutput, 0, kSPIFI_CommandOpcodeSerial, kSPIFI_CommandOpcodeAddrThreeBytes, EEPROM_WRITE_QPAGE}, /* 4PP (quad page program) */
-    {               1, false, kSPIFI_DataInput,  0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeOnly,           EEPROM_RDSR},        /* Read status register */
-    {               0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeAddrThreeBytes, EEPROM_ERASE_4K},    /* Sector erase */
-    {               0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeAddrThreeBytes, EEPROM_ERASE_32K},   /* Block 32k erase */
-    {               0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeOnly,           EEPROM_ERASE_ALL},   /* Chip erase */
-    {               0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeOnly,           EEPROM_WREN},        /* Write enable */
-    {               3, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeOnly,           EEPROM_WRSR},        /* Write Status register */
-    {               0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeAddrThreeBytes, EEPROM_ERASE_64K},   /* Block 64k erase */
-    {               3, false, kSPIFI_DataInput,  0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeOnly,           EEPROM_RDID},        /* Read ID register */
-    {               0, false, kSPIFI_DataInput,  0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeOnly,           EEPROM_DP},          /* Low Power */
-    {               4, false, kSPIFI_DataInput,  0, kSPIFI_CommandAllSerial,    kSPIFI_CommandOpcodeOnly,           EEPROM_RES},         /* Read  Electronic Signature */
+    { EEPROM_PAGE_SIZE, false, kSPIFI_DataInput, 1, kSPIFI_CommandDataQuad, kSPIFI_CommandOpcodeAddrThreeBytes,
+      EEPROM_DREAD }, /* DREAD (1I/2O)*/
+    { EEPROM_PAGE_SIZE, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeAddrThreeBytes,
+      EEPROM_WRITE_PAGE }, /* pp  (dual page program)*/
+    { EEPROM_PAGE_SIZE, false, kSPIFI_DataInput, 1, kSPIFI_CommandDataQuad, kSPIFI_CommandOpcodeAddrThreeBytes,
+      EEPROM_QREAD }, /* QREAD (1I/4O) */
+    { EEPROM_PAGE_SIZE, false, kSPIFI_DataOutput, 0, kSPIFI_CommandOpcodeSerial, kSPIFI_CommandOpcodeAddrThreeBytes,
+      EEPROM_WRITE_QPAGE },                                                                            /* 4PP (quad page program) */
+    { 1, false, kSPIFI_DataInput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeOnly, EEPROM_RDSR }, /* Read status register */
+    { 0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeAddrThreeBytes,
+      EEPROM_ERASE_4K }, /* Sector erase */
+    { 0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeAddrThreeBytes,
+      EEPROM_ERASE_32K },                                                                                    /* Block 32k erase */
+    { 0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeOnly, EEPROM_ERASE_ALL }, /* Chip erase */
+    { 0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeOnly, EEPROM_WREN },      /* Write enable */
+    { 3, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeOnly, EEPROM_WRSR }, /* Write Status register */
+    { 0, false, kSPIFI_DataOutput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeAddrThreeBytes,
+      EEPROM_ERASE_64K },                                                                              /* Block 64k erase */
+    { 3, false, kSPIFI_DataInput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeOnly, EEPROM_RDID }, /* Read ID register */
+    { 0, false, kSPIFI_DataInput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeOnly, EEPROM_DP },   /* Low Power */
+    { 4, false, kSPIFI_DataInput, 0, kSPIFI_CommandAllSerial, kSPIFI_CommandOpcodeOnly,
+      EEPROM_RES }, /* Read  Electronic Signature */
 
-};       /* Write status register */
+}; /* Write status register */
 
 #if defined gFlashBlockBitmap_d
-typedef struct {
+typedef struct
+{
     uint8_t EraseBitmap[gEepromParams_TotalSize_c / EEPROM_SECTOR_SIZE / 8];
 } EepromContext_t;
 
@@ -212,20 +212,19 @@ static uint32_t eEpromFlashID = FLASH_UNKNOWN_ID;
 ********************************************************************************** */
 
 /*! *********************************************************************************
-* \brief   This function initializes external memory.
-*
-* \return MEM_SUCCESS_c if initialization is successful. (It's always successful).
-*
-********************************************************************************** */
+ * \brief   This function initializes external memory.
+ *
+ * \return MEM_SUCCESS_c if initialization is successful. (It's always successful).
+ *
+ ********************************************************************************** */
 ee_err_t EEPROM_Init(void)
 {
-    ee_err_t status = ee_ok;
+    ee_err_t status     = ee_ok;
     bool_t resReqCalled = FALSE;
 
-    if( (mExtEepromSemaphoreId == NULL)
-    		&& ((mExtEepromSemaphoreId = OSA_SemaphoreCreate(1)) == NULL))
+    if ((mExtEepromSemaphoreId == NULL) && ((mExtEepromSemaphoreId = OSA_SemaphoreCreate(1)) == NULL))
     {
-        panic( ID_PANIC(0,0), (uint32_t)EEPROM_Init, 0, 0 );
+        panic(ID_PANIC(0, 0), (uint32_t) EEPROM_Init, 0, 0);
     }
 
 #if defined gFlashBlockBitmap_d
@@ -242,7 +241,7 @@ ee_err_t EEPROM_Init(void)
     {
         EEPROM_DBG_LOG("");
 
-        spifi_config_t config = {0};
+        spifi_config_t config = { 0 };
 
         /* Enable DIOs */
         BOARD_InitSPIFI();
@@ -265,45 +264,42 @@ ee_err_t EEPROM_Init(void)
              */
             EEPROM_ReadResReq();
             eEpromFlashID = EEPROM_ReadIDReq();
-            resReqCalled = TRUE;
+            resReqCalled  = TRUE;
         }
 
         switch (eEpromFlashID)
         {
-            case FLASH_XT25F08B_ID:
-                /* Read the Electronic Signature
-                 * It allows to release from Power-Down in case of FLASH_XT25F08B_ID
-                 */
-                if (!resReqCalled)
-                {
-                    EEPROM_ReadResReq();
-                }
-                command[CMD_SPIFI_WRITE_REGISTER].dataLen = 2;
-                SPIFI_SetCommand(SPIFI, &command[CMD_SPIFI_WRITE_REGISTER]);
-                SPIFI_WriteDataHalfword(SPIFI, 0x0200);
-                break;
-            case FLASH_MX25R8035F_ID:
+        case FLASH_XT25F08B_ID:
+            /* Read the Electronic Signature
+             * It allows to release from Power-Down in case of FLASH_XT25F08B_ID
+             */
+            if (!resReqCalled)
             {
-                SPIFI_SetCommand(SPIFI, &command[CMD_SPIFI_WRITE_REGISTER]);
-                /* Enable ultra low power mode */
-                uint32_t cfg_word = 0x000000; /* 24 bit register */
-
-                if (config.dualMode == kSPIFI_QuadMode)
-                {
-                    /* insert dummy cycles for Quad mode operation */
-                    cfg_word |= MX25R8035_CFG_STATUS_QUAD_MODE;
-                }
-#ifdef gSpiFiHiPerfMode_d
-                cfg_word |= MX25R8035_CFG_REG2_HI_PERF_MODE;
-#endif
-                SPIFI_WritePartialWord(SPIFI,
-                                       cfg_word,
-                                       command[CMD_SPIFI_WRITE_REGISTER].dataLen);
+                EEPROM_ReadResReq();
             }
+            command[CMD_SPIFI_WRITE_REGISTER].dataLen = 2;
+            SPIFI_SetCommand(SPIFI, &command[CMD_SPIFI_WRITE_REGISTER]);
+            SPIFI_WriteDataHalfword(SPIFI, 0x0200);
             break;
-            default:
-                status = ee_error;
-                break;
+        case FLASH_MX25R8035F_ID: {
+            SPIFI_SetCommand(SPIFI, &command[CMD_SPIFI_WRITE_REGISTER]);
+            /* Enable ultra low power mode */
+            uint32_t cfg_word = 0x000000; /* 24 bit register */
+
+            if (config.dualMode == kSPIFI_QuadMode)
+            {
+                /* insert dummy cycles for Quad mode operation */
+                cfg_word |= MX25R8035_CFG_STATUS_QUAD_MODE;
+            }
+#ifdef gSpiFiHiPerfMode_d
+            cfg_word |= MX25R8035_CFG_REG2_HI_PERF_MODE;
+#endif
+            SPIFI_WritePartialWord(SPIFI, cfg_word, command[CMD_SPIFI_WRITE_REGISTER].dataLen);
+        }
+        break;
+        default:
+            status = ee_error;
+            break;
         }
 
         if (status != ee_ok)
@@ -316,19 +312,20 @@ ee_err_t EEPROM_Init(void)
         {
             initialized = 1;
         }
-        while (EEPROM_isBusy());
+        while (EEPROM_isBusy())
+            ;
     }
 
     return status;
 }
 
 /******************************************************************************
-* NAME: EEPROM_DeInit
-* DESCRIPTION: De-Initializes the EEPROM peripheral
-* PARAMETERS: None
-* RETURN: ee_ok - if the EEPROM has been de-initialized successfully
-*         ee_error - otherwise
-******************************************************************************/
+ * NAME: EEPROM_DeInit
+ * DESCRIPTION: De-Initializes the EEPROM peripheral
+ * PARAMETERS: None
+ * RETURN: ee_ok - if the EEPROM has been de-initialized successfully
+ *         ee_error - otherwise
+ ******************************************************************************/
 ee_err_t EEPROM_DeInit(void)
 {
     if (initialized)
@@ -348,11 +345,11 @@ ee_err_t EEPROM_DeInit(void)
 }
 
 /*! *********************************************************************************
-* \brief   Erase all memory to 0xFF
-*
-* \return ee_err_t.
-*
-********************************************************************************** */
+ * \brief   Erase all memory to 0xFF
+ *
+ * \return ee_err_t.
+ *
+ ********************************************************************************** */
 #if gEepromWriteEnable_d
 ee_err_t EEPROM_ChipErase(void)
 {
@@ -366,7 +363,8 @@ ee_err_t EEPROM_ChipErase(void)
 
     /* Wait for idle state : check before operation in order to let previous
      * operation terminate rather than blocking */
-    while (EEPROM_isBusy());
+    while (EEPROM_isBusy())
+        ;
 
     /* Enable write */
     EEPROM_WriteEnable();
@@ -384,20 +382,19 @@ ee_err_t EEPROM_ChipErase(void)
     }
 #endif
 
-
     return ee_ok;
 }
 #endif
 
 /*! *********************************************************************************
-* \brief   Erase a block of memory to 0xFF
-*
-* \param[in] Addr      Start memory address
-* \param[in] size      The size of the block: either 4096 or 32768
-*
-* \return ee_err_t.
-*
-********************************************************************************** */
+ * \brief   Erase a block of memory to 0xFF
+ *
+ * \param[in] Addr      Start memory address
+ * \param[in] size      The size of the block: either 4096 or 32768
+ *
+ * \return ee_err_t.
+ *
+ ********************************************************************************** */
 #if gEepromWriteEnable_d
 ee_err_t EEPROM_EraseBlock(uint32_t Addr, uint32_t block_size)
 {
@@ -410,7 +407,8 @@ ee_err_t EEPROM_EraseBlock(uint32_t Addr, uint32_t block_size)
 
     OSA_SemaphoreWait(mExtEepromSemaphoreId, osaWaitForever_c);
 
-    while (EEPROM_isBusy());
+    while (EEPROM_isBusy())
+        ;
 
     EEPROM_WriteEnable();
 
@@ -423,17 +421,17 @@ ee_err_t EEPROM_EraseBlock(uint32_t Addr, uint32_t block_size)
 #endif
         break;
     case EEPROM_BLOCK_SIZE:
-            cmd = CMD_SPIFI_ERASE_BLOCK_32K;
+        cmd = CMD_SPIFI_ERASE_BLOCK_32K;
 #if defined gFlashBlockBitmap_d
-            mHandle.EraseBitmap[i] = 0xFF;
+        mHandle.EraseBitmap[i] = 0xFF;
 #endif
         break;
     case EEPROM_BLOCK2_SIZE:
         cmd = CMD_SPIFI_ERASE_BLOCK_64K;
 #if defined gFlashBlockBitmap_d
-        i = Addr/(block_size/2);
-        mHandle.EraseBitmap[i] = 0xFF;
-        mHandle.EraseBitmap[i+1] = 0xFF;
+        i                          = Addr / (block_size / 2);
+        mHandle.EraseBitmap[i]     = 0xFF;
+        mHandle.EraseBitmap[i + 1] = 0xFF;
 #endif
         break;
     default:
@@ -452,18 +450,17 @@ ee_err_t EEPROM_EraseBlock(uint32_t Addr, uint32_t block_size)
     return ee_ok;
 }
 
-
-ee_err_t EEPROM_EraseArea(uint32_t *Addr, int32_t *size, bool non_blocking)
+ee_err_t EEPROM_EraseArea(uint32_t * Addr, int32_t * size, bool non_blocking)
 {
     ee_err_t status = ee_error;
     uint32_t sz;
-    int32_t remain_sz = (int32_t)*size;
+    int32_t remain_sz   = (int32_t) *size;
     uint32_t erase_addr = *Addr;
 
     EEPROM_DBG_LOG("");
 
-
-    do {
+    do
+    {
         bool skip = false;
 
 #if defined gFlashBlockBitmap_d
@@ -481,7 +478,7 @@ ee_err_t EEPROM_EraseArea(uint32_t *Addr, int32_t *size, bool non_blocking)
             break;
         }
         erase_addr = SECTOR_ADDR(Addr);
-        for (erase_addr = *Addr; remain_sz > 0; )
+        for (erase_addr = *Addr; remain_sz > 0;)
         {
             OSA_SemaphoreWait(mExtEepromSemaphoreId, osaWaitForever_c);
 
@@ -499,13 +496,13 @@ ee_err_t EEPROM_EraseArea(uint32_t *Addr, int32_t *size, bool non_blocking)
 #endif
             sz = EEPROM_SECTOR_SIZE;
 
-            if ((IS_BLOCK2_ALIGNED(erase_addr) && (remain_sz >= EEPROM_BLOCK2_SIZE)))  /* EEPROM_BLOCK_SIZE*2 */
+            if ((IS_BLOCK2_ALIGNED(erase_addr) && (remain_sz >= EEPROM_BLOCK2_SIZE))) /* EEPROM_BLOCK_SIZE*2 */
             {
 #if defined gFlashBlockBitmap_d
                 if ((mHandle.EraseBitmap[block_nb]) != 0xff)
                 {
                     sz = EEPROM_BLOCK_SIZE;
-                    if ((mHandle.EraseBitmap[block_nb+1]) != 0xff) /* group 2 consecutive 32k blocks in one single 64k block */
+                    if ((mHandle.EraseBitmap[block_nb + 1]) != 0xff) /* group 2 consecutive 32k blocks in one single 64k block */
                         sz += EEPROM_BLOCK_SIZE;
                 }
                 else
@@ -517,20 +514,19 @@ ee_err_t EEPROM_EraseArea(uint32_t *Addr, int32_t *size, bool non_blocking)
             else if ((IS_BLOCK_ALIGNED(erase_addr) && (remain_sz >= EEPROM_BLOCK_SIZE))) /* EEPROM_BLOCK_SIZE */
             {
 #if defined gFlashBlockBitmap_d
-                if ((mHandle.EraseBitmap[block_nb] ) == 0)
+                if ((mHandle.EraseBitmap[block_nb]) == 0)
                     sz = EEPROM_BLOCK_SIZE;
                 else
                     skip = true;
 #else
                 sz = EEPROM_BLOCK_SIZE;
 #endif /* gFlashBlockBitmap_d */
-
             }
             else /* necessarily 4k aligned */
             {
 #if defined gFlashBlockBitmap_d
                 sect_nb = SECTOR_NUMBER(erase_addr);
-                if ((mHandle.EraseBitmap[block_nb] & (1 << (sect_nb%8) ) ) == 0)
+                if ((mHandle.EraseBitmap[block_nb] & (1 << (sect_nb % 8))) == 0)
                     sz = EEPROM_SECTOR_SIZE;
                 else
                     skip = true;
@@ -541,7 +537,8 @@ ee_err_t EEPROM_EraseArea(uint32_t *Addr, int32_t *size, bool non_blocking)
             {
                 EEPROM_DBG_LOG("Erasing block Addr=%x sz=%d", erase_addr, sz);
                 status = EEPROM_EraseBlock(erase_addr, sz);
-                if (status != ee_ok) break;
+                if (status != ee_ok)
+                    break;
             }
             erase_addr += sz;
             remain_sz -= sz;
@@ -556,37 +553,40 @@ ee_err_t EEPROM_EraseArea(uint32_t *Addr, int32_t *size, bool non_blocking)
 
 ee_err_t EEPROM_EraseNextBlock(uint32_t Addr, uint32_t size)
 {
-    ee_err_t status = ee_error;
-    uint8_t alignment = 0;
+    ee_err_t status     = ee_error;
+    uint8_t alignment   = 0;
     uint32_t block_size = EEPROM_SECTOR_SIZE;
     uint32_t erase_addr;
     EEPROM_DBG_LOG("");
 
-    do {
-        if (size<=EEPROM_SECTOR_SIZE)
+    do
+    {
+        if (size <= EEPROM_SECTOR_SIZE)
         {
             block_size = EEPROM_SECTOR_SIZE;
-            alignment = 12;
+            alignment  = 12;
         }
-        else if (size<=EEPROM_BLOCK_SIZE)
+        else if (size <= EEPROM_BLOCK_SIZE)
         {
             block_size = EEPROM_BLOCK_SIZE;
-            alignment = 15;
+            alignment  = 15;
         }
         else
         {
             block_size = EEPROM_BLOCK2_SIZE;
-            alignment = 16;
+            alignment  = 16;
         }
         erase_addr = Addr;
-        erase_addr = ((erase_addr + (block_size-1)) >> alignment << alignment);
+        erase_addr = ((erase_addr + (block_size - 1)) >> alignment << alignment);
         if ((size != 0) && (erase_addr < (Addr + size)))
         {
             status = EEPROM_EraseBlock(erase_addr, block_size);
-            if (status != ee_ok) break;
-            //while (EEPROM_isBusy());
+            if (status != ee_ok)
+                break;
+            // while (EEPROM_isBusy());
         }
-        status = ee_ok;;
+        status = ee_ok;
+        ;
     } while (0);
     return status;
 }
@@ -595,7 +595,7 @@ ee_err_t EEPROM_SectorAlignmentAfterReset(uint32_t Addr)
 {
     ee_err_t status = ee_error;
 #if gEepromSupportReset
-    uint32_t nbBytesToCopy =0;
+    uint32_t nbBytesToCopy = 0;
     do
     {
         /* The address given should be aligned on EEPROM_PAGE_SIZE */
@@ -606,13 +606,13 @@ ee_err_t EEPROM_SectorAlignmentAfterReset(uint32_t Addr)
         if (nbBytesToCopy != 0)
         {
             /* copy only the necessary bytes in RAM*/
-            if (EEPROM_ReadData(nbBytesToCopy, Addr-nbBytesToCopy, sectorRamBuffer) != ee_ok)
+            if (EEPROM_ReadData(nbBytesToCopy, Addr - nbBytesToCopy, sectorRamBuffer) != ee_ok)
                 break;
             /* Erase the sector */
-            if (EEPROM_EraseBlock(Addr-nbBytesToCopy, EEPROM_SECTOR_SIZE) != ee_ok)
+            if (EEPROM_EraseBlock(Addr - nbBytesToCopy, EEPROM_SECTOR_SIZE) != ee_ok)
                 break;
             /* Write the necessary bytes */
-            if (EEPROM_WriteData(nbBytesToCopy, Addr-nbBytesToCopy, sectorRamBuffer) != ee_ok)
+            if (EEPROM_WriteData(nbBytesToCopy, Addr - nbBytesToCopy, sectorRamBuffer) != ee_ok)
                 break;
         }
         status = ee_ok;
@@ -624,17 +624,17 @@ ee_err_t EEPROM_SectorAlignmentAfterReset(uint32_t Addr)
 #endif /* gEepromWriteEnable_d */
 
 /*! *********************************************************************************
-* \brief   Write a data buffer into the external memory, at a given address
-*
-* \param[in] NoOfBytes Number of bytes to write
-* \param[in] Addr      Start memory address
-* \param[in] inbuf     Pointer to the data
-*
-* \return ee_err_t.
-*
-********************************************************************************** */
+ * \brief   Write a data buffer into the external memory, at a given address
+ *
+ * \param[in] NoOfBytes Number of bytes to write
+ * \param[in] Addr      Start memory address
+ * \param[in] inbuf     Pointer to the data
+ *
+ * \return ee_err_t.
+ *
+ ********************************************************************************** */
 #if gEepromWriteEnable_d
-ee_err_t EEPROM_WriteData(uint32_t NoOfBytes, uint32_t Addr, uint8_t *Outbuf)
+ee_err_t EEPROM_WriteData(uint32_t NoOfBytes, uint32_t Addr, uint8_t * Outbuf)
 {
     ee_err_t retval = ee_ok;
 
@@ -679,10 +679,11 @@ void EEPROM_SetRead(void)
 
     OSA_SemaphoreWait(mExtEepromSemaphoreId, osaWaitForever_c);
 
-    while (EEPROM_isBusy());
+    while (EEPROM_isBusy())
+        ;
 
     /* Set start address */
-    SPIFI_SetCommandAddress(SPIFI, FSL_FEATURE_SPIFI_START_ADDR );
+    SPIFI_SetCommandAddress(SPIFI, FSL_FEATURE_SPIFI_START_ADDR);
 
     /* Enable read */
     if (CHIP_USING_SPIFI_DUAL_MODE())
@@ -697,24 +698,23 @@ void EEPROM_SetRead(void)
     OSA_SemaphorePost(mExtEepromSemaphoreId);
 }
 
-
-
 /*! *********************************************************************************
-* \brief   Reads a data buffer from the external memory, from a given address
-*
-* \param[in] NoOfBytes Number of bytes to read
-* \param[in] Addr      Start memory address
-* \param[in] inbuf     Pointer to a location where to store the read data
-*
-* \return ee_err_t.
-*
-********************************************************************************** */
-ee_err_t EEPROM_ReadData(uint16_t NoOfBytes, uint32_t Addr, uint8_t *inbuf)
+ * \brief   Reads a data buffer from the external memory, from a given address
+ *
+ * \param[in] NoOfBytes Number of bytes to read
+ * \param[in] Addr      Start memory address
+ * \param[in] inbuf     Pointer to a location where to store the read data
+ *
+ * \return ee_err_t.
+ *
+ ********************************************************************************** */
+ee_err_t EEPROM_ReadData(uint16_t NoOfBytes, uint32_t Addr, uint8_t * inbuf)
 {
 
     OSA_SemaphoreWait(mExtEepromSemaphoreId, osaWaitForever_c);
 
-    while (EEPROM_isBusy());
+    while (EEPROM_isBusy())
+        ;
 
     /* Set start address */
     SPIFI_SetCommandAddress(SPIFI, FSL_FEATURE_SPIFI_START_ADDR + Addr);
@@ -728,9 +728,9 @@ ee_err_t EEPROM_ReadData(uint16_t NoOfBytes, uint32_t Addr, uint8_t *inbuf)
     {
         SPIFI_SetMemoryCommand(SPIFI, &command[CMD_SPIFI_QREAD]);
     }
-    uint8_t * flash_addr = (uint8_t*)(FSL_FEATURE_SPIFI_START_ADDR + Addr);
+    uint8_t * flash_addr = (uint8_t *) (FSL_FEATURE_SPIFI_START_ADDR + Addr);
 
-    FLib_MemCpy((void *)inbuf, (void *)flash_addr, NoOfBytes);
+    FLib_MemCpy((void *) inbuf, (void *) flash_addr, NoOfBytes);
 
     /* Reset the SPIFI to switch to command mode */
     SPIFI_ResetCommand(SPIFI);
@@ -740,14 +740,12 @@ ee_err_t EEPROM_ReadData(uint16_t NoOfBytes, uint32_t Addr, uint8_t *inbuf)
     return ee_ok;
 }
 
-
-
 /*! *********************************************************************************
-* \brief   Check if the memory controller is busy
-*
-* \return TRUE/FALSE.
-*
-********************************************************************************** */
+ * \brief   Check if the memory controller is busy
+ *
+ * \return TRUE/FALSE.
+ *
+ ********************************************************************************** */
 uint8_t EEPROM_isBusy(void)
 {
     return (EEPROM_ReadStatusReq() & EEPROM_BUSY_FLAG_MASK) == EEPROM_BUSY_FLAG_MASK;
@@ -760,11 +758,11 @@ uint8_t EEPROM_isBusy(void)
 ********************************************************************************** */
 
 /*! *********************************************************************************
-* \brief   Read the memory controller status register
-*
-* \return status register.
-*
-********************************************************************************** */
+ * \brief   Read the memory controller status register
+ *
+ * \return status register.
+ *
+ ********************************************************************************** */
 static uint32_t EEPROM_ReadStatusReq(void)
 {
     SPIFI_SetCommand(SPIFI, &command[CMD_SPIFI_GET_STATUS]);
@@ -775,11 +773,11 @@ static uint32_t EEPROM_ReadStatusReq(void)
 }
 
 /*! *********************************************************************************
-* \brief   Read ID register
-*
-* \return ID register.
-*
-********************************************************************************** */
+ * \brief   Read ID register
+ *
+ * \return ID register.
+ *
+ ********************************************************************************** */
 static uint32_t EEPROM_ReadIDReq(void)
 {
     SPIFI_SetCommand(SPIFI, &command[CMD_SPIFI_READ_ID]);
@@ -790,11 +788,11 @@ static uint32_t EEPROM_ReadIDReq(void)
 }
 
 /*! *********************************************************************************
-* \brief   Read Electronic Signature
-*
-* \return Electronic Signature.
-*
-********************************************************************************** */
+ * \brief   Read Electronic Signature
+ *
+ * \return Electronic Signature.
+ *
+ ********************************************************************************** */
 static uint32_t EEPROM_ReadResReq(void)
 {
     uint32_t result = 0;
@@ -812,9 +810,9 @@ static uint32_t EEPROM_ReadResReq(void)
 }
 
 /*! *********************************************************************************
-* \brief   Enabled Write/Erase access for the next operation
-*
-********************************************************************************** */
+ * \brief   Enabled Write/Erase access for the next operation
+ *
+ ********************************************************************************** */
 #if gEepromWriteEnable_d
 static void EEPROM_WriteEnable(void)
 {
@@ -823,14 +821,14 @@ static void EEPROM_WriteEnable(void)
 #endif /* gEepromWriteEnable_d */
 
 /*! *********************************************************************************
-* \brief   Prepare the memory for write operations (bits must be in erased state)
-*
-* \param[in] NoOfBytes Number of bytes to write
-* \param[in] Addr      Start memory address
-*
-* \return ee_err_t.
-*
-********************************************************************************** */
+ * \brief   Prepare the memory for write operations (bits must be in erased state)
+ *
+ * \param[in] NoOfBytes Number of bytes to write
+ * \param[in] Addr      Start memory address
+ *
+ * \return ee_err_t.
+ *
+ ********************************************************************************** */
 #if (gFlashEraseDuringWrite == 1)
 static ee_err_t EEPROM_PrepareForWrite(uint32_t NoOfBytes, uint32_t Addr)
 {
@@ -845,7 +843,7 @@ static ee_err_t EEPROM_PrepareForWrite(uint32_t NoOfBytes, uint32_t Addr)
     /* Check if each sector needs erase */
     for (i = startBlk; i <= endBlk; i++)
     {
-        if ((mHandle.EraseBitmap[i/8] & (1 << (i%8) ) ) == 0)
+        if ((mHandle.EraseBitmap[i / 8] & (1 << (i % 8))) == 0)
         {
             ret = EEPROM_EraseBlock(i * EEPROM_SECTOR_SIZE, EEPROM_SECTOR_SIZE);
 
@@ -860,10 +858,9 @@ static ee_err_t EEPROM_PrepareForWrite(uint32_t NoOfBytes, uint32_t Addr)
 }
 #endif /* (gFlashEraseDuringWrite == 1) */
 
-
 #if gEepromWriteEnable_d
 
-void EepromWritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t *Outbuf)
+void EepromWritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t * Outbuf)
 {
     EEPROM_DBG_LOG("Addr=%x", Addr);
 #ifdef gFlashBlockBitmap_d
@@ -877,7 +874,7 @@ void EepromWritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t *Outbuf)
     /* Mark  each sector as written */
     for (sector_index = startBlk; sector_index <= endBlk; sector_index++)
     {
-        mHandle.EraseBitmap[sector_index/8] &= ~ (1 << (sector_index%8));
+        mHandle.EraseBitmap[sector_index / 8] &= ~(1 << (sector_index % 8));
     }
 #endif /* gFlashBlockBitmap_d */
 
@@ -902,16 +899,16 @@ void EepromWritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t *Outbuf)
 }
 
 /*! *********************************************************************************
-* \brief   Writes maximum 256 bytes into a memory page
-*
-* \param[in] NoOfBytes Number of bytes to write into thr page
-* \param[in] Addr      Start memory address
-* \param[in] Outbuf    Pointer to the data to be written
-*
-* \return ee_err_t.
-*
-********************************************************************************** */
-static ee_err_t EEPROM_WritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t *Outbuf)
+ * \brief   Writes maximum 256 bytes into a memory page
+ *
+ * \param[in] NoOfBytes Number of bytes to write into thr page
+ * \param[in] Addr      Start memory address
+ * \param[in] Outbuf    Pointer to the data to be written
+ *
+ * \return ee_err_t.
+ *
+ ********************************************************************************** */
+static ee_err_t EEPROM_WritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t * Outbuf)
 {
     EEPROM_DBG_LOG("");
 
@@ -919,7 +916,8 @@ static ee_err_t EEPROM_WritePage(uint32_t NoOfBytes, uint32_t Addr, uint8_t *Out
     {
         OSA_SemaphoreWait(mExtEepromSemaphoreId, osaWaitForever_c);
 
-        while (EEPROM_isBusy());
+        while (EEPROM_isBusy())
+            ;
 
         OSA_SemaphorePost(mExtEepromSemaphoreId);
 
