@@ -43,47 +43,47 @@ NAMESPACE_IPV6_ADDR=fc00::a
 
 function run_setup() {
   # Create namespace.
-  ip netns add ${NAMESPACE}
+  ip netns add "$NAMESPACE"
 
   # Create two virtual interfaces and link them - one on host side, one on namespace side.
-  ip link add ${HOST_SIDE_IF_NAME} type veth peer name ${NAMESPACE_SIDE_IF_NAME}
+  ip link add "$HOST_SIDE_IF_NAME" type veth peer name "$NAMESPACE_SIDE_IF_NAME"
 
   # Give the host a known IPv6 addr and set the host side up
-  ip -6 addr add ${HOST_IPV6_ADDR}/64 dev ${HOST_SIDE_IF_NAME}
-  ip link set ${HOST_SIDE_IF_NAME} up
+  ip -6 addr add "$HOST_IPV6_ADDR"/64 dev "$HOST_SIDE_IF_NAME"
+  ip link set "$HOST_SIDE_IF_NAME" up
 
   # Associate namespace IF with the namespace
-  ip link set ${NAMESPACE_SIDE_IF_NAME} netns ${NAMESPACE}
+  ip link set "$NAMESPACE_SIDE_IF_NAME" netns "$NAMESPACE"
 
   # Give the namespace IF an address (something nothing else is using) and set it up
   echo "Adding address for namespace IF"
-  ip netns exec ${NAMESPACE} ip -6 addr add ${NAMESPACE_IPV6_ADDR}/64 dev ${NAMESPACE_SIDE_IF_NAME}
-  ip netns exec ${NAMESPACE} ip link set dev ${NAMESPACE_SIDE_IF_NAME} up
+  ip netns exec "$NAMESPACE" ip -6 addr add "$NAMESPACE_IPV6_ADDR"/64 dev "$NAMESPACE_SIDE_IF_NAME"
+  ip netns exec "$NAMESPACE" ip link set dev "$NAMESPACE_SIDE_IF_NAME" up
 
   # Add a route to the namespace to go through the bridge
   echo "Setting routes for namespace"
-  ip netns exec ${NAMESPACE} ip -6 route add default dev ${NAMESPACE_SIDE_IF_NAME}
+  ip netns exec "$NAMESPACE" ip -6 route add default dev "$NAMESPACE_SIDE_IF_NAME"
 
   echo "Setup complete."
 }
 
 function run_add_ipv4() {
   # Give the namespace an IPv4 address
-  ip netns exec ${NAMESPACE} ip addr add ${NAMESPACE_ADDR}/24 dev ${NAMESPACE_SIDE_IF_NAME}
+  ip netns exec "$NAMESPACE" ip addr add "$NAMESPACE_ADDR"/24 dev "$NAMESPACE_SIDE_IF_NAME"
 
   # Add a bridge, give it an address (something nothing else is using)
   echo "Setting up bridge"
-  ip link add name ${BRIDGE_NAME} type bridge
-  ip -6 addr add ${BRIDGE_IPV6_ADDR}/64 dev ${BRIDGE_NAME}
-  ip addr add ${BRIDGE_ADDR}/24 brd + dev ${BRIDGE_NAME}
+  ip link add name "$BRIDGE_NAME" type bridge
+  ip -6 addr add "$BRIDGE_IPV6_ADDR"/64 dev "$BRIDGE_NAME"
+  ip addr add "$BRIDGE_ADDR"/24 brd + dev "$BRIDGE_NAME"
 
   # For ipv6 and ipv4 to work together, need the bridge to ignore the ipv6 packets (DROP here means don't bridge)
-  ebtables-legacy -t broute -A BROUTING -p ipv6 -j DROP -i ${HOST_SIDE_IF_NAME}
-  ip link set ${BRIDGE_NAME} up
+  ebtables-legacy -t broute -A BROUTING -p ipv6 -j DROP -i "$HOST_SIDE_IF_NAME"
+  ip link set "$BRIDGE_NAME" up
 
   # Connect the host side to the bridge, so now we have bridge <-> host_side_if <-> namespace_if
   echo "Connecting host virtual IF to bridge"
-  ip link set ${HOST_SIDE_IF_NAME} master ${BRIDGE_NAME}
+  ip link set "$HOST_SIDE_IF_NAME" master "$BRIDGE_NAME"
 
   #ip netns exec ${NAMESPACE} ip route add default via ${BRIDGE_ADDR} dev ${NAMESPACE_SIDE_IF_NAME}
 }
@@ -91,20 +91,20 @@ function run_add_ipv4() {
 function run_cmd() {
   # Start the app in the namespace
   echo "Running $1 in namespace."
-  ip netns exec ${NAMESPACE} $1
+  ip netns exec "$NAMESPACE" "$1"
 }
 
 function run_cleanup() {
   # Deleting the namespace will remove the namespace and peer'd interfaces to
   have_ebtables_legacy=$1
-  ip netns delete ${NAMESPACE}
-  if ifconfig | grep ${BRIDGE_NAME}; then
-    if [ $have_ebtables_legacy = true ]; then
+  ip netns delete "$NAMESPACE"
+  if ifconfig | grep "$BRIDGE_NAME"; then
+    if [ "$have_ebtables_legacy" = true ]; then
       # Just try to drop the additional rule - it references our interface
       # so if it's there, we added it.
-      ebtables-legacy -t broute -D BROUTING -p ipv6 -j DROP -i ${HOST_SIDE_IF_NAME} >/dev/null
+      ebtables-legacy -t broute -D BROUTING -p ipv6 -j DROP -i "$HOST_SIDE_IF_NAME" >/dev/null
     fi
-    ip link delete dev ${BRIDGE_NAME} type bridge
+    ip link delete dev "$BRIDGE_NAME" type bridge
   fi
 }
 
@@ -181,13 +181,13 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-if ifconfig | grep "${HOST_SIDE_IF_NAME}"; then
+if ifconfig | grep "$HOST_SIDE_IF_NAME"; then
   issetup=true
 else
   issetup=false
 fi
 
-if [ $setup = false ] && [ $run = false ] && [ $cleanup = false ]; then
+if [ "$setup" = false ] && [ "$run" = false ] && [ "$cleanup" = false ]; then
   echo "Must specify one or more of -s, -r, -c."
   exit 1
 fi
@@ -198,36 +198,36 @@ else
   have_ebtables_legacy=false
 fi
 
-if [ $ipv4 = true ] && [ $have_ebtables_legacy = false ]; then
+if [ "$ipv4" = true ] && [ "$have_ebtables_legacy" = false ]; then
   echo "To set up namespaces with ipv4/ipv6 connectivity, ebtables-legacy"
   echo "is required. For example, to install on machines using APT:"
   echo "sudo apt-get install ebtables"
   exit 1
 fi
 
-if [ $run = true ]; then
-  if [ $issetup = false ]; then
+if [ "$run" = true ]; then
+  if [ "$issetup" = false ]; then
     setup=true
   fi
 fi
 
-if [ $setup = true ]; then
-  if [ $issetup = true ]; then
+if [ "$setup" = true ]; then
+  if [ "$issetup" = true ]; then
     cleanup=true
   fi
 fi
 
-if [ $cleanup = true ]; then
-  run_cleanup $have_ebtables_legacy
+if [ "$cleanup" = true ]; then
+  run_cleanup "$have_ebtables_legacy"
 fi
 
-if [ $setup = true ]; then
+if [ "$setup" = true ]; then
   run_setup
-  if [ $ipv4 = true ]; then
+  if [ "$ipv4" = true ]; then
     run_add_ipv4
   fi
 fi
 
-if [ $run = true ]; then
-  run_cmd $filename
+if [ "$run" = true ]; then
+  run_cmd "$filename"
 fi
