@@ -22,6 +22,7 @@ declare_args() {
   # Location of the k32w SDK.
   k32w_sdk_root = getenv("K32W_SDK_ROOT")
   chip_with_OM15082 = 0
+  chip_with_ot_cli = 0
 }
 
 assert(k32w_sdk_root != "", "k32w_sdk_root must be specified")
@@ -117,9 +118,11 @@ template("k32w_sdk") {
       "CPU_JN518X_REV=2",
       "JENNIC_CHIP_FAMILY_NAME=_JN518x",
       "gPWR_LDOMEM_0_9V_PD=0",
-      "SDK_DEBUGCONSOLE=1",
+      "SDK_DEBUGCONSOLE=0",
       "NO_SYSCORECLK_UPD=0",
       "USE_RTOS=1",
+      "USE_SDK_OSA=0",
+      "gSerialManagerMaxInterfaces_c=2",
       "FSL_RTOS_FREE_RTOS=1",
       "gTotalHeapSize_c=0xF000",
       "gUartDebugConsole_d=1",
@@ -178,6 +181,10 @@ template("k32w_sdk") {
       ]
     } else {
       defines += [ "gKBD_KeysCount_c=1" ]
+    }
+
+    if (chip_with_ot_cli == 1) {
+      defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
     }
 
     if (defined(invoker.defines)) {
@@ -264,6 +271,8 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/middleware/wireless/framework/RNG/Source/RNG.c",
       "${k32w_sdk_root}/middleware/wireless/framework/Reset/Reset.c",
       "${k32w_sdk_root}/middleware/wireless/framework/SecLib/SecLib.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/SerialManager/Source/SerialManager.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/SerialManager/Source/UART_Serial_Adapter.c",
       "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source/TMR_Adapter.c",
       "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source/TimersManager.c",
       "${k32w_sdk_root}/middleware/wireless/framework/XCVR/DK6/fsl_xcvr.c",

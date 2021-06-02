@@ -28,14 +28,6 @@
         android:text="@string/provision_thread_credentials_btn_text" />
 
     <Button
-        android:id="@+id/otCommissioningBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/commissioner_openthread_commissioning" />
-
-    <Button
         android:id="@+id/echoClientBtn"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"

@@ -30,6 +30,8 @@ public:
 
     ~Listen()
     {
+        delete onReportBinaryInputBasicPresentValueCallback;
+        delete onReportBinaryInputBasicStatusFlagsCallback;
         delete onReportColorControlCurrentHueCallback;
         delete onReportColorControlCurrentSaturationCallback;
         delete onReportColorControlCurrentXCallback;
@@ -52,6 +54,10 @@ public:
     void AddReportCallbacks(uint8_t endpointId) override
     {
         chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x000F, 0x0055,
+                                       onReportBinaryInputBasicPresentValueCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x000F, 0x006F,
+                                       onReportBinaryInputBasicStatusFlagsCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0000,
                                        onReportColorControlCurrentHueCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0001,
@@ -120,6 +126,10 @@ public:
     }
 
 private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onReportBinaryInputBasicPresentValueCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportBinaryInputBasicStatusFlagsCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentHueCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentSaturationCallback =

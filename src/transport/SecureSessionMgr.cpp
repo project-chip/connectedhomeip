@@ -134,14 +134,18 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
                                                   EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(!msgBuf.HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    // Our send path needs a (writable) PacketBuffer (e.g. so it can encode a
+    // PacketHeader into it), so get that from the EncryptedPacketBufferHandle.
+    System::PacketBufferHandle mutableBuf(std::move(msgBuf).CastToWritable());
 
     // Advancing the start to encrypted header, since SendMessage will attach the packet header on top of it.
     PacketHeader packetHeader;
-    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
+    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(mutableBuf));
 
     PayloadHeader payloadHeader;
-    return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
+    return SendMessage(session, payloadHeader, packetHeader, std::move(mutableBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsEncrypted);
 }
 
