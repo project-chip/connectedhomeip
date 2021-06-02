@@ -86,7 +86,7 @@ bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Comman
 
     if (updateToken.size() != kUpdateTokenParamLength)
     {
-        // TODO: correct error?
+        ChipLogError(Zcl, "expected size %d for UpdateToken, got %d", kUpdateTokenParamLength, updateToken.size());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
@@ -124,6 +124,7 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(app::Comma
 
     if (updateToken.size() != kUpdateTokenParamLength)
     {
+        ChipLogError(Zcl, "expected size %d for UpdateToken, got %d", kUpdateTokenParamLength, updateToken.size());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
@@ -172,8 +173,14 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
 
     // TODO: (#7112) change location size checking once CHAR_STRING is supported
     const uint8_t locationLen = emberAfStringLength(location);
-    if ((locationLen != kLocationParamLength) || (metadataForServer.size() > kMaxMetadataLen))
+    if (locationLen != kLocationParamLength)
     {
+        ChipLogError(Zcl, "expected location length %d, got %d", locationLen, kLocationParamLength);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    }
+    else if (metadataForServer.size() > kMaxMetadataLen)
+    {
+        ChipLogError(Zcl, "metadata size %d exceeds max %d", metadataForServer.size(), kMaxMetadataLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
