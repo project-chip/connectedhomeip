@@ -22,3 +22,4 @@
 #include <core/CHIPError.h>
 
 CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
+CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray);

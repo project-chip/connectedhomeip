@@ -17,6 +17,7 @@
  */
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
+#include "JniReferences.h"
 
 #include <algorithm>
 #include <memory>
@@ -183,11 +184,20 @@ void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 }
 
 
-CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr,
+CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr,
                                                                                 int64_t serialNumber, uint8_t * certBuf,
                                                                                 uint32_t certBufSize, uint32_t & outCertLen)
 {
-   CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onOpCSRGenerationComplete", static_cast<jint>(error));
+   jmethodID method;
+    if (!FindMethod(GetJavaEnv(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method))
+    {
+        return CHIP_NO_ERROR;
+    }
+    jbyteArray argument;
+    GetJavaEnv()->ExceptionClear();
+    N2J_ByteArray(GetJavaEnv(), csr.data(),csr.size(),argument);
+    GetJavaEnv()->CallVoidMethod(mJavaObjectRef, method, argument);
+    return CHIP_NO_ERROR;
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
