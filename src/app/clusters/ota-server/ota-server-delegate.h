@@ -40,7 +40,7 @@ public:
 
     virtual EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t currentVersion) = 0;
 
-    virtual ~OTAServerDelegate() {}
+    virtual ~OTAServerDelegate() = default;
 };
 
 } // namespace clusters
