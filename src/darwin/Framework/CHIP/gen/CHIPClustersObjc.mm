@@ -3096,9 +3096,7 @@ public:
             for (uint16_t i = 0; i < count; i++) {
                 values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedLongLong:entries[i].FabricId],
                                                   @"FabricId", [NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
-                                                  [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId",
-                                                  [NSData dataWithBytes:entries[i].Label.data() length:entries[i].Label.size()],
-                                                  @"Label", nil];
+                                                  [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];

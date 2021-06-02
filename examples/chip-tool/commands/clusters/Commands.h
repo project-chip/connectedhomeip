@@ -879,7 +879,6 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(void * cont
         ChipLogProgress(chipTool, "  FabricId: %" PRIu64 "", entries[i].FabricId);
         ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entries[i].VendorId);
         ChipLogProgress(chipTool, "  NodeId: %" PRIu64 "", entries[i].NodeId);
-        ChipLogProgress(Zcl, "  Label: %zu", entries[i].Label.size());
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
