@@ -248,7 +248,7 @@ CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathL
             err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
-        err               = InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo);
+        err = InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo);
         SuccessOrExit(err);
     }
 

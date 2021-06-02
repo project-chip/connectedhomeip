@@ -37,11 +37,11 @@ struct AttributePathParams
         mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
     {}
     AttributePathParams() {}
-    NodeId mNodeId                = 0;
-    EndpointId mEndpointId        = 0;
-    ClusterId mClusterId          = 0;
-    FieldId mFieldId              = 0;
-    ListIndex mListIndex          = 0;
+    NodeId mNodeId         = 0;
+    EndpointId mEndpointId = 0;
+    ClusterId mClusterId   = 0;
+    FieldId mFieldId       = 0;
+    ListIndex mListIndex   = 0;
     BitFlags<Flags> mFlags;
 };
 } // namespace app

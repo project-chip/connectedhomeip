@@ -27,9 +27,9 @@ struct ClusterInfo
 {
     enum class Flags : uint8_t
     {
-        kFieldIdValid          = 0x01,
-        kListIndexValid        = 0x02,
-        kEventIdValid          = 0x03,
+        kFieldIdValid   = 0x01,
+        kListIndexValid = 0x02,
+        kEventIdValid   = 0x03,
     };
 
     ClusterInfo() {}
@@ -43,8 +43,8 @@ struct ClusterInfo
     EndpointId mEndpointId = 0;
     bool mDirty            = false;
     BitFlags<Flags> mFlags;
-    ClusterInfo * mpNext   = nullptr;
-    EventId mEventId       = 0;
+    ClusterInfo * mpNext = nullptr;
+    EventId mEventId     = 0;
     /* For better structure alignment
      * Above ordering is by bit-size to ensure least amount of memory alignment padding.
      * Changing order to something more natural (e.g. clusterid before nodeid) will result
