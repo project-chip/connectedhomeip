@@ -1218,21 +1218,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    // TODO - Update ZAP to use 16 bit length for OCTET_STRING. This is a temporary hack, as OCTET_STRING only supports 8 bit
-    // strings.
-    if (opCertBuf.size() >= UINT8_MAX)
-    {
-        ByteSpan tempCertFragment(&opCertBuf.data()[UINT8_MAX], opCertBuf.size() - UINT8_MAX);
-        ByteSpan opCertFragment(opCertBuf.data(), UINT8_MAX);
-
-        ReturnErrorOnFailure(cluster.AddOpCert(successCallback, failureCallback, opCertFragment, tempCertFragment,
-                                               ByteSpan(nullptr, 0), mLocalDeviceId, 0));
-    }
-    else
-    {
-        ReturnErrorOnFailure(cluster.AddOpCert(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0),
-                                               ByteSpan(nullptr, 0), mLocalDeviceId, 0));
-    }
+    ReturnErrorOnFailure(
+        cluster.AddOpCert(successCallback, failureCallback, opCertBuf, icaCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, 0));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
