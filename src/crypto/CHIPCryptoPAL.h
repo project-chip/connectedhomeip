@@ -29,6 +29,7 @@
 
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
+#include <support/Span.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -36,7 +37,7 @@
 namespace chip {
 namespace Crypto {
 
-const size_t kMax_x509_Certificate_Length = 1024;
+const size_t kMax_x509_Certificate_Length = 600;
 
 const size_t kP256_FE_Length     = 32;
 const size_t kP256_Point_Length  = (2 * kP256_FE_Length + 1);
@@ -910,6 +911,8 @@ CHIP_ERROR GetNumberOfCertsFromPKCS7(const uint8_t * pkcs7, uint32_t * n_certs);
 
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
+
+CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
 
 } // namespace Crypto
 } // namespace chip

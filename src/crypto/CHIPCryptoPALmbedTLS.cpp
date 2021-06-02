@@ -1219,5 +1219,10 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 } // namespace Crypto
 } // namespace chip

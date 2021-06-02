@@ -1584,7 +1584,6 @@ CHIP_ERROR LoadCertsFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509li
     bio_cert = BIO_new_mem_buf(pkcs7, -1);
 
     p7 = PEM_read_bio_PKCS7(bio_cert, NULL, NULL, NULL);
-    // TODO -> error value
     VerifyOrExit(p7 != nullptr, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
     p7_type = OBJ_obj2nid(p7->type);
@@ -1597,7 +1596,6 @@ CHIP_ERROR LoadCertsFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509li
         certs = p7->d.signed_and_enveloped->cert;
     }
 
-    // TODO -> error value
     VerifyOrExit(certs != NULL, err = CHIP_ERROR_WRONG_CERT_TYPE);
     VerifyOrExit(static_cast<uint32_t>(sk_X509_num(certs)) <= *max_certs, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
@@ -1639,7 +1637,6 @@ CHIP_ERROR LoadCertFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509lis
     bio_cert = BIO_new_mem_buf(pkcs7, -1);
 
     p7 = PEM_read_bio_PKCS7(bio_cert, NULL, NULL, NULL);
-    // TODO -> error value
     VerifyOrExit(p7 != nullptr, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
     p7_type = OBJ_obj2nid(p7->type);
@@ -1652,7 +1649,6 @@ CHIP_ERROR LoadCertFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509lis
         certs = p7->d.signed_and_enveloped->cert;
     }
 
-    // TODO -> error value
     VerifyOrExit(certs != NULL, err = CHIP_ERROR_WRONG_CERT_TYPE);
     VerifyOrExit(n_cert < static_cast<uint32_t>(sk_X509_num(certs)), err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1691,7 +1687,6 @@ CHIP_ERROR GetNumberOfCertsFromPKCS7(const uint8_t * pkcs7, uint32_t * n_certs)
     bio_cert = BIO_new_mem_buf(pkcs7, -1);
 
     p7 = PEM_read_bio_PKCS7(bio_cert, NULL, NULL, NULL);
-    // TODO -> error value
     VerifyOrExit(p7 != nullptr, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
     p7_type = OBJ_obj2nid(p7->type);
@@ -1704,7 +1699,6 @@ CHIP_ERROR GetNumberOfCertsFromPKCS7(const uint8_t * pkcs7, uint32_t * n_certs)
         certs = p7->d.signed_and_enveloped->cert;
     }
 
-    // TODO -> error value
     VerifyOrExit(certs != NULL, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
     *n_certs = static_cast<uint32_t>(sk_X509_num(certs));
@@ -1761,6 +1755,37 @@ exit:
     X509_free(x509RootCertificate);
     X509_STORE_CTX_free(verifyCtx);
     X509_STORE_free(store);
+
+    return err;
+}
+
+CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
+{
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    EVP_PKEY * pkey                      = nullptr;
+    X509 * x509certificate               = nullptr;
+    const unsigned char * pCertificate   = certificate.data();
+    const unsigned char ** ppCertificate = &pCertificate;
+    unsigned char * pPubkey              = pubkey;
+    unsigned char ** ppPubkey            = &pPubkey;
+    int pkeyLen;
+
+    x509certificate = d2i_X509(NULL, ppCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    pkey = X509_get_pubkey(x509certificate);
+    VerifyOrExit(pkey != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(EVP_PKEY_base_id(pkey) == EVP_PKEY_EC, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(EVP_PKEY_bits(pkey) == 256, err = CHIP_ERROR_INTERNAL);
+
+    pkeyLen = i2d_PublicKey(pkey, NULL);
+    VerifyOrExit(pkeyLen == static_cast<int>(pubkey.Length()), err = CHIP_ERROR_INTERNAL);
+
+    VerifyOrExit(i2d_PublicKey(pkey, ppPubkey) == pkeyLen, err = CHIP_ERROR_INTERNAL);
+
+exit:
+    EVP_PKEY_free(pkey);
+    X509_free(x509certificate);
 
     return err;
 }
