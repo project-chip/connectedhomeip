@@ -209,7 +209,8 @@ extern uint8_t emberAfIncomingZclSequenceNumber;
 // message that gets parsed).
 void emberAfSetNoReplyForNextMessage(bool set);
 
-#define isThisDataTypeSentLittleEndianOTA(dataType) (!(emberAfIsThisDataTypeAStringType(dataType)))
+#define isThisDataTypeSentLittleEndianOTA(dataType) \
+    (!(emberAfIsThisDataTypeAStringType(dataType)) && !(emberAfIsThisDataTypeAListType(dataType)))
 
 bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd);
 bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd);
