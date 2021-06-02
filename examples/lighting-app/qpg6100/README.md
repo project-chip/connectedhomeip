@@ -1,1 +1,0 @@
-../../platform/qpg6100/README.md

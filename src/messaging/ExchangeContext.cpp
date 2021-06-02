@@ -300,6 +300,27 @@ bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHea
         && (payloadHeader.IsInitiator() != IsInitiator());
 }
 
+void ExchangeContext::OnConnectionExpired()
+{
+    // Reset our mSecureSession to a default-initialized (hence not matching any
+    // connection state) value, because it's still referencing the now-expired
+    // connection.  This will mean that no more messages can be sent via this
+    // exchange, which seems fine given the semantics of connection expiration.
+    mSecureSession = SecureSessionHandle();
+
+    if (!IsResponseExpected())
+    {
+        // Nothing to do in this case
+        return;
+    }
+
+    // If we're waiting on a response, we now know it's never going to show up
+    // and we should notify our delegate accordingly.
+    CancelResponseTimer();
+    SetResponseExpected(false);
+    NotifyResponseTimeout();
+}
+
 CHIP_ERROR ExchangeContext::StartResponseTimer()
 {
     System::Layer * lSystemLayer = mExchangeMgr->GetSessionMgr()->SystemLayer();
@@ -334,11 +355,18 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
     // wants to never receive the response, they must close the exchange context.
 
-    ExchangeDelegate * delegate = ec->GetDelegate();
+    ec->NotifyResponseTimeout();
+}
+
+void ExchangeContext::NotifyResponseTimeout()
+{
+    ExchangeDelegate * delegate = GetDelegate();
 
     // Call the user's timeout handler.
     if (delegate != nullptr)
-        delegate->OnResponseTimeout(ec);
+    {
+        delegate->OnResponseTimeout(this);
+    }
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,

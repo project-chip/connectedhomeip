@@ -454,26 +454,26 @@ CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
 // TODO(cecille): Extend filter and use this for Resolve
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
-    mDiscoveryType    = type;
-    char subtypeStr[] = "_Xdddddd";
+    mDiscoveryType = type;
 
     mdns::Minimal::FullQName qname;
-
-    MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter);
 
     switch (type)
     {
     case DiscoveryType::kOperational:
-        qname = CheckAndAllocateQName("_chip", "_tcp", "local");
+        qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
         break;
     case DiscoveryType::kCommissionableNode:
         if (filter.type == DiscoveryFilterType::kNone)
         {
-            qname = CheckAndAllocateQName("_chipc", "_udp", "local");
+            qname = CheckAndAllocateQName(kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
         }
         else
         {
-            qname = CheckAndAllocateQName(subtypeStr, "_sub", "_chipc", "_udp", "local");
+            char subtypeStr[kMaxSubtypeDescSize];
+            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
+            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
+                                          kLocalDomain);
         }
         break;
     case DiscoveryType::kUnknown:
@@ -502,13 +502,13 @@ CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddress
         // Node and fabricid are encoded in server names.
         ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId));
 
-        const char * instanceQName[] = { nameBuffer, "_chip", "_tcp", "local" };
+        const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
         Query query(instanceQName);
 
         query
-            .SetClass(QClass::IN)      //
-            .SetType(QType::ANY)       //
-            .SetAnswerViaUnicast(true) //
+            .SetClass(QClass::IN)       //
+            .SetType(QType::ANY)        //
+            .SetAnswerViaUnicast(false) //
             ;
 
         // NOTE: type above is NOT A or AAAA because the name searched for is

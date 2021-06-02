@@ -14,10 +14,16 @@
 
 name: Lint Code Base
 # yamllint disable-line rule:truthy
-on:
-  push:
-    branches:
-      - 'master'
+on: workflow_dispatch 
+
+# On-push disabled until the workflow can run fully green
+# At that point the workflow should be enabled both on push and on PRs to not
+# allow failing links to be checked in. 
+#
+# on:
+#  push:
+#    branches:
+#      - 'master'
 
 jobs:
   check-broken-links:

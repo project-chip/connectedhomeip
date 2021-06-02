@@ -24,6 +24,7 @@
 #include <lib/shell/Engine.h>
 
 #include <core/CHIPError.h>
+#include <lib/shell/Commands.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
@@ -41,66 +42,9 @@ using namespace chip::Logging;
 namespace chip {
 namespace Shell {
 
-Shell Shell::theShellRoot;
+Engine Engine::theEngineRoot;
 
-intptr_t shell_line_read(char * buffer, size_t max)
-{
-    ssize_t read = 0;
-    bool done    = false;
-    char * inptr = buffer;
-
-    // Read in characters until we get a new line or we hit our max size.
-    while (((inptr - buffer) < static_cast<int>(max)) && !done)
-    {
-        if (read == 0)
-        {
-            read = streamer_read(streamer_get(), inptr, 1);
-        }
-
-        // Process any characters we just read in.
-        while (read > 0)
-        {
-            switch (*inptr)
-            {
-            case '\r':
-            case '\n':
-                streamer_printf(streamer_get(), "\r\n");
-                *inptr = 0; // null terminate
-                done   = true;
-                break;
-            case 0x7F:
-                // delete backspace character + 1 more
-                inptr -= 2;
-                if (inptr >= buffer - 1)
-                {
-                    streamer_printf(streamer_get(), "\b \b");
-                }
-                else
-                {
-                    inptr = buffer - 1;
-                }
-                break;
-            default:
-                if (isprint(static_cast<int>(*inptr)) || *inptr == '\t')
-                {
-                    streamer_printf(streamer_get(), "%c", *inptr);
-                }
-                else
-                {
-                    inptr--;
-                }
-                break;
-            }
-
-            inptr++;
-            read--;
-        }
-    }
-
-    return inptr - buffer;
-}
-
-void Shell::ForEachCommand(shell_command_iterator_t * on_command, void * arg)
+void Engine::ForEachCommand(shell_command_iterator_t * on_command, void * arg)
 {
     for (unsigned i = 0; i < _commandSetCount; i++)
     {
@@ -114,7 +58,7 @@ void Shell::ForEachCommand(shell_command_iterator_t * on_command, void * arg)
     }
 }
 
-void Shell::RegisterCommands(shell_command_t * command_set, unsigned count)
+void Engine::RegisterCommands(shell_command_t * command_set, unsigned count)
 {
     if (_commandSetCount >= CHIP_SHELL_MAX_MODULES)
     {
@@ -127,7 +71,7 @@ void Shell::RegisterCommands(shell_command_t * command_set, unsigned count)
     ++_commandSetCount;
 }
 
-int Shell::ExecCommand(int argc, char * argv[])
+int Engine::ExecCommand(int argc, char * argv[])
 {
     int retval = CHIP_ERROR_INVALID_ARGUMENT;
 
@@ -149,138 +93,19 @@ int Shell::ExecCommand(int argc, char * argv[])
     return retval;
 }
 
-static bool IsSeparator(char aChar)
+void Engine::RegisterDefaultCommands()
 {
-    return (aChar == ' ') || (aChar == '\t') || (aChar == '\r') || (aChar == '\n');
-}
-
-static bool IsEscape(char aChar)
-{
-    return (aChar == '\\');
-}
-
-static bool IsEscapable(char aChar)
-{
-    return IsSeparator(aChar) || IsEscape(aChar);
-}
-
-int Shell::TokenizeLine(char * buffer, char ** tokens, int max_tokens)
-{
-    size_t len = strlen(buffer);
-    int cursor = 0;
-    size_t i   = 0;
-
-    // Strip leading spaces
-    while (buffer[i] && buffer[i] == ' ')
-    {
-        i++;
-    }
-
-    VerifyOrExit((len - i) > 0, cursor = 0);
-
-    // The first token starts at the beginning.
-    tokens[cursor++] = &buffer[i];
-
-    for (; i < len && cursor < max_tokens; i++)
-    {
-        if (IsEscape(buffer[i]) && IsEscapable(buffer[i + 1]))
-        {
-            // include the null terminator: strlen(cmd) = strlen(cmd + 1) + 1
-            memmove(&buffer[i], &buffer[i + 1], strlen(&buffer[i]));
-        }
-        else if (IsSeparator(buffer[i]))
-        {
-            buffer[i] = 0;
-            if (!IsSeparator(buffer[i + 1]))
-            {
-                tokens[cursor++] = &buffer[i + 1];
-            }
-        }
-    }
-
-    tokens[cursor] = nullptr;
-
-exit:
-    return cursor;
-}
-
-void Shell::ProcessShellLineTask(intptr_t context)
-{
-    char * line = reinterpret_cast<char *>(context);
-    int retval;
-    int argc;
-    char * argv[CHIP_SHELL_MAX_TOKENS];
-
-    argc = shell_line_tokenize(line, argv, CHIP_SHELL_MAX_TOKENS);
-
-    if (argc > 0)
-    {
-        retval = theShellRoot.ExecCommand(argc, argv);
-
-        if (retval)
-        {
-            char errorStr[160];
-            bool errorStrFound = FormatCHIPError(errorStr, sizeof(errorStr), retval);
-            if (!errorStrFound)
-            {
-                errorStr[0] = 0;
-            }
-            streamer_printf(streamer_get(), "Error %s: %s\r\n", argv[0], errorStr);
-        }
-        else
-        {
-            streamer_printf(streamer_get(), "Done\r\n", argv[0]);
-        }
-    }
-    else
-    {
-        // Empty input has no output -- just display prompt
-    }
-    Platform::MemoryFree(line);
-    streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
-}
-
-void Shell::TaskLoop(void * arg)
-{
-    // char line[CHIP_SHELL_MAX_LINE_SIZE];
-
-    theShellRoot.RegisterDefaultCommands();
-    streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
-
-    while (true)
-    {
-        char * line = static_cast<char *>(Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
-        shell_line_read(line, CHIP_SHELL_MAX_LINE_SIZE);
-#if CONFIG_DEVICE_LAYER
-        DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLineTask, reinterpret_cast<intptr_t>(line));
-#else
-        ProcessShellLineTask(reinterpret_cast<intptr_t>(line));
+    RegisterBase64Commands();
+    RegisterMetaCommands();
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    RegisterBLECommands();
 #endif
-    }
-}
-
-/** Utility function for running ForEachCommand on root shell. */
-void shell_command_foreach(shell_command_iterator_t * on_command, void * arg)
-{
-    return Shell::Root().ForEachCommand(on_command, arg);
-}
-
-/** Utility function for running ForEachCommand on Root shell. */
-void shell_register(shell_command_t * command_set, unsigned count)
-{
-    return Shell::Root().RegisterCommands(command_set, count);
-}
-
-/** Utility function for to tokenize an input line. */
-int shell_line_tokenize(char * buffer, char ** tokens, int max_tokens)
-{
-    return Shell::TokenizeLine(buffer, tokens, max_tokens);
-}
-
-/** Utility function to run main shell task loop. */
-void shell_task(void * arg)
-{
-    return Shell::TaskLoop(arg);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    RegisterWiFiCommands();
+#endif
+#if CONFIG_DEVICE_LAYER
+    RegisterConfigCommands();
+#endif
 }
 
 } // namespace Shell

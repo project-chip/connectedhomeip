@@ -31,7 +31,7 @@ using chip::DeviceLayer::ConnectivityMgr;
 namespace chip {
 namespace Shell {
 
-static chip::Shell::Shell sShellDeviceSubcommands;
+static chip::Shell::Engine sShellDeviceSubcommands;
 
 int BLEHelpHandler(int argc, char ** argv)
 {
@@ -103,7 +103,7 @@ void RegisterBLECommands()
     sShellDeviceSubcommands.RegisterCommands(sBLESubCommands, ArraySize(sBLESubCommands));
 
     // Register the root `btp` command with the top-level shell.
-    shell_register(&sBLECommand, 1);
+    Engine::Root().RegisterCommands(&sBLECommand, 1);
 }
 
 } // namespace Shell

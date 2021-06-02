@@ -55,6 +55,10 @@ static bool sHaveServiceConnectivity = false;
 
 static uint32_t eventMask = 0;
 
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+extern "C" void K32WUartProcess(void);
+#endif
+
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -172,6 +176,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         // task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+            K32WUartProcess();
+#endif
+
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);

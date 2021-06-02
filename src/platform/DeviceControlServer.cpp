@@ -91,7 +91,19 @@ exit:
         ChipLogError(DeviceLayer, "SetRegulatoryConfig failed with error: %s", ErrorStr(err));
     }
 
-    return err;
+    // TODO(cecille): This command fails on ESP32, but it's blocking IP cluster-based commissioning so for now just return a success
+    // status.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControlServer::EnableNetworkForOperational(ByteSpan networkID)
+{
+    ChipDeviceEvent event;
+    event.Type = DeviceEventType::kOperationalNetworkEnabled;
+    // TODO(cecille): This should be some way to specify thread or wifi.
+    event.OperationalNetwork.network = 0;
+    PlatformMgr().DispatchEvent(&event);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

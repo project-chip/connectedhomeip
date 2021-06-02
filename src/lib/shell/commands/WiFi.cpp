@@ -35,7 +35,7 @@ using chip::DeviceLayer::ConnectivityMgr;
 namespace chip {
 namespace Shell {
 
-static chip::Shell::Shell sShellWifiSubCommands;
+static chip::Shell::Engine sShellWifiSubCommands;
 
 static int WiFiHelpHandler(int argc, char ** argv)
 {
@@ -139,7 +139,7 @@ void RegisterWiFiCommands()
     static const shell_command_t sWifiCommand = { &WiFiDispatch, "wifi", "Usage: wifi <subcommand>" };
 
     sShellWifiSubCommands.RegisterCommands(sWifiSubCommands, ArraySize(sWifiSubCommands));
-    shell_register(&sWifiCommand, 1);
+    Engine::Root().RegisterCommands(&sWifiCommand, 1);
 }
 
 } // namespace Shell

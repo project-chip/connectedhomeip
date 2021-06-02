@@ -58,8 +58,6 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
-    otCliUartInit(OTInstance());
-
 exit:
     return err;
 }
