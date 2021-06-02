@@ -224,7 +224,13 @@ private:
     CHIP_ERROR ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen);
 
     void SendErrorMsg(SigmaErrorType errorCode);
-    void HandleErrorMsg(const System::PacketBufferHandle & msg);
+
+    // This function always returns an error. The error value corresponds to the error in the received message.
+    // The returned error value helps top level message receiver/dispatcher to close the exchange context
+    // in a more seamless manner.
+    CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
+
+    void CloseExchange();
 
     // TODO: Remove this and replace with system method to retrieve current time
     CHIP_ERROR SetEffectiveTime(void);
