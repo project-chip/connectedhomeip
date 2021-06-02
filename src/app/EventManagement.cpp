@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/CriticalSection.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <core/CHIPEventLoggingConfig.h>
@@ -32,6 +31,7 @@ using namespace chip::TLV;
 namespace chip {
 namespace app {
 static EventManagement sInstance;
+
 
 /**
  * @brief
@@ -98,13 +98,6 @@ struct EventEnvelopeContext
     EventId mEventId           = 0;
 };
 
-EventManagement::EventManagement(Messaging::ExchangeManager * apExchangeMgr, int aNumBuffers,
-                                 CircularEventBuffer * apCircularEventBuffer,
-                                 const LogStorageResources * const apLogStorageResources)
-{
-    Init(apExchangeMgr, aNumBuffers, apCircularEventBuffer, apLogStorageResources);
-}
-
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers,
                            CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources)
 {
@@ -134,6 +127,12 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, int a
     mpEventBuffer = apCircularEventBuffer;
     mState        = EventManagementStates::Idle;
     mBytesWritten = 0;
+
+#if CHIP_SYSTEM_CONFIG_NO_LOCKING
+    ChipLogProgress(EventLogging, "EventBufferLock is not available");
+#else
+    chip::System::Mutex::Init(mLock);
+#endif
 }
 
 CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer)
@@ -367,7 +366,6 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
 {
 
     sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources);
-    static_assert(std::is_trivially_destructible<EventManagement>::value, "EventManagement must be trivially destructible");
 }
 
 /**
@@ -375,11 +373,11 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
  */
 void EventManagement::DestroyEventManagement()
 {
-    CriticalSectionEnter();
+    sInstance.Lock();
     sInstance.mState        = EventManagementStates::Shutdown;
     sInstance.mpEventBuffer = nullptr;
     sInstance.mpExchangeMgr = nullptr;
-    CriticalSectionExit();
+    sInstance.Unlock();
 }
 
 EventNumber CircularEventBuffer::VendEventNumber()
@@ -462,7 +460,7 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CriticalSectionEnter();
+    Lock();
 
     VerifyOrExit(mState != EventManagementStates::Shutdown, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(aEventOptions.mpEventSchema != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -470,7 +468,7 @@ CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOpt
     err = LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
 
 exit:
-    CriticalSectionExit();
+    Unlock();
     ChipLogFunctError(err);
     return err;
 }
@@ -692,7 +690,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
     EventLoadOutContext context(aWriter, aPriority, aEventNumber);
 
     CircularEventBuffer * buf = mpEventBuffer;
-    CriticalSectionEnter();
+    Lock();
 
     while (!buf->IsFinalDestinationForPriority(aPriority))
     {
@@ -713,7 +711,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
 
 exit:
     aEventNumber = context.mCurrentEventNumber;
-    CriticalSectionExit();
+    Unlock();
 
     return err;
 }
@@ -832,7 +830,7 @@ void EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)
 {
     CircularEventBuffer * eventBuffer = mpEventBuffer;
 
-    CriticalSectionEnter();
+    Lock();
 
     while (eventBuffer != nullptr)
     {
@@ -843,7 +841,21 @@ void EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)
         eventBuffer = eventBuffer->GetNextCircularEventBuffer();
     }
 
-    CriticalSectionExit();
+    Unlock();
+}
+
+void EventManagement::Lock()
+{
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    mLock.Lock();
+#endif
+}
+
+void EventManagement::Unlock()
+{
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    mLock.Unlock();
+#endif
 }
 
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,

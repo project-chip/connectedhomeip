@@ -34,6 +34,7 @@
 #include <core/CHIPCircularTLVBuffer.h>
 #include <messaging/ExchangeMgr.h>
 #include <support/PersistedCounter.h>
+#include <system/SystemMutex.h>
 
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug
 
@@ -241,8 +242,6 @@ class EventManagement
 public:
     /**
      * @brief
-     *   EventManagement constructor
-     *
      * Initialize the EventManagement with an array of LogStorageResources.  The
      * array must provide a resource for each valid priority level, the elements
      * of the array must be in increasing numerical value of priority (and in
@@ -259,16 +258,8 @@ public:
      * @param[in] apLogStorageResources  An array of LogStorageResources for each priority level.
      *
      */
-    EventManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-                    const LogStorageResources * const apLogStorageResources);
-
     void Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
               const LogStorageResources * const apLogStorageResources);
-    /**
-     * @brief
-     *   EventManagement default constructor. Provided primarily to make the compiler happy.
-     */
-    EventManagement(){};
 
     static EventManagement & GetInstance();
 
@@ -551,6 +542,9 @@ private:
      */
     static CHIP_ERROR CopyEvent(const TLV::TLVReader & aReader, TLV::TLVWriter & aWriter, EventLoadOutContext * apContext);
 
+    void Lock();
+    void Unlock();
+
     /**
      * @brief
      *   A function to get the circular buffer for particular priority
@@ -566,6 +560,7 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     EventManagementStates mState               = EventManagementStates::Shutdown;
     uint32_t mBytesWritten                     = 0;
+    System::Mutex mLock;
 };
 } // namespace app
 } // namespace chip
