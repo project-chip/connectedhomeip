@@ -43,7 +43,7 @@ if (chip_system_config_locking == "") {
   if (current_os != "freertos") {
     chip_system_config_locking = "posix"
   } else {
-    chip_system_config_locking = "none"
+    chip_system_config_locking = "freertos"
   }
 }
 

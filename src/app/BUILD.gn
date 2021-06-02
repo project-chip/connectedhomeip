@@ -20,20 +20,6 @@ declare_args() {
   # Enable strict schema checks.
   chip_enable_schema_check =
       is_debug && (current_os == "linux" || current_os == "mac")
-
-  # Mutex implementation: posix, freertos, zephyr.
-  chip_im_config_critical_section = ""
-}
-
-# TODO: Add locker support for different platform
-if (chip_im_config_critical_section == "") {
-  if (current_os == "freertos") {
-    chip_im_config_critical_section = "rtos"
-  } else if (current_os == "zephyr") {
-    chip_im_config_critical_section = "zephyr"
-  } else {
-    chip_im_config_critical_section = "posix"
-  }
 }
 
 config("app_config") {
@@ -109,16 +95,6 @@ static_library("app") {
     "reporting/Engine.cpp",
     "reporting/Engine.h",
   ]
-
-  if (chip_im_config_critical_section == "posix") {
-    sources += [ "CriticalSectionImplPosix.cpp" ]
-  } else if (chip_im_config_critical_section == "rtos") {
-    sources += [ "CriticalSectionImplRtos.cpp" ]
-  } else if (chip_im_config_critical_section == "zephyr") {
-    sources += [ "CriticalSectionImplZephyr.cpp" ]
-  } else {
-    assert(false, "Unknown IM critical section implementation.")
-  }
 
   if (chip_ip_commissioning) {
     defines = [
