@@ -266,7 +266,7 @@ public class ChipDeviceController {
     void onError(Throwable error);
 
     /** Notifies the Commissioner when the OpCSR for the Comissionee is generated. */
-    void onOpCSRGenerationComplete(byte[] errorCode)
+    void onOpCSRGenerationComplete(byte[] errorCode);
 
   }
 }

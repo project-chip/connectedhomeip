@@ -200,6 +200,11 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen)
+{
+ return CHIP_NO_ERROR;
+}
+
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
