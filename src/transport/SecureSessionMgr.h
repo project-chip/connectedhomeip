@@ -68,6 +68,8 @@ public:
 
     uint32_t GetMsgId() const;
 
+    PacketBufferHandle Retain() const { return PacketBufferHandle::Retain(); }
+
     /**
      * Creates a copy of the data in this packet.
      *
@@ -182,17 +184,23 @@ public:
 
     /**
      * @brief
-     *   Send a message to a currently connected peer.
+     *   This function takes the payload and returns the final message which can be send multiple times.
      *
      * @details
-     *   msgBuf contains the data to be transmitted.  If bufferRetainSlot is not null and this function
-     *   returns success, the encrypted data that was sent, as well as various other information needed
-     *   to retransmit it, will be stored in *bufferRetainSlot.
+     *   It contains following preparation:
+     *    1. Encrypt the msgBuf
+     *    2. construct the packet header
+     *    3. Encode the packet header and prepend it to message.
+     *   Returns a prepared message in preparedMessage.
      */
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
-    CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && msgBuf,
-                                    EncryptedPacketBufferHandle * bufferRetainSlot);
+    CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
+                              EncryptedPacketBufferHandle & preparedMessage);
+
+    /**
+     * @brief
+     *   Send a prepared message to a currently connected peer.
+     */
+    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
 
     Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
 
@@ -300,10 +308,6 @@ private:
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
     GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
-
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                           System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
-                           EncryptionState encryptionState);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
