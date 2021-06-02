@@ -162,6 +162,10 @@ public class ChipDeviceController {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
+  public void updateAddress(long deviceId, String address, int port) {
+    updateAddress(deviceControllerPtr, deviceId, address, port);
+  }
+
   public void sendMessage(long deviceId, String message) {
     sendMessage(deviceControllerPtr, deviceId, message);
   }
@@ -196,6 +200,9 @@ public class ChipDeviceController {
   private native void deleteDeviceController(long deviceControllerPtr);
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
+
+  private native void updateAddress(
+      long deviceControllerPtr, long deviceId, String address, int port);
 
   private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
 
