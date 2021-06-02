@@ -29,7 +29,6 @@ import androidx.fragment.app.Fragment
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
-import com.google.chip.chiptool.commissioner.CommissionerActivity
 import com.google.chip.chiptool.echoclient.EchoClientFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
@@ -104,11 +103,6 @@ class CHIPToolActivity :
   override fun onProvisionThreadCredentialsClicked() {
     networkType = ProvisionNetworkType.THREAD
     showFragment(BarcodeFragment.newInstance(), false)
-  }
-
-  override fun handleCommissioningClicked() {
-    var intent = Intent(this, CommissionerActivity::class.java)
-    startActivityForResult(intent, REQUEST_CODE_COMMISSIONING)
   }
 
   override fun handleEchoClientClicked() {

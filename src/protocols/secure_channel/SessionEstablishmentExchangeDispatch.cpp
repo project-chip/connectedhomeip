@@ -32,17 +32,36 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
                                                                  System::PacketBufferHandle && message,
                                                                  EncryptedPacketBufferHandle * retainedMessage)
 {
+    ReturnErrorCodeIf(mTransportMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
     PacketHeader packetHeader;
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
 
-    if (mTransportMgr != nullptr)
+    if (retainedMessage != nullptr)
     {
-        return mTransportMgr->SendMessage(mPeerAddress, std::move(message));
+        *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(message.Retain());
+        ChipLogError(Inet, "RETAINED IN SESS: %p %d", retainedMessage, (*retainedMessage).IsNull());
     }
+    return mTransportMgr->SendMessage(mPeerAddress, std::move(message));
+}
 
-    return CHIP_ERROR_INCORRECT_STATE;
+CHIP_ERROR SessionEstablishmentExchangeDispatch::ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
+                                                               EncryptedPacketBufferHandle * retainedMessage) const
+{
+    ReturnErrorCodeIf(mTransportMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Our send path needs a (writable) PacketBuffer, so get that from the
+    // EncryptedPacketBufferHandle.  Note that we have to do this before we set
+    // *retainedMessage, because 'message' and '*retainedMessage' might be the
+    // same memory location and we have to guarantee that we move out of
+    // 'message' before we write to *retainedMessage.
+    System::PacketBufferHandle writableBuf(std::move(message).CastToWritable());
+    if (retainedMessage != nullptr)
+    {
+        *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(writableBuf.Retain());
+    }
+    return mTransportMgr->SendMessage(mPeerAddress, std::move(writableBuf));
 }
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
@@ -60,6 +79,7 @@ bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, u
     case Protocols::SecureChannel::Id.GetProtocolId():
         switch (type)
         {
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PBKDFParamRequest):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PBKDFParamResponse):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Spake2p1):

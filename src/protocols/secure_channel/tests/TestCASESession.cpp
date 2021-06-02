@@ -120,7 +120,8 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
 
-    NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(
+        inSuite, pairing.MessageDispatch().Init(ctx.GetExchangeManager().GetReliableMessageMgr(), &gTransportMgr) == CHIP_NO_ERROR);
     ExchangeContext * context = ctx.NewExchangeToLocal(&pairing);
 
     NL_TEST_ASSERT(inSuite,
@@ -135,7 +136,9 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     CASESession pairing1;
-    NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   pairing1.MessageDispatch().Init(ctx.GetExchangeManager().GetReliableMessageMgr(), &gTransportMgr) ==
+                       CHIP_NO_ERROR);
 
     gLoopback.mSentMessageCount = 0;
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
@@ -159,8 +162,12 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     CASESessionSerializable serializableAccessory;
 
     gLoopback.mSentMessageCount = 0;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   pairingCommissioner.MessageDispatch().Init(ctx.GetExchangeManager().GetReliableMessageMgr(), &gTransportMgr) ==
+                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   pairingAccessory.MessageDispatch().Init(ctx.GetExchangeManager().GetReliableMessageMgr(), &gTransportMgr) ==
+                       CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
