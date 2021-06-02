@@ -158,8 +158,8 @@ CHIP_ERROR SecureSessionMgr::PrepareMessage(SecureSessionHandle session, Payload
 
 CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage)
 {
-    CHIP_ERROR err                      = CHIP_NO_ERROR;
-    PeerConnectionState * state         = nullptr;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    PeerConnectionState * state = nullptr;
     PacketBufferHandle msgBuf;
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
