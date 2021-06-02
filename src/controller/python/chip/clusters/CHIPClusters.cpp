@@ -2951,6 +2951,14 @@ CHIP_ERROR chip_ime_AppendCommand_TestCluster_TestSpecific(chip::Controller::Dev
     cluster.Associate(device, ZCLendpointId);
     return cluster.TestSpecific(nullptr, nullptr);
 }
+CHIP_ERROR chip_ime_AppendCommand_TestCluster_TestUnknownCommand(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                 chip::GroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TestUnknownCommand(nullptr, nullptr);
+}
 
 CHIP_ERROR chip_ime_ReadAttribute_TestCluster_Boolean(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                       chip::GroupId /* ZCLgroupId */)

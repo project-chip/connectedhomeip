@@ -6067,6 +6067,15 @@
                                                                                                                                    \
                                                            ZCL_TEST_SPECIFIC_COMMAND_ID, "", );
 
+/** @brief Command description for TestUnknownCommand
+ *
+ * Command: TestUnknownCommand
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestUnknownCommand() emberAfFillExternalBuffer(mask,                                                             \
+                                                                                                                                   \
+                                                                 ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID, "", );
+
 /** @brief Command description for MatchProtocolAddress
  *
  * Command: MatchProtocolAddress
