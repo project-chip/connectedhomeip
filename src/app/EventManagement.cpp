@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/CriticalSection.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <core/CHIPEventLoggingConfig.h>
@@ -98,13 +97,6 @@ struct EventEnvelopeContext
     EventId mEventId           = 0;
 };
 
-EventManagement::EventManagement(Messaging::ExchangeManager * apExchangeMgr, int aNumBuffers,
-                                 CircularEventBuffer * apCircularEventBuffer,
-                                 const LogStorageResources * const apLogStorageResources)
-{
-    Init(apExchangeMgr, aNumBuffers, apCircularEventBuffer, apLogStorageResources);
-}
-
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers,
                            CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources)
 {
@@ -134,6 +126,8 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, int a
     mpEventBuffer = apCircularEventBuffer;
     mState        = EventManagementStates::Idle;
     mBytesWritten = 0;
+
+    chip::System::Mutex::Init(mAccessLock);
 }
 
 CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer)
@@ -367,7 +361,6 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
 {
 
     sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources);
-    static_assert(std::is_trivially_destructible<EventManagement>::value, "EventManagement must be trivially destructible");
 }
 
 /**
@@ -375,11 +368,10 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
  */
 void EventManagement::DestroyEventManagement()
 {
-    CriticalSectionEnter();
+    ScopedLock lock(sInstance);
     sInstance.mState        = EventManagementStates::Shutdown;
     sInstance.mpEventBuffer = nullptr;
     sInstance.mpExchangeMgr = nullptr;
-    CriticalSectionExit();
 }
 
 EventNumber CircularEventBuffer::VendEventNumber()
@@ -462,15 +454,15 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CriticalSectionEnter();
+    {
+        ScopedLock lock(sInstance);
 
-    VerifyOrExit(mState != EventManagementStates::Shutdown, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(aEventOptions.mpEventSchema != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(mState != EventManagementStates::Shutdown, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(aEventOptions.mpEventSchema != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
-
+        err = LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
+    }
 exit:
-    CriticalSectionExit();
     ChipLogFunctError(err);
     return err;
 }
@@ -692,7 +684,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
     EventLoadOutContext context(aWriter, aPriority, aEventNumber);
 
     CircularEventBuffer * buf = mpEventBuffer;
-    CriticalSectionEnter();
+    ScopedLock lock(sInstance);
 
     while (!buf->IsFinalDestinationForPriority(aPriority))
     {
@@ -713,7 +705,6 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
 
 exit:
     aEventNumber = context.mCurrentEventNumber;
-    CriticalSectionExit();
 
     return err;
 }
@@ -832,7 +823,7 @@ void EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)
 {
     CircularEventBuffer * eventBuffer = mpEventBuffer;
 
-    CriticalSectionEnter();
+    ScopedLock lock(sInstance);
 
     while (eventBuffer != nullptr)
     {
@@ -842,8 +833,6 @@ void EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)
         }
         eventBuffer = eventBuffer->GetNextCircularEventBuffer();
     }
-
-    CriticalSectionExit();
 }
 
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
