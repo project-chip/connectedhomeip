@@ -66,6 +66,6 @@ limitations under the License.
     <attribute side="server" code="0x04" define="BOOT_REASONS" type="ENUM8" writable="false" optional="true">BootReasons</attribute>
     <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="ENUM8" length="254" writable="false" optional="true">ActiveHardwareFaults</attribute>
     <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="ENUM8" length="254" writable="false" optional="true">ActiveRadioFaults</attribute>
-    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="ENUM8" length="254" writable="false" optional="true">ActiveNetworkFaults</attribute>       
+    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="ENUM8" length="254" writable="false" optional="true">ActiveNetworkFaults</attribute>      
   </cluster>
 </configurator>

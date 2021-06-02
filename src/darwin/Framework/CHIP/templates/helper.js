@@ -34,6 +34,8 @@ function asExpectedEndpointForCluster(clusterName)
   case 'GeneralDiagnostics':
   case 'SoftwareDiagnostics':
   case 'EthernetNetworkDiagnostics':
+  case 'WiFiNetworkDiagnostics':
+  case 'ThreadNetworkDiagnostics':  
   case 'GroupKeyManagement':
   case 'NetworkCommissioning':
   case 'OperationalCredentials':

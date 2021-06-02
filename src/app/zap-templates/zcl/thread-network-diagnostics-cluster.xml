@@ -149,7 +149,7 @@ limitations under the License.
     <!-- Attribute with struct as type is not currently supported -->
     <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="ARRAY" entryType="OperationalDatasetComponents" length="1" writable="false" optional="false">OperationalDatasetComponents</attribute>
     <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFault" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
-    <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
+    <command source="client" code="0x00" name="ResetCounts" optional="false" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>
     </command>           
   </cluster>
