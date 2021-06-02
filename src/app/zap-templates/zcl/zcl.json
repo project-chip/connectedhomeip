@@ -23,6 +23,7 @@
         "custom-types.xml",
         "chip-devices.xml",
         "descriptor-cluster.xml",
+        "flow-measurement-cluster.xml",
         "types.xml",
         "general.xml",
         "operational-credentials-cluster.xml",
