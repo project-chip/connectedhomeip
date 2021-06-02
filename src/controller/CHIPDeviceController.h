@@ -30,8 +30,8 @@
 
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
-#include <controller/CHIPOperationalCredentialsProvisioner.h>
 #include <controller/OperationalCredentialsDelegate.h>
+#include <controller/data_model/gen/CHIPClientCallbacks.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
