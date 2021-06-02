@@ -241,8 +241,6 @@ class EventManagement
 public:
     /**
      * @brief
-     *   EventManagement constructor
-     *
      * Initialize the EventManagement with an array of LogStorageResources.  The
      * array must provide a resource for each valid priority level, the elements
      * of the array must be in increasing numerical value of priority (and in
@@ -259,16 +257,8 @@ public:
      * @param[in] apLogStorageResources  An array of LogStorageResources for each priority level.
      *
      */
-    EventManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-                    const LogStorageResources * const apLogStorageResources);
-
     void Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
               const LogStorageResources * const apLogStorageResources);
-    /**
-     * @brief
-     *   EventManagement default constructor. Provided primarily to make the compiler happy.
-     */
-    EventManagement(){};
 
     static EventManagement & GetInstance();
 
@@ -298,6 +288,24 @@ public:
 
     static void DestroyEventManagement();
 
+    class LockEvents
+    {
+    public:
+        LockEvents(EventManagement & aEventManagement): mEventManagement(aEventManagement)
+        {
+    #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+            mEventManagement.mAccessLock.Lock();
+    #endif
+        }
+        ~LockEvents()
+        {
+    #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+            mEventManagement.mAccessLock.Unlock();
+    #endif
+        }
+    private:
+        EventManagement& mEventManagement;
+    };
     /**
      * @brief
      *   Log an event via a EventLoggingDelegate, with options.
@@ -566,6 +574,7 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     EventManagementStates mState               = EventManagementStates::Shutdown;
     uint32_t mBytesWritten                     = 0;
+    System::Mutex mAccessLock;
 };
 } // namespace app
 } // namespace chip
