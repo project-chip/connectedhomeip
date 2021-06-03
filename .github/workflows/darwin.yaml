@@ -48,6 +48,8 @@ jobs:
             - name: Clean Build
               run: xcodebuild clean
               working-directory: src/darwin/Framework
+            - name: Delete Defaults
+              run: defaults delete com.apple.dt.xctest.tool
             - name: Run macOS Build
               timeout-minutes: 10
               # Enable -Werror by hand here, because the Xcode config can't
