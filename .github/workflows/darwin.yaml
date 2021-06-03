@@ -81,7 +81,7 @@ jobs:
               run: |
                 scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
             - name: Delete Defaults
-            run: defaults delete com.apple.dt.xctest.tool
+              run: defaults delete com.apple.dt.xctest.tool
             - name: Run Tests
               timeout-minutes: 5
               run: |
