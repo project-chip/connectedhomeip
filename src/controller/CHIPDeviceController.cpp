@@ -1101,10 +1101,10 @@ void DeviceCommissioner::OnSessionEstablished()
 
     if (sendOperationalCertsImmediately)
     {
-        err = SendOperationalCertificateSigningRequestCommand(device);
+        err = SendTrustedRootCertificate(device);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Ble, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+            ChipLogError(Ble, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }
@@ -1262,7 +1262,7 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uin
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
-    err = commissioner->SendTrustedRootCertificate(device);
+    err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1314,7 +1314,7 @@ void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
-    err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
+    err = commissioner->SendOperationalCertificateSigningRequestCommand(device);
     SuccessOrExit(err);
 
 exit:
@@ -1672,10 +1672,10 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Exchanging certificates");
         // TODO(cecille): Once this is implemented through the clusters, it should be moved to the proper stage and the callback
         // should advance the commissioning stage
-        CHIP_ERROR status = SendOperationalCertificateSigningRequestCommand(device);
+        CHIP_ERROR status = SendTrustedRootCertificate(device);
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+            ChipLogError(Controller, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }
