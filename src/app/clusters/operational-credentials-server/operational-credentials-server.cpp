@@ -445,3 +445,35 @@ bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(chip::app::Command
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
+
+bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(chip::app::Command * commandObj,
+                                                                           chip::ByteSpan RootCertificate)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
+
+    // Fetch current admin
+    AdminPairingInfo * admin = retrieveCurrentAdmin();
+    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(admin->SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+    VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+exit:
+    emberAfSendImmediateDefaultResponse(status);
+    if (status == EMBER_ZCL_STATUS_FAILURE)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");
+    }
+
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(chip::app::Command * commandObj,
+                                                                              chip::ByteSpan TrustedRootIdentifier)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}

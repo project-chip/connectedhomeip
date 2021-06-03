@@ -1284,7 +1284,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
 
     ChipLogProgress(Controller, "Sending root certificate to the device");
 
-    chip::Controller::TrustedRootCertificatesCluster cluster;
+    chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
     Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();

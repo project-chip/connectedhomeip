@@ -3768,8 +3768,8 @@
  * Command: AddTrustedRootCertificate
  * @param RootCertificate OCTET_STRING
  */
-#define emberAfFillCommandTrusted                                                                                                  \
-    Root CertificatesClusterAddTrustedRootCertificate(RootCertificate)                                                             \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAddTrustedRootCertificate(RootCertificate)                                                                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", RootCertificate);
@@ -3779,8 +3779,8 @@
  * Command: RemoveTrustedRootCertificate
  * @param TrustedRootIdentifier OCTET_STRING
  */
-#define emberAfFillCommandTrusted                                                                                                  \
-    Root CertificatesClusterRemoveTrustedRootCertificate(TrustedRootIdentifier)                                                    \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveTrustedRootCertificate(TrustedRootIdentifier)                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", TrustedRootIdentifier);

@@ -124,9 +124,6 @@ static constexpr chip::ClusterId ZCL_SWITCH_CLUSTER_ID = 0x003B;
 // Definitions for cluster: Operational Credentials
 static constexpr chip::ClusterId ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID = 0x003E;
 
-// Definitions for cluster: Trusted Root Certificates
-static constexpr chip::ClusterId ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID = 0x003F;
-
 // Definitions for cluster: Fixed Label
 static constexpr chip::ClusterId ZCL_FIXED_LABEL_CLUSTER_ID = 0x0040;
 

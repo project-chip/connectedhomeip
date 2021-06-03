@@ -11730,6 +11730,33 @@ private:
         responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
+- (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.AddTrustedRootCertificate(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) rootCertificate.bytes, rootCertificate.length));
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
 - (void)opCSRRequest:(NSData *)cSRNonce responseHandler:(ResponseHandler)responseHandler
 {
     CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge * onSuccess
@@ -11806,6 +11833,33 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.RemoveFabric(onSuccess->Cancel(), onFailure->Cancel(), fabricId, nodeId, vendorId);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.RemoveTrustedRootCertificate(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) trustedRootIdentifier.bytes, trustedRootIdentifier.length));
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -15024,101 +15078,6 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.WriteAttributeSystemMode(onSuccess->Cancel(), onFailure->Cancel(), value);
-    });
-
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
-    }
-}
-
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
-{
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onSuccess) {
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onFailure) {
-        delete onSuccess;
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    __block CHIP_ERROR err;
-    dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
-    });
-
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
-    }
-}
-
-@end
-
-@interface CHIPTrustedRootCertificates ()
-@property (readonly) Controller::TrustedRootCertificatesCluster cppCluster;
-@end
-
-@implementation CHIPTrustedRootCertificates
-
-- (Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
-- (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onSuccess) {
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onFailure) {
-        delete onSuccess;
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    __block CHIP_ERROR err;
-    dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.AddTrustedRootCertificate(onSuccess->Cancel(), onFailure->Cancel(),
-            chip::ByteSpan((const uint8_t *) rootCertificate.bytes, rootCertificate.length));
-    });
-
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
-    }
-}
-- (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onSuccess) {
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onFailure) {
-        delete onSuccess;
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    __block CHIP_ERROR err;
-    dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.RemoveTrustedRootCertificate(onSuccess->Cancel(), onFailure->Cancel(),
-            chip::ByteSpan((const uint8_t *) trustedRootIdentifier.bytes, trustedRootIdentifier.length));
     });
 
     if (err != CHIP_NO_ERROR) {
