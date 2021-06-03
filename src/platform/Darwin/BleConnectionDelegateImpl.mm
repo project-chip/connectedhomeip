@@ -21,6 +21,10 @@
  *          Provides an implementation of BleConnectionDelegate for Darwin platforms.
  */
 
+#if !__has_feature(objc_arc)
+#error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #include <ble/BleConfig.h>
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
@@ -70,7 +74,7 @@ namespace DeviceLayer {
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
-            [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
+            ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
         BLE_ERROR BleConnectionDelegateImpl::CancelConnection()
@@ -356,7 +360,6 @@ namespace DeviceLayer {
     }
 
     _peripheral = peripheral;
-    [_peripheral retain];
     [_centralManager connectPeripheral:peripheral options:nil];
 }
 
