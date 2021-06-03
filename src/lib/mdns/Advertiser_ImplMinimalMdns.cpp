@@ -300,6 +300,7 @@ void AdvertiserMinMdns::Clear()
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
+    Clear();
     char nameBuffer[64] = "";
 
     /// need to set server name
@@ -363,6 +364,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
+    Clear();
     // TODO: need to detect colisions here
     char nameBuffer[64] = "";
     size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), ChipLogFormatX64, GetRandU32(), GetRandU32());
