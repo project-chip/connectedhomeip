@@ -58,7 +58,7 @@ limitations under the License.
      <item name="FabricId" type="FABRIC_ID"/>
      <item name="VendorId" type="INT16U"/> // Change INT16U to new type VendorID #2395
      <item name="NodeId" type="NODE_ID"/>
-     <item name="Label" type="OCTET_STRING" length="32"/>// TODO: Add Label once CHAR_STRING or OCTET_STRING works
+     // TODO: Add Label once CHAR_STRING or OCTET_STRING works
    </struct>
    <struct name="TestListStructOctet">
      <item name="fabricIndex" type="INT64U"/>

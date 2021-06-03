@@ -30,8 +30,6 @@ target_compile_options(app PRIVATE -Werror)
 
 project(chip-nrfconnect-pump-controller-example)
 
-include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
-
 target_include_directories(app PRIVATE 
                            main/include 
                            ${PUMPC_COMMON} 

@@ -730,9 +730,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             CHECK_MESSAGE_LENGTH(8);
                             data[i].NodeId = emberAfGetInt64u(message, 0, 8);
                             message += 8;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].Label));
-                            messageLen -= 34;
-                            message += 34;
                         }
 
                         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
