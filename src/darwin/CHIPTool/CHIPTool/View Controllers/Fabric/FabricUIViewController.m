@@ -244,6 +244,7 @@
 - (IBAction)removeAllFabricsButtonPressed:(id)sender
 {
     NSLog(@"Request to Remove All Fabrics.");
+    [self.removeFabricTextField resignFirstResponder];
     UIAlertController * alert =
         [UIAlertController alertControllerWithTitle:@"Remove All Fabrics?"
                                             message:@"Are you sure you want to remove all fabrics, this will remove all fabrics on "
@@ -280,6 +281,7 @@
 {
     NSString * label = _updateFabricLabelTextField.text;
     NSLog(@"Request to updateFabricLabel %@", label);
+    [self.updateFabricLabelTextField resignFirstResponder];
     [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
     [self.cluster
         updateFabricLabel:label
@@ -287,18 +289,20 @@
               dispatch_async(dispatch_get_main_queue(), ^{
                   if (error) {
                       NSLog(@"Got back error trying to updateFabricLabel %@", error);
-                      self->_updateFabricLabelTextField.text = @"";
                       dispatch_async(dispatch_get_main_queue(), ^{
+                          self->_updateFabricLabelTextField.text = @"";
                           [self updateResult:[NSString stringWithFormat:@"Command updateFabricLabel failed with error %@", error]
                                      isError:YES];
                       });
                   } else {
                       NSLog(@"Successfully updated the label: %@", values);
                       dispatch_async(dispatch_get_main_queue(), ^{
+                          self->_updateFabricLabelTextField.text = @"";
                           [self
                               updateResult:[NSString
                                                stringWithFormat:@"Command updateFabricLabel succeeded to update label to %@", label]
                                    isError:NO];
+                          [self fetchFabricsList];
                       });
                   }
               });
