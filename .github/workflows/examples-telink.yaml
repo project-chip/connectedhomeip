@@ -31,7 +31,6 @@ jobs:
             image: connectedhomeip/chip-build-telink:latest
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
 
         steps:
             - name: Checkout
