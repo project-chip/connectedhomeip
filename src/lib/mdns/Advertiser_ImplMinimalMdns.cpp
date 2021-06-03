@@ -560,14 +560,19 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
 FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertisingParameters & params)
 {
-    char * txtFields[9];
+    // Max number of TXT fields from the spec is 9: D, VP, AP, CM, DT, DN, RI, PI, PH.
+    constexpr size_t kMaxTxtFields = 9;
+    const char * txtFields[kMaxTxtFields];
     size_t numTxtFields = 0;
 
     char txtVidPid[chip::Mdns::kKeyVendorProductMaxLength + 4];
     if (params.GetProductId().HasValue())
     {
         sprintf(txtVidPid, "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
-        txtFields[numTxtFields++] = txtVidPid;
+    }
+    else
+    {
+        sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
     }
 
     char txtDeviceType[chip::Mdns::kKeyDeviceTypeMaxLength + 4];
@@ -629,8 +634,14 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
             txtFields[numTxtFields++] = txtPairingInstr;
         }
     }
-
-    return AllocateQNameFromArray(txtFields, numTxtFields);
+    if (numTxtFields == 0)
+    {
+        return AllocateQNameFromArray(mEmptyTextEntries, 1);
+    }
+    else
+    {
+        return AllocateQNameFromArray(txtFields, numTxtFields);
+    }
 } // namespace
 
 bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
