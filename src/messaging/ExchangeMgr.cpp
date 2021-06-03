@@ -86,7 +86,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
     sessionMgr->SetDelegate(this);
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
-    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(&mReliableMessageMgr, mSessionMgr));
+    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionMgr));
 
     mState = State::kState_Initialized;
 
