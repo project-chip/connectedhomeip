@@ -34,12 +34,18 @@ namespace app {
 static EventManagement sInstance;
 
 #if CHIP_SYSTEM_CONFIG_NO_LOCKING
-static void LockEvents() { }
-static void UnLockEvents() { }
+static void LockEvents() {}
+static void UnLockEvents() {}
 #else
 static System::Mutex sEventLock;
-static void LockEvents() { sEventLock.Lock(); }
-static void UnLockEvents() { sEventLock.Unlock(); }
+static void LockEvents()
+{
+    sEventLock.Lock();
+}
+static void UnLockEvents()
+{
+    sEventLock.Unlock();
+}
 #endif
 
 /**
