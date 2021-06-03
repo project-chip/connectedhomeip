@@ -181,7 +181,8 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(ReadRequest::Builder & aRequest
 
         if (apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kListIndexValid))
         {
-            VerifyOrReturnError(apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kFieldIdValid), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            VerifyOrReturnError(apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kFieldIdValid),
+                                CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
             attributePathBuilder.ListIndex(apAttributePathParamsList[index].mListIndex);
         }
 
