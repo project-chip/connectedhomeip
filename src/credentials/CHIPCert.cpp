@@ -156,13 +156,13 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipC
     err = reader.Next(kTLVType_Structure, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate));
     SuccessOrExit(err);
 
-    err = LoadCert(reader, decodeFlags);
+    err = LoadCert(reader, decodeFlags, ByteSpan(chipCert, chipCertLen));
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags)
+CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, ByteSpan chipCert)
 {
     ASN1Writer writer; // ASN1Writer is used to encode TBS portion of the certificate for the purpose of signature
                        // validation, which should be performed on the TBS data encoded in ASN.1 DER form.
@@ -171,6 +171,8 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
 
     // Must be positioned on the structure element representing the certificate.
     VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_INVALID_ARGUMENT);
+
+    cert.mCertificate = chipCert;
 
     {
         TLVType containerType;
@@ -774,6 +776,32 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
 
 exit:
     return err;
+}
+
+CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
+{
+    uint8_t rdnCount = RDNCount();
+
+    chipId = 0;
+
+    for (uint8_t i = 0; i < rdnCount; i++)
+    {
+        switch (rdn[i].mAttrOID)
+        {
+        case kOID_AttributeType_ChipRootId:
+        case kOID_AttributeType_ChipICAId:
+        case kOID_AttributeType_ChipNodeId:
+        case kOID_AttributeType_ChipFirmwareSigningId:
+            VerifyOrReturnError(chipId == 0, CHIP_ERROR_WRONG_CERT_TYPE);
+
+            chipId = rdn[i].mAttrValue.mChipVal;
+            break;
+        default:
+            break;
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 bool ChipDN::IsEqual(const ChipDN & other) const
