@@ -211,7 +211,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->MatchExchange(session, packetHeader, payloadHeader))
         {
-            // Found a matching exchange. Set flag for correct subsequent CRMP
+            // Found a matching exchange. Set flag for correct subsequent MRP
             // retransmission timeout selection.
             if (!ec->HasRcvdMsgFromPeer())
             {

@@ -212,8 +212,8 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
         NL_TEST_ASSERT(inSuite, rc != nullptr);
 
         rc->SetConfig({
-            1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
-            1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+            1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+            1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
         });
         gLoopback.mContext = &ctx;
     }
