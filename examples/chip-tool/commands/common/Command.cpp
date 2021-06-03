@@ -25,9 +25,9 @@
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <support/BytesToHex.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
-#include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
 
 bool Command::InitArguments(int argc, char ** argv)
@@ -120,8 +120,9 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
             // for this somewhere else.  This works because the hex
             // representation is always longer than the octet string it encodes,
             // so we have enough space in argValue for the decoded version.
-            auto buffer = static_cast<uint8_t*>(chip::Platform::MemoryCalloc(argLen, 1)); // Bigger than needed, but it's fine.
-            if (!buffer) {
+            auto buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(argLen, 1)); // Bigger than needed, but it's fine.
+            if (!buffer)
+            {
                 isValidArgument = false;
                 break;
             }
