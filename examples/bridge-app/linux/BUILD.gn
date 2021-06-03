@@ -20,9 +20,9 @@ assert(chip_build_tools)
 
 executable("chip-bridge-app") {
   sources = [
-    "LightingManager.cpp",
+    "Device.cpp",
     "Options.cpp",
-    "include/LightingManager.h",
+    "include/Device.h",
     "main.cpp",
   ]
 
@@ -32,6 +32,9 @@ executable("chip-bridge-app") {
   ]
 
   cflags = [ "-Wconversion" ]
+
+  # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!
+  cflags += [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
 
   include_dirs = [ "include" ]
 
