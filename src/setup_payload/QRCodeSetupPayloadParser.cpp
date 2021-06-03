@@ -378,7 +378,8 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     err = readBits(buf, indexToReadFrom, dest, kCommissioningFlowFieldLengthInBits);
     SuccessOrExit(err);
-    static_assert(kCommissioningFlowFieldLengthInBits <= std::numeric_limits<std::underlying_type_t<CommissioningFlow>>::digits, "Won't fit in CommissioningFlow");
+    static_assert(kCommissioningFlowFieldLengthInBits <= std::numeric_limits<std::underlying_type_t<CommissioningFlow>>::digits,
+                  "Won't fit in CommissioningFlow");
     outPayload.commissioningFlow = static_cast<CommissioningFlow>(dest);
 
     err = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
