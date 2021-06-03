@@ -34,7 +34,6 @@ namespace app {
 static EventManagement sInstance;
 static System::Mutex sEventLock;
 
-
 /**
  * @brief
  *   A TLVReader backed by CircularEventBuffer

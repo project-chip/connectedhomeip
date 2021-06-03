@@ -85,7 +85,7 @@ private:
     StaticSemaphore_t mFreeRTOSSemaphoreObj;
 #endif // (configSUPPORT_STATIC_ALLOCATION == 1)
     volatile SemaphoreHandle_t mFreeRTOSSemaphore = nullptr;
-    volatile int mInitialized = 0;
+    volatile int mInitialized                     = 0;
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
     Mutex(const Mutex &) = delete;
