@@ -337,31 +337,18 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Com
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOC,
-                                                           chip::ByteSpan ICACertificate, chip::ByteSpan IPKValue,
-                                                           chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan OperationalCert,
+                                                           chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
+                                                           uint16_t AdminVendorId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> cert;
-
-    uint8_t * certBuf = nullptr;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
 
     AdminPairingInfo * admin = retrieveCurrentAdmin();
     VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
-    // TODO - Update ZAP to use 16 bit length for OCTET_STRING. This is a temporary hack, as OCTET_STRING only supports 8 bit
-    // strings. We are currently spilling over NOC into ICACertificate argument.
-    VerifyOrExit(cert.Alloc(NOC.size() + ICACertificate.size()), status = EMBER_ZCL_STATUS_FAILURE);
-    certBuf = cert.Get();
-    memcpy(certBuf, NOC.data(), NOC.size());
-    memcpy(&certBuf[NOC.size()], ICACertificate.data(), ICACertificate.size());
-
-    VerifyOrExit(admin->SetOperationalCert(ByteSpan(certBuf, NOC.size() + ICACertificate.size())) == CHIP_NO_ERROR,
-                 status = EMBER_ZCL_STATUS_FAILURE);
-
+    VerifyOrExit(admin->SetOperationalCert(OperationalCert) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:

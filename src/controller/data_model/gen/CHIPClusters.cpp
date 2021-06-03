@@ -6029,9 +6029,8 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
 
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddOpCert(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan noc,
-                                                    chip::ByteSpan iCACertificate, chip::ByteSpan iPKValue,
-                                                    chip::NodeId caseAdminNode, uint16_t adminVendorId)
+                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan operationalCert,
+                                                    chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -6052,10 +6051,8 @@ CHIP_ERROR OperationalCredentialsCluster::AddOpCert(Callback::Cancelable * onSuc
     SuccessOrExit(err = sender->PrepareCommand(&cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // noc: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), noc));
-    // iCACertificate: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), iCACertificate));
+    // operationalCert: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operationalCert));
     // iPKValue: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), iPKValue));
     // caseAdminNode: nodeId

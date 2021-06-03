@@ -1523,13 +1523,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         switch (aCommandId)
         {
         case ZCL_ADD_OP_CERT_COMMAND_ID: {
-            expectArgumentCount = 5;
-            chip::ByteSpan NOC;
-            chip::ByteSpan ICACertificate;
+            expectArgumentCount = 4;
+            chip::ByteSpan OperationalCert;
             chip::ByteSpan IPKValue;
             chip::NodeId CaseAdminNode;
             uint16_t AdminVendorId;
-            bool argExists[5];
+            bool argExists[4];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -1542,7 +1541,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 5)
+                if (currentDecodeTagId < 4)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -1561,25 +1560,19 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 case 0: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    NOC                  = chip::ByteSpan(data, aDataTlv.GetLength());
+                    OperationalCert      = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
                 case 1: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    ICACertificate       = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
-                case 2: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
                     IPKValue             = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
-                case 3:
+                case 2:
                     TLVUnpackError = aDataTlv.Get(CaseAdminNode);
                     break;
-                case 4:
+                case 3:
                     TLVUnpackError = aDataTlv.Get(AdminVendorId);
                     break;
                 default:
@@ -1599,10 +1592,10 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOperationalCredentialsClusterAddOpCertCallback(apCommandObj, NOC, ICACertificate, IPKValue,
+                wasHandled = emberAfOperationalCredentialsClusterAddOpCertCallback(apCommandObj, OperationalCert, IPKValue,
                                                                                    CaseAdminNode, AdminVendorId);
             }
             break;

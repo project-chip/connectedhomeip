@@ -251,7 +251,8 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
         return CHIP_NO_ERROR;
     }
 
-    VerifyOrReturnError(cert.size() <= kMaxChipCertSize, CHIP_ERROR_INVALID_ARGUMENT);
+    // There could be two certs in the set -> ICA and NOC
+    VerifyOrReturnError(cert.size() <= kMaxChipCertSize * 2, CHIP_ERROR_INVALID_ARGUMENT);
     if (mOpCertLen != 0 && mOpCertAllocatedLen < cert.size())
     {
         ReleaseOperationalCert();
@@ -279,8 +280,6 @@ CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentia
     ReturnErrorOnFailure(
         certificates.LoadCert(mRootCert, mRootCertLen,
                               BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor).Set(CertDecodeFlags::kGenerateTBSHash)));
-
-    // TODO - Add support of ICA certificates
 
     credentials.Release();
     ReturnErrorOnFailure(credentials.Init(&certificates, certificates.GetCertCount()));

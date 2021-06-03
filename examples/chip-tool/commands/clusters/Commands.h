@@ -12178,8 +12178,7 @@ class OperationalCredentialsAddOpCert : public ModelCommand
 public:
     OperationalCredentialsAddOpCert() : ModelCommand("add-op-cert")
     {
-        AddArgument("noc", &mNoc);
-        AddArgument("iCACertificate", &mICACertificate);
+        AddArgument("operationalCert", &mOperationalCert);
         AddArgument("iPKValue", &mIPKValue);
         AddArgument("caseAdminNode", 0, UINT64_MAX, &mCaseAdminNode);
         AddArgument("adminVendorId", 0, UINT16_MAX, &mAdminVendorId);
@@ -12197,7 +12196,7 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddOpCert(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNoc, mICACertificate, mIPKValue,
+        return cluster.AddOpCert(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mOperationalCert, mIPKValue,
                                  mCaseAdminNode, mAdminVendorId);
     }
 
@@ -12207,8 +12206,7 @@ private:
             OnOperationalCredentialsClusterOpCertResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mNoc;
-    chip::ByteSpan mICACertificate;
+    chip::ByteSpan mOperationalCert;
     chip::ByteSpan mIPKValue;
     chip::NodeId mCaseAdminNode;
     uint16_t mAdminVendorId;

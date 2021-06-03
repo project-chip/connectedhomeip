@@ -11695,8 +11695,7 @@ private:
     return &_cppCluster;
 }
 
-- (void)addOpCert:(NSData *)noc
-     iCACertificate:(NSData *)iCACertificate
+- (void)addOpCert:(NSData *)operationalCert
            iPKValue:(NSData *)iPKValue
       caseAdminNode:(uint64_t)caseAdminNode
       adminVendorId:(uint16_t)adminVendorId
@@ -11719,8 +11718,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.AddOpCert(onSuccess->Cancel(), onFailure->Cancel(),
-            chip::ByteSpan((const uint8_t *) noc.bytes, noc.length),
-            chip::ByteSpan((const uint8_t *) iCACertificate.bytes, iCACertificate.length),
+            chip::ByteSpan((const uint8_t *) operationalCert.bytes, operationalCert.length),
             chip::ByteSpan((const uint8_t *) iPKValue.bytes, iPKValue.length), caseAdminNode, adminVendorId);
     });
 
