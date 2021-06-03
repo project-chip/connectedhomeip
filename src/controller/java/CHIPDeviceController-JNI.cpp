@@ -145,10 +145,12 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryInit();
 
     // Save a reference to the JVM.  Will need this to call back into Java.
+    SetJavaVm(jvm);
     sJVM = jvm;
 
     // Get a JNI environment object.
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    env = GetEnvForCurrentThread();
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeMethodForward(sJVM, env);
 
@@ -740,16 +742,15 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
 void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env;
+    JNIEnv * env   = GetEnvForCurrentThread();
     jmethodID method;
     intptr_t tmpConnObj;
 
     ChipLogProgress(Controller, "Received NotifyChipConnectionClosed");
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     method = env->GetStaticMethodID(sAndroidChipStackCls, "onNotifyChipConnectionClosed", "(I)V");
-    VerifyOrExit(method != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    VerifyOrExit(method != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     ChipLogProgress(Controller, "Calling Java NotifyChipConnectionClosed");
 
@@ -773,7 +774,7 @@ bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svc
                               const uint8_t * characteristicData, uint32_t characteristicDataLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env;
+    JNIEnv * env   = GetEnvForCurrentThread();
     jbyteArray svcIdObj;
     jbyteArray charIdObj;
     jbyteArray characteristicDataObj;
@@ -782,8 +783,7 @@ bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svc
     bool rc = false;
 
     ChipLogProgress(Controller, "Received SendCharacteristic");
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     err = N2J_ByteArray(env, svcId, 16, svcIdObj);
     SuccessOrExit(err);
@@ -822,7 +822,7 @@ exit:
 bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env;
+    JNIEnv * env   = GetEnvForCurrentThread();
     jbyteArray svcIdObj;
     jbyteArray charIdObj;
     jmethodID method;
@@ -830,8 +830,7 @@ bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t 
     bool rc = false;
 
     ChipLogProgress(Controller, "Received SubscribeCharacteristic");
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     err = N2J_ByteArray(env, svcId, 16, svcIdObj);
     SuccessOrExit(err);
@@ -866,7 +865,7 @@ exit:
 bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env;
+    JNIEnv * env   = GetEnvForCurrentThread();
     jbyteArray svcIdObj;
     jbyteArray charIdObj;
     jmethodID method;
@@ -874,8 +873,7 @@ bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_
     bool rc = false;
 
     ChipLogProgress(Controller, "Received UnsubscribeCharacteristic");
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     err = N2J_ByteArray(env, svcId, 16, svcIdObj);
     SuccessOrExit(err);
@@ -910,14 +908,13 @@ exit:
 bool HandleCloseConnection(BLE_CONNECTION_OBJECT connObj)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env;
+    JNIEnv * env   = GetEnvForCurrentThread();
     jmethodID method;
     intptr_t tmpConnObj;
     bool rc = false;
 
     ChipLogProgress(Controller, "Received CloseConnection");
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     method = env->GetStaticMethodID(sAndroidChipStackCls, "onCloseConnection", "(I)Z");
     VerifyOrExit(method != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
@@ -945,14 +942,13 @@ exit:
 uint16_t HandleGetMTU(BLE_CONNECTION_OBJECT connObj)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env;
+    JNIEnv * env   = GetEnvForCurrentThread();
     jmethodID method;
     intptr_t tmpConnObj;
     uint16_t mtu = 0;
 
     ChipLogProgress(Controller, "Received GetMTU");
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
         AndroidDeviceControllerWrapper::StackUnlockGuard unlockGuard(&sStackLock);
@@ -981,15 +977,14 @@ exit:
 void HandleNewConnection(void * appState, const uint16_t discriminator)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env;
+    JNIEnv * env   = GetEnvForCurrentThread();
     jmethodID method;
     jclass deviceControllerCls;
     AndroidDeviceControllerWrapper * wrapper = reinterpret_cast<AndroidDeviceControllerWrapper *>(appState);
     jobject self                             = wrapper->JavaObjectRef();
 
     ChipLogProgress(Controller, "Received New Connection");
-
-    sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     deviceControllerCls = env->GetObjectClass(self);
     VerifyOrExit(deviceControllerCls != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);

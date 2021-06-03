@@ -21,4 +21,13 @@
 
 #include <core/CHIPError.h>
 
+namespace {
+JavaVM * sJvm = nullptr;
+} // namespace
+
+void SetJavaVm(JavaVM * jvm);
+JNIEnv * GetEnvForCurrentThread();
+
 CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
+CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId);
+void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);
