@@ -48,6 +48,8 @@ jobs:
             - name: Clean Build
               run: xcodebuild clean
               working-directory: src/darwin/Framework
+            - name: Delete Defaults
+              run: defaults delete com.apple.dt.xctest.tool
             - name: Run macOS Build
               timeout-minutes: 10
               # Enable -Werror by hand here, because the Xcode config can't
@@ -78,9 +80,13 @@ jobs:
               timeout-minutes: 5
               run: |
                 scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+            - name: Delete Defaults
+            run: defaults delete com.apple.dt.xctest.tool
             - name: Run Tests
               timeout-minutes: 5
               run: |
                 ../../../out/debug/chip-all-clusters-app &
                 xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx
               working-directory: src/darwin/Framework
+            - name: Delete Defaults
+              run: defaults delete com.apple.dt.xctest.tool
