@@ -187,15 +187,15 @@ int main(int argc, char ** args)
     mdns::Minimal::Server<10 /* endpoints */> mdnsServer;
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
-    mdns::Minimal::QNamePart tcpServiceName[]       = { "_chip", "_tcp", "local" };
-    mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, "_chip", "_tcp", "local" };
-    mdns::Minimal::QNamePart udpServiceName[]       = { "_chip", "_udp", "local" };
-    mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, "_chip", "_udp", "local" };
+    mdns::Minimal::QNamePart tcpServiceName[]       = { "_matter", "_tcp", "local" };
+    mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, "_matter", "_tcp", "local" };
+    mdns::Minimal::QNamePart udpServiceName[]       = { "_matter", "_udp", "local" };
+    mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, "_matter", "_udp", "local" };
 
     // several UDP versions for discriminators
-    mdns::Minimal::QNamePart udpDiscriminator1[] = { "S052", "_sub", "_chip", "_udp", "local" };
-    mdns::Minimal::QNamePart udpDiscriminator2[] = { "V123", "_sub", "_chip", "_udp", "local" };
-    mdns::Minimal::QNamePart udpDiscriminator3[] = { "L0840", "_sub", "_chip", "_udp", "local" };
+    mdns::Minimal::QNamePart udpDiscriminator1[] = { "S052", "_sub", "_matter", "_udp", "local" };
+    mdns::Minimal::QNamePart udpDiscriminator2[] = { "V123", "_sub", "_matter", "_udp", "local" };
+    mdns::Minimal::QNamePart udpDiscriminator3[] = { "L0840", "_sub", "_matter", "_udp", "local" };
 
     mdns::Minimal::QNamePart serverName[] = { gOptions.instanceName, "local" };
 

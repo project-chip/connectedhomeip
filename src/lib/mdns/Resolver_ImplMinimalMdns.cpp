@@ -198,7 +198,7 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
     {
         SerializedQNameIterator suffix = name;
 
-        constexpr const char * kExpectedSuffix[] = { "_chip", "_tcp", "local" };
+        constexpr const char * kExpectedSuffix[] = { "_matter", "_tcp", "local" };
 
         if (suffix != FullQName(kExpectedSuffix))
         {
@@ -464,16 +464,16 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
     switch (type)
     {
     case DiscoveryType::kOperational:
-        qname = CheckAndAllocateQName("_chip", "_tcp", "local");
+        qname = CheckAndAllocateQName("_matter", "_tcp", "local");
         break;
     case DiscoveryType::kCommissionableNode:
         if (filter.type == DiscoveryFilterType::kNone)
         {
-            qname = CheckAndAllocateQName("_chipc", "_udp", "local");
+            qname = CheckAndAllocateQName("_matterc", "_udp", "local");
         }
         else
         {
-            qname = CheckAndAllocateQName(subtypeStr, "_sub", "_chipc", "_udp", "local");
+            qname = CheckAndAllocateQName(subtypeStr, "_sub", "_matterc", "_udp", "local");
         }
         break;
     case DiscoveryType::kUnknown:
@@ -502,7 +502,7 @@ CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddress
         // Node and fabricid are encoded in server names.
         ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId));
 
-        const char * instanceQName[] = { nameBuffer, "_chip", "_tcp", "local" };
+        const char * instanceQName[] = { nameBuffer, "_matter", "_tcp", "local" };
         Query query(instanceQName);
 
         query

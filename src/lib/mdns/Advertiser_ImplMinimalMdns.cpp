@@ -305,8 +305,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     /// need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
 
-    FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
-    FullQName operationalServerName  = AllocateQName(nameBuffer, "_chip", "_tcp", "local");
+    FullQName operationalServiceName = AllocateQName("_matter", "_tcp", "local");
+    FullQName operationalServerName  = AllocateQName(nameBuffer, "_matter", "_tcp", "local");
 
     ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
     FullQName serverName = AllocateQName(nameBuffer, "local");
@@ -371,7 +371,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         return CHIP_ERROR_NO_MEMORY;
     }
     const char * serviceType =
-        params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode ? "_chipc" : "_chipd";
+        params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode ? "_matterc" : "_matterd";
 
     FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
     FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
