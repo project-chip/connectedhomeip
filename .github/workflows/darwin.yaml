@@ -23,6 +23,7 @@ jobs:
         name: Build Darwin
         timeout-minutes: 60
 
+        if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
 
         steps:
