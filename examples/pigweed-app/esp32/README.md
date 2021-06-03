@@ -23,7 +23,6 @@ following features are available:
 
 -   [CHIP ESP32 Pigweed Example Application](#chip-esp32-pigweed-example-application)
     -   [Building the Example Application](#building-the-example-application)
-        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
     -   [Testing the Example Application](#testing-the-example-application)
 
 ---
@@ -51,8 +50,6 @@ step. To install these components manually, follow these steps:
 
           $ sudo apt-get install ninja-build
 
-### To build the application, follow these steps:
-
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
@@ -64,22 +61,19 @@ To download and install packages.
         $ ./install.sh
         $ . ./export.sh
         $ cd {path-to-connectedhomeip}
+
+    To download and install packages.
+
         $ source ./scripts/bootstrap.sh
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
 
-If packages are already installed then simply activate it.
+    If packages are already installed then simply activate them.
 
-        $ cd ${HOME}/tools/esp-idf
-        $ ./install.sh
-        $ . ./export.sh
-        $ cd {path-to-connectedhomeip}
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
 
 -   Configuration Options
 
-        To choose from the different configuration options, run menuconfig
+        To choose from the different configuration options, run menuconfig.
 
           $ idf.py menuconfig
 
