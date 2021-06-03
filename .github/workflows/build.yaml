@@ -21,6 +21,7 @@ on:
 jobs:
     build:
         name: Build
+        timeout-minutes: 60
 
         strategy:
             matrix:
@@ -50,6 +51,7 @@ jobs:
                   languages: "cpp"
 
             - name: Bootstrap
+              timeout-minutes: 3
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
               run: |
@@ -64,8 +66,10 @@ jobs:
 
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
+              timeout-minutes: 10
               run: scripts/build/gn_build.sh
             - name: Run Tests
+              timeout-minutes: 2
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
