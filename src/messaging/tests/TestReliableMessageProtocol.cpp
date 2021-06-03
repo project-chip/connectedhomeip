@@ -261,8 +261,8 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
     // Let's drop the initial message
@@ -326,8 +326,8 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
     // Let's drop the initial message
@@ -390,8 +390,8 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
     err = mockSender.mMessageDispatch.Init(rm);
@@ -451,8 +451,8 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
     // Let's drop the initial message
@@ -611,8 +611,8 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
     err = mockSender.mMessageDispatch.Init(rm);

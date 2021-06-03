@@ -90,7 +90,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
     }
     else
     {
-        // If the channel itself is providing reliability, let's not request CRMP acks
+        // If the channel itself is providing reliability, let's not request MRP acks
         payloadHeader.SetNeedsAck(false);
         ReturnErrorOnFailure(SendMessageImpl(session, payloadHeader, std::move(message), nullptr));
     }
