@@ -175,8 +175,7 @@ private:
         return AddAllocatedResponder(chip::Platform::New<ResponderType>(std::forward<Args>(args)...));
     }
 
-    template <typename... Args>
-    FullQName AllocateQName(Args &&... names)
+    void * AllocateQNameSpace(size_t size)
     {
         for (size_t i = 0; i < kMaxAllocatedQNameData; i++)
         {
@@ -185,19 +184,36 @@ private:
                 continue;
             }
 
-            mAllocatedQNameParts[i] =
-                chip::Platform::MemoryAlloc(FlatAllocatedQName::RequiredStorageSize(std::forward<Args>(names)...));
-
+            mAllocatedQNameParts[i] = chip::Platform::MemoryAlloc(size);
             if (mAllocatedQNameParts[i] == nullptr)
             {
                 ChipLogError(Discovery, "QName memory allocation failed");
-                return FullQName();
             }
-            return FlatAllocatedQName::Build(mAllocatedQNameParts[i], std::forward<Args>(names)...);
+            return mAllocatedQNameParts[i];
         }
-
         ChipLogError(Discovery, "Failed to find free slot for adding a qname");
-        return FullQName();
+        return nullptr;
+    }
+
+    template <typename... Args>
+    FullQName AllocateQName(Args &&... names)
+    {
+        void * storage = AllocateQNameSpace(FlatAllocatedQName::RequiredStorageSize(std::forward<Args>(names)...));
+        if (storage == nullptr)
+        {
+            return FullQName();
+        }
+        return FlatAllocatedQName::Build(storage, std::forward<Args>(names)...);
+    }
+
+    FullQName AllocateQNameFromArray(char const * const * names, size_t num)
+    {
+        void * storage = AllocateQNameSpace(FlatAllocatedQName::RequiredStorageSizeFromArray(names, num));
+        if (storage == nullptr)
+        {
+            return FullQName();
+        }
+        return FlatAllocatedQName::BuildFromArray(storage, names, num);
     }
 
     FullQName GetCommisioningTextEntries(const CommissionAdvertisingParameters & params);
@@ -546,6 +562,11 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
 FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertisingParameters & params)
 {
+    // Max number of TXT fields from the spec is 9: D, VP, AP, CM, DT, DN, RI, PI, PH.
+    constexpr size_t kMaxTxtFields = 9;
+    const char * txtFields[kMaxTxtFields];
+    size_t numTxtFields = 0;
+
     char txtVidPid[chip::Mdns::kKeyVendorProductMaxLength + 4];
     if (params.GetProductId().HasValue())
     {
@@ -560,20 +581,14 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     if (params.GetDeviceType().HasValue())
     {
         sprintf(txtDeviceType, "DT=%d", params.GetDeviceType().Value());
-    }
-    else
-    {
-        txtDeviceType[0] = '\0';
+        txtFields[numTxtFields++] = txtDeviceType;
     }
 
     char txtDeviceName[chip::Mdns::kKeyDeviceNameMaxLength + 4];
     if (params.GetDeviceName().HasValue())
     {
         sprintf(txtDeviceName, "DN=%s", params.GetDeviceName().Value());
-    }
-    else
-    {
-        txtDeviceName[0] = '\0';
+        txtFields[numTxtFields++] = txtDeviceName;
     }
 
     // the following sub types only apply to commissionable node advertisements
@@ -582,6 +597,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         // a discriminator always exists
         char txtDiscriminator[chip::Mdns::kKeyDiscriminatorMaxLength + 3];
         sprintf(txtDiscriminator, "D=%d", params.GetLongDiscriminator());
+        txtFields[numTxtFields++] = txtDiscriminator;
 
         if (!params.GetVendorId().HasValue())
         {
@@ -590,55 +606,45 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
 
         char txtCommissioningMode[chip::Mdns::kKeyCommissioningModeMaxLength + 4];
         sprintf(txtCommissioningMode, "CM=%d", params.GetCommissioningMode() ? 1 : 0);
+        txtFields[numTxtFields++] = txtCommissioningMode;
 
         char txtOpenWindowCommissioningMode[chip::Mdns::kKeyAdditionalPairingMaxLength + 4];
         if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
             sprintf(txtOpenWindowCommissioningMode, "AP=1");
-        }
-        else
-        {
-            txtOpenWindowCommissioningMode[0] = '\0';
+            txtFields[numTxtFields++] = txtOpenWindowCommissioningMode;
         }
 
         char txtRotatingDeviceId[chip::Mdns::kKeyRotatingIdMaxLength + 4];
         if (params.GetRotatingId().HasValue())
         {
             sprintf(txtRotatingDeviceId, "RI=%s", params.GetRotatingId().Value());
-        }
-        else
-        {
-            txtRotatingDeviceId[0] = '\0';
+            txtFields[numTxtFields++] = txtRotatingDeviceId;
         }
 
         char txtPairingHint[chip::Mdns::kKeyPairingInstructionMaxLength + 4];
         if (params.GetPairingHint().HasValue())
         {
             sprintf(txtPairingHint, "PH=%d", params.GetPairingHint().Value());
-        }
-        else
-        {
-            txtPairingHint[0] = '\0';
+            txtFields[numTxtFields++] = txtPairingHint;
         }
 
         char txtPairingInstr[chip::Mdns::kKeyPairingInstructionMaxLength + 4];
         if (params.GetPairingInstr().HasValue())
         {
             sprintf(txtPairingInstr, "PI=%s", params.GetPairingInstr().Value());
+            txtFields[numTxtFields++] = txtPairingInstr;
         }
-        else
-        {
-            txtPairingInstr[0] = '\0';
-        }
-
-        return AllocateQName(txtDiscriminator, txtVidPid, txtCommissioningMode, txtOpenWindowCommissioningMode, txtDeviceType,
-                             txtDeviceName, txtRotatingDeviceId, txtPairingHint, txtPairingInstr);
+    }
+    if (numTxtFields == 0)
+    {
+        return AllocateQNameFromArray(mEmptyTextEntries, 1);
     }
     else
     {
-        return AllocateQName(txtVidPid, txtDeviceType, txtDeviceName);
+        return AllocateQNameFromArray(txtFields, numTxtFields);
     }
-}
+} // namespace
 
 bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
 {
