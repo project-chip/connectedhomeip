@@ -66,8 +66,10 @@ EmberAfStatus emberAfTargetNavigatorClusterClientCommandParse(EmberAfClusterComm
 EmberAfStatus emberAfTemperatureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTestClusterClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfThermostatClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfThreadNetworkDiagnosticsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTrustedRootCertificatesClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfWakeOnLanClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfWiFiNetworkDiagnosticsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfWindowCoveringClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
@@ -236,12 +238,20 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             // No commands are enabled for cluster Thermostat
             result = status(false, true, cmd->mfgSpecific);
             break;
+        case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster Thread Network Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
+            break;
         case ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID:
             // No commands are enabled for cluster Trusted Root Certificates
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_WAKE_ON_LAN_CLUSTER_ID:
             // No commands are enabled for cluster Wake on LAN
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster WiFi Network Diagnostics
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_WINDOW_COVERING_CLUSTER_ID:

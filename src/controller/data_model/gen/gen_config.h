@@ -67,8 +67,10 @@
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEST_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_THERMOSTAT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TRUSTED_ROOT_CERTIFICATES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WAKE_ON_LAN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WINDOW_COVERING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
@@ -225,6 +227,10 @@
 #define ZCL_USING_THERMOSTAT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_THERMOSTAT_CLIENT
 
+// Use this macro to check if the client side of the Thread Network Diagnostics cluster is included
+#define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_CLIENT
+
 // Use this macro to check if the client side of the Trusted Root Certificates cluster is included
 #define ZCL_USING_TRUSTED_ROOT_CERTIFICATES_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_TRUSTED_ROOT_CERTIFICATES_CLIENT
@@ -232,6 +238,10 @@
 // Use this macro to check if the client side of the Wake on LAN cluster is included
 #define ZCL_USING_WAKE_ON_LAN_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_WAKE_ON_LAN_CLIENT
+
+// Use this macro to check if the client side of the WiFi Network Diagnostics cluster is included
+#define ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS_CLIENT
 
 // Use this macro to check if the client side of the Window Covering cluster is included
 #define ZCL_USING_WINDOW_COVERING_CLUSTER_CLIENT
