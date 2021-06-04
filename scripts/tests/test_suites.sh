@@ -18,8 +18,7 @@
 
 set -e
 
-find_result=$(find src/app/tests/suites -type f -name "*.yaml" -exec basename {} \; | awk -F '.yaml' '{print $1}' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/;/g')
-test_array=("$(echo "$find_result" | tr ";" "\n")")
+declare -a test_array="($(find src/app/tests/suites -type f -name "*.yaml" -exec basename {} .yaml \;))"
 
 echo "Found tests:"
 for i in "${test_array[@]}"; do
