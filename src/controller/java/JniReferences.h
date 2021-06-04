@@ -20,21 +20,26 @@
 #include <core/CHIPError.h>
 #include <jni.h>
 #include <pthread.h>
+#include <support/CodeUtils.h>
 
 class JniReferences
 {
 public:
     static pthread_mutex_t * GetStackLock() { return &sStackLock; }
 
-    static void SetJavaVm(JavaVM * jvm) { sJvm = jvm; }
+    static void SetJavaVm(JavaVM * jvm);
 
     static JNIEnv * GetEnvForCurrentThread();
+
+    static jclass GetClusterExceptionCls() { return sClusterExceptionCls; }
 
 private:
     static pthread_mutex_t sStackLock;
     static JavaVM * sJvm;
+    static jclass sClusterExceptionCls;
 };
 
+jclass GetClusterExceptionCls();
 CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
 CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId);
 void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);

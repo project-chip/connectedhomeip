@@ -1142,6 +1142,9 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
     case CHIP_JNI_ERROR_FIELD_NOT_FOUND:
         errStr = "CHIP Device Controller Error: JNI field not found";
         break;
+    case CHIP_JNI_ERROR_DEVICE_NOT_FOUND:
+        errStr = "CHIP Device Controller Error: Device not found";
+        break;
     default:
         errStr = ErrorStr(inErr);
         break;
