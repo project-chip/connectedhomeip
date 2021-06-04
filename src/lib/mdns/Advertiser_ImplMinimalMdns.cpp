@@ -273,6 +273,8 @@ CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t 
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
 
+    Clear();
+
     ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port));
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
@@ -316,7 +318,12 @@ void AdvertiserMinMdns::Clear()
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
-    Clear();
+    /* NOTE :
+     * Clear() method should not be called in Advertise()
+     * because for the devices which call Advertise() method more than 1 times i.e. advertise operational, commissionable, and
+     * commissioner needs the result to be additive. If Clear() is called at the beginning of these Advertise methods, then only the
+     * last call to Advertise will take effect.
+     */
     char nameBuffer[64] = "";
 
     /// need to set server name
@@ -380,7 +387,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
-    Clear();
+    /* NOTE :
+     * Clear() should not be called in Advertise() because some devices want to advertise
+     * multiple things (operational advertisement, commissionable advertisement, commissioner
+     * advertisement). If Clear() were called at the beginning of these Advertise methods, then
+     * only the last call to Advertise would take effect.
+     */
     // TODO: need to detect colisions here
     char nameBuffer[64] = "";
     size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), ChipLogFormatX64, GetRandU32(), GetRandU32());
