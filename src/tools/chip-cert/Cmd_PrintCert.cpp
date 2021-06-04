@@ -361,11 +361,7 @@ bool PrintCert(const char * fileName, X509 * cert)
     }
 
     indent -= 4;
-    Indent(file, indent);
-    fprintf(file, "Signature:\n");
-    indent += 4;
-    PrintHexField(file, "r", indent, certData->mSignature.RLen, certData->mSignature.R);
-    PrintHexField(file, "s", indent, certData->mSignature.SLen, certData->mSignature.S);
+    PrintHexField(file, "Signature       ", indent, certData->mSignatureLen, certData->mSignature);
 
 exit:
     CloseFile(file);
