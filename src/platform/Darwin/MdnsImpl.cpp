@@ -415,6 +415,7 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     service.mTextEntrySize = sdCtx->textEntries.empty() ? 0 : sdCtx->textEntries.size();
     service.mAddress.SetValue(chip::Inet::IPAddress::FromSockAddr(*address));
     strncpy(service.mName, sdCtx->name, sizeof(service.mName));
+    service.mInterface = sdCtx->interfaceId;
 
     sdCtx->callback(sdCtx->context, &service, CHIP_NO_ERROR);
     MdnsContexts::GetInstance().Remove(sdCtx);
@@ -428,7 +429,7 @@ static CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint
     DNSServiceRef sdRef;
     GetAddrInfoContext * sdCtx;
 
-    sdCtx = chip::Platform::New<GetAddrInfoContext>(context, callback, name, port);
+    sdCtx = chip::Platform::New<GetAddrInfoContext>(context, callback, name, interfaceId, port);
 
     char key[kMdnsKeyMaxSize];
     char value[kMdnsTextMaxSize];
@@ -474,6 +475,8 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
                       const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen, const unsigned char * txtRecord,
                       void * context)
 {
+    ChipLogDetail(DeviceLayer, "Resolved interface id: %u", interfaceId);
+
     ResolveContext * sdCtx = reinterpret_cast<ResolveContext *>(context);
     VerifyOrReturn(CheckForSuccess(sdCtx, __func__, err, true));
 

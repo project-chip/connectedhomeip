@@ -89,14 +89,17 @@ struct GetAddrInfoContext : public GenericContext
     MdnsResolveCallback callback;
     std::vector<TextEntry> textEntries;
     char name[kMdnsNameMaxSize + 1];
+    uint32_t interfaceId;
     uint16_t port;
 
-    GetAddrInfoContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName, uint16_t cbContextPort)
+    GetAddrInfoContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName, uint32_t cbInterfaceId,
+                       uint16_t cbContextPort)
     {
-        type     = ContextType::GetAddrInfo;
-        context  = cbContext;
-        callback = cb;
-        port     = cbContextPort;
+        type        = ContextType::GetAddrInfo;
+        context     = cbContext;
+        callback    = cb;
+        interfaceId = cbInterfaceId;
+        port        = cbContextPort;
         strncpy(name, cbContextName, sizeof(name));
     }
 };
