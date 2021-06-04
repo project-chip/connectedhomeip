@@ -52,7 +52,7 @@
  * Define to 1 to enable NCP UART support.
  *
  */
-#define OPENTHREAD_CONFIG_NCP_UART_ENABLE 0
+#define OPENTHREAD_CONFIG_NCP_HDLC_ENABLE 0
 
 /* reduced to fit in SRAM */
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 22
