@@ -37,7 +37,7 @@ for i in "${test_array[@]}"; do
     background_pid=$!
     sleep 1
     echo "          * Pairing to device"
-    out/debug/standalone/chip-tool pairing onnetwork 1 34567890 3840 ::1 11097
+    out/debug/standalone/chip-tool pairing onnetwork 1 34567890 3840 127.0.0.1 11097
     sleep 1
     echo "          * Starting test run: $i"
     out/debug/standalone/chip-tool tests "$i"
