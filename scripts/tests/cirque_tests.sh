@@ -45,7 +45,9 @@ BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
 
 function __screen() {
-    if [[ "x$GITHUB_ACTION_RUN" != "x1" ]]; then
+    if [[ "x$GITHUB_ACTION_RUN" == "x1" ]]; then
+        "$@"
+    else if which screen; then
         screen -dm "$@"
     else
         "$@"
@@ -55,7 +57,7 @@ function __screen() {
 function __kill_grep() {
     ps aux | grep "$1" | awk '{print $2}' | sort -k2 -rn |
         while read -r pid; do
-            kill -2 "$pid"
+            kill -2 -"$pid"
         done
 }
 

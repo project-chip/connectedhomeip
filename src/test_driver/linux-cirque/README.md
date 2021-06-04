@@ -10,6 +10,18 @@ In Project CHIP, cirque is used for integration tests.
 There is a script for running cirque tests, you can find it at
 `scripts/tests/cirque_tests.sh`
 
+## "Docker out of docker" setup
+
+If you don't want cirque break your local environment, you can run
+
+```
+integrations/docker/images/chip-build-cirque/run.sh bash
+```
+
+To enter a environment inside docker, the following commands can be used inside the container without any change.
+
+Alternatively, you can prepend `integrations/docker/images/chip-build-cirque/run.sh` to the commands in this doc.
+
 ## Setting up cirque environment
 
 After checkout, in your local project chip directory, run:
@@ -85,7 +97,13 @@ LOG_DIR=/some/log/directory scripts/tests/cirque_tests.sh run_test OnOffClusterT
 You can run a ManualTest to setup test topology only:
 
 ```
-scripts/tests/cirque_tests.sh run_test ManualTest
+./scripts/tests/cirque_tests.sh run_test ManualTest -t <topology file>
+```
+
+The topology file is a JSON file, which contains the definition of each node in the network.
+
+```
+./scripts/tests/cirque_tests.sh run_test ManualTest -t src/test_driver/linux-cirque/topologies/three_node_with_thread.json
 ```
 
 It will print the container id in log, you can execute commands inside them.
@@ -115,4 +133,4 @@ It will print the container id in log, you can execute commands inside them.
 After you finished you test, press `Ctrl-C` and it will clean up testing
 environment.
 
-Refer to `test-manual.py` and `ManualTest.sh` for detail.
+Refer to `test-manual.py`, `ManualTest.sh`, and tolologies file under `topologies` for detail.
