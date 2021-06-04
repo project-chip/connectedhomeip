@@ -19,7 +19,7 @@
 set -e
 
 find_result=$(find src/app/tests/suites -type f -name "*.yaml" -exec basename {} \; | awk -F '.yaml' '{print $1}' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/;/g')
-test_array=($(echo $find_result | tr ";" "\n"))
+test_array=("$(echo "$find_result" | tr ";" "\n")")
 
 echo "Found tests:"
 for i in "${test_array[@]}"; do
@@ -41,7 +41,7 @@ for i in "${test_array[@]}"; do
     sleep 1
     echo "          * Starting test run: $i"
     out/debug/standalone/chip-tool tests "$i"
-    kill -9 $background_pid || true
+    kill -9 "$background_pid" || true
     echo "  ===== Test complete: $i"
     sleep 2
 done
