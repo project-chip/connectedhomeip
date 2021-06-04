@@ -881,9 +881,9 @@ void emberAfBinaryInputBasicClusterServerManufacturerSpecificAttributeChangedCal
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBinaryInputBasicClusterServerMessageSentCallback(EmberOutgoingMessageType type,
-                                                             chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
-                                                             uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBinaryInputBasicClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
 
 /** @brief Binary Input (Basic) Cluster Server Pre Attribute Changed
  *
@@ -2772,8 +2772,7 @@ void emberAfRelativeHumidityMeasurementClusterServerManufacturerSpecificAttribut
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfRelativeHumidityMeasurementClusterServerMessageSentCallback(EmberOutgoingMessageType type,
-                                                                        chip::MessageSendDestination destination,
+void emberAfRelativeHumidityMeasurementClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
                                                                         EmberApsFrame * apsFrame, uint16_t msgLen,
                                                                         uint8_t * message, EmberStatus status);
 

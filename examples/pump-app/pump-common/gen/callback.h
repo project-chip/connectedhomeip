@@ -480,9 +480,8 @@ void emberAfLevelControlClusterServerManufacturerSpecificAttributeChangedCallbac
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfLevelControlClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
-                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                         EmberStatus status);
+void emberAfLevelControlClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                         uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Level Control Cluster Server Pre Attribute Changed
  *
@@ -903,8 +902,7 @@ void emberAfTemperatureMeasurementClusterClientManufacturerSpecificAttributeChan
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTemperatureMeasurementClusterClientMessageSentCallback(EmberOutgoingMessageType type,
-                                                                   chip::MessageSendDestination destination,
+void emberAfTemperatureMeasurementClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                    EmberStatus status);
 
@@ -975,8 +973,7 @@ void emberAfTemperatureMeasurementClusterServerManufacturerSpecificAttributeChan
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTemperatureMeasurementClusterServerMessageSentCallback(EmberOutgoingMessageType type,
-                                                                   chip::MessageSendDestination destination,
+void emberAfTemperatureMeasurementClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                    EmberStatus status);
 
@@ -1189,8 +1186,7 @@ void emberAfWiFiNetworkDiagnosticsClusterServerManufacturerSpecificAttributeChan
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfWiFiNetworkDiagnosticsClusterServerMessageSentCallback(EmberOutgoingMessageType type,
-                                                                   chip::MessageSendDestination destination,
+void emberAfWiFiNetworkDiagnosticsClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                    EmberStatus status);
 
