@@ -420,8 +420,9 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
-CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint32_t interfaceId, const char * name, const char * hostname,
-                       uint16_t port, uint16_t txtLen, const unsigned char * txtRecord)
+static CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint32_t interfaceId,
+                              chip::Inet::IPAddressType addressType, const char * name, const char * hostname, uint16_t port,
+                              uint16_t txtLen, const unsigned char * txtRecord)
 {
     DNSServiceErrorType err;
     DNSServiceRef sdRef;
@@ -446,8 +447,21 @@ CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint32_t in
         sdCtx->textEntries.push_back(TextEntry{ strdup(key), reinterpret_cast<const uint8_t *>(strdup(value)), valueLen });
     }
 
-    err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6, hostname,
-                                OnGetAddrInfo, sdCtx);
+    DNSServiceProtocol protocol;
+    if (addressType == chip::Inet::kIPAddressType_IPv4)
+    {
+        protocol = kDNSServiceProtocol_IPv4;
+    }
+    else if (addressType == chip::Inet::kIPAddressType_IPv6)
+    {
+        protocol = kDNSServiceProtocol_IPv6;
+    }
+    else
+    {
+        protocol = kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6;
+    }
+
+    err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
     err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
@@ -463,17 +477,19 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
     ResolveContext * sdCtx = reinterpret_cast<ResolveContext *>(context);
     VerifyOrReturn(CheckForSuccess(sdCtx, __func__, err, true));
 
-    GetAddrInfo(sdCtx->context, sdCtx->callback, interfaceId, sdCtx->name, hostname, ntohs(port), txtLen, txtRecord);
+    GetAddrInfo(sdCtx->context, sdCtx->callback, interfaceId, sdCtx->addressType, sdCtx->name, hostname, ntohs(port), txtLen,
+                txtRecord);
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
-CHIP_ERROR Resolve(void * context, MdnsResolveCallback callback, uint32_t interfaceId, const char * type, const char * name)
+static CHIP_ERROR Resolve(void * context, MdnsResolveCallback callback, uint32_t interfaceId, chip::Inet::IPAddressType addressType,
+                          const char * type, const char * name)
 {
     DNSServiceErrorType err;
     DNSServiceRef sdRef;
     ResolveContext * sdCtx;
 
-    sdCtx = chip::Platform::New<ResolveContext>(context, callback, name);
+    sdCtx = chip::Platform::New<ResolveContext>(context, callback, name, addressType);
     err   = DNSServiceResolve(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, OnResolve, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
 
@@ -550,7 +566,7 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interf
     std::string regtype  = GetFullType(service->mType, service->mProtocol);
     uint32_t interfaceId = GetInterfaceId(interface);
 
-    return Resolve(context, callback, interfaceId, regtype.c_str(), service->mName);
+    return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
 }
 
 void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout)

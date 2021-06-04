@@ -72,13 +72,15 @@ struct ResolveContext : public GenericContext
 {
     MdnsResolveCallback callback;
     char name[kMdnsNameMaxSize + 1];
+    chip::Inet::IPAddressType addressType;
 
-    ResolveContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName)
+    ResolveContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName, chip::Inet::IPAddressType cbAddressType)
     {
         type     = ContextType::Resolve;
         context  = cbContext;
         callback = cb;
         strncpy(name, cbContextName, sizeof(name));
+        addressType = cbAddressType;
     }
 };
 
