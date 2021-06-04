@@ -36,7 +36,7 @@ for i in "${test_array[@]}"; do
     background_pid=$!
     sleep 1
     echo "          * Starting test run: $i"
-    out/debug/standalone/chip-tool tests TestCluster || true
+    out/debug/standalone/chip-tool tests "$i"
     kill -9 $background_pid || true
     echo "  ===== Test complete: $i"
     sleep 2

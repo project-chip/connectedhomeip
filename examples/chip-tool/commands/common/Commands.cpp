@@ -38,6 +38,7 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
     }
 }
 
+static PersistentStorage gStorage;
 int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
