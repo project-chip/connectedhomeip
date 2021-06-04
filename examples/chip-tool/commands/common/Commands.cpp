@@ -38,6 +38,7 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
     }
 }
 
+// TODO: Remove this work around due to crashes when storage is accessed from multiple threads and passed around
 static PersistentStorage gStorage;
 int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {

@@ -55,6 +55,7 @@ CHIP_ERROR TestCommand::Run(PersistentStorage & storage, NodeId localId, NodeId 
 
     // Give some time for all the pending messages to flush before shutting down
     // Note: This is working around racy code in message queues during shutdown
+    // TODO: Remove this workaround once we understand the message queue and shutdown race
     test_os_sleep_ms(1000);
     mCommissioner.Shutdown();
 
