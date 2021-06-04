@@ -197,6 +197,8 @@ private:
         Crypto::P256SerializedKeypair mOperationalKey;
         uint8_t mRootCert[kMaxChipCertSize];
         uint8_t mOperationalCert[kMaxChipCertSize];
+        
+        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
     };
 };
 
