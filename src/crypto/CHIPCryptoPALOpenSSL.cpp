@@ -1570,7 +1570,7 @@ static void security_free_cert_list(X509_LIST * certs)
     }
 }
 
-CHIP_ERROR LoadCertsFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs)
+CHIP_ERROR LoadCertsFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     X509_LIST * certs = NULL;
@@ -1624,7 +1624,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR LoadCertFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t n_cert)
+CHIP_ERROR LoadCertFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t n_cert)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     X509_LIST * certs = NULL;
@@ -1674,7 +1674,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR GetNumberOfCertsFromPKCS7(const uint8_t * pkcs7, uint32_t * n_certs)
+CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     X509_LIST * certs = NULL;

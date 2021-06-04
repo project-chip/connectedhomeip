@@ -1198,17 +1198,17 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LoadCertsFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs)
+CHIP_ERROR LoadCertsFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR LoadCertFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t n_cert)
+CHIP_ERROR LoadCertFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t n_cert)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR GetNumberOfCertsFromPKCS7(const uint8_t * pkcs7, uint32_t * n_certs)
+CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

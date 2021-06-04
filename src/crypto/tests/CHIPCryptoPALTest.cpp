@@ -1435,7 +1435,6 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
 
-// TODO: Add mbedTLS implementation for PKCS7 and Pubkey Extraction methods
 #if CHIP_CRYPTO_OPENSSL
 static void TestX509_PKCS7Extraction(nlTestSuite * inSuite, void * inContext)
 {
@@ -1443,7 +1442,7 @@ static void TestX509_PKCS7Extraction(nlTestSuite * inSuite, void * inContext)
     X509DerCertificate x509list[3];
     uint32_t max_certs = sizeof(x509list) / sizeof(X509DerCertificate);
 
-    err = LoadCertsFromPKCS7(reinterpret_cast<const uint8_t *>(pem_pkcs7_blob), x509list, &max_certs);
+    err = LoadCertsFromPKCS7(pem_pkcs7_blob, x509list, &max_certs);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = memcmp(certificate_blob_leaf, x509list[0], x509list[0].Length());
