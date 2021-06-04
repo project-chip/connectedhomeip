@@ -192,6 +192,7 @@ class DeviceMgrCmd(Cmd):
         "zclconfigure",
 
         "discover",
+        "ping",
 
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
@@ -310,7 +311,6 @@ class DeviceMgrCmd(Cmd):
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
-
 
     def do_setuppayload(self, line):
         """
@@ -561,6 +561,74 @@ class DeviceMgrCmd(Cmd):
             return
 
         self.devCtrl.PrintDiscoveredDevices()
+
+    def do_ping(self, line):
+        """
+        ping [options] <nodeid>
+
+        Options:
+          -i  <interval>  ping interval time in seconds
+          -c  <count>     stop after <count> replies
+          -r  <1|0>       enable or disable MRP
+          -s  <size>      payload size in bytes
+
+        ping command is using Echo Protocol to measure packet loss across network paths.
+
+        """
+        try:
+            args = shlex.split(line)
+            argc = len(args) - 1
+            if len(args) < 1 or args[0] == '?':
+                print("Usage:")
+                self.do_help("ping")
+                return
+
+            echoCount = 3
+            echoInterval = 1000
+            payloadSize = 32
+            usingMRP = True;
+            optIndex = 0
+
+            while (optIndex <= argc and args[optIndex][0] == '-'):
+                if args[optIndex] == "-i":
+                    optIndex += 1
+                    echoInterval = int(args[optIndex])
+                elif args[optIndex] == "-c":
+                    optIndex += 1
+                    echoCount = int(args[optIndex]) 
+                elif args[optIndex] == "-s":
+                    optIndex += 1
+                    payloadSize = int(args[optIndex])
+                elif args[optIndex] == "-r":
+                    optIndex += 1
+                    if (int(args[optIndex]) == 1):
+                        usingMRP = True
+                    else:
+                        usingMRP = False
+                else:
+                    print("Unexpected option %s" % args[optIndex])
+                    return
+
+                optIndex += 1
+
+            if (optIndex > argc):
+                print("Missing Node ID")
+                return
+            
+            nodeid = int(args[optIndex])
+
+            err = self.devCtrl.PingNode(nodeid, echoCount, echoInterval, payloadSize, usingMRP)
+            if err == 0:
+                print("Received command status response")
+            else:                
+                print("Failed to receive command status response")
+        except ValueError:
+            print("Incorrect argument type")
+        except IndexError:
+            print("Missing argument for option %s" % args[optIndex-1])
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+            return
 
     def do_zcl(self, line):
         """

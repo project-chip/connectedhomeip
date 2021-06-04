@@ -354,7 +354,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
             }
             else
             {
-                ChipLogDetail(Inet, "Received message have been queued due to peer counter is not synced");
+                ChipLogError(Inet, "Received message have been queued due to peer counter is not synced");
             }
 
             return;

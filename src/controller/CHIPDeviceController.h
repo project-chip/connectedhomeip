@@ -39,6 +39,7 @@
 #include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
+#include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <support/DLLUtil.h>
@@ -87,6 +88,66 @@ struct ControllerInitParams
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
+};
+
+class PingParams
+{
+public:
+    void Reset()
+    {
+        mEchoInterval       = 1000;
+        mLastEchoTime       = 0;
+        mEchoReqCount       = 0;
+        mEchoRespCount      = 0;
+        mEchoReqSize        = 32;
+        mWaitingForEchoResp = false;
+        mUsingMRP           = true;
+    }
+
+    uint64_t GetLastEchoTime() const { return mLastEchoTime; }
+    void SetLastEchoTime(uint64_t value) { mLastEchoTime = value; }
+
+    uint32_t GetEchoReqCount() const { return mEchoReqCount; }
+    void SetEchoReqCount(uint32_t value) { mEchoReqCount = value; }
+    void IncrementEchoReqCount() { mEchoReqCount++; }
+
+    uint32_t GetEchoRespCount() const { return mEchoRespCount; }
+    void SetEchoRespCount(uint32_t value) { mEchoRespCount = value; }
+    void IncrementEchoRespCount() { mEchoRespCount++; }
+
+    uint32_t GetEchoInterval() const { return mEchoInterval; }
+    void SetEchoInterval(uint32_t value) { mEchoInterval = value; }
+
+    uint32_t GetEchoReqSize() const { return mEchoReqSize; }
+    void SetEchoReqSize(uint32_t value) { mEchoReqSize = value; }
+
+    bool IsWaitingForEchoResp() const { return mWaitingForEchoResp; }
+    void SetWaitingForEchoResp(bool value) { mWaitingForEchoResp = value; }
+
+    bool IsUsingMRP() const { return mUsingMRP; }
+    void SetUsingMRP(bool value) { mUsingMRP = value; }
+
+private:
+    // The last time a echo request was attempted to be sent.
+    uint64_t mLastEchoTime;
+
+    // Count of the number of echo requests sent.
+    uint32_t mEchoReqCount;
+
+    // Count of the number of echo responses received.
+    uint32_t mEchoRespCount;
+
+    // The CHIP Echo request payload size in bytes.
+    uint32_t mEchoReqSize;
+
+    // The CHIP Echo interval time in milliseconds.
+    uint32_t mEchoInterval;
+
+    // True, if the echo client is waiting for an echo response
+    // after sending an echo request, false otherwise.
+    bool mWaitingForEchoResp;
+
+    bool mUsingMRP;
 };
 
 enum CommissioningStage : uint8_t
@@ -444,6 +505,20 @@ public:
      */
     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
 
+    /**
+     * @brief
+     *    Using Echo Protocol to measure packet loss across network paths for a paired device.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] maxCount              The max value for the number of echo requests sent.
+     * @param[in] waitTime              The max time to wait for Echo response message in seconds.
+     * @param[in] payloadSize           The CHIP Echo request payload size in bytes.
+     * @param[in] usingMRP              If enable Message Reliable Protocol for CHIP Echo request.
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR PingDevice(NodeId remoteDeviceId, uint32_t maxCount, uint32_t waitTime, uint32_t payloadSize, bool usingMRP);
+
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
@@ -548,6 +623,8 @@ private:
      */
     CHIP_ERROR SendTrustedRootCertificate(Device * device);
 
+    CHIP_ERROR SendEchoRequest(NodeId remoteDeviceId);
+
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
        The function does not hold a refernce to the device object.
@@ -575,13 +652,19 @@ private:
 
     /* Callback when adding operational certs to device results in failure */
     static void OnAddOpCertFailureResponse(void * context, uint8_t status);
+
     /* Callback when the device confirms that it has added the operational certificates */
     static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
 
     /* Callback when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);
+
     /* Callback called when adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, uint8_t status);
+
+    static void OnHandleEchoResponse(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload);
+
+    static bool EchoIntervalExpired(void);
 
     /**
      * @brief
@@ -612,6 +695,9 @@ private:
     Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
 
     PASESession mPairingSession;
+
+    static PingParams mPingParams;
+    Protocols::Echo::EchoClient mEchoClient;
 };
 
 } // namespace Controller

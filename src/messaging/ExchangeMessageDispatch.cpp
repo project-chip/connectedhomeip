@@ -75,7 +75,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
 
         ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
-        // Add to Table for subsequent sending
+        ChipLogProgress(ExchangeManager, "Add to RetransTable for subsequent sending");
         ReturnErrorOnFailure(reliableMessageMgr->AddToRetransTable(reliableMessageContext, &entry));
         auto deleter = [reliableMessageMgr](ReliableMessageMgr::RetransTableEntry * e) {
             reliableMessageMgr->ClearRetransTable(*e);
