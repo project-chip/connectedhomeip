@@ -16,7 +16,7 @@ If you don't want cirque break your local environment, you can enter a
 environment insider docker
 
 ```
-./integrations/docker/images/chip-build-cirque/run.sh --privileged --env LOG_DIR=/tmp/cirque_test_output --env CLEANUP_DOCKER_FOR_CI=1 --volume /dev/pts:/dev/pts --volume /tmp/cirque_test_output:/tmp/cirque_test_output -it -- bash
+integrations/docker/images/chip-build-cirque/run.sh --privileged --volume /dev/pts:/dev/pts --volume /tmp:/tmp -it -- bash
 ```
 
 ## Setting up cirque environment
