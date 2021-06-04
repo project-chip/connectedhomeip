@@ -12,7 +12,8 @@ There is a script for running cirque tests, you can find it at
 
 ## "Docker out of docker" setup
 
-If you don't want cirque break your local environment, you can enter a environment insider docker
+If you don't want cirque break your local environment, you can enter a
+environment insider docker
 
 ```
 ./integrations/docker/images/chip-build-cirque/run.sh --privileged --env LOG_DIR=/tmp/cirque_test_output --env CLEANUP_DOCKER_FOR_CI=1 --volume /dev/pts:/dev/pts --volume /tmp/cirque_test_output:/tmp/cirque_test_output -it -- bash
@@ -96,7 +97,8 @@ You can run a ManualTest to setup test topology only:
 ./scripts/tests/cirque_tests.sh run_test ManualTest -t <topology file>
 ```
 
-The topology file is a JSON file, which contains the definition of each node in the network.
+The topology file is a JSON file, which contains the definition of each node in
+the network.
 
 ```
 ./scripts/tests/cirque_tests.sh run_test ManualTest -t src/test_driver/linux-cirque/topologies/three_node_with_thread.json
@@ -129,4 +131,5 @@ It will print the container id in log, you can execute commands inside them.
 After you finished you test, press `Ctrl-C` and it will clean up testing
 environment.
 
-Refer to `test-manual.py`, `ManualTest.sh`, and tolologies file under `topologies` for detail.
+Refer to `test-manual.py`, `ManualTest.sh`, and tolologies file under
+`topologies` for detail.
