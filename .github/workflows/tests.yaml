@@ -51,6 +51,7 @@ jobs:
             - name: Run Tests
               timeout-minutes: 5
               run: |
+                  ifconfig -a
                   scripts/tests/test_suites.sh
     test_suites_darwin:
         name: Test Suites - Darwin
@@ -69,18 +70,18 @@ jobs:
             - name: Fix pkgconfig link
               working-directory: /usr/local/lib/pkgconfig
               run: |
-                pwd
-                ls -la /usr/local/Cellar/
-                ls -la /usr/local/Cellar/openssl@1.1
-                OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+                  pwd
+                  ls -la /usr/local/Cellar/
+                  ls -la /usr/local/Cellar/openssl@1.1
+                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
+                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
             - name: Bootstrap
               timeout-minutes: 3
               run: scripts/build/gn_bootstrap.sh
             - name: Run Build Test Server
               timeout-minutes: 5
               run: |
-                scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
             - name: Build chip-tool
               timeout-minutes: 5
               run: |

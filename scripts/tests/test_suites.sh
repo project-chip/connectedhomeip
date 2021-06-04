@@ -31,12 +31,13 @@ echo ""
 for i in "${test_array[@]}"; do
     echo "  ===== Running test: $i"
     echo "          * Starting cluster server"
-    rm -rf /tmp/chip_tool_config.ini || true
+    rm -rf /tmp/chip_tool_config.ini
+    sleep 1
     out/debug/chip-all-clusters-app &
     background_pid=$!
     sleep 1
     echo "          * Pairing to device"
-    out/debug/standalone/chip-tool pairing onnetwork 1 34567890 3840 127.0.0.1 11097
+    out/debug/standalone/chip-tool pairing onnetwork 1 34567890 3840 ::1 11097
     sleep 1
     echo "          * Starting test run: $i"
     out/debug/standalone/chip-tool tests "$i"
