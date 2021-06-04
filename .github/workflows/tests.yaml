@@ -74,10 +74,6 @@ jobs:
                 ls -la /usr/local/Cellar/openssl@1.1
                 OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                 ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
-
-            - name: Setup Build
-              run: |
-                  scripts/build/gn_gen.sh --args='chip_crypto="mbedtls"'
             - name: Bootstrap
               timeout-minutes: 3
               run: scripts/build/gn_bootstrap.sh

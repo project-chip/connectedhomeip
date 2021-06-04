@@ -57,7 +57,7 @@ CHIP_ERROR TestCommand::Run(PersistentStorage & storage, NodeId localId, NodeId 
                                                     .SetPeerAddress(peerAddress);
 
         ReturnErrorOnFailure(mCommissioner.PairDevice(deviceID, pairingParams));
-        ChipLogDetail(chipTool, "Paired Successfully");
+        ChipLogDetail(chipTool, "Started pairing");
     }
 
     ReturnErrorOnFailure(NextTest());
