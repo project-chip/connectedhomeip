@@ -696,6 +696,67 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
     return res;
 }
 
+INET_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
+{
+    if (!IsConnected())
+        return INET_ERROR_INCORRECT_STATE;
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // TODO: Does netif_get_by_index(mTCP->netif_idx) do the right thing?  I
+    // can't quite tell whether LwIP supports a specific interface id for TCP at
+    // all.  For now just claim no particular interface id.
+    *retInterface = INET_NULL_INTERFACEID;
+    return INET_NO_ERROR;
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    union
+    {
+        sockaddr any;
+        sockaddr_in6 in6;
+#if INET_CONFIG_ENABLE_IPV4
+        sockaddr_in in;
+#endif // INET_CONFIG_ENABLE_IPV4
+    } sa;
+
+    memset(&sa, 0, sizeof(sa));
+    socklen_t saLen = sizeof(sa);
+
+    if (getpeername(mSocket, &sa.any, &saLen) != 0)
+    {
+        return chip::System::MapErrorPOSIX(errno);
+    }
+
+    if (sa.any.sa_family == AF_INET6)
+    {
+        if (IPAddress::FromIPv6(sa.in6.sin6_addr).IsIPv6LinkLocal())
+        {
+            *retInterface = sa.in6.sin6_scope_id;
+        }
+        else
+        {
+            // TODO: Is there still a meaningful interface id in this case?
+            *retInterface = INET_NULL_INTERFACEID;
+        }
+        return INET_NO_ERROR;
+    }
+
+#if INET_CONFIG_ENABLE_IPV4
+    if (sa.any.sa_family == AF_INET)
+    {
+        // No interface id available for IPv4 sockets.
+        *retInterface = INET_NULL_INTERFACEID;
+    }
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    return INET_ERROR_INCORRECT_STATE;
+
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+    *retInterface = INET_NULL_INTERFACEID;
+    return INET_NO_ERROR;
+}
+
 INET_ERROR TCPEndPoint::Send(System::PacketBufferHandle && data, bool push)
 {
     INET_ERROR res = INET_NO_ERROR;
