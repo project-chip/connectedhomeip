@@ -43,7 +43,6 @@ step. To install these components manually, follow these steps:
           $ cd esp-idf
           $ git checkout release/v4.2
           $ git submodule update --init
-          $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
 
 -   Install ninja-build
@@ -95,7 +94,7 @@ To download and install packages.
     before flashing. For ESP32-DevKitC devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
-          $ idf.py build flash ESPPORT=/dev/tty.SLAB_USBtoUART
+          $ idf.py -p /dev/tty.SLAB_USBtoUART build flash
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
