@@ -32,7 +32,6 @@ namespace chip {
 namespace app {
 static EventManagement sInstance;
 
-
 /**
  * @brief
  *   A TLVReader backed by CircularEventBuffer
