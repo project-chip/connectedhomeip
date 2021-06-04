@@ -12,15 +12,11 @@ There is a script for running cirque tests, you can find it at
 
 ## "Docker out of docker" setup
 
-If you don't want cirque break your local environment, you can run
+If you don't want cirque break your local environment, you can enter a environment insider docker
 
 ```
-integrations/docker/images/chip-build-cirque/run.sh bash
+./integrations/docker/images/chip-build-cirque/run.sh --privileged --env LOG_DIR=/tmp/cirque_test_output --env CLEANUP_DOCKER_FOR_CI=1 --volume /dev/pts:/dev/pts --volume /tmp/cirque_test_output:/tmp/cirque_test_output -it -- bash
 ```
-
-To enter a environment inside docker, the following commands can be used inside the container without any change.
-
-Alternatively, you can prepend `integrations/docker/images/chip-build-cirque/run.sh` to the commands in this doc.
 
 ## Setting up cirque environment
 

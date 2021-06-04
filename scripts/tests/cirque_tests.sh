@@ -47,7 +47,7 @@ RESET_COLOR="\033[0m"
 function __screen() {
     if [[ "x$GITHUB_ACTION_RUN" == "x1" ]]; then
         "$@"
-    else if which screen; then
+    elif which screen; then
         screen -dm "$@"
     else
         "$@"
