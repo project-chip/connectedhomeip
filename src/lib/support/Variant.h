@@ -70,15 +70,6 @@ struct VariantCurry<>
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v) {}
 };
 
-// Using assert inside template will encoded template name into the assert
-// error message, which cost lots of flash space, this function can strip the
-// type name, and the function name should be as short as possible to save
-// space.
-inline void AssertStrip(bool exp)
-{
-    assert(exp);
-}
-
 } // namespace Internal
 
 /**
@@ -166,14 +157,14 @@ public:
     template <typename T>
     T & Get()
     {
-        Internal::AssertStrip(mTypeId == T::VariantId);
+        VerifyOrDie(mTypeId == T::VariantId);
         return *reinterpret_cast<T *>(&mData);
     }
 
     template <typename T>
     const T & Get() const
     {
-        Internal::AssertStrip(mTypeId == T::VariantId);
+        VerifyOrDie(mTypeId == T::VariantId);
         return *reinterpret_cast<const T *>(&mData);
     }
 

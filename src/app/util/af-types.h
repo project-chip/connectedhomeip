@@ -1282,8 +1282,6 @@ public:
         return MessageSendDestination(VariantViaExchange(exchangeContext));
     }
 
-    std::size_t GetType() const { return mDestination.GetType(); }
-
     bool IsViaBinding() const { return mDestination.Is<VariantViaBinding>(); }
     bool IsDirect() const { return mDestination.Is<VariantDirect>(); }
     bool IsViaExchange() const { return mDestination.Is<VariantViaExchange>(); }

@@ -330,8 +330,8 @@ EmberStatus emberAfSendMulticastWithAliasWithCallback(GroupId multicastId, Ember
                                                       uint8_t * message, EmberNodeId alias, uint8_t sequence,
                                                       EmberAfMessageSentFunction callback)
 {
-    apsFrame->groupId                        = multicastId;
-    const MessageSendDestination destination = MessageSendDestination::MulticastWithAlias(multicastId);
+    apsFrame->groupId      = multicastId;
+    const auto destination = MessageSendDestination::MulticastWithAlias(multicastId);
     return send(destination, apsFrame, messageLength, message,
                 true, // broadcast
                 alias, sequence, callback);
@@ -340,8 +340,8 @@ EmberStatus emberAfSendMulticastWithAliasWithCallback(GroupId multicastId, Ember
 EmberStatus emberAfSendMulticastWithCallback(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
                                              uint8_t * message, EmberAfMessageSentFunction callback)
 {
-    apsFrame->groupId                        = multicastId;
-    const MessageSendDestination destination = MessageSendDestination::Multicast(multicastId);
+    apsFrame->groupId      = multicastId;
+    const auto destination = MessageSendDestination::Multicast(multicastId);
     return send(destination, apsFrame, messageLength, message,
                 true, // broadcast?
                 0,    // alias
