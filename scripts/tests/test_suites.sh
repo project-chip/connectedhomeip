@@ -31,6 +31,7 @@ echo ""
 for i in "${test_array[@]}"; do
     echo "  ===== Running test: $i"
     echo "          * Starting cluster server"
+    rm -rf /tmp/chip_tool_config.ini || true
     out/debug/chip-all-clusters-app &
     background_pid=$!
     sleep 1
