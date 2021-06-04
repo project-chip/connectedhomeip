@@ -77,7 +77,7 @@ jobs:
 
             - name: Setup Build
               run: |
-                  scripts/build/gn_gen.sh --args="chip_crypto=mbedtls"
+                  scripts/build/gn_gen.sh --args='chip_crypto="mbedtls"'
             - name: Bootstrap
               timeout-minutes: 3
               run: scripts/build/gn_bootstrap.sh
