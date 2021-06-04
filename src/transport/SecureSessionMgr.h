@@ -68,8 +68,6 @@ public:
 
     uint32_t GetMsgId() const;
 
-    PacketBufferHandle Retain() const { return PacketBufferHandle::Retain(); }
-
     /**
      * Creates a copy of the data in this packet.
      *
@@ -108,11 +106,8 @@ public:
      * Get a handle to the data that allows mutating the bytes.  This should
      * only be used if absolutely necessary, because EncryptedPacketBufferHandle
      * represents a buffer that we want to resend as-is.
-     *
-     * We only allow doing this with an rvalue reference, so the fact that we
-     * are moving out of the EncryptedPacketBufferHandle is clear.
      */
-    PacketBufferHandle CastToWritable() && { return PacketBufferHandle(std::move(*this)); }
+    PacketBufferHandle CastToWritable() const { return PacketBufferHandle::Retain(); }
 
 private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
@@ -184,17 +179,17 @@ public:
 
     /**
      * @brief
-     *   This function takes the payload and returns the final message which can be send multiple times.
+     *   This function takes the payload and returns encrypted message which can be sent multiple times.
      *
      * @details
      *   It contains following preparation:
      *    1. Encrypt the msgBuf
      *    2. construct the packet header
      *    3. Encode the packet header and prepend it to message.
-     *   Returns a prepared message in preparedMessage.
+     *   Returns a encrypted message in encryptedMessage.
      */
-    CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
-                              EncryptedPacketBufferHandle & preparedMessage);
+    CHIP_ERROR BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                            System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle & encryptedMessage);
 
     /**
      * @brief

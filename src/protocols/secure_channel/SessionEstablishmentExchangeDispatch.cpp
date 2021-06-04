@@ -41,10 +41,10 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SecureSessionHan
 }
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SecureSessionHandle session,
-                                                                     const EncryptedPacketBufferHandle & message) const
+                                                                     const EncryptedPacketBufferHandle & preparedMessage) const
 {
     ReturnErrorCodeIf(mTransportMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mTransportMgr->SendMessage(mPeerAddress, message.Retain());
+    return mTransportMgr->SendMessage(mPeerAddress, preparedMessage.CastToWritable());
 }
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,

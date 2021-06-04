@@ -122,8 +122,9 @@ Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
     return Transport::Type::kUndefined;
 }
 
-CHIP_ERROR SecureSessionMgr::PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
-                                            System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle & preparedMessage)
+CHIP_ERROR SecureSessionMgr::BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                                          System::PacketBufferHandle && msgBuf,
+                                                          EncryptedPacketBufferHandle & encryptedMessage)
 {
     PacketHeader packetHeader;
     if (IsControlMessage(payloadHeader))
@@ -135,7 +136,7 @@ CHIP_ERROR SecureSessionMgr::PrepareMessage(SecureSessionHandle session, Payload
     if (state == nullptr)
     {
         return CHIP_ERROR_NOT_CONNECTED;
-    };
+    }
 
     Transport::AdminPairingInfo * admin = mAdmins->FindAdminWithId(state->GetAdminId());
     if (admin == nullptr)
@@ -149,11 +150,11 @@ CHIP_ERROR SecureSessionMgr::PrepareMessage(SecureSessionHandle session, Payload
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
 
-    preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(msgBuf));
+    encryptedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(msgBuf));
     ChipLogProgress(Inet,
-                    "Prepared msg %p from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
+                    "Encrypted message %p from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
                     " on exchange %d.",
-                    &preparedMessage, ChipLogValueX64(localNodeId), ChipLogValueX64(state->GetPeerNodeId()),
+                    &encryptedMessage, ChipLogValueX64(localNodeId), ChipLogValueX64(state->GetPeerNodeId()),
                     payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
                     payloadHeader.GetExchangeID());
 
@@ -168,7 +169,7 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SecureSessionHandle session, co
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!preparedMessage.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    msgBuf = preparedMessage.Retain();
+    msgBuf = preparedMessage.CastToWritable();
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!msgBuf->HasChainedBuffer(), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 

@@ -129,9 +129,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & message) const override
+    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override
     {
-        return gTransportMgr.SendMessage(Transport::PeerAddress(), message.Retain());
+        return gTransportMgr.SendMessage(Transport::PeerAddress(), preparedMessage.CastToWritable());
     }
 
     bool IsReliableTransmissionAllowed() const override { return mRetainMessageOnSend; }

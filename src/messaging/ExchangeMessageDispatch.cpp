@@ -29,6 +29,7 @@
 #endif
 
 #include <inttypes.h>
+#include <memory>
 
 #include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/ReliableMessageContext.h>
@@ -76,18 +77,14 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
 
         // Add to Table for subsequent sending
         ReturnErrorOnFailure(reliableMessageMgr->AddToRetransTable(reliableMessageContext, &entry));
+        auto deleter = [reliableMessageMgr](ReliableMessageMgr::RetransTableEntry * e) {
+            reliableMessageMgr->ClearRetransTable(*e);
+        };
+        std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
 
-        CHIP_ERROR err = PrepareMessage(session, payloadHeader, std::move(message), entry->retainedBuf);
-        if (err != CHIP_NO_ERROR)
-        {
-            // Remove from table
-            ChipLogError(ExchangeManager, "Failed to send message with err %s", ::chip::ErrorStr(err));
-            reliableMessageMgr->ClearRetransTable(*entry);
-            return err;
-        }
-
-        ReturnErrorOnFailure(SendPreparedMessage(session, entry->retainedBuf));
-        reliableMessageMgr->StartRetransmision(entry);
+        ReturnErrorOnFailure(PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
+        ReturnErrorOnFailure(SendPreparedMessage(session, entryOwner->retainedBuf));
+        reliableMessageMgr->StartRetransmision(entryOwner.release());
     }
     else
     {
