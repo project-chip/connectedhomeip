@@ -71,10 +71,12 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     If packages are already installed then simply activate them.
 
         $ source ./scripts/activate.sh
+
 -   Target Set
 
           $ idf.py set-target esp32
-       or $ idf.py set-target esp32c3
+
+    or \$ idf.py set-target esp32c3
 
 -   Configuration Options
 
