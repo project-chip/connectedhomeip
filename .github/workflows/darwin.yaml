@@ -50,6 +50,7 @@ jobs:
               working-directory: src/darwin/Framework
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
+              continue-on-error: true
             - name: Run macOS Build
               timeout-minutes: 10
               # Enable -Werror by hand here, because the Xcode config can't
@@ -82,6 +83,7 @@ jobs:
                 scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
+              continue-on-error: true
             - name: Run Tests
               timeout-minutes: 5
               run: |
@@ -90,3 +92,4 @@ jobs:
               working-directory: src/darwin/Framework
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
+              continue-on-error: true
