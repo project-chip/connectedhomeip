@@ -159,8 +159,8 @@ Ninja to build the executable.
 
     ```
     $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
-    $ export TI_SIMPLELINK_SDK_ROOT=<path-to-simplelink-sdk>
-    $ export TI_SYSCONFIG_ROOT=<path-to-sysconfig-sdk>
+    $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13x2_26x2_sdk_4_40_05_02_eng
+    $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.7.0
     $ gn gen out/debug --args="ti_simplelink_sdk_root=\"${TI_SIMPLELINK_SDK_ROOT}\" ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
     $ ninja -C out/debug
 
