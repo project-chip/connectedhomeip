@@ -32,8 +32,11 @@ for i in "${test_array[@]}"; do
     echo "  ===== Running test: $i"
     echo "          * Starting cluster server"
     out/debug/chip-all-clusters-app &
-    sleep 5
+    background_pid=$!
+    sleep 1
     echo "          * Starting test run: $i"
-    out/debug/standalone/chip-tool tests TestCluster
+    out/debug/standalone/chip-tool tests TestCluster || true
+    kill -9 $background_pid || true
     echo "  ===== Test complete: $i"
+    sleep 2
 done
