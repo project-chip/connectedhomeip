@@ -81,7 +81,7 @@ if (chip_device_platform != "none") {
 
     stack_log_tracking = chip_stack_lock_tracking
     if (stack_log_tracking == "auto") {
-      if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      if (chip_device_platform == "linux") {
         # TODO: should be fatal for development. Change once bugs are fixed
         stack_log_tracking = "log"
       } else {

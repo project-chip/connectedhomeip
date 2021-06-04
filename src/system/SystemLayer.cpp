@@ -674,7 +674,9 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
 {
     assertChipStackLockedByCurrentThread();
 
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_t lThreadSelf;
+#endif
     Error lReturn;
 
     if (this->State() != kLayerState_Initialized)
