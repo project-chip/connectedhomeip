@@ -66,7 +66,6 @@ CHIP_ERROR TestCommand::Run(PersistentStorage & storage, NodeId localId, NodeId 
     WaitForResponse(kWaitDurationInSeconds);
 
     mCommissioner.ServiceEventSignal();
-    mCommissioner.Shutdown();
 
     VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
 
