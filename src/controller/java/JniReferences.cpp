@@ -57,6 +57,11 @@ pthread_mutex_t * GetStackLock()
     return &sStackLock;
 }
 
+jclass GetClusterExceptionCls()
+{
+    return clusterExceptionCls;
+}
+
 CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

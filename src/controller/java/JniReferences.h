@@ -21,6 +21,7 @@
 #include <jni.h>
 #include <pthread.h>
 namespace {
+jclass clusterExceptionCls;
 JavaVM * sJvm              = nullptr;
 pthread_mutex_t sStackLock = PTHREAD_MUTEX_INITIALIZER;
 } // namespace
@@ -30,6 +31,7 @@ JavaVM * GetJavaVm();
 JNIEnv * GetEnvForCurrentThread();
 pthread_mutex_t * GetStackLock();
 
+jclass GetClusterExceptionCls();
 CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
 CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId);
 void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);
