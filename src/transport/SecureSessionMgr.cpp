@@ -202,10 +202,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         ChipLogProgress(Inet, "Sending secure msg on connection specific transport");
         err = state->GetTransport()->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
     }
-    else
+    else if (mTransportMgr != nullptr)
     {
         ChipLogProgress(Inet, "Sending secure msg on generic transport");
         err = mTransportMgr->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
+    }
+    else
+    {
+        ChipLogError(Inet, "The transport manager is not initialized. Unable to send the message");
+        err = CHIP_ERROR_INCORRECT_STATE;
     }
     ChipLogProgress(Inet, "Secure msg send status %s", ErrorStr(err));
     SuccessOrExit(err);

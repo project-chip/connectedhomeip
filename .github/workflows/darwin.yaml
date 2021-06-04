@@ -84,12 +84,9 @@ jobs:
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
-            - name: Run Tests
+            - name: Run Framework Tests
               timeout-minutes: 5
               run: |
                 ../../../out/debug/chip-all-clusters-app &
                 xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx
               working-directory: src/darwin/Framework
-            - name: Delete Defaults
-              run: defaults delete com.apple.dt.xctest.tool
-              continue-on-error: true
