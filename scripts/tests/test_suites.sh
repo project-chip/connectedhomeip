@@ -31,7 +31,6 @@ echo ""
 for i in "${test_array[@]}"; do
     echo "  ===== Running test: $i"
     echo "          * Starting cluster server"
-    killall -9 chip-all-clusters-app
     out/debug/chip-all-clusters-app &
     sleep 5
     echo "          * Starting test run: $i"
