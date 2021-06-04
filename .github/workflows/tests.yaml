@@ -19,8 +19,8 @@ on:
     pull_request:
 
 jobs:
-    certification_tests:
-        name: Certification Tests
+    test_suites_linux:
+        name: Test Suites - Linux
         timeout-minutes: 60
 
         if: github.actor != 'restyled-io[bot]'
@@ -49,6 +49,44 @@ jobs:
               run: |
                   scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
             - name: Run Tests
+              timeout-minutes: 5
+              run: |
+                  scripts/tests/test_suites.sh
+    test_suites_darwin:
+        name: Test Suites - Darwin
+        timeout-minutes: 60
+
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: macos-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+            - name: Setup Environment
+              run: brew install openssl pkg-config
+            - name: Fix pkgconfig link
+              working-directory: /usr/local/lib/pkgconfig
+              run: |
+                pwd
+                ls -la /usr/local/Cellar/
+                ls -la /usr/local/Cellar/openssl@1.1
+                OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
+                ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+
+            - name: Bootstrap
+              timeout-minutes: 3
+              run: scripts/build/gn_bootstrap.sh
+            - name: Run Build Test Server
+              timeout-minutes: 5
+              run: |
+                scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+            - name: Build chip-tool
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+            - name: Run Test Suites
               timeout-minutes: 5
               run: |
                   scripts/tests/test_suites.sh
