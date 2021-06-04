@@ -17,6 +17,7 @@
  */
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
+#include "StackLock.h"
 
 #include <algorithm>
 #include <memory>

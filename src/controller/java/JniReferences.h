@@ -17,16 +17,18 @@
 
 #pragma once
 
-#include <jni.h>
-
 #include <core/CHIPError.h>
-
+#include <jni.h>
+#include <pthread.h>
 namespace {
-JavaVM * sJvm = nullptr;
+JavaVM * sJvm              = nullptr;
+pthread_mutex_t sStackLock = PTHREAD_MUTEX_INITIALIZER;
 } // namespace
 
 void SetJavaVm(JavaVM * jvm);
+JavaVM * GetJavaVm();
 JNIEnv * GetEnvForCurrentThread();
+pthread_mutex_t * GetStackLock();
 
 CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
 CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId);

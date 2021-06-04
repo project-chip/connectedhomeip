@@ -52,6 +52,11 @@ JNIEnv * GetEnvForCurrentThread()
     return env;
 }
 
+pthread_mutex_t * GetStackLock()
+{
+    return &sStackLock;
+}
+
 CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -75,14 +80,12 @@ CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, con
     VerifyOrExit(env != nullptr && object != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
     javaClass = env->GetObjectClass(object);
-    ChipLogProgress(Controller, "FindMethod:: javaClass exists? %d", javaClass != NULL);
     VerifyOrExit(javaClass != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
     *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
     VerifyOrExit(*methodId != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
 exit:
-    ChipLogProgress(Controller, "FindMethod Returning %d", err);
     return err;
 }
 
