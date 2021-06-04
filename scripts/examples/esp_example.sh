@@ -31,14 +31,20 @@ fi
 
 source "scripts/activate.sh"
 # shellcheck source=/dev/null
-source "$root"/idf.sh
+source "$IDF_PATH/export.sh"
 
 for sdkconfig in "$root"/sdkconfig*.defaults; do
     # remove root path to get sdkconfig*.defaults name
     sdkconfig_name=${sdkconfig#"$root"/}
     rm -f "$root"/sdkconfig
-    SDKCONFIG_DEFAULTS=$sdkconfig_name idf make -j8 -C "$root" defconfig "$@"
-    idf make -j8 -C "$root" "$@" || {
+    (
+        cd "$root"
+        idf.py -D SDKCONFIG_DEFAULTS="$sdkconfig_name" build
+    )
+    (
+        cd "$root"
+        idf.py build "$@"
+    ) || {
         echo "build $sdkconfig_name failed"
         exit 1
     }

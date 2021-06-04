@@ -40,10 +40,15 @@ enum
                              // (in either CHIP or DER form), or to decode the certificates.
 };
 
+namespace {
 static const BitFlags<CertDecodeFlags> sGenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
 static const BitFlags<CertDecodeFlags> sTrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
 
 static const BitFlags<TestCertLoadFlags> sNullLoadFlag;
+
+static OperationalCredentialSerializable sSerialized;
+static OperationalCredentialSerializable sSerialized2;
+} // namespace
 
 static CHIP_ERROR SetEffectiveTime(ValidationContext & validContext, uint16_t year, uint8_t mon, uint8_t day, uint8_t hour = 0,
                                    uint8_t min = 0, uint8_t sec = 0)
@@ -180,6 +185,68 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
     }
 }
 
+static void TestChipOperationalCredentials_Serialization(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+    ChipCertificateSet certSet;
+    OperationalCredentialSet opCredSet;
+    OperationalCredentialSet opCredSet2;
+    P256Keypair keypair;
+    P256SerializedKeypair serializedKeypair;
+    enum
+    {
+        kMaxCerts = 2
+    };
+
+    // Initialize the certificate set and load the specified test certificates.
+    certSet.Init(kMaxCerts, kTestCertBufSize);
+    err = LoadTestCert(certSet, TestCerts::kRoot01, sNullLoadFlag, sTrustAnchorFlag);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = LoadTestCert(certSet, TestCerts::kICA01, sNullLoadFlag, sGenTBSHashFlag);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Initialize the Operational Credential Set and load certificate set
+    NL_TEST_ASSERT(inSuite, opCredSet.Init(&certSet, 1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, opCredSet2.Init(1) == CHIP_NO_ERROR);
+
+    const CertificateKeyId * trustedRootId = opCredSet.GetTrustedRootId(static_cast<uint16_t>(opCredSet.GetCertCount() - 1));
+    NL_TEST_ASSERT(inSuite, trustedRootId != nullptr);
+
+    NL_TEST_ASSERT(inSuite,
+                   serializedKeypair.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len) ==
+                       CHIP_NO_ERROR);
+
+    memcpy(static_cast<uint8_t *>(serializedKeypair), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+    memcpy(static_cast<uint8_t *>(serializedKeypair) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+           sTestCert_Node01_01_PrivateKey_Len);
+
+    NL_TEST_ASSERT(inSuite, keypair.Deserialize(serializedKeypair) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, opCredSet.SetDevOpCredKeypair(*trustedRootId, &keypair) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite,
+                   opCredSet.SetDevOpCred(*trustedRootId, sTestCert_Node01_01_Chip,
+                                          static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len)) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, opCredSet.ToSerializable(*trustedRootId, sSerialized) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, opCredSet2.FromSerializable(sSerialized) == CHIP_NO_ERROR);
+
+    const CertificateKeyId * trustedRootId2 = opCredSet2.GetTrustedRootId(static_cast<uint16_t>(opCredSet2.GetCertCount() - 1));
+    NL_TEST_ASSERT(inSuite, trustedRootId2->IsEqual(*trustedRootId));
+
+    NL_TEST_ASSERT(inSuite, opCredSet2.ToSerializable(*trustedRootId2, sSerialized2) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite,
+                   strncmp(reinterpret_cast<const char *>(&sSerialized), reinterpret_cast<const char *>(&sSerialized2),
+                           sizeof(sSerialized)) == 0);
+
+    // Clear the certificate set.
+    certSet.Release();
+    // Clear the Operational Credential Set
+    opCredSet2.Release();
+    opCredSet.Release();
+}
+
 /**
  *  Set up the test suite.
  */
@@ -210,6 +277,7 @@ int TestChipOperationalCredentials_Teardown(void * inContext)
 // clang-format off
 static const nlTest sTests[] = {
     NL_TEST_DEF("Test CHIP Certificate Validation", TestChipOperationalCredentials_CertValidation),
+    NL_TEST_DEF("Test CHIP Certificate Serialization", TestChipOperationalCredentials_Serialization),
     NL_TEST_SENTINEL()
 };
 // clang-format on

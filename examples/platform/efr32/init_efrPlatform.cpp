@@ -40,9 +40,9 @@ extern "C" {
 #include <openthread/instance.h>
 #include <openthread/link.h>
 #include <openthread/platform/openthread-system.h>
-#include <openthread/platform/uart.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
+#include <utils/uart.h>
 
 #include "platform-efr32.h"
 

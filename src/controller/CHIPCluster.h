@@ -36,7 +36,7 @@ class DLL_EXPORT ClusterBase
 public:
     virtual ~ClusterBase() {}
 
-    CHIP_ERROR Associate(Device * device, EndpointId endpoint, app::CommandSender * commandSender = nullptr);
+    CHIP_ERROR Associate(Device * device, EndpointId endpoint);
 
     void Dissociate();
 
@@ -73,7 +73,6 @@ protected:
 
     const ClusterId mClusterId;
     Device * mDevice;
-    app::CommandSender * mpCommandSender = nullptr;
     EndpointId mEndpoint;
 };
 

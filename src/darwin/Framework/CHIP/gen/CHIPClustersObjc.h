@@ -152,6 +152,29 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Binary Input (Basic)
+ *
+ */
+@interface CHIPBinaryInputBasic : CHIPCluster
+
+- (void)readAttributeOutOfServiceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOutOfServiceWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePresentValueWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributePresentValueWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeStatusFlagsWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Binding
  *
  */
@@ -168,6 +191,31 @@ NS_ASSUME_NONNULL_BEGIN
           clusterId:(uint16_t)clusterId
     responseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Bridged Device Basic
+ *
+ */
+@interface CHIPBridgedDeviceBasic : CHIPCluster
+
+- (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeVendorIDWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeUserLabelWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeHardwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeHardwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSoftwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSoftwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeManufacturingDateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePartNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductURLWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -454,6 +502,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeTxErrCountWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Fixed Label
+ *
+ */
+@interface CHIPFixedLabel : CHIPCluster
+
+- (void)readAttributeLabelListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -759,6 +818,24 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Relative Humidity Measurement
+ *
+ */
+@interface CHIPRelativeHumidityMeasurement : CHIPCluster
+
+- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                                change:(uint16_t)change
+                                       responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Scenes
  *
  */
@@ -880,6 +957,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)test:(ResponseHandler)responseHandler;
 - (void)testNotHandled:(ResponseHandler)responseHandler;
 - (void)testSpecific:(ResponseHandler)responseHandler;
+- (void)testUnknownCommand:(ResponseHandler)responseHandler;
 
 - (void)readAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBooleanWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;

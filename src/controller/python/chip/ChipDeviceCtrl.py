@@ -211,13 +211,12 @@ class ChipDeviceController(object):
             self.devCtrl, nodeid, pointer(device)))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
-
-        commandSenderHandle = im.GetCommandSenderHandle()
+        im.ClearCommandStatus(im.PLACEHOLDER_COMMAND_HANDLE)
         self._Cluster.SendCommand(
-            device, commandSenderHandle, cluster, command, endpoint, groupid, args, True)
+            device, cluster, command, endpoint, groupid, args, True)
         if blocking:
             # We only send 1 command by this function, so index is always 0
-            return im.WaitCommandIndexStatus(commandSenderHandle, 1)
+            return im.WaitCommandIndexStatus(im.PLACEHOLDER_COMMAND_HANDLE, 1)
         return (0, None)
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
@@ -227,13 +226,9 @@ class ChipDeviceController(object):
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
-        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
-        im.ClearCommandStatus(commandSenderHandle)
+        # We are not using IM for Attributes.
         res = self._Cluster.ReadAttribute(
-            device, cluster, attribute, endpoint, groupid, commandSenderHandle != 0)
-        if blocking:
-            # We only send 1 command by this function, so index is always 0
-            return im.WaitCommandIndexStatus(commandSenderHandle, 1)
+            device, cluster, attribute, endpoint, groupid, False)
 
     def ZCLConfigureAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, change, blocking=True):
         device = c_void_p(None)

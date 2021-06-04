@@ -1,0 +1,19 @@
+{{> header}}
+
+#pragma once
+
+#include "TestCommand.h"
+
+{{>test_cluster tests="TestCluster, OnOffCluster"}}
+
+void registerCommandsTests(Commands & commands)
+{
+    const char * clusterName = "Tests";
+
+    commands_list clusterCommands = {
+        make_unique<TestCluster>(),
+        make_unique<OnOffCluster>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}

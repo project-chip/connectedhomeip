@@ -1,29 +1,32 @@
-# CHIP All Clusters Example
+# CHIP ESP32 All Clusters Example
 
-A prototype application that uses CHIP to setup WiFi on the ESP32 and runs an
-Echo Server. This example will evolve as more complex messaging is supported in
-CHIP.
+A prototype application that demonstrates device commissioning and cluster
+control.
 
 ---
 
--   [CHIP App Server Example](#chip-app-server-example)
+-   [CHIP ESP32 All Clusters Example](#chip-esp32-all-clusters-example)
     -   [Supported Devices](#supported-devices)
     -   [Building the Example Application](#building-the-example-application)
-        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
-    -   [Using the Echo Server](#using-the-echo-server)
-        -   [Connect the ESP32 to a 2.4GHz Network of your choice](#connect-the-esp32-to-a-24ghz-network-of-your-choice)
-        -   [Use the ESP32's Network](#use-the-esp32s-network)
+    -   [Commissioning and cluster control](#commissioning-and-cluster-control)
+        -   [Setting up Python Controller](#setting-up-python-controller)
+        -   [Commissioning over BLE](#commissioning-over-ble)
+        -   [Cluster control](#cluster-control)
+    -   [Note](#note)
 
 ---
 
 ## Supported Devices
 
-The CHIP demo application is intended to work on two categories of ESP32
+The CHIP demo application is intended to work on three categories of ESP32
 devices: the
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
-and the [M5Stack](http://m5stack.com). On the [M5Stack](http://m5stack.com) this
-example displays a CHIP QRCode with the device's Soft-AP SSID encoded in the TLV
-section.
+the
+[ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
+and the [M5Stack](http://m5stack.com).
+
+Note: M5Stack Core 2 display is not supported in the tft component, while other
+functionality can still work fine.
 
 ## Building the Example Application
 
@@ -48,49 +51,34 @@ step. To install these components manually, follow these steps:
 
           $ sudo apt-get install ninja-build
 
-### To build the application, follow these steps:
-
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Setting up the environment
 
-To download and install packages.
-
         $ cd ${HOME}/tools/esp-idf
         $ ./install.sh
         $ . ./export.sh
         $ cd {path-to-connectedhomeip}
+
+    To download and install packages.
+
         $ source ./scripts/bootstrap.sh
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
 
-If packages are already installed then simply activate it.
+    If packages are already installed then simply activate them.
 
-        $ cd ${HOME}/tools/esp-idf
-        $ ./install.sh
-        $ . ./export.sh
-        $ cd {path-to-connectedhomeip}
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
 
 -   Configuration Options
 
-        To choose from the different configuration options, run menuconfig
+To choose from the different configuration options, run menuconfig.
 
           $ idf.py menuconfig
 
-        Select ESP32 based `Device Type` through `Demo`->`Device Type`.
-        The device types that are currently supported include `ESP32-DevKitC` (default),
-        `ESP32-WROVER-KIT_V4.1` and `M5Stack`
-
-        If you are using `standalone chip-tool` to communicate with the ESP32, bypass the
-        Rendezvous mode so that the device can communicate over an insecure channel.
-        This can be done through `Demo`->`Rendezvous Mode`->`Bypass`
-
-        To connect the ESP32 to your network, configure the Wi-Fi SSID and Passphrase through
-        `Component config`->`CHIP Device Layer`->`WiFi Station Options`->`Default WiFi SSID` and
-        `Default WiFi Password` respectively.
+Select ESP32 based `Device Type` through `Demo`->`Device Type`. The device types
+that are currently supported include `ESP32-DevKitC` (default),
+`ESP32-WROVER-KIT_V4.1` and `M5Stack`
 
 -   To build the demo application.
 
@@ -120,33 +108,40 @@ If packages are already installed then simply activate it.
 
           $ idf.py monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
-## Using the Echo Server
+## Commissioning and cluster control
 
-There are two ways to use the Echo Server running on the device.
+Commissioning can be carried out using WiFi, BLE or Bypass.
 
-### Connect the ESP32 to a 2.4GHz Network of your choice
+1.  Set the `Rendezvous Mode` for commissioning using menuconfig; the default
+    Rendezvous mode is BLE.
 
-1.  If the `WiFi Station Options` mentioned above are populated through
-    menuconfig, then ESP32 connects to the AP with those credentials (STA mode).
+         $ idf.py menuconfig
+
+Select the Rendezvous Mode via `Demo -> Rendezvous Mode`. If Rendezvous Mode is
+ByPass then set the credentials of the WiFi Network (i.e. SSID and Password from
+menuconfig).
+
+`idf.py menuconfig -> Component config -> CHIP Device Layer -> WiFi Station Options`
 
 2.  Now flash the device with the same command as before. (Use the right `/dev`
     device)
 
           $ idf.py flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
-3.  The device should boot up and connect to your network. When that happens you
-    will see a log like this in the monitor.
+3.  The device should boot up. When device connects to your network, you will
+    see a log like this on the device console.
 
           I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
           I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
 
-    Note: If you are using the M5Stack, the screen will display the server's IP
-    Address if it successfully connects to the configured 2.4GHz Network.
-
 4.  Use
+    [python based device controller](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python)
+    or
     [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
     or
-    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin)
+    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin/CHIPTool)
+    or
+    [Android chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/android/CHIPTool)
     to communicate with the device.
 
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
@@ -154,30 +149,70 @@ your network configuration. To erase it, simply run.
 
           $ idf.py erase_flash ESPPORT=/dev/tty.SLAB_USBtoUART
 
-### Use the ESP32's Network
+### Setting up Python Controller
 
-Alternatively, you can connect to the ESP32's Soft-AP directly.
+Once ESP32 is up and running, we need to set up a device controller to perform
+commissioning and cluster control.
 
-1.  After the application has been flashed, connect to the ESP32's Soft-AP. If
-    you use the M5Stack, the Soft-AP's SSID is encoded in the TLV section of the
-    QRCode on screen. It's usually something like `CHIP-XXX` where the last 3
-    digits are from the setup payload discriminator.
+-   Set up python controller.
 
-2.  Once you're connected, the server's IP can be found at the gateway address.
+           $ cd {path-to-connectedhomeip}
+           $ ./scripts/build_python.sh -m platform
 
-3.  Use
-    [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
-    or
-    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin)
-    to communicate with the device.
+-   Execute the controller.
 
-In addition to the echo server, this demo also supports controlling OnOff
-cluster (Server) attributes of an endpoint. For `ESP32-DevKitC` and
-`ESP32-WROVER-KIT_V4.1`, a GPIO (configurable through `STATUS_LED_GPIO_NUM` in
-`main/main.cpp`) is updated through the on/off/toggle commands from the
-`chip-tool`. For `M5Stack`, a virtual Green LED on the display is used for the
-same.
+           $ source ./out/python_env/bin/activate
+           $ chip-device-ctrl
 
-Note: If you wish to see the actual effect of the commands on `ESP32-DevKitC`
-and `ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
+### Commissioning over BLE
+
+-   Establish the secure session over BLE. BLE is the default mode in the
+    application and is configurable through menuconfig.
+
+         - chip-device-ctrl > ble-scan
+         - chip-device-ctrl > connect -ble 3840 20202021 135246
+
+         Parameters:
+         1. Discriminator: 3840 (configurable through menuconfig)
+         2. Setup-pin-code: 20202021 (configurable through menuconfig)
+         3. Node ID: Optional.
+            If not passed in this command, then it is auto-generated by the controller and displayed in the output of connect.
+            The same value should be used in the next commands.
+            We have chosen a random node ID which is 135246.
+
+-   Add credentials of the Wi-Fi network you want the ESP32 to connect to, using
+    the `AddWiFiNetwork` command and then enable the ESP32 to connect to it
+    using `EnableWiFiNetwork` command. In this example, we have used `TESTSSID`
+    and `TESTPASSWD` as the SSID and passphrase respectively.
+
+         - chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 135246 0 0 ssid=str:TESTSSID credentials=str:TESTPASSWD breadcrumb=0 timeoutMs=1000
+
+         - chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 135246 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
+
+-   Close the BLE connection to ESP32, as it is not required hereafter.
+
+         - chip-device-ctrl > close-ble
+
+-   Resolve DNS-SD name and update address of the node in the device controller.
+
+         - chip-device-ctrl > resolve 0 135246
+
+### Cluster control
+
+-   After successful commissioning, use the OnOff cluster command to control the
+    OnOff attribute. This allows you to toggle a parameter implemented by the
+    device to be On or Off.
+
+    `chip-device-ctrl > zcl OnOff Off 135246 1 0`
+
+### Note
+
+This demo app illustrates controlling OnOff cluster (Server) attributes of an
+endpoint. For `ESP32-DevKitC` and `ESP32-WROVER-KIT_V4.1`, a GPIO (configurable
+through `STATUS_LED_GPIO_NUM` in `main/main.cpp`) is updated through the
+on/off/toggle commands from the `python-controller`. For `M5Stack`, a virtual
+Green LED on the display is used for the same.
+
+If you wish to see the actual effect of the commands on `ESP32-DevKitC` and
+`ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
 `STATUS_LED_GPIO_NUM`.

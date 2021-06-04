@@ -105,15 +105,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
     }
 
-    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
-    ApplicationExchangeDispatch defaultDispatch;
-
-    if (dispatch == nullptr)
-    {
-        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-        dispatch = &defaultDispatch;
-    }
-
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse))
     {
@@ -130,8 +121,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
     }
 
-    err = dispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
-                                reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+    err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
+                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -166,7 +157,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     FlushAcks();
 
     // In case the protocol wants a harder release of the EC right away, such as calling Abort(), exchange
-    // needs to clear the CRMP retransmission table immediately.
+    // needs to clear the MRP retransmission table immediately.
     if (clearRetransTable)
     {
         mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(static_cast<ReliableMessageContext *>(this));
@@ -217,18 +208,8 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
     ec->mExchangeMgr->ReleaseContext(ec);
 }
 
-ExchangeMessageDispatch * ExchangeContext::GetMessageDispatch()
-{
-    if (mDelegate != nullptr)
-    {
-        return mDelegate->GetMessageDispatch(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-    }
-
-    return nullptr;
-}
-
 ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                 ExchangeDelegateBase * delegate)
+                                 ExchangeDelegate * delegate)
 {
     VerifyOrDie(mExchangeMgr == nullptr);
 
@@ -237,6 +218,22 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Secu
     mSecureSession = session;
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
+
+    ExchangeMessageDispatch * dispatch = nullptr;
+    if (delegate != nullptr)
+    {
+        dispatch = delegate->GetMessageDispatch(em->GetReliableMessageMgr(), em->GetSessionMgr());
+        if (dispatch == nullptr)
+        {
+            dispatch = &em->mDefaultExchangeDispatch;
+        }
+    }
+    else
+    {
+        dispatch = &em->mDefaultExchangeDispatch;
+    }
+    VerifyOrDie(dispatch != nullptr);
+    mDispatch = dispatch->Retain();
 
     SetDropAckDebug(false);
     SetAckPending(false);
@@ -267,6 +264,12 @@ ExchangeContext::~ExchangeContext()
         mExchangeACL = nullptr;
     }
 
+    if (mDispatch != nullptr)
+    {
+        mDispatch->Release();
+        mDispatch = nullptr;
+    }
+
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogDetail(ExchangeManager, "ec-- id: %d", mExchangeId);
 #endif
@@ -295,6 +298,27 @@ bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHea
         //    case, the initiator is ill defined)
 
         && (payloadHeader.IsInitiator() != IsInitiator());
+}
+
+void ExchangeContext::OnConnectionExpired()
+{
+    // Reset our mSecureSession to a default-initialized (hence not matching any
+    // connection state) value, because it's still referencing the now-expired
+    // connection.  This will mean that no more messages can be sent via this
+    // exchange, which seems fine given the semantics of connection expiration.
+    mSecureSession = SecureSessionHandle();
+
+    if (!IsResponseExpected())
+    {
+        // Nothing to do in this case
+        return;
+    }
+
+    // If we're waiting on a response, we now know it's never going to show up
+    // and we should notify our delegate accordingly.
+    CancelResponseTimer();
+    SetResponseExpected(false);
+    NotifyResponseTimeout();
 }
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
@@ -331,11 +355,18 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
     // wants to never receive the response, they must close the exchange context.
 
-    ExchangeDelegateBase * delegate = ec->GetDelegate();
+    ec->NotifyResponseTimeout();
+}
+
+void ExchangeContext::NotifyResponseTimeout()
+{
+    ExchangeDelegate * delegate = GetDelegate();
 
     // Call the user's timeout handler.
     if (delegate != nullptr)
-        delegate->OnResponseTimeout(ec);
+    {
+        delegate->OnResponseTimeout(this);
+    }
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -347,20 +378,11 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
-    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
-    ApplicationExchangeDispatch defaultDispatch;
-
-    if (dispatch == nullptr)
-    {
-        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-        dispatch = &defaultDispatch;
-    }
-
     CHIP_ERROR err =
-        dispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
+        mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
     SuccessOrExit(err);
 
-    // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
+    // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
     {
         ExitNow(err = CHIP_NO_ERROR);

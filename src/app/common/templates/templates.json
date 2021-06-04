@@ -1,0 +1,69 @@
+{
+    "name": "CHIP Application Common templates",
+    "version": "chip-v1",
+    "helpers": [
+        "../../zap-templates/partials/helper.js",
+        "../../zap-templates/common/StringHelper.js",
+        "../../zap-templates/templates/app/helper.js",
+        "../../zap-templates/templates/chip/helper.js"
+    ],
+    "override": "../../zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../zap-templates/partials/header.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "../../zap-templates/templates/app/af-structs.zapt",
+            "name": "ZCL af-structs header",
+            "output": "src/app/common/gen/af-structs.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/att-storage.zapt",
+            "name": "ZCL att-storage header",
+            "output": "src/app/common/gen/att-storage.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/attribute-id.zapt",
+            "name": "ZCL attribute-id header",
+            "output": "src/app/common/gen/attribute-id.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/attribute-size.zapt",
+            "name": "ZCL attribute-size header",
+            "output": "src/app/common/gen/attribute-size.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/attribute-type.zapt",
+            "name": "ZCL attribute-type header",
+            "output": "src/app/common/gen/attribute-type.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-id.zapt",
+            "name": "ZCL cluster-id header",
+            "output": "src/app/common/gen/cluster-id.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/client-command-macro.zapt",
+            "name": "ZCL client command",
+            "output": "src/app/common/gen/client-command-macro.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/command-id.zapt",
+            "name": "ZCL command-id header",
+            "output": "src/app/common/gen/command-id.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/enums.zapt",
+            "name": "ZCL enums header",
+            "output": "src/app/common/gen/enums.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/print-cluster.zapt",
+            "name": "ZCL print-cluster header",
+            "output": "src/app/common/gen/print-cluster.h"
+        }
+    ]
+}

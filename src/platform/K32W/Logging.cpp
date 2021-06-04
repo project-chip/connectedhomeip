@@ -15,9 +15,11 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
-#include <openthread/platform/uart.h>
+#include <utils/uart.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+static bool isLogInitialized;
+extern uint8_t gOtLogUartInstance;
 extern "C" void K32WWriteBlocking(const uint8_t * aBuf, uint32_t len);
 
 namespace chip {
@@ -96,6 +98,13 @@ void GenericLog(const char * format, va_list arg)
 
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
     size_t prefixLen, writtenLen;
+
+    if (!isLogInitialized)
+    {
+        isLogInitialized   = true;
+        gOtLogUartInstance = 0;
+        otPlatUartEnable();
+    }
 
     /* Prefix is composed of [Debug String][MOdule Name String] */
     FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, chip::Logging::kLogCategory_None,

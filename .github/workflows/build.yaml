@@ -21,6 +21,7 @@ on:
 jobs:
     build:
         name: Build
+        timeout-minutes: 60
 
         strategy:
             matrix:
@@ -44,12 +45,13 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-#             - name: Initialize CodeQL
-#               uses: github/codeql-action/init@v1
-#               with:
-#                   languages: "cpp, python"
+            - name: Initialize CodeQL
+              uses: github/codeql-action/init@v1
+              with:
+                  languages: "cpp"
 
             - name: Bootstrap
+              timeout-minutes: 3
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
               run: |
@@ -64,8 +66,10 @@ jobs:
 
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
+              timeout-minutes: 10
               run: scripts/build/gn_build.sh
             - name: Run Tests
+              timeout-minutes: 2
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
@@ -81,6 +85,6 @@ jobs:
               run: find out -type d -name "dbus" -exec rm -rf {} +
             # - name: Remove nrfxlib binaries for CodeQL Analysis
             #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
-#             - name: Perform CodeQL Analysis
-#               if: ${{ github.event_name == 'push' }}
-#               uses: github/codeql-action/analyze@v1
+            - name: Perform CodeQL Analysis
+              if: ${{ github.event_name == 'push' }}
+              uses: github/codeql-action/analyze@v1

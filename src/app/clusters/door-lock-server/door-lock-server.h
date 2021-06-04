@@ -43,9 +43,8 @@
 // ------------------------------------------------------------------------------
 // Core
 
+#include <app/common/gen/af-structs.h>
 #include <app/util/af.h>
-
-#include "gen/af-structs.h"
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct

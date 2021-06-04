@@ -35,7 +35,8 @@
 namespace chip {
 namespace Credentials {
 
-static constexpr size_t kOperationalCredentialsMax = 5;
+static constexpr size_t kOperationalCredentialsMax     = 5;
+static constexpr size_t kOperationalCertificateMaxSize = 400;
 
 using namespace Crypto;
 
@@ -43,6 +44,18 @@ struct NodeCredential
 {
     uint8_t * mCredential = nullptr;
     uint16_t mLen         = 0;
+};
+
+struct OperationalCredentialSerializable
+{
+    uint16_t mNodeCredentialLen;
+    uint8_t mNodeCredential[kOperationalCertificateMaxSize];
+    uint16_t mNodeKeypairLen;
+    uint8_t mNodeKeypair[kP256_PublicKey_Length + kP256_PrivateKey_Length];
+    uint16_t mRootCertificateLen;
+    uint8_t mRootCertificate[kOperationalCertificateMaxSize];
+    uint16_t mCACertificateLen;
+    uint8_t mCACertificate[kOperationalCertificateMaxSize];
 };
 
 struct NodeCredentialMap
@@ -218,6 +231,23 @@ public:
 
     CHIP_ERROR SetDevOpCred(const CertificateKeyId & trustedRootId, const uint8_t * chipDeviceCredentials,
                             uint16_t chipDeviceCredentialsLen);
+
+    /**
+     *  @brief
+     *    Serialize the OperationalCredentialSet indexed by a TrustedRootID to the given serializable data structure
+     *
+     *    This method must be called while the OperationalCredentialSet class is valid (After Init and before Release)
+     */
+    CHIP_ERROR ToSerializable(const CertificateKeyId & trustedRootId, OperationalCredentialSerializable & output);
+
+    /**
+     *  @brief
+     *    Reconstruct OperationalCredentialSet class from the serializable data structure.
+     *
+     *    This method must be called after initializing the OperationalCredentialSet class with internal allocation.
+     *    No references/pointers to the input parameter are made. The input parameter can be freed after calling this method.
+     */
+    CHIP_ERROR FromSerializable(const OperationalCredentialSerializable & input);
 
     P256Keypair & GetDevOpCredKeypair(const CertificateKeyId & trustedRootId) { return *GetNodeKeypairAt(trustedRootId); }
 
