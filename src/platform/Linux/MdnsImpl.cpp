@@ -278,8 +278,8 @@ void Poller::UpdateFdSet(fd_set & readFdSet, fd_set & writeFdSet, fd_set & error
         }
     }
 
-    timeout.tv_sec  = static_cast<uint64_t>(timeoutVal.count()) / kUsPerSec;
-    timeout.tv_usec = static_cast<uint64_t>(timeoutVal.count()) % kUsPerSec;
+    timeout.tv_sec  = static_cast<time_t>(static_cast<uint64_t>(timeoutVal.count()) / kUsPerSec);
+    timeout.tv_usec = static_cast<suseconds_t>(static_cast<uint64_t>(timeoutVal.count()) % kUsPerSec);
 }
 
 void Poller::Process(const fd_set & readFdSet, const fd_set & writeFdSet, const fd_set & errorFdSet)
