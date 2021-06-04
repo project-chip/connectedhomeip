@@ -18,12 +18,6 @@
 
 #include "TestCommand.h"
 
-#define DEFAULT_DEVICE_ID 1
-#define DEFAULT_DESCRIMINATOR 3840
-#define DEFAULT_SETUP_PIN_CODE 20202021
-#define DEFAULT_REMOTE_PORT 11097
-#define DEFAULT_TEST_ADDRESS "::1"
-
 constexpr uint16_t kWaitDurationInSeconds = 30;
 
 static void test_os_sleep_ms(uint64_t millisecs)
