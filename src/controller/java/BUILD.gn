@@ -37,6 +37,7 @@ shared_library("jni") {
     "JniReferences.cpp",
     "JniReferences.h",
     "JniTypeWrappers.h",
+    "StackLock.h",
   ]
 
   deps = [
