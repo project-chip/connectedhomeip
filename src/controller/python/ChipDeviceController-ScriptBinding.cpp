@@ -89,6 +89,9 @@ CHIP_ERROR
 pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId, char * outAddress,
                                           uint64_t maxAddressLen, uint16_t * outPort);
 
+#if CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+const char * pychip_DeviceController_GetPASEData(chip::Controller::DeviceCommissioner * devCtrl);
+#endif //CSG_TRACE_END
 // Rendezvous
 CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
@@ -209,6 +212,19 @@ void pychip_DeviceController_SetLogFilter(uint8_t category)
     chip::Logging::SetLogFilter(category);
 #endif
 }
+
+#if CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+const char * pychip_DeviceController_GetPASEData(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    PASESession *pase_session = devCtrl->GetPASESession();
+    std::map<std::string, std::map<std::string, std::string>> *paseTrace = pase_session->getPASETrace();
+    /*
+    TODO: Fix the string return memory leak
+    https://github.com/chip-csg/connectedhomeip/issues/32
+    */
+    return yaml_string_for_map(paseTrace);
+}
+#endif //CSG_TRACE_END
 
 CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                               uint32_t setupPINCode, chip::NodeId nodeid)

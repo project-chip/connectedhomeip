@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <csg_test_harness/constants.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
@@ -77,6 +79,9 @@ public:
     PASESession & operator=(const PASESession &) = default;
     PASESession & operator=(PASESession &&) = default;
 
+#ifdef CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+    std::map< std::string, std::map< std::string, std::string>> *getPASETrace();
+#endif //CSG_TRACE_END
     virtual ~PASESession();
 
     /**
@@ -271,6 +276,17 @@ private:
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
+
+#ifdef CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+    std::map< std::string, std::map< std::string, std::string>> mPASETrace;
+    // PASE parameters maps
+    std::map<std::string,std::string> request_message_map;
+    std::map<std::string,std::string> response_message_map;
+    std::map<std::string,std::string> pake_1_message_map;
+    std::map<std::string,std::string> pake_2_message_map;
+    std::map<std::string,std::string> pake_3_message_map;
+
+#endif //CSG_TRACE_END
 
 #ifdef ENABLE_HSM_SPAKE
     Spake2pHSM_P256_SHA256_HKDF_HMAC mSpake2p;
