@@ -141,7 +141,6 @@ void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
             break;
         }
 
-
         case procQueueCmd_random: {
             platformRandomProcess();
             break;
@@ -194,7 +193,6 @@ extern "C" void platformRadioSignal(uintptr_t arg)
     msg.arg = arg;
     ThreadStackMgrImpl()._SendProcMessage(msg);
 }
-
 
 /**
  * Glue function called directly by the OpenThread stack when tasklet processing work
