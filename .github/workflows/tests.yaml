@@ -37,10 +37,6 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-            - uses: actions/cache@v2
-              with:
-                  path: /root/.cipd-cache-dir
-                  key: ${{ runner.os }}-cipd
             - name: Bootstrap
               timeout-minutes: 3
               run: scripts/build/gn_bootstrap.sh
