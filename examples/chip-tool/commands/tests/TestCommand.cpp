@@ -50,25 +50,7 @@ CHIP_ERROR TestCommand::Run(PersistentStorage & storage, NodeId localId, NodeId 
     ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
     ReturnErrorOnFailure(mCommissioner.Init(localId, params));
     ReturnErrorOnFailure(mCommissioner.ServiceEvents());
-
-    CHIP_ERROR result = mCommissioner.GetDevice(remoteId, &mDevice);
-
-    if (result != CHIP_NO_ERROR)
-    {
-        chip::Inet::IPAddress addr;
-        chip::Inet::IPAddress::FromString(DEFAULT_TEST_ADDRESS, addr);
-        uint16_t port                            = DEFAULT_REMOTE_PORT;
-        uint32_t setupPINCode                    = DEFAULT_SETUP_PIN_CODE;
-        uint16_t discriminator                   = DEFAULT_DESCRIMINATOR;
-        chip::NodeId deviceID                    = DEFAULT_DEVICE_ID;
-        chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
-
-        chip::RendezvousParameters pairingParams =
-            chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator).SetPeerAddress(peerAddress);
-
-        ReturnErrorOnFailure(mCommissioner.PairDevice(deviceID, pairingParams));
-        ChipLogDetail(chipTool, "Started pairing");
-    }
+    ReturnErrorOnFailure(mCommissioner.GetDevice(remoteId, &mDevice));
 
     ReturnErrorOnFailure(NextTest());
 
@@ -78,6 +60,7 @@ CHIP_ERROR TestCommand::Run(PersistentStorage & storage, NodeId localId, NodeId 
     mCommissioner.ServiceEventSignal();
 
     // Give some time for all the pending messages to flush before shutting down
+    // Note: This is working around racy code in message queues during shutdown
     test_os_sleep_ms(1000);
     mCommissioner.Shutdown();
 
