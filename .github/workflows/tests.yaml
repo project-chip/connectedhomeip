@@ -90,3 +90,9 @@ jobs:
               timeout-minutes: 5
               run: |
                   scripts/tests/test_suites.sh
+            - name: Uploading Artifacts
+              uses: actions/upload-artifact@v1
+              if: ${{ always() }}
+              with:
+                  name: crash-log
+                  path: /cores/core.*

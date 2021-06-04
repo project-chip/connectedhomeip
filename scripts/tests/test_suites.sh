@@ -28,6 +28,9 @@ done
 echo ""
 echo ""
 
+ulimit -c unlimited
+rm -rf /cores/core.*
+
 for i in "${test_array[@]}"; do
     echo "  ===== Running test: $i"
     echo "          * Starting cluster server"
