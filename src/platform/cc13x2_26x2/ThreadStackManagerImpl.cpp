@@ -141,10 +141,6 @@ void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
             break;
         }
 
-        case procQueueCmd_uart: {
-            platformUartProcess(procMsg.arg);
-            break;
-        }
 
         case procQueueCmd_random: {
             platformRandomProcess();
@@ -199,16 +195,6 @@ extern "C" void platformRadioSignal(uintptr_t arg)
     ThreadStackMgrImpl()._SendProcMessage(msg);
 }
 
-/**
- * Glue function called by UART processing layer to notify OpenThread the driver needs processing.
- */
-extern "C" void platformUartSignal(uintptr_t arg)
-{
-    ThreadStackManagerImpl::procQueueMsg msg;
-    msg.cmd = ThreadStackManagerImpl::procQueueCmd_uart;
-    msg.arg = arg;
-    ThreadStackMgrImpl()._SendProcMessage(msg);
-}
 
 /**
  * Glue function called directly by the OpenThread stack when tasklet processing work
