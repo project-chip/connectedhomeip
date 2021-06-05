@@ -291,20 +291,21 @@ public:
     class LockEvents
     {
     public:
-        LockEvents(EventManagement & aEventManagement): mEventManagement(aEventManagement)
+        LockEvents(EventManagement & aEventManagement) : mEventManagement(aEventManagement)
         {
-    #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
             mEventManagement.mAccessLock.Lock();
-    #endif
+#endif
         }
         ~LockEvents()
         {
-    #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
             mEventManagement.mAccessLock.Unlock();
-    #endif
+#endif
         }
+
     private:
-        EventManagement& mEventManagement;
+        EventManagement & mEventManagement;
     };
     /**
      * @brief
