@@ -84,7 +84,7 @@ class PacketDataReporter : public ParserDelegate
 {
 public:
     PacketDataReporter(ResolverDelegate * delegate, chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType,
-                       const BytesRange & packet, Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS>  & ipCache) :
+                       const BytesRange & packet, Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> & ipCache) :
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet), mIPCache(ipCache)
     {
@@ -310,13 +310,8 @@ void PacketDataReporter::OnComplete()
         mDelegate->OnCommissionableNodeFound(mCommissionableNodeData);
     }
 
-    CHIP_ERROR error = mIPCache.Insert(
-        mNodeData.mPeerId.GetNodeId(),
-        mNodeData.mPeerId.GetFabricId(),
-        mNodeData.mAddress,
-        mNodeData.mPort,
-        mNodeData.mInterfaceId
-    );
+    CHIP_ERROR error = mIPCache.Insert(mNodeData.mPeerId.GetNodeId(), mNodeData.mPeerId.GetFabricId(), mNodeData.mAddress,
+                                       mNodeData.mPort, mNodeData.mInterfaceId);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -463,7 +458,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
 
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
-    mDiscoveryType                    = DiscoveryType::kOperational;
+    mDiscoveryType = DiscoveryType::kOperational;
 
     FabricId fabricId;
     Inet::IPAddress addr;

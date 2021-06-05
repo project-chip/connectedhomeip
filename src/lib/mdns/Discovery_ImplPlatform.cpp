@@ -495,13 +495,8 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         return;
     }
 
-    error = mgr->sIPCache.Insert(
-        nodeData.mPeerId.GetNodeId(),
-        nodeData.mPeerId.GetFabricId(),
-        result->mAddress.Value(),
-        result->mPort,
-        result->mInterface
-    );
+    error = mgr->sIPCache.Insert(nodeData.mPeerId.GetNodeId(), nodeData.mPeerId.GetFabricId(), result->mAddress.Value(),
+                                 result->mPort, result->mInterface);
 
     if (error != CHIP_NO_ERROR)
     {

@@ -20,16 +20,15 @@
 
 #include <string.h>
 
-#include <support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 #include <cstdint>
+#include <nlunit-test.h>
+#include <support/UnitTestRegistration.h>
 
+#include <core/CHIPError.h>
 #include <core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
-#include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
-#include <core/CHIPError.h>
 #include <system/SystemTimer.h>
 #include <system/TimeSource.h>
 
@@ -60,7 +59,7 @@ void TestCheckOccupancy(nlTestSuite * inSuite, void * inContext)
     {
         nodeId   = i;
         fabricId = i;
-	port     = i;
+        port     = i;
 
         NL_TEST_ASSERT(inSuite, tIPCache.Insert(nodeId, fabricId, addr, port, iface) == CHIP_NO_ERROR);
     }
@@ -79,8 +78,8 @@ void TestCheckInsert(nlTestSuite * inSuite, void * inContext)
     IPCache<TEST_IPCACHE_SIZE_SMALL, TEST_IPCACHE_TTL_MS> tIPCache;
 
     NodeId nodeIdYes = 2, nodeIdNo = 3;
-    FabricId fabricId = 2;
-    uint16_t port = 2;
+    FabricId fabricId       = 2;
+    uint16_t port           = 2;
     Inet::InterfaceId iface = 0;
 
     Inet::IPAddress addr;
@@ -98,8 +97,8 @@ void TestCheckDelete(nlTestSuite * inSuite, void * inContext)
     IPCache<TEST_IPCACHE_SIZE_SMALL, TEST_IPCACHE_TTL_MS> tIPCache;
 
     NodeId nodeIdYes = 2, nodeIdNo = 3;
-    FabricId fabricId = 2;
-    uint16_t port = 2;
+    FabricId fabricId       = 2;
+    uint16_t port           = 2;
     Inet::InterfaceId iface = 0;
 
     Inet::IPAddress addr;
@@ -115,9 +114,9 @@ void TestCheckExpiration(nlTestSuite * inSuite, void * inContext)
 {
     IPCache<TEST_IPCACHE_SIZE_SMALL, TEST_IPCACHE_TTL_MS> tIPCache;
 
-    NodeId nodeId = 2;
-    FabricId fabricId = 2;
-    uint16_t port = 2;
+    NodeId nodeId           = 2;
+    FabricId fabricId       = 2;
+    uint16_t port           = 2;
     Inet::InterfaceId iface = 0;
 
     Inet::IPAddress addr;
@@ -127,13 +126,9 @@ void TestCheckExpiration(nlTestSuite * inSuite, void * inContext)
     usleep((TEST_IPCACHE_TTL_MS + 1) * 1000);
     NL_TEST_ASSERT(inSuite, tIPCache.Lookup(nodeId, fabricId, addr, port, iface) != CHIP_NO_ERROR);
 }
-const nlTest sTests[] = {
-    NL_TEST_DEF("CheckOccupancy", TestCheckOccupancy),
-    NL_TEST_DEF("CheckInsert", TestCheckInsert),
-    NL_TEST_DEF("CheckDelete", TestCheckDelete),
-    NL_TEST_DEF("CheckExpiration", TestCheckExpiration),
-    NL_TEST_SENTINEL()
-};
+const nlTest sTests[] = { NL_TEST_DEF("CheckOccupancy", TestCheckOccupancy), NL_TEST_DEF("CheckInsert", TestCheckInsert),
+                          NL_TEST_DEF("CheckDelete", TestCheckDelete), NL_TEST_DEF("CheckExpiration", TestCheckExpiration),
+                          NL_TEST_SENTINEL() };
 
 } // namespace
 
