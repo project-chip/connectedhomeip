@@ -70,6 +70,7 @@ public:
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_KVS; // special key for KVS system
 
     static CHIP_ERROR Init(void);
 
@@ -90,6 +91,11 @@ public:
     static CHIP_ERROR FactoryResetConfig(void);
 
     static void RunConfigUnitTest(void);
+
+    // internal to the platform for KeyValueStoreManagerImpl.cpp
+    static CHIP_ERROR ReadKVS(uint16_t key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes);
+    static CHIP_ERROR WriteKVS(uint16_t key, const void * value, size_t value_size);
+    static CHIP_ERROR ClearKVS(uint16_t key);
 };
 
 struct CC13X2_26X2Config::Key
