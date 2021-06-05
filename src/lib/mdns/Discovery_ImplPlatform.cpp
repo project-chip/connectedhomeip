@@ -34,6 +34,7 @@ namespace chip {
 namespace Mdns {
 
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> DiscoveryImplPlatform::sIPCache;
 
 DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
 
@@ -432,6 +433,26 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
 {
     ReturnErrorOnFailure(Init());
 
+    FabricId fabricId;
+    Inet::IPAddress addr;
+    uint16_t port;
+    Inet::InterfaceId iface;
+
+    if (sIPCache.Lookup(peerId.GetNodeId(), fabricId, addr, port, iface) == CHIP_NO_ERROR)
+    {
+        ResolvedNodeData nodeData;
+
+        nodeData.mInterfaceId = iface;
+        nodeData.mPort        = port;
+        nodeData.mAddress     = addr;
+        nodeData.mPeerId.SetNodeId(peerId.GetNodeId());
+        nodeData.mPeerId.SetFabricId(fabricId);
+
+        mResolverDelegate->OnNodeIdResolved(nodeData);
+
+        return CHIP_NO_ERROR;
+    }
+
     MdnsService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
@@ -474,6 +495,19 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         return;
     }
 
+    error = mgr->sIPCache.Insert(
+        nodeData.mPeerId.GetNodeId(),
+        nodeData.mPeerId.GetFabricId(),
+        result->mAddress.Value(),
+        result->mPort,
+        result->mInterface
+    );
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "IPCache insert failed with %s", chip::ErrorStr(error));
+    }
+ 
     nodeData.mInterfaceId = result->mInterface;
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;

@@ -15,12 +15,15 @@
  *    limitations under the License.
  */
 
+#include "IPCache.h"
 #include "Resolver.h"
 
 #include <limits>
 
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
+
+#include <core/CHIPConfig.h>
 
 #include <mdns/TxtFields.h>
 #include <mdns/minimal/Parser.h>
@@ -81,9 +84,9 @@ class PacketDataReporter : public ParserDelegate
 {
 public:
     PacketDataReporter(ResolverDelegate * delegate, chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType,
-                       const BytesRange & packet) :
+                       const BytesRange & packet, Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS>  & ipCache) :
         mDelegate(delegate),
-        mDiscoveryType(discoveryType), mPacketRange(packet)
+        mDiscoveryType(discoveryType), mPacketRange(packet), mIPCache(ipCache)
     {
         mNodeData.mInterfaceId = interfaceId;
     }
@@ -103,6 +106,8 @@ private:
     ResolvedNodeData mNodeData;
     CommissionableNodeData mCommissionableNodeData;
     BytesRange mPacketRange;
+
+    Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> & mIPCache;
 
     bool mValid       = false;
     bool mHasNodePort = false;
@@ -304,6 +309,19 @@ void PacketDataReporter::OnComplete()
     {
         mDelegate->OnCommissionableNodeFound(mCommissionableNodeData);
     }
+
+    CHIP_ERROR error = mIPCache.Insert(
+        mNodeData.mPeerId.GetNodeId(),
+        mNodeData.mPeerId.GetFabricId(),
+        mNodeData.mAddress,
+        mNodeData.mPort,
+        mNodeData.mInterfaceId
+    );
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "IPCache insert failed with %s", chip::ErrorStr(error));
+    }
 }
 
 class MinMdnsResolver : public Resolver, public MdnsPacketDelegate
@@ -338,7 +356,11 @@ private:
     }
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
+
+    static Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> sIPCache;
 };
+
+Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> MinMdnsResolver::sIPCache;
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
@@ -347,7 +369,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
         return;
     }
 
-    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data);
+    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data, sIPCache);
 
     if (!ParsePacket(data, &reporter))
     {
@@ -442,6 +464,26 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     mDiscoveryType                    = DiscoveryType::kOperational;
+
+    FabricId fabricId;
+    Inet::IPAddress addr;
+    uint16_t port;
+    Inet::InterfaceId iface;
+
+    if (sIPCache.Lookup(peerId.GetNodeId(), fabricId, addr, port, iface) == CHIP_NO_ERROR)
+    {
+        ResolvedNodeData mNodeData;
+
+        mNodeData.mPeerId.SetNodeId(peerId.GetNodeId());
+        mNodeData.mPeerId.SetFabricId(fabricId);
+        mNodeData.mAddress     = addr;
+        mNodeData.mPort        = port;
+        mNodeData.mInterfaceId = iface;
+
+        mDelegate->OnNodeIdResolved(mNodeData);
+        return CHIP_NO_ERROR;
+    }
+
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
     ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 

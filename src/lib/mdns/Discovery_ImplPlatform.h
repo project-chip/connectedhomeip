@@ -17,9 +17,11 @@
 
 #pragma once
 
+#include <core/CHIPConfig.h>
 #include <core/CHIPError.h>
 #include <inet/InetInterface.h>
 #include <lib/mdns/Advertiser.h>
+#include <lib/mdns/IPCache.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/mdns/platform/Mdns.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -87,6 +89,7 @@ private:
     bool mMdnsInitialized                = false;
     ResolverDelegate * mResolverDelegate = nullptr;
 
+    static IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> sIPCache;
     static DiscoveryImplPlatform sManager;
 };
 
