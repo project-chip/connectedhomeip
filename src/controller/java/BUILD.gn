@@ -18,6 +18,13 @@ import("//build_overrides/chip.gni")
 import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 
+config("java_config") {
+    include_dirs =[
+        ".",
+        "..",
+    ]
+}
+
 shared_library("jni") {
   output_name = "libCHIPController"
 
@@ -37,13 +44,17 @@ shared_library("jni") {
     "JniReferences.cpp",
     "JniReferences.h",
     "JniTypeWrappers.h",
+    "gen/CHIPClusters-JNI.cpp",
     "StackLock.h",
   ]
 
   deps = [
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
+    "${chip_root}/src/app",
   ]
+
+  public_configs = [":java_config"]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 }
@@ -63,6 +74,7 @@ android_library("java") {
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
     "src/chip/devicecontroller/KeyValueStoreManager.java",
+    "gen/ChipClusters.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
