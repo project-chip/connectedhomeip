@@ -314,6 +314,19 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
     }
 }
 
+JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
+{
+    StackLockGuard lock(JniReferences::GetStackLock());
+    Device * chipDevice = nullptr;
+
+    ChipLogProgress(Controller, "getDevicePointer() called with device ID %d", deviceId);
+
+    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+
+    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
+    return reinterpret_cast<jlong>(chipDevice);
+}
+
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
 {
     StackLockGuard lock(JniReferences::GetStackLock());
