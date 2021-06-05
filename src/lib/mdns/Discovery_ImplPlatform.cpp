@@ -507,7 +507,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     {
         ChipLogError(Discovery, "IPCache insert failed with %s", chip::ErrorStr(error));
     }
- 
+
     nodeData.mInterfaceId = result->mInterface;
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
