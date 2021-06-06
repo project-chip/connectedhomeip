@@ -292,14 +292,8 @@ public:
     class ScopedLock
     {
     public:
-        ScopedLock(EventManagement & aEventManagement) : mEventManagement(aEventManagement)
-        {
-            mEventManagement.mAccessLock.Lock();
-        }
-        ~ScopedLock()
-        {
-            mEventManagement.mAccessLock.Unlock();
-        }
+        ScopedLock(EventManagement & aEventManagement) : mEventManagement(aEventManagement) { mEventManagement.mAccessLock.Lock(); }
+        ~ScopedLock() { mEventManagement.mAccessLock.Unlock(); }
 
     private:
         EventManagement & mEventManagement;
