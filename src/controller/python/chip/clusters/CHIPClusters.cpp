@@ -1870,6 +1870,22 @@ CHIP_ERROR chip_ime_ReadAttribute_Descriptor_ClusterRevision(chip::Controller::D
 }
 
 // End of Cluster Descriptor
+// Cluster DiagnosticLogs
+
+CHIP_ERROR chip_ime_AppendCommand_DiagnosticLogs_RetrieveLogsRequest(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t intent,
+                                                                     uint8_t requestedProtocol,
+                                                                     const uint8_t * transferFileDesignator,
+                                                                     uint32_t transferFileDesignator_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::DiagnosticLogsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.RetrieveLogsRequest(nullptr, nullptr, intent, requestedProtocol,
+                                       chip::ByteSpan(transferFileDesignator, transferFileDesignator_Len));
+}
+
+// End of Cluster DiagnosticLogs
 // Cluster DoorLock
 
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearAllPins(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
