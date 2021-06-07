@@ -55,7 +55,7 @@ namespace {
 TimerHandle_t sbleAdvTimeoutTimer;
 
 // Full service UUID - CHIP_BLE_SVC_ID - taken from BleUUID.h header
-const uint8_t chipUUID_CHIPoBLE_Service[CHIP_ADV_SHORT_UUID_LEN] = {0xFF, 0xF6};
+const uint8_t chipUUID_CHIPoBLE_Service[CHIP_ADV_SHORT_UUID_LEN] = { 0xFF, 0xF6 };
 
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -89,7 +89,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     appCbacks.chrReadCback  = HandleTXCharRead;
     appCbacks.chrWriteCback = HandleRXCharWrite;
     appCbacks.cccCback      = _handleTXCharCCCDWrite;
-    qvCHIP_BleSetUUIDs((uint8_t *)chipUUID_CHIPoBLE_Service, (uint8_t *)chipUUID_CHIPoBLEChar_TX.bytes, (uint8_t *)chipUUID_CHIPoBLEChar_RX.bytes);
+    qvCHIP_BleSetUUIDs((uint8_t *) chipUUID_CHIPoBLE_Service, (uint8_t *) chipUUID_CHIPoBLEChar_TX.bytes,
+                       (uint8_t *) chipUUID_CHIPoBLEChar_RX.bytes);
     qvCHIP_BleInit(&appCbacks);
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
@@ -478,9 +479,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     // Fill in scan response data
     index                     = 0;
-    mScanRespDataBuf[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;            // AD length
-    mScanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_UUID;                // AD type : uuid
-    mScanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[1];           // AD value
+    mScanRespDataBuf[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;  // AD length
+    mScanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_UUID;      // AD type : uuid
+    mScanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[1]; // AD value
     mScanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
 
     qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_SCAN, index, mScanRespDataBuf);
