@@ -51,7 +51,7 @@ jobs:
                   languages: "cpp"
 
             - name: Bootstrap
-              timeout-minutes: 3
+              timeout-minutes: 5
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
               run: |

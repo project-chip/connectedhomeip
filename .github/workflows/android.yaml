@@ -46,7 +46,7 @@ jobs:
               with:
                   submodules: true
             - name: Bootstrap
-              timeout-minutes: 3
+              timeout-minutes: 5
               run: scripts/build/gn_bootstrap.sh
             - name: Build libs
               timeout-minutes: 2

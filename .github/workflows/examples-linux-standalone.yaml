@@ -47,7 +47,7 @@ jobs:
 #               with:
 #                   languages: "cpp, python"
             - name: Bootstrap
-              timeout-minutes: 3
+              timeout-minutes: 5
               run: scripts/build/gn_bootstrap.sh
             - name: Build example Standalone Echo Client
               timeout-minutes: 5
