@@ -46,7 +46,7 @@ static uint32_t chunk1PayloadRepresentation(const SetupPayload & payload)
                   "Discriminator won't fit");
 
     uint32_t discriminatorChunk = (payload.discriminator >> kDiscriminatorShift) & kDiscriminatorMask;
-    uint32_t vidPidPresentFlag  = payload.requiresCustomFlow ? 1 : 0;
+    uint32_t vidPidPresentFlag  = payload.commissioningFlow == CommissioningFlow::kCustom ? 1 : 0;
 
     uint32_t result = (discriminatorChunk << kManualSetupChunk1DiscriminatorMsbitsPos) |
         (vidPidPresentFlag << kManualSetupChunk1VidPidPresentBitPos);
@@ -129,7 +129,7 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::
     decimalString += decimalStringWithPadding(chunk2, kManualSetupCodeChunk2CharLength);
     decimalString += decimalStringWithPadding(chunk3, kManualSetupCodeChunk3CharLength);
 
-    if (mSetupPayload.requiresCustomFlow)
+    if (mSetupPayload.commissioningFlow == CommissioningFlow::kCustom)
     {
         decimalString += decimalStringWithPadding(mSetupPayload.vendorID, kManualSetupVendorIdCharLength);
         decimalString += decimalStringWithPadding(mSetupPayload.productID, kManualSetupProductIdCharLength);

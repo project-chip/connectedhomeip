@@ -509,8 +509,8 @@ std::string createSetupPayload()
             ESP_LOGE(TAG, "Failed to get decimal setup code");
         }
 
-        payload.requiresCustomFlow = 1;
-        generator                  = ManualSetupPayloadGenerator(payload);
+        payload.commissioningFlow = CommissioningFlow::kCustom;
+        generator                 = ManualSetupPayloadGenerator(payload);
 
         if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
         {

@@ -88,17 +88,17 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     jmethodID setupConstr    = env->GetMethodID(setupPayloadClass, "<init>", "()V");
     jobject setupPayload     = env->NewObject(setupPayloadClass, setupConstr);
 
-    jfieldID version            = env->GetFieldID(setupPayloadClass, "version", "I");
-    jfieldID vendorId           = env->GetFieldID(setupPayloadClass, "vendorId", "I");
-    jfieldID productId          = env->GetFieldID(setupPayloadClass, "productId", "I");
-    jfieldID requiresCustomFlow = env->GetFieldID(setupPayloadClass, "requiresCustomFlow", "Z");
-    jfieldID discriminator      = env->GetFieldID(setupPayloadClass, "discriminator", "I");
-    jfieldID setUpPinCode       = env->GetFieldID(setupPayloadClass, "setupPinCode", "J");
+    jfieldID version           = env->GetFieldID(setupPayloadClass, "version", "I");
+    jfieldID vendorId          = env->GetFieldID(setupPayloadClass, "vendorId", "I");
+    jfieldID productId         = env->GetFieldID(setupPayloadClass, "productId", "I");
+    jfieldID commissioningFlow = env->GetFieldID(setupPayloadClass, "commissioningFlow", "I");
+    jfieldID discriminator     = env->GetFieldID(setupPayloadClass, "discriminator", "I");
+    jfieldID setUpPinCode      = env->GetFieldID(setupPayloadClass, "setupPinCode", "J");
 
     env->SetIntField(setupPayload, version, payload.version);
     env->SetIntField(setupPayload, vendorId, payload.vendorID);
     env->SetIntField(setupPayload, productId, payload.productID);
-    env->SetBooleanField(setupPayload, requiresCustomFlow, payload.requiresCustomFlow);
+    env->SetIntField(setupPayload, commissioningFlow, static_cast<int>(payload.commissioningFlow));
     env->SetIntField(setupPayload, discriminator, payload.discriminator);
     env->SetLongField(setupPayload, setUpPinCode, payload.setUpPINCode);
 
