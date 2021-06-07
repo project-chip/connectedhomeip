@@ -9,7 +9,7 @@
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (nonatomic) bool advanced;
 @property (nonatomic) bool hasStatus;
-@property (assign, nonatomic) dispatch_semaphore_t statusSemaphore;
+@property (strong, nonatomic) dispatch_semaphore_t statusSemaphore;
 
 - (id)init;
 - (bool)isPoweredOn;
@@ -84,9 +84,12 @@
 
 @end
 
-extern "C" void * pychip_ble_adapter_list_new() { return static_cast<void *>([[FakeBleAdapterInformation alloc] init]); }
+extern "C" void * pychip_ble_adapter_list_new() { return (__bridge_retained void *) [[FakeBleAdapterInformation alloc] init]; }
 
-extern "C" void pychip_ble_adapter_list_delete(FakeBleAdapterInformation * adapterIterator) { [adapterIterator release]; }
+extern "C" void pychip_ble_adapter_list_delete(FakeBleAdapterInformation * adapterIterator)
+{
+    CFRelease((CFTypeRef) adapterIterator);
+}
 
 extern "C" bool pychip_ble_adapter_list_next(FakeBleAdapterInformation * adapterIterator)
 {
@@ -115,5 +118,5 @@ extern "C" bool pychip_ble_adapter_list_is_powered(FakeBleAdapterInformation * a
 
 extern "C" void * pychip_ble_adapter_list_get_raw_adapter(FakeBleAdapterInformation * adapterIterator)
 {
-    return static_cast<void *>(adapterIterator);
+    return (__bridge void *) adapterIterator;
 }

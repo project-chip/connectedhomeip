@@ -168,6 +168,10 @@ public class ChipDeviceController {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
+  public void updateAddress(long deviceId, String address, int port) {
+    updateAddress(deviceControllerPtr, deviceId, address, port);
+  }
+
   public void sendMessage(long deviceId, String message) {
     sendMessage(deviceControllerPtr, deviceId, message);
   }
@@ -176,9 +180,8 @@ public class ChipDeviceController {
     sendCommand(deviceControllerPtr, deviceId, command, value);
   }
 
-  public void enableThreadNetwork(
-      long deviceId, int channel, int panId, byte[] extPanId, byte[] masterKey) {
-    enableThreadNetwork(deviceControllerPtr, deviceId, channel, panId, extPanId, masterKey);
+  public void enableThreadNetwork(long deviceId, byte[] operationalDataset) {
+    enableThreadNetwork(deviceControllerPtr, deviceId, operationalDataset);
   }
 
   public boolean openPairingWindow(long deviceId, int duration) {
@@ -204,18 +207,16 @@ public class ChipDeviceController {
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
 
+  private native void updateAddress(
+      long deviceControllerPtr, long deviceId, String address, int port);
+
   private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
 
   private native void sendCommand(
       long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
 
   private native void enableThreadNetwork(
-      long deviceControllerPtr,
-      long deviceId,
-      int channel,
-      int panId,
-      byte[] extPanId,
-      byte[] masterKey);
+      long deviceControllerPtr, long deviceId, byte[] operationalDataset);
 
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 

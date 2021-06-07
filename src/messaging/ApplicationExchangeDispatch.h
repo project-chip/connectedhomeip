@@ -38,11 +38,11 @@ public:
 
     virtual ~ApplicationExchangeDispatch() {}
 
-    CHIP_ERROR Init(ReliableMessageMgr * reliableMessageMgr, SecureSessionMgr * sessionMgr)
+    CHIP_ERROR Init(SecureSessionMgr * sessionMgr)
     {
         ReturnErrorCodeIf(sessionMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mSessionMgr = sessionMgr;
-        return ExchangeMessageDispatch::Init(reliableMessageMgr);
+        return ExchangeMessageDispatch::Init();
     }
 
     CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,

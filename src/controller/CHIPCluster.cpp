@@ -32,22 +32,20 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint, app::CommandSender * commandSender)
+CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: Check if the device supports mCluster at the requested endpoint
 
-    mDevice         = device;
-    mEndpoint       = endpoint;
-    mpCommandSender = commandSender;
+    mDevice   = device;
+    mEndpoint = endpoint;
 
     return err;
 }
 
 void ClusterBase::Dissociate()
 {
-    mDevice         = nullptr;
-    mpCommandSender = nullptr;
+    mDevice = nullptr;
 }
 
 CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle && payload,

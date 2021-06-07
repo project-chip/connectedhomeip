@@ -54,8 +54,8 @@ public:
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mUsingTCP = false;
 #endif
-        mUsingCRMP = true;
-        mPort      = CHIP_PORT;
+        mUsingMRP = true;
+        mPort     = CHIP_PORT;
     }
 
     uint64_t GetLastSendTime() const { return mLastSendTime; }
@@ -78,8 +78,8 @@ public:
     void SetUsingTCP(bool value) { mUsingTCP = value; }
 #endif
 
-    bool IsUsingCRMP() const { return mUsingCRMP; }
-    void SetUsingCRMP(bool value) { mUsingCRMP = value; }
+    bool IsUsingMRP() const { return mUsingMRP; }
+    void SetUsingMRP(bool value) { mUsingMRP = value; }
 
 private:
     // The last time a CHIP message was attempted to be sent.
@@ -94,7 +94,7 @@ private:
     bool mUsingTCP;
 #endif
 
-    bool mUsingCRMP;
+    bool mUsingMRP;
 } gSendArguments;
 
 class MockAppDelegate : public Messaging::ExchangeDelegate
@@ -155,7 +155,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
     VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    if (gSendArguments.IsUsingCRMP())
+    if (gSendArguments.IsUsingMRP())
     {
         sendFlags.Set(Messaging::SendMessageFlags::kNone);
     }
@@ -316,7 +316,7 @@ void PrintUsage(streamer_t * stream)
     streamer_printf(stream, "  -P  <protocol>  protocol ID\n");
     streamer_printf(stream, "  -T  <type>      message type\n");
     streamer_printf(stream, "  -p  <port>      server port number\n");
-    streamer_printf(stream, "  -r  <1|0>       enable or disable CRMP\n");
+    streamer_printf(stream, "  -r  <1|0>       enable or disable MRP\n");
     streamer_printf(stream, "  -s  <size>      payload size in bytes\n");
 }
 
@@ -399,11 +399,11 @@ int cmd_send(int argc, char ** argv)
 
                 if (arg == 0)
                 {
-                    gSendArguments.SetUsingCRMP(false);
+                    gSendArguments.SetUsingMRP(false);
                 }
                 else if (arg == 1)
                 {
-                    gSendArguments.SetUsingCRMP(true);
+                    gSendArguments.SetUsingMRP(true);
                 }
                 else
                 {
@@ -441,5 +441,5 @@ static shell_command_t cmds_send[] = {
 
 void cmd_send_init()
 {
-    shell_register(cmds_send, ArraySize(cmds_send));
+    Engine::Root().RegisterCommands(cmds_send, ArraySize(cmds_send));
 }

@@ -26,8 +26,8 @@
 #include "tv-channel/TvChannelManager.h"
 #include "wake-on-lan/WakeOnLanManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 
 using namespace chip;
 

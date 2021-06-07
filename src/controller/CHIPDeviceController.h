@@ -30,8 +30,8 @@
 
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
-#include <controller/CHIPOperationalCredentialsProvisioner.h>
 #include <controller/OperationalCredentialsDelegate.h>
+#include <controller/data_model/gen/CHIPClientCallbacks.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
@@ -67,6 +67,12 @@ namespace Controller {
 constexpr uint16_t kNumMaxActiveDevices = 64;
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
+// Raw functions for cluster callbacks
+typedef void (*BasicSuccessCallback)(void * context, uint16_t val);
+typedef void (*BasicFailureCallback)(void * context, uint8_t status);
+void BasicSuccess(void * context, uint16_t val);
+void BasicFailure(void * context, uint8_t status);
+
 struct ControllerInitParams
 {
     PersistentStorageDelegate * storageDelegate = nullptr;
@@ -81,6 +87,25 @@ struct ControllerInitParams
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
+};
+
+enum CommissioningStage : uint8_t
+{
+    kError,
+    kSecurePairing,
+    kArmFailsafe,
+    // kConfigTime,  // NOT YET IMPLEMENTED
+    // kConfigTimeZone,  // NOT YET IMPLEMENTED
+    // kConfigDST,  // NOT YET IMPLEMENTED
+    kConfigRegulatory,
+    kCheckCertificates,
+    kConfigACL,
+    kNetworkSetup,
+    kScanNetworks, // optional stage if network setup fails (not yet implemented)
+    kNetworkEnable,
+    kFindOperational,
+    kSendComplete,
+    kCleanup,
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -247,23 +272,23 @@ protected:
     bool mPairedDevicesInitialized;
 
     NodeId mLocalDeviceId;
-    DeviceTransportMgr * mTransportMgr;
-    SecureSessionMgr * mSessionMgr;
-    Messaging::ExchangeManager * mExchangeMgr;
-    secure_channel::MessageCounterManager * mMessageCounterManager;
-    PersistentStorageDelegate * mStorageDelegate;
-    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
+    DeviceTransportMgr * mTransportMgr                             = nullptr;
+    SecureSessionMgr * mSessionMgr                                 = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
+    secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
+    PersistentStorageDelegate * mStorageDelegate                   = nullptr;
+    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate  = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
-    Inet::InetLayer * mInetLayer;
+    Inet::InetLayer * mInetLayer = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
-    System::Layer * mSystemLayer;
+    System::Layer * mSystemLayer = nullptr;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
@@ -288,6 +313,13 @@ protected:
 
     uint16_t mNextKeyId = 0;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    //////////// ResolverDelegate Implementation ///////////////
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+
 private:
     //////////// ExchangeDelegate Implementation ///////////////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -297,13 +329,6 @@ private:
     //////////// ExchangeMgrDelegate Implementation ///////////////
     void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    //////////// ResolverDelegate Implementation ///////////////
-    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
 
@@ -338,6 +363,7 @@ public:
  *   will be stored.
  */
 class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEstablishmentDelegate
+
 {
 public:
     DeviceCommissioner();
@@ -397,6 +423,8 @@ public:
 
     void ReleaseDevice(Device * device) override;
 
+    void AdvanceCommissioningStage(CHIP_ERROR err);
+
 #if CONFIG_NETWORK_LAYER_BLE
     /**
      * @brief
@@ -438,6 +466,9 @@ public:
      */
     int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
 
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+
 #endif
 
 private:
@@ -458,6 +489,8 @@ private:
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
        persist the device list */
     bool mPairedDevicesUpdated;
+
+    CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
@@ -533,6 +566,12 @@ private:
      */
     CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
                             const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
+
+    // Cluster callbacks for advancing commissioning flows
+    Callback::Callback<BasicSuccessCallback> mSuccess;
+    Callback::Callback<BasicFailureCallback> mFailure;
+
+    CommissioningStage GetNextCommissioningStage();
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;

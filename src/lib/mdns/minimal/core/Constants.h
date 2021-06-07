@@ -45,6 +45,9 @@ enum class QType : uint16_t
 
 /// Flag encoded in QCLASS requesting unicast answers
 constexpr uint16_t kQClassUnicastAnswerFlag = 0x8000;
+// Flag used to indicate receiver should flush cache rather than appending. Used for Response RR's.
+// See https://datatracker.ietf.org/doc/html/rfc6762#section-10.2.
+constexpr uint16_t kQClassResponseFlushBit = 0x8000;
 
 enum class QClass : uint16_t
 {
@@ -53,6 +56,7 @@ enum class QClass : uint16_t
 
     // Unicast version for the class
     IN_UNICAST = IN | kQClassUnicastAnswerFlag,
+    IN_FLUSH   = IN | kQClassResponseFlushBit,
 };
 
 enum class ResourceType

@@ -1,282 +1,347 @@
-# CHIP Device Controller - Python Binding & Command line interface
+# Python CHIP Device Controller
 
 ## Overview
 
-Chip Device Controller is a general library to control devices and manage
-commissioner functionality, it has Python, Java (for Android) and ObjC (for iOS)
-bindings for building tests and CHIP mobile applications. This document will
-focus on its python binding interface on Linux and mac os.
+The Python CHIP controller is a tool that allows to commission a Matter device
+into the network and to communicate with it using the Zigbee Cluster Library
+(ZCL) messages. The tool uses the generic [Chip Device Controller](../) library.
 
-## Checkout / Build / Install
+The following instruction describes how to build and test the Python CHIP
+controller.
 
-> Note: The CHIP can be built on Linux (amd64 / aarch64) and macOS
+To learn more about advanced usage of the tool, read the
+[advanced usage page](ADVANCED_USAGE.md).
 
-1. Clone Project CHIP repo.
+## Building and installing
 
-```
-git clone https://github.com/project-chip/connectedhomeip.git
-```
+Before you can use the Python controller, you must compile it from the source on
+Linux (amd64 / aarch64) or macOS.
 
-2. Build the CHIP python package
+> To ensure compatibility, build the Python CHIP controller and the Matter
+> device from the same revision of the connectedhomeip repository.
 
-Follow [BUILDING.md](/docs/BUILDING.md) to setup CHIP on your platform.
+To build and run the Python CHIP controller:
 
-Genrally, once build dependencies are satisfied you can build the `python`
-target.
+1. Install all necessary packages and prepare the build system. For more
+   details, see the [BUILDING.md](/docs/BUILDING.md) documentation:
 
-Use `scripts/build_python.sh` or run something equivalent to:
+    ```
+    sudo apt-get update
+    sudo apt-get upgrade
 
-```sh
-gn gen out/python_lib
-ninja -C out/python_lib python
-```
+    sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev bluez
+    ```
 
-3. Install Chip Device Controller
+    If the Python CHIP controller is built on a Raspberry Pi, install additional
+    packages and reboot the device:
 
-> Note: Python device controller is not versioned, so you need to uninstall the
-> old device controller before install the new one.
+    ```
+    sudo apt-get install pi-bluetooth
+    sudo reboot
+    ```
 
-> It is recommended to setup a separate clean virtual environment The
-> `scripts/build_python.sh` script sets up a python environment and installs the
-> WHL file.
+2. Clone the Project CHIP repository:
 
-```sh
-virtualenv out/python_env --clear
-source out/python_env/bin/activate
-pip install out/python_lib/controller/python/chip*.whl
-```
+    ```
+    git clone https://github.com/project-chip/connectedhomeip.git
+    ```
 
-The WHL file installation will:
+3. Enter the `connectedhomeip` directory:
 
--   Install the 'chip' module
--   create a `ENV/bin/chip-device-ctrl` script that provides an interactive
-    shell for the chip library
+    ```
+    cd connectedhomeip
+    ```
 
-## BLE Virtualization on Linux (Optional)
+4. Initialize the git submodules:
 
-If we would like to setup virtual BLE central and peripheral in the same
-machine, then Bluez setup
+    ```
+    git submodule update --init
+    ```
 
-```
-cd third_party/bluez/repo
-./bootstrap
-third_party/bluez/repo/configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd --enable-deprecated --enable-testing --enable-tools
-make
-```
+5. Build and install the Python CHIP controller:
 
-Note: You also need to install several packages on RPi if you want to build
-bluez
+    ```
+    scripts/build_python.sh -m platform
+    ```
 
-```
-sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
-```
+    > Note: To get more details about available build configurations, run the
+    > following command: `scripts/build_python.sh --help`
 
-Run bluetoothd:
+## Running the tool
 
-```
-sudo third_party/bluez/repo/src/bluetoothd --experimental --debug &
-```
+1. Activate the Python virtual environment:
 
-Bring up two virtual ble interface:
+    ```
+    source out/python_env/bin/activate
+    ```
 
-```
-sudo third_party/bluez/repo/emulator/btvirt -L -l2
-```
+2. Run the Python CHIP controller with root privileges, which is required to
+   obtain access to the Bluetooth interface:
 
-You can find the virtual interface by `hciconfig` command:
+    ```
+    sudo out/python_env/bin/chip-device-ctrl
+    ```
 
-```
-$ hciconfig
+    You can also select the Bluetooth LE interface using command line argument:
 
-hci2:	Type: Primary  Bus: Virtual
-	BD Address: 00:AA:01:01:00:24  ACL MTU: 192:1  SCO MTU: 0:0
-	UP RUNNING
-	RX bytes:0 acl:95 sco:0 events:205 errors:0
-	TX bytes:2691 acl:95 sco:0 commands:98 errors:0
+    ```
+    sudo out/python_env/bin/chip-device-ctrl --bluetooth-adapter=hci2
+    ```
 
-hci1:	Type: Primary  Bus: Virtual
-	BD Address: 00:AA:01:00:00:23  ACL MTU: 192:1  SCO MTU: 0:0
-	UP RUNNING
-	RX bytes:0 acl:95 sco:0 events:208 errors:0
-	TX bytes:3488 acl:95 sco:0 commands:110 errors:0
-```
+## Working with Python CHIP Controller
 
-Then you can choose the adapter to use in command line arguments of the device
-controller:
+This section describes how to use Python CHIP controller to test the Matter
+accessory. Below steps depend on the application clusters that you implemented
+on the device side and may be different for your accessory.
 
-For example, add `--bluetooth-adapter=hci2` to use the virtual interface `hci2`
-listed above.
+### Step 1: Prepare the Matter accessory.
 
-```
-chip-device-ctrl --bluetooth-adapter=hci2
-```
+This tutorial is using the [Matter Light Bulb](/examples/lighting-app) example
+with the Bluetooth LE commissioning. However, you can adapt this procedure to
+other available [Matter examples](/examples).
 
-## Usage / BLE Secure Session Establishment
+Build and program the device with the Matter accessory firmware by following the
+example's documentation.
 
-1. Run CHIP Device Controller
+### Step 2: Enable Bluetooth LE advertising on Matter accessory device.
 
-> Running as root via `sudo` to ensure permissions to interface with the
-> bluetooth adapter.
+Some examples are configured to advertise automatically on boot. Other examples
+require physical trigger, for example pushing a button. Follow the documentation
+of the Matter accessory example to learn how Bluetooth LE advertising is enabled
+for the given example.
 
-```
-sudo chip-device-ctrl
-```
+### Step 3: Discover Matter accessory device over Bluetooth LE
 
-or select the bluetooth interface by command line arguments.
-
-```
-sudo chip-device-ctrl --bluetooth-adapter=hci2
-```
-
-2. Scan BLE devices
+An uncommissioned accessory device advertises over Bluetooth LE. Run the
+following command to scan all advertised Matter devices:
 
 ```
 chip-device-ctrl > ble-scan
-2021-01-19 02:27:23,653 ChipBLEMgr   INFO     scanning started
-2021-01-19 02:27:25,144 ChipBLEMgr   INFO     Name            = CHIP-1383
-2021-01-19 02:27:25,144 ChipBLEMgr   INFO     ID              = ae0125dc-e621-3e05-9166-70ca7ea07985
-2021-01-19 02:27:25,146 ChipBLEMgr   INFO     RSSI            = -32
-2021-01-19 02:27:25,147 ChipBLEMgr   INFO     Address         = DC:A6:32:A5:4C:56
-2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Pairing State   = 0
-2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Discriminator   = 1383
-2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Vendor Id       = 9050
-2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Product Id      = 65279
-2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000fff6-0000-1000-8000-00805f9b34fb
-2021-01-19 02:27:25,156 ChipBLEMgr   INFO     Adv Data        = 0067055a23fffe
-2021-01-19 02:27:27,257 ChipBLEMgr   INFO
-2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
-Connect to BLE device
 ```
 
-3.  Set wifi credential
+### Step 4: Connect to Matter accessory device over Bluetooth LE
 
-> Note: This command will be deprerated after the network provisioning cluster
-> is ready.
-
-```
-chip-device-ctrl > set-pairing-wifi-credential TestAP TestPassword
-```
-
-4.  Connect to device using setup pin code
+The controller uses a 12-bit value called **discriminator** to discern between
+multiple commissionable device advertisements. Moreover, a 27-bit **PIN code**
+is used by the controller to authenticate in the device. You can find those
+values in the logging terminal of the device (for example, UART). For example:
 
 ```
-chip-device-ctrl > connect -ble 1383 20202021
+I: 254 [DL]Device Configuration:
+I: 257 [DL] Serial Number: TEST_SN
+I: 260 [DL] Vendor Id: 9050 (0x235A)
+I: 263 [DL] Product Id: 20043 (0x4E4B)
+I: 267 [DL] Product Revision: 1
+I: 270 [DL] Setup Pin Code: 20202021
+I: 273 [DL] Setup Discriminator: 3840 (0xF00)
+I: 278 [DL] Manufacturing Date: (not set)
+I: 281 [DL] Device Type: 65535 (0xFFFF)
 ```
 
-## Thread provisioning
+Run the following command to establish the secure connection over Bluetooth LE,
+with the following assumptions for the Matter accessory device:
 
-1. Configure Thread border router. For example, follow
-   [Setup OpenThread Border Router on Raspberry Pi / ubuntu](../../../docs/guides/openthread_border_router_pi.md)
-   instruction to configure OpenThread Border Router on a Linux workstation.
-
-2. Run CHIP Device Controller
-
-```
-sudo chip-device-ctrl
-```
-
-3. Set Thread credentials
+-   The discriminator of the device is _3840_
+-   The setup pin code of the device is _20202021_
+-   The temporary Node ID is _1234_
 
 ```
-set-pairing-thread-credential <channel> <pan id[HEX]> <master_key>
+chip-device-ctrl > connect -ble 3840 20202021 1234
 ```
 
-4. BLE Connect to the device
+You can skip the last parameter, that is the Node ID. If you skip it, the
+controller will assign it randomly. However, note the Node ID down, because it
+is required later in the configuration process.
+
+At the end of the secure connection establishment, the Python controller prints
+the following log:
 
 ```
-connect -ble <discriminator> <setup pin code> [<nodeid>]
+Secure Session to Device Established
 ```
 
-## IP Secure Session Establishment
+This means that the PASE (Password-Authenticated Session Establishment) session
+using SPAKE2+ protocol is completed.
 
-1. Run CHIP Device Controller
+### Step 5: Commission Matter accessory to the underlying network
+
+The main goal of the network commissioning step is to configure the device with
+a network interface, such as Thread or Wi-Fi. This process provides the device
+with network credentials.
+
+#### Commissioning a Thread device
+
+1. Fetch and store the current Active Operational Dataset and Extended PAN ID
+   from the Thread Border Router. Depending if Thread Border Router is running
+   on Docker or natively on Raspberry Pi, execute the following commands:
+
+    - For Docker:
+
+        ```
+        sudo docker exec -it otbr sh -c "sudo ot-ctl dataset active -x"
+        0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
+        Done
+
+        sudo docker exec -it otbr sh -c "sudo ot-ctl dataset extpanid”
+        4fe76e9a8b5edaf5
+        Done
+        ```
+
+    - For native installation:
+
+        ```
+        sudo ot-ctl dataset active -x
+        0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
+        Done
+
+        sudo ot-ctl dataset extpanid
+        4fe76e9a8b5edaf5
+        Done
+        ```
+
+    Matter specifiction does not define how the Thread or Wi-Fi credentials are
+    obtained by Controller. For example, for Thread, instead of fetching
+    datasets directly from the Thread Border Router, you might also use a
+    different out-of-band method.
+
+2. Inject the previously obtained Active Operational Dataset as hex-encoded
+   value using ZCL Network Commissioning cluster:
+
+    > Each ZCL command has a following format:
+    > `zcl <Cluster> <Command> <Node Id> <Endpoint Id> <Group Id> [arguments]`
+
+    ```
+    chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 breadcrumb=0 timeoutMs=3000
+    ```
+
+3. Enable Thread interface on the device by executing the following command with
+   `networkID` equal to Extended PAN Id of the Thread network:
+
+    ```
+    chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=hex:4fe76e9a8b5edaf5 breadcrumb=0 timeoutMs=3000
+    ```
+
+#### Commissioning a Wi-Fi device
+
+1. Assuming your Wi-Fi SSID is _TESTSSID_, and your Wi-Fi password is
+   _P455W4RD_, inject the credentials to the device by excuting the following
+   command:
+
+    ```
+    chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 1234 0 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
+    ```
+
+2. Enable the Wi-Fi interface on the device by executing the following command:
+
+    ```
+    chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
+    ```
+
+### Step 6: Close Bluetooth LE connection.
+
+After the Matter accessory device was provisioned with Thread or Wi-Fi
+credentials (or both), the commissioning process is finished. The Python CHIP
+controller is now using only the IPv6 traffic to reach the device, so you can
+close the Bluetooth LE connection. To close the connection, run the following
+command:
 
 ```
-chip-device-ctrl
+chip-device-ctrl > close-ble
 ```
 
-> Note: SUDO is not required when use IP to connect device.
+### Step 7: Discover IPv6 address of the Matter accessory.
 
-2. Connect to device using setup pin code
+The Matter controller must discover the IPv6 address of the node that it
+previously commissioned. Depending on the network type:
 
-```
-chip-device-ctrl > connect -ip <Device IP Address> 20202021
-```
+-   For Thread, the Matter accessory uses SRP (Service Registration Protocol) to
+    register its presence on the Thread Border Router’s SRP Server.
+-   For Wi-Fi or Ethernet devices, the Matter accessory uses the mDNS (Multicast
+    Domain Name System) protocol.
 
-## Commands
-
-**`[L]`** = Linux only / **`[D]`** = Deprecated / **`[W]`** = WIP / **`[T]`** =
-For testing
-
-### `setup-payload parse-manual <manual-pairing-code>`
-
-Print the commissioning information encoded in the Manual Pairing Code.
+Assuming your Fabric ID is _5544332211_ and Node ID is _1234_ (use the Node ID
+you noted down when you established the secure connection over Bluetooth LE)),
+run the following command:
 
 ```
-chip-device-ctrl > setup-payload parse-manual 35767807533
-Version: 0
-VendorID: 0
-ProductID: 0
-RequiresCustomFlow: 0
-RendezvousInformation: 0
-Discriminator: 3840
-SetUpPINCode: 20202021
+chip-device-ctrl > resolve 5544332211 1234
 ```
 
-### `setup-payload parse-qr <qr-code>`
+A notification in the log indicates that the node address has been updated. The
+IPv6 address of the device is cached in the controller for later usage.
 
-Print the commissioning information encoded in the QR Code payload.
+### Step 8: Control application ZCL clusters.
+
+For the light bulb example, execute the following command to toggle the LED
+state:
 
 ```
-chip-device-ctrl > setup-payload parse-qr "VP:vendorpayload%CH:H34.GHY00 0C9SS0"
-Version: 0
-VendorID: 9050
-ProductID: 20043
-RequiresCustomFlow: 0
-RendezvousInformation: 2 [BLE]
-Discriminator: 3840
-SetUpPINCode: 20202021
+chip-device-ctrl > zcl OnOff Toggle 1234 1 0
 ```
 
-### **`[L]`** `ble-adapter-print`
+To change the brightness of the LED, use the following command, with the level
+value somewhere between 0 and 255.
 
-Print the available Bluetooth adapters on device. Takes no arguments.
+```
+chip-device-ctrl > zcl LevelControl MoveToLevel 1234 1 0 level=50
+```
+
+### Step 9: Read basic information out of the accessory.
+
+Every Matter accessory device supports a Basic Cluster, which maintains
+collection of attributes that a controller can obtain from a device, such as the
+vendor name, the product name, or software version. Use `zclread` command to
+read those values from the device:
+
+```
+chip-device-ctrl > zclread Basic VendorName 1234 1 0
+chip-device-ctrl > zclread Basic ProductName 1234 1 0
+chip-device-ctrl > zclread Basic SoftwareVersion 1234 1 0
+```
+
+> Use the `zcl ? Basic` command to list all available commands for Basic
+> Cluster.
+
+## List of commands
+
+### `ble-adapter-print`
+
+Print the available Bluetooth adapters on device. Takes no arguments:
 
 ```
 chip-device-ctrl > ble-adapter-print
 2021-03-04 16:09:40,930 ChipBLEMgr   INFO     AdapterName: hci0   AdapterAddress: 00:AA:01:00:00:23
 ```
 
-### **`[D]`** `ble-adapter-select <address>`
+### `ble-debug-log`
 
-Select the Bluetooth adapter for device controller, takes adapter MAC address as
-argument. This command only affects `ble-scan` command.
+Enable the Bluetooth LE debug logs.
 
 ```
-chip-device-ctrl > ble-adapter-select DC:A6:32:9E:2E:A7
-(no output)
+chip-device-ctrl > ble-debug-log 1
 ```
 
 ### `ble-scan [-t <timeout>] [identifier]`
 
-Start a ble-scan action for searching valid CHIP devices over BLE [for at most
-*timeout* seconds], stop when device matching the identifier or timeout.
+Start a scan action to search for valid CHIP devices over Bluetooth LE (for at
+most _timeout_ seconds). Stop when the device is matching the identifier or the
+counter times out.
 
 ```
 chip-device-ctrl > ble-scan
-2021-01-19 02:27:23,653 ChipBLEMgr   INFO     scanning started
-2021-01-19 02:27:25,144 ChipBLEMgr   INFO     Name            = CHIP-1383
-2021-01-19 02:27:25,144 ChipBLEMgr   INFO     ID              = ae0125dc-e621-3e05-9166-70ca7ea07985
-2021-01-19 02:27:25,146 ChipBLEMgr   INFO     RSSI            = -32
-2021-01-19 02:27:25,147 ChipBLEMgr   INFO     Address         = DC:A6:32:A5:4C:56
-2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Pairing State   = 0
-2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Discriminator   = 1383
-2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Vendor Id       = 9050
-2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Product Id      = 65279
-2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000fff6-0000-1000-8000-00805f9b34fb
-2021-01-19 02:27:25,156 ChipBLEMgr   INFO     Adv Data        = 0067055a23fffe
-2021-01-19 02:27:27,257 ChipBLEMgr   INFO
-2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
+2021-05-29 22:28:05,461 ChipBLEMgr   INFO     scanning started
+2021-05-29 22:28:07,206 ChipBLEMgr   INFO     Name            = ChipLight
+2021-05-29 22:28:07,206 ChipBLEMgr   INFO     ID              = f016e23d-0d00-35d5-93e7-588acdbc7e54
+2021-05-29 22:28:07,207 ChipBLEMgr   INFO     RSSI            = -79
+2021-05-29 22:28:07,207 ChipBLEMgr   INFO     Address         = E0:4D:84:3C:BB:C3
+2021-05-29 22:28:07,209 ChipBLEMgr   INFO     Pairing State   = 0
+2021-05-29 22:28:07,209 ChipBLEMgr   INFO     Discriminator   = 3840
+2021-05-29 22:28:07,209 ChipBLEMgr   INFO     Vendor Id       = 9050
+2021-05-29 22:28:07,209 ChipBLEMgr   INFO     Product Id      = 20044
+2021-05-29 22:28:07,210 ChipBLEMgr   INFO     Adv UUID        = 0000fff6-0000-1000-8000-00805f9b34fb
+2021-05-29 22:28:07,210 ChipBLEMgr   INFO     Adv Data        = 00000f5a234c4e
+2021-05-29 22:28:07,210 ChipBLEMgr   INFO
+2021-05-29 22:28:16,246 ChipBLEMgr   INFO     scanning stopped
 ```
 
 ### `connect -ip <address> <SetUpPinCode> [<nodeid>]`
@@ -284,65 +349,73 @@ chip-device-ctrl > ble-scan
 Do key exchange and establish a secure session between controller and device
 using IP transport.
 
-The node id will be used by controller to distinguish multiple devices. This
+The Node ID will be used by controller to distinguish multiple devices. This
 does not match the spec and will be removed later. The nodeid will not be
 persisted by controller / device.
 
-If no nodeid given, a random node id will be used.
+If no nodeid given, a random Node ID will be used.
 
 ### `connect -ble <discriminator> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
-using BLE transport.
+using Bluetooth LE transport.
 
-The node id will be used by controller to distinguish multiple devices. This
+The Node ID will be used by controller to distinguish multiple devices. This
 does not match the spec and will be removed later. The nodeid will not be
 persisted by controller / device.
 
-If no nodeid given, a random node id will be used.
+If no nodeid given, a random Node ID will be used.
 
-### **`[W]`** `zcl`
+### `discover`
 
-Sending ZCL commands.
-
-#### `zcl ?`
-
-List available clusters.
+Discover available Matter accessory devices:
 
 ```
-chip-device-ctrl > zcl ?
-dict_keys(['BarrierControl', 'Basic', 'ColorControl', 'DoorLock', 'Groups', 'IasZone', 'Identify', 'LevelControl', 'NetworkProvisioning', 'OnOff', 'Scenes', 'TemperatureMeasurement'])
+chip-device-ctrl > discover -all
 ```
 
-#### `zcl ? <Cluster>`
+### `resolve <fabric_id> <node_id>`
 
-List available commands in cluster.
+Resolve DNS-SD name corresponding with the given fabric and Node IDs and update
+address of the node in the device controller:
 
 ```
-chip-device-ctrl > zcl ? LevelControl
-Move
-   moveMode: int, rate: int, optionMask: int, optionOverride: int
-MoveToLevel
-   level: int, transitionTime: int, optionMask: int, optionOverride: int
-MoveToLevelWithOnOff
-   level: int, transitionTime: int
-MoveWithOnOff
-   moveMode: int, rate: int
-Step
-   stepMode: int, stepSize: int, transitionTime: int, optionMask: int, optionOverride: int
-StepWithOnOff
-   stepMode: int, stepSize: int, transitionTime: int
-Stop
-   optionMask: int, optionOverride: int
-StopWithOnOff
-  <no arguments>
+chip-device-ctrl > resolve 5544332211 1234
 ```
 
-#### `zcl <Cluster> <Command> <NodeId> <EndpointId> <GroupId> [arguments]`
+### `setup-payload parse-manual <manual-pairing-code>`
 
-Send a ZCL command to `EndpointId` on device (`NodeId`).
+Print the commissioning information encoded in the Manual Pairing Code:
 
-Example:
+```
+chip-device-ctrl > setup-payload parse-manual 34970112332
+Version: 0
+VendorID: 0
+ProductID: 0
+CommissioningFlow: 0
+RendezvousInformation: 0
+Discriminator: 3840
+SetUpPINCode: 20202021
+```
+
+### `setup-payload parse-qr <qr-code>`
+
+Print the commissioning information encoded in the QR Code payload:
+
+```
+chip-device-ctrl > setup-payload parse-qr "VP:vendorpayload%MT:W0GU2OTB00KA0648G00"
+Version: 0
+VendorID: 9050
+ProductID: 20043
+CommissioningFlow: 0
+RendezvousInformation: 2 [BLE]
+Discriminator: 3840
+SetUpPINCode: 20202021
+```
+
+### `zcl <Cluster> <Command> <NodeId> <EndpointId> <GroupId> [arguments]`
+
+Send a ZCL command to the device. For example:
 
 ```
 chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
@@ -359,239 +432,92 @@ example, `networkId=hex:0123456789abcdef` (for
 `[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for
 `['T', 'e', 's', 't', 0x00]`).
 
-## Example Commissioning flow over
+### `zcl ?`
 
--   Assuming your WiFi ssid is `TESTSSID`, and your WiFi password is `P455W4RD`.
-
--   Assuming your Thread network has the following operational dataset (the
-    extended pan id of this network is `577c1f5384d9e909`, thus the network id
-    for this network is also `577c1f5384d9e909`):
-
-    ```
-    0e 08 0000000000010000
-    00 03 000014
-    35 06 0004001fffe0
-    02 08 577c1f5384d9e909
-    07 08 fdca4e253816ae9d
-    05 10 bb53ac7bf2133f0f686759ad9969255c
-    03 0f 4f70656e5468726561642d31343937
-    01 02 1497
-    04 10 420111ea791a892d28e3160f20eea396
-    0c 03 0000ff
-    ```
-
--   Assuming your device is on the same network, with IP address 192.168.0.1
-
--   The setup pincode is 20202021
-
--   You set the temporary node id to 4546
-
--   The discriminator of the device is 2333
-
-> Establish PASE session over BLE
->
-> ```
-> chip-device-ctrl > connect -ble 2333 20202021 4546
-> ```
-
-> Establish PASE session over IP
->
-> ```
-> chip-device-ctrl > connect -ip 192.168.0.1 20202021 4546
-> ```
-
-> Skip this part if your device does not support WiFi.
->
-> ```
-> chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 4546 1 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
->
-> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
-> ```
-
-> Skip this part if your device does not support Thread.
->
-> ```
-> chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 4546 1 0 operationalDataset=hex:0e080000000000010000000300001435060004001fffe00208577c1f5384d9e9090708fdca4e253816ae9d0510bb53ac7bf2133f0f686759ad9969255c030f4f70656e5468726561642d31343937010214970410420111ea791a892d28e3160f20eea3960c030000ff breadcrumb=0 timeoutMs=1000
->
-> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkID=hex:577c1f5384d9e909 breadcrumb=0 timeoutMs=1000
-> ```
-
-> If you are using BLE connection, release BLE connection
->
-> ```
-> chip-device-ctrl > close-ble
-> ```
-
-## Debugging with gdb
-
-You can run the chip-device-ctrl under GDB for debugging, however, since the
-CHIP core support library is a dynamic library, you cannot read the symbols
-unless it is fully loaded.
-
-The following block is a example debug session using GDB
+List available clusters:
 
 ```
-# GDB cannot run scripts directly
-# so you need to run Python3 with the path of device controller
-# Here, we use the feature from bash to get the path of chip-device-ctrl without typing it.
-$ gdb --args python3 `which chip-device-ctrl`
-GNU gdb (Ubuntu 10.1-2ubuntu2) 10.1.90.20210411-git
-Copyright (C) 2021 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-Type "show copying" and "show warranty" for details.
-This GDB was configured as "aarch64-linux-gnu".
-Type "show configuration" for configuration details.
-For bug reporting instructions, please see:
-<https://www.gnu.org/software/gdb/bugs/>.
-Find the GDB manual and other documentation resources online at:
-    <http://www.gnu.org/software/gdb/documentation/>.
-
-For help, type "help".
-Type "apropos word" to search for commands related to "word"...
-Reading symbols from python3...
-(No debugging symbols found in python3)
-(gdb)
+chip-device-ctrl > zcl ?
+AccountLogin
+ApplicationBasic
+ApplicationLauncher
+AudioOutput
+BarrierControl
+Basic
+Binding
+BridgedDeviceBasic
+ColorControl
+ContentLaunch
+Descriptor
+DoorLock
+EthernetNetworkDiagnostics
+FixedLabel
+GeneralCommissioning
+GeneralDiagnostics
+GroupKeyManagement
+Groups
+Identify
+KeypadInput
+LevelControl
+LowPower
+MediaInput
+MediaPlayback
+NetworkCommissioning
+OnOff
+OperationalCredentials
+PumpConfigurationAndControl
+RelativeHumidityMeasurement
+Scenes
+SoftwareDiagnostics
+Switch
+TvChannel
+TargetNavigator
+TemperatureMeasurement
+TestCluster
+Thermostat
+TrustedRootCertificates
+WakeOnLan
+WindowCovering
 ```
 
-The Python will create lots of threads due to main loop, so you may want to
-supress thread related outputs first by `set print thread-events off`
+### `zcl ? <Cluster>`
+
+List available commands in cluster. For example, for _Basic_ cluster:
 
 ```
-(gdb) set print thread-events off
-(gdb)
+chip-device-ctrl > zcl ? Basic
+InteractionModelVersion
+VendorName
+VendorID
+ProductName
+ProductID
+UserLabel
+Location
+HardwareVersion
+HardwareVersionString
+SoftwareVersion
+SoftwareVersionString
+ManufacturingDate
+PartNumber
+ProductURL
+ProductLabel
+SerialNumber
+LocalConfigDisabled
+ClusterRevision
 ```
 
-We cannot set breakpoints here, since the GDB knows nothing about the CHIP
-library, let run the CHIP device controller first.
+### `zclread <Cluster> <Attribute> <NodeId> <EndpointId> <GroupId> [arguments]`
+
+Read the value of ZCL attribute. For example:
 
 ```
-(gdb) run
-Starting program: /usr/bin/python3 /home/ubuntu/.local/bin/chip-device-ctrl
-[Thread debugging using libthread_db enabled]
-Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1".
-CHIP:DIS: Init admin pairing table with server storage.
-CHIP:IN: local node id is 0x000000000001b669
-CHIP:DL: MDNS failed to join multicast group on wpan0 for address type IPv4: Inet Error 1016 (0x000003F8): Address not found
-CHIP:ZCL: Using ZAP configuration...
-CHIP:ZCL: deactivate report event
-CHIP:CTL: Getting operational keys
-CHIP:CTL: Generating operational certificate for the controller
-CHIP:CTL: Getting root certificate for the controller from the issuer
-CHIP:CTL: Generating credentials
-CHIP:CTL: Loaded credentials successfully
-CHIP:DL: Platform main loop started.
-Chip Device Controller Shell
-
-chip-device-ctrl >
+chip-device-ctrl > zclread Basic VendorName 1234 1 0
 ```
 
-The prompt `chip-device-ctrl >` indicates that the CHIP core library is loaded
-by Python, you can browse the symbols in the CHIP core library, setting
-breakpoints on functions and many other functions provided by GDB.
+### `zclconfigure <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval> <Change>`
 
-You can use `Ctrl-C` to send SIGINT to the controller anytime you want so you
-can set breakpoints.
-
-> (`Ctrl-C` pressed here.)
+Configure ZCL attribute reporting settings. For example:
 
 ```
-Thread 1 "python3" received signal SIGINT, Interrupt.
-0x0000fffff7db79ec in __GI___select (nfds=<optimized out>, readfds=0xffffffffe760, writefds=0x0, exceptfds=0x0, timeout=<optimized out>) at ../sysdeps/unix/sysv/linux/select.c:49
-49	../sysdeps/unix/sysv/linux/select.c: No such file or directory.
-(gdb)
+chip-device-ctrl > zclconfigure OccupancySensing Occupancy 1234 1 0 1000 2000 1
 ```
-
-For example, you can break on `DeviceCommissioner::PairDevice` by using `break`
-command in GDB (`b` for short)
-
-```
-(gdb) b DeviceCommissioner::PairDevice
-Breakpoint 1 at 0xfffff5b0f6b4 (2 locations)
-(gdb)
-```
-
-Type `continue` (`c` for short) to continue the device controller, you may need
-another hit of `Enter` to see the prompt.
-
-```
-(gdb) c
-Continuing.
-
-chip-device-ctrl >
-```
-
-Let do pairing over IP to see the effect of the breakpoint we just set.
-
-```
-chip-device-ctrl > connect -ip 192.168.50.5 20202021 1
-Device is assigned with nodeid = 1
-
-Thread 1 "python3" hit Breakpoint 1, 0x0000fffff5b0f6b4 in chip::Controller::DeviceCommissioner::PairDevice(unsigned long, chip::RendezvousParameters&)@plt ()
-   from /home/ubuntu/.local/lib/python3.9/site-packages/chip/_ChipDeviceCtrl.so
-(gdb)
-```
-
-The `@plt` symbol means it is a symbol used by dynamic library loader, type `c`
-(for `continue`) and it will break on the real function.
-
-```
-(gdb) c
-Continuing.
-
-Thread 1 "python3" hit Breakpoint 1, chip::Controller::DeviceCommissioner::PairDevice (this=0xd28540, remoteDeviceId=1, params=...) at ../../src/controller/CHIPDeviceController.cpp:827
-827	{
-(gdb)
-```
-
-You can find the `this` pointer, and value of arguments passed to this function,
-then you can use `bt` (for `backtrace`) to see the backtrace of the call stack.
-
-```
-(gdb) bt
-#0  chip::Controller::DeviceCommissioner::PairDevice(unsigned long, chip::RendezvousParameters&) (this=0xd28540, remoteDeviceId=1, params=...)
-    at ../../src/controller/CHIPDeviceController.cpp:827
-#1  0x0000fffff5b3095c in pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner*, char const*, uint32_t, chip::NodeId)
-    (devCtrl=0xd28540, peerAddrStr=0xfffff467ace0 "192.168.50.5", setupPINCode=20202021, nodeid=1) at ../../src/controller/python/ChipDeviceController-ScriptBinding.cpp:234
-#2  0x0000fffff7639148 in  () at /lib/aarch64-linux-gnu/libffi.so.8
-#3  0x0000fffff7638750 in  () at /lib/aarch64-linux-gnu/libffi.so.8
-#4  0x0000fffff7665a44 in  () at /usr/lib/python3.9/lib-dynload/_ctypes.cpython-39-aarch64-linux-gnu.so
-#5  0x0000fffff7664c7c in  () at /usr/lib/python3.9/lib-dynload/_ctypes.cpython-39-aarch64-linux-gnu.so
-#6  0x00000000004a54f0 in _PyObject_MakeTpCall ()
-#7  0x000000000049cb10 in _PyEval_EvalFrameDefault ()
-#8  0x0000000000496d1c in  ()
-#9  0x00000000004b1eb0 in _PyFunction_Vectorcall ()
-#10 0x0000000000498264 in _PyEval_EvalFrameDefault ()
-#11 0x00000000004b1cb8 in _PyFunction_Vectorcall ()
-#12 0x0000000000498418 in _PyEval_EvalFrameDefault ()
-#13 0x0000000000496d1c in  ()
-#14 0x00000000004b1eb0 in _PyFunction_Vectorcall ()
-#15 0x0000000000498418 in _PyEval_EvalFrameDefault ()
-#16 0x00000000004b1cb8 in _PyFunction_Vectorcall ()
-#17 0x00000000004c6bc8 in  ()
-#18 0x0000000000498264 in _PyEval_EvalFrameDefault ()
-#19 0x00000000004b1cb8 in _PyFunction_Vectorcall ()
-#20 0x0000000000498418 in _PyEval_EvalFrameDefault ()
-#21 0x00000000004966f8 in  ()
-#22 0x00000000004b1f18 in _PyFunction_Vectorcall ()
-#23 0x0000000000498418 in _PyEval_EvalFrameDefault ()
-#24 0x00000000004b1cb8 in _PyFunction_Vectorcall ()
-#25 0x0000000000498264 in _PyEval_EvalFrameDefault ()
-#26 0x00000000004966f8 in  ()
-#27 0x0000000000496490 in _PyEval_EvalCodeWithName ()
-#28 0x0000000000595b7c in PyEval_EvalCode ()
-#29 0x00000000005c6a5c in  ()
-#30 0x00000000005c0a70 in  ()
-#31 0x00000000005c69a8 in  ()
-#32 0x00000000005c6148 in PyRun_SimpleFileExFlags ()
-#33 0x00000000005b60bc in Py_RunMain ()
-#34 0x0000000000585a08 in Py_BytesMain ()
-#35 0x0000fffff7d0c9d4 in __libc_start_main (main=
-    0x5858fc <_start+60>, argc=2, argv=0xfffffffff498, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>, stack_end=<optimized out>) at ../csu/libc-start.c:332
-#36 0x00000000005858f8 in _start ()
-(gdb)
-```
-
-The frame #0 and frame #1 are the function frame in the CHIP C++ library, the
-other frames lives in the Python intepreter so you can ignore it.

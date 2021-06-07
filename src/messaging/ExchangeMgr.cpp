@@ -86,6 +86,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
     sessionMgr->SetDelegate(this);
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
+    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionMgr));
 
     mState = State::kState_Initialized;
 
@@ -113,18 +114,18 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegateBase * delegate)
+ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
 {
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegateBase * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, kAnyMessageType, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
-                                                                     ExchangeDelegateBase * delegate)
+                                                                     ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
@@ -141,10 +142,15 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols
 
 void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
 {
-    ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
+#if CHIP_ERROR_LOGGING
+    char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
+    source.ToString(srcAddressStr);
+
+    ChipLogError(ExchangeManager, "Error receiving message from %s: %s", srcAddressStr, ErrorStr(error));
+#endif // CHIP_ERROR_LOGGING
 }
 
-CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegateBase * delegate)
+CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
 {
     UnsolicitedMessageHandler * selected = nullptr;
 
@@ -197,15 +203,15 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
-    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d", payloadHeader.GetMessageType(),
-                    payloadHeader.GetProtocolID());
+    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d on exchange %d", payloadHeader.GetMessageType(),
+                    payloadHeader.GetProtocolID(), payloadHeader.GetExchangeID());
 
     // Search for an existing exchange that the message applies to. If a match is found...
     bool found = false;
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->MatchExchange(session, packetHeader, payloadHeader))
         {
-            // Found a matching exchange. Set flag for correct subsequent CRMP
+            // Found a matching exchange. Set flag for correct subsequent MRP
             // retransmission timeout selection.
             if (!ec->HasRcvdMsgFromPeer())
             {
@@ -313,8 +319,9 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->mSecureSession == session)
         {
-            ec->Close();
-            // Continue iterate because there can be multiple contexts associated with the connection.
+            ec->OnConnectionExpired();
+            // Continue to iterate because there can be multiple exchanges
+            // associated with the connection.
         }
         return true;
     });
@@ -337,7 +344,7 @@ void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, S
     }
 }
 
-void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegateBase * delegate)
+void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)
 {
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->GetDelegate() == delegate)

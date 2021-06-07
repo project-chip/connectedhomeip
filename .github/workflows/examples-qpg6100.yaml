@@ -21,6 +21,8 @@ on:
 jobs:
     qpg6100:
         name: QPG6100
+        timeout-minutes: 60
+
         env:
             BUILD_TYPE: gn_qpg6100
 
@@ -44,9 +46,11 @@ jobs:
 #               with:
 #                   languages: "cpp"
             - name: Build example QPG6100 Lock App
+              timeout-minutes: 5
               run: scripts/examples/gn_build_example.sh
                    examples/lock-app/qpg6100 out/lock_app_debug
             - name: Build example QPG6100 Lighting App
+              timeout-minutes: 5
               run: scripts/examples/gn_build_example.sh
                    examples/lighting-app/qpg6100 out/lighting_app_debug
             - name: Binary artifact suffix

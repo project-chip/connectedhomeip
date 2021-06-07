@@ -101,7 +101,7 @@ CHIP_ERROR AdvertiseOperational()
             .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
             .SetMac(FillMAC(mac))
             .SetPort(CHIP_PORT)
-            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
+            .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL, CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .EnableIpV4(true);
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();

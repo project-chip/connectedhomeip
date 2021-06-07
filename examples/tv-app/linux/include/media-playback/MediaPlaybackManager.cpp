@@ -17,13 +17,12 @@
 
 #include "MediaPlaybackManager.h"
 #include <app/Command.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <iostream>
-
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 #include <map>
 #include <string>
@@ -170,21 +169,21 @@ bool emberAfMediaPlaybackClusterMediaRewindCallback(chip::app::Command *)
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::Command *, unsigned long long deltaPositionMilliseconds)
+bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::Command *, uint64_t deltaPositionMilliseconds)
 {
     EmberAfMediaPlaybackStatus status = MediaPlaybackManager().proxyMediaPlaybackRequest(MediaPlaybackRequest::SkipBackward);
     sendResponse("MediaSkipBackward", ZCL_MEDIA_SKIP_BACKWARD_RESPONSE_COMMAND_ID, status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::Command *, unsigned long long deltaPositionMilliseconds)
+bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::Command *, uint64_t deltaPositionMilliseconds)
 {
     EmberAfMediaPlaybackStatus status = MediaPlaybackManager().proxyMediaPlaybackRequest(MediaPlaybackRequest::SkipForward);
     sendResponse("MediaSkipForward", ZCL_MEDIA_SKIP_FORWARD_RESPONSE_COMMAND_ID, status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipSeekCallback(chip::app::Command *, unsigned long long positionMilliseconds)
+bool emberAfMediaPlaybackClusterMediaSkipSeekCallback(chip::app::Command *, uint64_t positionMilliseconds)
 {
     EmberAfMediaPlaybackStatus status = MediaPlaybackManager().proxyMediaPlaybackRequest(MediaPlaybackRequest::Seek);
     sendResponse("MediaSeek", ZCL_MEDIA_SKIP_FORWARD_RESPONSE_COMMAND_ID, status);

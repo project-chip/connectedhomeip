@@ -73,7 +73,8 @@ EOF
         [ ! -s "$_SETUP_SH" ]; then
         pw_bootstrap --shell-file "$_SETUP_SH" \
             --install-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT" \
-            --config-file "$_CHIP_ROOT/$_CONFIG_FILE"
+            --config-file "$_CHIP_ROOT/$_CONFIG_FILE" \
+            --virtualenv-gn-out-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT/gn_out"
         pw_finalize bootstrap "$_SETUP_SH"
     else
         pw_activate

@@ -30,53 +30,11 @@ using chip::Controller::DeviceCommissioner;
 
 extern chip::Ble::BleLayer * GetJNIBleLayer();
 
-namespace {
-
-bool FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId)
-{
-    if ((env == nullptr) || (object == nullptr))
-    {
-        ChipLogError(Controller, "Missing java object for %s", methodName);
-        return false;
-    }
-
-    jclass javaClass = env->GetObjectClass(object);
-    if (javaClass == NULL)
-    {
-        ChipLogError(Controller, "Failed to get class for %s", methodName);
-        return false;
-    }
-
-    *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
-    if (*methodId == NULL)
-    {
-        ChipLogError(Controller, "Failed to find method %s", methodName);
-        return false;
-    }
-
-    return true;
-}
-
-void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument)
-{
-    jmethodID method;
-
-    if (!FindMethod(env, object, methodName, "(I)V", &method))
-    {
-        return;
-    }
-
-    env->ExceptionClear();
-    env->CallVoidMethod(object, method, argument);
-}
-
-} // namespace
-
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
     if ((mJavaVM != nullptr) && (mJavaObjectRef != nullptr))
     {
-        GetJavaEnv()->DeleteGlobalRef(mJavaObjectRef);
+        GetEnvForCurrentThread()->DeleteGlobalRef(mJavaObjectRef);
     }
     mController->Shutdown();
 }
@@ -84,25 +42,12 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
 {
     mJavaVM        = vm;
-    mJavaObjectRef = GetJavaEnv()->NewGlobalRef(obj);
+    mJavaObjectRef = GetEnvForCurrentThread()->NewGlobalRef(obj);
 }
 
 void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jint argument)
 {
-    CallVoidInt(GetJavaEnv(), mJavaObjectRef, methodName, argument);
-}
-
-JNIEnv * AndroidDeviceControllerWrapper::GetJavaEnv()
-{
-    if (mJavaVM == nullptr)
-    {
-        return nullptr;
-    }
-
-    JNIEnv * env = nullptr;
-    mJavaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
-
-    return env;
+    CallVoidInt(GetEnvForCurrentThread(), mJavaObjectRef, methodName, argument);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
@@ -115,7 +60,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId f
 
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
-                                                                             chip::NodeId nodeId, chip::System::Layer * systemLayer,
+                                                                             pthread_mutex_t * stackLock, chip::NodeId nodeId,
+                                                                             chip::System::Layer * systemLayer,
                                                                              chip::Inet::InetLayer * inetLayer,
                                                                              CHIP_ERROR * errInfoOnFailure)
 {
@@ -146,7 +92,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
         return nullptr;
     }
-    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller)));
+    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller), stackLock));
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
     wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
@@ -185,11 +131,13 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
+    StackUnlockGuard unlockGuard(mStackLock);
     CallJavaMethod("onStatusUpdate", static_cast<jint>(status));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
+    StackUnlockGuard unlockGuard(mStackLock);
     CallJavaMethod("onPairingComplete", static_cast<jint>(error));
 }
 
@@ -213,6 +161,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
+    StackUnlockGuard unlockGuard(mStackLock);
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
 }
 

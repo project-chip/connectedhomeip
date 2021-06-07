@@ -46,9 +46,12 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/PersistentStorageMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <transport/MessageCounter.h>
+#include <transport/PeerMessageCounter.h>
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -150,8 +153,10 @@ CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
 {
-    CHIP_ERROR error       = CHIP_NO_ERROR;
-    uint16_t serializedLen = 0;
+    CHIP_ERROR error             = CHIP_NO_ERROR;
+    uint16_t serializedLen       = 0;
+    uint32_t localMessageCounter = 0;
+    uint32_t peerMessageCounter  = 0;
     SerializableDevice serializable;
 
     static_assert(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
@@ -163,6 +168,14 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
     serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
+
+    Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
+    VerifyOrExit(connectionState != nullptr, error = CHIP_ERROR_INCORRECT_STATE);
+    localMessageCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter().Value();
+    peerMessageCounter  = connectionState->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
+
+    serializable.mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(localMessageCounter);
+    serializable.mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(peerMessageCounter);
 
     serializable.mCASESessionKeyId           = Encoding::LittleEndian::HostSwap16(mCASESessionKeyId);
     serializable.mDeviceProvisioningComplete = (mDeviceProvisioningComplete) ? 1 : 0;
@@ -215,10 +228,20 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
         IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, ipAddress),
         error = CHIP_ERROR_INVALID_ADDRESS);
 
-    mPairing  = serializable.mOpsCreds;
-    mDeviceId = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
-    port      = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
-    mAdminId  = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
+    mPairing             = serializable.mOpsCreds;
+    mDeviceId            = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
+    port                 = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    mAdminId             = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
+    mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(serializable.mLocalMessageCounter);
+    mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(serializable.mPeerMessageCounter);
+
+    // TODO - Remove the hack that's incrementing message counter while deserializing device
+    // This hack was added as a quick workaround for TE3 testing. The commissioning code
+    // is closing the exchange after the device has already been serialized and persisted to the storage.
+    // While closing the exchange, the outstanding ack gets sent to the device, thus incrementing
+    // the local message counter. As the device information was stored prior to sending the ack, it now has
+    // the old counter value (which is 1 less than the updated counter).
+    mLocalMessageCounter++;
 
     mCASESessionKeyId           = Encoding::LittleEndian::HostSwap16(serializable.mCASESessionKeyId);
     mDeviceProvisioningComplete = (serializable.mDeviceProvisioningComplete != 0);
@@ -258,10 +281,43 @@ exit:
     return error;
 }
 
+CHIP_ERROR Device::Persist()
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    if (mStorageDelegate != nullptr)
+    {
+        SerializedDevice serialized;
+        SuccessOrExit(error = Serialize(serialized));
+
+        // TODO: no need to base-64 the serialized values AGAIN
+        PERSISTENT_KEY_OP(GetDeviceId(), kPairedDeviceKeyPrefix, key,
+                          error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to persist device %d", error);
+        }
+    }
+exit:
+    return error;
+}
+
 void Device::OnNewConnection(SecureSessionHandle session)
 {
     mState         = ConnectionState::SecureConnected;
     mSecureSession = session;
+
+    // Reset the message counters here because this is the first time we get a handle to the secure session.
+    // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
+    // we need to restore the session counters along with the session information.
+    Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
+    VerifyOrReturn(connectionState != nullptr);
+    MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
+    if (localCounter.SetCounter(mLocalMessageCounter))
+    {
+        ChipLogError(Controller, "Unable to restore local counter to %d", mLocalMessageCounter);
+    }
+    Transport::PeerMessageCounter & peerCounter = connectionState->GetSessionMessageCounter().GetPeerMessageCounter();
+    peerCounter.SetCounter(mPeerMessageCounter);
 }
 
 void Device::OnConnectionExpired(SecureSessionHandle session)
@@ -343,6 +399,36 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
     return CHIP_NO_ERROR;
 }
 
+void Device::Reset()
+{
+    if (IsActive() && mStorageDelegate != nullptr && mSessionManager != nullptr)
+    {
+        // If a session can be found, persist the device so that we track the newest message counter values
+        Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
+        if (connectionState != nullptr)
+        {
+            Persist();
+        }
+    }
+
+    SetActive(false);
+    mState          = ConnectionState::NotConnected;
+    mSessionManager = nullptr;
+    mStatusDelegate = nullptr;
+    mInetLayer      = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    mBleLayer = nullptr;
+#endif
+    if (mExchangeMgr)
+    {
+        // Ensure that any exchange contexts we have open get closed now,
+        // because we don't want them to call back in to us after this
+        // point.
+        mExchangeMgr->CloseAllContextsForDelegate(this);
+    }
+    mExchangeMgr = nullptr;
+}
+
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -376,11 +462,12 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
                                       SecureSession::SessionRole::kInitiator, mAdminId);
     SuccessOrExit(err);
 
-    if (IsProvisioningComplete())
-    {
-        err = EstablishCASESession();
-        SuccessOrExit(err);
-    }
+    // TODO - Enable CASE Session setup before message is sent to a fully provisioned device
+    // if (IsProvisioningComplete())
+    // {
+    //     err = EstablishCASESession();
+    //     SuccessOrExit(err);
+    // }
 
 exit:
 
@@ -468,6 +555,17 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeI
                               Callback::Cancelable * onReportCallback)
 {
     mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
+}
+
+Device::~Device()
+{
+    if (mExchangeMgr)
+    {
+        // Ensure that any exchange contexts we have open get closed now,
+        // because we don't want them to call back in to us after this
+        // point.
+        mExchangeMgr->CloseAllContextsForDelegate(this);
+    }
 }
 
 } // namespace Controller

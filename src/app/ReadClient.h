@@ -111,6 +111,8 @@ private:
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; };
 
+    CHIP_ERROR GenerateAttributePathList(ReadRequest::Builder & aRequest, AttributePathParams * apAttributePathParamsList,
+                                         size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
 
     void MoveToState(const ClientState aTargetState);

@@ -133,6 +133,17 @@ void ReliableMessageMgr::ExecuteActions()
         if (!rc || entry.nextRetransTimeTick != 0)
             continue;
 
+        if (entry.retainedBuf.IsNull())
+        {
+            // We generally try to prevent entries with a null buffer being in a table, but it could happen
+            // if the message dispatch (which is supposed to fill in the buffer) fails to do so _and_ returns
+            // success (so its caller doesn't clear out the bogus table entry).
+            //
+            // If that were to happen, we would crash in the code below.  Guard against it, just in case.
+            ClearRetransTable(entry);
+            continue;
+        }
+
         uint8_t sendCount = entry.sendCount;
         uint32_t msgId    = entry.retainedBuf.GetMsgId();
 
@@ -285,7 +296,8 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
-    VerifyOrDie(entry != nullptr && entry->rc != nullptr);
+    VerifyOrReturn(entry != nullptr && entry->rc != nullptr,
+                   ChipLogError(ExchangeManager, "StartRetransmission was called for invalid entry"));
 
     entry->nextRetransTimeTick = static_cast<uint16_t>(entry->rc->GetInitialRetransmitTimeoutTick() +
                                                        GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
@@ -503,6 +515,7 @@ void ReliableMessageMgr::StopTimer()
     mSystemLayer->CancelTimer(Timeout, this);
 }
 
+#if CHIP_CONFIG_TEST
 int ReliableMessageMgr::TestGetCountRetransTable()
 {
     int count = 0;
@@ -516,6 +529,7 @@ int ReliableMessageMgr::TestGetCountRetransTable()
 
     return count;
 }
+#endif // CHIP_CONFIG_TEST
 
 } // namespace Messaging
 } // namespace chip

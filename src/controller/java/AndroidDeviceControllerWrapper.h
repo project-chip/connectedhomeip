@@ -17,6 +17,8 @@
  */
 #pragma once
 
+#include "JniReferences.h"
+
 #include <memory>
 
 #include <jni.h>
@@ -38,6 +40,18 @@ class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDel
 {
 public:
     ~AndroidDeviceControllerWrapper();
+
+    // Use StackUnlockGuard to temporarily unlock the CHIP BLE stack, e.g. when calling application
+    // or Android BLE code as a result of a BLE event.
+    struct StackUnlockGuard
+    {
+    public:
+        StackUnlockGuard(pthread_mutex_t * mutex) : mMutex(mutex) { pthread_mutex_unlock(mMutex); }
+        ~StackUnlockGuard() { pthread_mutex_lock(mMutex); }
+
+    private:
+        pthread_mutex_t * mMutex;
+    };
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
     chip::Controller::ExampleOperationalCredentialsIssuer & OpCredsIssuer() { return mOpCredsIssuer; }
@@ -72,9 +86,9 @@ public:
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
-    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                                        chip::System::Layer * systemLayer, chip::Inet::InetLayer * inetLayer,
-                                                        CHIP_ERROR * errInfoOnFailure);
+    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, pthread_mutex_t * stackLock,
+                                                        chip::NodeId nodeId, chip::System::Layer * systemLayer,
+                                                        chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
 
 private:
     chip::Crypto::P256Keypair mIssuer;
@@ -87,14 +101,14 @@ private:
     ChipDeviceControllerPtr mController;
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
+    pthread_mutex_t * mStackLock;
+
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
 
-    JNIEnv * GetJavaEnv();
-
-    jclass GetPersistentStorageClass() { return GetJavaEnv()->FindClass("chip/devicecontroller/PersistentStorage"); }
-
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller)) {}
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, pthread_mutex_t * stackLock) :
+        mController(std::move(controller)), mStackLock(stackLock)
+    {}
 };
 
 inline jlong AndroidDeviceControllerWrapper::ToJNIHandle()

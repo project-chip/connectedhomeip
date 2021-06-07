@@ -2,7 +2,11 @@
 
 #include <platform/logging/LogV.h>
 
-#include <stdio.h>
+#include <cinttypes>
+#include <cstdio>
+#include <sys/syscall.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -25,7 +29,14 @@ namespace Platform {
  */
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    printf("CHIP:%s: ", module);
+    struct timeval tv;
+
+    // Should not fail per man page of gettimeofday(), but failed to get time is not a fatal error in log. The bad time value will
+    // indicate the error occurred during getting time.
+    gettimeofday(&tv, nullptr);
+
+    printf("[%" PRIu64 ".%06" PRIu64 "][%ld] CHIP:%s: ", static_cast<uint64_t>(tv.tv_sec), static_cast<uint64_t>(tv.tv_usec),
+           static_cast<long>(syscall(SYS_gettid)), module);
     vprintf(msg, v);
     printf("\n");
     fflush(stdout);

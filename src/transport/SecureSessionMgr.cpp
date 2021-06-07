@@ -134,14 +134,18 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
                                                   EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(!msgBuf.HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    // Our send path needs a (writable) PacketBuffer (e.g. so it can encode a
+    // PacketHeader into it), so get that from the EncryptedPacketBufferHandle.
+    System::PacketBufferHandle mutableBuf(std::move(msgBuf).CastToWritable());
 
     // Advancing the start to encrypted header, since SendMessage will attach the packet header on top of it.
     PacketHeader packetHeader;
-    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
+    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(mutableBuf));
 
     PayloadHeader payloadHeader;
-    return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
+    return SendMessage(session, payloadHeader, packetHeader, std::move(mutableBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsEncrypted);
 }
 
@@ -187,7 +191,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-        (*bufferRetainSlot) = msgBuf.Retain();
+        *bufferRetainSlot = EncryptedPacketBufferHandle::MarkEncrypted(msgBuf.Retain());
     }
 
     ChipLogProgress(Inet, "Sending msg from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec",
@@ -198,10 +202,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         ChipLogProgress(Inet, "Sending secure msg on connection specific transport");
         err = state->GetTransport()->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
     }
-    else
+    else if (mTransportMgr != nullptr)
     {
         ChipLogProgress(Inet, "Sending secure msg on generic transport");
         err = mTransportMgr->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
+    }
+    else
+    {
+        ChipLogError(Inet, "The transport manager is not initialized. Unable to send the message");
+        err = CHIP_ERROR_INCORRECT_STATE;
     }
     ChipLogProgress(Inet, "Secure msg send status %s", ErrorStr(err));
     SuccessOrExit(err);
@@ -370,11 +379,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         {
             ChipLogError(Inet, "Message counter verify failed, err = %d", err);
         }
-        // TODO - Enable exit on error for message counter verification failure.
-        //        We are now using IM messages in commissioner class to provision op creds and
-        //        other device commissioning steps. This is somehow causing issues with message counter
-        //        verification. Disabling this check for now. Enable it after debugging the cause.
-        // SuccessOrExit(err);
+        SuccessOrExit(err);
     }
 
     admin = mAdmins->FindAdminWithId(state->GetAdminId());
@@ -393,12 +398,14 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
 
     if (packetHeader.GetDestinationNodeId().HasValue())
     {
-        ChipLogError(Inet, "Secure transport received message destined to node ID (0x" ChipLogFormatX64 ")",
-                     ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()));
+        ChipLogProgress(Inet, "Secure transport received message destined to fabric %d, node 0x" ChipLogFormatX64 ". Key ID %d",
+                        static_cast<int>(state->GetAdminId()), ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()),
+                        packetHeader.GetEncryptionKeyID());
     }
     else
     {
-        ChipLogError(Inet, "Secure transport received message without node ID with key ID (%d)", packetHeader.GetEncryptionKeyID());
+        ChipLogProgress(Inet, "Secure transport received message for fabric %d without node ID. Key ID %d",
+                        static_cast<int>(state->GetAdminId()), packetHeader.GetEncryptionKeyID());
     }
 
     mPeerConnections.MarkConnectionActive(state);

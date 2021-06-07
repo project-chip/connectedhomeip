@@ -28,31 +28,5 @@
 
 #pragma once
 
-/**
- * @def OPENTHREAD_CONFIG_PLATFORM_INFO
- *
- * The platform-specific string to insert into the OpenThread version string.
- *
- */
-#define OPENTHREAD_CONFIG_PLATFORM_INFO "CC1352"
-
-/**
- * @def OPENTHREAD_CONFIG_PLATFORM_FLASH_API_ENABLE
- *
- * Define to 1 to enable otPlatFlash* APIs to support non-volatile storage.
- *
- * When defined to 1, the platform MUST implement the otPlatFlash* APIs instead of the otPlatSettings* APIs.
- *
- */
-#define OPENTHREAD_CONFIG_PLATFORM_FLASH_API_ENABLE 0
-
-/**
- * @def OPENTHREAD_CONFIG_NCP_UART_ENABLE
- *
- * Define to 1 to enable NCP UART support.
- *
- */
-#define OPENTHREAD_CONFIG_NCP_UART_ENABLE 0
-
-/* reduced to fit in SRAM */
+/* Number of message buffers reduced to fit into CC26x2x3 RAM */
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 22

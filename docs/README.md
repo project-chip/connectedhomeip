@@ -13,7 +13,7 @@
 
 ## Project Flow
 
--   Documentation about general CHIP usage of GitHub, and project tools is
+-   Documentation about general project usage of GitHub, and project tools is
     documented in [the project flow](./PROJECT_FLOW.md)
 
 ## Style Guide
