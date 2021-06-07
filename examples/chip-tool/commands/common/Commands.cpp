@@ -38,11 +38,10 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
     }
 }
 
-// TODO: Remove this work around due to crashes when storage is accessed from multiple threads and passed around
-static PersistentStorage gStorage;
 int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    PersistentStorage storage;
 
     err = chip::Platform::MemoryInit();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
@@ -52,12 +51,12 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
     SuccessOrExit(err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ 0, /* BLE central */ true));
 #endif
 
-    err = gStorage.Init();
+    err = storage.Init();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
 
-    chip::Logging::SetLogFilter(gStorage.GetLoggingLevel());
+    chip::Logging::SetLogFilter(storage.GetLoggingLevel());
 
-    err = RunCommand(gStorage, localId, remoteId, argc, argv);
+    err = RunCommand(storage, localId, remoteId, argc, argv);
     SuccessOrExit(err);
 
 exit:
