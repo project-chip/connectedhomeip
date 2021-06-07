@@ -189,14 +189,14 @@ private:
         uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
 
-        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
-
         uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
         uint16_t mOpCertLen;   /* This field is serialized in LittleEndian byte order */
 
         Crypto::P256SerializedKeypair mOperationalKey;
         uint8_t mRootCert[kMaxChipCertSize];
         uint8_t mOperationalCert[kMaxChipCertSize];
+
+        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
     };
 };
 

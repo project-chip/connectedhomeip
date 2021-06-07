@@ -1,0 +1,92 @@
+# Copyright (c) 2020-2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Tests
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    test_suites_linux:
+        name: Test Suites - Linux
+        timeout-minutes: 60
+
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build:latest
+            options:
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+            - name: Bootstrap
+              timeout-minutes: 3
+              run: scripts/build/gn_bootstrap.sh
+            - name: Build all clusters app
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+            - name: Build chip-tool
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+            - name: Run Tests
+              timeout-minutes: 5
+              run: |
+                  ifconfig -a
+                  scripts/tests/test_suites.sh
+    test_suites_darwin:
+        name: Test Suites - Darwin
+        timeout-minutes: 60
+
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: macos-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+            - name: Setup Environment
+              run: brew install openssl pkg-config
+            - name: Fix pkgconfig link
+              working-directory: /usr/local/lib/pkgconfig
+              run: |
+                  pwd
+                  ls -la /usr/local/Cellar/
+                  ls -la /usr/local/Cellar/openssl@1.1
+                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
+                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+            - name: Bootstrap
+              timeout-minutes: 3
+              run: scripts/build/gn_bootstrap.sh
+            - name: Run Build Test Server
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+            - name: Build chip-tool
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+            - name: Run Test Suites
+              timeout-minutes: 5
+              run: |
+                  scripts/tests/test_suites.sh

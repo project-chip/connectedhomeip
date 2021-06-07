@@ -23,7 +23,12 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include <lib/core/CHIPSafeCasts.h>
+#include <support/BytesToHex.h>
+#include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/SafeInt.h>
+#include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 
 bool Command::InitArguments(int argc, char ** argv)
@@ -78,7 +83,7 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
     return true;
 }
 
-bool Command::InitArgument(size_t argIndex, const char * argValue)
+bool Command::InitArgument(size_t argIndex, char * argValue)
 {
     bool isValidArgument = false;
 
@@ -91,10 +96,63 @@ bool Command::InitArgument(size_t argIndex, const char * argValue)
         break;
     }
 
-    case ArgumentType::String: {
+    case ArgumentType::CharString: {
         const char ** value = reinterpret_cast<const char **>(arg.value);
-        *value              = const_cast<char *>(argValue);
-        isValidArgument     = (strcmp(argValue, *value) == 0);
+        *value              = argValue;
+        isValidArgument     = true;
+        break;
+    }
+
+    case ArgumentType::OctetString: {
+        auto * value = static_cast<chip::ByteSpan *>(arg.value);
+        // We support two ways to pass an octet string argument.  If it happens
+        // to be all-ASCII, you can just pass it in.  Otherwise you can pass in
+        // 0x followed by the hex-encoded bytes.
+        size_t argLen                     = strlen(argValue);
+        static constexpr char hexPrefix[] = "hex:";
+        constexpr size_t prefixLen        = ArraySize(hexPrefix) - 1; // Don't count the null
+        if (strncmp(argValue, hexPrefix, prefixLen) == 0)
+        {
+            // Hex-encoded.  Decode it into a temporary buffer first, so if we
+            // run into errors we can do correct "argument is not valid" logging
+            // that actually shows the value that was passed in.  After we
+            // determine it's valid, modify the passed-in value to hold the
+            // right bytes, so we don't need to worry about allocating storage
+            // for this somewhere else.  This works because the hex
+            // representation is always longer than the octet string it encodes,
+            // so we have enough space in argValue for the decoded version.
+            chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
+            if (!buffer.Calloc(argLen)) // Bigger than needed, but it's fine.
+            {
+                isValidArgument = false;
+                break;
+            }
+
+            size_t octetCount = chip::Encoding::HexToBytes(argValue + prefixLen, argLen - prefixLen, buffer.Get(), argLen);
+            if (octetCount == 0)
+            {
+                isValidArgument = false;
+                break;
+            }
+
+            memcpy(argValue, buffer.Get(), octetCount);
+            *value          = chip::ByteSpan(chip::Uint8::from_char(argValue), octetCount);
+            isValidArgument = true;
+        }
+        else
+        {
+            // Just ASCII.  Check for the "str:" prefix.
+            static constexpr char strPrefix[] = "str:";
+            constexpr size_t strPrefixLen     = ArraySize(strPrefix) - 1; // Don't count the null
+            if (strncmp(argValue, strPrefix, strPrefixLen) == 0)
+            {
+                // Skip the prefix
+                argValue += strPrefixLen;
+                argLen -= strPrefixLen;
+            }
+            *value          = chip::ByteSpan(chip::Uint8::from_char(argValue), argLen);
+            isValidArgument = true;
+        }
         break;
     }
 
@@ -237,7 +295,18 @@ size_t Command::AddArgument(const char * name, const char * value)
 size_t Command::AddArgument(const char * name, char ** value)
 {
     Argument arg;
-    arg.type  = ArgumentType::String;
+    arg.type  = ArgumentType::CharString;
+    arg.name  = name;
+    arg.value = reinterpret_cast<void *>(value);
+
+    mArgs.emplace_back(arg);
+    return mArgs.size();
+}
+
+size_t Command::AddArgument(const char * name, chip::ByteSpan * value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::OctetString;
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(value);
 

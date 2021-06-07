@@ -39,6 +39,13 @@
 #include <openthread/ip6.h>
 #include <openthread/link.h>
 #include <openthread/thread.h>
+#if OPENTHREAD_API_VERSION >= 85
+#ifndef SHELL_OTCLI_TX_BUFFER_SIZE
+#define SHELL_OTCLI_TX_BUFFER_SIZE 1024
+#endif
+static char sTxBuffer[SHELL_OTCLI_TX_BUFFER_SIZE];
+static constexpr uint16_t sTxLength = SHELL_OTCLI_TX_BUFFER_SIZE;
+#endif
 #else
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -98,8 +105,11 @@ int cmd_otcli_dispatch(int argc, char ** argv)
         }
     }
     buff_ptr = 0;
-
+#if OPENTHREAD_API_VERSION >= 85
+    otCliInputLine(buff);
+#else
     otCliConsoleInputLine(buff, buff_ptr - buff);
+#endif
 exit:
     return error;
 }
@@ -156,10 +166,21 @@ exit:
 static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
 
 #if CHIP_TARGET_STYLE_EMBEDDED
+#if OPENTHREAD_API_VERSION >= 85
+static int OnOtCliOutput(void * aContext, const char * aFormat, va_list aArguments)
+{
+    int rval = vsnprintf(sTxBuffer, sTxLength, aFormat, aArguments);
+    VerifyOrExit(rval >= 0 && rval < sTxLength, rval = CHIP_ERROR_BUFFER_TOO_SMALL);
+    return streamer_write(streamer_get(), (const char *) sTxBuffer, rval);
+exit:
+    return rval;
+}
+#else
 static int OnOtCliOutput(const char * aBuf, uint16_t aBufLength, void * aContext)
 {
     return streamer_write(streamer_get(), aBuf, aBufLength);
 }
+#endif
 #endif
 
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -168,7 +189,11 @@ void cmd_otcli_init()
 {
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_TARGET_STYLE_EMBEDDED
+#if OPENTHREAD_API_VERSION >= 85
+    otCliInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
+#else
     otCliConsoleInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
+#endif
 #endif
 
     // Register the root otcli command with the top-level shell.

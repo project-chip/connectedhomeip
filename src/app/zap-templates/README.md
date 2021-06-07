@@ -61,7 +61,7 @@ To generate the application additional files, the command is:
 For example, to generate `chip-tool` additional files the command is:
 
 ```
-./scripts/tools/zap/generate.py examples/chip-tool/chip-tool.zap -t examples/chip-tool/templates/templates.json
+./scripts/tools/zap/generate.py src/controller/data_model/controller-clusters.zap -t examples/chip-tool/templates/templates.json
 ```
 
 For more information please see the documentation under `docs/` in
