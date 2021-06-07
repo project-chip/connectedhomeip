@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,25 +17,16 @@
 
 #pragma once
 
-#include <mdns/minimal/responders/RecordResponder.h>
-
+#include <mdns/minimal/responders/Responder.h>
 namespace mdns {
 namespace Minimal {
 
-class IPv4Responder : public RecordResponder
+// This is a container class for the various record responders (PTR, SRV, TXT, A, AAAA etc.)
+// This class is used to restrict the set of possible responders added to a QueryResponder.
+class RecordResponder : public Responder
 {
 public:
-    IPv4Responder(const FullQName & qname) : RecordResponder(QType::A, qname) {}
-
-    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
-};
-
-class IPv6Responder : public RecordResponder
-{
-public:
-    IPv6Responder(const FullQName & qname) : RecordResponder(QType::AAAA, qname) {}
-
-    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
+    RecordResponder(QType qType, const FullQName & qName) : Responder(qType, qName) {}
 };
 
 } // namespace Minimal
