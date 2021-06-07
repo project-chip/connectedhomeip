@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +17,16 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
 
-arm_toolchain("qpg6100_lock_app") {
+arm_toolchain("qpg_lock_app") {
   toolchain_args = {
     current_os = "freertos"
-    import("${chip_root}/examples/lock-app/qpg6100/args.gni")
+    import("${chip_root}/examples/lock-app/qpg/args.gni")
+  }
+}
+
+arm_toolchain("qpg_lighting_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/lighting-app/qpg/args.gni")
   }
 }
