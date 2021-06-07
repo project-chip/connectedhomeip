@@ -21,6 +21,9 @@
 #include <algorithm>
 #include <memory>
 
+#include "JniReferences.h"
+#include <support/CodeUtils.h>
+
 #include <platform/KeyValueStoreManager.h>
 #include <support/ThreadOperationalDataset.h>
 
@@ -46,6 +49,14 @@ void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
 void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jint argument)
 {
     CallVoidInt(GetEnvForCurrentThread(), mJavaObjectRef, methodName, argument);
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
+                                                                     uint32_t & outCertLen)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    chip::X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+    return NewRootX509Cert(request, mIssuer, certBuf, certBufSize, outCertLen);
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
@@ -91,6 +102,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.storageDelegate = wrapper.get();
     initParams.pairingDelegate = wrapper.get();
     initParams.systemLayer     = systemLayer;
+    initParams.operationalCredentialsDelegate = wrapper.get();
     initParams.inetLayer       = inetLayer;
     initParams.bleLayer        = GetJNIBleLayer();
 
@@ -99,8 +111,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     {
         return nullptr;
     }
-
-    initParams.operationalCredentialsDelegate = &wrapper->OpCredsIssuer();
 
     *errInfoOnFailure = wrapper->Controller()->Init(nodeId, initParams);
 
@@ -135,6 +145,22 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
     StackUnlockGuard unlockGuard(mStackLock);
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr,
+                                                                                int64_t serialNumber, uint8_t * certBuf,
+                                                                                uint32_t certBufSize, uint32_t & outCertLen)
+{
+   jmethodID method;
+    if (!FindMethod(GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method))
+    {
+        return CHIP_NO_ERROR;
+    }
+    jbyteArray argument;
+    GetEnvForCurrentThread()->ExceptionClear();
+    N2J_ByteArray(GetEnvForCurrentThread(), csr.data(),csr.size(),argument);
+    GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, argument);
+    return CHIP_NO_ERROR;
 }
 
 void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle && msg) {}

@@ -35,6 +35,7 @@
  */
 class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
                                        public chip::Controller::DeviceStatusDelegate,
+                                       public chip::Controller::OperationalCredentialsDelegate,
                                        public chip::PersistentStorageDelegate
 {
 public:
@@ -65,6 +66,11 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
 
+// OperationalCredentialsDelegate implementation
+   CHIP_ERROR GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr, int64_t serialNumber,
+                                                              uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+   CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+
     // DeviceStatusDelegate implementation
     void OnMessage(chip::System::PacketBufferHandle && msg) override;
     void OnStatusChange(void) override;
@@ -85,6 +91,11 @@ public:
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
+    chip::Crypto::P256Keypair mIssuer;
+        bool mInitialized  = false;
+        uint32_t mIssuerId = 0;
+        uint32_t mNow      = 0;
+        uint32_t mValidity = 365 * 24 * 60 * 60 * 10;
 
     ChipDeviceControllerPtr mController;
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
