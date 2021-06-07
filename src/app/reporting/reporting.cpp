@@ -73,8 +73,8 @@ static void removeConfigurationAndScheduleTick(uint8_t index);
 static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cmd, AttributeId attributeId, uint8_t mask,
                                                 uint16_t timeout);
 static void putReportableChangeInResp(const EmberAfPluginReportingEntry * entry, EmberAfAttributeType dataType);
-static void retrySendReport(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                            uint16_t msgLen, uint8_t * message, EmberStatus status);
+static void retrySendReport(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
+                            uint8_t * message, EmberStatus status);
 static uint32_t computeStringHash(uint8_t * data, uint8_t length);
 
 EmberEventControl emberAfPluginReportingTickEventControl;
@@ -99,13 +99,13 @@ EmberAfStatus emberAfPluginReportingConfiguredCallback(const EmberAfPluginReport
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-static void retrySendReport(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                            uint16_t msgLen, uint8_t * message, EmberStatus status)
+static void retrySendReport(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
+                            uint8_t * message, EmberStatus status)
 {
     // Retry once, and do so by unicasting without a pointer to this callback
     if (status != EMBER_SUCCESS)
     {
-        emberAfSendUnicast(type, destination, apsFrame, msgLen, message);
+        emberAfSendUnicast(destination, apsFrame, msgLen, message);
     }
 }
 
@@ -364,7 +364,7 @@ static void conditionallySendReport(EndpointId endpoint, ClusterId clusterId)
     EmberStatus status;
     if (emberAfIsDeviceEnabled(endpoint) || clusterId == ZCL_IDENTIFY_CLUSTER_ID)
     {
-        status = emberAfSendCommandUnicastToBindingsWithCallback((EmberAfMessageSentFunction)(&retrySendReport));
+        status = emberAfSendCommandUnicastToBindingsWithCallback(&retrySendReport);
 
         // If the callback table is full, attempt to send the message with no
         // callback.  Note that this could lead to a message failing to transmit

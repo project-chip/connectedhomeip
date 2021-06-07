@@ -81,7 +81,7 @@ void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}Manufac
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}MessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}MessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief {{name}} Cluster {{asCamelCased side false}} Pre Attribute Changed
  *
@@ -372,7 +372,7 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
+bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Pre Attribute Change
