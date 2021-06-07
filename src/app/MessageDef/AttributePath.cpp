@@ -151,16 +151,14 @@ CHIP_ERROR AttributePath::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // check for required fields:
-        const uint16_t RequiredFields = (1 << kCsTag_EndpointId) | (1 << kCsTag_ClusterId);
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        // Not allow for situation where ListIndex exists, but FieldId not exists
+        if ((TagPresenceMask & (1 << kCsTag_FieldId)) == 0 && (TagPresenceMask & (1 << kCsTag_ListIndex)) != 0)
         {
-            err = CHIP_NO_ERROR;
+            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
         }
         else
         {
-            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            err = CHIP_NO_ERROR;
         }
     }
     SuccessOrExit(err);
