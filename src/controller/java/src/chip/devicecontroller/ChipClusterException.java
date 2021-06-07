@@ -1,4 +1,4 @@
-  /*
+/*
  *   Copyright (c) 2020 Project CHIP Authors
  *   All rights reserved.
  *
@@ -15,9 +15,9 @@
  *   limitations under the License.
  *
  */
- package chip.devicecontroller;
+package chip.devicecontroller;
 
-/** Exception class holding error codes defined by clusters.  */
+/** Exception class holding error codes defined by clusters. */
 public class ChipClusterException extends Exception {
   private static final long serialVersionUID = 1L;
 
