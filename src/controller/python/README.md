@@ -383,6 +383,14 @@ address of the node in the device controller:
 chip-device-ctrl > resolve 5544332211 1234
 ```
 
+### `ping <node_id>`
+
+ping command is using Echo Protocol to measure packet loss across network paths:
+
+```
+chip-device-ctrl > ping 1234
+```
+
 ### `setup-payload parse-manual <manual-pairing-code>`
 
 Print the commissioning information encoded in the Manual Pairing Code:
