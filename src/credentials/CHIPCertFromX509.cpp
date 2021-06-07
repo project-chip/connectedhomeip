@@ -578,7 +578,6 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
             SuccessOrExit(err);
             ChipLogProgress(Controller, "after  ConvertDistinguishedName ");
 
-
             // validity Validity,
             err = ConvertValidity(reader, writer);
 
@@ -705,7 +704,7 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32
 
     ChipLogProgress(Controller, "after success or exit 1");
     err = writer.Finalize();
-     ChipLogProgress(Controller, "after finalize");
+    ChipLogProgress(Controller, "after finalize");
     SuccessOrExit(err);
 
     chipCertLen = writer.GetLengthWritten();

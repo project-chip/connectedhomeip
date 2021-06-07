@@ -1115,7 +1115,6 @@ void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)
     }
 }
 
-
 CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;

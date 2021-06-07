@@ -67,10 +67,11 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
 
     // OperationalCredentialsDelegate implementation
-   CHIP_ERROR GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr, int64_t serialNumber,
-                                                              uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr, int64_t serialNumber,
+                                                  uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
 
-   CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
+                                    uint32_t & outCertLen) override;
 
     // DeviceStatusDelegate implementation
     void OnMessage(chip::System::PacketBufferHandle && msg) override;
@@ -92,10 +93,10 @@ public:
 
 private:
     chip::Crypto::P256Keypair mIssuer;
-    bool mInitialized  = false;
-    uint32_t mIssuerId = 0;
-    uint32_t mNow      = 0;
-    uint32_t mValidity = 365 * 24 * 60 * 60 * 10;
+    bool mInitialized             = false;
+    uint32_t mIssuerId            = 0;
+    uint32_t mNow                 = 0;
+    uint32_t mValidity            = 365 * 24 * 60 * 60 * 10;
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;

@@ -82,38 +82,38 @@ CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArray
 exit:
     return err;
 
-CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId)
-{
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    jclass javaClass = NULL;
-    VerifyOrExit(env != nullptr && object != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
-
-    javaClass = env->GetObjectClass(object);
-    ChipLogProgress(Controller, "FindMethod:: javaClass exists? %d", javaClass != NULL);
-    VerifyOrExit(javaClass != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-
-    *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
-    VerifyOrExit(*methodId != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-
-exit:
-    ChipLogProgress(Controller, "FindMethod Returning %d", err);
-    return err;
-}
-
-void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    jmethodID method;
-
-    err = FindMethod(env, object, methodName, "(I)V", &method);
-    SuccessOrExit(err);
-
-    env->ExceptionClear();
-    env->CallVoidMethod(object, method, argument);
-
-exit:
-    if (err != CHIP_NO_ERROR)
+    CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId)
     {
-        ChipLogError(Controller, "Error calling Java method: %d", err);
+        CHIP_ERROR err   = CHIP_NO_ERROR;
+        jclass javaClass = NULL;
+        VerifyOrExit(env != nullptr && object != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+
+        javaClass = env->GetObjectClass(object);
+        ChipLogProgress(Controller, "FindMethod:: javaClass exists? %d", javaClass != NULL);
+        VerifyOrExit(javaClass != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
+        *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
+        VerifyOrExit(*methodId != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+
+    exit:
+        ChipLogProgress(Controller, "FindMethod Returning %d", err);
+        return err;
     }
-}
+
+    void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        jmethodID method;
+
+        err = FindMethod(env, object, methodName, "(I)V", &method);
+        SuccessOrExit(err);
+
+        env->ExceptionClear();
+        env->CallVoidMethod(object, method, argument);
+
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Error calling Java method: %d", err);
+        }
+    }
