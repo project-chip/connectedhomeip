@@ -28,6 +28,8 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-telink-lighting-example)
 
+include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
+
 target_compile_options(app PRIVATE -fpermissive)
 
 target_include_directories(app PRIVATE
@@ -43,7 +45,6 @@ target_sources(app PRIVATE
                src/main.cpp
                src/ZclCallbacks.cpp
                ${LIGHTING_COMMON}/gen/attribute-size.cpp
-               ${LIGHTING_COMMON}/gen/call-command-handler.cpp
                ${LIGHTING_COMMON}/gen/callback-stub.cpp
                ${LIGHTING_COMMON}/gen/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
