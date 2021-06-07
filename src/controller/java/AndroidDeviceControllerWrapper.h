@@ -77,6 +77,11 @@ public:
                                                         CHIP_ERROR * errInfoOnFailure);
 
 private:
+    chip::Crypto::P256Keypair mIssuer;
+    bool mInitialized  = false;
+    uint32_t mIssuerId = 0;
+    uint32_t mNow      = 0;
+    uint32_t mValidity = 365 * 24 * 60 * 60 * 10;
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;

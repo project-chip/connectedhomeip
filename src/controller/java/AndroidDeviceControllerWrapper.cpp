@@ -18,6 +18,7 @@
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
 #include "JniReferences.h"
+#include <support/CodeUtils.h>
 
 #include <algorithm>
 #include <memory>
@@ -103,6 +104,15 @@ JNIEnv * AndroidDeviceControllerWrapper::GetJavaEnv()
 
     return env;
 }
+
+CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
+                                                                     uint32_t & outCertLen)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    chip::X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+    return NewRootX509Cert(request, mIssuer, certBuf, certBufSize, outCertLen);
+}
+
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
                                                                              chip::NodeId nodeId, chip::System::Layer * systemLayer,
@@ -200,10 +210,6 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen)
-{
- return CHIP_NO_ERROR;
-}
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {

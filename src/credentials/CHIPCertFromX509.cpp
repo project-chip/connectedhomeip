@@ -523,10 +523,13 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
     OID sigAlgoOID;
     TLVType containerType;
 
+    ChipLogProgress(Controller, "before StartContainer");
     err = writer.StartContainer(ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate), kTLVType_Structure,
                                 containerType);
+    ChipLogProgress(Controller, "after StartContainer");
     SuccessOrExit(err);
 
+    ChipLogProgress(Controller, "before certificate sequence");
     // Certificate ::= SEQUENCE
     ASN1_PARSE_ENTER_SEQUENCE
     {
@@ -549,7 +552,11 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
             // CertificateSerialNumber ::= INTEGER
             ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Integer);
             err = writer.PutBytes(ContextTag(kTag_SerialNumber), reader.GetValue(), reader.GetValueLen());
+
+            ChipLogProgress(Controller, "after certificate sequence");
             SuccessOrExit(err);
+
+            ChipLogProgress(Controller, "after certificate sequence error printing ");
 
             // signature AlgorithmIdentifier
             // AlgorithmIdentifier ::= SEQUENCE
@@ -565,20 +572,27 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
             }
             ASN1_EXIT_SEQUENCE;
 
+            ChipLogProgress(Controller, "before  ConvertDistinguishedName ");
             // issuer Name
             err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Issuer));
             SuccessOrExit(err);
+            ChipLogProgress(Controller, "after  ConvertDistinguishedName ");
+
 
             // validity Validity,
             err = ConvertValidity(reader, writer);
+
             SuccessOrExit(err);
+            ChipLogProgress(Controller, "after  ConvertValidity ");
 
             // subject Name,
             err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Subject));
             SuccessOrExit(err);
-
+            ChipLogProgress(Controller, "after  ConvertDistinguishedName ");
             err = ConvertSubjectPublicKeyInfo(reader, writer);
             SuccessOrExit(err);
+
+            ChipLogProgress(Controller, "after  ConvertSubjectPublicKeyInfo ");
 
             err = reader.Next();
 
@@ -677,14 +691,21 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32
     ASN1Reader reader;
     TLVWriter writer;
 
+    ChipLogProgress(Controller, "before reader.init");
     reader.Init(x509Cert, x509CertLen);
 
+    ChipLogProgress(Controller, "after reader.init");
     writer.Init(chipCertBuf, chipCertBufSize);
 
+    ChipLogProgress(Controller, "after writer.init");
     err = ConvertCertificate(reader, writer);
+
+    ChipLogProgress(Controller, "after ConvertCertificate");
     SuccessOrExit(err);
 
+    ChipLogProgress(Controller, "after success or exit 1");
     err = writer.Finalize();
+     ChipLogProgress(Controller, "after finalize");
     SuccessOrExit(err);
 
     chipCertLen = writer.GetLengthWritten();

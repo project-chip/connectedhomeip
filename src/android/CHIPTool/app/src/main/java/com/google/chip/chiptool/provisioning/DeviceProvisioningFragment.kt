@@ -131,8 +131,12 @@ class DeviceProvisioningFragment : Fragment() {
             .add(R.id.fragment_container, EnterNetworkFragment.newInstance(networkType))
             .commit()
       } else {
-        showMessage(R.string.rendezvous_over_ble_pairing_failure_text)
+        showMessage(R.string.rendezvous_over_ble_pairing_failure_text_test)
       }
+    }
+
+    override fun onOpCSRGenerationComplete(errorCode: ByteArray) {
+      Log.d(TAG,String(errorCode))
     }
 
     override fun onPairingDeleted(code: Int) {
