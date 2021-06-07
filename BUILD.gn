@@ -32,7 +32,7 @@ import("${chip_root}/build/chip/tools.gni")
 
 import("//src/crypto/crypto.gni")
 
-if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
+if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&

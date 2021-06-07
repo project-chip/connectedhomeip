@@ -202,16 +202,6 @@ var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
- * extract the cluster name from the enpoint cluster comment
- * @param {*} comments
- */
-function extract_cluster_name(comments)
-{
-  let secondPart = comments.split(": ").pop();
-  return secondPart.split(" (")[0];
-}
-
-/**
  * Populate the GENERATED_FUNCTIONS field
  */
 function chip_endpoint_generated_functions()
@@ -219,7 +209,7 @@ function chip_endpoint_generated_functions()
   let alreadySetCluster = [];
   let ret               = '\\\n';
   this.clusterList.forEach((c) => {
-    let clusterName  = extract_cluster_name(c.comment);
+    let clusterName  = c.clusterName;
     let functionList = '';
     if (alreadySetCluster.includes(clusterName)) {
       // Only one array of Generated functions per cluster across all endpoints
@@ -275,7 +265,7 @@ function chip_endpoint_cluster_list()
   this.clusterList.forEach((c) => {
     let mask          = '';
     let functionArray = c.functions;
-    let clusterName   = extract_cluster_name(c.comment);
+    let clusterName   = c.clusterName;
 
     if (c.comment.includes('server')) {
       let hasFunctionArray = false;

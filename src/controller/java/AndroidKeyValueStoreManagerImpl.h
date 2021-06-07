@@ -41,8 +41,6 @@ private:
     jmethodID mGetMethod    = nullptr;
     jmethodID mDeleteMethod = nullptr;
 
-    JNIEnv * GetEnvForCurrentThread();
-
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();

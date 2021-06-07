@@ -33,6 +33,7 @@ constexpr ClusterId kApplicationLauncherClusterId         = 0x050C;
 constexpr ClusterId kAudioOutputClusterId                 = 0x050B;
 constexpr ClusterId kBarrierControlClusterId              = 0x0103;
 constexpr ClusterId kBasicClusterId                       = 0x0028;
+constexpr ClusterId kBinaryInputBasicClusterId            = 0x000F;
 constexpr ClusterId kBindingClusterId                     = 0xF000;
 constexpr ClusterId kBridgedDeviceBasicClusterId          = 0x0039;
 constexpr ClusterId kColorControlClusterId                = 0x0300;
@@ -213,6 +214,30 @@ public:
 
 private:
     static constexpr CommandId kMfgSpecificPingCommandId = 0x00;
+};
+
+class DLL_EXPORT BinaryInputBasicCluster : public ClusterBase
+{
+public:
+    BinaryInputBasicCluster() : ClusterBase(kBinaryInputBasicClusterId) {}
+    ~BinaryInputBasicCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOutOfService(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePresentValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeStatusFlags(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeOutOfService(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t value);
+    CHIP_ERROR WriteAttributePresentValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t value);
+    CHIP_ERROR ConfigureAttributePresentValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributePresentValue(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeStatusFlags(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeStatusFlags(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT BindingCluster : public ClusterBase
@@ -1118,6 +1143,7 @@ public:
     CHIP_ERROR Test(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TestNotHandled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR TestSpecific(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TestUnknownCommand(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -1176,9 +1202,10 @@ public:
                                          chip::ByteSpan value);
 
 private:
-    static constexpr CommandId kTestCommandId           = 0x00;
-    static constexpr CommandId kTestNotHandledCommandId = 0x01;
-    static constexpr CommandId kTestSpecificCommandId   = 0x02;
+    static constexpr CommandId kTestCommandId               = 0x00;
+    static constexpr CommandId kTestNotHandledCommandId     = 0x01;
+    static constexpr CommandId kTestSpecificCommandId       = 0x02;
+    static constexpr CommandId kTestUnknownCommandCommandId = 0x03;
 };
 
 class DLL_EXPORT ThermostatCluster : public ClusterBase

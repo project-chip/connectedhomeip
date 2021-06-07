@@ -38,7 +38,7 @@ public:
     ResourceRecord & operator=(const ResourceRecord & other) = default;
 
     const FullQName & GetName() const { return mQName; }
-    QClass GetClass() const { return QClass::IN; }
+    QClass GetClass() const { return mCacheFlush ? QClass::IN_FLUSH : QClass::IN; }
     QType GetType() const { return mType; }
 
     uint32_t GetTtl() const { return mTtl; }
@@ -47,6 +47,13 @@ public:
         mTtl = ttl;
         return *this;
     }
+
+    ResourceRecord & SetCacheFlush(bool set)
+    {
+        mCacheFlush = set;
+        return *this;
+    }
+    bool GetCacheFlush() const { return mCacheFlush; }
 
     /// Append the given record to the underlying output.
     /// Updates header item count on success, does NOT update header on failure.
@@ -62,6 +69,7 @@ private:
     QType mType;
     uint32_t mTtl = kDefaultTtl;
     FullQName mQName;
+    bool mCacheFlush = false;
 };
 
 } // namespace Minimal

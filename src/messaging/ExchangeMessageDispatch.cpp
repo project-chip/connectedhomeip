@@ -65,32 +65,34 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
 #endif
     }
 
-    if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() && mReliableMessageMgr != nullptr &&
-        isReliableTransmission)
+    if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() &&
+        reliableMessageContext->GetReliableMessageMgr() != nullptr && isReliableTransmission)
     {
+        auto * reliableMessageMgr = reliableMessageContext->GetReliableMessageMgr();
+
         payloadHeader.SetNeedsAck(true);
 
         ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
         // Add to Table for subsequent sending
-        ReturnErrorOnFailure(mReliableMessageMgr->AddToRetransTable(reliableMessageContext, &entry));
+        ReturnErrorOnFailure(reliableMessageMgr->AddToRetransTable(reliableMessageContext, &entry));
 
         CHIP_ERROR err = SendMessageImpl(session, payloadHeader, std::move(message), &entry->retainedBuf);
         if (err != CHIP_NO_ERROR)
         {
             // Remove from table
             ChipLogError(ExchangeManager, "Failed to send message with err %s", ::chip::ErrorStr(err));
-            mReliableMessageMgr->ClearRetransTable(*entry);
+            reliableMessageMgr->ClearRetransTable(*entry);
             ReturnErrorOnFailure(err);
         }
         else
         {
-            mReliableMessageMgr->StartRetransmision(entry);
+            reliableMessageMgr->StartRetransmision(entry);
         }
     }
     else
     {
-        // If the channel itself is providing reliability, let's not request CRMP acks
+        // If the channel itself is providing reliability, let's not request MRP acks
         payloadHeader.SetNeedsAck(false);
         ReturnErrorOnFailure(SendMessageImpl(session, payloadHeader, std::move(message), nullptr));
     }

@@ -21,6 +21,8 @@ on:
 jobs:
     k32w:
         name: K32W
+        timeout-minutes: 60
+
         env:
             BUILD_TYPE: gn_k32w
 
@@ -45,9 +47,11 @@ jobs:
 #                  languages: "cpp"
 #                  queries: +security-and-quality
             - name: Build example K32W Lock App
+              timeout-minutes: 5
               run: scripts/examples/k32w_example.sh
                    examples/lock-app/k32w out/lock_app_debug
             - name: Build example K32W Lighting App
+              timeout-minutes: 5
               run: scripts/examples/k32w_example.sh
                    examples/lighting-app/k32w out/lighting_app_debug
             - name: Binary artifact suffix

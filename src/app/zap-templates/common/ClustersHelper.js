@@ -324,11 +324,11 @@ function enhancedCommands(commands, types)
     });
   });
 
-  // This filter uses the assumption that a response to a command has a well defined name, such as
-  // (response name) == (command name + 'Response') or s/Request/Response. This is very often the case,
-  // but this is not always true since some clusters use the same response to answer different commands, such as the
-  // operational cluster.
   commands.forEach(command => {
+    // This filter uses the assumption that a response to a command has a well defined name, such as
+    // (response name) == (command name + 'Response') or s/Request/Response. This is very often the case,
+    // but this is not always true since some clusters use the same response to answer different commands, such as the
+    // operational cluster.
     const automaticFilter = response => (response.name == (command.name + 'Response')
         || (command.name.includes('Request') && response.name == (command.name.replace('Request', 'Response'))));
     const manualFilter = response => {
@@ -348,6 +348,11 @@ function enhancedCommands(commands, types)
     if (response) {
       command.hasSpecificResponse = true;
       command.responseName        = response.name;
+      command.response            = response;
+    } else {
+      command.hasSpecificResponse = false;
+      command.responseName        = 'DefaultSuccess';
+      command.response            = { arguments : [] };
     }
   });
 
@@ -363,6 +368,12 @@ function enhancedAttributes(attributes, types)
 {
   attributes.forEach(attribute => {
     enhancedItem(attribute, types);
+  });
+
+  attributes.forEach(attribute => {
+    const argument      = { name : attribute.name, chipType : attribute.chipType };
+    attribute.arguments = [ argument ];
+    attribute.response  = { arguments : [ argument ] };
   });
 
   // At this stage, the 'attributes' array contains all attributes enabled for all endpoints. It means
@@ -410,6 +421,18 @@ Clusters.init = function(context, packageId) {
 //
 // Helpers: All
 //
+function asBlocks(promise, options)
+{
+  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise.then(data => templateUtil.collectBlocks(data, options, this)));
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
+}
+
+function asPromise(promise)
+{
+  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise);
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
+}
+
 Clusters.getClusters = function()
 {
     return this.ready.then(() => this._clusters);
@@ -417,20 +440,20 @@ Clusters.getClusters = function()
 
 Clusters.getCommands = function(name, side)
 {
-    const filter = command => command.clusterName == name && command.clusterSide == side && command.name.includes('Response') == false;
+    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.name.includes('Response') == false;
     return this.ready.then(() => this._commands.filter(filter));
 }
 
 Clusters.getResponses = function(name, side)
 {
-    const filter = command => command.clusterName == name && command.clusterSide == side && command.name.includes('Response') == true;
+    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.name.includes('Response') == true;
     return this.ready.then(() => this._commands.filter(filter));
 }
 
 Clusters.getAttributes = function(name, side)
 {
     return this.ready.then(() => {
-      const code = this._clusters.find(cluster => cluster.name == name).id;
+      const code = this._clusters.find(cluster => cluster.name.toLowerCase() == name.toLowerCase()).id;
       const filter = attribute => attribute.clusterId == code && attribute.side == side;
       return this._attributes.filter(filter);
     });
@@ -487,4 +510,6 @@ Clusters.getServerAttributes = function(name)
 //
 // Module exports
 //
-exports.Clusters = Clusters;
+exports.Clusters  = Clusters;
+exports.asBlocks  = asBlocks;
+exports.asPromise = asPromise;

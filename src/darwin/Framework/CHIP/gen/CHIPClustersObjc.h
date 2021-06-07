@@ -152,6 +152,29 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Binary Input (Basic)
+ *
+ */
+@interface CHIPBinaryInputBasic : CHIPCluster
+
+- (void)readAttributeOutOfServiceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOutOfServiceWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePresentValueWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributePresentValueWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeStatusFlagsWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Binding
  *
  */
@@ -934,6 +957,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)test:(ResponseHandler)responseHandler;
 - (void)testNotHandled:(ResponseHandler)responseHandler;
 - (void)testSpecific:(ResponseHandler)responseHandler;
+- (void)testUnknownCommand:(ResponseHandler)responseHandler;
 
 - (void)readAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBooleanWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;

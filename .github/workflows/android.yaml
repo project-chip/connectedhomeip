@@ -21,6 +21,8 @@ on:
 jobs:
     android:
         name: Build Android
+        timeout-minutes: 60
+
         strategy:
             matrix:
                 type: [arm, arm64, x64]
@@ -44,11 +46,14 @@ jobs:
               with:
                   submodules: true
             - name: Bootstrap
+              timeout-minutes: 3
               run: scripts/build/gn_bootstrap.sh
             - name: Build libs
+              timeout-minutes: 2
               run: |
                   ./scripts/examples/android_app.sh
             - name: Build App
+              timeout-minutes: 5
               run: |
                   yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses
                   cd src/android/CHIPTool

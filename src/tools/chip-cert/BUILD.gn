@@ -16,13 +16,6 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 
-import("//build/config/linux/pkg_config.gni")
-
-# TODO: Move it into common BUILD file to avoid multiple runs of pkg_config
-pkg_config("openssl_config") {
-  packages = [ "openssl" ]
-}
-
 assert(chip_build_tools)
 
 executable("chip-cert") {
@@ -40,7 +33,7 @@ executable("chip-cert") {
     "chip-cert.h",
   ]
 
-  public_configs = [ ":openssl_config" ]
+  public_configs = [ "${chip_root}/src/crypto:openssl_config" ]
 
   cflags = [ "-Wconversion" ]
 

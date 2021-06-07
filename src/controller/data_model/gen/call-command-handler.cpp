@@ -20,7 +20,6 @@
 #include <stdint.h>
 
 #include "app/util/util.h"
-#include "call-command-handler.h"
 #include "callback.h"
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/cluster-id.h>
@@ -34,6 +33,7 @@ EmberAfStatus emberAfApplicationLauncherClusterClientCommandParse(EmberAfCluster
 EmberAfStatus emberAfAudioOutputClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBarrierControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfBinaryInputBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBindingClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBridgedDeviceBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfColorControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -118,6 +118,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_BASIC_CLUSTER_ID:
             // No commands are enabled for cluster Basic
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_BINARY_INPUT_BASIC_CLUSTER_ID:
+            // No commands are enabled for cluster Binary Input (Basic)
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_BINDING_CLUSTER_ID:
