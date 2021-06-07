@@ -103,7 +103,7 @@ public class ChipDeviceController {
   }
 
   public void onOpCSRGenerationComplete(byte[] errorCode) {
-    if(completionListener !=null) {
+    if (completionListener != null) {
       completionListener.onOpCSRGenerationComplete(errorCode);
     }
   }
@@ -268,6 +268,5 @@ public class ChipDeviceController {
 
     /** Notifies the Commissioner when the OpCSR for the Comissionee is generated. */
     void onOpCSRGenerationComplete(byte[] errorCode);
-
   }
 }
