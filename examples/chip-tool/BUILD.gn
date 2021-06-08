@@ -21,11 +21,11 @@ assert(chip_build_tools)
 
 executable("chip-tool") {
   sources = [
+    "commands/casting/DiscoverCommissionersCommand.cpp",
     "commands/clusters/ModelCommand.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
     "commands/discover/DiscoverCommand.cpp",
-    "commands/casting/DiscoverCommissionersCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
