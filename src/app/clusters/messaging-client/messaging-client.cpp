@@ -328,8 +328,9 @@ EmberAfStatus emberAfPluginMessagingClientConfirmMessage(EndpointId endpoint)
                                       emberAfGetCurrentTime(), 0x00, "");
             // The source and destination are reversed for the confirmation.
             emberAfSetCommandEndpoints(messageTable[ep].clientEndpoint, esiEntry->endpoint);
-            status = ((emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId) == EMBER_SUCCESS) ? EMBER_ZCL_STATUS_SUCCESS
-                                                                                                  : EMBER_ZCL_STATUS_FAILURE);
+            const MessageSendDestination destination = MessageSendDestination::Direct(nodeId);
+            status =
+                ((emberAfSendCommandUnicast(destination) == EMBER_SUCCESS) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
         }
     }
     else

@@ -182,7 +182,7 @@ CHIP_ERROR SendReadRequest(void)
                                                false /*not urgent*/);
 
     chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, 1, 0,
-                                                       chip::app::AttributePathFlags::kFieldIdValid);
+                                                       chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 

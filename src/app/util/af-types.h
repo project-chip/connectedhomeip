@@ -56,6 +56,7 @@
 #include <app/util/types_stub.h> // For various types.
 
 #include <messaging/ExchangeContext.h>
+#include <support/Variant.h>
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
@@ -1252,26 +1253,103 @@ typedef void (*EmberAfDefaultResponseFunction)(chip::EndpointId endpoint, chip::
 
 namespace chip {
 /**
- * @brief a type that represents where we are trying to send a message.  This
- *        must always be paired with an EmberOutgoingMessageType that identifies
- *        which arm of the union is in use.
+ * @brief a type that represents where we are trying to send a message.
+ *        The variant type identifies which arm of the union is in use.
  */
-union MessageSendDestination
+class MessageSendDestination
 {
-    explicit constexpr MessageSendDestination(uint8_t aBindingIndex) : mBindingIndex(aBindingIndex) {}
-    explicit constexpr MessageSendDestination(NodeId aNodeId) : mNodeId(aNodeId) {}
-    explicit constexpr MessageSendDestination(GroupId aGroupId) : mGroupId(aGroupId) {}
-    explicit constexpr MessageSendDestination(Messaging::ExchangeContext * aExchangeContext) : mExchangeContext(aExchangeContext) {}
+public:
+    MessageSendDestination(MessageSendDestination & that)       = default;
+    MessageSendDestination(const MessageSendDestination & that) = default;
+    MessageSendDestination(MessageSendDestination && that)      = default;
 
-    // Used when the type is EMBER_OUTGOING_VIA_BINDING
-    uint8_t mBindingIndex;
-    // Used when the type is EMBER_OUTGOING_DIRECT
-    NodeId mNodeId;
-    // Used when the type is EMBER_OUTGOING_MULTICAST or
-    // EMBER_OUTGOING_MULTICAST_WITH_ALIAS
-    GroupId mGroupId;
-    // Used when the type is EMBER_OUTGOING_VIA_EXCHANGE
-    Messaging::ExchangeContext * mExchangeContext;
+    static MessageSendDestination ViaBinding(uint8_t bindingIndex)
+    {
+        return MessageSendDestination(VariantViaBinding(bindingIndex));
+    }
+
+    static MessageSendDestination Direct(NodeId nodeId) { return MessageSendDestination(VariantDirect(nodeId)); }
+
+    static MessageSendDestination Multicast(GroupId groupId) { return MessageSendDestination(VariantMulticast(groupId)); }
+
+    static MessageSendDestination MulticastWithAlias(GroupId groupId)
+    {
+        return MessageSendDestination(VariantMulticastWithAlias(groupId));
+    }
+
+    static MessageSendDestination ViaExchange(Messaging::ExchangeContext * exchangeContext)
+    {
+        return MessageSendDestination(VariantViaExchange(exchangeContext));
+    }
+
+    bool IsViaBinding() const { return mDestination.Is<VariantViaBinding>(); }
+    bool IsDirect() const { return mDestination.Is<VariantDirect>(); }
+    bool IsViaExchange() const { return mDestination.Is<VariantViaExchange>(); }
+
+    uint8_t GetBindingIndex() const { return mDestination.Get<VariantViaBinding>().mBindingIndex; }
+    NodeId GetDirectNodeId() const { return mDestination.Get<VariantDirect>().mNodeId; }
+    Messaging::ExchangeContext * GetExchangeContext() const { return mDestination.Get<VariantViaExchange>().mExchangeContext; }
+
+private:
+    struct VariantViaBinding
+    {
+        static constexpr const std::size_t VariantId = 1;
+        explicit VariantViaBinding(uint8_t bindingIndex) : mBindingIndex(bindingIndex) {}
+        uint8_t mBindingIndex;
+    };
+
+    struct VariantViaAddressTable
+    {
+        static constexpr const std::size_t VariantId = 2;
+    };
+
+    struct VariantDirect
+    {
+        static constexpr const std::size_t VariantId = 3;
+        explicit VariantDirect(NodeId nodeId) : mNodeId(nodeId) {}
+        NodeId mNodeId;
+    };
+
+    struct VariantMulticast
+    {
+        static constexpr const std::size_t VariantId = 4;
+        explicit VariantMulticast(GroupId groupId) : mGroupId(groupId) {}
+        GroupId mGroupId;
+    };
+
+    struct VariantMulticastWithAlias
+    {
+        static constexpr const std::size_t VariantId = 5;
+        explicit VariantMulticastWithAlias(GroupId groupId) : mGroupId(groupId) {}
+        GroupId mGroupId;
+    };
+
+    struct VariantBroadcast
+    {
+        static constexpr const std::size_t VariantId = 6;
+    };
+
+    struct VariantBroadcastWithAlias
+    {
+        static constexpr const std::size_t VariantId = 7;
+    };
+
+    struct VariantViaExchange
+    {
+        static constexpr const std::size_t VariantId = 8;
+        explicit VariantViaExchange(Messaging::ExchangeContext * exchangeContext) : mExchangeContext(exchangeContext) {}
+        Messaging::ExchangeContext * mExchangeContext;
+    };
+
+    template <typename Destination>
+    MessageSendDestination(Destination && destination)
+    {
+        mDestination.Set<Destination>(std::forward<Destination>(destination));
+    }
+
+    Variant<VariantViaBinding, VariantViaAddressTable, VariantDirect, VariantMulticast, VariantMulticastWithAlias, VariantBroadcast,
+            VariantBroadcastWithAlias, VariantViaExchange>
+        mDestination;
 };
 } // namespace chip
 
@@ -1280,8 +1358,8 @@ union MessageSendDestination
  *
  * This function is called when a message is sent.
  */
-typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
-                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+typedef void (*EmberAfMessageSentFunction)(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                           uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /**
  * @brief The EmberAfMessageStruct is a struct wrapper that
@@ -1293,9 +1371,8 @@ typedef struct
     EmberAfMessageSentFunction callback;
     EmberApsFrame * apsFrame;
     uint8_t * message;
-    chip::MessageSendDestination destination;
+    const chip::MessageSendDestination destination;
     uint16_t messageLength;
-    EmberOutgoingMessageType type;
     bool broadcast;
 } EmberAfMessageStruct;
 

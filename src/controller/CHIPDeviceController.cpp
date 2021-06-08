@@ -307,10 +307,10 @@ CHIP_ERROR DeviceController::Shutdown()
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
-    mSystemLayer->Shutdown();
     mInetLayer->Shutdown();
-    chip::Platform::Delete(mSystemLayer);
+    mSystemLayer->Shutdown();
     chip::Platform::Delete(mInetLayer);
+    chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
 
     mSystemLayer     = nullptr;
@@ -1513,10 +1513,9 @@ void BasicFailure(void * context, uint8_t status)
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 void DeviceCommissioner::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
-    Device * device = nullptr;
     if (mDeviceBeingPaired < kNumMaxActiveDevices)
     {
-        device = &mActiveDevices[mDeviceBeingPaired];
+        Device * device = &mActiveDevices[mDeviceBeingPaired];
         if (device->GetDeviceId() == nodeData.mPeerId.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
         {
             AdvanceCommissioningStage(CHIP_NO_ERROR);
@@ -1527,16 +1526,13 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & n
 
 void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
 {
-    Device * device = nullptr;
-    if (mDeviceBeingPaired >= kNumMaxActiveDevices)
+    if (mDeviceBeingPaired < kNumMaxActiveDevices)
     {
-        return;
-    }
-
-    device = &mActiveDevices[mDeviceBeingPaired];
-    if (device->GetDeviceId() == peer.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
-    {
-        OnSessionEstablishmentError(error);
+        Device * device = &mActiveDevices[mDeviceBeingPaired];
+        if (device->GetDeviceId() == peer.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
+        {
+            OnSessionEstablishmentError(error);
+        }
     }
     DeviceController::OnNodeIdResolutionFailed(peer, error);
 }
