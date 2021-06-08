@@ -32,32 +32,7 @@ export AP_PASSWORD=CHIPnet123
 export AP_GATEWAY=192.168.4.1
 export ECHO_SERVER_PORT=7
 
-bash ./start_wlan_ap.sh start --interface $AP_NAME --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
-
-if ! nmcli con show | grep -q "$AP_NAME"; then
-    # Run access point
-    echo "Run access point"
-
-    sudo nmcli con add type wifi ifname wlan0 mode ap con-name "$AP_NAME" autoconnect true ssid "$AP_SSID"
-    sudo nmcli con modify "$AP_NAME" 802-11-wireless.band bg 802-11-wireless.channel 7
-    sudo nmcli con modify "$AP_NAME" 802-11-wireless-security.proto rsn 802-11-wireless-security.group ccmp 802-11-wireless-security.pairwise ccmp 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk "$AP_PASSWORD"
-    sudo nmcli con modify "$AP_NAME" ipv4.method shared
-    sudo nmcli con modify "$AP_NAME" ipv4.addr "$AP_GATEWAY"/24
-    sudo nmcli con up "$AP_NAME"
-
-    sudo nmcli -f GENERAL.STATE con show "$AP_NAME"
-fi
-
-if ! netstat -a | less | grep -q "echo"; then
-    #Setting TCP and UDP echo server
-    echo "Setting TCP and UDP echo server"
-
-    echo 'echo            stream  tcp     nowait  root    internal' | sudo tee -a /etc/inetd.conf
-    echo 'echo            dgram   udp     wait    root    internal' | sudo tee -a /etc/inetd.conf
-    sudo service openbsd-inetd restart
-
-    netstat -a | less | grep "echo"
-fi
+sudo bash ./start_wlan_ap.sh start --interface $AP_NAME --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
 
 cd $HOME
 
