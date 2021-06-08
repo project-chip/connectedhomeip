@@ -45,6 +45,7 @@ namespace Credentials {
 using namespace chip::ASN1;
 using namespace chip::TLV;
 using namespace chip::Protocols;
+using namespace chip::Crypto;
 
 static ASN1_ERROR ParseChipAttribute(ASN1Reader & reader, uint64_t & chipAttrOut)
 {
@@ -516,6 +517,39 @@ exit:
     return err;
 }
 
+CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1Reader & reader, TLVWriter & writer, uint64_t tag)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t rawSig[kP256_ECDSA_Signature_Length_Raw];
+
+    // Per RFC3279, the ECDSA signature value is encoded in DER encapsulated in the signatureValue BIT STRING.
+    ASN1_ENTER_ENCAPSULATED(kASN1TagClass_Universal, kASN1UniversalTag_BitString)
+    {
+        // Ecdsa-Sig-Value ::= SEQUENCE
+        ASN1_PARSE_ENTER_SEQUENCE
+        {
+            // r INTEGER
+            ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Integer);
+            VerifyOrReturnError(reader.GetValueLen() <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(
+                ConvertIntegerDERToRaw(reader.GetValue(), static_cast<uint16_t>(reader.GetValueLen()), rawSig, kP256_FE_Length));
+
+            // s INTEGER
+            ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Integer);
+            VerifyOrReturnError(reader.GetValueLen() <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(ConvertIntegerDERToRaw(reader.GetValue(), static_cast<uint16_t>(reader.GetValueLen()),
+                                                        rawSig + kP256_FE_Length, kP256_FE_Length));
+        }
+        ASN1_EXIT_SEQUENCE;
+    }
+    ASN1_EXIT_ENCAPSULATED;
+
+    ReturnErrorOnFailure(writer.PutBytes(tag, rawSig, kP256_ECDSA_Signature_Length_Raw));
+
+exit:
+    return err;
+}
+
 static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
 {
     CHIP_ERROR err;
@@ -633,33 +667,7 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
         // signatureValue BIT STRING
         ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_BitString);
 
-        // Per RFC3279, the ECDSA signature value is encoded in DER encapsulated in the signatureValue BIT STRING.
-        ASN1_ENTER_ENCAPSULATED(kASN1TagClass_Universal, kASN1UniversalTag_BitString)
-        {
-            TLVType outerContainer;
-
-            err = writer.StartContainer(ContextTag(kTag_ECDSASignature), kTLVType_Structure, outerContainer);
-            SuccessOrExit(err);
-
-            // Ecdsa-Sig-Value ::= SEQUENCE
-            ASN1_PARSE_ENTER_SEQUENCE
-            {
-                // r INTEGER
-                ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Integer);
-                err = writer.PutBytes(ContextTag(kTag_ECDSASignature_r), reader.GetValue(), reader.GetValueLen());
-                SuccessOrExit(err);
-
-                // s INTEGER
-                ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Integer);
-                err = writer.PutBytes(ContextTag(kTag_ECDSASignature_s), reader.GetValue(), reader.GetValueLen());
-                SuccessOrExit(err);
-            }
-            ASN1_EXIT_SEQUENCE;
-
-            err = writer.EndContainer(outerContainer);
-            SuccessOrExit(err);
-        }
-        ASN1_EXIT_ENCAPSULATED;
+        ReturnErrorOnFailure(ConvertECDSASignatureDERToRaw(reader, writer, ContextTag(kTag_ECDSASignature)));
     }
     ASN1_EXIT_SEQUENCE;
 
