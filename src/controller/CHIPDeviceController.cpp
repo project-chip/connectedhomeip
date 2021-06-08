@@ -292,6 +292,20 @@ CHIP_ERROR DeviceController::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the controller");
 
+#if CONFIG_DEVICE_LAYER
+    // Start by shutting down the PlatformManager.  This will ensure, with
+    // reasonable synchronization, that we stop processing of incoming messages
+    // before doing any other shutdown work.  Otherwise we can end up trying to
+    // process incoming messages in a partially shut down state, which is not
+    // great at all.
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
+#else
+    mInetLayer->Shutdown();
+    mSystemLayer->Shutdown();
+    chip::Platform::Delete(mInetLayer);
+    chip::Platform::Delete(mSystemLayer);
+#endif // CONFIG_DEVICE_LAYER
+
     mState = State::NotInitialized;
 
     // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
@@ -303,15 +317,6 @@ CHIP_ERROR DeviceController::Shutdown()
     {
         mSessionMgr->Shutdown();
     }
-
-#if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
-#else
-    mInetLayer->Shutdown();
-    mSystemLayer->Shutdown();
-    chip::Platform::Delete(mInetLayer);
-    chip::Platform::Delete(mSystemLayer);
-#endif // CONFIG_DEVICE_LAYER
 
     mSystemLayer     = nullptr;
     mInetLayer       = nullptr;
