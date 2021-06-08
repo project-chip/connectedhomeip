@@ -592,7 +592,7 @@ class DeviceMgrCmd(Cmd):
             while (optIndex <= argc and args[optIndex][0] == '-'):
                 if args[optIndex] == "-i":
                     optIndex += 1
-                    echoInterval = int(args[optIndex])
+                    echoInterval = int(args[optIndex]) * 1000
                 elif args[optIndex] == "-c":
                     optIndex += 1
                     echoCount = int(args[optIndex]) 

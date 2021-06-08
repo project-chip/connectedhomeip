@@ -116,7 +116,7 @@ CHIP_ERROR pychip_Resolver_ResolveNode(uint64_t fabricid, chip::NodeId nodeid);
 CHIP_ERROR pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
 
 CHIP_ERROR pychip_Resolver_PingNode(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId, uint32_t maxCount,
-                                    uint32_t waitTime, uint32_t payloadSize, bool usingMRP);
+                                    uint32_t waitTimeMillis, uint32_t payloadSize, bool usingMRP);
 
 uint8_t pychip_DeviceController_GetLogFilter();
 void pychip_DeviceController_SetLogFilter(uint8_t category);
@@ -324,9 +324,9 @@ CHIP_ERROR pychip_Resolver_ResolveNode(uint64_t fabricid, chip::NodeId nodeid)
 }
 
 CHIP_ERROR pychip_Resolver_PingNode(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, uint32_t maxCount,
-                                    uint32_t waitTime, uint32_t payloadSize, bool usingMRP)
+                                    uint32_t waitTimeMillis, uint32_t payloadSize, bool usingMRP)
 {
-    return devCtrl->PingDevice(nodeid, maxCount, waitTime, payloadSize, usingMRP);
+    return devCtrl->PingDevice(nodeid, maxCount, waitTimeMillis, payloadSize, usingMRP);
 }
 
 CHIP_ERROR pychip_Stack_Init()

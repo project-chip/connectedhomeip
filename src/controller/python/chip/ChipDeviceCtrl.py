@@ -169,9 +169,9 @@ class ChipDeviceController(object):
             lambda: self._dmLib.pychip_Resolver_ResolveNode(fabricid, nodeid)
         )
 
-    def PingNode(self, nodeid, maxCount, waitTime, payloadSize, usingMRP):
+    def PingNode(self, nodeid, maxCount, waitTimeMillis, payloadSize, usingMRP):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_Resolver_PingNode(self.devCtrl, nodeid, maxCount, waitTime, payloadSize, usingMRP)
+            lambda: self._dmLib.pychip_Resolver_PingNode(self.devCtrl, nodeid, maxCount, waitTimeMillis, payloadSize, usingMRP)
         )    
 
     def GetAddressAndPort(self, nodeid):

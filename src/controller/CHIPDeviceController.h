@@ -95,7 +95,7 @@ class PingParams
 public:
     void Reset()
     {
-        mEchoInterval       = 1000;
+        mEchoIntervalMillis = 1000;
         mLastEchoTime       = 0;
         mEchoReqCount       = 0;
         mEchoRespCount      = 0;
@@ -115,8 +115,8 @@ public:
     void SetEchoRespCount(uint32_t value) { mEchoRespCount = value; }
     void IncrementEchoRespCount() { mEchoRespCount++; }
 
-    uint32_t GetEchoInterval() const { return mEchoInterval; }
-    void SetEchoInterval(uint32_t value) { mEchoInterval = value; }
+    uint32_t GetEchoInterval() const { return mEchoIntervalMillis; }
+    void SetEchoInterval(uint32_t value) { mEchoIntervalMillis = value; }
 
     uint32_t GetEchoReqSize() const { return mEchoReqSize; }
     void SetEchoReqSize(uint32_t value) { mEchoReqSize = value; }
@@ -141,7 +141,7 @@ private:
     uint32_t mEchoReqSize;
 
     // The CHIP Echo interval time in milliseconds.
-    uint32_t mEchoInterval;
+    uint32_t mEchoIntervalMillis;
 
     // True, if the echo client is waiting for an echo response
     // after sending an echo request, false otherwise.
@@ -511,13 +511,13 @@ public:
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] maxCount              The max value for the number of echo requests sent.
-     * @param[in] waitTime              The max time to wait for Echo response message in seconds.
+     * @param[in] waitTimeMillis        The max time to wait for Echo response message in milliseconds.
      * @param[in] payloadSize           The CHIP Echo request payload size in bytes.
      * @param[in] usingMRP              If enable Message Reliable Protocol for CHIP Echo request.
      *
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR PingDevice(NodeId remoteDeviceId, uint32_t maxCount, uint32_t waitTime, uint32_t payloadSize, bool usingMRP);
+    CHIP_ERROR PingDevice(NodeId remoteDeviceId, uint32_t maxCount, uint32_t waitTimeMillis, uint32_t payloadSize, bool usingMRP);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;

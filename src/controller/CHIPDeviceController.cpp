@@ -1096,7 +1096,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceCommissioner::PingDevice(NodeId remoteDeviceId, uint32_t maxCount, uint32_t waitTime, uint32_t payloadSize,
+CHIP_ERROR DeviceCommissioner::PingDevice(NodeId remoteDeviceId, uint32_t maxCount, uint32_t waitTimeMillis, uint32_t payloadSize,
                                           bool usingMRP)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1110,7 +1110,7 @@ CHIP_ERROR DeviceCommissioner::PingDevice(NodeId remoteDeviceId, uint32_t maxCou
     mEchoClient.SetEchoResponseReceived(OnHandleEchoResponse);
 
     mPingParams.Reset();
-    mPingParams.SetEchoInterval(waitTime * 1000);
+    mPingParams.SetEchoInterval(waitTimeMillis);
     mPingParams.SetEchoReqSize(payloadSize);
     mPingParams.SetUsingMRP(usingMRP);
 
