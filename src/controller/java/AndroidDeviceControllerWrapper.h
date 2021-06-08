@@ -61,6 +61,7 @@ public:
     jlong ToJNIHandle();
 
     void CallJavaMethod(const char * methodName, jint argument);
+    CHIP_ERROR Initialize();
 
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
