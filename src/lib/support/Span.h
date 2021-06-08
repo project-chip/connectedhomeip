@@ -62,7 +62,7 @@ public:
 
     const T * data() const { return mDataBuf; }
     size_t size() const { return N; }
-    bool empty() const { return mDataBuf == nullptr; }
+    bool empty() const { return size() == 0; }
     bool data_equal(const FixedSpan & other) const
     {
         return !empty() && !other.empty() && memcmp(data(), other.data(), size() * sizeof(T)) == 0;
