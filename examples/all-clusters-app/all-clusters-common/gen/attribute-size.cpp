@@ -762,7 +762,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     // and data is undefined.
     uint16_t entryCount = emberAfGetInt16u(buffer, 0, kSizeLengthInBytes);
 
-    ChipLogProgress(Zcl, "*DEBUG* Cluster 0x%04x,Attribute 0x%02x EntryCount 0x%04x", clusterId, attributeId,entryCount);
+    ChipLogProgress(Zcl, "*DEBUG* Cluster 0x%04x,Attribute 0x%02x EntryCount 0x%04x", clusterId, attributeId, entryCount);
 
     if (entryCount == 0xFFFF)
     {
