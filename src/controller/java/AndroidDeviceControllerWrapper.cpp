@@ -55,6 +55,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
                                                                      uint32_t & outCertLen)
 {
+    Initialize();
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     chip::X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
     return NewRootX509Cert(request, mIssuer, certBuf, certBufSize, outCertLen);
