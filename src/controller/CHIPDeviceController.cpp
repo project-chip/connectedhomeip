@@ -306,8 +306,8 @@ CHIP_ERROR DeviceController::Shutdown()
     chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
 
-    mSystemLayer     = nullptr;
-    mInetLayer       = nullptr;
+    mSystemLayer = nullptr;
+    mInetLayer   = nullptr;
 
     mState = State::NotInitialized;
 
