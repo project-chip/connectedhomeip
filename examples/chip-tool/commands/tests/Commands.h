@@ -31,6 +31,12 @@ public:
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TestCluster: Test complete");
+            SetCommandExitStatus(true);
+        }
+
         switch (mTestIndex)
         {
         case 0:
@@ -51,10 +57,10 @@ public:
         }
         mTestIndex++;
 
-        if (mTestCount == mTestIndex || CHIP_NO_ERROR != err)
+        if (CHIP_NO_ERROR != err)
         {
             ChipLogProgress(chipTool, "TestCluster: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(CHIP_NO_ERROR == err);
+            SetCommandExitStatus(false);
         }
 
         return err;
@@ -438,6 +444,12 @@ public:
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "OnOffCluster: Test complete");
+            SetCommandExitStatus(true);
+        }
+
         switch (mTestIndex)
         {
         case 0:
@@ -458,10 +470,10 @@ public:
         }
         mTestIndex++;
 
-        if (mTestCount == mTestIndex || CHIP_NO_ERROR != err)
+        if (CHIP_NO_ERROR != err)
         {
             ChipLogProgress(chipTool, "OnOffCluster: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(CHIP_NO_ERROR == err);
+            SetCommandExitStatus(false);
         }
 
         return err;
