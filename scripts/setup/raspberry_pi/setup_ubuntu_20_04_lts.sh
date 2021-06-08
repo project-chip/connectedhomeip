@@ -43,4 +43,23 @@ sudo apt-get install -fy \
     unzip &&
     true
 
+sudo apt-get install -fy \
+    rfkill \
+    hostapd \
+    iptables \
+    isc-dhcp-server \
+    iproute2 \
+    iw \
+    net-tools \
+    iputils-ping &&
+    true
+
+sudo echo "" > /var/lib/dhcp/dhcpd.leases
+
+sudo apt-get install -fy \
+    net-tools \
+    openbsd-inetd \
+    python3-virtualenv &&
+    true
+
 echo "You must REBOOT after pi-bluetooth has been installed"

@@ -32,12 +32,7 @@ export AP_PASSWORD=CHIPnet123
 export AP_GATEWAY=192.168.4.1
 export ECHO_SERVER_PORT=7
 
-sudo apt-get install -fy \
-    network-manager \
-    net-tools \
-    openbsd-inetd \
-    python3-virtualenv &&
-    true
+bash ./start_wlan_ap.sh start --interface $AP_NAME --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
 
 if ! nmcli con show | grep -q "$AP_NAME"; then
     # Run access point
