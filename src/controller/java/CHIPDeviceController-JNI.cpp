@@ -229,8 +229,8 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     sBleLayer.Shutdown();
 #endif
 
-    sSystemLayer.Shutdown();
     sInetLayer.Shutdown();
+    sSystemLayer.Shutdown();
     sJVM = NULL;
 
     chip::Platform::MemoryShutdown();
