@@ -54,6 +54,7 @@ class CHIPVirtualHome:
         self.device_ids = []
         self.devices = []
         self.non_ap_devices = []
+        self.thread_devices = []
         self.ap_devices = []
 
     # The entrance of the whole test
@@ -198,7 +199,7 @@ class CHIPVirtualHome:
         this network.
         '''
         self.logger.info("Running commands to form default Thread network")
-        for device in self.non_ap_devices:
+        for device in self.thread_devices:
             self.wait_for_device_output(device['id'], "Border router agent started.", 5)
 
         otInitCommands = [
@@ -209,7 +210,7 @@ class CHIPVirtualHome:
             "ot-ctl thread start",
             "ot-ctl dataset active", # Emit
         ]
-        for device in self.non_ap_devices:
+        for device in self.thread_devices:
             # Set default openthread provisioning
             for cmd in otInitCommands:
                 self.execute_device_cmd(device['id'], cmd)
@@ -217,11 +218,11 @@ class CHIPVirtualHome:
         threadNetworkFormed = False
         for i in range(30):
             roles = list()
-            for device in self.non_ap_devices:
+            for device in self.thread_devices:
                 # We can only check the status of ot-agent by query its state.
                 reply = self.execute_device_cmd(device['id'], 'ot-ctl state')
                 roles.append(reply['output'].split()[0])
-            threadNetworkFormed = (roles.count('leader') == 1) and (roles.count('leader') + roles.count('router') + roles.count('child') == len(self.non_ap_devices))
+            threadNetworkFormed = (roles.count('leader') == 1) and (roles.count('leader') + roles.count('router') + roles.count('child') == len(self.thread_devices))
             if threadNetworkFormed:
                 break
             time.sleep(1)
@@ -348,6 +349,8 @@ class CHIPVirtualHome:
         self.device_ids = [device_id for device_id in self.device_config]
         self.non_ap_devices = [device for device in self.device_config.values()
                                if device['type'] != 'wifi_ap']
+        self.thread_devices = [device for device in self.device_config.values()
+                               if device['capability'].get('Thread', None) is not None]
         self.ap_devices = [device for device in self.device_config.values()
                            if device['type'] == 'wifi_ap']
 
