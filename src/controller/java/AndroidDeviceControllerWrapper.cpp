@@ -173,6 +173,9 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
     chip::P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
 
+    ChipLogProgress(chipTool, "VerifyCertificateSigningRequest");
+
+
     CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, certBuf, certBufSize,
                                          outCertLen);
     jbyteArray argument;
@@ -195,6 +198,11 @@ CHIP_ERROR AndroidDeviceControllerWrapper::Initialize()
          keySize = static_cast<uint16_t>(sizeof(serializedKey));
          SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize);
         }
+    else
+    {
+     // Use the keypair from the storage
+     ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
+    }
 
     mInitialized = true;
     return CHIP_NO_ERROR;
