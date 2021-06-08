@@ -38,6 +38,7 @@
 #include <credentials/CHIPCert.h>
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {
@@ -699,6 +700,41 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32
 
 exit:
     return err;
+}
+
+CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509Cert1, const ByteSpan & x509Cert2, uint8_t * chipCertArrayBuf,
+                                           uint32_t chipCertArrayBufSize, uint32_t & chipCertBufLen)
+{
+
+    TLVWriter writer;
+    writer.Init(chipCertArrayBuf, chipCertArrayBufSize);
+
+    TLVType outerContainer;
+    //    ReturnErrorOnFailure(writer.StartContainer(ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(),
+    //    kTag_ChipCertificateArray), kTLVType_Array, outerContainer));
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Array, outerContainer));
+
+    ASN1Reader reader;
+    if (x509Cert1.size() > 0)
+    {
+        VerifyOrReturnError(CanCastTo<uint32_t>(x509Cert1.size()), CHIP_ERROR_INVALID_ARGUMENT);
+        reader.Init(x509Cert1.data(), static_cast<uint32_t>(x509Cert1.size()));
+        ReturnErrorOnFailure(ConvertCertificate(reader, writer));
+    }
+
+    if (x509Cert2.size() > 0)
+    {
+        VerifyOrReturnError(CanCastTo<uint32_t>(x509Cert2.size()), CHIP_ERROR_INVALID_ARGUMENT);
+        reader.Init(x509Cert2.data(), static_cast<uint32_t>(x509Cert2.size()));
+        ReturnErrorOnFailure(ConvertCertificate(reader, writer));
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(outerContainer));
+    ReturnErrorOnFailure(writer.Finalize());
+
+    chipCertBufLen = writer.GetLengthWritten();
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Credentials

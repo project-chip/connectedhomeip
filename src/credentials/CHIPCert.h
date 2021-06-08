@@ -633,6 +633,22 @@ CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509Cert
                                      uint32_t chipCertBufSize, uint32_t & chipCertLen);
 
 /**
+ * @brief Convert standard X.509 certificates to CHIP certificate array.
+ *        This function takes upto two X.509 certificates (e.g. NOC, and ICA cert) and
+ *        encodes into kTag_ChipCertificateArray container type array.
+ *
+ * @param x509Cert1            First X.509 DER encoded certificate.
+ * @param x509Cert2            Second X.509 DER encoded certificate.
+ * @param chipCertArrayBuf     Buffer to store converted certificates in CHIP format.
+ * @param chipCertArrayBufSize The size of the buffer to store converted certificates.
+ * @param chipCertBufLen       The length of the converted certificates.
+ *
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509Cert1, const ByteSpan & x509Cert2, uint8_t * chipCertArrayBuf,
+                                           uint32_t chipCertArrayBufSize, uint32_t & chipCertBufLen);
+
+/**
  * @brief Convert CHIP certificate to the standard X.509 DER encoded certificate.
  *
  * @param chipCert        Buffer containing CHIP certificate.
