@@ -56,12 +56,18 @@ class TestReadInteraction
 public:
     static void TestReadClient(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientGenerateAttributePathList(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientGenerateInvalidAttributePathList(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
 
 private:
-    static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
+    static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
+                                   bool aNeedInvalidReport = false);
 };
 
-void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
+void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
+                                             bool aNeedInvalidReport)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
@@ -71,6 +77,56 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
 
     err = reportDataBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    AttributeDataList::Builder attributeDataListBuilder = reportDataBuilder.CreateAttributeDataListBuilder();
+    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
+
+    AttributeDataElement::Builder attributeDataElementBuilder = attributeDataListBuilder.CreateAttributeDataElementBuilder();
+    NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
+
+    AttributePath::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePathBuilder();
+    NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
+
+    if (aNeedInvalidReport)
+    {
+        attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).ListIndex(5).EndOfAttributePath();
+    }
+    else
+    {
+        attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    }
+
+    err = attributePathBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    attributeDataElementBuilder.DataVersion(2);
+    err = attributeDataElementBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // Construct attribute data
+    {
+        chip::TLV::TLVWriter * pWriter = attributeDataElementBuilder.GetWriter();
+        chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
+        err = pWriter->StartContainer(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
+                                      dummyType);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = pWriter->EndContainer(dummyType);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    }
+
+    attributeDataElementBuilder.MoreClusterData(false);
+    err = attributeDataElementBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    attributeDataElementBuilder.EndOfAttributeDataElement();
+    NL_TEST_ASSERT(apSuite, attributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
+
+    attributeDataListBuilder.EndOfAttributeDataList();
+    NL_TEST_ASSERT(apSuite, attributeDataListBuilder.GetError() == CHIP_NO_ERROR);
 
     reportDataBuilder.SuppressResponse(true);
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
@@ -92,14 +148,15 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     app::ReadClient readClient;
     EventNumber eventNumber = 0;
 
+    chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, nullptr);
+    err                            = readClient.Init(&gExchangeManager, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
                                      nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/,
                                      eventNumber /*aEventNumber*/);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 
     GenerateReportData(apSuite, apContext, buf);
 
@@ -117,8 +174,8 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequest::Builder readRequestBuilder;
-
-    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    chip::app::InteractionModelDelegate delegate;
+    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     readHandler.Init(nullptr);
 
@@ -129,7 +186,17 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     writer.Init(std::move(readRequestbuf));
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    readRequestBuilder.EventNumber(1);
+
+    AttributePathList::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+    AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).FieldId(4).ListIndex(5).EndOfAttributePath();
+    err = attributePathBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     readRequestBuilder.EndOfReadRequest();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
@@ -138,6 +205,121 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
 
     err = readHandler.OnReadRequest(nullptr, std::move(readRequestbuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+}
+
+void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::ReadClient readClient;
+    chip::app::InteractionModelDelegate delegate;
+    System::PacketBufferHandle msgBuf;
+    System::PacketBufferTLVWriter writer;
+    ReadRequest::Builder request;
+    msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    writer.Init(std::move(msgBuf));
+    err = request.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = readClient.Init(&gExchangeManager, &delegate);
+
+    AttributePathParams attributePathParams[2];
+    attributePathParams[0].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+    attributePathParams[1].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+    attributePathParams[1].mFlags.Set(AttributePathParams::Flags::kListIndexValid);
+    err = readClient.GenerateAttributePathList(request, attributePathParams, 2 /*aAttributePathParamsListSize*/);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+}
+
+void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::ReadClient readClient;
+    chip::app::InteractionModelDelegate delegate;
+    System::PacketBufferHandle msgBuf;
+    System::PacketBufferTLVWriter writer;
+    ReadRequest::Builder request;
+    msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    writer.Init(std::move(msgBuf));
+    err = readClient.Init(&gExchangeManager, &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = request.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    AttributePathParams attributePathParams[2];
+    attributePathParams[0].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+    attributePathParams[1].mFlags.Set(AttributePathParams::Flags::kListIndexValid);
+    err = readClient.GenerateAttributePathList(request, attributePathParams, 2 /*aAttributePathParamsListSize*/);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+}
+
+void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    app::ReadClient readClient;
+    chip::app::InteractionModelDelegate delegate;
+    EventNumber eventNumber = 0;
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    err                            = readClient.Init(&gExchangeManager, &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
+                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/,
+                                     eventNumber /*aEventNumber*/);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+
+    GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);
+
+    err = readClient.ProcessReportData(std::move(buf));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+    readClient.Shutdown();
+}
+
+void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::ReadHandler readHandler;
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    ReadRequest::Builder readRequestBuilder;
+    chip::app::InteractionModelDelegate delegate;
+
+    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    readHandler.Init(nullptr);
+
+    GenerateReportData(apSuite, apContext, reportDatabuf);
+    err = readHandler.SendReportData(std::move(reportDatabuf));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+    writer.Init(std::move(readRequestbuf));
+    err = readRequestBuilder.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    AttributePathList::Builder attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+    AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+
+    attributePathBuilder.NodeId(1).EndpointId(2).ClusterId(3).ListIndex(5).EndOfAttributePath();
+    err = attributePathBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+    readRequestBuilder.EndOfReadRequest();
+    NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+    err = writer.Finalize(&readRequestbuf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = readHandler.OnReadRequest(nullptr, std::move(readRequestbuf));
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 }
 
 } // namespace app
@@ -179,6 +361,10 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("CheckReadClient", chip::app::TestReadInteraction::TestReadClient),
     NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
+    NL_TEST_DEF("TestReadClientGenerateAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateAttributePathList),
+    NL_TEST_DEF("TestReadClientGenerateInvalidAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateInvalidAttributePathList),
+    NL_TEST_DEF("TestReadClientInvalidReport", chip::app::TestReadInteraction::TestReadClientInvalidReport),
+    NL_TEST_DEF("TestReadHandlerInvalidAttributePath", chip::app::TestReadInteraction::TestReadHandlerInvalidAttributePath),
     NL_TEST_SENTINEL()
 };
 // clang-format on

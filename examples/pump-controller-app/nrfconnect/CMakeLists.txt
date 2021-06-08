@@ -30,6 +30,8 @@ target_compile_options(app PRIVATE -Werror)
 
 project(chip-nrfconnect-pump-controller-example)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
+
 target_include_directories(app PRIVATE 
                            main/include 
                            ${PUMPC_COMMON} 
@@ -41,8 +43,8 @@ target_sources(app PRIVATE
                main/PumpManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${PUMPC_COMMON}/gen/call-command-handler.cpp
                ${PUMPC_COMMON}/gen/callback-stub.cpp
+               ${PUMPC_COMMON}/gen/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp

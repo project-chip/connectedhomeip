@@ -29,8 +29,10 @@
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <string.h>
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
@@ -77,7 +79,7 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
                                     index + 1);
 }
 
-EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, int32_t index)
+EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, int32_t index)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -85,6 +87,11 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, i
     fabricDescriptor.FabricId = fabricId;
     fabricDescriptor.NodeId   = nodeId;
     fabricDescriptor.VendorId = vendorId;
+    if (fabricLabel != nullptr)
+    {
+        size_t lengthToStore   = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
+        fabricDescriptor.Label = ByteSpan(fabricLabel, lengthToStore);
+    }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                    "OpCreds: Writing admin into attribute store at index %d: fabricId 0x" ChipLogFormatX64
@@ -103,9 +110,10 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     uint32_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
     {
-        NodeId nodeId     = pairing.GetNodeId();
-        uint64_t fabricId = pairing.GetFabricId();
-        uint16_t vendorId = pairing.GetVendorId();
+        NodeId nodeId               = pairing.GetNodeId();
+        uint64_t fabricId           = pairing.GetFabricId();
+        uint16_t vendorId           = pairing.GetVendorId();
+        const uint8_t * fabricLabel = pairing.GetFabricLabel();
 
         // Skip over uninitialized admins
         if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
@@ -116,7 +124,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
         }
-        else if (writeFabric(fabricId, nodeId, vendorId, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+        else if (writeFabric(fabricId, nodeId, vendorId, fabricLabel, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                            "OpCreds: Failed to write admin with fabricId 0x" ChipLogFormatX64 " in fabrics list",
@@ -292,7 +300,23 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Co
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err;
+
+    // Fetch current fabric
+    AdminPairingInfo * admin = retrieveCurrentAdmin();
+    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+
+    // Set Label on fabric
+    err = admin->SetFabricLabel(Label);
+    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+    // Persist updated fabric
+    err = GetGlobalAdminPairingTable().Store(admin->GetAdminId());
+    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+exit:
+    writeAdminsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }

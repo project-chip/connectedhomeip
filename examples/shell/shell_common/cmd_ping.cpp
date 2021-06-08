@@ -58,8 +58,8 @@ public:
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mUsingTCP = false;
 #endif
-        mUsingCRMP = true;
-        mEchoPort  = CHIP_PORT;
+        mUsingMRP = true;
+        mEchoPort = CHIP_PORT;
     }
 
     uint64_t GetLastEchoTime() const { return mLastEchoTime; }
@@ -93,8 +93,8 @@ public:
     void SetUsingTCP(bool value) { mUsingTCP = value; }
 #endif
 
-    bool IsUsingCRMP() const { return mUsingCRMP; }
-    void SetUsingCRMP(bool value) { mUsingCRMP = value; }
+    bool IsUsingMRP() const { return mUsingMRP; }
+    void SetUsingMRP(bool value) { mUsingMRP = value; }
 
 private:
     // The last time a echo request was attempted to be sent.
@@ -125,7 +125,7 @@ private:
     bool mUsingTCP;
 #endif
 
-    bool mUsingCRMP;
+    bool mUsingMRP;
 } gPingArguments;
 
 Protocols::Echo::EchoClient gEchoClient;
@@ -156,7 +156,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
     VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    if (gPingArguments.IsUsingCRMP())
+    if (gPingArguments.IsUsingMRP())
     {
         sendFlags.Set(Messaging::SendMessageFlags::kNone);
     }
@@ -363,7 +363,7 @@ void PrintUsage(streamer_t * stream)
     streamer_printf(stream, "  -p  <port>      echo server port\n");
     streamer_printf(stream, "  -i  <interval>  ping interval time in seconds\n");
     streamer_printf(stream, "  -c  <count>     stop after <count> replies\n");
-    streamer_printf(stream, "  -r  <1|0>       enable or disable CRMP\n");
+    streamer_printf(stream, "  -r  <1|0>       enable or disable MRP\n");
     streamer_printf(stream, "  -s  <size>      payload size in bytes\n");
 }
 
@@ -446,11 +446,11 @@ int cmd_ping(int argc, char ** argv)
 
                 if (arg == 0)
                 {
-                    gPingArguments.SetUsingCRMP(false);
+                    gPingArguments.SetUsingMRP(false);
                 }
                 else if (arg == 1)
                 {
-                    gPingArguments.SetUsingCRMP(true);
+                    gPingArguments.SetUsingMRP(true);
                 }
                 else
                 {

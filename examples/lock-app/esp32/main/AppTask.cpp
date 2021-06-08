@@ -21,9 +21,9 @@
 #include "Button.h"
 #include "LEDWidget.h"
 #include "esp_log.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/af-enums.h>

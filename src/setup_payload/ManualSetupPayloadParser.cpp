@@ -188,7 +188,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         }
         outPayload.productID = static_cast<uint16_t>(productID);
     }
-    outPayload.requiresCustomFlow = isLongCode ? 1 : 0;
+    outPayload.commissioningFlow = isLongCode ? CommissioningFlow::kCustom : CommissioningFlow::kStandard;
     static_assert(kSetupPINCodeFieldLengthInBits <= 32, "Won't fit in uint32_t");
     outPayload.setUpPINCode = static_cast<uint32_t>(setUpPINCode);
     static_assert(kManualSetupDiscriminatorFieldLengthInBits <= 16, "Won't fit in uint16_t");

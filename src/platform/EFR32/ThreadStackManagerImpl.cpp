@@ -142,7 +142,7 @@ extern "C" __WEAK otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLeng
 
 extern "C" __WEAK void efr32UartProcess(void)
 {
-#ifndef PW_RPC_ENABLED
+#if !defined(PW_RPC_ENABLED) && !defined(ENABLE_CHIP_SHELL)
     uint8_t tempBuf[128] = { 0 };
     // will read the data available up to 128bytes
     uint16_t count = uartConsoleRead((char *) tempBuf, 128);

@@ -11,8 +11,8 @@ public class SetupPayload {
   public int vendorId;
   /** The CHIP device product ID */
   public int productId;
-  /** Boolean indicating if the CHIP device needs custom flow */
-  public boolean requiresCustomFlow;
+  /** Commissioning flow: 0 = standard, 1 = requires user action, 2 = custom */
+  public int commissioningFlow;
   /** The CHIP device supported rendezvous flags */
   public int rendezvousInformation;
   /** The CHIP device discriminator */
@@ -30,14 +30,14 @@ public class SetupPayload {
       int version,
       int vendorId,
       int productId,
-      boolean requiresCustomFlow,
+      int commissioningFlow,
       int rendezvousInfo,
       int discriminator,
       long setupPinCode) {
     this.version = version;
     this.vendorId = vendorId;
     this.productId = productId;
-    this.requiresCustomFlow = requiresCustomFlow;
+    this.commissioningFlow = commissioningFlow;
     this.rendezvousInformation = rendezvousInfo;
     this.discriminator = discriminator;
     this.setupPinCode = setupPinCode;

@@ -47,6 +47,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BASIC_CLUSTER_ID:
         emberAfBasicClusterInitCallback(endpoint);
         break;
+    case ZCL_BINARY_INPUT_BASIC_CLUSTER_ID:
+        emberAfBinaryInputBasicClusterInitCallback(endpoint);
+        break;
     case ZCL_BINDING_CLUSTER_ID:
         emberAfBindingClusterInitCallback(endpoint);
         break;
@@ -113,6 +116,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
         emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
         break;
+    case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID:
+        emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
+        break;
     case ZCL_SCENES_CLUSTER_ID:
         emberAfScenesClusterInitCallback(endpoint);
         break;
@@ -178,6 +184,11 @@ void __attribute__((weak)) emberAfBarrierControlClusterInitCallback(EndpointId e
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfBinaryInputBasicClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -288,6 +299,11 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfPumpConfigurationAndControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfRelativeHumidityMeasurementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -630,9 +646,8 @@ bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * 
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool __attribute__((weak))
-emberAfMessageSentCallback(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                           uint16_t msgLen, uint8_t * message, EmberStatus status)
+bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                      uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
     return false;
 }
@@ -732,10 +747,11 @@ bool __attribute__((weak)) emberAfReadAttributesResponseCallback(ClusterId clust
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
  * @param maxReadLength   Ver.: always
+ * @param index   Ver.: always
  */
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
-                                     uint16_t manufacturerCode, uint8_t * buffer, uint16_t maxReadLength)
+                                     uint16_t manufacturerCode, uint8_t * buffer, uint16_t maxReadLength, int32_t index)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
@@ -801,10 +817,11 @@ bool __attribute__((weak)) emberAfWriteAttributesResponseCallback(ClusterId clus
  * @param attributeMetadata   Ver.: always
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
+ * @param index   Ver.: always
  */
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
-                                      uint16_t manufacturerCode, uint8_t * buffer)
+                                      uint16_t manufacturerCode, uint8_t * buffer, int32_t index)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }

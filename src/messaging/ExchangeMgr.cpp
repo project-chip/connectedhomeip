@@ -86,7 +86,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
     sessionMgr->SetDelegate(this);
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
-    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(&mReliableMessageMgr, mSessionMgr));
+    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionMgr));
 
     mState = State::kState_Initialized;
 
@@ -211,7 +211,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->MatchExchange(session, packetHeader, payloadHeader))
         {
-            // Found a matching exchange. Set flag for correct subsequent CRMP
+            // Found a matching exchange. Set flag for correct subsequent MRP
             // retransmission timeout selection.
             if (!ec->HasRcvdMsgFromPeer())
             {

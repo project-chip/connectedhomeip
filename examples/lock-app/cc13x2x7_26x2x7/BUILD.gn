@@ -90,7 +90,7 @@ ti_simplelink_executable("lock_app") {
     ":sysconfig",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
-    "${openthread_root}:libopenthread-cli-ftd",
+    "${openthread_root}:libopenthread-ftd",
   ]
 
   include_dirs = [

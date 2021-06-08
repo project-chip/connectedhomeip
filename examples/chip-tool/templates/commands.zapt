@@ -205,7 +205,7 @@ public:
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isString type)}} chip::ByteSpan(chip::Uint8::from_char(m{{asCamelCased label false}}), strlen(m{{asCamelCased label false}})){{else}}m{{asCamelCased label false}}{{/if}}{{/chip_server_cluster_command_arguments}});
+        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isCharString type)}} chip::ByteSpan(chip::Uint8::from_char(m{{asCamelCased label false}}), strlen(m{{asCamelCased label false}})){{else}}m{{asCamelCased label false}}{{/if}}{{/chip_server_cluster_command_arguments}});
     }
 
 private:
@@ -216,7 +216,7 @@ private:
     {{/if}}
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     {{#chip_server_cluster_command_arguments}}
-    {{#if (isString type)}}
+    {{#if (isCharString type)}}
     char * m{{asCamelCased label false}};
     {{else}}
     {{chipType}} m{{asCamelCased label false}};
@@ -321,13 +321,13 @@ public:
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), {{#if (isString type)}} chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)){{else}}mValue{{/if}});
+        return cluster.WriteAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), {{#if (isCharString type)}} chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)){{else}}mValue{{/if}});
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    {{#if (isString type)}}
+    {{#if (isCharString type)}}
     char * mValue;
     {{else}}
     {{chipType}} mValue;

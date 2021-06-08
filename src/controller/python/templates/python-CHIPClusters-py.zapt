@@ -39,9 +39,7 @@ class ChipClusters:
 {{#chip_client_clusters}}
             "{{asCamelCased name false}}": [
 {{#chip_server_cluster_attributes}}
-{{#unless isList}}
                 "{{asCamelCased name false}}",
-{{/unless}}
 {{/chip_server_cluster_attributes}}
             ],
 {{/chip_client_clusters}}
@@ -88,14 +86,12 @@ class ChipClusters:
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
-{{#unless isList}}
     def Cluster{{asCamelCased parent.name false}}_ReadAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, ZCLgroupid)
 {{#if (isReportableAttribute)}}
     def Cluster{{asCamelCased parent.name false}}_ConfigureAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
         return self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, minInterval, maxInterval, change)
 {{/if}}
-{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
@@ -116,7 +112,6 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
 {{/chip_server_cluster_commands}}
 {{#chip_server_cluster_attributes}}
-{{#unless isList}}
         # Cluster {{asCamelCased parent.name false}} ReadAttribute {{asCamelCased name false}}
         self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
@@ -125,7 +120,6 @@ class ChipClusters:
         self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16{{#unless (isDiscreteType)}}, ctypes.{{asPythonCType chipType}}{{/unless}}]
         self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
 {{/if}}
-{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
         # Init response delegates

@@ -30,6 +30,7 @@ executable("chip-tool") {
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/reporting/ReportingCommand.cpp",
+    "commands/tests/TestCommand.cpp",
     "config/PersistentStorage.cpp",
     "main.cpp",
   ]

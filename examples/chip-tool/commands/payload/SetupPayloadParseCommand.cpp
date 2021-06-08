@@ -44,7 +44,7 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
     std::vector<OptionalQRCodeInfo> optionalVendorData;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(SetupPayload, "RequiresCustomFlow: %u", payload.requiresCustomFlow);
+    ChipLogProgress(SetupPayload, "CommissioningFlow: %u", payload.commissioningFlow);
     ChipLogProgress(SetupPayload, "VendorID: %u", payload.vendorID);
     ChipLogProgress(SetupPayload, "Version: %u", payload.version);
     ChipLogProgress(SetupPayload, "ProductID: %u", payload.productID);
@@ -100,5 +100,5 @@ CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, chip::SetupPa
 
 bool SetupPayloadParseCommand::IsQRCode(std::string codeString)
 {
-    return codeString.rfind(QRCODE_PREFIX) == 0;
+    return codeString.rfind(kQRCodePrefix) == 0;
 }

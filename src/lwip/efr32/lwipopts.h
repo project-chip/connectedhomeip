@@ -58,12 +58,10 @@
 
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
 
-// TODO: seems like this is unnecessary on Thread-only platforms
 #define LWIP_RAW 1
-#define MEMP_NUM_RAW_PCB (5)
+#define MEMP_NUM_RAW_PCB (4)
 
-// TODO: verify count
-#define MEMP_NUM_UDP_PCB (7)
+#define MEMP_NUM_UDP_PCB (5)
 
 #define LWIP_HAVE_LOOPIF (0)
 
@@ -94,11 +92,11 @@
 #define LWIP_ND6_MAX_NEIGHBOR_ADVERTISEMENT (0)
 #define LWIP_ND6_TCP_REACHABILITY_HINTS (0)
 
-#ifdef CHIP_CONFIG_EFR32MG21_PBUF_POOLS
+#if defined(EFR32MG21)
 #define MEMP_SEPARATE_POOLS (1)
 #define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
 #define MEMP_USE_CUSTOM_POOLS (0)
-#define PBUF_POOL_SIZE (6)
+#define PBUF_POOL_SIZE (5)
 #define PBUF_POOL_BUFSIZE (1280)
 #define PBUF_CUSTOM_POOL_IDX_START (MEMP_PBUF_POOL_SMALL)
 #define PBUF_CUSTOM_POOL_IDX_END (MEMP_PBUF_POOL_LARGE)
@@ -121,7 +119,7 @@
 #define PBUF_LINK_HLEN (0)
 
 #if defined(EFR32MG21)
-#define TCPIP_THREAD_STACKSIZE (1300)
+#define TCPIP_THREAD_STACKSIZE (1536)
 #else
 #define TCPIP_THREAD_STACKSIZE (2048)
 #endif
@@ -142,9 +140,7 @@
 #define DEFAULT_UDP_RECVMBOX_SIZE 6
 #define DEFAULT_TCP_RECVMBOX_SIZE 6
 
-#ifndef LWIP_DEBUG
-#define LWIP_DEBUG 1
-#endif
+#ifdef LWIP_DEBUG
 
 #define MEMP_OVERFLOW_CHECK (0)
 #define MEMP_SANITY_CHECK (0)
@@ -176,6 +172,7 @@
 #define TCP_QLEN_DEBUG (LWIP_DBG_OFF)
 #define TCP_RST_DEBUG (LWIP_DBG_OFF)
 #define PPP_DEBUG (LWIP_DBG_OFF)
+#endif
 
 #define LWIP_DBG_TYPES_ON                                                                                                          \
     (LWIP_DBG_ON | LWIP_DBG_TRACE) /* (LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT) */

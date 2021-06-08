@@ -1,0 +1,135 @@
+{{#chip_tests tests}}
+class {{asCamelCased filename false}}: public TestCommand
+{
+  public:
+    {{asCamelCased filename false}}(): TestCommand("{{filename}}") {}
+
+    /////////// TestCommand Interface /////////
+    CHIP_ERROR NextTest() override
+    {
+      CHIP_ERROR err = CHIP_NO_ERROR;
+
+      if (mTestCount == mTestIndex)
+      {
+          ChipLogProgress(chipTool, "{{filename}}: Test complete");
+          SetCommandExitStatus(true);
+      }
+
+      switch (mTestIndex)
+      {
+        {{#chip_tests_items}}
+        case {{index}}:
+          err = TestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}();
+          break;
+        {{/chip_tests_items}}
+      }
+      mTestIndex++;
+
+      if (CHIP_NO_ERROR != err)
+      {
+          ChipLogProgress(chipTool, "{{filename}}: %s", chip::ErrorStr(err));
+          SetCommandExitStatus(false);
+      }
+
+      return err;
+    }
+
+
+  private:
+    uint16_t mTestIndex = 0;
+    uint16_t mTestCount = {{totalTests}};
+
+    //
+    // Tests methods
+    //
+
+    {{#chip_tests_items}}
+    // Test {{label}}
+    typedef void (*SuccessCallback_{{index}})(void * context{{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
+    chip::Callback::Callback<SuccessCallback_{{index}}> * mOnSuccessCallback_{{index}} = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_{{index}} = nullptr;
+    bool mIsFailureExpected_{{index}} = {{response.error}};
+
+    CHIP_ERROR TestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}()
+    {
+        ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Sending command...");
+
+        mOnFailureCallback_{{index}} = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_FailureResponse, this);
+        mOnSuccessCallback_{{index}} = new chip::Callback::Callback<SuccessCallback_{{index}}>(OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse, this);
+
+        chip::Controller::{{asCamelCased cluster false}}Cluster cluster;
+        cluster.Associate(mDevice, {{endpoint}});
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        {{#if isCommand}}
+        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel());
+        {{else if isReadAttribute}}
+        err = cluster.ReadAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel());
+        {{else if isWriteAttribute}}
+        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(), {{#chip_tests_item_parameters}}{{definedValue}}{{/chip_tests_item_parameters}});
+        {{else}}
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        {{/if}}
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_{{index}};
+            delete mOnSuccessCallback_{{index}};
+        }
+
+        return err;
+    }
+
+    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Failure Response");
+
+        {{asCamelCased parent.filename false}} * runner = reinterpret_cast<{{asCamelCased parent.filename false}} *>(context);
+
+        delete runner->mOnFailureCallback_{{index}};
+        delete runner->mOnSuccessCallback_{{index}};
+
+        if (runner->mIsFailureExpected_{{index}} == false) {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}})
+    {
+        ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Success Response");
+
+        {{asCamelCased parent.filename false}} * runner = reinterpret_cast<{{asCamelCased parent.filename false}} *>(context);
+
+        delete runner->mOnFailureCallback_{{index}};
+        delete runner->mOnSuccessCallback_{{index}};
+
+        if (runner->mIsFailureExpected_{{index}} == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        {{#chip_tests_item_response_parameters}}
+        {{#if hasExpectedValue}}
+        if ({{asCamelCased name true}} != {{expectedValue}})
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+        {{/if}}
+        {{/chip_tests_item_response_parameters}}
+
+        runner->NextTest();
+    }
+
+    {{/chip_tests_items}}
+};
+
+{{/chip_tests}}
