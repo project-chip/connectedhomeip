@@ -761,9 +761,6 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     // The first 2 bytes specify the number of entries. A value of 0xFFFF means the list in invalid
     // and data is undefined.
     uint16_t entryCount = emberAfGetInt16u(buffer, 0, kSizeLengthInBytes);
-
-    ChipLogProgress(Zcl, "*DEBUG* Cluster 0x%04x,Attribute 0x%02x EntryCount 0x%04x", clusterId, attributeId, entryCount);
-
     if (entryCount == 0xFFFF)
     {
         return 0;
@@ -936,8 +933,6 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     }
 
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);
-    ChipLogProgress(Zcl, "*DEBUG* totalSize %d", totalSize);
-
     if (!chip::CanCastTo<uint16_t>(totalSize))
     {
         ChipLogError(Zcl, "Cluster 0x%04x: Size of attribute 0x%02x is too large.", clusterId, attributeId);
