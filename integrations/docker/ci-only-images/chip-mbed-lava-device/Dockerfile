@@ -23,6 +23,7 @@ RUN set -x \
     && true \
     && : # last line
 
+# Install WiFi AP creation tools
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
@@ -34,11 +35,11 @@ RUN set -x \
     iw \
     net-tools \
     iputils-ping \
-    && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 RUN echo "" > /var/lib/dhcp/dhcpd.leases
 
+# Install net-tools required for functional tests
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
@@ -47,4 +48,14 @@ RUN set -x \
     python3-virtualenv \
     && : # last line
 
-RUN echo "" > /var/lib/dhcp/dhcpd.leases
+# Install GIT hub CLI
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy gnupg curl \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list >/dev/null \
+    && apt-get update \
+    && apt-get install -fy gh \
+    && : # last line
+
+RUN rm -rf /var/lib/apt/lists/
