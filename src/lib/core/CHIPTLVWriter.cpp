@@ -644,8 +644,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
     else
     {
         uint32_t profileId = ProfileIdFromTag(tag);
-        if (mContainerType != kTLVType_NotSpecified && mContainerType != kTLVType_Structure && mContainerType != kTLVType_List &&
-            mContainerType != kTLVType_Array)
+        if (mContainerType != kTLVType_NotSpecified && mContainerType != kTLVType_Structure && mContainerType != kTLVType_List)
             return CHIP_ERROR_INVALID_TLV_TAG;
 
         if (profileId == kCommonProfileId)
