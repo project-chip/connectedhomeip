@@ -55,6 +55,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
                                                                      uint32_t & outCertLen)
 {
+    Initialize();
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     chip::X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
     return NewRootX509Cert(request, mIssuer, certBuf, certBufSize, outCertLen);
@@ -164,7 +165,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
    }
 
     // Initializing the KeyPair.
-
+     Initialize();
 
     chip::X509CertRequestParams request = { serialNumber, mIssuerId,         mNow, mNow + mValidity, true, peerId.GetFabricId(),
                                           true,         peerId.GetNodeId() };
@@ -172,7 +173,6 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
     chip::P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
 
-    Initialize();
     CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, certBuf, certBufSize,
                                          outCertLen);
     jbyteArray argument;
