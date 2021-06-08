@@ -306,6 +306,9 @@ CHIP_ERROR DeviceController::Shutdown()
     chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
 
+    mSystemLayer     = nullptr;
+    mInetLayer       = nullptr;
+
     mState = State::NotInitialized;
 
     // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
@@ -318,8 +321,6 @@ CHIP_ERROR DeviceController::Shutdown()
         mSessionMgr->Shutdown();
     }
 
-    mSystemLayer     = nullptr;
-    mInetLayer       = nullptr;
     mStorageDelegate = nullptr;
 
     ReleaseAllDevices();
