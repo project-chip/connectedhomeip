@@ -19,6 +19,9 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <string.h>
+
+// TODO: Add unit tests for Span and FixedSpan classes
 
 namespace chip {
 
@@ -38,6 +41,12 @@ public:
 
     const T * data() const { return mDataBuf; }
     size_t size() const { return mDataLen; }
+    bool empty() const { return mDataBuf == nullptr; }
+    bool data_equal(const Span & other) const
+    {
+        return !empty() && !other.empty() && size() == other.size() &&
+                memcmp(data(), other.data(), size() * sizeof(T)) == 0;
+    }
 
 private:
     const T * mDataBuf;
@@ -53,6 +62,11 @@ public:
 
     const T * data() const { return mDataBuf; }
     size_t size() const { return N; }
+    bool empty() const { return mDataBuf == nullptr; }
+    bool data_equal(const FixedSpan & other) const
+    {
+        return !empty() && !other.empty() && memcmp(data(), other.data(), size() * sizeof(T)) == 0;
+    }
 
 private:
     const T * mDataBuf;
