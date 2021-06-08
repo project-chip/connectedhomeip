@@ -76,7 +76,8 @@ class BaseTestHelper:
         except Exception as ex:
             self.logger.exception("Failed to send AddThreadNetwork command")
             return False
-        self.logger.info("Send EnableNetwork command to device {}".format(nodeid))
+        self.logger.info(
+            "Send EnableNetwork command to device {}".format(nodeid))
         try:
             self.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", nodeid, endpoint, group, {
                 "networkID": bytes.fromhex(network_id),
@@ -88,21 +89,25 @@ class BaseTestHelper:
         return True
 
     def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
-        self.logger.info("Sending On/Off commands to device {}".format(nodeid))
-        try:
-            self.devCtrl.ZCLSend("OnOff", "On", nodeid, endpoint, group, {}, blocking=True)
-        except Exception as ex:
-            self.logger.exception("Failed to send On command")
+        self.logger.info(
+            "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
+        err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
+                                         endpoint, group, {}, blocking=True)
+        if err != 0 or resp is None or resp.ProtocolCode != 0:
+            self.logger.error(
+                "failed to send OnOff.On: error is {} with im response{}".format(err, resp))
             return False
-        try:
-            self.devCtrl.ZCLSend("OnOff", "Off", nodeid, endpoint, group, {}, blocking=True)
-        except Exception as ex:
-            self.logger.exception("Failed to send Off command")
+        err, resp = self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
+                                         endpoint, group, {}, blocking=True)
+        if err != 0 or resp is None or resp.ProtocolCode != 0:
+            self.logger.error(
+                "failed to send OnOff.Off: error is {} with im response {}".format(err, resp))
             return False
         return True
 
     def TestResolve(self, fabricid, nodeid):
-        self.logger.info("Resolve {} with fabric id: {}".format(nodeid, fabricid))
+        self.logger.info(
+            "Resolve {} with fabric id: {}".format(nodeid, fabricid))
         try:
             self.devCtrl.ResolveNode(fabricid=fabricid, nodeid=nodeid)
         except Exception as ex:
@@ -136,6 +141,3 @@ class BaseTestHelper:
             self.logger.exception(f"Following attributes failed: {failed_zcl}")
             return False
         return True
-
-
-

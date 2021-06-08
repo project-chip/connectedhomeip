@@ -36,9 +36,13 @@
 namespace chip {
 namespace Crypto {
 
-const size_t kP256_FE_Length     = 32;
-const size_t kP256_Point_Length  = (2 * kP256_FE_Length + 1);
-const size_t kSHA256_Hash_Length = 32;
+// TODO: Consider renaming these values to be closer to definisions in the spec:
+// CHIP_CRYPTO_GROUP_SIZE_BYTES
+// CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES
+const size_t kP256_FE_Length                  = 32;
+const size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
+const size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
+const size_t kSHA256_Hash_Length              = 32;
 
 const size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
 const size_t kMax_ECDSA_Signature_Length = 72;

@@ -9,6 +9,12 @@ class {{asCamelCased filename false}}: public TestCommand
     {
       CHIP_ERROR err = CHIP_NO_ERROR;
 
+      if (mTestCount == mTestIndex)
+      {
+          ChipLogProgress(chipTool, "{{filename}}: Test complete");
+          SetCommandExitStatus(true);
+      }
+
       switch (mTestIndex)
       {
         {{#chip_tests_items}}
@@ -19,10 +25,10 @@ class {{asCamelCased filename false}}: public TestCommand
       }
       mTestIndex++;
 
-      if (mTestCount == mTestIndex || CHIP_NO_ERROR != err)
+      if (CHIP_NO_ERROR != err)
       {
           ChipLogProgress(chipTool, "{{filename}}: %s", chip::ErrorStr(err));
-          SetCommandExitStatus(CHIP_NO_ERROR == err);
+          SetCommandExitStatus(false);
       }
 
       return err;
