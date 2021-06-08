@@ -47,7 +47,7 @@ jobs:
               with:
                   submodules: true
             - name: Bootstrap
-              timeout-minutes: 3
+              timeout-minutes: 5
               run: |
                   mkdir -p /tmp/happy_test_logs ;
                   mkdir -p /tmp/log_output ;
