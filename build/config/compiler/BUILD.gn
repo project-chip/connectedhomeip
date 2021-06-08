@@ -274,13 +274,10 @@ config("sanitize_address") {
 }
 
 config("sanitize_thread") {
-  cflags = [
-    "-fsanitize=thread",
-  ]
+  cflags = [ "-fsanitize=thread" ]
 
   ldflags = cflags
 }
-
 
 config("sanitize_memory") {
   cflags = [
@@ -313,7 +310,7 @@ config("sanitize_default") {
   configs = []
 
   if (is_tsan) {
-      configs += [ ":sanitize_thread" ]
+    configs += [ ":sanitize_thread" ]
   }
 
   if (is_asan) {
