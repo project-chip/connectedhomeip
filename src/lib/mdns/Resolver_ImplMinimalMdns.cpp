@@ -442,11 +442,14 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
     case DiscoveryType::kCommissionerNode:
         if (filter.type == DiscoveryFilterType::kNone)
         {
-            qname = CheckAndAllocateQName("_chipd", "_udp", "local");
+            qname = CheckAndAllocateQName(kCommissionerServiceName, kCommissionProtocol, kLocalDomain);
         }
         else
         {
-            qname = CheckAndAllocateQName(subtypeStr, "_sub", "_chipd", "_udp", "local");
+            char subtypeStr[kMaxSubtypeDescSize];
+            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter));
+            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
+                                          kLocalDomain);
         }
         break;
     case DiscoveryType::kUnknown:
