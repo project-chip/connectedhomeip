@@ -44,8 +44,7 @@ public:
     bool empty() const { return mDataBuf == nullptr; }
     bool data_equal(const Span & other) const
     {
-        return !empty() && !other.empty() && size() == other.size() &&
-                memcmp(data(), other.data(), size() * sizeof(T)) == 0;
+        return !empty() && !other.empty() && size() == other.size() && memcmp(data(), other.data(), size() * sizeof(T)) == 0;
     }
 
 private:
