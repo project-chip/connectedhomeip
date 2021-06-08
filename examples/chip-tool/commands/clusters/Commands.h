@@ -16810,7 +16810,7 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mRootCertificate);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -16818,7 +16818,6 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mRootCertificate;
 };
 
 /*
@@ -16845,8 +16844,7 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.RemoveTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                    mTrustedRootIdentifier);
+        return cluster.ReadAttributeChannel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -16854,7 +16852,6 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mTrustedRootIdentifier;
 };
 
 /*
@@ -18936,9 +18933,7 @@ public:
 
         chip::Controller::TrustedRootCertificatesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddTrustedRootCertificate(
-            onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-            chip::ByteSpan(chip::Uint8::from_char(mRootCertificate), strlen(mRootCertificate)));
+        return cluster.AddTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mRootCertificate);
     }
 
 private:
@@ -18946,7 +18941,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mRootCertificate;
+    chip::ByteSpan mRootCertificate;
 };
 
 /*
@@ -18972,9 +18967,8 @@ public:
 
         chip::Controller::TrustedRootCertificatesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.RemoveTrustedRootCertificate(
-            onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-            chip::ByteSpan(chip::Uint8::from_char(mTrustedRootIdentifier), strlen(mTrustedRootIdentifier)));
+        return cluster.RemoveTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                    mTrustedRootIdentifier);
     }
 
 private:
@@ -18982,7 +18976,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mTrustedRootIdentifier;
+    chip::ByteSpan mTrustedRootIdentifier;
 };
 
 /*

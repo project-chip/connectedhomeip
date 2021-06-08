@@ -3079,8 +3079,7 @@ void emberAfThreadNetworkDiagnosticsClusterClientManufacturerSpecificAttributeCh
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfThreadNetworkDiagnosticsClusterClientMessageSentCallback(EmberOutgoingMessageType type,
-                                                                     chip::MessageSendDestination destination,
+void emberAfThreadNetworkDiagnosticsClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
                                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                                      EmberStatus status);
 
