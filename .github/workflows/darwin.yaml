@@ -75,7 +75,7 @@ jobs:
               run: xcodebuild clean
               working-directory: src/darwin/Framework
             - name: Bootstrap
-              timeout-minutes: 5
+              timeout-minutes: 15
               run: scripts/build/gn_bootstrap.sh
             - name: Run Build Test Server
               timeout-minutes: 10
