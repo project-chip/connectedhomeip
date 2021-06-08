@@ -39,7 +39,6 @@ namespace Crypto {
 
 const size_t kMax_x509_Certificate_Length = 600;
 
-
 // TODO: Consider renaming these values to be closer to definisions in the spec:
 // CHIP_CRYPTO_GROUP_SIZE_BYTES
 // CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES
