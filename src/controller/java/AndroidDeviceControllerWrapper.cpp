@@ -31,6 +31,7 @@ using chip::Controller::DeviceCommissioner;
 
 extern chip::Ble::BleLayer * GetJNIBleLayer();
 
+constexpr const char kOperationalCredentialsIssuerKeypairStorage[] = "AndroidDeviceControllerKey";
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
     if ((mJavaVM != nullptr) && (mJavaObjectRef != nullptr))
@@ -54,7 +55,9 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
                                                                      uint32_t & outCertLen)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+ChipLogProgress(Controller, " sequence finder GetRootCACertificate");
+
+    //VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     chip::X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
     return NewRootX509Cert(request, mIssuer, certBuf, certBufSize, outCertLen);
 }
@@ -102,7 +105,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.storageDelegate = wrapper.get();
     initParams.pairingDelegate = wrapper.get();
     initParams.systemLayer     = systemLayer;
-    initParams.operationalCredentialsDelegate = wrapper.get();
+   initParams.operationalCredentialsDelegate = wrapper.get();
     initParams.inetLayer       = inetLayer;
     initParams.bleLayer        = GetJNIBleLayer();
 
@@ -111,6 +114,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     {
         return nullptr;
     }
+
+   // initParams.operationalCredentialsDelegate = &wrapper->OpCredsIssuer();
 
     *errInfoOnFailure = wrapper->Controller()->Init(nodeId, initParams);
 
@@ -151,16 +156,42 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
                                                                                 int64_t serialNumber, uint8_t * certBuf,
                                                                                 uint32_t certBufSize, uint32_t & outCertLen)
 {
-   jmethodID method;
-    if (!FindMethod(GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method))
-    {
-        return CHIP_NO_ERROR;
-    }
+    jmethodID method;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    err = FindMethod(GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method);
+    if (err != CHIP_NO_ERROR)
+   {
+      ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %d", err);
+      return err;
+   }
+
+    // Initializing the KeyPair.
+    chip::Crypto::P256SerializedKeypair serializedKey;
+    uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));
+
+    if (SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
+        {
+         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
+         ReturnErrorOnFailure(mIssuer.Initialize());
+         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
+         keySize = static_cast<uint16_t>(sizeof(serializedKey));
+         SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize);
+        }
+
+    mInitialized = true;
     jbyteArray argument;
     GetEnvForCurrentThread()->ExceptionClear();
     N2J_ByteArray(GetEnvForCurrentThread(), csr.data(),csr.size(),argument);
     GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, argument);
-    return CHIP_NO_ERROR;
+
+    chip::X509CertRequestParams request = { serialNumber, mIssuerId,         mNow, mNow + mValidity, true, peerId.GetFabricId(),
+                                          true,         peerId.GetNodeId() };
+
+    chip::P256PublicKey pubkey;
+    ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
+
+    return NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, certBuf, certBufSize,
+                                         outCertLen);
 }
 
 void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle && msg) {}

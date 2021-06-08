@@ -26,6 +26,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
