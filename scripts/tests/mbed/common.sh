@@ -139,6 +139,19 @@ download_artifacts_gh() {
 
     echo "${GITHUB_TOKEN}" >token.txt
     gh auth login --with-token <token.txt
+    rm token.txt
 
     gh run download --repo ${GITHUB_REPOSITORY} ${GITHUB_ACTION_ID} --dir ${OUTPUT_NAME}
+}
+
+mount_mbed_device() {
+    device_index=1
+    for file in /dev/disk/by-id/*; do
+        if [[ $file == *"MBED"* ]]; then
+            mnt_name="MBED_${device_index}"
+            mkdir -p /mnt/"${mnt_name}"
+            mount "${file}" /mnt/"${mnt_name}"
+            ((device_index++))
+        fi
+    done
 }
