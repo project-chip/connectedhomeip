@@ -21,8 +21,6 @@
 #include <cinttypes>
 #include <cstdint>
 
-#include <gen/enums.h>
-
 #include <app/Command.h>
 #include <app/common/gen/enums.h>
 #include <lib/core/CHIPCore.h>
@@ -34,59 +32,15 @@ namespace app {
 namespace clusters {
 namespace NetworkCommissioning {
 
+namespace Internal {
+// Predefine the internal namespace here, it does not expose any functions to other files.
+}
+
 constexpr uint8_t kMaxNetworkIDLen       = 32;
 constexpr uint8_t kMaxThreadDatasetLen   = 254; // As defined in Thread spec.
 constexpr uint8_t kMaxWiFiSSIDLen        = 32;
 constexpr uint8_t kMaxWiFiCredentialsLen = 64;
 constexpr uint8_t kMaxNetworks           = 4;
-
-namespace Internal {
-enum class NetworkType : uint8_t
-{
-    kUndefined = 0,
-    kWiFi      = 1,
-    kThread    = 2,
-    kEthernet  = 3,
-};
-
-struct WiFiNetworkInfo
-{
-    uint8_t mSSID[kMaxWiFiSSIDLen + 1];
-    uint8_t mSSIDLen;
-    uint8_t mCredentials[kMaxWiFiCredentialsLen];
-    uint8_t mCredentialsLen;
-};
-
-struct NetworkInfo
-{
-    uint8_t mNetworkID[kMaxNetworkIDLen];
-    uint8_t mNetworkIDLen;
-    uint8_t mEnabled;
-    NetworkType mNetworkType;
-    union NetworkData
-    {
-        Thread::OperationalDataset mThread;
-        WiFiNetworkInfo mWiFi;
-    } mData;
-};
-
-enum class ClusterState : uint8_t
-{
-    kIdle            = 0,
-    kEnablingNetwork = 1,
-};
-
-constexpr uint8_t kInvalidNetworkSeq = 0xFF;
-
-void EncodeAndSendEnableNetworkResponse(CHIP_ERROR err);
-void SetEnablingNetworkSeq(uint8_t seq);
-ClusterState GetClusterState();
-CHIP_ERROR __attribute__((warn_unused_result)) MoveClusterState(ClusterState newState);
-void OnNetworkEnableStatusChangeCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-void SetCommissionerSecureSessionHandle(const SecureSessionHandle & handle);
-
-NetworkInfo * GetNetworkBySeq(uint8_t seq);
-} // namespace Internal
 
 void OnAddThreadNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan operationalDataset, uint64_t breadcrumb,
                                                uint32_t timeoutMs);
@@ -94,9 +48,6 @@ void OnAddWiFiNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpa
                                              uint32_t timeoutMs);
 void OnEnableNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan networkID, uint64_t breadcrumb,
                                             uint32_t timeoutMs);
-
-namespace Internal {
-} // namespace Internal
 } // namespace NetworkCommissioning
 
 } // namespace clusters

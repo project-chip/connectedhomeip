@@ -21,14 +21,14 @@
 #include <cstring>
 #include <type_traits>
 
+#include <app/common/gen/att-storage.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
+#include <app/common/gen/enums.h>
 #include <app/util/af.h>
-#include <gen/att-storage.h>
-#include <gen/attribute-id.h>
-#include <gen/attribute-type.h>
 #include <gen/callback.h>
-#include <gen/cluster-id.h>
-#include <gen/command-id.h>
-#include <gen/enums.h>
 
 #include <app/CommandPathParams.h>
 #include <app/CommandSender.h>
@@ -58,16 +58,56 @@
 #define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 4
 #endif // CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::clusters;
-using namespace chip::app::clusters::NetworkCommissioning;
-using namespace chip::app::clusters::NetworkCommissioning::Internal;
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::app::clusters;
+using namespace ::chip::app::clusters::NetworkCommissioning;
+using namespace ::chip::app::clusters::NetworkCommissioning::Internal;
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace NetworkCommissioning {
+
+// Internal structs and helper functions for network commissioning.
+namespace Internal {
+
+enum class NetworkType : uint8_t
+{
+    kUndefined = 0,
+    kWiFi      = 1,
+    kThread    = 2,
+    kEthernet  = 3,
+};
+
+struct WiFiNetworkInfo
+{
+    uint8_t mSSID[kMaxWiFiSSIDLen + 1];
+    uint8_t mSSIDLen;
+    uint8_t mCredentials[kMaxWiFiCredentialsLen];
+    uint8_t mCredentialsLen;
+};
+
+struct NetworkInfo
+{
+    uint8_t mNetworkID[kMaxNetworkIDLen];
+    uint8_t mNetworkIDLen;
+    uint8_t mEnabled;
+    NetworkType mNetworkType;
+    union NetworkData
+    {
+        Thread::OperationalDataset mThread;
+        WiFiNetworkInfo mWiFi;
+    } mData;
+};
+
+enum class ClusterState : uint8_t
+{
+    kIdle            = 0,
+    kEnablingNetwork = 1,
+};
+
+} // namespace Internal
 
 namespace {
 // The internal network info containing credentials. Need to find some better place to save these info.
@@ -75,6 +115,16 @@ NetworkInfo sNetworks[kMaxNetworks];
 } // namespace
 
 namespace Internal {
+constexpr uint8_t kInvalidNetworkSeq = 0xFF;
+
+// void EncodeAndSendEnableNetworkResponse(CHIP_ERROR err);
+// void SetEnablingNetworkSeq(uint8_t seq);
+// ClusterState GetClusterState();
+// CHIP_ERROR __attribute__((warn_unused_result)) MoveClusterState(ClusterState newState);
+// void OnNetworkEnableStatusChangeCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+// void SetCommissionerSecureSessionHandle(const SecureSessionHandle & handle);
+
+NetworkInfo * GetNetworkBySeq(uint8_t seq);
 
 chip::NodeId networkCommissionerNodeId = chip::kAnyNodeId;
 ClusterState sClusterState             = ClusterState::kIdle;
@@ -94,6 +144,46 @@ void SetEnablingNetworkSeq(uint8_t seq)
 ClusterState GetClusterState()
 {
     return sClusterState;
+}
+
+void SetCommissionerSecureSessionHandle(const SecureSessionHandle & secureSessionHandle)
+{
+    sCommissionerSecureSessionHandle = secureSessionHandle;
+}
+
+void EncodeAndSendEnableNetworkResponse(CHIP_ERROR err)
+{
+    CHIP_ERROR processError                  = CHIP_NO_ERROR;
+    chip::app::CommandSender * commandSender = nullptr;
+    EmberAfNetworkCommissioningError commissioningError =
+        (err == CHIP_NO_ERROR ? EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS
+                              : EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR);
+    NodeId commissionerNodeId              = sCommissionerSecureSessionHandle.GetPeerNodeId();
+    Transport::AdminId commissionerAdminId = sCommissionerSecureSessionHandle.GetAdminId();
+
+    // From the Network Commissioning cluster spec, we MAY put response command in seperate exchange, and may have a StatusCode
+    // before the ResponseCommand.
+    app::CommandPathParams cmdParams = { 0, /* group id */ 0, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID,
+                                         ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+    TLV::TLVWriter * writer          = nullptr;
+    SuccessOrExit(processError = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&commandSender));
+    SuccessOrExit(processError = commandSender->PrepareCommand(&cmdParams));
+    writer = commandSender->GetCommandDataElementTLVWriter();
+    SuccessOrExit(processError = writer->Put(TLV::ContextTag(0), static_cast<uint32_t>(commissioningError)));
+    SuccessOrExit(processError = writer->PutString(TLV::ContextTag(1), ""));
+    SuccessOrExit(processError = commandSender->FinishCommand());
+    SuccessOrExit(processError = commandSender->SendCommandRequest(commissionerNodeId, commissionerAdminId));
+
+    // Interaction model engine will manage the state of command sender when successfully send this command, so we can safely delete
+    // this.
+    commandSender = nullptr;
+
+exit:
+    if (commandSender != nullptr)
+    {
+        commandSender->Shutdown();
+    }
+    ChipLogError(Zcl, "Failed to send response command to commissioner: %d", processError);
 }
 
 CHIP_ERROR __attribute__((warn_unused_result)) MoveClusterState(ClusterState newState)
@@ -170,56 +260,17 @@ void OnNetworkEnableStatusChangeCallback(const chip::DeviceLayer::ChipDeviceEven
     }
 }
 
-void SetCommissionerSecureSessionHandle(const SecureSessionHandle & secureSessionHandle)
-{
-    sCommissionerSecureSessionHandle = secureSessionHandle;
-}
-
-void EncodeAndSendEnableNetworkResponse(CHIP_ERROR err)
-{
-    CHIP_ERROR processError                  = CHIP_NO_ERROR;
-    chip::app::CommandSender * commandSender = nullptr;
-    EmberAfNetworkCommissioningError commissioningError =
-        (err == CHIP_NO_ERROR ? EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS
-                              : EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR);
-    NodeId commissionerNodeId              = sCommissionerSecureSessionHandle.GetPeerNodeId();
-    Transport::AdminId commissionerAdminId = sCommissionerSecureSessionHandle.GetAdminId();
-
-    // From the Network Commissioning cluster spec, we MAY put response command in seperate exchange, and may have a StatusCode
-    // before the ResponseCommand.
-    app::CommandPathParams cmdParams = { 0, /* group id */ 0, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID,
-                                         ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
-    SuccessOrExit(processError = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&commandSender));
-    SuccessOrExit(processError = commandSender->PrepareCommand(&cmdParams));
-    writer = commandSender->GetCommandDataElementTLVWriter();
-    SuccessOrExit(processError = writer->Put(TLV::ContextTag(0), static_cast<uint32_t>(commissioningError)));
-    SuccessOrExit(processError = writer->PutString(TLV::ContextTag(1), ""));
-    SuccessOrExit(processError = commandSender->FinishCommand());
-    SuccessOrExit(processError = commandSender->SendCommandRequest(commissionerNodeId, commissionerAdminId));
-
-    // Interaction model engine will manage the state of command sender when successfully send this command, so we can safely delete
-    // this.
-    commandSender = nullptr;
-
-exit:
-    if (commandSender != nullptr)
-    {
-        commandSender->Shutdown();
-    }
-    ChipLogError(Zcl, "Failed to send response command to commissioner: %d", processError);
-}
-
 } // namespace Internal
 
 // Actual command handlers.
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void OnAddThreadNetworkCommandCallbackInternal(app::Command * apCommandObj, EndpointId endpointId, ByteSpan operationalDataset,
                                                uint64_t breadcrumb, uint32_t timeoutMs)
 {
     CHIP_ERROR encodingError             = CHIP_NO_ERROR;
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
     if (GetClusterState() != ClusterState::kIdle)
     {
         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
@@ -261,9 +312,6 @@ void OnAddThreadNetworkCommandCallbackInternal(app::Command * apCommandObj, Endp
             }
         }
     }
-#else
-    err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
-#endif
 
     TLV::TLVWriter * writer          = nullptr;
     app::CommandPathParams cmdParams = { /* endpoint id */ endpointId, /* group id */ 0, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID,
@@ -280,13 +328,14 @@ exit:
         ChipLogError(Zcl, "Failed to encode response command for AddThreadNetwork: %d (Command Error: %d)", encodingError, err);
     }
 }
+#endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 void OnAddWiFiNetworkCommandCallbackInternal(app::Command * apCommandObj, EndpointId endpointId, ByteSpan ssid,
                                              ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     CHIP_ERROR encodingError             = CHIP_NO_ERROR;
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
-#if defined(CHIP_DEVICE_LAYER_TARGET)
     if (GetClusterState() != ClusterState::kIdle)
     {
         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
@@ -352,10 +401,6 @@ void OnAddWiFiNetworkCommandCallbackInternal(app::Command * apCommandObj, Endpoi
         }
     }
 
-#else
-    err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
-#endif
-
     TLV::TLVWriter * writer          = nullptr;
     app::CommandPathParams cmdParams = { /* endpoint id */ endpointId, /* group id */ 0, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID,
                                          ZCL_ADD_WI_FI_NETWORK_RESPONSE_COMMAND_ID,
@@ -373,6 +418,8 @@ exit:
         ChipLogError(Zcl, "Failed to encode response command for AddWiFiNetwork: %d (Command Error: %d)", encodingError, err);
     }
 }
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 namespace {
 void DoEnableNetwork(intptr_t networkPtr)
@@ -395,7 +442,7 @@ void DoEnableNetwork(intptr_t networkPtr)
 #endif
         break;
     case NetworkType::kWiFi:
-#if defined(CHIP_DEVICE_LAYER_TARGET)
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     {
         // TODO: Currently, DeviceNetworkProvisioningDelegateImpl assumes that ssid and credentials are null terminated strings,
         // which is not correct, this should be changed once we have better method for commissioning wifi networks.
@@ -442,7 +489,7 @@ void OnEnableNetworkCommandCallbackInternal(app::Command * apCommandObj, Endpoin
         memcmp(networkID.data(), ethernetNetifMagicCode, networkID.size()) == 0)
     {
         ChipLogProgress(Zcl, "Wired network enabling requested. Assuming success.");
-        ExitNow(err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS);
+        ExitNow(emberError = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS);
     }
 
     SuccessOrExit(err = MoveClusterState(ClusterState::kEnablingNetwork));
@@ -492,12 +539,20 @@ void OnEnableNetworkCommandCallbackInternal(app::Command * apCommandObj, Endpoin
                                                         chip::Protocols::InteractionModel::Id, 0));
     }
 exit:
-    if (err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS)
+    if (emberError == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS)
     {
         DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().EnableNetworkForOperational(networkID);
+        TLV::TLVWriter * writer          = nullptr;
+        app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID,
+                                             ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID,
+                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
+        SuccessOrExit(err = apCommandObj->PrepareCommand(&cmdParams));
+        VerifyOrExit((writer = apCommandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint32_t>(EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS)));
+        SuccessOrExit(err = writer->PutString(TLV::ContextTag(1), ""));
+        SuccessOrExit(err = apCommandObj->FinishCommand());
     }
-    return err;
-    if (err != CHIP_NO_ERROR)
+    else if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to handle EnableNetwork command: %d (Command Error: %d)", err, emberError);
     }

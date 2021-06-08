@@ -33,23 +33,32 @@
 #include <app/common/gen/enums.h>
 #include <app/util/af.h>
 #include <gen/callback.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 
 bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, ByteSpan operationalDataset,
                                                                 uint64_t breadcrumb, uint32_t timeoutMs)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     chip::app::clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(commandObj, emberAfCurrentEndpoint(),
                                                                                          operationalDataset, breadcrumb, timeoutMs);
     return true;
+#else
+    return false;
+#endif
 }
 
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, ByteSpan ssid, ByteSpan credentials,
                                                               uint64_t breadcrumb, uint32_t timeoutMs)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     chip::app::clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(commandObj, emberAfCurrentEndpoint(), ssid,
                                                                                        credentials, breadcrumb, timeoutMs);
     return true;
+#else
+    return false;
+#endif
 }
 
 bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, ByteSpan networkID,
