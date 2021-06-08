@@ -413,6 +413,11 @@ int main(int argc, char * argv[])
         {
             printf("Invoke Command: No response received\n");
         }
+        else
+        {
+            // Inject 1 second delay before start next test to improve the stability in cirque.
+            sleep(1);
+        }
 
         VerifyOrExit(gLastCommandResult == TestCommandResult::kSuccess, err = CHIP_ERROR_INCORRECT_STATE);
     }
@@ -432,6 +437,11 @@ int main(int argc, char * argv[])
         if (gCond.wait_for(lock, std::chrono::seconds(gMessageIntervalSeconds)) == std::cv_status::timeout)
         {
             printf("Invoke Command: No response received\n");
+        }
+        else
+        {
+            // Inject 1 second delay before start next test to improve the stability in cirque.
+            sleep(1);
         }
 
         VerifyOrExit(gLastCommandResult == TestCommandResult::kFailure, err = CHIP_ERROR_INCORRECT_STATE);
