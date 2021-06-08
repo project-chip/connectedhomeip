@@ -3,6 +3,7 @@ FROM ubuntu:20.04
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+    sudo \
     g++ \
     gcc \
     git \
@@ -13,7 +14,6 @@ RUN set -x \
     libglib2.0-dev \
     libssl-dev \
     ninja-build \
-    pi-bluetooth \
     pkg-config \
     protobuf-compiler \
     python \
