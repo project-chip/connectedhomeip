@@ -24,6 +24,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestQueryReplyFilter.cpp",
     "TestRecordData.cpp",
+    "TestResponseSender.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
