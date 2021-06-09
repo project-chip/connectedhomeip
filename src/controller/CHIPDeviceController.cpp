@@ -292,6 +292,23 @@ CHIP_ERROR DeviceController::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the controller");
 
+#if CONFIG_DEVICE_LAYER
+    // Start by shutting down the PlatformManager.  This will ensure, with
+    // reasonable synchronization, that we stop processing of incoming messages
+    // before doing any other shutdown work.  Otherwise we can end up trying to
+    // process incoming messages in a partially shut down state, which is not
+    // great at all.
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
+#else
+    mInetLayer->Shutdown();
+    mSystemLayer->Shutdown();
+    chip::Platform::Delete(mInetLayer);
+    chip::Platform::Delete(mSystemLayer);
+#endif // CONFIG_DEVICE_LAYER
+
+    mSystemLayer = nullptr;
+    mInetLayer   = nullptr;
+
     mState = State::NotInitialized;
 
     // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
@@ -304,17 +321,6 @@ CHIP_ERROR DeviceController::Shutdown()
         mSessionMgr->Shutdown();
     }
 
-#if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
-#else
-    mSystemLayer->Shutdown();
-    mInetLayer->Shutdown();
-    chip::Platform::Delete(mSystemLayer);
-    chip::Platform::Delete(mInetLayer);
-#endif // CONFIG_DEVICE_LAYER
-
-    mSystemLayer     = nullptr;
-    mInetLayer       = nullptr;
     mStorageDelegate = nullptr;
 
     ReleaseAllDevices();
@@ -748,7 +754,7 @@ void DeviceController::OnCommissionableNodeFound(const chip::Mdns::Commissionabl
             return;
         }
     }
-    ChipLogError(Discovery, "Failed to add discovered commisisonable node - Insufficient space");
+    ChipLogError(Discovery, "Failed to add discovered commissionable node with hostname %s- Insufficient space", nodeData.hostName);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
@@ -851,7 +857,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
-    err = mPairingSession.MessageDispatch().Init(mExchangeMgr->GetReliableMessageMgr(), mTransportMgr);
+    err = mPairingSession.MessageDispatch().Init(mTransportMgr);
     SuccessOrExit(err);
     mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
 
@@ -1513,10 +1519,9 @@ void BasicFailure(void * context, uint8_t status)
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 void DeviceCommissioner::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
-    Device * device = nullptr;
     if (mDeviceBeingPaired < kNumMaxActiveDevices)
     {
-        device = &mActiveDevices[mDeviceBeingPaired];
+        Device * device = &mActiveDevices[mDeviceBeingPaired];
         if (device->GetDeviceId() == nodeData.mPeerId.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
         {
             AdvanceCommissioningStage(CHIP_NO_ERROR);
@@ -1527,16 +1532,13 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & n
 
 void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
 {
-    Device * device = nullptr;
-    if (mDeviceBeingPaired >= kNumMaxActiveDevices)
+    if (mDeviceBeingPaired < kNumMaxActiveDevices)
     {
-        return;
-    }
-
-    device = &mActiveDevices[mDeviceBeingPaired];
-    if (device->GetDeviceId() == peer.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
-    {
-        OnSessionEstablishmentError(error);
+        Device * device = &mActiveDevices[mDeviceBeingPaired];
+        if (device->GetDeviceId() == peer.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
+        {
+            OnSessionEstablishmentError(error);
+        }
     }
     DeviceController::OnNodeIdResolutionFailed(peer, error);
 }

@@ -81,14 +81,14 @@ EmberAfStatus writeClientAttribute(uint8_t endpoint)
     return writeClientServerAttribute(endpoint, false);
 }
 
-EmberAfStatus writeDeviceAttribute(uint8_t endpoint)
+EmberAfStatus writeDeviceAttribute(uint8_t endpoint, uint8_t index)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
     AttributeId attributeId = ZCL_DEVICE_LIST_ATTRIBUTE_ID;
 
     uint16_t deviceTypeCount  = 1;
-    DeviceTypeId deviceTypeId = emberAfDeviceIdFromIndex(endpoint);
-    uint16_t revision         = emberAfDeviceVersionFromIndex(endpoint);
+    DeviceTypeId deviceTypeId = emberAfDeviceIdFromIndex(index);
+    uint16_t revision         = emberAfDeviceVersionFromIndex(index);
 
     EmberAfDeviceType deviceType;
     deviceType.type     = deviceTypeId;
@@ -111,10 +111,13 @@ EmberAfStatus writePartsAttribute(uint8_t endpoint)
     {
         for (uint8_t endpointIndex = 1; endpointIndex < emberAfEndpointCount(); endpointIndex++)
         {
-            EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
-            status                = writeAttribute(endpoint, attributeId, (uint8_t *) &endpointId, partsCount);
-            VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
-            partsCount++;
+            if (emberAfEndpointIndexIsEnabled(endpointIndex))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(endpointIndex);
+                status                = writeAttribute(endpoint, attributeId, (uint8_t *) &endpointId, partsCount);
+                VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+                partsCount++;
+            }
         }
     }
 
@@ -133,7 +136,12 @@ void emberAfPluginDescriptorServerInitCallback(void)
             continue;
         }
 
-        status = writeDeviceAttribute(endpoint);
+        if (!emberAfEndpointIndexIsEnabled(index))
+        {
+            continue;
+        }
+
+        status = writeDeviceAttribute(endpoint, index);
         VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "device", status));
 
         status = writeServerAttribute(endpoint);

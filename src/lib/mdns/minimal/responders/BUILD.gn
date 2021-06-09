@@ -21,6 +21,7 @@ static_library("responders") {
     "Ptr.h",
     "QueryResponder.cpp",
     "QueryResponder.h",
+    "RecordResponder.h",
     "ReplyFilter.h",
     "Responder.h",
     "Srv.h",

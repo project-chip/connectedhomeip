@@ -21,6 +21,7 @@ on:
 jobs:
     build:
         name: Build
+        timeout-minutes: 60
 
         strategy:
             matrix:
@@ -50,7 +51,16 @@ jobs:
                   languages: "cpp"
 
             - name: Bootstrap
+              timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                   .environment/gn_out/.ninja_log
+                   .environment/pigweed-venv/*.log
             - name: Setup Build
               run: |
                   case $BUILD_TYPE in
@@ -58,14 +68,15 @@ jobs:
                      "gcc_release") GN_ARGS='is_debug=false';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
-                     "clang_experimental") GN_ARGS='is_clang=true chip_enable_interaction_model=true';;
                      *) ;;
                   esac
 
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
+              timeout-minutes: 10
               run: scripts/build/gn_build.sh
             - name: Run Tests
+              timeout-minutes: 2
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512

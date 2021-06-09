@@ -235,6 +235,14 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(serializable.mLocalMessageCounter);
     mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(serializable.mPeerMessageCounter);
 
+    // TODO - Remove the hack that's incrementing message counter while deserializing device
+    // This hack was added as a quick workaround for TE3 testing. The commissioning code
+    // is closing the exchange after the device has already been serialized and persisted to the storage.
+    // While closing the exchange, the outstanding ack gets sent to the device, thus incrementing
+    // the local message counter. As the device information was stored prior to sending the ack, it now has
+    // the old counter value (which is 1 less than the updated counter).
+    mLocalMessageCounter++;
+
     mCASESessionKeyId           = Encoding::LittleEndian::HostSwap16(serializable.mCASESessionKeyId);
     mDeviceProvisioningComplete = (serializable.mDeviceProvisioningComplete != 0);
 
@@ -485,8 +493,7 @@ CHIP_ERROR Device::EstablishCASESession()
     Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(SecureSessionHandle(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure(
-        mCASESession.MessageDispatch().Init(mExchangeMgr->GetReliableMessageMgr(), mSessionManager->GetTransportManager()));
+    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
     mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);
 
     ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, mCredentials, mDeviceId, 0, exchange, this));

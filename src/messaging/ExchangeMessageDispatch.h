@@ -38,11 +38,7 @@ public:
     ExchangeMessageDispatch() {}
     virtual ~ExchangeMessageDispatch() {}
 
-    CHIP_ERROR Init(ReliableMessageMgr * reliableMessageMgr)
-    {
-        mReliableMessageMgr = reliableMessageMgr;
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
@@ -70,9 +66,6 @@ protected:
                                        System::PacketBufferHandle && message, EncryptedPacketBufferHandle * retainedMessage) = 0;
 
     virtual bool IsReliableTransmissionAllowed() { return true; }
-
-private:
-    ReliableMessageMgr * mReliableMessageMgr = nullptr;
 };
 
 } // namespace Messaging

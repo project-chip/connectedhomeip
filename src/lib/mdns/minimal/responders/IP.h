@@ -17,23 +17,23 @@
 
 #pragma once
 
-#include <mdns/minimal/responders/Responder.h>
+#include <mdns/minimal/responders/RecordResponder.h>
 
 namespace mdns {
 namespace Minimal {
 
-class IPv4Responder : public Responder
+class IPv4Responder : public RecordResponder
 {
 public:
-    IPv4Responder(const FullQName & qname) : Responder(QType::A, qname) {}
+    IPv4Responder(const FullQName & qname) : RecordResponder(QType::A, qname) {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
 };
 
-class IPv6Responder : public Responder
+class IPv6Responder : public RecordResponder
 {
 public:
-    IPv6Responder(const FullQName & qname) : Responder(QType::AAAA, qname) {}
+    IPv6Responder(const FullQName & qname) : RecordResponder(QType::AAAA, qname) {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
 };

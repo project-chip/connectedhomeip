@@ -39,7 +39,7 @@ OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 
 declare chip_detail_logging=false
-declare chip_mdns="minimal"
+declare chip_mdns
 declare clusters=true
 
 help() {
@@ -94,7 +94,8 @@ echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$
 source "$CHIP_ROOT/scripts/activate.sh"
 
 # Generates ninja files
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging chip_mdns=\"$chip_mdns\" chip_use_clusters_for_ip_commissioning=$clusters"
+[[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging chip_use_clusters_for_ip_commissioning=$clusters $chip_mdns_arg"
 
 # Compiles python files
 ninja -C "$OUTPUT_ROOT" python
@@ -105,7 +106,7 @@ virtualenv --clear "$ENVIRONMENT_ROOT"
 # Activate the new enviroment to register the python WHL
 source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-"$ENVIRONMENT_ROOT"/bin/pip install "$OUTPUT_ROOT"/controller/python/chip-*.whl
+"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "$OUTPUT_ROOT"/controller/python/chip-*.whl
 
 echo ""
 echo_green "Compilation completed and WHL package installed in: "

@@ -4,8 +4,8 @@
 
 #include <cinttypes>
 #include <cstdio>
+#include <sys/syscall.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 namespace chip {
@@ -36,7 +36,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     gettimeofday(&tv, nullptr);
 
     printf("[%" PRIu64 ".%06" PRIu64 "][%ld] CHIP:%s: ", static_cast<uint64_t>(tv.tv_sec), static_cast<uint64_t>(tv.tv_usec),
-           static_cast<long>(gettid()), module);
+           static_cast<long>(syscall(SYS_gettid)), module);
     vprintf(msg, v);
     printf("\n");
     fflush(stdout);

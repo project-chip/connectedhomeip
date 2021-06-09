@@ -11536,9 +11536,8 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                        chip::ByteSpan(chip::Uint8::from_char(mOperationalDataset), strlen(mOperationalDataset)),
-                                        mBreadcrumb, mTimeoutMs);
+        return cluster.AddThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mOperationalDataset, mBreadcrumb,
+                                        mTimeoutMs);
     }
 
 private:
@@ -11547,7 +11546,7 @@ private:
             OnNetworkCommissioningClusterAddThreadNetworkResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mOperationalDataset;
+    chip::ByteSpan mOperationalDataset;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -11578,9 +11577,8 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddWiFiNetwork(
-            onSuccessCallback->Cancel(), onFailureCallback->Cancel(), chip::ByteSpan(chip::Uint8::from_char(mSsid), strlen(mSsid)),
-            chip::ByteSpan(chip::Uint8::from_char(mCredentials), strlen(mCredentials)), mBreadcrumb, mTimeoutMs);
+        return cluster.AddWiFiNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mSsid, mCredentials, mBreadcrumb,
+                                      mTimeoutMs);
     }
 
 private:
@@ -11589,8 +11587,8 @@ private:
             OnNetworkCommissioningClusterAddWiFiNetworkResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mSsid;
-    char * mCredentials;
+    chip::ByteSpan mSsid;
+    chip::ByteSpan mCredentials;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -11620,8 +11618,7 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.DisableNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                      chip::ByteSpan(chip::Uint8::from_char(mNetworkID), strlen(mNetworkID)), mBreadcrumb,
+        return cluster.DisableNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNetworkID, mBreadcrumb,
                                       mTimeoutMs);
     }
 
@@ -11631,7 +11628,7 @@ private:
             OnNetworkCommissioningClusterDisableNetworkResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mNetworkID;
+    chip::ByteSpan mNetworkID;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -11661,9 +11658,7 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.EnableNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                     chip::ByteSpan(chip::Uint8::from_char(mNetworkID), strlen(mNetworkID)), mBreadcrumb,
-                                     mTimeoutMs);
+        return cluster.EnableNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNetworkID, mBreadcrumb, mTimeoutMs);
     }
 
 private:
@@ -11672,7 +11667,7 @@ private:
             OnNetworkCommissioningClusterEnableNetworkResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mNetworkID;
+    chip::ByteSpan mNetworkID;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -11736,9 +11731,7 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.RemoveNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                     chip::ByteSpan(chip::Uint8::from_char(mNetworkID), strlen(mNetworkID)), mBreadcrumb,
-                                     mTimeoutMs);
+        return cluster.RemoveNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNetworkID, mBreadcrumb, mTimeoutMs);
     }
 
 private:
@@ -11747,7 +11740,7 @@ private:
             OnNetworkCommissioningClusterRemoveNetworkResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mNetworkID;
+    chip::ByteSpan mNetworkID;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -11777,8 +11770,7 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ScanNetworks(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                    chip::ByteSpan(chip::Uint8::from_char(mSsid), strlen(mSsid)), mBreadcrumb, mTimeoutMs);
+        return cluster.ScanNetworks(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mSsid, mBreadcrumb, mTimeoutMs);
     }
 
 private:
@@ -11787,7 +11779,7 @@ private:
             OnNetworkCommissioningClusterScanNetworksResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mSsid;
+    chip::ByteSpan mSsid;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -11817,8 +11809,7 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UpdateThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                           chip::ByteSpan(chip::Uint8::from_char(mOperationalDataset), strlen(mOperationalDataset)),
+        return cluster.UpdateThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mOperationalDataset,
                                            mBreadcrumb, mTimeoutMs);
     }
 
@@ -11828,7 +11819,7 @@ private:
             OnNetworkCommissioningClusterUpdateThreadNetworkResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mOperationalDataset;
+    chip::ByteSpan mOperationalDataset;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -11859,9 +11850,8 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UpdateWiFiNetwork(
-            onSuccessCallback->Cancel(), onFailureCallback->Cancel(), chip::ByteSpan(chip::Uint8::from_char(mSsid), strlen(mSsid)),
-            chip::ByteSpan(chip::Uint8::from_char(mCredentials), strlen(mCredentials)), mBreadcrumb, mTimeoutMs);
+        return cluster.UpdateWiFiNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mSsid, mCredentials, mBreadcrumb,
+                                         mTimeoutMs);
     }
 
 private:
@@ -11870,8 +11860,8 @@ private:
             OnNetworkCommissioningClusterUpdateWiFiNetworkResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mSsid;
-    char * mCredentials;
+    chip::ByteSpan mSsid;
+    chip::ByteSpan mCredentials;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -12433,10 +12423,8 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddOpCert(
-            onSuccessCallback->Cancel(), onFailureCallback->Cancel(), chip::ByteSpan(chip::Uint8::from_char(mNoc), strlen(mNoc)),
-            chip::ByteSpan(chip::Uint8::from_char(mICACertificate), strlen(mICACertificate)),
-            chip::ByteSpan(chip::Uint8::from_char(mIPKValue), strlen(mIPKValue)), mCaseAdminNode, mAdminVendorId);
+        return cluster.AddOpCert(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNoc, mICACertificate, mIPKValue,
+                                 mCaseAdminNode, mAdminVendorId);
     }
 
 private:
@@ -12445,9 +12433,9 @@ private:
             OnOperationalCredentialsClusterOpCertResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mNoc;
-    char * mICACertificate;
-    char * mIPKValue;
+    chip::ByteSpan mNoc;
+    chip::ByteSpan mICACertificate;
+    chip::ByteSpan mIPKValue;
     chip::NodeId mCaseAdminNode;
     uint16_t mAdminVendorId;
 };
@@ -12475,8 +12463,7 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.OpCSRRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                    chip::ByteSpan(chip::Uint8::from_char(mCSRNonce), strlen(mCSRNonce)));
+        return cluster.OpCSRRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mCSRNonce);
     }
 
 private:
@@ -12485,7 +12472,7 @@ private:
             OnOperationalCredentialsClusterOpCSRResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mCSRNonce;
+    chip::ByteSpan mCSRNonce;
 };
 
 /*
@@ -16099,8 +16086,7 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttributeOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                 chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)));
+        return cluster.WriteAttributeOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
     }
 
 private:
@@ -16108,7 +16094,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mValue;
+    chip::ByteSpan mValue;
 };
 
 /*
@@ -16887,9 +16873,7 @@ public:
 
         chip::Controller::TrustedRootCertificatesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddTrustedRootCertificate(
-            onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-            chip::ByteSpan(chip::Uint8::from_char(mRootCertificate), strlen(mRootCertificate)));
+        return cluster.AddTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mRootCertificate);
     }
 
 private:
@@ -16897,7 +16881,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mRootCertificate;
+    chip::ByteSpan mRootCertificate;
 };
 
 /*
@@ -16923,9 +16907,8 @@ public:
 
         chip::Controller::TrustedRootCertificatesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.RemoveTrustedRootCertificate(
-            onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-            chip::ByteSpan(chip::Uint8::from_char(mTrustedRootIdentifier), strlen(mTrustedRootIdentifier)));
+        return cluster.RemoveTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                    mTrustedRootIdentifier);
     }
 
 private:
@@ -16933,7 +16916,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mTrustedRootIdentifier;
+    chip::ByteSpan mTrustedRootIdentifier;
 };
 
 /*

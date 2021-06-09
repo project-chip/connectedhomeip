@@ -43,7 +43,7 @@ namespace Messaging {
 #endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
 
 /**
- *  @def CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+ *  @def CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
  *
  *  @brief
  *    Active retransmit interval, or time to wait before retransmission after
@@ -53,12 +53,12 @@ namespace Messaging {
  *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
  *
  */
-#ifndef CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
-#define CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL (300)
-#endif // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+#ifndef CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (300)
+#endif // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
 
 /**
- *  @def CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+ *  @def CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
  *
  *  @brief
  *    Initial retransmission interval, or time to wait before retransmission after first
@@ -67,9 +67,9 @@ namespace Messaging {
  * This is the default value, that might be adjusted by end device depending on its
  * needs (e.g. sleeping period) using Service Discovery TXT record CRI key.
  */
-#ifndef CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
-#define CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL (5000)
-#endif // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+#ifndef CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+#define CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL (5000)
+#endif // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
 
 /**
  *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
@@ -121,8 +121,8 @@ struct ReliableMessageProtocolConfig
 };
 
 const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = {
-    CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
-    CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
+    CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+    CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
 };
 
 // clang-format on

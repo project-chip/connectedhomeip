@@ -34,10 +34,10 @@ const QNamePart kDnsSdname[] = { "_services", "_dns-sd", "_udp", "local" };
 const QNamePart kName1[] = { "some", "test" };
 const QNamePart kName2[] = { "some", "other", "test" };
 
-class EmptyResponder : public Responder
+class EmptyResponder : public RecordResponder
 {
 public:
-    EmptyResponder(const FullQName & qName) : Responder(QType::NULLVALUE, qName) {}
+    EmptyResponder(const FullQName & qName) : RecordResponder(QType::NULLVALUE, qName) {}
     void AddAllResponses(const chip::Inet::IPPacketInfo *, ResponderDelegate *) override {}
 };
 

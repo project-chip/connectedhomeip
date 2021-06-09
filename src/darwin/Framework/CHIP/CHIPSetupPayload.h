@@ -28,6 +28,13 @@ typedef NS_ENUM(NSUInteger, CHIPRendezvousInformationFlags) {
     kRendezvousInformationAllMask = kRendezvousInformationSoftAP | kRendezvousInformationBLE | kRendezvousInformationOnNetwork,
 };
 
+typedef NS_ENUM(NSUInteger, CHIPCommissioningFlow) {
+    kCommissioningFlowStandard = 0, // Device automatically enters pairing mode upon power-up
+    kCommissioningFlowUserActionRequired = 1, // Device requires a user interaction to enter pairing mode
+    kCommissioningFlowCustom = 2, // Commissioning steps should be retrieved from the distributed compliance ledger
+    kCommissioningFlowInvalid = 3,
+};
+
 typedef NS_ENUM(NSUInteger, CHIPOptionalQRCodeInfoType) {
     kOptionalQRCodeInfoTypeUnknown,
     kOptionalQRCodeInfoTypeString,
@@ -46,7 +53,7 @@ typedef NS_ENUM(NSUInteger, CHIPOptionalQRCodeInfoType) {
 @property (nonatomic, strong) NSNumber * version;
 @property (nonatomic, strong) NSNumber * vendorID;
 @property (nonatomic, strong) NSNumber * productID;
-@property (nonatomic, assign) BOOL requiresCustomFlow;
+@property (nonatomic, assign) CHIPCommissioningFlow commissioningFlow;
 @property (nonatomic, assign) CHIPRendezvousInformationFlags rendezvousInformation;
 @property (nonatomic, strong) NSNumber * discriminator;
 @property (nonatomic, strong) NSNumber * setUpPINCode;
