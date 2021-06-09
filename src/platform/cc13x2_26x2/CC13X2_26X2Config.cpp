@@ -99,15 +99,11 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_CountryCode        = 
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Breadcrumb         = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                             .itemID   = 0x0020 } };
 
-/* Internal for the KVS interface.
- *
- * Lower 6 bits used for key ID. Consider this a bit-mask for items using the
- * KVS system. All numbers greater than this should be considered reserved.
- *
- * Consult \ref CreateKVSKey for usage.
- */
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                     .itemID   = 0x0200 } };
+/* Internal for the KVS interface. */
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_key   = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+                                                                         .itemID   = 0x0021 } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_value = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+                                                                           .itemID   = 0x0020 } };
 
 /* Static local variables */
 static NVINTF_nvFuncts_t sNvoctpFps = { 0 };
@@ -158,45 +154,92 @@ CHIP_ERROR CC13X2_26X2Config::ReadConfigValueStr(Key key, char * buf, size_t buf
     return ReadConfigValueBin(key, (uint8_t *) buf, bufSize, outLen);
 }
 
-static CC13X2_26X2Config::Key CreateKVSKey(uint16_t key)
-{
-    CC13X2_26X2Config::Key ret = CC13X2_26X2Config::kConfigKey_KVS;
-    ret.nvID.subID             = key & 0x3FF;
-    ret.nvID.itemID |= (key >> 10U) & 0x3F;
-    /* NOTE: Another 3 bits could be used from the itemID field here */
-
-    return ret;
-}
-
-static CHIP_ERROR ReadBin(CC13X2_26X2Config::Key key, void * buf, size_t bufSize, size_t * outLen, size_t offset)
+CHIP_ERROR CC13X2_26X2Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     size_t len;
 
     len = sNvoctpFps.getItemLen(key.nvID);
     VerifyOrExit(len > 0, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // key not found
-    VerifyOrExit(len - offset <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(len <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    VerifyOrExit(sNvoctpFps.readItem(key.nvID, (uint16_t) offset, (uint16_t) len, buf) == NVINTF_SUCCESS,
+    VerifyOrExit(sNvoctpFps.readItem(key.nvID, 0, (uint16_t) len, buf) == NVINTF_SUCCESS,
                  err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     if (outLen)
     {
-        *outLen = len;
+        outLen = len;
     }
 
 exit:
     return err;
 }
 
-CHIP_ERROR CC13X2_26X2Config::ReadKVS(uint16_t key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes)
+/* Iterate through the key range to find a key that matches. */
+static uint8_t FindKVSSubID(const char * key, uint16_t & subID)
 {
-    return ReadBin(CreateKVSKey(key), value, value_size, read_bytes_size, offset_bytes);
+    char key_scratch[32]; // 32 characters seems large enough for a key
+    NVINTF_nvProxy_t nvProxy = { 0 };
+    uint8_t status           = NVINTF_SUCCESS;
+
+    nvProxy.sysid  = CC13X2_26X2Config::kConfigKey_KVS_key.nvID.systemID;
+    nvProxy.itemid = CC13X2_26X2Config::kConfigKey_KVS_key.nvID.itemID;
+    nvProxy.buffer = key_scratch;
+    nvProxy.len    = sizeof(key_scratch);
+    nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DOREAD;
+
+    intptr_t lock_key = sNvoctpFps.lockNV();
+    do
+    {
+        memset(key_scratch, 0, sizeof(key_scratch));
+        status = sNvoctpFps.doNext(&nvProxy);
+        if (NVINTF_SUCCESS != status)
+        {
+            break;
+        }
+        if (0 == strcmp(key, (char *) nvProxy.buffer))
+        {
+            subID = nvProxy.subid;
+            break;
+        }
+    } while (NVINTF_SUCCESS == status);
+
+    sNvoctpFps.unlockNV(lock_key);
+    return status;
 }
 
-CHIP_ERROR CC13X2_26X2Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR CC13X2_26X2Config::ReadKVS(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
+                                      size_t offset_bytes)
 {
-    return ReadBin(key, (void *) buf, bufSize, &outLen, 0);
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
+    uint16_t subID;
+    size_t len;
+
+    VerifyOrExit(FindKVSSubID(key, subID) == NVINTF_SUCCESS, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    val_item.subID = subID;
+
+    len = sNvoctpFps.getItemLen(val_item);
+    VerifyOrExit(len > 0, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // key not found
+
+    VerifyOrExit(sNvoctpFps.readItem(val_item, (uint16_t) offset_bytes, (uint16_t) value_size, value) == NVINTF_SUCCESS,
+                 err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+
+    if (read_bytes_size)
+    {
+        if (len - offset_bytes > value_size)
+        {
+            *read_bytes_size = value_size;
+        }
+        else
+        {
+            *read_bytes_size = len - offset_bytes;
+        }
+    }
+
+exit:
+    return err;
 }
 
 CHIP_ERROR CC13X2_26X2Config::WriteConfigValue(Key key, bool val)
@@ -225,9 +268,61 @@ CHIP_ERROR CC13X2_26X2Config::WriteConfigValueStr(Key key, const char * str, siz
     return WriteConfigValueBin(key, (const uint8_t *) str, strLen);
 }
 
-CHIP_ERROR CC13X2_26X2Config::WriteKVS(uint16_t key, const void * value, size_t value_size)
+CHIP_ERROR CC13X2_26X2Config::WriteKVS(const char * key, const void * value, size_t value_size)
 {
-    return WriteConfigValueBin(CreateKVSKey(key), (const uint8_t *) value, value_size);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t subID;
+
+    if (FindKVSSubID(key, subID) == NVINTF_SUCCESS)
+    {
+        NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
+        // key already exists, update value
+        val_item.subID = subID;
+        VerifyOrExit(sNvoctpFps.updateItem(val_item, (uint16_t) value_size, (void *) value) == NVINTF_SUCCESS,
+                     err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    }
+    else
+    {
+        // key does not exist, likely case
+        intptr_t lock_key = sNvoctpFps.lockNV();
+
+        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+
+        NVINTF_itemID_t key_item = CC13X2_26X2Config::kConfigKey_KVS_key.nvID;
+        NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
+
+        /* Iterate through the subID range to find an unused subID in the
+         * keyspace.  SubID is a 10 bit value, reference
+         * `<simplelink_sdk>/source/ti/common/nv/nvocmp.c:MVOCMP_MAXSUBID`.
+         */
+        for (uint16_t i = 0; i < 0x3FF; i++)
+        {
+            key_item.subID = i;
+            if (sNvoctpFps.getItemLen(key_item) == 0U)
+            {
+                val_item.subID = i;
+                break;
+            }
+        }
+        // write they key item
+        if (sNvoctpFps.writeItem(key_item, (uint16_t) strlen(key), (void *) key) == NVINTF_SUCCESS)
+        {
+            // write the value item
+            if (sNvoctpFps.writeItem(val_item, (uint16_t) value_size, (void *) value) != NVINTF_SUCCESS)
+            {
+                // try to delete the key item
+                sNvoctpFps.deleteItem(key_item);
+                err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+            }
+        }
+        else
+        {
+            err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        }
+        sNvoctpFps.unlockNV(lock_key);
+    }
+exit:
+    return err;
 }
 
 CHIP_ERROR CC13X2_26X2Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
@@ -240,9 +335,30 @@ exit:
     return err;
 }
 
-CHIP_ERROR CC13X2_26X2Config::ClearKVS(uint16_t key)
+CHIP_ERROR CC13X2_26X2Config::ClearKVS(const char * key)
 {
-    return ClearConfigValue(CreateKVSKey(key));
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t subID;
+    NVINTF_itemID_t key_item = CC13X2_26X2Config::kConfigKey_KVS_key.nvID;
+    NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
+
+    if (FindKVSSubID(key, subID) == NVINTF_SUCCESS)
+    {
+        key_item.subID = subID;
+        val_item.subID = subID;
+        // delete the value item
+        if (sNvoctpFps.deleteItem(val_item) != NVINTF_SUCCESS)
+        {
+            err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        }
+        // delete the key item
+        if (sNvoctpFps.deleteItem(key_item) != NVINTF_SUCCESS)
+        {
+            err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        }
+    }
+
+    return err;
 }
 
 CHIP_ERROR CC13X2_26X2Config::ClearConfigValue(Key key)
