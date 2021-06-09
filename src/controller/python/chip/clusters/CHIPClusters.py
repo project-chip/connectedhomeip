@@ -958,7 +958,9 @@ class ChipClusters:
         if not func:
             raise UnknownCommand(cluster, command)
         funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
-        funcCaller(lambda: func(device, endpoint, groupid, **args))
+        res = funcCaller(lambda: func(device, endpoint, groupid, **args))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
 
     def ReadAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, groupid: int, imEnabled):
         func = getattr(self, "Cluster{}_ReadAttribute{}".format(cluster, attribute), None)
