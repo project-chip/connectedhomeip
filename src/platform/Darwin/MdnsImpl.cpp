@@ -322,8 +322,8 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
     }
 
     sdCtx = chip::Platform::New<RegisterContext>(type, nullptr);
-    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, NULL, port, recordLen, recordBytesPtr,
-                             OnRegister, sdCtx);
+    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, NULL, ntohs(port), recordLen,
+                             recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
 
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
