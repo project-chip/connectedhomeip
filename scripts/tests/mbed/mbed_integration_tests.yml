@@ -53,9 +53,9 @@ actions:
           - . $PWD/../../../secrets
           - set -x
           - echo "Preparation of the environment..."
-          - source CHIP/scripts/tests/mbed/integration_test_env start --chip_dir=CHIP
+          - source CHIP/scripts/tests/mbed/integration_test_env.sh start --chip_dir=CHIP
           - echo "Integration tests execution..."
-          - /bin/bash repo/scripts/tests/mbed/run_chip_integration_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN
+          - /bin/bash repo/scripts/tests/mbed/run_chip_integration_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
           - echo "Integration tests completed"
           - echo "Cleanup"
           - /bin/bash CHIP/scripts/tests/mbed/integration_test_env stop

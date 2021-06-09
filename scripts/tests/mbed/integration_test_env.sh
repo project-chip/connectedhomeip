@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 #####################################################################
 ### Default parameters
 true ${CHIP_DIR:=CHIP}
@@ -14,21 +16,24 @@ export ECHO_SERVER_PORT=7
 ####################################################################
 ### Declare ap_stop function
 function env_stop() {
-    sudo bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh stop
+    bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh stop
 }
 
 #####################################################################
 ### Declare ap_start function
 function env_start() {
-    sudo bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh start --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
-    sudo bash $CHIP_DIR/scripts/tests/mbed/echo_server.sh
+    bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh start --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
+    bash $CHIP_DIR/scripts/tests/mbed/echo_server.sh
 
     # Build CHIP main
-    ./$CHIP_DIR/scripts/build/default.sh
+    pwd=$PWD
+    cd $CHIP_DIR
+    bash scripts/build/default.sh
+    cd $pwd
     export CHIP_TOOLS_DIR=$CHIP_DIR/out/default
 
     # Install Python Chip Device Controller
-    pip install $CHIP_TOOLS_DIR/controller/python/chip*.whl
+    pip install $CHIP_DIR/out/default/controller/python/chip*.whl
     pip install -r $CHIP_DIR/src/test_driver/mbed-functional/requirements.txt
 
     source $CHIP_DIR/scripts/tests/mbed/common.sh
