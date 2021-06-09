@@ -190,9 +190,10 @@ CHIP_ERROR AndroidDeviceControllerWrapper::Initialize()
     chip::Crypto::P256SerializedKeypair serializedKey;
     uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));
 
+    // TODO: Use Android keystore system instead of direct storage of private key.
     if (SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
         {
-         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
+         // If storage doesn't have an existing keypair, create one and add it to the storage.
          ReturnErrorOnFailure(mIssuer.Initialize());
          ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
          keySize = static_cast<uint16_t>(sizeof(serializedKey));
