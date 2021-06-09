@@ -82,7 +82,8 @@ exit:
     return err;
 }
 
-static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & subjectOrIssuer)
+static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & subjectOrIssuer,
+                                           uint64_t & fabric)
 {
     CHIP_ERROR err;
     TLVType outerContainer;
@@ -159,6 +160,10 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                             attrOID == chip::ASN1::kOID_AttributeType_ChipRootId)
                         {
                             subjectOrIssuer = chipAttr;
+                        }
+                        else if (attrOID == chip::ASN1::kOID_AttributeType_ChipFabricId)
+                        {
+                            fabric = chipAttr;
                         }
                     }
 
@@ -569,7 +574,8 @@ exit:
     return err;
 }
 
-static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & issuer, uint64_t & subject)
+static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & issuer, uint64_t & subject,
+                                     uint64_t & fabric)
 {
     CHIP_ERROR err;
     int64_t version;
@@ -618,7 +624,7 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, ui
             ASN1_EXIT_SEQUENCE;
 
             // issuer Name
-            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Issuer), issuer);
+            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Issuer), issuer, fabric);
             SuccessOrExit(err);
 
             // validity Validity,
@@ -626,7 +632,7 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, ui
             SuccessOrExit(err);
 
             // subject Name,
-            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Subject), subject);
+            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Subject), subject, fabric);
             SuccessOrExit(err);
 
             err = ConvertSubjectPublicKeyInfo(reader, writer);
@@ -703,14 +709,14 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32
     ASN1Reader reader;
     TLVWriter writer;
 
-    uint64_t issuer, subject;
+    uint64_t issuer, subject, fabric;
 
     reader.Init(x509Cert, x509CertLen);
 
     writer.Init(chipCertBuf, chipCertBufSize);
 
     err = ConvertCertificate(reader, writer, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate),
-                             issuer, subject);
+                             issuer, subject, fabric);
     SuccessOrExit(err);
 
     err = writer.Finalize();
@@ -737,17 +743,18 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
     ASN1Reader reader;
     VerifyOrReturnError(CanCastTo<uint32_t>(x509NOC.size()), CHIP_ERROR_INVALID_ARGUMENT);
     reader.Init(x509NOC.data(), static_cast<uint32_t>(x509NOC.size()));
-    uint64_t nocIssuer, nocSubject;
-    ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, nocIssuer, nocSubject));
+    uint64_t nocIssuer, nocSubject, nocFabric;
+    ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, nocIssuer, nocSubject, nocFabric));
 
     // ICAC is optional
     if (x509ICAC.size() > 0)
     {
         VerifyOrReturnError(CanCastTo<uint32_t>(x509ICAC.size()), CHIP_ERROR_INVALID_ARGUMENT);
         reader.Init(x509ICAC.data(), static_cast<uint32_t>(x509ICAC.size()));
-        uint64_t icaIssuer, icaSubject;
-        ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, icaIssuer, icaSubject));
+        uint64_t icaIssuer, icaSubject, icaFabric;
+        ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, icaIssuer, icaSubject, icaFabric));
         VerifyOrReturnError(icaSubject == nocIssuer, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(icaFabric == nocFabric, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     ReturnErrorOnFailure(writer.EndContainer(outerContainer));

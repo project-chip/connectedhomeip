@@ -1152,6 +1152,16 @@ static void TestChipCert_X509ToChipArrayErrorScenarios(nlTestSuite * inSuite, vo
     NL_TEST_ASSERT(inSuite,
                    ConvertX509CertsToChipCertArray(ByteSpan(noc_cert, noc_len), ByteSpan(root_cert, root_len), outCertBuf,
                                                    sizeof(outCertBuf), outCertLen) == CHIP_ERROR_INVALID_ARGUMENT);
+
+    X509CertRequestParams ica_params_wrong_fabric = { 1234, 0xabcdabcd, 9876, 98790000, true, 0x9999, false, 0 };
+
+    NL_TEST_ASSERT(inSuite,
+                   NewICAX509Cert(ica_params_wrong_fabric, 0xaabbccdd, ica_keypair.Pubkey(), keypair, ica_cert, sizeof(ica_cert),
+                                  ica_len) == CHIP_NO_ERROR);
+    // Test that NOC fabric must match ICA fabric
+    NL_TEST_ASSERT(inSuite,
+                   ConvertX509CertsToChipCertArray(ByteSpan(noc_cert, noc_len), ByteSpan(ica_cert, ica_len), outCertBuf,
+                                                   sizeof(outCertBuf), outCertLen) == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 /**
