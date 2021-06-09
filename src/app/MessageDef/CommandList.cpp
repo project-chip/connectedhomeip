@@ -79,6 +79,8 @@ CHIP_ERROR CommandList::Parser::CheckSchemaValidity() const
             err = CHIP_NO_ERROR;
         }
     }
+    SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
