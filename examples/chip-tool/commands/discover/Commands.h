@@ -66,9 +66,9 @@ public:
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
         ChipDevice * device;
-        ReturnErrorOnFailure(mCommissioner.GetDevice(remoteId, &device));
+        ReturnErrorOnFailure(GetExecContext()->Commissioner->GetDevice(remoteId, &device));
         ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return mCommissioner.UpdateDevice(device, fabricId);
+        return GetExecContext()->Commissioner->UpdateDevice(device, fabricId);
     }
 
     /////////// DeviceAddressUpdateDelegate Interface /////////

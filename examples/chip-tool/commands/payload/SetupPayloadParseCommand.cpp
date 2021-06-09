@@ -23,7 +23,7 @@
 
 using namespace ::chip;
 
-CHIP_ERROR SetupPayloadParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR SetupPayloadParseCommand::Run(NodeId localId, NodeId remoteId)
 {
     std::string codeString(mCode);
     SetupPayload payload;

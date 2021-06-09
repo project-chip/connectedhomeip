@@ -91,10 +91,12 @@ public:
     void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
     void RunEventLoop();
     CHIP_ERROR StartEventLoopTask();
+    CHIP_ERROR StopEventLoopTask();
     void LockChipStack();
     bool TryLockChipStack();
     void UnlockChipStack();
     CHIP_ERROR Shutdown();
+    CHIP_ERROR TeardownChipStack();
 
 #if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
     bool IsChipStackLockedByCurrentThread() const;
@@ -233,9 +235,30 @@ inline void PlatformManager::RunEventLoop()
     static_cast<ImplClass *>(this)->_RunEventLoop();
 }
 
+/**
+ * @brief
+ *  Starts the stack on its own thread/task with an associated event queue
+ *  to dispatch and handle events posted to that task.
+ *
+ *  Thread Safe: YES
+ */
 inline CHIP_ERROR PlatformManager::StartEventLoopTask()
 {
     return static_cast<ImplClass *>(this)->_StartEventLoopTask();
+}
+
+/**
+ * @brief
+ *  Stops the CHIP thread/task (if running). Upon returning successfully from this call,
+ *  the CHIP thread/task should no longer be running. This will not actually shutdown the stack.
+ *  to dispatch and handle events posted to that task.
+ *
+ *  Thread Safe: YES
+ *
+ */
+inline CHIP_ERROR PlatformManager::StopEventLoopTask()
+{
+    return static_cast<ImplClass *>(this)->_StopEventLoopTask();
 }
 
 inline void PlatformManager::LockChipStack()
@@ -268,9 +291,27 @@ inline CHIP_ERROR PlatformManager::StartChipTimer(uint32_t durationMS)
     return static_cast<ImplClass *>(this)->_StartChipTimer(durationMS);
 }
 
+/**
+ * @brief
+ *   Completely stops the CHIP thread and event queue before shutting down and cleaning-up
+ *   individual objects in the CHIP stack
+ *
+ *  Thread Safe: YES
+ */
 inline CHIP_ERROR PlatformManager::Shutdown()
 {
     return static_cast<ImplClass *>(this)->_Shutdown();
+}
+
+/**
+ * @brief
+ *   This is similar to Shutdown, except it does not actually stop the CHIP thread and event queue.
+ *
+ *  Thread Safe: NO
+ */
+inline CHIP_ERROR PlatformManager::TeardownChipStack()
+{
+    return static_cast<ImplClass *>(this)->_TeardownChipStack();
 }
 
 } // namespace DeviceLayer

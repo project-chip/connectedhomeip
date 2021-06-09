@@ -257,19 +257,62 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
 {
     int err = 0;
+
+    _LockChipStack();
+
     mShouldRunEventLoop.store(false, std::memory_order_relaxed);
+
     if (mChipTask)
     {
         SystemLayer.WakeSelect();
+
+        _UnlockChipStack();
+
         SuccessOrExit(err = pthread_join(mChipTask, nullptr));
     }
-    // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
-    err = GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    else
+    {
+        _UnlockChipStack();
+    }
 
 exit:
+    return System::MapErrorPOSIX(err);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
+{
+    int err = 0;
+
+    //
+    // Stop the CHIP task and close out the eventqueue
+    //
+    err = _StopEventLoopTask();
+    SuccessOrExit(err);
+
+    //
+    // Call up to the base class _TeardownChipStack() to perform the actual stack de-initialization
+    // and clean-up
+    //
+    err = GenericPlatformManagerImpl<ImplClass>::_TeardownChipStack();
+
+exit:
+    return System::MapErrorPOSIX(err);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_TeardownChipStack()
+{
+    int err = 0;
+
+    //
+    // Call up to the base class _TeardownChipStack() to perform the actual stack de-initialization
+    // and clean-up
+    //
+    err = GenericPlatformManagerImpl<ImplClass>::_TeardownChipStack();
     return System::MapErrorPOSIX(err);
 }
 

@@ -20,30 +20,23 @@
 
 constexpr uint16_t kWaitDurationInSeconds = 30;
 
-CHIP_ERROR TestCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR TestCommand::Run(NodeId localId, NodeId remoteId)
 {
-    ReturnErrorOnFailure(mOpCredsIssuer.Initialize(storage));
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Controller::CommissionerInitParams params;
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    err = GetExecContext()->Commissioner->GetDevice(remoteId, &mDevice);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    ReturnErrorOnFailure(err);
 
-    params.storageDelegate                = &storage;
-    params.operationalCredentialsDelegate = &mOpCredsIssuer;
-
-    ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
-    ReturnErrorOnFailure(mCommissioner.Init(localId, params));
-    ReturnErrorOnFailure(mCommissioner.ServiceEvents());
-    ReturnErrorOnFailure(mCommissioner.GetDevice(remoteId, &mDevice));
-
-    ReturnErrorOnFailure(NextTest());
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    err = NextTest();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    ReturnErrorOnFailure(err);
 
     UpdateWaitForResponse(true);
     WaitForResponse(kWaitDurationInSeconds);
 
-    mCommissioner.ServiceEventSignal();
-
-    mCommissioner.Shutdown();
-
     VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
-
     return CHIP_NO_ERROR;
 }

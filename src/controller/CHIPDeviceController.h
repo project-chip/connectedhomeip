@@ -190,6 +190,11 @@ public:
 
     CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
 
+    /**
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This is not a thread-safe API, and should be called with external synchronization.
+     */
     virtual CHIP_ERROR Shutdown();
 
     /**
@@ -236,6 +241,15 @@ public:
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
     virtual void ReleaseDevice(Device * device);
+
+    /**
+     * @brief
+     *   Register a delegate to get notified when a device's address gets updated
+     *
+     * @param[in] delegate  The delegate of type chip::Controller::DeviceAddressUpdateDelegate
+     *                      being registered
+     */
+    void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
 
     // ----- IO -----
     /**
@@ -374,6 +388,11 @@ public:
      */
     CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
 
+    /**
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This is not a thread-safe API, and should be called with external synchronization.
+     */
     CHIP_ERROR Shutdown() override;
 
     // ----- Connection Management -----
@@ -470,6 +489,14 @@ public:
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
 
 #endif
+
+    /**
+     * @brief
+     *   Register a pairing delegate to be notified of notable pairing events
+     *
+     * @param[in] pairingDelegate       Pointer to a DevicePairingDelegate.
+     */
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
 private:
     DevicePairingDelegate * mPairingDelegate;
