@@ -191,7 +191,7 @@ public:
     CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
 
     /**
-     * @brief 
+     * @brief
      *  Tears down the entirety of the stack, including destructing key objects in the system.
      *  This is not a thread-safe API, and should be called with external synchronization.
      */
@@ -389,7 +389,7 @@ public:
     CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
 
     /**
-     * @brief 
+     * @brief
      *  Tears down the entirety of the stack, including destructing key objects in the system.
      *  This is not a thread-safe API, and should be called with external synchronization.
      */

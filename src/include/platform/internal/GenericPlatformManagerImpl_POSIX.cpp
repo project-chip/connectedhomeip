@@ -276,7 +276,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
     else {
         _UnlockChipStack();
     }
-    
+
 exit:
     return System::MapErrorPOSIX(err);
 }

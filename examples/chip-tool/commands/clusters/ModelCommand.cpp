@@ -44,7 +44,7 @@ CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     err = GetExecContext()->Commissioner->GetDevice(remoteId, &mDevice);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
 
     UpdateWaitForResponse(true);

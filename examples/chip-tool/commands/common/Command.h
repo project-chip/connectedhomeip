@@ -95,7 +95,7 @@ public:
      * @brief
      *   Encapsulates key objects in the CHIP stack that need continued
      *   access, so wrapping it in here makes it nice and compactly encapsulated.
-     */ 
+     */
     struct ExecutionContext
     {
         ChipDeviceCommissioner *Commissioner;
@@ -177,7 +177,7 @@ public:
 protected:
     ExecutionContext *GetExecContext() { return mExecContext; }
     ExecutionContext *mExecContext;
-    
+
 private:
     bool InitArgument(size_t argIndex, char * argValue);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type);

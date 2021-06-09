@@ -36,7 +36,7 @@ CHIP_ERROR ReportingCommand::Run(NodeId localId, NodeId remoteId)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     err = GetExecContext()->Commissioner->GetDevice(remoteId, &mDevice);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -46,7 +46,7 @@ CHIP_ERROR ReportingCommand::Run(NodeId localId, NodeId remoteId)
     err = cluster.MfgSpecificPing(nullptr, nullptr);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
 
     UpdateWaitForResponse(true);

@@ -254,7 +254,7 @@ inline CHIP_ERROR PlatformManager::StartEventLoopTask()
  *  to dispatch and handle events posted to that task.
  *
  *  Thread Safe: YES
- *  
+ *
  */
 inline CHIP_ERROR PlatformManager::StopEventLoopTask()
 {
@@ -293,7 +293,7 @@ inline CHIP_ERROR PlatformManager::StartChipTimer(uint32_t durationMS)
 
 /**
  * @brief
- *   Completely stops the CHIP thread and event queue before shutting down and cleaning-up 
+ *   Completely stops the CHIP thread and event queue before shutting down and cleaning-up
  *   individual objects in the CHIP stack
  *
  *  Thread Safe: YES

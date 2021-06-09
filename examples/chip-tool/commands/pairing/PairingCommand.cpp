@@ -84,7 +84,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     // event posts into its event queue
     //
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    
+
     WaitForResponse(kWaitDurationInSeconds);
     ReleaseCallbacks();
 
