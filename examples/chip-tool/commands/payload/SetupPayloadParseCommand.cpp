@@ -29,7 +29,7 @@ CHIP_ERROR SetupPayloadParseCommand::Run(NodeId localId, NodeId remoteId)
     SetupPayload payload;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = Parse(codeString, payload);
+    err            = Parse(codeString, payload);
     SuccessOrExit(err);
 
     err = Print(payload);

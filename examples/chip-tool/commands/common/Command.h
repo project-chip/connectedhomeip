@@ -98,15 +98,15 @@ public:
      */
     struct ExecutionContext
     {
-        ChipDeviceCommissioner *Commissioner;
-        chip::Controller::ExampleOperationalCredentialsIssuer *OpCredsIssuer;
-        PersistentStorage *Storage;
+        ChipDeviceCommissioner * Commissioner;
+        chip::Controller::ExampleOperationalCredentialsIssuer * OpCredsIssuer;
+        PersistentStorage * Storage;
     };
 
     Command(const char * commandName) : mName(commandName) {}
     virtual ~Command() {}
 
-    void SetExecutionContext(ExecutionContext& execContext) { mExecContext = &execContext; }
+    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = &execContext; }
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
@@ -175,8 +175,8 @@ public:
     void WaitForResponse(uint16_t duration);
 
 protected:
-    ExecutionContext *GetExecContext() { return mExecContext; }
-    ExecutionContext *mExecContext;
+    ExecutionContext * GetExecContext() { return mExecContext; }
+    ExecutionContext * mExecContext;
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);

@@ -37,7 +37,8 @@ CHIP_ERROR DiscoverCommand::Run(NodeId localId, NodeId remoteId)
     WaitForResponse(kWaitDurationInSeconds);
 
 exit:
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         return err;
     }
 

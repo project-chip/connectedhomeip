@@ -273,14 +273,14 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
 
         SuccessOrExit(err = pthread_join(mChipTask, nullptr));
     }
-    else {
+    else
+    {
         _UnlockChipStack();
     }
 
 exit:
     return System::MapErrorPOSIX(err);
 }
-
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
@@ -315,7 +315,6 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_TeardownChipStack()
     err = GenericPlatformManagerImpl<ImplClass>::_TeardownChipStack();
     return System::MapErrorPOSIX(err);
 }
-
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;

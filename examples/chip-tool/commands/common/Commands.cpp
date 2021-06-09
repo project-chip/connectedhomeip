@@ -152,9 +152,9 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
     {
         Command::ExecutionContext execContext;
 
-        execContext.Commissioner = &mController;
+        execContext.Commissioner  = &mController;
         execContext.OpCredsIssuer = &mOpCredsIssuer;
-        execContext.Storage = &mStorage;
+        execContext.Storage       = &mStorage;
 
         command->SetExecutionContext(execContext);
 

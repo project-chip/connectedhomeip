@@ -249,7 +249,7 @@ public:
      * @param[in] delegate  The delegate of type chip::Controller::DeviceAddressUpdateDelegate
      *                      being registered
      */
-    void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate *delegate) { mDeviceAddressUpdateDelegate = delegate; }
+    void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
 
     // ----- IO -----
     /**
@@ -496,7 +496,7 @@ public:
      *
      * @param[in] pairingDelegate       Pointer to a DevicePairingDelegate.
      */
-    void RegisterPairingDelegate(DevicePairingDelegate *pairingDelegate) { mPairingDelegate = pairingDelegate; }
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
 private:
     DevicePairingDelegate * mPairingDelegate;

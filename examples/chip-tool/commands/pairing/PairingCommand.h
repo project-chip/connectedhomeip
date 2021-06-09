@@ -96,7 +96,6 @@ public:
         }
     }
 
-
     /////////// Command Interface /////////
     CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
 
