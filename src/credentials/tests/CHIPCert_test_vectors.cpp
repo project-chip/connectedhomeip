@@ -96,6 +96,7 @@ CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFla
     SELECT_CERT(Node02_05);
     SELECT_CERT(Node02_06);
     SELECT_CERT(Node02_07);
+#undef SELECT_CERT
 
     err = CHIP_ERROR_CA_CERT_NOT_FOUND;
 
@@ -131,6 +132,44 @@ const char * GetTestCertName(uint8_t certType)
     NAME_CERT(Node02_07);
 
     return nullptr;
+}
+
+CHIP_ERROR GetTestCertPubkey(uint8_t certType, const uint8_t *& certPubkey, uint32_t & certPubkeyLen)
+{
+    CHIP_ERROR err;
+
+#define SELECT_CERT(NAME)                                                                                                          \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (certType == TestCert::k##NAME)                                                                                         \
+        {                                                                                                                          \
+            certPubkey    = sTestCert_##NAME##_PublicKey;                                                                          \
+            certPubkeyLen = sTestCert_##NAME##_PublicKey_Len;                                                                      \
+            ExitNow(err = CHIP_NO_ERROR);                                                                                          \
+        }                                                                                                                          \
+    } while (0)
+
+    SELECT_CERT(Root01);
+    SELECT_CERT(Root02);
+    SELECT_CERT(ICA01);
+    SELECT_CERT(ICA02);
+    SELECT_CERT(ICA01_1);
+    SELECT_CERT(FWSign01);
+    SELECT_CERT(Node01_01);
+    SELECT_CERT(Node01_02);
+    SELECT_CERT(Node02_01);
+    SELECT_CERT(Node02_02);
+    SELECT_CERT(Node02_03);
+    SELECT_CERT(Node02_04);
+    SELECT_CERT(Node02_05);
+    SELECT_CERT(Node02_06);
+    SELECT_CERT(Node02_07);
+#undef SELECT_CERT
+
+    err = CHIP_ERROR_CA_CERT_NOT_FOUND;
+
+exit:
+    return err;
 }
 
 CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags,
