@@ -59,6 +59,7 @@ void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId comma
 
 bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
 {
+    Protocols::InteractionModel::ProtocolCode protocolCode = Protocols::InteractionModel::ProtocolCode::kSuccess;
     if (currentCommandObject == nullptr)
     {
         // If this command is not handled by IM, then let ember send response.
@@ -71,11 +72,15 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
                                                        imCompatibilityEmberAfCluster.commandId,
                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
 
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        protocolCode  = Protocols::InteractionModel::ProtocolCode::kFailure;
+    }
     CHIP_ERROR err = currentCommandObject->AddStatusCode(&returnStatusParam,
                                                          status == EMBER_ZCL_STATUS_SUCCESS
                                                              ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                                              : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                         chip::Protocols::InteractionModel::Id, status);
+                                                         chip::Protocols::InteractionModel::Id, protocolCode);
     return CHIP_NO_ERROR == err;
 }
 
