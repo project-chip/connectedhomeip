@@ -59,7 +59,7 @@ private:
     void Read(uint8_t * dest, size_t length, size_t offset) const; // read length bytes into dest
     void Write(const uint8_t * source, size_t length);
     void Drop(size_t length);
-    size_t Size() const; // returns number of bytes stored
+    size_t Size() const;                                                // returns number of bytes stored
     std::size_t Advance(std::size_t dataLocation, size_t amount) const; // advance dataLocation by amount, wrap around on mCapacity
 
     // Internal storage. Arranged by packets with following structure:

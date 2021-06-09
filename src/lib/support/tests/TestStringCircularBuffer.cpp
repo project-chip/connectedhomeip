@@ -30,7 +30,7 @@ using namespace chip;
 void TestPushPop(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t storage[10];
-    const unsigned char s[] = {'T', 'e', 's', 't'};
+    const unsigned char s[] = { 'T', 'e', 's', 't' };
     unsigned char o[sizeof(s)];
 
     StringCircularBuffer buffer(storage, sizeof(storage));
@@ -62,7 +62,7 @@ void TestPushInvalid(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t storage[10];
     StringCircularBuffer buffer(storage, sizeof(storage));
-    const unsigned char s[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
+    const unsigned char s[] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
     NL_TEST_ASSERT(inSuite, buffer.IsEmpty());
     NL_TEST_ASSERT(inSuite, buffer.Push(ByteSpan(s, 8)) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite, buffer.IsEmpty());
@@ -75,8 +75,8 @@ void TestPushInvalid(nlTestSuite * inSuite, void * inContext)
 void TestPushWrap(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t storage[10];
-    const unsigned char s1[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
-    const unsigned char s2[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
+    const unsigned char s1[] = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+    const unsigned char s2[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' };
     unsigned char o[sizeof(s1)];
 
     // Total space = 9
@@ -128,10 +128,8 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestPushPop),
-    NL_TEST_DEF_FN(TestPushInvalid),
-    NL_TEST_DEF_FN(TestPushWrap),
-    NL_TEST_SENTINEL() };
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestPushPop), NL_TEST_DEF_FN(TestPushInvalid), NL_TEST_DEF_FN(TestPushWrap),
+                                 NL_TEST_SENTINEL() };
 
 int TestStringCircularBuffer()
 {
