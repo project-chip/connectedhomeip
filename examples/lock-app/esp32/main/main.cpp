@@ -35,6 +35,12 @@
 #include <vector>
 
 #include <support/ErrorStr.h>
+
+#if CONFIG_ENABLE_PW_RPC
+#include "PigweedLogger.h"
+#include "Rpc.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
@@ -54,11 +60,15 @@ extern "C" void app_main()
         return;
     }
 
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
+
     ESP_LOGI(TAG, "==================================================");
     ESP_LOGI(TAG, "chip-esp32-lock-example starting");
     ESP_LOGI(TAG, "==================================================");
 
-    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    CHIPDeviceManager &deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
@@ -75,7 +85,6 @@ extern "C" void app_main()
     {
         ESP_LOGE(TAG, "GetAppTask().Init() failed");
     }
-
     while (true)
     {
         vTaskDelay(500 / portTICK_PERIOD_MS);
