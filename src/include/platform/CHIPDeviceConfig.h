@@ -307,7 +307,7 @@
  * consists of the final two bytes of the device's primary WiFi MAC address in hex.
  */
 #ifndef CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
-#define CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX "CHIP-"
+#define CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX "MATTER-"
 #endif
 
 /**
@@ -424,7 +424,7 @@
  * may need to be shorter.
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX
-#define CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX "CHIP-"
+#define CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX "MATTER-"
 #endif
 
 /**

@@ -460,7 +460,7 @@ menu "CHIP Device Layer"
 
         config WIFI_AP_SSID_PREFIX
             string "WiFi AP SSID Prefix"
-            default "CHIP-"
+            default "MATTER-"
             help
                 A prefix string used in forming the WiFi soft-AP SSID.  The remainder of the SSID
                 consists of the final two bytes of the device's primary WiFi MAC address in hex.
@@ -510,7 +510,7 @@ menu "CHIP Device Layer"
 
         config BLE_DEVICE_NAME_PREFIX
             string "BLE Device Name Prefix"
-            default "CHIP-"
+            default "MATTER-"
             depends on ENABLE_CHIPOBLE
             help
                 A prefix string used in forming the BLE device name.  The remainder of the name
