@@ -746,7 +746,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         switch (aCommandId)
         {
         case ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(apCommandObj);
                     break;
@@ -988,13 +988,13 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case ZCL_WINDOW_COVERING_STOP_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfWindowCoveringClusterWindowCoveringStopCallback(apCommandObj);
                     break;
         }
         case ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(apCommandObj);
                     break;

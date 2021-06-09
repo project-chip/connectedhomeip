@@ -871,7 +871,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case ZCL_STOP_WITH_ON_OFF_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj);
                     break;
@@ -1074,7 +1074,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case ZCL_REMOVE_ALL_FABRICS_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(apCommandObj);
                     break;
