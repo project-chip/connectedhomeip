@@ -117,7 +117,7 @@ function asJniSignature(label, type) {
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
   return templateUtil.templatePromise(this.global, promise)
 }
- 
+
 function omitCommaForFirstNonStatusCommand(id, index) {
   let promise = templateUtil.ensureZclPackageId(this).then((pkgId) => {
     return queryZcl.selectCommandArgumentsByCommandId(
