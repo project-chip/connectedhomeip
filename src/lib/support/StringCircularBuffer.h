@@ -53,7 +53,7 @@ public:
     size_t GetFrontSize() const;
 
     /** @brief read the front element into dest. The length of dest must be equal or larger than GetFrontSize */
-    CHIP_ERROR ReadFront(uint8_t * dest) const; 
+    CHIP_ERROR ReadFront(uint8_t * dest) const;
 
 private:
     void Read(uint8_t * dest, size_t length, size_t offset) const; // read length bytes into dest
@@ -74,4 +74,3 @@ private:
 };
 
 } // namespace chip
-
