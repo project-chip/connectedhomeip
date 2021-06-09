@@ -40,6 +40,8 @@ namespace Internal {
 
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
+/* itemID and subID are limited to 10 bits, even though their types are uint16_t */
+
 // Keys stored in the Chip-factory namespace
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SerialNum           = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
                                                                            .itemID   = 0x0001 } };
@@ -97,9 +99,15 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_CountryCode        = 
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Breadcrumb         = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                             .itemID   = 0x0020 } };
 
-/* Internal for the KVS interface */
+/* Internal for the KVS interface.
+ *
+ * Lower 6 bits used for key ID. Consider this a bit-mask for items using the
+ * KVS system. All numbers greater than this should be considered reserved.
+ *
+ * Consult \ref CreateKVSKey for usage.
+ */
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                     .itemID   = 0x0021 } };
+                                                                     .itemID   = 0x0200 } };
 
 /* Static local variables */
 static NVINTF_nvFuncts_t sNvoctpFps = { 0 };
@@ -150,6 +158,16 @@ CHIP_ERROR CC13X2_26X2Config::ReadConfigValueStr(Key key, char * buf, size_t buf
     return ReadConfigValueBin(key, (uint8_t *) buf, bufSize, outLen);
 }
 
+static CC13X2_26X2Config::Key CreateKVSKey(uint16_t key)
+{
+    CC13X2_26X2Config::Key ret = CC13X2_26X2Config::kConfigKey_KVS;
+    ret.nvID.subID             = key & 0x3FF;
+    ret.nvID.itemID |= (key >> 10U) & 0x3F;
+    /* NOTE: Another 3 bits could be used from the itemID field here */
+
+    return ret;
+}
+
 static CHIP_ERROR ReadBin(CC13X2_26X2Config::Key key, void * buf, size_t bufSize, size_t * outLen, size_t offset)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -173,10 +191,7 @@ exit:
 
 CHIP_ERROR CC13X2_26X2Config::ReadKVS(uint16_t key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes)
 {
-    Key nv_key = CC13X2_26X2Config::kConfigKey_KVS;
-
-    nv_key.nvID.subID = key;
-    return ReadBin(nv_key, value, value_size, read_bytes_size, offset_bytes);
+    return ReadBin(CreateKVSKey(key), value, value_size, read_bytes_size, offset_bytes);
 }
 
 CHIP_ERROR CC13X2_26X2Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
@@ -212,10 +227,7 @@ CHIP_ERROR CC13X2_26X2Config::WriteConfigValueStr(Key key, const char * str, siz
 
 CHIP_ERROR CC13X2_26X2Config::WriteKVS(uint16_t key, const void * value, size_t value_size)
 {
-    Key nv_key = CC13X2_26X2Config::kConfigKey_KVS;
-
-    nv_key.nvID.subID = key;
-    return WriteConfigValueBin(nv_key, (const uint8_t *) value, value_size);
+    return WriteConfigValueBin(CreateKVSKey(key), (const uint8_t *) value, value_size);
 }
 
 CHIP_ERROR CC13X2_26X2Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
@@ -230,10 +242,7 @@ exit:
 
 CHIP_ERROR CC13X2_26X2Config::ClearKVS(uint16_t key)
 {
-    Key nv_key = CC13X2_26X2Config::kConfigKey_KVS;
-
-    nv_key.nvID.subID = key;
-    return ClearConfigValue(nv_key);
+    return ClearConfigValue(CreateKVSKey(key));
 }
 
 CHIP_ERROR CC13X2_26X2Config::ClearConfigValue(Key key)
