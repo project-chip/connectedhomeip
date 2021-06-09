@@ -185,8 +185,8 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
     {
         if (aIsEmptyResponse)
         {
-            apCommand->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::InteractionModel::Id,
-                                     Protocols::InteractionModel::ProtocolCode::kSuccess);
+            apCommand->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                     Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::kSuccess);
         }
         else
         {

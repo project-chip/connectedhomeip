@@ -21,53 +21,52 @@
 
 #include "TestCommand.h"
 
-class TestCluster: public TestCommand
+class TestCluster : public TestCommand
 {
-  public:
-    TestCluster(): TestCommand("TestCluster") {}
+public:
+    TestCluster() : TestCommand("TestCluster") {}
 
     /////////// TestCommand Interface /////////
     CHIP_ERROR NextTest() override
     {
-      CHIP_ERROR err = CHIP_NO_ERROR;
+        CHIP_ERROR err = CHIP_NO_ERROR;
 
-      if (mTestCount == mTestIndex)
-      {
-          ChipLogProgress(chipTool, "TestCluster: Test complete");
-          SetCommandExitStatus(true);
-      }
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TestCluster: Test complete");
+            SetCommandExitStatus(true);
+        }
 
-      switch (mTestIndex)
-      {
+        switch (mTestIndex)
+        {
         case 0:
-          err = TestSendClusterTestClusterCommandTest_0();
-          break;
+            err = TestSendClusterTestClusterCommandTest_0();
+            break;
         case 1:
-          err = TestSendClusterTestClusterCommandTestNotHandled_1();
-          break;
+            err = TestSendClusterTestClusterCommandTestNotHandled_1();
+            break;
         case 2:
-          err = TestSendClusterTestClusterCommandTestSpecific_2();
-          break;
+            err = TestSendClusterTestClusterCommandTestSpecific_2();
+            break;
         case 3:
-          err = TestSendClusterTestClusterCommandWriteAttribute_3();
-          break;
+            err = TestSendClusterTestClusterCommandWriteAttribute_3();
+            break;
         case 4:
-          err = TestSendClusterTestClusterCommandReadAttribute_4();
-          break;
-      }
-      mTestIndex++;
+            err = TestSendClusterTestClusterCommandReadAttribute_4();
+            break;
+        }
+        mTestIndex++;
 
-      if (CHIP_NO_ERROR != err)
-      {
-          ChipLogProgress(chipTool, "TestCluster: %s", chip::ErrorStr(err));
-          SetCommandExitStatus(false);
-      }
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "TestCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(false);
+        }
 
-      return err;
+        return err;
     }
 
-
-  private:
+private:
     uint16_t mTestIndex = 0;
     uint16_t mTestCount = 5;
 
@@ -77,16 +76,18 @@ class TestCluster: public TestCommand
 
     // Test Send Test Command
     typedef void (*SuccessCallback_0)(void * context);
-    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0 = nullptr;
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
-    bool mIsFailureExpected_0 = 0;
+    bool mIsFailureExpected_0                                               = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandTest_0()
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Command: Sending command...");
 
-        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterTestClusterCommandTest_0_FailureResponse, this);
-        mOnSuccessCallback_0 = new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterTestClusterCommandTest_0_SuccessResponse, this);
+        mOnFailureCallback_0 =
+            new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterTestClusterCommandTest_0_FailureResponse, this);
+        mOnSuccessCallback_0 =
+            new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterTestClusterCommandTest_0_SuccessResponse, this);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -113,7 +114,8 @@ class TestCluster: public TestCommand
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
 
-        if (runner->mIsFailureExpected_0 == false) {
+        if (runner->mIsFailureExpected_0 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -122,7 +124,7 @@ class TestCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterTestClusterCommandTest_0_SuccessResponse(void * context )
+    static void OnTestSendClusterTestClusterCommandTest_0_SuccessResponse(void * context)
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Command: Success Response");
 
@@ -138,22 +140,23 @@ class TestCluster: public TestCommand
             return;
         }
 
-
         runner->NextTest();
     }
 
     // Test Send Test Not Handled Command
     typedef void (*SuccessCallback_1)(void * context);
-    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1 = nullptr;
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
-    bool mIsFailureExpected_1 = 1;
+    bool mIsFailureExpected_1                                               = 1;
 
     CHIP_ERROR TestSendClusterTestClusterCommandTestNotHandled_1()
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Not Handled Command: Sending command...");
 
-        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterTestClusterCommandTestNotHandled_1_FailureResponse, this);
-        mOnSuccessCallback_1 = new chip::Callback::Callback<SuccessCallback_1>(OnTestSendClusterTestClusterCommandTestNotHandled_1_SuccessResponse, this);
+        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandTestNotHandled_1_FailureResponse, this);
+        mOnSuccessCallback_1 = new chip::Callback::Callback<SuccessCallback_1>(
+            OnTestSendClusterTestClusterCommandTestNotHandled_1_SuccessResponse, this);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -180,7 +183,8 @@ class TestCluster: public TestCommand
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
 
-        if (runner->mIsFailureExpected_1 == false) {
+        if (runner->mIsFailureExpected_1 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -189,7 +193,7 @@ class TestCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterTestClusterCommandTestNotHandled_1_SuccessResponse(void * context )
+    static void OnTestSendClusterTestClusterCommandTestNotHandled_1_SuccessResponse(void * context)
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Not Handled Command: Success Response");
 
@@ -205,22 +209,23 @@ class TestCluster: public TestCommand
             return;
         }
 
-
         runner->NextTest();
     }
 
     // Test Send Test Specific Command
     typedef void (*SuccessCallback_2)(void * context, uint8_t returnValue);
-    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2 = nullptr;
+    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_2 = nullptr;
-    bool mIsFailureExpected_2 = 0;
+    bool mIsFailureExpected_2                                               = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandTestSpecific_2()
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Specific Command: Sending command...");
 
-        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterTestClusterCommandTestSpecific_2_FailureResponse, this);
-        mOnSuccessCallback_2 = new chip::Callback::Callback<SuccessCallback_2>(OnTestSendClusterTestClusterCommandTestSpecific_2_SuccessResponse, this);
+        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandTestSpecific_2_FailureResponse, this);
+        mOnSuccessCallback_2 = new chip::Callback::Callback<SuccessCallback_2>(
+            OnTestSendClusterTestClusterCommandTestSpecific_2_SuccessResponse, this);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -247,7 +252,8 @@ class TestCluster: public TestCommand
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
 
-        if (runner->mIsFailureExpected_2 == false) {
+        if (runner->mIsFailureExpected_2 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -256,7 +262,7 @@ class TestCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterTestClusterCommandTestSpecific_2_SuccessResponse(void * context , uint8_t returnValue)
+    static void OnTestSendClusterTestClusterCommandTestSpecific_2_SuccessResponse(void * context, uint8_t returnValue)
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Specific Command: Success Response");
 
@@ -284,16 +290,18 @@ class TestCluster: public TestCommand
 
     // Test Write attribute BOOLEAN
     typedef void (*SuccessCallback_3)(void * context, uint8_t boolean);
-    chip::Callback::Callback<SuccessCallback_3> * mOnSuccessCallback_3 = nullptr;
+    chip::Callback::Callback<SuccessCallback_3> * mOnSuccessCallback_3      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_3 = nullptr;
-    bool mIsFailureExpected_3 = 0;
+    bool mIsFailureExpected_3                                               = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_3()
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BOOLEAN: Sending command...");
 
-        mOnFailureCallback_3 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterTestClusterCommandWriteAttribute_3_FailureResponse, this);
-        mOnSuccessCallback_3 = new chip::Callback::Callback<SuccessCallback_3>(OnTestSendClusterTestClusterCommandWriteAttribute_3_SuccessResponse, this);
+        mOnFailureCallback_3 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandWriteAttribute_3_FailureResponse, this);
+        mOnSuccessCallback_3 = new chip::Callback::Callback<SuccessCallback_3>(
+            OnTestSendClusterTestClusterCommandWriteAttribute_3_SuccessResponse, this);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -320,7 +328,8 @@ class TestCluster: public TestCommand
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
 
-        if (runner->mIsFailureExpected_3 == false) {
+        if (runner->mIsFailureExpected_3 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -329,7 +338,7 @@ class TestCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterTestClusterCommandWriteAttribute_3_SuccessResponse(void * context , uint8_t boolean)
+    static void OnTestSendClusterTestClusterCommandWriteAttribute_3_SuccessResponse(void * context, uint8_t boolean)
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BOOLEAN: Success Response");
 
@@ -345,22 +354,23 @@ class TestCluster: public TestCommand
             return;
         }
 
-
         runner->NextTest();
     }
 
     // Test Read attribute BOOLEAN
     typedef void (*SuccessCallback_4)(void * context, uint8_t boolean);
-    chip::Callback::Callback<SuccessCallback_4> * mOnSuccessCallback_4 = nullptr;
+    chip::Callback::Callback<SuccessCallback_4> * mOnSuccessCallback_4      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_4 = nullptr;
-    bool mIsFailureExpected_4 = 0;
+    bool mIsFailureExpected_4                                               = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_4()
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BOOLEAN: Sending command...");
 
-        mOnFailureCallback_4 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterTestClusterCommandReadAttribute_4_FailureResponse, this);
-        mOnSuccessCallback_4 = new chip::Callback::Callback<SuccessCallback_4>(OnTestSendClusterTestClusterCommandReadAttribute_4_SuccessResponse, this);
+        mOnFailureCallback_4 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandReadAttribute_4_FailureResponse, this);
+        mOnSuccessCallback_4 = new chip::Callback::Callback<SuccessCallback_4>(
+            OnTestSendClusterTestClusterCommandReadAttribute_4_SuccessResponse, this);
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -387,7 +397,8 @@ class TestCluster: public TestCommand
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
 
-        if (runner->mIsFailureExpected_4 == false) {
+        if (runner->mIsFailureExpected_4 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -396,7 +407,7 @@ class TestCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterTestClusterCommandReadAttribute_4_SuccessResponse(void * context , uint8_t boolean)
+    static void OnTestSendClusterTestClusterCommandReadAttribute_4_SuccessResponse(void * context, uint8_t boolean)
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BOOLEAN: Success Response");
 
@@ -421,56 +432,54 @@ class TestCluster: public TestCommand
 
         runner->NextTest();
     }
-
 };
 
-class OnOffCluster: public TestCommand
+class OnOffCluster : public TestCommand
 {
-  public:
-    OnOffCluster(): TestCommand("OnOffCluster") {}
+public:
+    OnOffCluster() : TestCommand("OnOffCluster") {}
 
     /////////// TestCommand Interface /////////
     CHIP_ERROR NextTest() override
     {
-      CHIP_ERROR err = CHIP_NO_ERROR;
+        CHIP_ERROR err = CHIP_NO_ERROR;
 
-      if (mTestCount == mTestIndex)
-      {
-          ChipLogProgress(chipTool, "OnOffCluster: Test complete");
-          SetCommandExitStatus(true);
-      }
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "OnOffCluster: Test complete");
+            SetCommandExitStatus(true);
+        }
 
-      switch (mTestIndex)
-      {
+        switch (mTestIndex)
+        {
         case 0:
-          err = TestSendClusterOnOffCommandReadAttribute_0();
-          break;
+            err = TestSendClusterOnOffCommandReadAttribute_0();
+            break;
         case 1:
-          err = TestSendClusterOnOffCommandOn_1();
-          break;
+            err = TestSendClusterOnOffCommandOn_1();
+            break;
         case 2:
-          err = TestSendClusterOnOffCommandReadAttribute_2();
-          break;
+            err = TestSendClusterOnOffCommandReadAttribute_2();
+            break;
         case 3:
-          err = TestSendClusterOnOffCommandOff_3();
-          break;
+            err = TestSendClusterOnOffCommandOff_3();
+            break;
         case 4:
-          err = TestSendClusterOnOffCommandReadAttribute_4();
-          break;
-      }
-      mTestIndex++;
+            err = TestSendClusterOnOffCommandReadAttribute_4();
+            break;
+        }
+        mTestIndex++;
 
-      if (CHIP_NO_ERROR != err)
-      {
-          ChipLogProgress(chipTool, "OnOffCluster: %s", chip::ErrorStr(err));
-          SetCommandExitStatus(false);
-      }
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "OnOffCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(false);
+        }
 
-      return err;
+        return err;
     }
 
-
-  private:
+private:
     uint16_t mTestIndex = 0;
     uint16_t mTestCount = 5;
 
@@ -480,16 +489,18 @@ class OnOffCluster: public TestCommand
 
     // Test Check on/off attribute value is false when starting
     typedef void (*SuccessCallback_0)(void * context, uint8_t onOff);
-    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0 = nullptr;
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
-    bool mIsFailureExpected_0 = 0;
+    bool mIsFailureExpected_0                                               = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_0()
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false when starting: Sending command...");
 
-        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterOnOffCommandReadAttribute_0_FailureResponse, this);
-        mOnSuccessCallback_0 = new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterOnOffCommandReadAttribute_0_SuccessResponse, this);
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterOnOffCommandReadAttribute_0_FailureResponse, this);
+        mOnSuccessCallback_0 =
+            new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterOnOffCommandReadAttribute_0_SuccessResponse, this);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -516,7 +527,8 @@ class OnOffCluster: public TestCommand
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
 
-        if (runner->mIsFailureExpected_0 == false) {
+        if (runner->mIsFailureExpected_0 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -525,7 +537,7 @@ class OnOffCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandReadAttribute_0_SuccessResponse(void * context , uint8_t onOff)
+    static void OnTestSendClusterOnOffCommandReadAttribute_0_SuccessResponse(void * context, uint8_t onOff)
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false when starting: Success Response");
 
@@ -553,16 +565,18 @@ class OnOffCluster: public TestCommand
 
     // Test Send On Command
     typedef void (*SuccessCallback_1)(void * context);
-    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1 = nullptr;
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
-    bool mIsFailureExpected_1 = 0;
+    bool mIsFailureExpected_1                                               = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOn_1()
     {
         ChipLogProgress(chipTool, "On/Off - Send On Command: Sending command...");
 
-        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterOnOffCommandOn_1_FailureResponse, this);
-        mOnSuccessCallback_1 = new chip::Callback::Callback<SuccessCallback_1>(OnTestSendClusterOnOffCommandOn_1_SuccessResponse, this);
+        mOnFailureCallback_1 =
+            new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterOnOffCommandOn_1_FailureResponse, this);
+        mOnSuccessCallback_1 =
+            new chip::Callback::Callback<SuccessCallback_1>(OnTestSendClusterOnOffCommandOn_1_SuccessResponse, this);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -589,7 +603,8 @@ class OnOffCluster: public TestCommand
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
 
-        if (runner->mIsFailureExpected_1 == false) {
+        if (runner->mIsFailureExpected_1 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -598,7 +613,7 @@ class OnOffCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandOn_1_SuccessResponse(void * context )
+    static void OnTestSendClusterOnOffCommandOn_1_SuccessResponse(void * context)
     {
         ChipLogProgress(chipTool, "On/Off - Send On Command: Success Response");
 
@@ -614,22 +629,23 @@ class OnOffCluster: public TestCommand
             return;
         }
 
-
         runner->NextTest();
     }
 
     // Test Check on/off attribute value is true after on command
     typedef void (*SuccessCallback_2)(void * context, uint8_t onOff);
-    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2 = nullptr;
+    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_2 = nullptr;
-    bool mIsFailureExpected_2 = 0;
+    bool mIsFailureExpected_2                                               = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_2()
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Sending command...");
 
-        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterOnOffCommandReadAttribute_2_FailureResponse, this);
-        mOnSuccessCallback_2 = new chip::Callback::Callback<SuccessCallback_2>(OnTestSendClusterOnOffCommandReadAttribute_2_SuccessResponse, this);
+        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterOnOffCommandReadAttribute_2_FailureResponse, this);
+        mOnSuccessCallback_2 =
+            new chip::Callback::Callback<SuccessCallback_2>(OnTestSendClusterOnOffCommandReadAttribute_2_SuccessResponse, this);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -656,7 +672,8 @@ class OnOffCluster: public TestCommand
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
 
-        if (runner->mIsFailureExpected_2 == false) {
+        if (runner->mIsFailureExpected_2 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -665,7 +682,7 @@ class OnOffCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandReadAttribute_2_SuccessResponse(void * context , uint8_t onOff)
+    static void OnTestSendClusterOnOffCommandReadAttribute_2_SuccessResponse(void * context, uint8_t onOff)
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Success Response");
 
@@ -693,16 +710,18 @@ class OnOffCluster: public TestCommand
 
     // Test Send Off Command
     typedef void (*SuccessCallback_3)(void * context);
-    chip::Callback::Callback<SuccessCallback_3> * mOnSuccessCallback_3 = nullptr;
+    chip::Callback::Callback<SuccessCallback_3> * mOnSuccessCallback_3      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_3 = nullptr;
-    bool mIsFailureExpected_3 = 0;
+    bool mIsFailureExpected_3                                               = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOff_3()
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Sending command...");
 
-        mOnFailureCallback_3 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterOnOffCommandOff_3_FailureResponse, this);
-        mOnSuccessCallback_3 = new chip::Callback::Callback<SuccessCallback_3>(OnTestSendClusterOnOffCommandOff_3_SuccessResponse, this);
+        mOnFailureCallback_3 =
+            new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterOnOffCommandOff_3_FailureResponse, this);
+        mOnSuccessCallback_3 =
+            new chip::Callback::Callback<SuccessCallback_3>(OnTestSendClusterOnOffCommandOff_3_SuccessResponse, this);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -729,7 +748,8 @@ class OnOffCluster: public TestCommand
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
 
-        if (runner->mIsFailureExpected_3 == false) {
+        if (runner->mIsFailureExpected_3 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -738,7 +758,7 @@ class OnOffCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandOff_3_SuccessResponse(void * context )
+    static void OnTestSendClusterOnOffCommandOff_3_SuccessResponse(void * context)
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Success Response");
 
@@ -754,22 +774,23 @@ class OnOffCluster: public TestCommand
             return;
         }
 
-
         runner->NextTest();
     }
 
     // Test Check on/off attribute value is false after off command
     typedef void (*SuccessCallback_4)(void * context, uint8_t onOff);
-    chip::Callback::Callback<SuccessCallback_4> * mOnSuccessCallback_4 = nullptr;
+    chip::Callback::Callback<SuccessCallback_4> * mOnSuccessCallback_4      = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_4 = nullptr;
-    bool mIsFailureExpected_4 = 0;
+    bool mIsFailureExpected_4                                               = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_4()
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Sending command...");
 
-        mOnFailureCallback_4 = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterOnOffCommandReadAttribute_4_FailureResponse, this);
-        mOnSuccessCallback_4 = new chip::Callback::Callback<SuccessCallback_4>(OnTestSendClusterOnOffCommandReadAttribute_4_SuccessResponse, this);
+        mOnFailureCallback_4 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterOnOffCommandReadAttribute_4_FailureResponse, this);
+        mOnSuccessCallback_4 =
+            new chip::Callback::Callback<SuccessCallback_4>(OnTestSendClusterOnOffCommandReadAttribute_4_SuccessResponse, this);
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -796,7 +817,8 @@ class OnOffCluster: public TestCommand
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
 
-        if (runner->mIsFailureExpected_4 == false) {
+        if (runner->mIsFailureExpected_4 == false)
+        {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(false);
             return;
@@ -805,7 +827,7 @@ class OnOffCluster: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandReadAttribute_4_SuccessResponse(void * context , uint8_t onOff)
+    static void OnTestSendClusterOnOffCommandReadAttribute_4_SuccessResponse(void * context, uint8_t onOff)
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Success Response");
 
@@ -830,9 +852,7 @@ class OnOffCluster: public TestCommand
 
         runner->NextTest();
     }
-
 };
-
 
 void registerCommandsTests(Commands & commands)
 {

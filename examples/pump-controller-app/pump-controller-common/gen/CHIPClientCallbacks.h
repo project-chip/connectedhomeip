@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <inttypes.h>
+#include <app/Command.h>
 #include <app/common/gen/af-structs.h>
 #include <app/util/af-enums.h>
+#include <inttypes.h>
 #include <lib/support/Span.h>
-#include <app/Command.h>
 
 // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
 // instead of IM status code.
@@ -43,8 +43,8 @@ typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
 typedef void (*StringAttributeCallback)(void * context, const chip::ByteSpan value);
-typedef void (*ReadReportingConfigurationReportedCallback)(void* context, uint16_t minInterval, uint16_t maxInterval);
-typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16_t timeout);
+typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint16_t minInterval, uint16_t maxInterval);
+typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
 

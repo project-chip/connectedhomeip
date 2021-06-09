@@ -74,7 +74,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        protocolCode  = Protocols::InteractionModel::ProtocolCode::kFailure;
+        protocolCode = Protocols::InteractionModel::ProtocolCode::kFailure;
     }
     CHIP_ERROR err = currentCommandObject->AddStatusCode(&returnStatusParam,
                                                          status == EMBER_ZCL_STATUS_SUCCESS
