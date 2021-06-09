@@ -16,45 +16,48 @@
  */
 
 // Import helpers from zap core
-const zapPath = '../../../../third_party/zap/repo/src-electron/';
+const zapPath      = '../../../../third_party/zap/repo/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper = require(zapPath + 'generator/helper-zcl.js')
-const queryZcl = require(zapPath + 'db/query-zcl.js')
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const queryZcl     = require(zapPath + 'db/query-zcl.js')
 
 const ChipTypesHelper = require('../../../../src/app/zap-templates/common/ChipTypesHelper.js');
-const StringHelper = require('../../../../src/app/zap-templates/common/StringHelper.js');
+const StringHelper    = require('../../../../src/app/zap-templates/common/StringHelper.js');
 
-function convertBasicCTypeToJavaType(cType) {
+function convertBasicCTypeToJavaType(cType)
+{
   switch (cType) {
-    case 'uint8_t':
-    case 'int8_t':
-    case 'uint16_t':
-    case 'int16_t':
-      return 'int';
-    case 'uint32_t':
-    case 'int32_t':
-    case 'uint64_t':
-    case 'int64_t':
-      return 'long';
-    default:
-      error = label + ': Unhandled type ' + cType;
-      throw error;
+  case 'uint8_t':
+  case 'int8_t':
+  case 'uint16_t':
+  case 'int16_t':
+    return 'int';
+  case 'uint32_t':
+  case 'int32_t':
+  case 'uint64_t':
+  case 'int64_t':
+    return 'long';
+  default:
+    error = label + ': Unhandled type ' + cType;
+    throw error;
   }
 }
 
-function convertBasicCTypeToJniType(cType) {
+function convertBasicCTypeToJniType(cType)
+{
   switch (convertBasicCTypeToJavaType(cType)) {
-    case 'int':
-      return 'jint';
-    case 'long':
-      return 'jlong';
-    default:
-      error = label + ': Unhandled type ' + cType;
-      throw error;
+  case 'int':
+    return 'jint';
+  case 'long':
+    return 'jlong';
+  default:
+    error = label + ': Unhandled type ' + cType;
+    throw error;
   }
 }
 
-function asJavaBasicType(type) {
+function asJavaBasicType(type)
+{
   if (StringHelper.isOctetString(type)) {
     return 'byte[]';
   } else if (StringHelper.isCharString(type)) {
@@ -64,7 +67,8 @@ function asJavaBasicType(type) {
   }
 }
 
-function asJniBasicType(type) {
+function asJniBasicType(type)
+{
   if (StringHelper.isOctetString(type)) {
     return 'jbyteArray';
   } else if (StringHelper.isCharString(type)) {
@@ -74,9 +78,11 @@ function asJniBasicType(type) {
   }
 }
 
-function asJavaBasicTypeForZclType(label, type) {
-  function fn(pkgId) {
-    const options = { 'hash': {} };
+function asJavaBasicTypeForZclType(label, type)
+{
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       return convertBasicCTypeToJavaType(ChipTypesHelper.asBasicType(zclType));
     })
@@ -86,9 +92,11 @@ function asJavaBasicTypeForZclType(label, type) {
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asJniBasicTypeForZclType(label, type) {
-  function fn(pkgId) {
-    const options = { 'hash': {} };
+function asJniBasicTypeForZclType(label, type)
+{
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       return convertBasicCTypeToJniType(ChipTypesHelper.asBasicType(zclType));
     })
@@ -98,18 +106,20 @@ function asJniBasicTypeForZclType(label, type) {
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asJniSignature(label, type) {
-  function fn(pkgId) {
-    const options = { 'hash': {} };
+function asJniSignature(label, type)
+{
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       switch (convertBasicCTypeToJavaType(ChipTypesHelper.asBasicType(zclType))) {
-        case 'int':
-          return 'I';
-        case 'long':
-          return 'J';
-        default:
-          error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
-          throw error;
+      case 'int':
+        return 'I';
+      case 'long':
+        return 'J';
+      default:
+        error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
+        throw error;
       }
     })
   }
@@ -118,23 +128,20 @@ function asJniSignature(label, type) {
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function omitCommaForFirstNonStatusCommand(id, index) {
-  let promise = templateUtil.ensureZclPackageId(this).then((pkgId) => {
-    return queryZcl.selectCommandArgumentsByCommandId(
-      this.global.db,
-      id,
-      pkgId
-    )
-  }).catch(err => console.log(err))
-  .then((result) => {
-    // Currently, we omit array types, so don't count it as a valid non-status command.
-    let firstNonStatusCommandIndex = result.findIndex((command) => command.label != "status" && !command.isArray);
-    if (firstNonStatusCommandIndex == -1 || firstNonStatusCommandIndex != index) {
-      return ", ";
-    }
-    return "";
-  })
-  .catch(err => console.log(err));
+function omitCommaForFirstNonStatusCommand(id, index)
+{
+  let promise = templateUtil.ensureZclPackageId(this)
+                    .then((pkgId) => { return queryZcl.selectCommandArgumentsByCommandId(this.global.db, id, pkgId) })
+                    .catch(err => console.log(err))
+                    .then((result) => {
+                      // Currently, we omit array types, so don't count it as a valid non-status command.
+                      let firstNonStatusCommandIndex = result.findIndex((command) => command.label != "status" && !command.isArray);
+                      if (firstNonStatusCommandIndex == -1 || firstNonStatusCommandIndex != index) {
+                        return ", ";
+                      }
+                      return "";
+                    })
+                    .catch(err => console.log(err));
 
   return templateUtil.templatePromise(this.global, promise);
 }
@@ -142,9 +149,9 @@ function omitCommaForFirstNonStatusCommand(id, index) {
 //
 // Module exports
 //
-exports.asJavaBasicType = asJavaBasicType;
-exports.asJniBasicType = asJniBasicType;
-exports.asJniBasicTypeForZclType = asJniBasicTypeForZclType;
-exports.asJniSignature = asJniSignature;
-exports.asJavaBasicTypeForZclType = asJavaBasicTypeForZclType;
+exports.asJavaBasicType                   = asJavaBasicType;
+exports.asJniBasicType                    = asJniBasicType;
+exports.asJniBasicTypeForZclType          = asJniBasicTypeForZclType;
+exports.asJniSignature                    = asJniSignature;
+exports.asJavaBasicTypeForZclType         = asJavaBasicTypeForZclType;
 exports.omitCommaForFirstNonStatusCommand = omitCommaForFirstNonStatusCommand;
