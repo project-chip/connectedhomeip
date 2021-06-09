@@ -11966,8 +11966,7 @@ public:
 
         chip::Controller::OtaSoftwareUpdateServerCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ApplyUpdateRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                          chip::ByteSpan(chip::Uint8::from_char(mUpdateToken), strlen(mUpdateToken)), mNewVersion);
+        return cluster.ApplyUpdateRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUpdateToken, mNewVersion);
     }
 
 private:
@@ -11976,7 +11975,7 @@ private:
             OnOtaSoftwareUpdateServerClusterApplyUpdateRequestResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mUpdateToken;
+    chip::ByteSpan mUpdateToken;
     uint32_t mNewVersion;
 };
 
@@ -12004,9 +12003,7 @@ public:
 
         chip::Controller::OtaSoftwareUpdateServerCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.NotifyUpdateApplied(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                           chip::ByteSpan(chip::Uint8::from_char(mUpdateToken), strlen(mUpdateToken)),
-                                           mCurrentVersion);
+        return cluster.NotifyUpdateApplied(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUpdateToken, mCurrentVersion);
     }
 
 private:
@@ -12014,7 +12011,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mUpdateToken;
+    chip::ByteSpan mUpdateToken;
     uint32_t mCurrentVersion;
 };
 
@@ -12052,7 +12049,7 @@ public:
         return cluster.QueryImage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mVendorId, mProductId, mImageType,
                                   mHardwareVersion, mCurrentVersion, mProtocolsSupported,
                                   chip::ByteSpan(chip::Uint8::from_char(mLocation), strlen(mLocation)), mClientCanConsent,
-                                  chip::ByteSpan(chip::Uint8::from_char(mMetadataForServer), strlen(mMetadataForServer)));
+                                  mMetadataForServer);
     }
 
 private:
@@ -12069,7 +12066,7 @@ private:
     uint8_t mProtocolsSupported;
     char * mLocation;
     uint8_t mClientCanConsent;
-    char * mMetadataForServer;
+    chip::ByteSpan mMetadataForServer;
 };
 
 /*
