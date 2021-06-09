@@ -96,30 +96,30 @@ public:
     void Reset()
     {
         mEchoIntervalMillis = 1000;
-        mLastEchoTime       = 0;
+        mLastEchoTimeMillis = 0;
         mEchoReqCount       = 0;
         mEchoRespCount      = 0;
         mEchoReqSize        = 32;
         mWaitingForEchoResp = false;
-        mUsingMRP           = true;
+        mUsingMRP           = false;
     }
 
-    uint64_t GetLastEchoTime() const { return mLastEchoTime; }
-    void SetLastEchoTime(uint64_t value) { mLastEchoTime = value; }
-
-    uint32_t GetEchoReqCount() const { return mEchoReqCount; }
-    void SetEchoReqCount(uint32_t value) { mEchoReqCount = value; }
-    void IncrementEchoReqCount() { mEchoReqCount++; }
-
-    uint32_t GetEchoRespCount() const { return mEchoRespCount; }
-    void SetEchoRespCount(uint32_t value) { mEchoRespCount = value; }
-    void IncrementEchoRespCount() { mEchoRespCount++; }
+    uint64_t GetLastEchoTime() const { return mLastEchoTimeMillis; }
+    void SetLastEchoTime(uint64_t value) { mLastEchoTimeMillis = value; }
 
     uint32_t GetEchoInterval() const { return mEchoIntervalMillis; }
     void SetEchoInterval(uint32_t value) { mEchoIntervalMillis = value; }
 
-    uint32_t GetEchoReqSize() const { return mEchoReqSize; }
-    void SetEchoReqSize(uint32_t value) { mEchoReqSize = value; }
+    uint16_t GetEchoReqCount() const { return mEchoReqCount; }
+    void SetEchoReqCount(uint16_t value) { mEchoReqCount = value; }
+    void IncrementEchoReqCount() { mEchoReqCount++; }
+
+    uint16_t GetEchoRespCount() const { return mEchoRespCount; }
+    void SetEchoRespCount(uint16_t value) { mEchoRespCount = value; }
+    void IncrementEchoRespCount() { mEchoRespCount++; }
+
+    uint16_t GetEchoReqSize() const { return mEchoReqSize; }
+    void SetEchoReqSize(uint16_t value) { mEchoReqSize = value; }
 
     bool IsWaitingForEchoResp() const { return mWaitingForEchoResp; }
     void SetWaitingForEchoResp(bool value) { mWaitingForEchoResp = value; }
@@ -129,25 +129,25 @@ public:
 
 private:
     // The last time a echo request was attempted to be sent.
-    uint64_t mLastEchoTime;
-
-    // Count of the number of echo requests sent.
-    uint32_t mEchoReqCount;
-
-    // Count of the number of echo responses received.
-    uint32_t mEchoRespCount;
-
-    // The CHIP Echo request payload size in bytes.
-    uint32_t mEchoReqSize;
+    uint64_t mLastEchoTimeMillis = 0;
 
     // The CHIP Echo interval time in milliseconds.
-    uint32_t mEchoIntervalMillis;
+    uint32_t mEchoIntervalMillis = 1000;
+
+    // Count of the number of echo requests sent.
+    uint16_t mEchoReqCount = 0;
+
+    // Count of the number of echo responses received.
+    uint16_t mEchoRespCount = 0;
+
+    // The CHIP Echo request payload size in bytes.
+    uint16_t mEchoReqSize = 32;
 
     // True, if the echo client is waiting for an echo response
     // after sending an echo request, false otherwise.
-    bool mWaitingForEchoResp;
+    bool mWaitingForEchoResp = false;
 
-    bool mUsingMRP;
+    bool mUsingMRP = false;
 };
 
 enum CommissioningStage : uint8_t
@@ -510,14 +510,14 @@ public:
      *    Using Echo Protocol to measure packet loss across network paths for a paired device.
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] maxCount              The max value for the number of echo requests sent.
      * @param[in] waitTimeMillis        The max time to wait for Echo response message in milliseconds.
+     * @param[in] maxCount              The max value for the number of echo requests sent.
      * @param[in] payloadSize           The CHIP Echo request payload size in bytes.
      * @param[in] usingMRP              If enable Message Reliable Protocol for CHIP Echo request.
      *
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR PingDevice(NodeId remoteDeviceId, uint32_t maxCount, uint32_t waitTimeMillis, uint32_t payloadSize, bool usingMRP);
+    CHIP_ERROR PingDevice(NodeId remoteDeviceId, uint32_t waitTimeMillis, uint16_t maxCount, uint16_t payloadSize, bool usingMRP);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;

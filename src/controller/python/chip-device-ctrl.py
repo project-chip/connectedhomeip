@@ -27,6 +27,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
 from chip import exceptions
+import argparse
 import ctypes
 import sys
 import os
@@ -569,63 +570,34 @@ class DeviceMgrCmd(Cmd):
         Options:
           -i  <interval>  ping interval time in seconds
           -c  <count>     stop after <count> replies
-          -r  <1|0>       enable or disable MRP
+          -r              enable MRP
           -s  <size>      payload size in bytes
 
         ping command is using Echo Protocol to measure packet loss across network paths.
 
         """
         try:
-            args = shlex.split(line)
-            argc = len(args) - 1
-            if len(args) < 1 or args[0] == '?':
+            argumentList = shlex.split(line)
+            if argumentList[0] == '?':
                 print("Usage:")
                 self.do_help("ping")
                 return
 
-            echoCount = 3
-            echoInterval = 1000
-            payloadSize = 32
-            usingMRP = True;
-            optIndex = 0
+            parser = argparse.ArgumentParser()
+            parser.add_argument("-i", type=int, default=1, dest='interval')
+            parser.add_argument("-c", type=int, default=3, dest='count')
+            parser.add_argument('-r', action="store_true", default=False, dest='mrp')
+            parser.add_argument("-s", type=int, default=32, dest='size')
+            parser.add_argument('nodeid', type=int, nargs=1)
+            args = parser.parse_args(argumentList)
 
-            while (optIndex <= argc and args[optIndex][0] == '-'):
-                if args[optIndex] == "-i":
-                    optIndex += 1
-                    echoInterval = int(args[optIndex]) * 1000
-                elif args[optIndex] == "-c":
-                    optIndex += 1
-                    echoCount = int(args[optIndex]) 
-                elif args[optIndex] == "-s":
-                    optIndex += 1
-                    payloadSize = int(args[optIndex])
-                elif args[optIndex] == "-r":
-                    optIndex += 1
-                    if (int(args[optIndex]) == 1):
-                        usingMRP = True
-                    else:
-                        usingMRP = False
-                else:
-                    print("Unexpected option %s" % args[optIndex])
-                    return
-
-                optIndex += 1
-
-            if (optIndex > argc):
-                print("Missing Node ID")
-                return
-            
-            nodeid = int(args[optIndex])
-
-            err = self.devCtrl.PingNode(nodeid, echoCount, echoInterval, payloadSize, usingMRP)
+            err = self.devCtrl.PingNode(args.nodeid[0], args.count, args.interval * 1000, args.size, args.mrp)
             if err == 0:
                 print("Received command status response")
             else:                
                 print("Failed to receive command status response")
-        except ValueError:
-            print("Incorrect argument type")
-        except IndexError:
-            print("Missing argument for option %s" % args[optIndex-1])
+        except argparse.ArgumentError as ex:
+            print(str(ex))
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
