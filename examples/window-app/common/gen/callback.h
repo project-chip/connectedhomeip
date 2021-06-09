@@ -40,6 +40,7 @@ void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clust
 
 // Cluster Init Functions
 
+
 /** @brief Basic Cluster Init
  *
  * Cluster Init
@@ -47,6 +48,7 @@ void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clust
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
+
 
 /** @brief Network Commissioning Cluster Init
  *
@@ -56,6 +58,7 @@ void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfNetworkCommissioningClusterInitCallback(chip::EndpointId endpoint);
 
+
 /** @brief Thread Network Diagnostics Cluster Init
  *
  * Cluster Init
@@ -63,6 +66,7 @@ void emberAfNetworkCommissioningClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfThreadNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoint);
+
 
 /** @brief Window Covering Cluster Init
  *
@@ -72,7 +76,9 @@ void emberAfThreadNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoin
  */
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint);
 
+
 // Cluster Server/Client Init Functions
+
 
 //
 // Basic Cluster server
@@ -103,8 +109,7 @@ void emberAfBasicClusterServerAttributeChangedCallback(chip::EndpointId endpoint
  * @param attributeId       Attribute that changed
  * @param manufacturerCode  Manufacturer Code of the attribute that changed
  */
-void emberAfBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           uint16_t manufacturerCode);
+void emberAfBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 
 /** @brief Basic Cluster Server Message Sent
  *
@@ -117,8 +122,7 @@ void emberAfBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip:
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Basic Cluster Server Pre Attribute Changed
  *
@@ -130,9 +134,7 @@ void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestina
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
-                                                                   uint8_t * value);
+EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Basic Cluster Server Tick
  *
@@ -171,9 +173,7 @@ void emberAfNetworkCommissioningClusterServerAttributeChangedCallback(chip::Endp
  * @param attributeId       Attribute that changed
  * @param manufacturerCode  Manufacturer Code of the attribute that changed
  */
-void emberAfNetworkCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId,
-                                                                                          uint16_t manufacturerCode);
+void emberAfNetworkCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 
 /** @brief Network Commissioning Cluster Server Message Sent
  *
@@ -186,9 +186,7 @@ void emberAfNetworkCommissioningClusterServerManufacturerSpecificAttributeChange
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfNetworkCommissioningClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                 EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                 EmberStatus status);
+void emberAfNetworkCommissioningClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Network Commissioning Cluster Server Pre Attribute Changed
  *
@@ -200,10 +198,7 @@ void emberAfNetworkCommissioningClusterServerMessageSentCallback(const chip::Mes
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfNetworkCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                                  uint8_t * value);
+EmberAfStatus emberAfNetworkCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Network Commissioning Cluster Server Tick
  *
@@ -242,9 +237,7 @@ void emberAfThreadNetworkDiagnosticsClusterServerAttributeChangedCallback(chip::
  * @param attributeId       Attribute that changed
  * @param manufacturerCode  Manufacturer Code of the attribute that changed
  */
-void emberAfThreadNetworkDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              uint16_t manufacturerCode);
+void emberAfThreadNetworkDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 
 /** @brief Thread Network Diagnostics Cluster Server Message Sent
  *
@@ -257,9 +250,7 @@ void emberAfThreadNetworkDiagnosticsClusterServerManufacturerSpecificAttributeCh
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfThreadNetworkDiagnosticsClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                     EmberStatus status);
+void emberAfThreadNetworkDiagnosticsClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Thread Network Diagnostics Cluster Server Pre Attribute Changed
  *
@@ -271,10 +262,7 @@ void emberAfThreadNetworkDiagnosticsClusterServerMessageSentCallback(const chip:
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfThreadNetworkDiagnosticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      EmberAfAttributeType attributeType,
-                                                                                      uint16_t size, uint8_t * value);
+EmberAfStatus emberAfThreadNetworkDiagnosticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Thread Network Diagnostics Cluster Server Tick
  *
@@ -313,9 +301,7 @@ void emberAfWindowCoveringClusterServerAttributeChangedCallback(chip::EndpointId
  * @param attributeId       Attribute that changed
  * @param manufacturerCode  Manufacturer Code of the attribute that changed
  */
-void emberAfWindowCoveringClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    uint16_t manufacturerCode);
+void emberAfWindowCoveringClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 
 /** @brief Window Covering Cluster Server Message Sent
  *
@@ -328,9 +314,7 @@ void emberAfWindowCoveringClusterServerManufacturerSpecificAttributeChangedCallb
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfWindowCoveringClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfWindowCoveringClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Window Covering Cluster Server Pre Attribute Changed
  *
@@ -342,10 +326,7 @@ void emberAfWindowCoveringClusterServerMessageSentCallback(const chip::MessageSe
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfWindowCoveringClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint16_t size,
-                                                                            uint8_t * value);
+EmberAfStatus emberAfWindowCoveringClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Window Covering Cluster Server Tick
  *
@@ -358,113 +339,101 @@ void emberAfWindowCoveringClusterServerTickCallback(chip::EndpointId endpoint);
 // Cluster Commands Callback
 
 /**
- * @brief Network Commissioning Cluster AddThreadNetwork Command callback
- */
+* @brief Network Commissioning Cluster AddThreadNetwork Command callback
+*/
 
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan operationalDataset,
-                                                                uint64_t breadcrumb, uint32_t timeoutMs);
-
-/**
- * @brief Network Commissioning Cluster AddWiFiNetwork Command callback
- */
-
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
-                                                              chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
+bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief Network Commissioning Cluster DisableNetwork Command callback
- */
+* @brief Network Commissioning Cluster AddWiFiNetwork Command callback
+*/
 
-bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
-                                                              uint64_t breadcrumb, uint32_t timeoutMs);
-
-/**
- * @brief Network Commissioning Cluster EnableNetwork Command callback
- */
-
-bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
-                                                             uint64_t breadcrumb, uint32_t timeoutMs);
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback
- */
+* @brief Network Commissioning Cluster DisableNetwork Command callback
+*/
 
-bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::Command * commandObj,
-                                                                                 uint32_t timeoutMs);
-
-/**
- * @brief Network Commissioning Cluster RemoveNetwork Command callback
- */
-
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan NetworkID,
-                                                             uint64_t Breadcrumb, uint32_t TimeoutMs);
+bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief Network Commissioning Cluster ScanNetworks Command callback
- */
+* @brief Network Commissioning Cluster EnableNetwork Command callback
+*/
 
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
-                                                            uint64_t breadcrumb, uint32_t timeoutMs);
-
-/**
- * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback
- */
-
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj,
-                                                                   chip::ByteSpan operationalDataset, uint64_t breadcrumb,
-                                                                   uint32_t timeoutMs);
+bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback
- */
+* @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback
+*/
 
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
-                                                                 chip::ByteSpan credentials, uint64_t breadcrumb,
-                                                                 uint32_t timeoutMs);
+bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::Command * commandObj, uint32_t timeoutMs);
 
 /**
- * @brief Window Covering Cluster WindowCoveringDownClose Command callback
- */
+* @brief Network Commissioning Cluster RemoveNetwork Command callback
+*/
+
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan NetworkID, uint64_t Breadcrumb, uint32_t TimeoutMs);
+
+/**
+* @brief Network Commissioning Cluster ScanNetworks Command callback
+*/
+
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, chip::ByteSpan ssid, uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+* @brief Network Commissioning Cluster UpdateThreadNetwork Command callback
+*/
+
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+* @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback
+*/
+
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+* @brief Window Covering Cluster WindowCoveringDownClose Command callback
+*/
 
 bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(chip::app::Command * commandObj);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToLiftPercentage Command callback
- */
+* @brief Window Covering Cluster WindowCoveringGoToLiftPercentage Command callback
+*/
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(chip::app::Command * commandObj,
-                                                                          uint8_t percentageLiftValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(chip::app::Command * commandObj, uint8_t percentageLiftValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToLiftValue Command callback
- */
+* @brief Window Covering Cluster WindowCoveringGoToLiftValue Command callback
+*/
 
 bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(chip::app::Command * commandObj, uint16_t liftValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToTiltPercentage Command callback
- */
+* @brief Window Covering Cluster WindowCoveringGoToTiltPercentage Command callback
+*/
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(chip::app::Command * commandObj,
-                                                                          uint8_t percentageTiltValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(chip::app::Command * commandObj, uint8_t percentageTiltValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToTiltValue Command callback
- */
+* @brief Window Covering Cluster WindowCoveringGoToTiltValue Command callback
+*/
 
 bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(chip::app::Command * commandObj, uint16_t tiltValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringStop Command callback
- */
+* @brief Window Covering Cluster WindowCoveringStop Command callback
+*/
 
 bool emberAfWindowCoveringClusterWindowCoveringStopCallback(chip::app::Command * commandObj);
 
 /**
- * @brief Window Covering Cluster WindowCoveringUpOpen Command callback
- */
+* @brief Window Covering Cluster WindowCoveringUpOpen Command callback
+*/
 
 bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(chip::app::Command * commandObj);
+
 
 //
 // Non-Cluster Related Callbacks
@@ -622,8 +591,8 @@ bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId
  * @param extended Indicates whether the response is in the extended format or
  * not.  Ver.: always
  */
-bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool discoveryComplete, uint8_t * buffer, uint16_t bufLen,
-                                               bool extended);
+bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
+                                               uint16_t bufLen, bool extended);
 
 /** @brief Discover Commands Generated Response
  *
@@ -642,6 +611,7 @@ bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool d
 bool emberAfDiscoverCommandsGeneratedResponseCallback(chip::ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
                                                       chip::CommandId * commandIds, uint16_t commandIdCount);
 
+
 /** @brief Discover Commands Received Response
  *
  * This function is called by the framework when Discover Commands Received
@@ -658,6 +628,7 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(chip::ClusterId clusterId,
  */
 bool emberAfDiscoverCommandsReceivedResponseCallback(chip::ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
                                                      chip::CommandId * commandIds, uint16_t commandIdCount);
+
 
 /** @brief Pre Command Received
  *
@@ -713,8 +684,8 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                                uint8_t * message, EmberStatus status);
+bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Pre Attribute Change
  *
@@ -752,8 +723,8 @@ EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip:
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
+void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
 
 /** @brief Read Attributes Response
  *
@@ -914,8 +885,7 @@ uint32_t emberAfGetCurrentTimeCallback();
  * @param returnEndpointInfo A pointer to a data struct that will be written
  * with information about the endpoint.  Ver.: always
  */
-bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex,
-                                    EmberAfEndpointInfoStruct * returnEndpointInfo);
+bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo);
 
 /** @brief Registration Abort
  *

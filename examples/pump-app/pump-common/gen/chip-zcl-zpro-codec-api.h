@@ -61,42 +61,35 @@
  * @brief
  *    Encode a Temperature Measurement server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t seqNum,
-                                                                                       chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Temperature Measurement server read command for the measured value attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle
-encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Temperature Measurement server configure report command for the measured value attribute into buffer including the
- * APS frame
+ *    Encode a Temperature Measurement server configure report command for the measured value attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle
-encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                                   uint16_t minInterval, uint16_t maxInterval, int16_t change);
+chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, int16_t change);
 
 /**
  * @brief
  *    Encode a Temperature Measurement server read command for the min measured value attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle
-encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Temperature Measurement server read command for the max measured value attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle
-encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
  *    Encode a Temperature Measurement server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle
-encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+

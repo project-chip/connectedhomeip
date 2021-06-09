@@ -51,6 +51,7 @@ using namespace chip::Encoding::LittleEndian;
     }                                                                                                                              \
     return buf.Finalize();
 
+
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
@@ -339,6 +340,7 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_WINDOW_COVERING_STOP_COMMAND_ID (0x02)
 #define ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID (0x00)
 
+
 // TODO: Find a way to calculate maximum message length for clusters
 //       https://github.com/project-chip/connectedhomeip/issues/965
 constexpr uint16_t kMaxBufferSize = 1024;
@@ -365,7 +367,11 @@ constexpr EndpointId kSourceEndpoint = 1;
 PacketBufferHandle encodeAccountLoginClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverAccountLoginAttributes", ACCOUNT_LOGIN_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -375,7 +381,10 @@ PacketBufferHandle encodeAccountLoginClusterDiscoverAttributes(uint8_t seqNum, E
 PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadAccountLoginClusterRevision", ACCOUNT_LOGIN_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -398,7 +407,11 @@ PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t
 PacketBufferHandle encodeApplicationBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverApplicationBasicAttributes", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -408,7 +421,10 @@ PacketBufferHandle encodeApplicationBasicClusterDiscoverAttributes(uint8_t seqNu
 PacketBufferHandle encodeApplicationBasicClusterReadVendorNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicVendorName", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -418,7 +434,10 @@ PacketBufferHandle encodeApplicationBasicClusterReadVendorNameAttribute(uint8_t 
 PacketBufferHandle encodeApplicationBasicClusterReadVendorIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicVendorId", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -428,7 +447,10 @@ PacketBufferHandle encodeApplicationBasicClusterReadVendorIdAttribute(uint8_t se
 PacketBufferHandle encodeApplicationBasicClusterReadApplicationNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicApplicationName", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -438,7 +460,10 @@ PacketBufferHandle encodeApplicationBasicClusterReadApplicationNameAttribute(uin
 PacketBufferHandle encodeApplicationBasicClusterReadProductIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicProductId", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
@@ -448,7 +473,10 @@ PacketBufferHandle encodeApplicationBasicClusterReadProductIdAttribute(uint8_t s
 PacketBufferHandle encodeApplicationBasicClusterReadApplicationIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicApplicationId", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0005);
     COMMAND_FOOTER();
 }
 
@@ -458,7 +486,10 @@ PacketBufferHandle encodeApplicationBasicClusterReadApplicationIdAttribute(uint8
 PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicCatalogVendorId", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0006);
     COMMAND_FOOTER();
 }
 
@@ -468,7 +499,10 @@ PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uin
 PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicApplicationSatus", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0007);
     COMMAND_FOOTER();
 }
 
@@ -478,7 +512,10 @@ PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(ui
 PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicClusterRevision", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -496,18 +533,24 @@ PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uin
 PacketBufferHandle encodeApplicationLauncherClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverApplicationLauncherAttributes", APPLICATION_LAUNCHER_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute ApplicationLauncherList
  */
-PacketBufferHandle encodeApplicationLauncherClusterReadApplicationLauncherListAttribute(uint8_t seqNum,
-                                                                                        EndpointId destinationEndpoint)
+PacketBufferHandle encodeApplicationLauncherClusterReadApplicationLauncherListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationLauncherApplicationLauncherList", APPLICATION_LAUNCHER_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -517,7 +560,10 @@ PacketBufferHandle encodeApplicationLauncherClusterReadApplicationLauncherListAt
 PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationLauncherClusterRevision", APPLICATION_LAUNCHER_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -536,7 +582,11 @@ PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(
 PacketBufferHandle encodeAudioOutputClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverAudioOutputAttributes", AUDIO_OUTPUT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -546,7 +596,10 @@ PacketBufferHandle encodeAudioOutputClusterDiscoverAttributes(uint8_t seqNum, En
 PacketBufferHandle encodeAudioOutputClusterReadAudioOutputListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadAudioOutputAudioOutputList", AUDIO_OUTPUT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -556,7 +609,10 @@ PacketBufferHandle encodeAudioOutputClusterReadAudioOutputListAttribute(uint8_t 
 PacketBufferHandle encodeAudioOutputClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadAudioOutputClusterRevision", AUDIO_OUTPUT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -578,7 +634,11 @@ PacketBufferHandle encodeAudioOutputClusterReadClusterRevisionAttribute(uint8_t 
 PacketBufferHandle encodeBarrierControlClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverBarrierControlAttributes", BARRIER_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -588,7 +648,10 @@ PacketBufferHandle encodeBarrierControlClusterDiscoverAttributes(uint8_t seqNum,
 PacketBufferHandle encodeBarrierControlClusterReadBarrierMovingStateAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBarrierControlBarrierMovingState", BARRIER_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -598,7 +661,10 @@ PacketBufferHandle encodeBarrierControlClusterReadBarrierMovingStateAttribute(ui
 PacketBufferHandle encodeBarrierControlClusterReadBarrierSafetyStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBarrierControlBarrierSafetyStatus", BARRIER_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -608,7 +674,10 @@ PacketBufferHandle encodeBarrierControlClusterReadBarrierSafetyStatusAttribute(u
 PacketBufferHandle encodeBarrierControlClusterReadBarrierCapabilitiesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBarrierControlBarrierCapabilities", BARRIER_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
@@ -618,7 +687,10 @@ PacketBufferHandle encodeBarrierControlClusterReadBarrierCapabilitiesAttribute(u
 PacketBufferHandle encodeBarrierControlClusterReadBarrierPositionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBarrierControlBarrierPosition", BARRIER_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000A);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000A);
     COMMAND_FOOTER();
 }
 
@@ -628,7 +700,10 @@ PacketBufferHandle encodeBarrierControlClusterReadBarrierPositionAttribute(uint8
 PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBarrierControlClusterRevision", BARRIER_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -662,7 +737,11 @@ PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionAttribute(uint8
 PacketBufferHandle encodeBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverBasicAttributes", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -672,7 +751,10 @@ PacketBufferHandle encodeBasicClusterDiscoverAttributes(uint8_t seqNum, Endpoint
 PacketBufferHandle encodeBasicClusterReadInteractionModelVersionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicInteractionModelVersion", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -682,7 +764,10 @@ PacketBufferHandle encodeBasicClusterReadInteractionModelVersionAttribute(uint8_
 PacketBufferHandle encodeBasicClusterReadVendorNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicVendorName", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -692,7 +777,10 @@ PacketBufferHandle encodeBasicClusterReadVendorNameAttribute(uint8_t seqNum, End
 PacketBufferHandle encodeBasicClusterReadVendorIDAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicVendorID", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -702,7 +790,10 @@ PacketBufferHandle encodeBasicClusterReadVendorIDAttribute(uint8_t seqNum, Endpo
 PacketBufferHandle encodeBasicClusterReadProductNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicProductName", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
@@ -712,7 +803,10 @@ PacketBufferHandle encodeBasicClusterReadProductNameAttribute(uint8_t seqNum, En
 PacketBufferHandle encodeBasicClusterReadProductIDAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicProductID", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0004);
     COMMAND_FOOTER();
 }
 
@@ -722,12 +816,14 @@ PacketBufferHandle encodeBasicClusterReadProductIDAttribute(uint8_t seqNum, Endp
 PacketBufferHandle encodeBasicClusterReadUserLabelAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicUserLabel", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0005);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeBasicClusterWriteUserLabelAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                             chip::ByteSpan userLabel)
+PacketBufferHandle encodeBasicClusterWriteUserLabelAttribute(uint8_t seqNum, EndpointId destinationEndpoint, chip::ByteSpan userLabel)
 {
     COMMAND_HEADER("WriteBasicUserLabel", BASIC_CLUSTER_ID);
     size_t userLabelStrLen = userLabel.size();
@@ -738,12 +834,13 @@ PacketBufferHandle encodeBasicClusterWriteUserLabelAttribute(uint8_t seqNum, End
     }
 
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0005)
-        .Put8(66)
-        .Put(static_cast<uint8_t>(userLabelStrLen))
-        .Put(userLabel.data(), userLabelStrLen);
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0005)
+       .Put8(66)
+       .Put(static_cast<uint8_t>(userLabelStrLen))
+       .Put(userLabel.data(), userLabelStrLen)
+       ;
     COMMAND_FOOTER();
 }
 
@@ -753,7 +850,10 @@ PacketBufferHandle encodeBasicClusterWriteUserLabelAttribute(uint8_t seqNum, End
 PacketBufferHandle encodeBasicClusterReadLocationAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicLocation", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0006);
     COMMAND_FOOTER();
 }
 
@@ -768,12 +868,13 @@ PacketBufferHandle encodeBasicClusterWriteLocationAttribute(uint8_t seqNum, Endp
     }
 
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0006)
-        .Put8(66)
-        .Put(static_cast<uint8_t>(locationStrLen))
-        .Put(location.data(), locationStrLen);
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0006)
+       .Put8(66)
+       .Put(static_cast<uint8_t>(locationStrLen))
+       .Put(location.data(), locationStrLen)
+       ;
     COMMAND_FOOTER();
 }
 
@@ -783,7 +884,10 @@ PacketBufferHandle encodeBasicClusterWriteLocationAttribute(uint8_t seqNum, Endp
 PacketBufferHandle encodeBasicClusterReadHardwareVersionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicHardwareVersion", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0007);
     COMMAND_FOOTER();
 }
 
@@ -793,7 +897,10 @@ PacketBufferHandle encodeBasicClusterReadHardwareVersionAttribute(uint8_t seqNum
 PacketBufferHandle encodeBasicClusterReadHardwareVersionStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicHardwareVersionString", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0008);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0008);
     COMMAND_FOOTER();
 }
 
@@ -803,7 +910,10 @@ PacketBufferHandle encodeBasicClusterReadHardwareVersionStringAttribute(uint8_t 
 PacketBufferHandle encodeBasicClusterReadSoftwareVersionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicSoftwareVersion", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0009);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0009);
     COMMAND_FOOTER();
 }
 
@@ -813,7 +923,10 @@ PacketBufferHandle encodeBasicClusterReadSoftwareVersionAttribute(uint8_t seqNum
 PacketBufferHandle encodeBasicClusterReadSoftwareVersionStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicSoftwareVersionString", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000A);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000A);
     COMMAND_FOOTER();
 }
 
@@ -823,7 +936,10 @@ PacketBufferHandle encodeBasicClusterReadSoftwareVersionStringAttribute(uint8_t 
 PacketBufferHandle encodeBasicClusterReadManufacturingDateAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicManufacturingDate", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000B);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000B);
     COMMAND_FOOTER();
 }
 
@@ -833,7 +949,10 @@ PacketBufferHandle encodeBasicClusterReadManufacturingDateAttribute(uint8_t seqN
 PacketBufferHandle encodeBasicClusterReadPartNumberAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicPartNumber", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000C);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000C);
     COMMAND_FOOTER();
 }
 
@@ -843,7 +962,10 @@ PacketBufferHandle encodeBasicClusterReadPartNumberAttribute(uint8_t seqNum, End
 PacketBufferHandle encodeBasicClusterReadProductURLAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicProductURL", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000D);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000D);
     COMMAND_FOOTER();
 }
 
@@ -853,7 +975,10 @@ PacketBufferHandle encodeBasicClusterReadProductURLAttribute(uint8_t seqNum, End
 PacketBufferHandle encodeBasicClusterReadProductLabelAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicProductLabel", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000E);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000E);
     COMMAND_FOOTER();
 }
 
@@ -863,7 +988,10 @@ PacketBufferHandle encodeBasicClusterReadProductLabelAttribute(uint8_t seqNum, E
 PacketBufferHandle encodeBasicClusterReadSerialNumberAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicSerialNumber", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000F);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000F);
     COMMAND_FOOTER();
 }
 
@@ -873,20 +1001,23 @@ PacketBufferHandle encodeBasicClusterReadSerialNumberAttribute(uint8_t seqNum, E
 PacketBufferHandle encodeBasicClusterReadLocalConfigDisabledAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicLocalConfigDisabled", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0010);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0010);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint8_t localConfigDisabled)
+PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t localConfigDisabled)
 {
     COMMAND_HEADER("WriteBasicLocalConfigDisabled", BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0010)
-        .Put8(16)
-        .Put8(static_cast<uint8_t>(localConfigDisabled));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0010)
+       .Put8(16)
+       .Put8(static_cast<uint8_t>(localConfigDisabled))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -896,7 +1027,10 @@ PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t s
 PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicClusterRevision", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -915,7 +1049,11 @@ PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(uint8_t seqNum
 PacketBufferHandle encodeBinaryInputBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverBinaryInputBasicAttributes", BINARY_INPUT_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -925,20 +1063,23 @@ PacketBufferHandle encodeBinaryInputBasicClusterDiscoverAttributes(uint8_t seqNu
 PacketBufferHandle encodeBinaryInputBasicClusterReadOutOfServiceAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBinaryInputBasicOutOfService", BINARY_INPUT_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0051);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0051);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeBinaryInputBasicClusterWriteOutOfServiceAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                           uint8_t outOfService)
+PacketBufferHandle encodeBinaryInputBasicClusterWriteOutOfServiceAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t outOfService)
 {
     COMMAND_HEADER("WriteBinaryInputBasicOutOfService", BINARY_INPUT_BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0051)
-        .Put8(16)
-        .Put8(static_cast<uint8_t>(outOfService));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0051)
+       .Put8(16)
+       .Put8(static_cast<uint8_t>(outOfService))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -948,35 +1089,37 @@ PacketBufferHandle encodeBinaryInputBasicClusterWriteOutOfServiceAttribute(uint8
 PacketBufferHandle encodeBinaryInputBasicClusterReadPresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0055);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0055);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeBinaryInputBasicClusterWritePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                           uint8_t presentValue)
+PacketBufferHandle encodeBinaryInputBasicClusterWritePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t presentValue)
 {
     COMMAND_HEADER("WriteBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0055)
-        .Put8(16)
-        .Put8(static_cast<uint8_t>(presentValue));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0055)
+       .Put8(16)
+       .Put8(static_cast<uint8_t>(presentValue))
+       ;
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeBinaryInputBasicClusterConfigurePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
+PacketBufferHandle encodeBinaryInputBasicClusterConfigurePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0055)
-        .Put8(16)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0055)
+       .Put8(16)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     COMMAND_FOOTER();
 }
 
@@ -986,22 +1129,24 @@ PacketBufferHandle encodeBinaryInputBasicClusterConfigurePresentValueAttribute(u
 PacketBufferHandle encodeBinaryInputBasicClusterReadStatusFlagsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBinaryInputBasicStatusFlags", BINARY_INPUT_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x006F);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x006F);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeBinaryInputBasicClusterConfigureStatusFlagsAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
+PacketBufferHandle encodeBinaryInputBasicClusterConfigureStatusFlagsAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportBinaryInputBasicStatusFlags", BINARY_INPUT_BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x006F)
-        .Put8(24)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x006F)
+       .Put8(24)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     COMMAND_FOOTER();
 }
 
@@ -1011,7 +1156,10 @@ PacketBufferHandle encodeBinaryInputBasicClusterConfigureStatusFlagsAttribute(ui
 PacketBufferHandle encodeBinaryInputBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBinaryInputBasicClusterRevision", BINARY_INPUT_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -1029,7 +1177,11 @@ PacketBufferHandle encodeBinaryInputBasicClusterReadClusterRevisionAttribute(uin
 PacketBufferHandle encodeBindingClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverBindingAttributes", BINDING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -1039,7 +1191,10 @@ PacketBufferHandle encodeBindingClusterDiscoverAttributes(uint8_t seqNum, Endpoi
 PacketBufferHandle encodeBindingClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBindingClusterRevision", BINDING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -1069,7 +1224,11 @@ PacketBufferHandle encodeBindingClusterReadClusterRevisionAttribute(uint8_t seqN
 PacketBufferHandle encodeBridgedDeviceBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverBridgedDeviceBasicAttributes", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -1079,7 +1238,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterDiscoverAttributes(uint8_t seq
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadVendorNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicVendorName", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -1089,7 +1251,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadVendorNameAttribute(uint8_
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadVendorIDAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicVendorID", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -1099,7 +1264,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadVendorIDAttribute(uint8_t 
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadProductNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicProductName", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
@@ -1109,12 +1277,14 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadProductNameAttribute(uint8
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadUserLabelAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicUserLabel", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0005);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeBridgedDeviceBasicClusterWriteUserLabelAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                          chip::ByteSpan userLabel)
+PacketBufferHandle encodeBridgedDeviceBasicClusterWriteUserLabelAttribute(uint8_t seqNum, EndpointId destinationEndpoint, chip::ByteSpan userLabel)
 {
     COMMAND_HEADER("WriteBridgedDeviceBasicUserLabel", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
     size_t userLabelStrLen = userLabel.size();
@@ -1125,12 +1295,13 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterWriteUserLabelAttribute(uint8_
     }
 
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0005)
-        .Put8(66)
-        .Put(static_cast<uint8_t>(userLabelStrLen))
-        .Put(userLabel.data(), userLabelStrLen);
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0005)
+       .Put8(66)
+       .Put(static_cast<uint8_t>(userLabelStrLen))
+       .Put(userLabel.data(), userLabelStrLen)
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1140,7 +1311,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterWriteUserLabelAttribute(uint8_
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadHardwareVersionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicHardwareVersion", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0007);
     COMMAND_FOOTER();
 }
 
@@ -1150,7 +1324,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadHardwareVersionAttribute(u
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadHardwareVersionStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicHardwareVersionString", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0008);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0008);
     COMMAND_FOOTER();
 }
 
@@ -1160,7 +1337,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadHardwareVersionStringAttri
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadSoftwareVersionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicSoftwareVersion", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0009);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0009);
     COMMAND_FOOTER();
 }
 
@@ -1170,7 +1350,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadSoftwareVersionAttribute(u
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadSoftwareVersionStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicSoftwareVersionString", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000A);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000A);
     COMMAND_FOOTER();
 }
 
@@ -1180,7 +1363,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadSoftwareVersionStringAttri
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadManufacturingDateAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicManufacturingDate", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000B);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000B);
     COMMAND_FOOTER();
 }
 
@@ -1190,7 +1376,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadManufacturingDateAttribute
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadPartNumberAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicPartNumber", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000C);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000C);
     COMMAND_FOOTER();
 }
 
@@ -1200,7 +1389,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadPartNumberAttribute(uint8_
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadProductURLAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicProductURL", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000D);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000D);
     COMMAND_FOOTER();
 }
 
@@ -1210,7 +1402,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadProductURLAttribute(uint8_
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadProductLabelAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicProductLabel", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000E);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000E);
     COMMAND_FOOTER();
 }
 
@@ -1220,7 +1415,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadProductLabelAttribute(uint
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadSerialNumberAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicSerialNumber", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000F);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000F);
     COMMAND_FOOTER();
 }
 
@@ -1230,7 +1428,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadSerialNumberAttribute(uint
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadReachableAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicReachable", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0011);
     COMMAND_FOOTER();
 }
 
@@ -1240,7 +1441,10 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadReachableAttribute(uint8_t
 PacketBufferHandle encodeBridgedDeviceBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBridgedDeviceBasicClusterRevision", BRIDGED_DEVICE_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -1320,7 +1524,11 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadClusterRevisionAttribute(u
 PacketBufferHandle encodeColorControlClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverColorControlAttributes", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -1330,22 +1538,24 @@ PacketBufferHandle encodeColorControlClusterDiscoverAttributes(uint8_t seqNum, E
 PacketBufferHandle encodeColorControlClusterReadCurrentHueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlCurrentHue", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterConfigureCurrentHueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                         uint16_t minInterval, uint16_t maxInterval, uint8_t change)
+PacketBufferHandle encodeColorControlClusterConfigureCurrentHueAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentHue", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0000)
-        .Put8(32)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0000)
+       .Put8(32)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -1356,23 +1566,24 @@ PacketBufferHandle encodeColorControlClusterConfigureCurrentHueAttribute(uint8_t
 PacketBufferHandle encodeColorControlClusterReadCurrentSaturationAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlCurrentSaturation", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterConfigureCurrentSaturationAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                uint16_t minInterval, uint16_t maxInterval,
-                                                                                uint8_t change)
+PacketBufferHandle encodeColorControlClusterConfigureCurrentSaturationAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentSaturation", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0001)
-        .Put8(32)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0001)
+       .Put8(32)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -1383,7 +1594,10 @@ PacketBufferHandle encodeColorControlClusterConfigureCurrentSaturationAttribute(
 PacketBufferHandle encodeColorControlClusterReadRemainingTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlRemainingTime", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -1393,22 +1607,24 @@ PacketBufferHandle encodeColorControlClusterReadRemainingTimeAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadCurrentXAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlCurrentX", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterConfigureCurrentXAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint16_t minInterval, uint16_t maxInterval, uint16_t change)
+PacketBufferHandle encodeColorControlClusterConfigureCurrentXAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentX", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0003)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0003)
+       .Put8(33)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -1419,22 +1635,24 @@ PacketBufferHandle encodeColorControlClusterConfigureCurrentXAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadCurrentYAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlCurrentY", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0004);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterConfigureCurrentYAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint16_t minInterval, uint16_t maxInterval, uint16_t change)
+PacketBufferHandle encodeColorControlClusterConfigureCurrentYAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentY", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0004)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0004)
+       .Put8(33)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -1445,7 +1663,10 @@ PacketBufferHandle encodeColorControlClusterConfigureCurrentYAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadDriftCompensationAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlDriftCompensation", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0005);
     COMMAND_FOOTER();
 }
 
@@ -1455,7 +1676,10 @@ PacketBufferHandle encodeColorControlClusterReadDriftCompensationAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadCompensationTextAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlCompensationText", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0006);
     COMMAND_FOOTER();
 }
 
@@ -1465,23 +1689,24 @@ PacketBufferHandle encodeColorControlClusterReadCompensationTextAttribute(uint8_
 PacketBufferHandle encodeColorControlClusterReadColorTemperatureAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorTemperature", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0007);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterConfigureColorTemperatureAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                               uint16_t minInterval, uint16_t maxInterval,
-                                                                               uint16_t change)
+PacketBufferHandle encodeColorControlClusterConfigureColorTemperatureAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportColorControlColorTemperature", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0007)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0007)
+       .Put8(33)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -1492,7 +1717,10 @@ PacketBufferHandle encodeColorControlClusterConfigureColorTemperatureAttribute(u
 PacketBufferHandle encodeColorControlClusterReadColorModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorMode", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0008);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0008);
     COMMAND_FOOTER();
 }
 
@@ -1502,20 +1730,23 @@ PacketBufferHandle encodeColorControlClusterReadColorModeAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadColorControlOptionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorControlOptions", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000F);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000F);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorControlOptionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                              uint8_t colorControlOptions)
+PacketBufferHandle encodeColorControlClusterWriteColorControlOptionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t colorControlOptions)
 {
     COMMAND_HEADER("WriteColorControlColorControlOptions", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x000F)
-        .Put8(24)
-        .Put8(static_cast<uint8_t>(colorControlOptions));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000F)
+       .Put8(24)
+       .Put8(static_cast<uint8_t>(colorControlOptions))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1525,7 +1756,10 @@ PacketBufferHandle encodeColorControlClusterWriteColorControlOptionsAttribute(ui
 PacketBufferHandle encodeColorControlClusterReadNumberOfPrimariesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlNumberOfPrimaries", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0010);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0010);
     COMMAND_FOOTER();
 }
 
@@ -1535,7 +1769,10 @@ PacketBufferHandle encodeColorControlClusterReadNumberOfPrimariesAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadPrimary1XAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary1X", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0011);
     COMMAND_FOOTER();
 }
 
@@ -1545,7 +1782,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary1XAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary1YAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary1Y", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0012);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0012);
     COMMAND_FOOTER();
 }
 
@@ -1555,7 +1795,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary1YAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary1IntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary1Intensity", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0013);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0013);
     COMMAND_FOOTER();
 }
 
@@ -1565,7 +1808,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary1IntensityAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadPrimary2XAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary2X", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0015);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0015);
     COMMAND_FOOTER();
 }
 
@@ -1575,7 +1821,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary2XAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary2YAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary2Y", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0016);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0016);
     COMMAND_FOOTER();
 }
 
@@ -1585,7 +1834,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary2YAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary2IntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary2Intensity", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0017);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0017);
     COMMAND_FOOTER();
 }
 
@@ -1595,7 +1847,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary2IntensityAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadPrimary3XAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary3X", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0019);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0019);
     COMMAND_FOOTER();
 }
 
@@ -1605,7 +1860,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary3XAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary3YAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary3Y", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001A);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x001A);
     COMMAND_FOOTER();
 }
 
@@ -1615,7 +1873,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary3YAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary3IntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary3Intensity", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001B);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x001B);
     COMMAND_FOOTER();
 }
 
@@ -1625,7 +1886,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary3IntensityAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadPrimary4XAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary4X", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0020);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0020);
     COMMAND_FOOTER();
 }
 
@@ -1635,7 +1899,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary4XAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary4YAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary4Y", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0021);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0021);
     COMMAND_FOOTER();
 }
 
@@ -1645,7 +1912,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary4YAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary4IntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary4Intensity", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0022);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0022);
     COMMAND_FOOTER();
 }
 
@@ -1655,7 +1925,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary4IntensityAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadPrimary5XAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary5X", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0024);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0024);
     COMMAND_FOOTER();
 }
 
@@ -1665,7 +1938,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary5XAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary5YAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary5Y", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0025);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0025);
     COMMAND_FOOTER();
 }
 
@@ -1675,7 +1951,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary5YAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary5IntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary5Intensity", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0026);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0026);
     COMMAND_FOOTER();
 }
 
@@ -1685,7 +1964,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary5IntensityAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadPrimary6XAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary6X", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0028);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0028);
     COMMAND_FOOTER();
 }
 
@@ -1695,7 +1977,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary6XAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary6YAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary6Y", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0029);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0029);
     COMMAND_FOOTER();
 }
 
@@ -1705,7 +1990,10 @@ PacketBufferHandle encodeColorControlClusterReadPrimary6YAttribute(uint8_t seqNu
 PacketBufferHandle encodeColorControlClusterReadPrimary6IntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlPrimary6Intensity", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x002A);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x002A);
     COMMAND_FOOTER();
 }
 
@@ -1715,20 +2003,23 @@ PacketBufferHandle encodeColorControlClusterReadPrimary6IntensityAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadWhitePointXAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlWhitePointX", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0030);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0030);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteWhitePointXAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                      uint16_t whitePointX)
+PacketBufferHandle encodeColorControlClusterWriteWhitePointXAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t whitePointX)
 {
     COMMAND_HEADER("WriteColorControlWhitePointX", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0030)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(whitePointX));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0030)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(whitePointX))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1738,20 +2029,23 @@ PacketBufferHandle encodeColorControlClusterWriteWhitePointXAttribute(uint8_t se
 PacketBufferHandle encodeColorControlClusterReadWhitePointYAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlWhitePointY", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0031);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0031);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteWhitePointYAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                      uint16_t whitePointY)
+PacketBufferHandle encodeColorControlClusterWriteWhitePointYAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t whitePointY)
 {
     COMMAND_HEADER("WriteColorControlWhitePointY", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0031)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(whitePointY));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0031)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(whitePointY))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1761,20 +2055,23 @@ PacketBufferHandle encodeColorControlClusterWriteWhitePointYAttribute(uint8_t se
 PacketBufferHandle encodeColorControlClusterReadColorPointRXAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorPointRX", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0032);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0032);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorPointRXAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint16_t colorPointRX)
+PacketBufferHandle encodeColorControlClusterWriteColorPointRXAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t colorPointRX)
 {
     COMMAND_HEADER("WriteColorControlColorPointRX", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0032)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(colorPointRX));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0032)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(colorPointRX))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1784,20 +2081,23 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointRXAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadColorPointRYAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorPointRY", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0033);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0033);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorPointRYAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint16_t colorPointRY)
+PacketBufferHandle encodeColorControlClusterWriteColorPointRYAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t colorPointRY)
 {
     COMMAND_HEADER("WriteColorControlColorPointRY", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0033)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(colorPointRY));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0033)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(colorPointRY))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1807,20 +2107,23 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointRYAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadColorPointRIntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorPointRIntensity", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0034);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0034);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorPointRIntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                               uint8_t colorPointRIntensity)
+PacketBufferHandle encodeColorControlClusterWriteColorPointRIntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t colorPointRIntensity)
 {
     COMMAND_HEADER("WriteColorControlColorPointRIntensity", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0034)
-        .Put8(32)
-        .Put8(static_cast<uint8_t>(colorPointRIntensity));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0034)
+       .Put8(32)
+       .Put8(static_cast<uint8_t>(colorPointRIntensity))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1830,20 +2133,23 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointRIntensityAttribute(u
 PacketBufferHandle encodeColorControlClusterReadColorPointGXAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorPointGX", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0036);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0036);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorPointGXAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint16_t colorPointGX)
+PacketBufferHandle encodeColorControlClusterWriteColorPointGXAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t colorPointGX)
 {
     COMMAND_HEADER("WriteColorControlColorPointGX", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0036)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(colorPointGX));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0036)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(colorPointGX))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1853,20 +2159,23 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointGXAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadColorPointGYAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorPointGY", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0037);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0037);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorPointGYAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint16_t colorPointGY)
+PacketBufferHandle encodeColorControlClusterWriteColorPointGYAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t colorPointGY)
 {
     COMMAND_HEADER("WriteColorControlColorPointGY", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0037)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(colorPointGY));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0037)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(colorPointGY))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1876,20 +2185,23 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointGYAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadColorPointGIntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorPointGIntensity", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0038);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0038);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorPointGIntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                               uint8_t colorPointGIntensity)
+PacketBufferHandle encodeColorControlClusterWriteColorPointGIntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t colorPointGIntensity)
 {
     COMMAND_HEADER("WriteColorControlColorPointGIntensity", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0038)
-        .Put8(32)
-        .Put8(static_cast<uint8_t>(colorPointGIntensity));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0038)
+       .Put8(32)
+       .Put8(static_cast<uint8_t>(colorPointGIntensity))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1899,20 +2211,23 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointGIntensityAttribute(u
 PacketBufferHandle encodeColorControlClusterReadColorPointBXAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorPointBX", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x003A);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x003A);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorPointBXAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint16_t colorPointBX)
+PacketBufferHandle encodeColorControlClusterWriteColorPointBXAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t colorPointBX)
 {
     COMMAND_HEADER("WriteColorControlColorPointBX", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x003A)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(colorPointBX));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x003A)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(colorPointBX))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1922,20 +2237,23 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointBXAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadColorPointBYAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorPointBY", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x003B);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x003B);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorPointBYAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                       uint16_t colorPointBY)
+PacketBufferHandle encodeColorControlClusterWriteColorPointBYAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t colorPointBY)
 {
     COMMAND_HEADER("WriteColorControlColorPointBY", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x003B)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(colorPointBY));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x003B)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(colorPointBY))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1945,20 +2263,23 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointBYAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadColorPointBIntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorPointBIntensity", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x003C);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x003C);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteColorPointBIntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                               uint8_t colorPointBIntensity)
+PacketBufferHandle encodeColorControlClusterWriteColorPointBIntensityAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t colorPointBIntensity)
 {
     COMMAND_HEADER("WriteColorControlColorPointBIntensity", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x003C)
-        .Put8(32)
-        .Put8(static_cast<uint8_t>(colorPointBIntensity));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x003C)
+       .Put8(32)
+       .Put8(static_cast<uint8_t>(colorPointBIntensity))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -1968,7 +2289,10 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointBIntensityAttribute(u
 PacketBufferHandle encodeColorControlClusterReadEnhancedCurrentHueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlEnhancedCurrentHue", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x4000);
     COMMAND_FOOTER();
 }
 
@@ -1978,7 +2302,10 @@ PacketBufferHandle encodeColorControlClusterReadEnhancedCurrentHueAttribute(uint
 PacketBufferHandle encodeColorControlClusterReadEnhancedColorModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlEnhancedColorMode", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x4001);
     COMMAND_FOOTER();
 }
 
@@ -1988,7 +2315,10 @@ PacketBufferHandle encodeColorControlClusterReadEnhancedColorModeAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadColorLoopActiveAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorLoopActive", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x4002);
     COMMAND_FOOTER();
 }
 
@@ -1998,7 +2328,10 @@ PacketBufferHandle encodeColorControlClusterReadColorLoopActiveAttribute(uint8_t
 PacketBufferHandle encodeColorControlClusterReadColorLoopDirectionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorLoopDirection", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x4003);
     COMMAND_FOOTER();
 }
 
@@ -2008,7 +2341,10 @@ PacketBufferHandle encodeColorControlClusterReadColorLoopDirectionAttribute(uint
 PacketBufferHandle encodeColorControlClusterReadColorLoopTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorLoopTime", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4004);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x4004);
     COMMAND_FOOTER();
 }
 
@@ -2018,7 +2354,10 @@ PacketBufferHandle encodeColorControlClusterReadColorLoopTimeAttribute(uint8_t s
 PacketBufferHandle encodeColorControlClusterReadColorCapabilitiesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorCapabilities", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x400A);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x400A);
     COMMAND_FOOTER();
 }
 
@@ -2028,7 +2367,10 @@ PacketBufferHandle encodeColorControlClusterReadColorCapabilitiesAttribute(uint8
 PacketBufferHandle encodeColorControlClusterReadColorTempPhysicalMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorTempPhysicalMin", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x400B);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x400B);
     COMMAND_FOOTER();
 }
 
@@ -2038,43 +2380,49 @@ PacketBufferHandle encodeColorControlClusterReadColorTempPhysicalMinAttribute(ui
 PacketBufferHandle encodeColorControlClusterReadColorTempPhysicalMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlColorTempPhysicalMax", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x400C);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x400C);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute CoupleColorTempToLevelMinMireds
  */
-PacketBufferHandle encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(uint8_t seqNum,
-                                                                                         EndpointId destinationEndpoint)
+PacketBufferHandle encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlCoupleColorTempToLevelMinMireds", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x400D);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x400D);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute StartUpColorTemperatureMireds
  */
-PacketBufferHandle encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uint8_t seqNum,
-                                                                                       EndpointId destinationEndpoint)
+PacketBufferHandle encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlStartUpColorTemperatureMireds", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4010);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x4010);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(uint8_t seqNum,
-                                                                                        EndpointId destinationEndpoint,
-                                                                                        uint16_t startUpColorTemperatureMireds)
+PacketBufferHandle encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t startUpColorTemperatureMireds)
 {
     COMMAND_HEADER("WriteColorControlStartUpColorTemperatureMireds", COLOR_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x4010)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(startUpColorTemperatureMireds));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x4010)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(startUpColorTemperatureMireds))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -2084,7 +2432,10 @@ PacketBufferHandle encodeColorControlClusterWriteStartUpColorTemperatureMiredsAt
 PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlClusterRevision", COLOR_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2104,7 +2455,11 @@ PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t
 PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverContentLaunchAttributes", CONTENT_LAUNCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2114,7 +2469,10 @@ PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, 
 PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadContentLaunchAcceptsHeaderList", CONTENT_LAUNCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -2124,7 +2482,10 @@ PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint
 PacketBufferHandle encodeContentLaunchClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadContentLaunchSupportedStreamingTypes", CONTENT_LAUNCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -2134,7 +2495,10 @@ PacketBufferHandle encodeContentLaunchClusterReadSupportedStreamingTypesAttribut
 PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadContentLaunchClusterRevision", CONTENT_LAUNCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2154,7 +2518,11 @@ PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_
 PacketBufferHandle encodeDescriptorClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverDescriptorAttributes", DESCRIPTOR_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2164,7 +2532,10 @@ PacketBufferHandle encodeDescriptorClusterDiscoverAttributes(uint8_t seqNum, End
 PacketBufferHandle encodeDescriptorClusterReadDeviceListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDescriptorDeviceList", DESCRIPTOR_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -2174,7 +2545,10 @@ PacketBufferHandle encodeDescriptorClusterReadDeviceListAttribute(uint8_t seqNum
 PacketBufferHandle encodeDescriptorClusterReadServerListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDescriptorServerList", DESCRIPTOR_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -2184,7 +2558,10 @@ PacketBufferHandle encodeDescriptorClusterReadServerListAttribute(uint8_t seqNum
 PacketBufferHandle encodeDescriptorClusterReadClientListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDescriptorClientList", DESCRIPTOR_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -2194,7 +2571,10 @@ PacketBufferHandle encodeDescriptorClusterReadClientListAttribute(uint8_t seqNum
 PacketBufferHandle encodeDescriptorClusterReadPartsListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDescriptorPartsList", DESCRIPTOR_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
@@ -2204,7 +2584,10 @@ PacketBufferHandle encodeDescriptorClusterReadPartsListAttribute(uint8_t seqNum,
 PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDescriptorClusterRevision", DESCRIPTOR_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2246,7 +2629,11 @@ PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t s
 PacketBufferHandle encodeDoorLockClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverDoorLockAttributes", DOOR_LOCK_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2256,22 +2643,24 @@ PacketBufferHandle encodeDoorLockClusterDiscoverAttributes(uint8_t seqNum, Endpo
 PacketBufferHandle encodeDoorLockClusterReadLockStateAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDoorLockLockState", DOOR_LOCK_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeDoorLockClusterConfigureLockStateAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                    uint16_t minInterval, uint16_t maxInterval)
+PacketBufferHandle encodeDoorLockClusterConfigureLockStateAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportDoorLockLockState", DOOR_LOCK_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0000)
-        .Put8(48)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0000)
+       .Put8(48)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     COMMAND_FOOTER();
 }
 
@@ -2281,7 +2670,10 @@ PacketBufferHandle encodeDoorLockClusterConfigureLockStateAttribute(uint8_t seqN
 PacketBufferHandle encodeDoorLockClusterReadLockTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDoorLockLockType", DOOR_LOCK_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -2291,7 +2683,10 @@ PacketBufferHandle encodeDoorLockClusterReadLockTypeAttribute(uint8_t seqNum, En
 PacketBufferHandle encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDoorLockActuatorEnabled", DOOR_LOCK_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -2301,7 +2696,10 @@ PacketBufferHandle encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t seq
 PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDoorLockClusterRevision", DOOR_LOCK_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2323,7 +2721,11 @@ PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seq
 PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverEthernetNetworkDiagnosticsAttributes", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2333,7 +2735,10 @@ PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterDiscoverAttributes(uin
 PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadPacketRxCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadEthernetNetworkDiagnosticsPacketRxCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -2343,7 +2748,10 @@ PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadPacketRxCountAttri
 PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadPacketTxCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadEthernetNetworkDiagnosticsPacketTxCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
@@ -2353,18 +2761,23 @@ PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadPacketTxCountAttri
 PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadTxErrCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadEthernetNetworkDiagnosticsTxErrCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0004);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute CollisionCount
  */
-PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadCollisionCountAttribute(uint8_t seqNum,
-                                                                                      EndpointId destinationEndpoint)
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadCollisionCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadEthernetNetworkDiagnosticsCollisionCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0005);
     COMMAND_FOOTER();
 }
 
@@ -2374,18 +2787,23 @@ PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadCollisionCountAttr
 PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadOverrunCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadEthernetNetworkDiagnosticsOverrunCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0006);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute ClusterRevision
  */
-PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                       EndpointId destinationEndpoint)
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadEthernetNetworkDiagnosticsClusterRevision", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2402,7 +2820,11 @@ PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadClusterRevisionAtt
 PacketBufferHandle encodeFixedLabelClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverFixedLabelAttributes", FIXED_LABEL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2412,7 +2834,10 @@ PacketBufferHandle encodeFixedLabelClusterDiscoverAttributes(uint8_t seqNum, End
 PacketBufferHandle encodeFixedLabelClusterReadLabelListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadFixedLabelLabelList", FIXED_LABEL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -2422,7 +2847,10 @@ PacketBufferHandle encodeFixedLabelClusterReadLabelListAttribute(uint8_t seqNum,
 PacketBufferHandle encodeFixedLabelClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadFixedLabelClusterRevision", FIXED_LABEL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2443,7 +2871,11 @@ PacketBufferHandle encodeFixedLabelClusterReadClusterRevisionAttribute(uint8_t s
 PacketBufferHandle encodeGeneralCommissioningClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverGeneralCommissioningAttributes", GENERAL_COMMISSIONING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2453,7 +2885,10 @@ PacketBufferHandle encodeGeneralCommissioningClusterDiscoverAttributes(uint8_t s
 PacketBufferHandle encodeGeneralCommissioningClusterReadFabricIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGeneralCommissioningFabricId", GENERAL_COMMISSIONING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -2463,20 +2898,23 @@ PacketBufferHandle encodeGeneralCommissioningClusterReadFabricIdAttribute(uint8_
 PacketBufferHandle encodeGeneralCommissioningClusterReadBreadcrumbAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGeneralCommissioningBreadcrumb", GENERAL_COMMISSIONING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                             uint64_t breadcrumb)
+PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint64_t breadcrumb)
 {
     COMMAND_HEADER("WriteGeneralCommissioningBreadcrumb", GENERAL_COMMISSIONING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0001)
-        .Put8(39)
-        .Put64(static_cast<uint64_t>(breadcrumb));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001)
+       .Put8(39)
+       .Put64(static_cast<uint64_t>(breadcrumb))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -2486,7 +2924,10 @@ PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(uin
 PacketBufferHandle encodeGeneralCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGeneralCommissioningClusterRevision", GENERAL_COMMISSIONING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2504,7 +2945,11 @@ PacketBufferHandle encodeGeneralCommissioningClusterReadClusterRevisionAttribute
 PacketBufferHandle encodeGeneralDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverGeneralDiagnosticsAttributes", GENERAL_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2514,7 +2959,10 @@ PacketBufferHandle encodeGeneralDiagnosticsClusterDiscoverAttributes(uint8_t seq
 PacketBufferHandle encodeGeneralDiagnosticsClusterReadNetworkInterfacesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGeneralDiagnosticsNetworkInterfaces", GENERAL_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -2524,7 +2972,10 @@ PacketBufferHandle encodeGeneralDiagnosticsClusterReadNetworkInterfacesAttribute
 PacketBufferHandle encodeGeneralDiagnosticsClusterReadRebootCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGeneralDiagnosticsRebootCount", GENERAL_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -2534,7 +2985,10 @@ PacketBufferHandle encodeGeneralDiagnosticsClusterReadRebootCountAttribute(uint8
 PacketBufferHandle encodeGeneralDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGeneralDiagnosticsClusterRevision", GENERAL_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2552,7 +3006,11 @@ PacketBufferHandle encodeGeneralDiagnosticsClusterReadClusterRevisionAttribute(u
 PacketBufferHandle encodeGroupKeyManagementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverGroupKeyManagementAttributes", GROUP_KEY_MANAGEMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2562,7 +3020,10 @@ PacketBufferHandle encodeGroupKeyManagementClusterDiscoverAttributes(uint8_t seq
 PacketBufferHandle encodeGroupKeyManagementClusterReadGroupsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGroupKeyManagementGroups", GROUP_KEY_MANAGEMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -2572,7 +3033,10 @@ PacketBufferHandle encodeGroupKeyManagementClusterReadGroupsAttribute(uint8_t se
 PacketBufferHandle encodeGroupKeyManagementClusterReadGroupKeysAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGroupKeyManagementGroupKeys", GROUP_KEY_MANAGEMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -2582,7 +3046,10 @@ PacketBufferHandle encodeGroupKeyManagementClusterReadGroupKeysAttribute(uint8_t
 PacketBufferHandle encodeGroupKeyManagementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGroupKeyManagementClusterRevision", GROUP_KEY_MANAGEMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2605,7 +3072,11 @@ PacketBufferHandle encodeGroupKeyManagementClusterReadClusterRevisionAttribute(u
 PacketBufferHandle encodeGroupsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverGroupsAttributes", GROUPS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2615,7 +3086,10 @@ PacketBufferHandle encodeGroupsClusterDiscoverAttributes(uint8_t seqNum, Endpoin
 PacketBufferHandle encodeGroupsClusterReadNameSupportAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGroupsNameSupport", GROUPS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -2625,7 +3099,10 @@ PacketBufferHandle encodeGroupsClusterReadNameSupportAttribute(uint8_t seqNum, E
 PacketBufferHandle encodeGroupsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGroupsClusterRevision", GROUPS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2644,7 +3121,11 @@ PacketBufferHandle encodeGroupsClusterReadClusterRevisionAttribute(uint8_t seqNu
 PacketBufferHandle encodeIdentifyClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverIdentifyAttributes", IDENTIFY_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2654,20 +3135,23 @@ PacketBufferHandle encodeIdentifyClusterDiscoverAttributes(uint8_t seqNum, Endpo
 PacketBufferHandle encodeIdentifyClusterReadIdentifyTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadIdentifyIdentifyTime", IDENTIFY_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeIdentifyClusterWriteIdentifyTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                   uint16_t identifyTime)
+PacketBufferHandle encodeIdentifyClusterWriteIdentifyTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t identifyTime)
 {
     COMMAND_HEADER("WriteIdentifyIdentifyTime", IDENTIFY_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0000)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(identifyTime));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(identifyTime))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -2677,7 +3161,10 @@ PacketBufferHandle encodeIdentifyClusterWriteIdentifyTimeAttribute(uint8_t seqNu
 PacketBufferHandle encodeIdentifyClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadIdentifyClusterRevision", IDENTIFY_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2694,7 +3181,11 @@ PacketBufferHandle encodeIdentifyClusterReadClusterRevisionAttribute(uint8_t seq
 PacketBufferHandle encodeKeypadInputClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverKeypadInputAttributes", KEYPAD_INPUT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2704,7 +3195,10 @@ PacketBufferHandle encodeKeypadInputClusterDiscoverAttributes(uint8_t seqNum, En
 PacketBufferHandle encodeKeypadInputClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadKeypadInputClusterRevision", KEYPAD_INPUT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2729,7 +3223,11 @@ PacketBufferHandle encodeKeypadInputClusterReadClusterRevisionAttribute(uint8_t 
 PacketBufferHandle encodeLevelControlClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverLevelControlAttributes", LEVEL_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2739,23 +3237,24 @@ PacketBufferHandle encodeLevelControlClusterDiscoverAttributes(uint8_t seqNum, E
 PacketBufferHandle encodeLevelControlClusterReadCurrentLevelAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadLevelControlCurrentLevel", LEVEL_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                           uint16_t minInterval, uint16_t maxInterval,
-                                                                           uint8_t change)
+PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportLevelControlCurrentLevel", LEVEL_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0000)
-        .Put8(32)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0000)
+       .Put8(32)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -2766,7 +3265,10 @@ PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelAttribute(uint8
 PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadLevelControlClusterRevision", LEVEL_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2783,7 +3285,11 @@ PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t
 PacketBufferHandle encodeLowPowerClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverLowPowerAttributes", LOW_POWER_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2793,7 +3299,10 @@ PacketBufferHandle encodeLowPowerClusterDiscoverAttributes(uint8_t seqNum, Endpo
 PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadLowPowerClusterRevision", LOW_POWER_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2814,7 +3323,11 @@ PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seq
 PacketBufferHandle encodeMediaInputClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverMediaInputAttributes", MEDIA_INPUT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2824,7 +3337,10 @@ PacketBufferHandle encodeMediaInputClusterDiscoverAttributes(uint8_t seqNum, End
 PacketBufferHandle encodeMediaInputClusterReadMediaInputListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadMediaInputMediaInputList", MEDIA_INPUT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -2834,7 +3350,10 @@ PacketBufferHandle encodeMediaInputClusterReadMediaInputListAttribute(uint8_t se
 PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadMediaInputClusterRevision", MEDIA_INPUT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2861,7 +3380,11 @@ PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttribute(uint8_t s
 PacketBufferHandle encodeMediaPlaybackClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverMediaPlaybackAttributes", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2871,7 +3394,10 @@ PacketBufferHandle encodeMediaPlaybackClusterDiscoverAttributes(uint8_t seqNum, 
 PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadMediaPlaybackClusterRevision", MEDIA_PLAYBACK_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2896,7 +3422,11 @@ PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_
 PacketBufferHandle encodeNetworkCommissioningClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverNetworkCommissioningAttributes", NETWORK_COMMISSIONING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2906,7 +3436,10 @@ PacketBufferHandle encodeNetworkCommissioningClusterDiscoverAttributes(uint8_t s
 PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadNetworkCommissioningClusterRevision", NETWORK_COMMISSIONING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2926,7 +3459,11 @@ PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute
 PacketBufferHandle encodeOnOffClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverOnOffAttributes", ON_OFF_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2936,22 +3473,24 @@ PacketBufferHandle encodeOnOffClusterDiscoverAttributes(uint8_t seqNum, Endpoint
 PacketBufferHandle encodeOnOffClusterReadOnOffAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadOnOffOnOff", ON_OFF_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval,
-                                                             uint16_t maxInterval)
+PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportOnOffOnOff", ON_OFF_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0000)
-        .Put8(16)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0000)
+       .Put8(16)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     COMMAND_FOOTER();
 }
 
@@ -2961,7 +3500,10 @@ PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, End
 PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadOnOffClusterRevision", ON_OFF_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -2984,7 +3526,11 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 PacketBufferHandle encodeOperationalCredentialsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverOperationalCredentialsAttributes", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2994,7 +3540,10 @@ PacketBufferHandle encodeOperationalCredentialsClusterDiscoverAttributes(uint8_t
 PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadOperationalCredentialsFabricsList", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -3004,7 +3553,10 @@ PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(u
 PacketBufferHandle encodeOperationalCredentialsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadOperationalCredentialsClusterRevision", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -3027,7 +3579,11 @@ PacketBufferHandle encodeOperationalCredentialsClusterReadClusterRevisionAttribu
 PacketBufferHandle encodePumpConfigurationAndControlClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverPumpConfigurationAndControlAttributes", PUMP_CONFIG_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -3037,7 +3593,10 @@ PacketBufferHandle encodePumpConfigurationAndControlClusterDiscoverAttributes(ui
 PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxPressureAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadPumpConfigurationAndControlMaxPressure", PUMP_CONFIG_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -3047,7 +3606,10 @@ PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxPressureAttrib
 PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxSpeedAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadPumpConfigurationAndControlMaxSpeed", PUMP_CONFIG_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -3057,29 +3619,36 @@ PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxSpeedAttribute
 PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxFlowAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadPumpConfigurationAndControlMaxFlow", PUMP_CONFIG_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute EffectiveOperationMode
  */
-PacketBufferHandle encodePumpConfigurationAndControlClusterReadEffectiveOperationModeAttribute(uint8_t seqNum,
-                                                                                               EndpointId destinationEndpoint)
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadEffectiveOperationModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadPumpConfigurationAndControlEffectiveOperationMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0011);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute EffectiveControlMode
  */
-PacketBufferHandle encodePumpConfigurationAndControlClusterReadEffectiveControlModeAttribute(uint8_t seqNum,
-                                                                                             EndpointId destinationEndpoint)
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadEffectiveControlModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadPumpConfigurationAndControlEffectiveControlMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0012);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0012);
     COMMAND_FOOTER();
 }
 
@@ -3089,24 +3658,24 @@ PacketBufferHandle encodePumpConfigurationAndControlClusterReadEffectiveControlM
 PacketBufferHandle encodePumpConfigurationAndControlClusterReadCapacityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadPumpConfigurationAndControlCapacity", PUMP_CONFIG_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0013);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0013);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodePumpConfigurationAndControlClusterConfigureCapacityAttribute(uint8_t seqNum,
-                                                                                      EndpointId destinationEndpoint,
-                                                                                      uint16_t minInterval, uint16_t maxInterval,
-                                                                                      int16_t change)
+PacketBufferHandle encodePumpConfigurationAndControlClusterConfigureCapacityAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, int16_t change)
 {
     COMMAND_HEADER("ReportPumpConfigurationAndControlCapacity", PUMP_CONFIG_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0013)
-        .Put8(41)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0013)
+       .Put8(41)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -3114,36 +3683,39 @@ PacketBufferHandle encodePumpConfigurationAndControlClusterConfigureCapacityAttr
 /*
  * Attribute OperationMode
  */
-PacketBufferHandle encodePumpConfigurationAndControlClusterReadOperationModeAttribute(uint8_t seqNum,
-                                                                                      EndpointId destinationEndpoint)
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadOperationModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadPumpConfigurationAndControlOperationMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0020);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0020);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqNum,
-                                                                                       EndpointId destinationEndpoint,
-                                                                                       uint8_t operationMode)
+PacketBufferHandle encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t operationMode)
 {
     COMMAND_HEADER("WritePumpConfigurationAndControlOperationMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0020)
-        .Put8(48)
-        .Put8(static_cast<uint8_t>(operationMode));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0020)
+       .Put8(48)
+       .Put8(static_cast<uint8_t>(operationMode))
+       ;
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute ClusterRevision
  */
-PacketBufferHandle encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                        EndpointId destinationEndpoint)
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadPumpConfigurationAndControlClusterRevision", PUMP_CONFIG_CONTROL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -3162,35 +3734,38 @@ PacketBufferHandle encodePumpConfigurationAndControlClusterReadClusterRevisionAt
 PacketBufferHandle encodeRelativeHumidityMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverRelativeHumidityMeasurementAttributes", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute MeasuredValue
  */
-PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum,
-                                                                                      EndpointId destinationEndpoint)
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadRelativeHumidityMeasurementMeasuredValue", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeRelativeHumidityMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum,
-                                                                                           EndpointId destinationEndpoint,
-                                                                                           uint16_t minInterval,
-                                                                                           uint16_t maxInterval, uint16_t change)
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportRelativeHumidityMeasurementMeasuredValue", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0000)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0000)
+       .Put8(33)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -3198,33 +3773,39 @@ PacketBufferHandle encodeRelativeHumidityMeasurementClusterConfigureMeasuredValu
 /*
  * Attribute MinMeasuredValue
  */
-PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum,
-                                                                                         EndpointId destinationEndpoint)
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadRelativeHumidityMeasurementMinMeasuredValue", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute MaxMeasuredValue
  */
-PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum,
-                                                                                         EndpointId destinationEndpoint)
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadRelativeHumidityMeasurementMaxMeasuredValue", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute ClusterRevision
  */
-PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                        EndpointId destinationEndpoint)
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadRelativeHumidityMeasurementClusterRevision", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -3252,7 +3833,11 @@ PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadClusterRevisionAt
 PacketBufferHandle encodeScenesClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverScenesAttributes", SCENES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -3262,7 +3847,10 @@ PacketBufferHandle encodeScenesClusterDiscoverAttributes(uint8_t seqNum, Endpoin
 PacketBufferHandle encodeScenesClusterReadSceneCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadScenesSceneCount", SCENES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -3272,7 +3860,10 @@ PacketBufferHandle encodeScenesClusterReadSceneCountAttribute(uint8_t seqNum, En
 PacketBufferHandle encodeScenesClusterReadCurrentSceneAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadScenesCurrentScene", SCENES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -3282,7 +3873,10 @@ PacketBufferHandle encodeScenesClusterReadCurrentSceneAttribute(uint8_t seqNum, 
 PacketBufferHandle encodeScenesClusterReadCurrentGroupAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadScenesCurrentGroup", SCENES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -3292,7 +3886,10 @@ PacketBufferHandle encodeScenesClusterReadCurrentGroupAttribute(uint8_t seqNum, 
 PacketBufferHandle encodeScenesClusterReadSceneValidAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadScenesSceneValid", SCENES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
@@ -3302,7 +3899,10 @@ PacketBufferHandle encodeScenesClusterReadSceneValidAttribute(uint8_t seqNum, En
 PacketBufferHandle encodeScenesClusterReadNameSupportAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadScenesNameSupport", SCENES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0004);
     COMMAND_FOOTER();
 }
 
@@ -3312,7 +3912,10 @@ PacketBufferHandle encodeScenesClusterReadNameSupportAttribute(uint8_t seqNum, E
 PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadScenesClusterRevision", SCENES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -3330,18 +3933,24 @@ PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNu
 PacketBufferHandle encodeSoftwareDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverSoftwareDiagnosticsAttributes", SOFTWARE_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute CurrentHeapHighWatermark
  */
-PacketBufferHandle encodeSoftwareDiagnosticsClusterReadCurrentHeapHighWatermarkAttribute(uint8_t seqNum,
-                                                                                         EndpointId destinationEndpoint)
+PacketBufferHandle encodeSoftwareDiagnosticsClusterReadCurrentHeapHighWatermarkAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadSoftwareDiagnosticsCurrentHeapHighWatermark", SOFTWARE_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
@@ -3351,7 +3960,10 @@ PacketBufferHandle encodeSoftwareDiagnosticsClusterReadCurrentHeapHighWatermarkA
 PacketBufferHandle encodeSoftwareDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadSoftwareDiagnosticsClusterRevision", SOFTWARE_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -3369,7 +3981,11 @@ PacketBufferHandle encodeSoftwareDiagnosticsClusterReadClusterRevisionAttribute(
 PacketBufferHandle encodeSwitchClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverSwitchAttributes", SWITCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -3379,7 +3995,10 @@ PacketBufferHandle encodeSwitchClusterDiscoverAttributes(uint8_t seqNum, Endpoin
 PacketBufferHandle encodeSwitchClusterReadNumberOfPositionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadSwitchNumberOfPositions", SWITCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -3389,22 +4008,24 @@ PacketBufferHandle encodeSwitchClusterReadNumberOfPositionsAttribute(uint8_t seq
 PacketBufferHandle encodeSwitchClusterReadCurrentPositionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadSwitchCurrentPosition", SWITCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeSwitchClusterConfigureCurrentPositionAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                        uint16_t minInterval, uint16_t maxInterval, uint8_t change)
+PacketBufferHandle encodeSwitchClusterConfigureCurrentPositionAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportSwitchCurrentPosition", SWITCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0001)
-        .Put8(32)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0001)
+       .Put8(32)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -3415,7 +4036,10 @@ PacketBufferHandle encodeSwitchClusterConfigureCurrentPositionAttribute(uint8_t 
 PacketBufferHandle encodeSwitchClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadSwitchClusterRevision", SWITCH_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -3437,7 +4061,11 @@ PacketBufferHandle encodeSwitchClusterReadClusterRevisionAttribute(uint8_t seqNu
 PacketBufferHandle encodeTvChannelClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverTvChannelAttributes", TV_CHANNEL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -3447,7 +4075,10 @@ PacketBufferHandle encodeTvChannelClusterDiscoverAttributes(uint8_t seqNum, Endp
 PacketBufferHandle encodeTvChannelClusterReadTvChannelListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTvChannelTvChannelList", TV_CHANNEL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -3457,7 +4088,10 @@ PacketBufferHandle encodeTvChannelClusterReadTvChannelListAttribute(uint8_t seqN
 PacketBufferHandle encodeTvChannelClusterReadTvChannelLineupAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTvChannelTvChannelLineup", TV_CHANNEL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -3467,7 +4101,10 @@ PacketBufferHandle encodeTvChannelClusterReadTvChannelLineupAttribute(uint8_t se
 PacketBufferHandle encodeTvChannelClusterReadCurrentTvChannelAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTvChannelCurrentTvChannel", TV_CHANNEL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -3477,7 +4114,10 @@ PacketBufferHandle encodeTvChannelClusterReadCurrentTvChannelAttribute(uint8_t s
 PacketBufferHandle encodeTvChannelClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTvChannelClusterRevision", TV_CHANNEL_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -3495,7 +4135,11 @@ PacketBufferHandle encodeTvChannelClusterReadClusterRevisionAttribute(uint8_t se
 PacketBufferHandle encodeTargetNavigatorClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverTargetNavigatorAttributes", TARGET_NAVIGATOR_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -3505,7 +4149,10 @@ PacketBufferHandle encodeTargetNavigatorClusterDiscoverAttributes(uint8_t seqNum
 PacketBufferHandle encodeTargetNavigatorClusterReadTargetNavigatorListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTargetNavigatorTargetNavigatorList", TARGET_NAVIGATOR_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -3515,7 +4162,10 @@ PacketBufferHandle encodeTargetNavigatorClusterReadTargetNavigatorListAttribute(
 PacketBufferHandle encodeTargetNavigatorClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTargetNavigatorClusterRevision", TARGET_NAVIGATOR_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -3534,7 +4184,11 @@ PacketBufferHandle encodeTargetNavigatorClusterReadClusterRevisionAttribute(uint
 PacketBufferHandle encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverTemperatureMeasurementAttributes", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -3544,24 +4198,24 @@ PacketBufferHandle encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t
 PacketBufferHandle encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTemperatureMeasurementMeasuredValue", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum,
-                                                                                      EndpointId destinationEndpoint,
-                                                                                      uint16_t minInterval, uint16_t maxInterval,
-                                                                                      int16_t change)
+PacketBufferHandle encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, int16_t change)
 {
     COMMAND_HEADER("ReportTemperatureMeasurementMeasuredValue", TEMP_MEASUREMENT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0000)
-        .Put8(41)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0000)
+       .Put8(41)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -3572,7 +4226,10 @@ PacketBufferHandle encodeTemperatureMeasurementClusterConfigureMeasuredValueAttr
 PacketBufferHandle encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTemperatureMeasurementMinMeasuredValue", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -3582,7 +4239,10 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadMinMeasuredValueAttrib
 PacketBufferHandle encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTemperatureMeasurementMaxMeasuredValue", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -3592,7 +4252,10 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttrib
 PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTemperatureMeasurementClusterRevision", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -3631,7 +4294,11 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 PacketBufferHandle encodeTestClusterClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverTestClusterAttributes", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -3641,7 +4308,10 @@ PacketBufferHandle encodeTestClusterClusterDiscoverAttributes(uint8_t seqNum, En
 PacketBufferHandle encodeTestClusterClusterReadBooleanAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterBoolean", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -3649,11 +4319,12 @@ PacketBufferHandle encodeTestClusterClusterWriteBooleanAttribute(uint8_t seqNum,
 {
     COMMAND_HEADER("WriteTestClusterBoolean", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0000)
-        .Put8(16)
-        .Put8(static_cast<uint8_t>(boolean));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(16)
+       .Put8(static_cast<uint8_t>(boolean))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3663,7 +4334,10 @@ PacketBufferHandle encodeTestClusterClusterWriteBooleanAttribute(uint8_t seqNum,
 PacketBufferHandle encodeTestClusterClusterReadBitmap8Attribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterBitmap8", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001);
     COMMAND_FOOTER();
 }
 
@@ -3671,11 +4345,12 @@ PacketBufferHandle encodeTestClusterClusterWriteBitmap8Attribute(uint8_t seqNum,
 {
     COMMAND_HEADER("WriteTestClusterBitmap8", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0001)
-        .Put8(24)
-        .Put8(static_cast<uint8_t>(bitmap8));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0001)
+       .Put8(24)
+       .Put8(static_cast<uint8_t>(bitmap8))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3685,7 +4360,10 @@ PacketBufferHandle encodeTestClusterClusterWriteBitmap8Attribute(uint8_t seqNum,
 PacketBufferHandle encodeTestClusterClusterReadBitmap16Attribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterBitmap16", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002);
     COMMAND_FOOTER();
 }
 
@@ -3693,11 +4371,12 @@ PacketBufferHandle encodeTestClusterClusterWriteBitmap16Attribute(uint8_t seqNum
 {
     COMMAND_HEADER("WriteTestClusterBitmap16", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0002)
-        .Put8(25)
-        .Put16(static_cast<uint16_t>(bitmap16));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0002)
+       .Put8(25)
+       .Put16(static_cast<uint16_t>(bitmap16))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3707,7 +4386,10 @@ PacketBufferHandle encodeTestClusterClusterWriteBitmap16Attribute(uint8_t seqNum
 PacketBufferHandle encodeTestClusterClusterReadBitmap32Attribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterBitmap32", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
@@ -3715,11 +4397,12 @@ PacketBufferHandle encodeTestClusterClusterWriteBitmap32Attribute(uint8_t seqNum
 {
     COMMAND_HEADER("WriteTestClusterBitmap32", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0003)
-        .Put8(27)
-        .Put32(static_cast<uint32_t>(bitmap32));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003)
+       .Put8(27)
+       .Put32(static_cast<uint32_t>(bitmap32))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3729,7 +4412,10 @@ PacketBufferHandle encodeTestClusterClusterWriteBitmap32Attribute(uint8_t seqNum
 PacketBufferHandle encodeTestClusterClusterReadBitmap64Attribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterBitmap64", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0004);
     COMMAND_FOOTER();
 }
 
@@ -3737,11 +4423,12 @@ PacketBufferHandle encodeTestClusterClusterWriteBitmap64Attribute(uint8_t seqNum
 {
     COMMAND_HEADER("WriteTestClusterBitmap64", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0004)
-        .Put8(31)
-        .Put64(static_cast<uint64_t>(bitmap64));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0004)
+       .Put8(31)
+       .Put64(static_cast<uint64_t>(bitmap64))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3751,7 +4438,10 @@ PacketBufferHandle encodeTestClusterClusterWriteBitmap64Attribute(uint8_t seqNum
 PacketBufferHandle encodeTestClusterClusterReadInt8uAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterInt8u", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0005);
     COMMAND_FOOTER();
 }
 
@@ -3759,11 +4449,12 @@ PacketBufferHandle encodeTestClusterClusterWriteInt8uAttribute(uint8_t seqNum, E
 {
     COMMAND_HEADER("WriteTestClusterInt8u", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0005)
-        .Put8(32)
-        .Put8(static_cast<uint8_t>(int8u));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0005)
+       .Put8(32)
+       .Put8(static_cast<uint8_t>(int8u))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3773,7 +4464,10 @@ PacketBufferHandle encodeTestClusterClusterWriteInt8uAttribute(uint8_t seqNum, E
 PacketBufferHandle encodeTestClusterClusterReadInt16uAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterInt16u", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0006);
     COMMAND_FOOTER();
 }
 
@@ -3781,11 +4475,12 @@ PacketBufferHandle encodeTestClusterClusterWriteInt16uAttribute(uint8_t seqNum, 
 {
     COMMAND_HEADER("WriteTestClusterInt16u", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0006)
-        .Put8(33)
-        .Put16(static_cast<uint16_t>(int16u));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0006)
+       .Put8(33)
+       .Put16(static_cast<uint16_t>(int16u))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3795,7 +4490,10 @@ PacketBufferHandle encodeTestClusterClusterWriteInt16uAttribute(uint8_t seqNum, 
 PacketBufferHandle encodeTestClusterClusterReadInt32uAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterInt32u", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0008);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0008);
     COMMAND_FOOTER();
 }
 
@@ -3803,11 +4501,12 @@ PacketBufferHandle encodeTestClusterClusterWriteInt32uAttribute(uint8_t seqNum, 
 {
     COMMAND_HEADER("WriteTestClusterInt32u", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0008)
-        .Put8(35)
-        .Put32(static_cast<uint32_t>(int32u));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0008)
+       .Put8(35)
+       .Put32(static_cast<uint32_t>(int32u))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3817,7 +4516,10 @@ PacketBufferHandle encodeTestClusterClusterWriteInt32uAttribute(uint8_t seqNum, 
 PacketBufferHandle encodeTestClusterClusterReadInt64uAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterInt64u", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000C);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000C);
     COMMAND_FOOTER();
 }
 
@@ -3825,11 +4527,12 @@ PacketBufferHandle encodeTestClusterClusterWriteInt64uAttribute(uint8_t seqNum, 
 {
     COMMAND_HEADER("WriteTestClusterInt64u", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x000C)
-        .Put8(39)
-        .Put64(static_cast<uint64_t>(int64u));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000C)
+       .Put8(39)
+       .Put64(static_cast<uint64_t>(int64u))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3839,7 +4542,10 @@ PacketBufferHandle encodeTestClusterClusterWriteInt64uAttribute(uint8_t seqNum, 
 PacketBufferHandle encodeTestClusterClusterReadInt8sAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterInt8s", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000D);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000D);
     COMMAND_FOOTER();
 }
 
@@ -3847,11 +4553,12 @@ PacketBufferHandle encodeTestClusterClusterWriteInt8sAttribute(uint8_t seqNum, E
 {
     COMMAND_HEADER("WriteTestClusterInt8s", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x000D)
-        .Put8(40)
-        .Put8(static_cast<uint8_t>(int8s));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000D)
+       .Put8(40)
+       .Put8(static_cast<uint8_t>(int8s))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3861,7 +4568,10 @@ PacketBufferHandle encodeTestClusterClusterWriteInt8sAttribute(uint8_t seqNum, E
 PacketBufferHandle encodeTestClusterClusterReadInt16sAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterInt16s", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000E);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000E);
     COMMAND_FOOTER();
 }
 
@@ -3869,11 +4579,12 @@ PacketBufferHandle encodeTestClusterClusterWriteInt16sAttribute(uint8_t seqNum, 
 {
     COMMAND_HEADER("WriteTestClusterInt16s", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x000E)
-        .Put8(41)
-        .Put16(static_cast<uint16_t>(int16s));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x000E)
+       .Put8(41)
+       .Put16(static_cast<uint16_t>(int16s))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3883,7 +4594,10 @@ PacketBufferHandle encodeTestClusterClusterWriteInt16sAttribute(uint8_t seqNum, 
 PacketBufferHandle encodeTestClusterClusterReadInt32sAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterInt32s", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0010);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0010);
     COMMAND_FOOTER();
 }
 
@@ -3891,11 +4605,12 @@ PacketBufferHandle encodeTestClusterClusterWriteInt32sAttribute(uint8_t seqNum, 
 {
     COMMAND_HEADER("WriteTestClusterInt32s", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0010)
-        .Put8(43)
-        .Put32(static_cast<uint32_t>(int32s));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0010)
+       .Put8(43)
+       .Put32(static_cast<uint32_t>(int32s))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3905,7 +4620,10 @@ PacketBufferHandle encodeTestClusterClusterWriteInt32sAttribute(uint8_t seqNum, 
 PacketBufferHandle encodeTestClusterClusterReadInt64sAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterInt64s", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0014);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0014);
     COMMAND_FOOTER();
 }
 
@@ -3913,11 +4631,12 @@ PacketBufferHandle encodeTestClusterClusterWriteInt64sAttribute(uint8_t seqNum, 
 {
     COMMAND_HEADER("WriteTestClusterInt64s", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0014)
-        .Put8(47)
-        .Put64(static_cast<uint64_t>(int64s));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0014)
+       .Put8(47)
+       .Put64(static_cast<uint64_t>(int64s))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3927,7 +4646,10 @@ PacketBufferHandle encodeTestClusterClusterWriteInt64sAttribute(uint8_t seqNum, 
 PacketBufferHandle encodeTestClusterClusterReadEnum8Attribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterEnum8", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0015);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0015);
     COMMAND_FOOTER();
 }
 
@@ -3935,11 +4657,12 @@ PacketBufferHandle encodeTestClusterClusterWriteEnum8Attribute(uint8_t seqNum, E
 {
     COMMAND_HEADER("WriteTestClusterEnum8", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0015)
-        .Put8(48)
-        .Put8(static_cast<uint8_t>(enum8));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0015)
+       .Put8(48)
+       .Put8(static_cast<uint8_t>(enum8))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3949,7 +4672,10 @@ PacketBufferHandle encodeTestClusterClusterWriteEnum8Attribute(uint8_t seqNum, E
 PacketBufferHandle encodeTestClusterClusterReadEnum16Attribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterEnum16", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0016);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0016);
     COMMAND_FOOTER();
 }
 
@@ -3957,11 +4683,12 @@ PacketBufferHandle encodeTestClusterClusterWriteEnum16Attribute(uint8_t seqNum, 
 {
     COMMAND_HEADER("WriteTestClusterEnum16", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0016)
-        .Put8(49)
-        .Put16(static_cast<uint16_t>(enum16));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0016)
+       .Put8(49)
+       .Put16(static_cast<uint16_t>(enum16))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -3971,12 +4698,14 @@ PacketBufferHandle encodeTestClusterClusterWriteEnum16Attribute(uint8_t seqNum, 
 PacketBufferHandle encodeTestClusterClusterReadOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterOctetString", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0019);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0019);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                     chip::ByteSpan octetString)
+PacketBufferHandle encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint, chip::ByteSpan octetString)
 {
     COMMAND_HEADER("WriteTestClusterOctetString", TEST_CLUSTER_ID);
     size_t octetStringStrLen = octetString.size();
@@ -3987,12 +4716,13 @@ PacketBufferHandle encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seq
     }
 
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0019)
-        .Put8(65)
-        .Put(static_cast<uint8_t>(octetStringStrLen))
-        .Put(octetString.data(), octetStringStrLen);
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0019)
+       .Put8(65)
+       .Put(static_cast<uint8_t>(octetStringStrLen))
+       .Put(octetString.data(), octetStringStrLen)
+       ;
     COMMAND_FOOTER();
 }
 
@@ -4002,7 +4732,10 @@ PacketBufferHandle encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seq
 PacketBufferHandle encodeTestClusterClusterReadListInt8uAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterListInt8u", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001A);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x001A);
     COMMAND_FOOTER();
 }
 
@@ -4012,7 +4745,10 @@ PacketBufferHandle encodeTestClusterClusterReadListInt8uAttribute(uint8_t seqNum
 PacketBufferHandle encodeTestClusterClusterReadListOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterListOctetString", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001B);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x001B);
     COMMAND_FOOTER();
 }
 
@@ -4022,7 +4758,10 @@ PacketBufferHandle encodeTestClusterClusterReadListOctetStringAttribute(uint8_t 
 PacketBufferHandle encodeTestClusterClusterReadListStructOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterListStructOctetString", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001C);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x001C);
     COMMAND_FOOTER();
 }
 
@@ -4032,7 +4771,10 @@ PacketBufferHandle encodeTestClusterClusterReadListStructOctetStringAttribute(ui
 PacketBufferHandle encodeTestClusterClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTestClusterClusterRevision", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -4058,7 +4800,11 @@ PacketBufferHandle encodeTestClusterClusterReadClusterRevisionAttribute(uint8_t 
 PacketBufferHandle encodeThermostatClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverThermostatAttributes", THERMOSTAT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -4068,23 +4814,24 @@ PacketBufferHandle encodeThermostatClusterDiscoverAttributes(uint8_t seqNum, End
 PacketBufferHandle encodeThermostatClusterReadLocalTemperatureAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadThermostatLocalTemperature", THERMOSTAT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeThermostatClusterConfigureLocalTemperatureAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                             uint16_t minInterval, uint16_t maxInterval,
-                                                                             int16_t change)
+PacketBufferHandle encodeThermostatClusterConfigureLocalTemperatureAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, int16_t change)
 {
     COMMAND_HEADER("ReportThermostatLocalTemperature", THERMOSTAT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0000)
-        .Put8(41)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0000)
+       .Put8(41)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -4095,20 +4842,23 @@ PacketBufferHandle encodeThermostatClusterConfigureLocalTemperatureAttribute(uin
 PacketBufferHandle encodeThermostatClusterReadOccupiedCoolingSetpointAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadThermostatOccupiedCoolingSetpoint", THERMOSTAT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0011);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeThermostatClusterWriteOccupiedCoolingSetpointAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                int16_t occupiedCoolingSetpoint)
+PacketBufferHandle encodeThermostatClusterWriteOccupiedCoolingSetpointAttribute(uint8_t seqNum, EndpointId destinationEndpoint, int16_t occupiedCoolingSetpoint)
 {
     COMMAND_HEADER("WriteThermostatOccupiedCoolingSetpoint", THERMOSTAT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0011)
-        .Put8(41)
-        .Put16(static_cast<uint16_t>(occupiedCoolingSetpoint));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0011)
+       .Put8(41)
+       .Put16(static_cast<uint16_t>(occupiedCoolingSetpoint))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -4118,20 +4868,23 @@ PacketBufferHandle encodeThermostatClusterWriteOccupiedCoolingSetpointAttribute(
 PacketBufferHandle encodeThermostatClusterReadOccupiedHeatingSetpointAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadThermostatOccupiedHeatingSetpoint", THERMOSTAT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0012);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0012);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeThermostatClusterWriteOccupiedHeatingSetpointAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                int16_t occupiedHeatingSetpoint)
+PacketBufferHandle encodeThermostatClusterWriteOccupiedHeatingSetpointAttribute(uint8_t seqNum, EndpointId destinationEndpoint, int16_t occupiedHeatingSetpoint)
 {
     COMMAND_HEADER("WriteThermostatOccupiedHeatingSetpoint", THERMOSTAT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0012)
-        .Put8(41)
-        .Put16(static_cast<uint16_t>(occupiedHeatingSetpoint));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0012)
+       .Put8(41)
+       .Put16(static_cast<uint16_t>(occupiedHeatingSetpoint))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -4141,20 +4894,23 @@ PacketBufferHandle encodeThermostatClusterWriteOccupiedHeatingSetpointAttribute(
 PacketBufferHandle encodeThermostatClusterReadControlSequenceOfOperationAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadThermostatControlSequenceOfOperation", THERMOSTAT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001B);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x001B);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeThermostatClusterWriteControlSequenceOfOperationAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                   uint8_t controlSequenceOfOperation)
+PacketBufferHandle encodeThermostatClusterWriteControlSequenceOfOperationAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t controlSequenceOfOperation)
 {
     COMMAND_HEADER("WriteThermostatControlSequenceOfOperation", THERMOSTAT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x001B)
-        .Put8(48)
-        .Put8(static_cast<uint8_t>(controlSequenceOfOperation));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x001B)
+       .Put8(48)
+       .Put8(static_cast<uint8_t>(controlSequenceOfOperation))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -4164,20 +4920,23 @@ PacketBufferHandle encodeThermostatClusterWriteControlSequenceOfOperationAttribu
 PacketBufferHandle encodeThermostatClusterReadSystemModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadThermostatSystemMode", THERMOSTAT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001C);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x001C);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                   uint8_t systemMode)
+PacketBufferHandle encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t systemMode)
 {
     COMMAND_HEADER("WriteThermostatSystemMode", THERMOSTAT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x001C)
-        .Put8(48)
-        .Put8(static_cast<uint8_t>(systemMode));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x001C)
+       .Put8(48)
+       .Put8(static_cast<uint8_t>(systemMode))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -4187,7 +4946,10 @@ PacketBufferHandle encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNu
 PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadThermostatClusterRevision", THERMOSTAT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -4205,7 +4967,11 @@ PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t s
 PacketBufferHandle encodeTrustedRootCertificatesClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverTrustedRootCertificatesAttributes", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -4215,7 +4981,10 @@ PacketBufferHandle encodeTrustedRootCertificatesClusterDiscoverAttributes(uint8_
 PacketBufferHandle encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTrustedRootCertificatesClusterRevision", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -4232,7 +5001,11 @@ PacketBufferHandle encodeTrustedRootCertificatesClusterReadClusterRevisionAttrib
 PacketBufferHandle encodeWakeOnLanClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverWakeOnLanAttributes", WAKE_ON_LAN_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -4242,7 +5015,10 @@ PacketBufferHandle encodeWakeOnLanClusterDiscoverAttributes(uint8_t seqNum, Endp
 PacketBufferHandle encodeWakeOnLanClusterReadWakeOnLanMacAddressAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWakeOnLanWakeOnLanMacAddress", WAKE_ON_LAN_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
@@ -4252,7 +5028,10 @@ PacketBufferHandle encodeWakeOnLanClusterReadWakeOnLanMacAddressAttribute(uint8_
 PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWakeOnLanClusterRevision", WAKE_ON_LAN_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
 
@@ -4284,7 +5063,11 @@ PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t se
 PacketBufferHandle encodeWindowCoveringClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("DiscoverWindowCoveringAttributes", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000)
+       .Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -4294,22 +5077,24 @@ PacketBufferHandle encodeWindowCoveringClusterDiscoverAttributes(uint8_t seqNum,
 PacketBufferHandle encodeWindowCoveringClusterReadWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
+PacketBufferHandle encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportWindowCoveringWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0000)
-        .Put8(48)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0000)
+       .Put8(48)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     COMMAND_FOOTER();
 }
 
@@ -4319,23 +5104,24 @@ PacketBufferHandle encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribu
 PacketBufferHandle encodeWindowCoveringClusterReadCurrentPositionLiftAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringCurrentPositionLift", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0003);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureCurrentPositionLiftAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                    uint16_t minInterval, uint16_t maxInterval,
-                                                                                    uint16_t change)
+PacketBufferHandle encodeWindowCoveringClusterConfigureCurrentPositionLiftAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportWindowCoveringCurrentPositionLift", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0003)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0003)
+       .Put8(33)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -4346,23 +5132,24 @@ PacketBufferHandle encodeWindowCoveringClusterConfigureCurrentPositionLiftAttrib
 PacketBufferHandle encodeWindowCoveringClusterReadCurrentPositionTiltAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringCurrentPositionTilt", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0004);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureCurrentPositionTiltAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                    uint16_t minInterval, uint16_t maxInterval,
-                                                                                    uint16_t change)
+PacketBufferHandle encodeWindowCoveringClusterConfigureCurrentPositionTiltAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportWindowCoveringCurrentPositionTilt", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0004)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0004)
+       .Put8(33)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -4373,22 +5160,24 @@ PacketBufferHandle encodeWindowCoveringClusterConfigureCurrentPositionTiltAttrib
 PacketBufferHandle encodeWindowCoveringClusterReadConfigStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringConfigStatus", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0007);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureConfigStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
+PacketBufferHandle encodeWindowCoveringClusterConfigureConfigStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportWindowCoveringConfigStatus", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0007)
-        .Put8(24)
-        .Put16(minInterval)
-        .Put16(maxInterval);
+       .Put8(seqNum)
+       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+       .Put16(0x0007)
+       .Put8(24)
+       .Put16(minInterval)
+       .Put16(maxInterval);
     COMMAND_FOOTER();
 }
 
@@ -4398,7 +5187,10 @@ PacketBufferHandle encodeWindowCoveringClusterConfigureConfigStatusAttribute(uin
 PacketBufferHandle encodeWindowCoveringClusterReadInstalledOpenLimitLiftAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringInstalledOpenLimitLift", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0010);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0010);
     COMMAND_FOOTER();
 }
 
@@ -4408,7 +5200,10 @@ PacketBufferHandle encodeWindowCoveringClusterReadInstalledOpenLimitLiftAttribut
 PacketBufferHandle encodeWindowCoveringClusterReadInstalledClosedLimitLiftAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringInstalledClosedLimitLift", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0011);
     COMMAND_FOOTER();
 }
 
@@ -4418,7 +5213,10 @@ PacketBufferHandle encodeWindowCoveringClusterReadInstalledClosedLimitLiftAttrib
 PacketBufferHandle encodeWindowCoveringClusterReadInstalledOpenLimitTiltAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringInstalledOpenLimitTilt", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0012);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0012);
     COMMAND_FOOTER();
 }
 
@@ -4428,7 +5226,10 @@ PacketBufferHandle encodeWindowCoveringClusterReadInstalledOpenLimitTiltAttribut
 PacketBufferHandle encodeWindowCoveringClusterReadInstalledClosedLimitTiltAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringInstalledClosedLimitTilt", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0013);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0013);
     COMMAND_FOOTER();
 }
 
@@ -4438,7 +5239,10 @@ PacketBufferHandle encodeWindowCoveringClusterReadInstalledClosedLimitTiltAttrib
 PacketBufferHandle encodeWindowCoveringClusterReadModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringMode", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0017);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0017);
     COMMAND_FOOTER();
 }
 
@@ -4446,11 +5250,12 @@ PacketBufferHandle encodeWindowCoveringClusterWriteModeAttribute(uint8_t seqNum,
 {
     COMMAND_HEADER("WriteWindowCoveringMode", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0017)
-        .Put8(24)
-        .Put8(static_cast<uint8_t>(mode));
+       .Put8(seqNum)
+       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put16(0x0017)
+       .Put8(24)
+       .Put8(static_cast<uint8_t>(mode))
+       ;
     COMMAND_FOOTER();
 }
 
@@ -4460,6 +5265,10 @@ PacketBufferHandle encodeWindowCoveringClusterWriteModeAttribute(uint8_t seqNum,
 PacketBufferHandle encodeWindowCoveringClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWindowCoveringClusterRevision", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
+
