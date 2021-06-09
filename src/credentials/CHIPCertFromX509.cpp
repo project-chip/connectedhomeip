@@ -152,7 +152,7 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                         //      Subject = kOID_AttributeType_ChipRootId
                         //
                         // This function is called first for the Issuer DN, and later for Subject DN.
-                        // Since, the caller knows if Issuer or Subject DN is being parsed, it's left up to
+                        // Since the caller knows if Issuer or Subject DN is being parsed, it's left up to
                         // the caller to use the returned value (subjectOrIssuer) appropriately.
                         if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId ||
                             attrOID == chip::ASN1::kOID_AttributeType_ChipICAId ||
