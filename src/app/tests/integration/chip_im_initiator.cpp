@@ -33,7 +33,6 @@
 #include <core/CHIPCore.h>
 #include <mutex>
 #include <platform/CHIPDeviceLayer.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -55,9 +54,6 @@ constexpr chip::Transport::AdminId gAdminId       = 0;
 chip::app::ReadClient * gpReadClient = nullptr;
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
-
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Command was attempted to be sent.
