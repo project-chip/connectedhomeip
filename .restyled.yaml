@@ -109,6 +109,7 @@ restylers:
           - "**/*.mm"
     - name: google-java-format
       enabled: true
+      # Update https://github.com/project-chip/connectedhomeip/blob/master/scripts/tools/zap/generate.py if this version changes.
       image: restyled/restyler-google-java-format:v1.6
       command:
           - google-java-format
