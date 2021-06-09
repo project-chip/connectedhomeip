@@ -328,8 +328,9 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "PASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt == nullptr || mExchangeCtxt == ec,
                    ChipLogError(SecureChannel, "PASESession::OnResponseTimeout exchange doesn't match"));
-    ChipLogError(SecureChannel, "PASESession timed out while waiting for a response from the peer. Expected message type was %d",
-                 mNextExpectedMsg);
+    ChipLogError(SecureChannel,
+                 "PASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
+                 static_cast<std::underlying_type_t<decltype(mNextExpectedMsg)>>(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
     Clear();
 }

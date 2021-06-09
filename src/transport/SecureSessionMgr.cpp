@@ -363,7 +363,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
             {
                 ChipLogError(Inet,
                              "Message counter synchronization for received message, failed to "
-                             "QueueReceivedMessageAndStartSync, err = %d",
+                             "QueueReceivedMessageAndStartSync, err = %" PRId32,
                              err);
             }
             else
@@ -377,7 +377,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageId());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Inet, "Message counter verify failed, err = %d", err);
+            ChipLogError(Inet, "Message counter verify failed, err = %" PRId32, err);
         }
         SuccessOrExit(err);
     }

@@ -37,7 +37,7 @@ bool Command::InitArguments(int argc, char ** argv)
     size_t argsCount    = mArgs.size();
 
     VerifyOrExit(argsCount == (size_t)(argc),
-                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %zu instead of %zu", argc, argsCount));
+                 ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %zu", argc, argsCount));
 
     for (size_t i = 0; i < argsCount; i++)
     {

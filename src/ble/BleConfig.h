@@ -183,6 +183,11 @@
 #ifndef BLE_CONFIG_ERROR_TYPE
 #include <stdint.h>
 #define BLE_CONFIG_ERROR_TYPE                              int32_t
+#define BLE_CONFIG_ERROR_FORMAT                            PRId32
+#else // BLE_CONFIG_ERROR_TYPE
+#ifndef BLE_CONFIG_ERROR_FORMAT
+#error "Must define BLE_CONFIG_ERROR_FORMAT when defining BLE_CONFIG_ERROR_TYPE"
+#endif // BLE_CONFIG_ERROR_FORMAT
 #endif // BLE_CONFIG_ERROR_TYPE
 
 /**
