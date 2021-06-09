@@ -38,6 +38,7 @@
 #include <credentials/CHIPCert.h>
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {
@@ -81,7 +82,8 @@ exit:
     return err;
 }
 
-static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, uint64_t tag)
+static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & subjectOrIssuer,
+                                           uint64_t & fabric)
 {
     CHIP_ERROR err;
     TLVType outerContainer;
@@ -141,6 +143,28 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                         // Write the CHIP attribute value into the TLV.
                         err = writer.Put(ContextTag(tlvTagNum), chipAttr);
                         SuccessOrExit(err);
+
+                        // Certificates use a combination of OIDs for Issuer and Subject.
+                        // NOC: Issuer  = kOID_AttributeType_ChipRootId or kOID_AttributeType_ChipICAId
+                        //      Subject = kOID_AttributeType_ChipNodeId
+                        // ICA: Issuer  = kOID_AttributeType_ChipRootId
+                        //      Subject = kOID_AttributeType_ChipICAId
+                        // Root: Issuer = kOID_AttributeType_ChipRootId
+                        //      Subject = kOID_AttributeType_ChipRootId
+                        //
+                        // This function is called first for the Issuer DN, and later for Subject DN.
+                        // Since the caller knows if Issuer or Subject DN is being parsed, it's left up to
+                        // the caller to use the returned value (subjectOrIssuer) appropriately.
+                        if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId ||
+                            attrOID == chip::ASN1::kOID_AttributeType_ChipICAId ||
+                            attrOID == chip::ASN1::kOID_AttributeType_ChipRootId)
+                        {
+                            subjectOrIssuer = chipAttr;
+                        }
+                        else if (attrOID == chip::ASN1::kOID_AttributeType_ChipFabricId)
+                        {
+                            fabric = chipAttr;
+                        }
                     }
 
                     //
@@ -550,15 +574,15 @@ exit:
     return err;
 }
 
-static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
+static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & issuer, uint64_t & subject,
+                                     uint64_t & fabric)
 {
     CHIP_ERROR err;
     int64_t version;
     OID sigAlgoOID;
     TLVType containerType;
 
-    err = writer.StartContainer(ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate), kTLVType_Structure,
-                                containerType);
+    err = writer.StartContainer(tag, kTLVType_Structure, containerType);
     SuccessOrExit(err);
 
     // Certificate ::= SEQUENCE
@@ -600,7 +624,7 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
             ASN1_EXIT_SEQUENCE;
 
             // issuer Name
-            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Issuer));
+            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Issuer), issuer, fabric);
             SuccessOrExit(err);
 
             // validity Validity,
@@ -608,7 +632,7 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
             SuccessOrExit(err);
 
             // subject Name,
-            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Subject));
+            err = ConvertDistinguishedName(reader, writer, ContextTag(kTag_Subject), subject, fabric);
             SuccessOrExit(err);
 
             err = ConvertSubjectPublicKeyInfo(reader, writer);
@@ -685,11 +709,14 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32
     ASN1Reader reader;
     TLVWriter writer;
 
+    uint64_t issuer, subject, fabric;
+
     reader.Init(x509Cert, x509CertLen);
 
     writer.Init(chipCertBuf, chipCertBufSize);
 
-    err = ConvertCertificate(reader, writer);
+    err = ConvertCertificate(reader, writer, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate),
+                             issuer, subject, fabric);
     SuccessOrExit(err);
 
     err = writer.Finalize();
@@ -699,6 +726,43 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32
 
 exit:
     return err;
+}
+
+CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteSpan & x509ICAC, uint8_t * chipCertArrayBuf,
+                                           uint32_t chipCertArrayBufSize, uint32_t & chipCertBufLen)
+{
+    // NOC is mandatory
+    VerifyOrReturnError(x509NOC.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    TLVWriter writer;
+    writer.Init(chipCertArrayBuf, chipCertArrayBufSize);
+
+    TLVType outerContainer;
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Array, outerContainer));
+
+    ASN1Reader reader;
+    VerifyOrReturnError(CanCastTo<uint32_t>(x509NOC.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    reader.Init(x509NOC.data(), static_cast<uint32_t>(x509NOC.size()));
+    uint64_t nocIssuer, nocSubject, nocFabric;
+    ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, nocIssuer, nocSubject, nocFabric));
+
+    // ICAC is optional
+    if (x509ICAC.size() > 0)
+    {
+        VerifyOrReturnError(CanCastTo<uint32_t>(x509ICAC.size()), CHIP_ERROR_INVALID_ARGUMENT);
+        reader.Init(x509ICAC.data(), static_cast<uint32_t>(x509ICAC.size()));
+        uint64_t icaIssuer, icaSubject, icaFabric;
+        ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, icaIssuer, icaSubject, icaFabric));
+        VerifyOrReturnError(icaSubject == nocIssuer, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(icaFabric == nocFabric, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(outerContainer));
+    ReturnErrorOnFailure(writer.Finalize());
+
+    chipCertBufLen = writer.GetLengthWritten();
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Credentials
