@@ -27,5 +27,18 @@ set(EXTRA_COMPONENT_DIRS
 )
 
 project(chip-lock-app)
-idf_build_set_property(CXX_COMPILE_OPTIONS "-std=c++14;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
+idf_build_set_property(CXX_COMPILE_OPTIONS "-std=c++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
+
+if (CONFIG_ENABLE_PW_RPC)
+# C++17 is required for RPC build.
+get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
+include(third_party/connectedhomeip/third_party/pigweed/repo/pw_build/pigweed.cmake)
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert pw_assert_log)
+pw_set_backend(pw_sys_io pw_sys_io.esp32)
+
+add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
+add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
+add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
+endif(CONFIG_ENABLE_PW_RPC)
