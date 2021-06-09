@@ -830,7 +830,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
     // on the concrete implementation class so that that class can override the default
     // method implementation if it chooses to.
-    otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, this);
+    otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, mOTInst);
     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
     // Enable automatic assignment of Thread advertised addresses.

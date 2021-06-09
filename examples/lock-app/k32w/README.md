@@ -228,10 +228,42 @@ used or with _out/debug/chip-k32w061-lock-example_ if MCUXpresso is used.
 
 <a name="knownissues"></a>
 
+## Low power
+
+The example also offers the possibility to run in low power mode. This means
+that the board will go in a deep power down mode most of the time and the power
+consumption will be very low.
+
+In order build with low power support, the _chip_with_low_power=1_ must be
+provided to the build system. In this case, please note that the GN build
+arguments chip*with_OM15082 and \_chip_with_ot_cli* must be set to 0.
+
+In order to maintain a low power consumption, the LEDs showing the state of the
+elock and the internal state are disabled. Console logs can be used instead.
+Also, please note that once the board is flashed with MCUXpresso the debugger
+disconnects because the board enters low power.
+
+Power Measurement Tool can be used inside MCUXpresso for checking the power
+consumption pattern: Window -> Show View -> Other -> Power Measurement Tool. The
+configuration for this tool is the next one:
+
+![POWER_CONF](../../platform/k32w/doc/images/power_conf.JPG)
+
+Also, please make sure that the J14 jumper is set to the _ENABLED_ position and
+no expansion board is attached to the DK6. A view from this tool is illustrated
+below:
+
+![POWER_VIEW](../../platform/k32w/doc/images/power_view.JPG)
+
+Please note that that the Power Measurement Tool is not very accurate and
+professional tools must be used if exact power consumption needs to be kwnown.
+
 ## Known issues
 
 -   When cross-compiling on Linux - Log messages from the Plug&Trust middleware
-    stack may not echo to the console.
+    stack may not echo to the console;
+-   Power Measurement Tool may not work correctly in MCUXpresso versions greater
+    that 11.0.1.
 
 ## Testing the example
 

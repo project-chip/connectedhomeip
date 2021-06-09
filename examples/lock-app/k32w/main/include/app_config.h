@@ -34,8 +34,8 @@
 
 #define APP_BUTTON_PUSH 1
 
-#define SYSTEM_STATE_LED LED1
-#define LOCK_STATE_LED LED2
+#define LOCK_STATE_LED LED1
+#define SYSTEM_STATE_LED LED2
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
