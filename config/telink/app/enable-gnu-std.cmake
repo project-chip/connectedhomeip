@@ -14,16 +14,6 @@
 #   limitations under the License.
 #
 
-rsource "../../zephyr/Kconfig"
-
-config CHIP_NFC_COMMISSIONING
-	bool "Enable NFC commissioning support"
-	default n
-	imply NFC_T2T_NRFXLIB
-	imply NFC_NDEF
-	imply NFC_NDEF_MSG
-	imply NFC_NDEF_RECORD
-	imply NFC_NDEF_URI_REC
-	imply NFC_NDEF_URI_MSG
-	help
-	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
+add_library(gnu17 INTERFACE)
+target_compile_options(gnu17 INTERFACE -std=gnu++17 -D_SYS__PTHREADTYPES_H_)
+target_link_libraries(app PRIVATE gnu17)
