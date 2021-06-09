@@ -88,6 +88,7 @@ void TestMdnsPubSub(nlTestSuite * inSuite, void * inContext)
 
     ChipLogProgress(DeviceLayer, "Start EventLoop");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    ChipLogProgress(DeviceLayer, "End EventLoop");
 }
 
 static const nlTest sTests[] = { NL_TEST_DEF("Test Mdns::PubSub", TestMdnsPubSub), NL_TEST_SENTINEL() };
@@ -132,10 +133,7 @@ int TestMdns()
         {
             fprintf(stderr, "mDNS test timeout, is avahi daemon running?\n");
 
-            chip::DeviceLayer::PlatformMgr().LockChipStack();
             chip::DeviceLayer::PlatformMgr().Shutdown();
-            chip::DeviceLayer::SystemLayer.WakeSelect();
-            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
             // TODO: the above does not seem to actually reliably shut down the chip stack.
             // Program will abort with core because chip thread will still run.

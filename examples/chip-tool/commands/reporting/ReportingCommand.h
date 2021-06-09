@@ -36,14 +36,11 @@ public:
     }
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
 
     virtual void AddReportCallbacks(uint8_t endPointId) = 0;
 
 private:
     uint8_t mEndPointId;
-
-    ChipDeviceCommissioner mCommissioner;
     ChipDevice * mDevice;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 };

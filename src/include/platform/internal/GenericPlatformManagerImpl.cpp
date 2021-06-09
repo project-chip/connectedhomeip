@@ -121,7 +121,7 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_TeardownChipStack()
 {
     CHIP_ERROR err;
     ChipLogError(DeviceLayer, "Inet Layer shutdown");

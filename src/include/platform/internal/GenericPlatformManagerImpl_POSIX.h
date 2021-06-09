@@ -83,8 +83,10 @@ protected:
     void _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop();
     CHIP_ERROR _StartEventLoopTask();
+    CHIP_ERROR _StopEventLoopTask();
     CHIP_ERROR _StartChipTimer(int64_t durationMS);
     CHIP_ERROR _Shutdown();
+    CHIP_ERROR _TeardownChipStack();
 
 #if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
     bool _IsChipStackLockedByCurrentThread() const;

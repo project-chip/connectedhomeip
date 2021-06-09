@@ -87,8 +87,23 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(uint32_
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void)
+{
+    VerifyOrDieWithMsg(false, DeviceLayer, "StopEventLoopTask is not implemented");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
+    VerifyOrDieWithMsg(false, DeviceLayer, "Shutdown is not implemented");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_TeardownChipStack(void)
+{
+    VerifyOrDieWithMsg(false, DeviceLayer, "Teardown is not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 

@@ -207,13 +207,11 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mExchangeMgr->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    if (params.mDeviceAddressUpdateDelegate != nullptr)
-    {
-        err = Mdns::Resolver::Instance().SetResolverDelegate(this);
-        SuccessOrExit(err);
+    err = Mdns::Resolver::Instance().SetResolverDelegate(this);
+    SuccessOrExit(err);
 
-        mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
-    }
+    RegisterDeviceAddressUpdateDelegate(params.mDeviceAddressUpdateDelegate);
+
     Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
@@ -293,17 +291,18 @@ CHIP_ERROR DeviceController::Shutdown()
     ChipLogDetail(Controller, "Shutting down the controller");
 
 #if CONFIG_DEVICE_LAYER
-    // Start by shutting down the PlatformManager.  This will ensure, with
-    // reasonable synchronization, that we stop processing of incoming messages
-    // before doing any other shutdown work.  Otherwise we can end up trying to
-    // process incoming messages in a partially shut down state, which is not
-    // great at all.
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
+    //
+    // We don't call the PlatformMgr's() Shutdown() API since that is a thread-safe API,
+    // which internally can grab the CHIP platform lock. Instead, we call an equivalent thread-unsafe API
+    // that is Teardown, which achieves the same effect, minus the actual shutdown of the CHIP thread.
+    // This now needs to be called by callers before invoking this DeviceController::Shutdown method
+    //
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().TeardownChipStack());
 #else
-    mInetLayer->Shutdown();
     mSystemLayer->Shutdown();
-    chip::Platform::Delete(mInetLayer);
+    mInetLayer->Shutdown();
     chip::Platform::Delete(mSystemLayer);
+    chip::Platform::Delete(mInetLayer);
 #endif // CONFIG_DEVICE_LAYER
 
     mState = State::NotInitialized;
