@@ -63,7 +63,24 @@ protected:
     pthread_mutex_t mChipStackLock;
     std::queue<ChipDeviceEvent> mChipEventQueue;
 
+    enum TaskType
+    {
+        kExternallyManagedTask = 0,
+        kInternallyManagedTask = 1
+    };
+
     pthread_t mChipTask;
+    bool mHasValidChipTask = false;
+    TaskType mTaskType;
+    pthread_cond_t mEventQueueStoppedCond;
+    pthread_mutex_t mStateLock;
+
+    //
+    // TODO: This variable is very similar to mMainLoopIsStarted, track the
+    // cleanup and consolidation in this issue:
+    //
+    bool mEventQueueHasStopped = false;
+
     pthread_attr_t mChipTaskAttr;
     struct sched_param mChipTaskSchedParam;
 
@@ -83,6 +100,7 @@ protected:
     void _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop();
     CHIP_ERROR _StartEventLoopTask();
+    CHIP_ERROR _StopEventLoopTask();
     CHIP_ERROR _StartChipTimer(int64_t durationMS);
     CHIP_ERROR _Shutdown();
 

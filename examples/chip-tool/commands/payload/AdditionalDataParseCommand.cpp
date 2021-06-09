@@ -24,7 +24,7 @@
 using namespace ::chip;
 using namespace ::chip::SetupPayloadData;
 
-CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR AdditionalDataParseCommand::Run(NodeId localId, NodeId remoteId)
 {
     std::vector<uint8_t> payloadData;
     AdditionalDataPayload resultPayload;
@@ -40,9 +40,12 @@ CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId l
         uint8_t x = (uint8_t) stoi(str, 0, 16);
         payloadData.push_back(x);
     }
+
     err = AdditionalDataPayloadParser(payloadData.data(), (uint32_t) payloadData.size()).populatePayload(resultPayload);
     SuccessOrExit(err);
+
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
+
 exit:
     return err;
 }

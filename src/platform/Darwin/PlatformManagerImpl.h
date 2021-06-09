@@ -59,6 +59,7 @@ private:
 
     CHIP_ERROR _StartChipTimer(int64_t aMilliseconds) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR _StartEventLoopTask() { return CHIP_NO_ERROR; };
+    CHIP_ERROR _StopEventLoopTask() { return CHIP_NO_ERROR; };
     void _RunEventLoop(){};
     void _LockChipStack(){};
     bool _TryLockChipStack() { return false; };

@@ -2,7 +2,7 @@
 class {{asCamelCased filename false}}: public TestCommand
 {
   public:
-    {{asCamelCased filename false}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
+    {{asCamelCased filename false}}(): TestCommand("{{filename}}") {}
 
     /////////// TestCommand Interface /////////
     CHIP_ERROR NextTest() override
@@ -15,11 +15,7 @@ class {{asCamelCased filename false}}: public TestCommand
           SetCommandExitStatus(true);
       }
 
-      // Ensure we increment mTestIndex before we start running the relevant
-      // command.  That way if we lose the timeslice after we send the message
-      // but before our function call returns, we won't end up with an
-      // incorrect mTestIndex value observed when we get the response.
-      switch (mTestIndex++)
+      switch (mTestIndex)
       {
         {{#chip_tests_items}}
         case {{index}}:
@@ -27,6 +23,7 @@ class {{asCamelCased filename false}}: public TestCommand
           break;
         {{/chip_tests_items}}
       }
+      mTestIndex++;
 
       if (CHIP_NO_ERROR != err)
       {
@@ -39,8 +36,8 @@ class {{asCamelCased filename false}}: public TestCommand
 
 
   private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = {{totalTests}};
+    uint16_t mTestIndex = 0;
+    uint16_t mTestCount = {{totalTests}};
 
     //
     // Tests methods
