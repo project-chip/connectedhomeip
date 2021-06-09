@@ -14,21 +14,25 @@ export ECHO_SERVER_PORT=7
 ####################################################################
 ### Declare ap_stop function
 function env_stop() {
-    sudo bash $CHIP_DIR/scripts/setup/raspberry_pi/wlan_ap.sh stop
+    sudo bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh stop
 }
 
 #####################################################################
 ### Declare ap_start function
 function env_start() {
-    sudo bash $CHIP_DIR/scripts/setup/raspberry_pi/wlan_ap.sh start --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
-    sudo bash $CHIP_DIR/scripts/setup/raspberry_pi/echo_server.sh
+    sudo bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh start --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
+    sudo bash $CHIP_DIR/scripts/tests/mbed/echo_server.sh
 
     # Build CHIP main
     ./$CHIP_DIR/scripts/build/default.sh
     export CHIP_TOOLS_DIR=$CHIP_DIR/out/default
+
     # Install Python Chip Device Controller
     pip install $CHIP_TOOLS_DIR/controller/python/chip*.whl
     pip install -r $CHIP_DIR/src/test_driver/mbed-functional/requirements.txt
+
+    source $CHIP_DIR/scripts/tests/mbed/common.sh
+    mount_mbed_device
 }
 
 #####################################################################
