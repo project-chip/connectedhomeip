@@ -48,7 +48,7 @@ NodeId GetCurrentNodeId()
 
     // Search for one admin pairing and use its node id.
     auto pairing = GetGlobalAdminPairingTable().cbegin();
-    if (pairing != GetGlobalAdminPairingTable().cend())
+    if (pairing != GetGlobalAdminPairingTable().cend() && pairing->GetNodeId() != kUndefinedNodeId)
     {
         ChipLogProgress(Discovery, "Found admin pairing for admin %" PRIX16 ", node 0x" ChipLogFormatX64, pairing->GetAdminId(),
                         ChipLogValueX64(pairing->GetNodeId()));
