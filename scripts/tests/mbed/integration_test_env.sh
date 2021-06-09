@@ -12,13 +12,6 @@ fi
 true ${CHIP_DIR:=CHIP}
 
 #####################################################################
-### Set enviroment variables
-export AP_SSID=CHIPnet
-export AP_PASSWORD=CHIPnet123
-export AP_GATEWAY=192.168.4.1
-export ECHO_SERVER_PORT=7
-
-#####################################################################
 ### Check if using supported commands [start/stop]
 
 SUPPORTED_COMMAND=(start stop)
@@ -46,7 +39,6 @@ if [[ "$COMMAND" == *"start"* ]]; then
     cd $CHIP_DIR
     bash scripts/build/default.sh
     cd $pwd
-    export CHIP_TOOLS_DIR=$CHIP_DIR/out/default
 
     # Install Python Chip Device Controller
     pip install $CHIP_DIR/out/default/controller/python/chip*.whl
