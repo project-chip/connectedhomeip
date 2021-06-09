@@ -87,6 +87,8 @@ static_library("support") {
     "SafeInt.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",
+    "StringCircularBuffer.cpp",
+    "StringCircularBuffer.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
