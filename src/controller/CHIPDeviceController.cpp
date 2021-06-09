@@ -679,7 +679,8 @@ CHIP_ERROR DeviceController::SetPairedDeviceList(ByteSpan serialized)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to recreate the device list with buffer %s\n", serialized);
+        ChipLogError(Controller, "Failed to recreate the device list with buffer %.*s\n", static_cast<int>(serialized.size()),
+                     serialized.data());
     }
     else
     {
@@ -1175,7 +1176,8 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
     // TODO: Validate CSR Nonce and signature
 
     uint32_t opCertLen = 0;
-    ChipLogProgress(Controller, "Generating operational certificate for device %llx", device->GetDeviceId());
+    ChipLogProgress(Controller, "Generating operational certificate for device " ChipLogFormatX64,
+                    ChipLogValueX64(device->GetDeviceId()));
     ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
         PeerId().SetNodeId(device->GetDeviceId()), CSR, 1, opCert.Get(), kMaxCHIPOpCertLength, opCertLen));
 

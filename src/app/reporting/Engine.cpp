@@ -212,7 +212,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportD
     SuccessOrExit(err = eventList.GetError());
 
     eventCount = CountEvents(apReadHandler, initialEvents);
-    ChipLogDetail(DataManagement, "Fetched %d events", eventCount);
+    ChipLogDetail(DataManagement, "Fetched 0x" ChipLogFormatX64 " events", ChipLogValueX64(eventCount));
 
 exit:
     if (err != CHIP_NO_ERROR)

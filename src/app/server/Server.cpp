@@ -327,8 +327,8 @@ public:
         VerifyOrExit(packetHeader.GetSourceNodeId().Value() != kUndefinedNodeId,
                      ChipLogError(AppServer, "Unknown source for received message"));
 
-        ChipLogProgress(AppServer, "Packet received from Node:%x: %u bytes", packetHeader.GetSourceNodeId().Value(),
-                        buffer->DataLength());
+        ChipLogProgress(AppServer, "Packet received from Node 0x" ChipLogFormatX64 ": %u bytes",
+                        ChipLogValueX64(packetHeader.GetSourceNodeId().Value()), buffer->DataLength());
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725

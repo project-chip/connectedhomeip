@@ -232,7 +232,7 @@ CHIP_ERROR Advertise(bool commissionableNode)
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
     ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
-                    advertiseParameters.GetVendorId(), advertiseParameters.GetProductId(),
+                    advertiseParameters.GetVendorId().ValueOr(0), advertiseParameters.GetProductId().ValueOr(0),
                     advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
