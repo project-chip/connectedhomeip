@@ -24,7 +24,7 @@
 class TestCluster : public TestCommand
 {
 public:
-    TestCluster() : TestCommand("TestCluster") {}
+    TestCluster() : TestCommand("TestCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     CHIP_ERROR NextTest() override
@@ -37,7 +37,11 @@ public:
             SetCommandExitStatus(true);
         }
 
-        switch (mTestIndex)
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
         {
         case 0:
             err = TestSendClusterTestClusterCommandTest_0();
@@ -55,7 +59,6 @@ public:
             err = TestSendClusterTestClusterCommandReadAttribute_4();
             break;
         }
-        mTestIndex++;
 
         if (CHIP_NO_ERROR != err)
         {
@@ -67,8 +70,8 @@ public:
     }
 
 private:
-    uint16_t mTestIndex = 0;
-    uint16_t mTestCount = 5;
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 5;
 
     //
     // Tests methods
@@ -437,7 +440,7 @@ private:
 class OnOffCluster : public TestCommand
 {
 public:
-    OnOffCluster() : TestCommand("OnOffCluster") {}
+    OnOffCluster() : TestCommand("OnOffCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     CHIP_ERROR NextTest() override
@@ -450,7 +453,11 @@ public:
             SetCommandExitStatus(true);
         }
 
-        switch (mTestIndex)
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
         {
         case 0:
             err = TestSendClusterOnOffCommandReadAttribute_0();
@@ -468,7 +475,6 @@ public:
             err = TestSendClusterOnOffCommandReadAttribute_4();
             break;
         }
-        mTestIndex++;
 
         if (CHIP_NO_ERROR != err)
         {
@@ -480,8 +486,8 @@ public:
     }
 
 private:
-    uint16_t mTestIndex = 0;
-    uint16_t mTestCount = 5;
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 5;
 
     //
     // Tests methods
