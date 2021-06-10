@@ -53,7 +53,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
-                                                                     uint32_t & outCertLen)
+                                                                uint32_t & outCertLen)
 {
     Initialize();
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -101,12 +101,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
     chip::Controller::CommissionerInitParams initParams;
 
-    initParams.storageDelegate = wrapper.get();
-    initParams.pairingDelegate = wrapper.get();
-    initParams.systemLayer     = systemLayer;
+    initParams.storageDelegate                = wrapper.get();
+    initParams.pairingDelegate                = wrapper.get();
+    initParams.systemLayer                    = systemLayer;
     initParams.operationalCredentialsDelegate = wrapper.get();
-    initParams.inetLayer       = inetLayer;
-    initParams.bleLayer        = GetJNIBleLayer();
+    initParams.inetLayer                      = inetLayer;
+    initParams.bleLayer                       = GetJNIBleLayer();
 
     *errInfoOnFailure = wrapper->OpCredsIssuer().Initialize(*initParams.storageDelegate);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
@@ -114,7 +114,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         return nullptr;
     }
 
-   // initParams.operationalCredentialsDelegate = &wrapper->OpCredsIssuer();
+    // initParams.operationalCredentialsDelegate = &wrapper->OpCredsIssuer();
 
     *errInfoOnFailure = wrapper->Controller()->Init(nodeId, initParams);
 
@@ -151,36 +151,36 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr,
-                                                                                int64_t serialNumber, uint8_t * certBuf,
-                                                                                uint32_t certBufSize, uint32_t & outCertLen)
+CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const chip::PeerId & peerId,
+                                                                              const chip::ByteSpan & csr, int64_t serialNumber,
+                                                                              uint8_t * certBuf, uint32_t certBufSize,
+                                                                              uint32_t & outCertLen)
 {
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = FindMethod(GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method);
+    err            = FindMethod(GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
-   {
-      ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %d", err);
-      return err;
-   }
+    {
+        ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %d", err);
+        return err;
+    }
 
     // Initializing the KeyPair.
-     Initialize();
+    Initialize();
 
     chip::X509CertRequestParams request = { serialNumber, mIssuerId,         mNow, mNow + mValidity, true, peerId.GetFabricId(),
-                                          true,         peerId.GetNodeId() };
+                                            true,         peerId.GetNodeId() };
 
     chip::P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
 
     ChipLogProgress(chipTool, "VerifyCertificateSigningRequest");
 
-
-    CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, certBuf, certBufSize,
-                                         outCertLen);
+    CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer,
+                                                         certBuf, certBufSize, outCertLen);
     jbyteArray argument;
     GetEnvForCurrentThread()->ExceptionClear();
-    N2J_ByteArray(GetEnvForCurrentThread(), csr.data(),csr.size(),argument);
+    N2J_ByteArray(GetEnvForCurrentThread(), csr.data(), csr.size(), argument);
     GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, argument);
     return generateCert;
 }
@@ -192,17 +192,17 @@ CHIP_ERROR AndroidDeviceControllerWrapper::Initialize()
 
     // TODO: Use Android keystore system instead of direct storage of private key.
     if (SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
-        {
-         // If storage doesn't have an existing keypair, create one and add it to the storage.
-         ReturnErrorOnFailure(mIssuer.Initialize());
-         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
-         keySize = static_cast<uint16_t>(sizeof(serializedKey));
-         SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize);
-        }
+    {
+        // If storage doesn't have an existing keypair, create one and add it to the storage.
+        ReturnErrorOnFailure(mIssuer.Initialize());
+        ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
+        keySize = static_cast<uint16_t>(sizeof(serializedKey));
+        SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize);
+    }
     else
     {
-     // Use the keypair from the storage
-     ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
+        // Use the keypair from the storage
+        ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
 
     mInitialized = true;
