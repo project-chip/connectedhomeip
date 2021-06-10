@@ -743,6 +743,10 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {                                                             \
         (EmberAfGenericClusterFunction) emberAfBasicClusterServerInitCallback,                                                     \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayPumpConfigurationAndControlServer[] = {                                       \
+        (EmberAfGenericClusterFunction) emberAfPumpConfigurationAndControlClusterServerInitCallback,                               \
+        (EmberAfGenericClusterFunction) emberAfPumpConfigurationAndControlClusterServerAttributeChangedCallback,                   \
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
@@ -797,7 +801,12 @@
                 0x003F, ZAP_ATTRIBUTE_INDEX(100), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Trusted Root Certificates (server) */                                                      \
             {                                                                                                                      \
-                0x0200, ZAP_ATTRIBUTE_INDEX(101), 8, 13, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+                0x0200,                                                                                                            \
+                ZAP_ATTRIBUTE_INDEX(101),                                                                                          \
+                8,                                                                                                                 \
+                13,                                                                                                                \
+                ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),         \
+                chipFuncArrayPumpConfigurationAndControlServer                                                                     \
             }, /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                 \
             {                                                                                                                      \
                 0x0402, ZAP_ATTRIBUTE_INDEX(109), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
