@@ -29,16 +29,18 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                            intptr_t aAppIdentifier)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
     VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mpExchangeMgr = apExchangeMgr;
-    mpDelegate    = apDelegate;
-    mState        = ClientState::Initialized;
+    mpExchangeMgr  = apExchangeMgr;
+    mpDelegate     = apDelegate;
+    mState         = ClientState::Initialized;
+    mAppIdentifier = aAppIdentifier;
 
     AbortExistingExchangeContext();
 
@@ -224,6 +226,9 @@ exit:
         }
     }
 
+    // TODO(#7521): Should close it after checking moreChunkedMessages flag is not set.
+    Shutdown();
+
     return err;
 }
 
@@ -322,12 +327,11 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d",
                     apExchangeContext->GetExchangeId());
-    AbortExistingExchangeContext();
-    MoveToState(ClientState::Initialized);
     if (nullptr != mpDelegate)
     {
         mpDelegate->ReportError(this, CHIP_ERROR_TIMEOUT);
     }
+    Shutdown();
 }
 
 CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)
@@ -339,6 +343,9 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         AttributeDataElement::Parser element;
         AttributePath::Parser attributePathParser;
         ClusterInfo clusterInfo;
+        uint16_t statusU16                               = 0;
+        Protocols::InteractionModel::ProtocolCode status = Protocols::InteractionModel::ProtocolCode::Success;
+
         TLV::TLVReader reader = aAttributeDataListReader;
         err                   = element.Init(reader);
         SuccessOrExit(err);
@@ -379,7 +386,18 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
-        SuccessOrExit(err);
+        if (err == CHIP_END_OF_TLV)
+        {
+            // The spec requires that one of data or status code must exists, thus failed to read data and status code means we
+            // received malformed data from server.
+            SuccessOrExit(err = element.GetStatus(&statusU16));
+            status = static_cast<Protocols::InteractionModel::ProtocolCode>(statusU16);
+        }
+        else if (err != CHIP_NO_ERROR)
+        {
+            ExitNow();
+        }
+        mpDelegate->OnReportData(this, clusterInfo, &dataReader, status);
     }
 
     if (CHIP_END_OF_TLV == err)

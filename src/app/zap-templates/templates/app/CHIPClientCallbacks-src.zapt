@@ -215,6 +215,7 @@ void LogStatus(uint8_t status)
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_SOFTWARE_FAILURE (0x%02x)", status);
         break;
     case EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER:
+
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER (0x%02x)", status);
         break;
     case EMBER_ZCL_STATUS_LIMIT_REACHED:
@@ -222,6 +223,98 @@ void LogStatus(uint8_t status)
         break;
     default:
         ChipLogError(Zcl, "Unknow status: 0x%02x", status);
+        break;
+    }
+}
+
+void LogIMStatus(uint16_t status)
+{
+    switch (status)
+    {
+    case 0x0: // Success
+        ChipLogProgress(Zcl, "  status: Success                (0x%04" PRIx16 ")", status); break;
+    case 0x01: // Failure
+        ChipLogProgress(Zcl, "  status: Failure                (0x%04" PRIx16 ")", status); break;
+    case 0x7d: // InvalidSubscription
+        ChipLogProgress(Zcl, "  status: InvalidSubscription    (0x%04" PRIx16 ")", status); break;
+    case 0x7e: // UnsupportedAccess
+        ChipLogProgress(Zcl, "  status: UnsupportedAccess      (0x%04" PRIx16 ")", status); break;
+    case 0x7f: // UnsupportedEndpoint
+        ChipLogProgress(Zcl, "  status: UnsupportedEndpoint    (0x%04" PRIx16 ")", status); break;
+    case 0x80: // InvalidAction
+        ChipLogProgress(Zcl, "  status: InvalidAction          (0x%04" PRIx16 ")", status); break;
+    case 0x81: // UnsupportedCommand
+        ChipLogProgress(Zcl, "  status: UnsupportedCommand     (0x%04" PRIx16 ")", status); break;
+    case 0x82: // Reserved82
+        ChipLogProgress(Zcl, "  status: Reserved82             (0x%04" PRIx16 ")", status); break;
+    case 0x83: // Reserved83
+        ChipLogProgress(Zcl, "  status: Reserved83             (0x%04" PRIx16 ")", status); break;
+    case 0x84: // Reserved84
+        ChipLogProgress(Zcl, "  status: Reserved84             (0x%04" PRIx16 ")", status); break;
+    case 0x85: // InvalidCommand
+        ChipLogProgress(Zcl, "  status: InvalidCommand         (0x%04" PRIx16 ")", status); break;
+    case 0x86: // UnsupportedAttribute
+        ChipLogProgress(Zcl, "  status: UnsupportedAttribute   (0x%04" PRIx16 ")", status); break;
+    case 0x87: // InvalidValue
+        ChipLogProgress(Zcl, "  status: InvalidValue           (0x%04" PRIx16 ")", status); break;
+    case 0x88: // UnsupportedWrite
+        ChipLogProgress(Zcl, "  status: UnsupportedWrite       (0x%04" PRIx16 ")", status); break;
+    case 0x89: // ResourceExhausted
+        ChipLogProgress(Zcl, "  status: ResourceExhausted      (0x%04" PRIx16 ")", status); break;
+    case 0x8a: // Reserved8a
+        ChipLogProgress(Zcl, "  status: Reserved8a             (0x%04" PRIx16 ")", status); break;
+    case 0x8b: // NotFound
+        ChipLogProgress(Zcl, "  status: NotFound               (0x%04" PRIx16 ")", status); break;
+    case 0x8c: // UnreportableAttribute
+        ChipLogProgress(Zcl, "  status: UnreportableAttribute  (0x%04" PRIx16 ")", status); break;
+    case 0x8d: // InvalidDataType
+        ChipLogProgress(Zcl, "  status: InvalidDataType        (0x%04" PRIx16 ")", status); break;
+    case 0x8e: // Reserved8e
+        ChipLogProgress(Zcl, "  status: Reserved8e             (0x%04" PRIx16 ")", status); break;
+    case 0x8f: // UnsupportedRead
+        ChipLogProgress(Zcl, "  status: UnsupportedRead        (0x%04" PRIx16 ")", status); break;
+    case 0x90: // Reserved90
+        ChipLogProgress(Zcl, "  status: Reserved90             (0x%04" PRIx16 ")", status); break;
+    case 0x91: // Reserved91
+        ChipLogProgress(Zcl, "  status: Reserved91             (0x%04" PRIx16 ")", status); break;
+    case 0x92: // Reserved92
+        ChipLogProgress(Zcl, "  status: Reserved92             (0x%04" PRIx16 ")", status); break;
+    case 0x93: // Reserved93
+        ChipLogProgress(Zcl, "  status: Reserved93             (0x%04" PRIx16 ")", status); break;
+    case 0x94: // Timeout
+        ChipLogProgress(Zcl, "  status: Timeout                (0x%04" PRIx16 ")", status); break;
+    case 0x95: // Reserved95
+        ChipLogProgress(Zcl, "  status: Reserved95             (0x%04" PRIx16 ")", status); break;
+    case 0x96: // Reserved96
+        ChipLogProgress(Zcl, "  status: Reserved96             (0x%04" PRIx16 ")", status); break;
+    case 0x97: // Reserved97
+        ChipLogProgress(Zcl, "  status: Reserved97             (0x%04" PRIx16 ")", status); break;
+    case 0x98: // Reserved98
+        ChipLogProgress(Zcl, "  status: Reserved98             (0x%04" PRIx16 ")", status); break;
+    case 0x99: // Reserved99
+        ChipLogProgress(Zcl, "  status: Reserved99             (0x%04" PRIx16 ")", status); break;
+    case 0x9a: // Reserved9a
+        ChipLogProgress(Zcl, "  status: Reserved9a             (0x%04" PRIx16 ")", status); break;
+    case 0x9b: // ConstraintError
+        ChipLogProgress(Zcl, "  status: ConstraintError        (0x%04" PRIx16 ")", status); break;
+    case 0x9c: // Busy
+        ChipLogProgress(Zcl, "  status: Busy                   (0x%04" PRIx16 ")", status); break;
+    case 0xc0: // Reservedc0
+        ChipLogProgress(Zcl, "  status: Reservedc0             (0x%04" PRIx16 ")", status); break;
+    case 0xc1: // Reservedc1
+        ChipLogProgress(Zcl, "  status: Reservedc1             (0x%04" PRIx16 ")", status); break;
+    case 0xc2: // Reservedc2
+        ChipLogProgress(Zcl, "  status: Reservedc2             (0x%04" PRIx16 ")", status); break;
+    case 0xc3: // UnsupportedCluster
+        ChipLogProgress(Zcl, "  status: UnsupportedCluster     (0x%04" PRIx16 ")", status); break;
+    case 0xc4: // Reservedc4
+        ChipLogProgress(Zcl, "  status: Reservedc4             (0x%04" PRIx16 ")", status); break;
+    case 0xc5: // NoUpstreamSubscription
+        ChipLogProgress(Zcl, "  status: NoUpstreamSubscription (0x%04" PRIx16 ")", status); break;
+    case 0xc6: // InvalidArgument
+        ChipLogProgress(Zcl, "  status: InvalidArgument        (0x%04" PRIx16 ")", status); break;
+    default:
+        ChipLogError(Zcl, "Unknow status: 0x%04" PRIx16, status);
         break;
     }
 }
@@ -288,6 +381,201 @@ bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfSta
     {
         Callback::Callback<DefaultFailureCallback> * cb = Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
         cb->mCall(cb->mContext, static_cast<uint8_t>(status));
+    }
+
+    return true;
+}
+
+
+
+bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
+                                            TLV::TLVReader * apData, uint16_t status)
+{
+    ChipLogProgress(Zcl, "ReadAttributesResponse:");
+    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", aPath.mClusterId);
+
+    Callback::Cancelable * onSuccessCallback = nullptr;
+    Callback::Cancelable * onFailureCallback = nullptr;
+    NodeId sourceId                          = aPath.mNodeId;
+    // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
+    uint8_t sequenceNumber                   = static_cast<uint8_t>(apReadClient->GetAppIdentifier());
+    CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceId, sequenceNumber, &onSuccessCallback, &onFailureCallback);
+
+    if (CHIP_NO_ERROR != err)
+    {
+        if (onSuccessCallback == nullptr)
+        {
+            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
+        }
+
+        if (onFailureCallback == nullptr)
+        {
+            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
+        }
+
+        return true;
+    }
+
+    // struct readAttributeResponseRecord[]
+    uint16_t attributeId = aPath.mFieldId; // attribId
+    ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+    LogIMStatus(status);
+
+    if (status == EMBER_ZCL_STATUS_SUCCESS && apData != nullptr)
+    {
+        chip::TLV::TLVType attributeType = apData->GetType();
+        ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
+
+        switch (attributeType)
+        {
+        case chip::TLV::kTLVType_SignedInteger: {
+            int64_t value;
+            apData->Get(value);
+            ChipLogProgress(Zcl, "  value: %" PRId64, value);
+
+            Callback::Callback<Int64sAttributeCallback> * cb =
+                Callback::Callback<Int64sAttributeCallback>::FromCancelable(onSuccessCallback);
+            cb->mCall(cb->mContext, value);
+            break;
+        }
+        case chip::TLV::kTLVType_UnsignedInteger: {
+            uint64_t value;
+            apData->Get(value);
+            ChipLogProgress(Zcl, "  value: %" PRIu64, value);
+
+            Callback::Callback<Int64uAttributeCallback> * cb =
+                Callback::Callback<Int64uAttributeCallback>::FromCancelable(onSuccessCallback);
+            cb->mCall(cb->mContext, value);
+            break;
+        }
+        case chip::TLV::kTLVType_Boolean: {
+            bool value;
+            apData->Get(value);
+            ChipLogProgress(Zcl, "  value: %s", value ? "True" : "False");
+
+            Callback::Callback<Int64uAttributeCallback> * cb =
+                Callback::Callback<Int64uAttributeCallback>::FromCancelable(onSuccessCallback);
+            cb->mCall(cb->mContext, value);
+            break;
+        }
+
+        case chip::TLV::kTLVType_UTF8String:
+        case chip::TLV::kTLVType_ByteString: {
+            uint16_t length = apData->GetLength();
+            const uint8_t * data;
+            apData->GetDataPtr(data);
+            LogStringAttribute(data, length, attributeType == chip::TLV::kTLVType_UTF8String);
+            Callback::Callback<StringAttributeCallback> * cb =
+                Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
+            cb->mCall(cb->mContext, chip::ByteSpan(data, length));
+            break;
+        }
+        case chip::TLV::kTLVType_Array:
+        case chip::TLV::kTLVType_List:
+        {
+            // TODO: Add actual support for array and lists.
+                CHIP_ERROR tlvError     = CHIP_NO_ERROR;
+                const uint8_t * message = nullptr;
+                uint16_t messageLen     = 0;
+
+                TLV::TLVReader reader;
+                TLV::TLVType type;
+                reader.Init(*apData);
+                reader.EnterContainer(type);
+                tlvError = reader.Next();
+                if (tlvError != CHIP_NO_ERROR && tlvError != CHIP_END_OF_TLV)
+                {
+                    Callback::Callback<DefaultFailureCallback> * cb =
+                        Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+                    cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));
+                    break;
+                }
+                if (tlvError == CHIP_NO_ERROR)
+                {
+                    tlvError   = reader.GetDataPtr(message);
+                    messageLen = reader.GetLength();
+                }
+                if (tlvError != CHIP_NO_ERROR)
+                {
+                    Callback::Callback<DefaultFailureCallback> * cb =
+                        Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+                    cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));
+                    break;
+                }
+
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+                    switch (aPath.mClusterId)
+                    {
+{{#chip_client_clusters}}
+{{#if (chip_server_has_list_attributes)}}
+                    case {{asHex code 4}}:
+                        switch (aPath.mFieldId)
+                        {
+{{#chip_server_cluster_attributes}}
+                        {{#if isList}}
+                        case {{asHex code 4}}: // {{type}}
+                        {
+                            {{chipType}} data[count];
+                            for (size_t i = 0; i < count; i++)
+                            {
+                                {{#if isStruct}}
+                                {{#chip_attribute_list_entryTypes}}
+                                {{#if (isString type)}}
+                                CHECK_STATUS(ReadByteSpan(message, {{size}}, &data[i].{{name}}));
+                                messageLen -= {{size}};
+                                {{else}}
+                                CHECK_MESSAGE_LENGTH({{size}});
+                                data[i].{{name}} = emberAfGet{{asReadType type}}(message, 0, {{size}});
+                                {{/if}}
+                                message += {{size}};
+                                {{/chip_attribute_list_entryTypes}}
+                                {{else}}
+                                {{#if (isString type)}}
+                                CHECK_STATUS(ReadByteSpan(message, messageLen, &data[i]));
+                                uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
+                                messageLen -= entryLength;
+                                message += entryLength;
+                                {{else}}
+                                CHECK_MESSAGE_LENGTH({{size}});
+                                data[i] = emberAfGet{{asReadType type}}(message, 0, {{size}});
+                                message += {{size}};
+                                {{/if}}
+                                {{/if}}
+                            }
+
+                            Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * cb = Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>::FromCancelable(onSuccessCallback);
+                            cb->mCall(cb->mContext, count, data);
+                            break;
+                        }
+                        {{/if}}
+{{/chip_server_cluster_attributes}}
+                        }
+                        break;
+{{/if}}
+{{/chip_client_clusters}}
+                    }
+                reader.ExitContainer(type);
+            break;
+        }
+        case chip::TLV::kTLVType_FloatingPointNumber:
+        case chip::TLV::kTLVType_Null:
+        case chip::TLV::kTLVType_Structure:
+        case chip::TLV::kTLVType_UnknownContainer:
+        case chip::TLV::kTLVType_NotSpecified: {
+            ChipLogError(Zcl, "attributeType 0x%02x is not yet supported", attributeType);
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return true;
+        }
+        }
+    }
+    else
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
     }
 
     return true;
