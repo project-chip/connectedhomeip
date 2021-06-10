@@ -27,7 +27,6 @@
 
 using namespace chip;
 
-
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
     emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
