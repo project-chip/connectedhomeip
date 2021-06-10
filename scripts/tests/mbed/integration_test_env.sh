@@ -48,7 +48,7 @@ if [[ "$COMMAND" == *"start"* ]]; then
 
     source $CHIP_DIR/scripts/tests/mbed/common.sh
     mount_mbed_device
-    mbedls
+    mbedls -j >devices.json
 fi
 
 #####################################################################

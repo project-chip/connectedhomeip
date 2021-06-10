@@ -1,5 +1,5 @@
 device_type: mbed
-job_name: test tag
+job_name: Mbed CHIP integration tests
 
 tags:
 - chip
@@ -15,11 +15,11 @@ environment:
 
 timeouts:
   job:
-    minutes: 5
+    minutes: 30
   action:
-    minutes: 5
+    minutes: 30
   connection:
-    minutes: 5
+    minutes: 30
 visibility: personal
 priority: medium
 actions:
@@ -33,7 +33,7 @@ actions:
     prompts: ['root@lava:']
 - test:
     timeout:
-      minutes: 5
+      minutes: 30
     definitions:
     - from: inline
       name: services-inline
@@ -53,9 +53,11 @@ actions:
           - . $PWD/../../../secrets
           - set -x
           - echo "Preparation of the environment..."
-          - source CHIP/scripts/tests/mbed/integration_test_env.sh start --chip_dir=CHIP
+          - . $PWD/CHIP/scripts/tests/mbed/integration_test_env_config.sh
+          - /bin/bash CHIP/scripts/tests/mbed/integration_test_env.sh start CHIP
+          - export CHIP_TOOLS_DIR=CHIP/out/default
           - echo "Integration tests execution..."
           - /bin/bash repo/scripts/tests/mbed/run_chip_integration_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
           - echo "Integration tests completed"
           - echo "Cleanup"
-          - /bin/bash CHIP/scripts/tests/mbed/integration_test_env stop
+          - /bin/bash CHIP/scripts/tests/mbed/integration_test_env.sh stop
