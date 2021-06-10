@@ -262,7 +262,6 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
 {
     int err = 0;
 
-
     mShouldRunEventLoop.store(false, std::memory_order_relaxed);
 
     if (mChipTask)

@@ -181,15 +181,9 @@ extern PlatformManagerImpl & PlatformMgrImpl();
 class StackLock
 {
 public:
-    StackLock()
-    {
-        PlatformMgr().LockChipStack();
-    }
+    StackLock() { PlatformMgr().LockChipStack(); }
 
-    ~StackLock()
-    {
-        PlatformMgr().UnlockChipStack();
-    }
+    ~StackLock() { PlatformMgr().UnlockChipStack(); }
 };
 
 } // namespace DeviceLayer
