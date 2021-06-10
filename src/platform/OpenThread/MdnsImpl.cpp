@@ -44,7 +44,6 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     VerifyOrExit(service, result = CHIP_ERROR_INVALID_ARGUMENT);
     if (strcmp(service->mHostName, "") != 0)
     {
-        ChipLogProgress(Discovery, "Setting host name\n");
         ThreadStackMgr().SetupSrpHost(service->mHostName);
     }
 

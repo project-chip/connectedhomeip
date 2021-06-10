@@ -68,7 +68,6 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 
     if (strcmp(service->mHostName, "") != 0)
     {
-        ChipLogProgress(Discovery, "Setting host name\n");
         VerifyOrExit(mdns_hostname_set(service->mHostName) == ESP_OK, error = CHIP_ERROR_INTERNAL);
     }
 

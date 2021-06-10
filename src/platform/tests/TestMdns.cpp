@@ -57,6 +57,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mPort      = 80;
     strcpy(service.mName, "test");
     strcpy(service.mType, "_mock");
+    service.mAddressType   = chip::Inet::kIPAddressType_Any;
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     entry.mKey             = key;
     entry.mData            = reinterpret_cast<const uint8_t *>(val);
