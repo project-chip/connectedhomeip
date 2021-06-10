@@ -26,7 +26,7 @@ actions:
 - deploy:
     to: docker
     image:
-      name: lgniadzik/chip-mbed-lava-device:latest-rpi
+      name: lgniadzik/chip-mbed-lava-device:latest
 - boot:
     method: docker
     command: bash
@@ -55,7 +55,6 @@ actions:
           - echo "Preparation of the environment..."
           - . $PWD/CHIP/scripts/tests/mbed/integration_test_env_config.sh
           - /bin/bash CHIP/scripts/tests/mbed/integration_test_env.sh start CHIP
-          - export CHIP_TOOLS_DIR=CHIP/out/default
           - echo "Integration tests execution..."
           - /bin/bash repo/scripts/tests/mbed/run_chip_integration_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
           - echo "Integration tests completed"
