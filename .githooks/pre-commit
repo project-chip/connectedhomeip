@@ -56,7 +56,7 @@ FAILED_COMMIT="$RESTYLED"
 revert_if_needed
 
 if [[ $FAILED_COMMIT -ne 0 ]]; then
-    echo "Comming Failed: Code needs restyling before committing."
+    echo "Commit Failed: Code needs restyling before committing."
     echo "Restyling can be done by running $CHIP_ROOT/scripts/helpers/restyle-diff.sh"
     exit 1
 fi
