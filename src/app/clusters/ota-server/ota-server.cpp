@@ -53,7 +53,7 @@ bool SendStatusIfDelegateNull(chip::EndpointId endpointId)
 {
     if (GetDelegate(endpointId) == nullptr)
     {
-        ChipLogError(Zcl, "No OTAServerDelegate set for ep:%d", endpointId);
+        ChipLogError(Zcl, "No OTAServerDelegate set for ep:%" PRIu8, endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
         return true;
     }
@@ -86,7 +86,7 @@ bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Comman
 
     if (updateToken.size() != kUpdateTokenParamLength)
     {
-        ChipLogError(Zcl, "expected size %d for UpdateToken, got %d", kUpdateTokenParamLength, updateToken.size());
+        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenParamLength, updateToken.size());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
@@ -124,7 +124,7 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(app::Comma
 
     if (updateToken.size() != kUpdateTokenParamLength)
     {
-        ChipLogError(Zcl, "expected size %d for UpdateToken, got %d", kUpdateTokenParamLength, updateToken.size());
+        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenParamLength, updateToken.size());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
@@ -175,12 +175,12 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
     const uint8_t locationLen = emberAfStringLength(location);
     if (locationLen != kLocationParamLength)
     {
-        ChipLogError(Zcl, "expected location length %d, got %d", locationLen, kLocationParamLength);
+        ChipLogError(Zcl, "expected location length %" PRIu8 ", got %" PRIu8, locationLen, kLocationParamLength);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
     else if (metadataForServer.size() > kMaxMetadataLen)
     {
-        ChipLogError(Zcl, "metadata size %d exceeds max %d", metadataForServer.size(), kMaxMetadataLen);
+        ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForServer.size(), kMaxMetadataLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
