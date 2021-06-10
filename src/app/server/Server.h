@@ -47,9 +47,12 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
  */
 void InitServer(AppDelegate * delegate = nullptr);
 
-// #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port);
-// #endif
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+CHIP_ERROR InitCommissioner();
 
 CHIP_ERROR DiscoverCommissionableNodes();
 
@@ -58,6 +61,7 @@ CHIP_ERROR DiscoverCommissionableNodes(char * instance);
 CHIP_ERROR DisplayCommissionableNodes();
 
 CHIP_ERROR ResetUDCStates();
+#endif
 
 CHIP_ERROR AddTestPairing();
 

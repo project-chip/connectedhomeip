@@ -588,15 +588,10 @@ void InitServer(AppDelegate * delegate)
     SuccessOrExit(err);
 #endif
 
-    /*
-    printf("sleeping for 2 secs\n");
-    sleep(1);
-    printf("done sleeping\n");
-
-    chip::Inet::IPAddress commissioner;
-    chip::Inet::IPAddress::FromString("127.0.0.1", commissioner);
-    SendUserDirectedCommissioningRequest(commissioner, CHIP_PORT + 2);
-    */
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    err = InitCommissioner();
+    SuccessOrExit(err);
+#endif
 
     err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable());
     SuccessOrExit(err);
