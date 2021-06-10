@@ -37,20 +37,6 @@ CHIP_ERROR Engine::Init()
     return CHIP_NO_ERROR;
 }
 
-EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents)
-{
-    EventNumber event_count             = 0;
-    EventNumber * vendedEventNumberList = apReadHandler->GetVendedEventNumberList();
-    for (size_t index = 0; index < kNumPriorityLevel; index++)
-    {
-        if (vendedEventNumberList[index] > apInitialEvents[index])
-        {
-            event_count += vendedEventNumberList[index] - apInitialEvents[index];
-        }
-    }
-    return event_count;
-}
-
 CHIP_ERROR
 Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo)
 {
@@ -162,7 +148,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportD
     {
         uint8_t priorityIndex = static_cast<uint8_t>(apReadHandler->GetCurrentPriority());
         err = eventManager.FetchEventsSince(*(eventList.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
-                                            eventNumberList[priorityIndex]);
+                                            eventNumberList[priorityIndex], eventCount);
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
         {
@@ -175,8 +161,6 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportD
         }
         else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
         {
-            eventCount = CountEvents(apReadHandler, initialEvents);
-
             // when first cluster event is too big to fit in the packet, ignore that cluster event.
             if (eventCount == 0)
             {
@@ -211,7 +195,10 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportD
     eventList.EndOfEventList();
     SuccessOrExit(err = eventList.GetError());
 
-    eventCount = CountEvents(apReadHandler, initialEvents);
+    if (eventCount == 0)
+    {
+        aReportDataBuilder.Rollback(backup);
+    }
     ChipLogDetail(DataManagement, "Fetched %d events", eventCount);
 
 exit:

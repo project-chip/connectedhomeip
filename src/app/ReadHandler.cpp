@@ -106,7 +106,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
-
     ReadRequest::Parser readRequestParser;
     EventPathList::Parser eventPathListParser;
     AttributePathList::Parser attributePathListParser;
@@ -139,10 +138,23 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     {
         err = CHIP_NO_ERROR;
     }
-    else
+    else if (err == CHIP_NO_ERROR)
     {
-        SuccessOrExit(err);
+        uint64_t lastEventNumber;
         err = ProcessEventPathList(eventPathListParser);
+        SuccessOrExit(err);
+        err = readRequestParser.GetEventNumber(&lastEventNumber);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            for (size_t index = 0; index < kNumPriorityLevel; index++)
+            {
+                mSelfProcessedEvents[index] = static_cast<EventNumber>(lastEventNumber);
+            }
+        }
     }
     SuccessOrExit(err);
 
@@ -293,7 +305,7 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
     if (mCurrentPriority == PriorityLevel::Invalid)
     {
         // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events, and set a checkpoint
-        for (size_t index = 0; index < ArraySize(mSelfProcessedEvents); index++)
+        for (int index = ArraySize(mSelfProcessedEvents); index >=0 ; index--)
         {
             EventNumber lastEventNumber = aEventManager.GetLastEventNumber(static_cast<PriorityLevel>(index));
             if ((lastEventNumber != 0) && (lastEventNumber >= mSelfProcessedEvents[index]))
@@ -318,7 +330,7 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
 
 void ReadHandler::MoveToNextScheduledDirtyPriority()
 {
-    for (uint8_t i = 0; i < ArraySize(mSelfProcessedEvents); i++)
+    for (int i = ArraySize(mSelfProcessedEvents)-1; i >= 0; i--)
     {
         if ((mLastScheduledEventNumber[i] != 0) && mSelfProcessedEvents[i] <= mLastScheduledEventNumber[i])
         {

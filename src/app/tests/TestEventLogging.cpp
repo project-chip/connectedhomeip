@@ -150,16 +150,18 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     chip::TLV::TLVReader reader;
     chip::TLV::TLVWriter writer;
     uint8_t backingStore[1024];
-    size_t elementCount;
+    chip::EventNumber elementCount1 = 0;
+    size_t elementCount2 = 0;
     writer.Init(backingStore, 1024);
-    err = alogMgmt.FetchEventsSince(writer, clusterInfo, priority, startingEventNumber);
+    err = alogMgmt.FetchEventsSince(writer, clusterInfo, priority, startingEventNumber, elementCount1);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
 
     reader.Init(backingStore, writer.GetLengthWritten());
 
-    err = chip::TLV::Utilities::Count(reader, elementCount, false);
+    err = chip::TLV::Utilities::Count(reader, elementCount2, false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, elementCount == expectedNumEvents);
+
+    NL_TEST_ASSERT(apSuite, elementCount1 == expectedNumEvents && elementCount2 == expectedNumEvents);
     reader.Init(backingStore, writer.GetLengthWritten());
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
 }

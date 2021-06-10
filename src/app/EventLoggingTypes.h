@@ -172,6 +172,8 @@ struct EventLoadOutContext
     Timestamp mPreviousSystemTime;
     Timestamp mCurrentSystemTime;
     EventNumber mCurrentEventNumber = 0;
+    EventNumber mPreviousEventNumber = 0;
+    EventNumber mEventCount = 0;
     Timestamp mCurrentUTCTime;
     ClusterInfo * mpInterestedEventPaths = nullptr;
     bool mFirst                          = true;
