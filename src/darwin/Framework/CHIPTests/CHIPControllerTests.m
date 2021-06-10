@@ -31,7 +31,7 @@
 
 - (void)testControllerLifecycle
 {
-    CHIPDeviceController *controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     XCTAssertTrue([controller startup:nil]);
     XCTAssertTrue([controller shutdown]);
 
