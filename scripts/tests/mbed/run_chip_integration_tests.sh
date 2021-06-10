@@ -18,7 +18,7 @@ echo "Downloading artifact from $GITHUB_ACTION_ID action in $GITHUB_REPOSITORY"
 download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN binaries
 
 echo "Get test sets"
-IFS=$'\n' read -d '' -r -a test_sets <$CHIP_DIR/src/test_driver/mbed-functional/test_set.in
+mapfile -t test_sets <$CHIP_DIR/src/test_driver/mbed-functional/test_set.in
 echo "${#test_sets[@]}"
 for i in "${test_sets[@]}"; do
     echo "$i"
