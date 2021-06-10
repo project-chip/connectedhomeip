@@ -617,6 +617,19 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
     verifier_len = static_cast<uint16_t>(verifier_len_raw);
 
     {
+        const uint8_t * hash = &buf[kMAX_Point_Length];
+        err                  = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
+        if (err != CHIP_NO_ERROR)
+        {
+            spake2pErr = Spake2pErrorType::kInvalidKeyConfirmation;
+            SuccessOrExit(err);
+        }
+
+        err = mSpake2p.GetKeys(mKe, &mKeLen);
+        SuccessOrExit(err);
+    }
+
+    {
         Encoding::PacketBufferWriter bbuf(System::PacketBufferHandle::New(verifier_len));
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
@@ -629,19 +642,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
     }
 
     ChipLogDetail(SecureChannel, "Sent spake2p msg3");
-
-    {
-        const uint8_t * hash = &buf[kMAX_Point_Length];
-        err                  = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
-        if (err != CHIP_NO_ERROR)
-        {
-            spake2pErr = Spake2pErrorType::kInvalidKeyConfirmation;
-            SuccessOrExit(err);
-        }
-
-        err = mSpake2p.GetKeys(mKe, &mKeLen);
-        SuccessOrExit(err);
-    }
 
     mPairingComplete = true;
 
