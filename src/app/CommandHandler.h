@@ -46,7 +46,7 @@ public:
                            System::PacketBufferHandle && payload);
     CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
                              const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
-                             const uint16_t aProtocolCode) override;
+                             const Protocols::InteractionModel::ProtocolCode aProtocolCode) override;
 
 private:
     friend class TestCommandInteraction;
