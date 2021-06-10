@@ -31,10 +31,12 @@ CHIP_ERROR PairingCommand::Run(NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    GetExecContext()->Commissioner->RegisterDeviceAddressUpdateDelegate(this);
-    GetExecContext()->Commissioner->RegisterPairingDelegate(this);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
+
+        GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
+        GetExecContext()->commissioner->RegisterPairingDelegate(this);
+    }
 
     err = RunInternal(remoteId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", ErrorStr(err)));
@@ -57,33 +59,29 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     // appropriately. None of the following calls below before the unlock are, nor should be
     // blocking.
     //
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-
-    switch (mPairingMode)
     {
-    case PairingMode::None:
-        err = Unpair(remoteId);
-        break;
-    case PairingMode::Bypass:
-        err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-        break;
-    case PairingMode::Ble:
-        err = Pair(remoteId, PeerAddress::BLE());
-        break;
-    case PairingMode::OnNetwork:
-    case PairingMode::SoftAP:
-        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-        break;
-    case PairingMode::Ethernet:
-        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-        break;
-    }
+        chip::DeviceLayer::StackLock lock;
 
-    //
-    // Unlock before we wait for a response to permit the stack to run upon receiving messages through
-    // event posts into its event queue
-    //
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        switch (mPairingMode)
+        {
+            case PairingMode::None:
+                err = Unpair(remoteId);
+                break;
+            case PairingMode::Bypass:
+                err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+                break;
+            case PairingMode::Ble:
+                err = Pair(remoteId, PeerAddress::BLE());
+                break;
+            case PairingMode::OnNetwork:
+            case PairingMode::SoftAP:
+                err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+                break;
+            case PairingMode::Ethernet:
+                err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+                break;
+        }
+    }
 
     WaitForResponse(kWaitDurationInSeconds);
     ReleaseCallbacks();
@@ -96,19 +94,19 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
     RendezvousParameters params =
         RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
 
-    return GetExecContext()->Commissioner->PairDevice(remoteId, params);
+    return GetExecContext()->commissioner->PairDevice(remoteId, params);
 }
 
 CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress address)
 {
     ChipSerializedDevice serializedTestDevice;
-    return GetExecContext()->Commissioner->PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
+    return GetExecContext()->commissioner->PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
 }
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
     SetCommandExitStatus(true);
-    return GetExecContext()->Commissioner->UnpairDevice(remoteId);
+    return GetExecContext()->commissioner->UnpairDevice(remoteId);
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -166,7 +164,7 @@ CHIP_ERROR PairingCommand::SetupNetwork()
     case PairingNetworkType::WiFi:
     case PairingNetworkType::Ethernet:
     case PairingNetworkType::Thread:
-        err = GetExecContext()->Commissioner->GetDevice(mRemoteId, &mDevice);
+        err = GetExecContext()->commissioner->GetDevice(mRemoteId, &mDevice);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Setup failure! No pairing for device: %" PRIu64, mRemoteId));
 
         mCluster.Associate(mDevice, mEndpointId);
@@ -306,9 +304,9 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
 
 CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
-    ReturnErrorOnFailure(GetExecContext()->Commissioner->GetDevice(mRemoteId, &mDevice));
+    ReturnErrorOnFailure(GetExecContext()->commissioner->GetDevice(mRemoteId, &mDevice));
     ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", mRemoteId, mFabricId);
-    return GetExecContext()->Commissioner->UpdateDevice(mDevice, mFabricId);
+    return GetExecContext()->commissioner->UpdateDevice(mDevice, mFabricId);
 }
 
 void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)

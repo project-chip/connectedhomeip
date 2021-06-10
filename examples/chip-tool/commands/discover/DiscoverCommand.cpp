@@ -24,14 +24,13 @@ CHIP_ERROR DiscoverCommand::Run(NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
 
-    GetExecContext()->Commissioner->RegisterDeviceAddressUpdateDelegate(this);
-    err = RunCommand(mNodeId, mFabricId);
-
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    SuccessOrExit(err);
+        GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
+        err = RunCommand(mNodeId, mFabricId);
+        SuccessOrExit(err);
+    }
 
     UpdateWaitForResponse(true);
     WaitForResponse(kWaitDurationInSeconds);

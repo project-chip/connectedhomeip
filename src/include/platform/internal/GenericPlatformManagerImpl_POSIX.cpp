@@ -24,6 +24,7 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP
 
+#include "system/SystemError.h"
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
@@ -261,21 +262,20 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
 {
     int err = 0;
 
-    _LockChipStack();
 
     mShouldRunEventLoop.store(false, std::memory_order_relaxed);
 
     if (mChipTask)
     {
+        //
+        // We need to grab the lock to protect critical sections accessed by the WakeSelect() call within
+        // SystemLayer
+        //
+        Impl()->LockChipStack();
         SystemLayer.WakeSelect();
-
-        _UnlockChipStack();
+        Impl()->UnlockChipStack();
 
         SuccessOrExit(err = pthread_join(mChipTask, nullptr));
-    }
-    else
-    {
-        _UnlockChipStack();
     }
 
 exit:
@@ -306,14 +306,11 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_TeardownChipStack()
 {
-    int err = 0;
-
     //
     // Call up to the base class _TeardownChipStack() to perform the actual stack de-initialization
     // and clean-up
     //
-    err = GenericPlatformManagerImpl<ImplClass>::_TeardownChipStack();
-    return System::MapErrorPOSIX(err);
+    return System::MapErrorPOSIX(GenericPlatformManagerImpl<ImplClass>::_TeardownChipStack());
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.

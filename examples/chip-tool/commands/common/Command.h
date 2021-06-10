@@ -98,9 +98,9 @@ public:
      */
     struct ExecutionContext
     {
-        ChipDeviceCommissioner * Commissioner;
-        chip::Controller::ExampleOperationalCredentialsIssuer * OpCredsIssuer;
-        PersistentStorage * Storage;
+        ChipDeviceCommissioner * commissioner;
+        chip::Controller::ExampleOperationalCredentialsIssuer * opCredsIssuer;
+        PersistentStorage * storage;
     };
 
     Command(const char * commandName) : mName(commandName) {}

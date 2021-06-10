@@ -299,10 +299,10 @@ CHIP_ERROR DeviceController::Shutdown()
     //
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().TeardownChipStack());
 #else
-    mSystemLayer->Shutdown();
     mInetLayer->Shutdown();
-    chip::Platform::Delete(mSystemLayer);
+    mSystemLayer->Shutdown();
     chip::Platform::Delete(mInetLayer);
+    chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
 
     mSystemLayer = nullptr;

@@ -24,15 +24,15 @@ CHIP_ERROR TestCommand::Run(NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    err = GetExecContext()->Commissioner->GetDevice(remoteId, &mDevice);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    ReturnErrorOnFailure(err);
+    {
+        chip::DeviceLayer::StackLock lock;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    err = NextTest();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    ReturnErrorOnFailure(err);
+        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
+        ReturnErrorOnFailure(err);
+
+        err = NextTest();
+        ReturnErrorOnFailure(err);
+    }
 
     UpdateWaitForResponse(true);
     WaitForResponse(kWaitDurationInSeconds);

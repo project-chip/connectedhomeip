@@ -41,19 +41,17 @@ CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    err = GetExecContext()->Commissioner->GetDevice(remoteId, &mDevice);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
 
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
+        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
 
-    UpdateWaitForResponse(true);
+        UpdateWaitForResponse(true);
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    err = SendCommand(mDevice, mEndPointId);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
+        err = SendCommand(mDevice, mEndPointId);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
+    }
 
     WaitForResponse(kWaitDurationInSeconds);
 

@@ -80,9 +80,12 @@ exit:
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 #endif
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    //
+    // We can call DeviceController::Shutdown() safely without grabbing the stack lock
+    // since the CHIP thread and event queue have been stopped, preventing any thread
+    // races.
+    //
     mController.Shutdown();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
@@ -152,9 +155,9 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
     {
         Command::ExecutionContext execContext;
 
-        execContext.Commissioner  = &mController;
-        execContext.OpCredsIssuer = &mOpCredsIssuer;
-        execContext.Storage       = &mStorage;
+        execContext.commissioner  = &mController;
+        execContext.opCredsIssuer = &mOpCredsIssuer;
+        execContext.storage       = &mStorage;
 
         command->SetExecutionContext(execContext);
 

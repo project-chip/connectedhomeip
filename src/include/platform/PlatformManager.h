@@ -173,6 +173,25 @@ extern PlatformManager & PlatformMgr();
  */
 extern PlatformManagerImpl & PlatformMgrImpl();
 
+/**
+ * @brief
+ * RAII locking for PlatformManager to simplify management of
+ * LockChipStack()/UnlockChipStack calls.
+ */
+class StackLock
+{
+public:
+    StackLock()
+    {
+        PlatformMgr().LockChipStack();
+    }
+    
+    ~StackLock() 
+    { 
+        PlatformMgr().UnlockChipStack();
+    }
+};
+
 } // namespace DeviceLayer
 } // namespace chip
 
@@ -240,7 +259,8 @@ inline void PlatformManager::RunEventLoop()
  *  Starts the stack on its own thread/task with an associated event queue
  *  to dispatch and handle events posted to that task.
  *
- *  Thread Safe: YES
+ *  This is thread-safe.
+ *  This is *NOT SAFE* to call from within the CHIP event loop since it can grab the stack lock.
  */
 inline CHIP_ERROR PlatformManager::StartEventLoopTask()
 {
@@ -253,7 +273,8 @@ inline CHIP_ERROR PlatformManager::StartEventLoopTask()
  *  the CHIP thread/task should no longer be running. This will not actually shutdown the stack.
  *  to dispatch and handle events posted to that task.
  *
- *  Thread Safe: YES
+ *  This is thread-safe.
+ *  This is *NOT SAFE* to call from within the CHIP event loop since it can grab the stack lock.
  *
  */
 inline CHIP_ERROR PlatformManager::StopEventLoopTask()

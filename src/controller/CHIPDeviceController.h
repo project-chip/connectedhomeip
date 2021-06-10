@@ -242,13 +242,6 @@ public:
 
     virtual void ReleaseDevice(Device * device);
 
-    /**
-     * @brief
-     *   Register a delegate to get notified when a device's address gets updated
-     *
-     * @param[in] delegate  The delegate of type chip::Controller::DeviceAddressUpdateDelegate
-     *                      being registered
-     */
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
 
     // ----- IO -----
@@ -490,12 +483,6 @@ public:
 
 #endif
 
-    /**
-     * @brief
-     *   Register a pairing delegate to be notified of notable pairing events
-     *
-     * @param[in] pairingDelegate       Pointer to a DevicePairingDelegate.
-     */
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
 private:
