@@ -103,7 +103,7 @@ public class ChipDeviceController {
   }
 
   public void onOpCSRGenerationComplete(byte[] errorCode) {
-    if(completionListener !=null) {
+    if (completionListener != null) {
       completionListener.onOpCSRGenerationComplete(errorCode);
     }
   }
