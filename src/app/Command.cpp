@@ -126,7 +126,7 @@ exit:
 
 void Command::Shutdown()
 {
-    VerifyOrExit(mState != CommandState::Uninitialized, );
+    VerifyOrReturn(mState != CommandState::Uninitialized);
     mCommandMessageWriter.Reset();
 
     AbortExistingExchangeContext();
@@ -136,8 +136,6 @@ void Command::Shutdown()
     ClearState();
 
     mCommandIndex = 0;
-exit:
-    return;
 }
 
 CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus)

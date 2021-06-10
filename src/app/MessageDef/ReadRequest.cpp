@@ -271,12 +271,11 @@ exit:
 ReadRequest::Builder & ReadRequest::Builder::EventNumber(const uint64_t aEventNumber)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventNumber), aEventNumber);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventNumber), aEventNumber);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 

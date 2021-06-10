@@ -42,16 +42,12 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     mpExchangeMgr = apExchangeMgr;
     mpDelegate    = apDelegate;
 
-    err = mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
     mReportingEngine.Init();
-    SuccessOrExit(err);
 
     for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS - 1; index++)
     {
@@ -60,8 +56,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS - 1].mpNext = nullptr;
     mpNextAvailableClusterInfo                                 = mClusterInfoPool;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void InteractionModelEngine::Shutdown()
@@ -108,26 +103,22 @@ void InteractionModelEngine::Shutdown()
 
 CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCommandSender)
 {
-    CHIP_ERROR err   = CHIP_ERROR_NO_MEMORY;
     *apCommandSender = nullptr;
 
     for (auto & commandSender : mCommandSenderObjs)
     {
         if (commandSender.IsFree())
         {
-            *apCommandSender = &commandSender;
-            err              = commandSender.Init(mpExchangeMgr, mpDelegate);
-            if (CHIP_NO_ERROR != err)
+            const CHIP_ERROR err = commandSender.Init(mpExchangeMgr, mpDelegate);
+            if (err == CHIP_NO_ERROR)
             {
-                *apCommandSender = nullptr;
-                ExitNow();
+                *apCommandSender = &commandSender;
             }
-            break;
+            return err;
         }
     }
 
-exit:
-    return err;
+    return CHIP_ERROR_NO_MEMORY;
 }
 
 CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient)

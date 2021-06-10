@@ -68,13 +68,13 @@ static void RebootCallbackFn()
     if (!lArgv.Alloc(static_cast<size_t>(sRestartCallbackCtx.mArgc + 2)))
     {
         printf("** failed to allocate memory **\n");
-        ExitNow();
+        return;
     }
 
     if (gSigusr1Received)
     {
         printf("** skipping restart case after SIGUSR1 **\n");
-        ExitNow();
+        return;
     }
 
     for (i = 0; sRestartCallbackCtx.mArgv[i] != nullptr; i++)
@@ -108,9 +108,6 @@ static void RebootCallbackFn()
     printf("********** Restarting *********\n");
     fflush(stdout);
     execvp(lArgv[0], lArgv.Get());
-
-exit:
-    return;
 }
 
 static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::FaultInjection::Identifier aId,

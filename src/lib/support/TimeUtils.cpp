@@ -545,18 +545,15 @@ void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year
 bool CalendarToChipEpochTime(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute, uint8_t second,
                              uint32_t & chipEpochTime)
 {
-    bool res = true;
+    VerifyOrReturnError(year >= kChipEpochBaseYear && year <= kChipEpochMaxYear, false);
+
     uint32_t daysSinceUnixEpoch;
-
-    VerifyOrExit(year >= kChipEpochBaseYear && year <= kChipEpochMaxYear, res = false);
-
     CalendarDateToDaysSinceEpoch(year, month, dayOfMonth, daysSinceUnixEpoch);
 
     chipEpochTime = ((daysSinceUnixEpoch - kChipEpochDaysSinceUnixEpoch) * kSecondsPerDay) + (hour * kSecondsPerHour) +
         (minute * kSecondsPerMinute) + second;
 
-exit:
-    return res;
+    return true;
 }
 
 void ChipEpochToCalendarTime(uint32_t chipEpochTime, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour,
@@ -568,14 +565,11 @@ void ChipEpochToCalendarTime(uint32_t chipEpochTime, uint16_t & year, uint8_t & 
 
 bool UnixEpochToChipEpochTime(uint32_t unixEpochTime, uint32_t & chipEpochTime)
 {
-    bool res = true;
-
-    VerifyOrExit(unixEpochTime >= kChipEpochSecondsSinceUnixEpoch, res = false);
+    VerifyOrReturnError(unixEpochTime >= kChipEpochSecondsSinceUnixEpoch, false);
 
     chipEpochTime = unixEpochTime - kChipEpochSecondsSinceUnixEpoch;
 
-exit:
-    return res;
+    return true;
 }
 
 } // namespace chip
