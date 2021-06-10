@@ -185,9 +185,9 @@ public:
     {
         PlatformMgr().LockChipStack();
     }
-    
-    ~StackLock() 
-    { 
+
+    ~StackLock()
+    {
         PlatformMgr().UnlockChipStack();
     }
 };
