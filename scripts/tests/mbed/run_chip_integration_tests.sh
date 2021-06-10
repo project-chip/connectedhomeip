@@ -16,5 +16,9 @@ source $CHIP_DIR/scripts/tests/mbed/common.sh
 
 echo "Downloading artifact from $GITHUB_ACTION_ID action in $GITHUB_REPOSITORY"
 download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN binaries
-ls binaries
-cat devices.json
+
+IFS=$'\n' read -d '' -r -a test_sets <$CHIP_DIR/src/test_driver/mbed-functional/test_set.in
+echo ${#test_sets[@]}
+for i in "${test_sets[@]}"; do
+    echo $i
+done
