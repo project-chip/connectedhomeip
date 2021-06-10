@@ -39,11 +39,11 @@ uint16_t doEncodeApsFrame(BufferWriter & buf, chip::ClusterId clusterId, chip::E
     size_t result = buf.Needed();
     if (isMeasuring)
     {
-        ChipLogDetail(Zcl, "Measured APS frame size %d", result);
+        ChipLogDetail(Zcl, "Measured APS frame size %zu", result);
     }
     else if (buf.Fit())
     {
-        ChipLogDetail(Zcl, "Successfully encoded %d bytes", result);
+        ChipLogDetail(Zcl, "Successfully encoded %zu bytes", result);
     }
     else
     {

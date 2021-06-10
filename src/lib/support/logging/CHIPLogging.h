@@ -72,8 +72,21 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 
 void SetLogRedirectCallback(LogRedirectCallback_t callback);
 
+/**
+ * gcc and clang provide a way to warn for a custom formatter when formats don't
+ * match arguments.  Use that for Log() so we catch mistakes.  The "format"
+ * attribute takes the type of format, which arg is the format string, and which
+ * arg is the first variadic arg, with both arg numbers 1-based.
+ */
+
+#if defined(__GNUC__)
+#define ENFORCE_FORMAT(n, m) __attribute__((format(printf, n, m)))
+#else                        // __GNUC__
+#define ENFORCE_FORMAT(n, m) /* How to do with MSVC? */
+#endif                       // __GNUC__
+
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
-void Log(uint8_t module, uint8_t category, const char * msg, ...);
+void Log(uint8_t module, uint8_t category, const char * msg, ...) ENFORCE_FORMAT(3, 4);
 
 uint8_t GetLogFilter();
 void SetLogFilter(uint8_t category);

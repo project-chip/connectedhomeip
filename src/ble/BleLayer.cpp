@@ -470,7 +470,7 @@ exit:
 
     if (err != BLE_NO_ERROR)
     {
-        ChipLogError(Ble, "HandleChipConnectionReceived failed, err = %d", err);
+        ChipLogError(Ble, "HandleChipConnectionReceived failed, err = %" BleErrorFormat, err);
     }
 
     return err;
@@ -501,7 +501,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
             BLE_ERROR status = endPoint->Receive(std::move(pBuf));
             if (status != BLE_NO_ERROR)
             {
-                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
+                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %" BleErrorFormat, status);
             }
         }
         else
@@ -509,7 +509,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
             BLE_ERROR status = HandleBleTransportConnectionInitiated(connObj, std::move(pBuf));
             if (status != BLE_NO_ERROR)
             {
-                ChipLogError(Ble, "failed handle new chip BLE connection, status = %d", status);
+                ChipLogError(Ble, "failed handle new chip BLE connection, status = %" BleErrorFormat, status);
             }
         }
     }
@@ -546,7 +546,7 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const Chi
             BLE_ERROR status = endPoint->Receive(std::move(pBuf));
             if (status != BLE_NO_ERROR)
             {
-                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
+                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %" BleErrorFormat, status);
             }
         }
         else
@@ -612,7 +612,7 @@ void BleLayer::HandleAckReceived(BLE_CONNECTION_OBJECT connObj)
 
         if (status != BLE_NO_ERROR)
         {
-            ChipLogError(Ble, "endpoint conf recvd failed, err = %d", status);
+            ChipLogError(Ble, "endpoint conf recvd failed, err = %" BleErrorFormat, status);
         }
     }
     else

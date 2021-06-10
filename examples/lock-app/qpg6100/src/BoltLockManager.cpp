@@ -220,7 +220,8 @@ void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 
             lock->mAutoLockTimerArmed = true;
 
-            ChipLogProgress(NotSpecified, "Auto Re-lock enabled. Will be triggered in %u seconds", lock->mAutoLockDuration);
+            ChipLogProgress(NotSpecified, "Auto Re-lock enabled. Will be triggered in %" PRIu32 " seconds",
+                            lock->mAutoLockDuration);
         }
     }
 }
