@@ -167,7 +167,7 @@ flash_image_to_device() {
 
     image=$(find $images_dir -name '${image_name}_${target_name}*')
 
-    echo $image
+    echo "$image"
 
     if [ -z "$image" ]; then
         echo "Image does not exists"
