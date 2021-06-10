@@ -77,7 +77,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     {
         printf("responder constructing status code in command");
         apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::Success);
     }
     else
     {
