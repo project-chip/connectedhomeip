@@ -34,7 +34,6 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR EventList::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
@@ -92,7 +91,6 @@ exit:
 
     return err;
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
 EventDataElement::Builder & EventList::Builder::CreateEventBuilder()
 {

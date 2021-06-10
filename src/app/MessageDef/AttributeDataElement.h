@@ -55,7 +55,6 @@ public:
      */
     CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -70,7 +69,6 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
-#endif
 
     /**
      *  @brief Get a TLVReader for the AttributePath. Next() must be called before accessing them.

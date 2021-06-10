@@ -34,7 +34,6 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR AttributeDataVersionList::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -86,7 +85,6 @@ exit:
 
     return err;
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
 // 1) current element is anonymous
 // 2) current element is either unsigned integer or NULL

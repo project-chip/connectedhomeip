@@ -48,7 +48,6 @@ exit:
     return err;
 }
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR WriteResponse::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
@@ -101,7 +100,6 @@ exit:
 
     return err;
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
 CHIP_ERROR WriteResponse::Parser::GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const
 {

@@ -24,9 +24,9 @@ declare_args() {
 
 config("app_config") {
   if (chip_enable_schema_check) {
-    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=1" ]
+    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK_LOGGING=1" ]
   } else {
-    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=0" ]
+    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK_LOGGING=0" ]
   }
 }
 

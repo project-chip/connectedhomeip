@@ -34,7 +34,6 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR AttributePathList::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -80,7 +79,6 @@ exit:
 
     return err;
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
 // Re-initialize the shared PathBuilder with anonymous tag
 AttributePath::Builder & AttributePathList::Builder::CreateAttributePathBuilder()

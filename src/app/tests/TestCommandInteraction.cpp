@@ -334,7 +334,6 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     err = commandHandler.FinalizeCommandsMessage();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     chip::System::PacketBufferTLVReader reader;
     InvokeCommand::Parser invokeCommandParser;
     reader.Init(std::move(commandHandler.mCommandMessageBuf));
@@ -344,7 +343,6 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = invokeCommandParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-#endif
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext)

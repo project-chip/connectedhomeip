@@ -50,7 +50,6 @@ exit:
     return err;
 }
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR AttributePath::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
@@ -166,7 +165,6 @@ exit:
 
     return err;
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
 CHIP_ERROR AttributePath::Parser::GetNodeId(chip::NodeId * const apNodeId) const
 {

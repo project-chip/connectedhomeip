@@ -222,7 +222,6 @@ exit:
     return err;
 }
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
@@ -322,7 +321,6 @@ exit:
     ChipLogFunctError(err);
     return err;
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
 CHIP_ERROR CommandDataElement::Parser::GetCommandPath(CommandPath::Parser * const apCommandPath) const
 {

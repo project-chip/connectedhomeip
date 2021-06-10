@@ -39,7 +39,6 @@ namespace EventList {
 class Parser : public ListParser
 {
 public:
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -54,7 +53,6 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
-#endif
 };
 
 class Builder : public ListBuilder

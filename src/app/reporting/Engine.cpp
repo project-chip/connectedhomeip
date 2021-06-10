@@ -257,23 +257,6 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     err = reportDataWriter.Finalize(&bufHandle);
     SuccessOrExit(err);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    {
-        ChipLogDetail(DataManagement, "<RE> Dumping report data...");
-        chip::System::PacketBufferTLVReader reader;
-        ReportData::Parser report;
-
-        reader.Init(bufHandle.Retain());
-        reader.Next();
-
-        err = report.Init(reader);
-        SuccessOrExit(err);
-
-        err = report.CheckSchemaValidity();
-        SuccessOrExit(err);
-    }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-
     ChipLogDetail(DataManagement, "<RE> Sending report...");
     err = SendReport(apReadHandler, std::move(bufHandle));
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DataManagement, "<RE> Error sending out report data with %" PRId32 "!", err));
