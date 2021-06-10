@@ -645,7 +645,7 @@ void ParseCommandList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 #endif
 }
 
-void BuildReportData(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter, bool hasEmptyEventList=false)
+void BuildReportData(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter, bool hasEmptyEventList = false)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportData::Builder reportDataBuilder;
@@ -678,7 +678,7 @@ void BuildReportData(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter, bool
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseReportData(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader, bool hasEmptyEventList=false)
+void ParseReportData(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader, bool hasEmptyEventList = false)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportData::Parser reportDataParser;
@@ -1290,7 +1290,7 @@ void ReportDataEmptyEventListTest(nlTestSuite * apSuite, void * apContext)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    BuildReportData(apSuite, writer, true/*hasEmptyEventList*/);
+    BuildReportData(apSuite, writer, true /*hasEmptyEventList*/);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1300,7 +1300,7 @@ void ReportDataEmptyEventListTest(nlTestSuite * apSuite, void * apContext)
     reader.Init(std::move(buf));
     err = reader.Next();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ParseReportData(apSuite, reader, true/*hasEmptyEventList*/);
+    ParseReportData(apSuite, reader, true /*hasEmptyEventList*/);
 }
 
 void InvokeCommandTest(nlTestSuite * apSuite, void * apContext)

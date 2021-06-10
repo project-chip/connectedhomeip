@@ -152,7 +152,7 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     uint8_t backingStore[1024];
     chip::EventNumber elementCount1 = 0;
     size_t elementCount2            = 0;
-    writer.Init(backingStore,  sizeof(backingStore));
+    writer.Init(backingStore, sizeof(backingStore));
     err = alogMgmt.FetchEventsSince(writer, clusterInfo, priority, startingEventNumber, elementCount1);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
 
