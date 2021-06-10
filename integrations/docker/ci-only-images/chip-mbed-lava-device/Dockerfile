@@ -22,6 +22,7 @@ RUN set -x \
     python3-dev \
     python3-venv \
     unzip \
+    jq \
     && true \
     && : # last line
 
