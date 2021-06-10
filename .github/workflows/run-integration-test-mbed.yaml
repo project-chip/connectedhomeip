@@ -48,7 +48,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          JOB_FILE=$GITHUB_WORKSPACE/scripts/tests/lava/mbed-integration-tests.yml
+          JOB_FILE=$GITHUB_WORKSPACE/scripts/tests/mbed/lava-integration-tests.yml
           GITHUB_REPOSITORY_URL="$GITHUB_SERVER_URL"/"$GITHUB_REPOSITORY".git
           yq e -i ".environment.GITHUB_REPOSITORY = \"$GITHUB_REPOSITORY\"" $JOB_FILE
           yq e -i ".environment.GITHUB_REPOSITORY_URL = \"$GITHUB_REPOSITORY_URL\"" $JOB_FILE
@@ -64,7 +64,7 @@ jobs:
           echo "Add id to lavacli"
           lavacli identities add --uri "$LAVA_SERVER_URL" --username lava-admin --token "$LAVA_SERVER_TOKEN" default
           echo "Submit job to lava"
-          LAVA_JOB_ID=`lavacli jobs submit $GITHUB_WORKSPACE/scripts/tests/lava/mbed-integration-tests.yml`
+          LAVA_JOB_ID=`lavacli jobs submit $GITHUB_WORKSPACE/scripts/tests/mbed/lava-integration-tests.yml`
           echo "job id: $LAVA_JOB_ID"
           lavacli jobs wait $LAVA_JOB_ID
   faillure-report:

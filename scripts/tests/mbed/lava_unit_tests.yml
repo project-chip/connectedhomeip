@@ -1,0 +1,59 @@
+device_type: mbed
+job_name: test tag
+
+tags:
+- chip
+
+secrets:
+  GITHUB_TOKEN: _
+
+environment:
+  GITHUB_REPOSITORY: _
+  GITHUB_REPOSITORY_URL: _
+  GITHUB_ARTIFACT_NAME: _
+  GITHUB_SHA: _
+
+timeouts:
+  job:
+    minutes: 30
+  action:
+    minutes: 30
+  connection:
+    minutes: 30
+visibility: personal
+priority: medium
+actions:
+- deploy:
+    to: docker
+    image:
+      name: lgniadzik/chip-mbed-lava-device:latest
+- boot:
+    method: docker
+    command: bash
+    prompts: ['root@lava:']
+- test:
+    timeout:
+      minutes: 30
+    definitions:
+    - from: inline
+      name: services-inline
+      path: inline/services.yaml
+      repository:
+        metadata:
+          format: Lava-Test Test Definition 1.0
+          name: test
+        run:
+          steps:
+          - echo "Clone CHIP repository..."
+          - git clone "$GITHUB_REPOSITORY_URL" CHIP
+          - cd CHIP
+          - git checkout $GITHUB_SHA 
+          - cd ..
+          - set +x
+          - . $PWD/../../../secrets
+          - set -x
+          - echo "Preparation of the environment..."
+          - /bin/bash CHIP/scripts/tests/mbed/unit_test_env.sh
+          - echo "Unit tests execution..."
+          - /bin/bash repo/scripts/tests/mbed/run_unit_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
+          - echo "Unit tests completed"
