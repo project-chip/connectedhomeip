@@ -278,6 +278,23 @@ CHIP_ERROR AttributeDataElement::Parser::CheckSchemaValidity() const
             err = ParseData(reader, 0);
             SuccessOrExit(err);
             break;
+        case kCsTag_Status:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_Status)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_Status);
+            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+#if CHIP_DETAIL_LOGGING
+            {
+                uint16_t status;
+                err = reader.Get(status);
+                SuccessOrExit(err);
+
+                PRETTY_PRINT("\tStatus = 0x%" PRIx16 ",", status);
+            }
+
+#endif // CHIP_DETAIL_LOGGING
+            break;
         case kCsTag_MoreClusterDataFlag:
             // check if this tag has appeared before
             VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_MoreClusterDataFlag)), err = CHIP_ERROR_INVALID_TLV_TAG);
@@ -309,9 +326,11 @@ CHIP_ERROR AttributeDataElement::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        // Either the data or deleted keys should be present.
-        const uint16_t RequiredFields = (1 << kCsTag_AttributePath) | (1 << kCsTag_DataVersion) | (1 << kCsTag_Data);
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        // Either the data or the status code should exists.
+        const uint16_t RequiredFieldSetSuccess = (1 << kCsTag_AttributePath) | (1 << kCsTag_Data) | (1 << kCsTag_DataVersion);
+        const uint16_t RequiredFieldSetFailure = (1 << kCsTag_AttributePath) | (1 << kCsTag_Status);
+        if (((TagPresenceMask & RequiredFieldSetSuccess) == RequiredFieldSetSuccess) ||
+            ((TagPresenceMask & RequiredFieldSetFailure) == RequiredFieldSetFailure))
         {
             err = CHIP_NO_ERROR;
         }

@@ -50,9 +50,6 @@ constexpr size_t kMaxReadMessageCount             = 3;
 constexpr int32_t gMessageIntervalSeconds         = 1;
 constexpr chip::Transport::AdminId gAdminId       = 0;
 
-// The ReadClient object.
-chip::app::ReadClient * gpReadClient = nullptr;
-
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::Inet::IPAddress gDestAddr;
 
@@ -182,7 +179,8 @@ CHIP_ERROR SendReadRequest(void)
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, &eventPathParams, 1, &attributePathParams, 1, number);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, &eventPathParams, 1,
+                                                                            &attributePathParams, 1, number);
     SuccessOrExit(err);
 
     if (err == CHIP_NO_ERROR)
@@ -324,6 +322,13 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+{
+    // We does not really care about the value, just return an not found status code.
+    VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
+    return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status), (uint16_t) 0x86 /* unsupported attribute */);
+}
+
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader)
 {
     if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
@@ -389,9 +394,6 @@ int main(int argc, char * argv[])
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->NewReadClient(&gpReadClient);
-    SuccessOrExit(err);
-
     // Connection has been established. Now send the CommandRequests.
     for (unsigned int i = 0; i < kMaxCommandMessageCount; i++)
     {
@@ -449,7 +451,6 @@ int main(int argc, char * argv[])
         }
     }
 
-    gpReadClient->Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     ShutdownChip();
 

@@ -55,7 +55,6 @@ CHIP_ERROR
 Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err                              = CHIP_NO_ERROR;
-    TLV::TLVType type                           = TLV::kTLVType_NotSpecified;
     AttributePath::Builder attributePathBuilder = aAttributeDataElementBuilder.CreateAttributePathBuilder();
     attributePathBuilder.NodeId(aClusterInfo.mNodeId)
         .EndpointId(aClusterInfo.mEndpointId)
@@ -65,14 +64,11 @@ Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElemen
     err = attributePathBuilder.GetError();
     SuccessOrExit(err);
 
-    aAttributeDataElementBuilder.GetWriter()->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data),
-                                                             TLV::kTLVType_Structure, type);
-    err = ReadSingleClusterData(aClusterInfo, *(aAttributeDataElementBuilder.GetWriter()));
+    err = ReadSingleClusterData(aClusterInfo, aAttributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
     SuccessOrExit(err);
-    aAttributeDataElementBuilder.GetWriter()->EndContainer(type);
-    aAttributeDataElementBuilder.DataVersion(0).MoreClusterData(false).EndOfAttributeDataElement();
+    aAttributeDataElementBuilder.MoreClusterData(false);
+    aAttributeDataElementBuilder.EndOfAttributeDataElement();
     err = aAttributeDataElementBuilder.GetError();
-    // TODO: Add DataVersion support
 
 exit:
     aClusterInfo.ClearDirty();

@@ -33,7 +33,6 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
-    VerifyOrExit(apDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     mpExchangeCtx              = nullptr;
     mpDelegate                 = apDelegate;

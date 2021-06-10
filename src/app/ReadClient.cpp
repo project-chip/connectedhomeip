@@ -28,16 +28,18 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                            intptr_t aAppIdentifier)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
     VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mpExchangeMgr = apExchangeMgr;
-    mpDelegate    = apDelegate;
-    mState        = ClientState::Initialized;
+    mpExchangeMgr  = apExchangeMgr;
+    mpDelegate     = apDelegate;
+    mState         = ClientState::Initialized;
+    mAppIdentifier = aAppIdentifier;
 
     AbortExistingExchangeContext();
 
@@ -223,6 +225,9 @@ exit:
         }
     }
 
+    // TODO(#7521): Should close it after checking moreChunkedMessages flag is not set.
+    Shutdown();
+
     return;
 }
 
@@ -321,12 +326,11 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d",
                     apExchangeContext->GetExchangeId());
-    AbortExistingExchangeContext();
-    MoveToState(ClientState::Initialized);
     if (nullptr != mpDelegate)
     {
         mpDelegate->ReportError(this, CHIP_ERROR_TIMEOUT);
     }
+    Shutdown();
 }
 
 CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)
@@ -379,8 +383,11 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
-        err = WriteSingleClusterData(clusterInfo, dataReader);
+        TLV::TLVReader localWriteReader;
+        localWriteReader.Init(dataReader);
+        err = WriteSingleClusterData(clusterInfo, localWriteReader);
         SuccessOrExit(err);
+        mpDelegate->OnReportData(this, clusterInfo, &dataReader, 0);
     }
 
     if (CHIP_END_OF_TLV == err)

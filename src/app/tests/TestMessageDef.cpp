@@ -82,7 +82,7 @@ void ParseAttributePath(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     chip::NodeId nodeId         = 1;
     chip::EndpointId endpointId = 2;
     chip::ClusterId clusterId   = 3;
-    chip::FieldId fieldId       = 4;
+    chip::AttributeId fieldId   = 4;
     chip::ListIndex listIndex   = 5;
 
     err = attributePathParser.Init(aReader);

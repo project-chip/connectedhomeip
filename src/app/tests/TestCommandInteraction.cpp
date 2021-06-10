@@ -33,6 +33,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
@@ -84,6 +85,14 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
 {
     // Mock cluster catalog, only support one command on one cluster on one endpoint.
     return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestCommandId);
+}
+
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+{
+    // We does not really care about the value, just return an not found status code.
+    VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
+    return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
+                         static_cast<uint16_t>(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
 }
 
 class TestCommandInteraction

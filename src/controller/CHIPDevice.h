@@ -339,6 +339,12 @@ public:
     }
     bool IsProvisioningComplete() const { return mDeviceProvisioningComplete; }
 
+    CHIP_ERROR LoadSecureSessionParametersIfNeeded()
+    {
+        bool loadedSecureSession = false;
+        return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
+    };
+
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;

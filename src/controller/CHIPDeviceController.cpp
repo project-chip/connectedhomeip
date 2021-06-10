@@ -404,6 +404,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
         }
 
         device->Init(GetControllerDeviceInitParams(), mListenPort, mAdminId);
+        ReturnErrorOnFailure(device->LoadSecureSessionParametersIfNeeded());
     }
 
     *out_device = device;
@@ -447,6 +448,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
             device->Init(GetControllerDeviceInitParams(), mListenPort, mAdminId);
+            ReturnErrorOnFailure(device->LoadSecureSessionParametersIfNeeded());
         }
     }
 
@@ -1479,6 +1481,21 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(co
     // CommandResponseStatus, CommandResponseProtocolError and CommandResponseError.
     return CHIP_NO_ERROR;
 }
+
+void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
+                                                            TLV::TLVReader * apData, uint8_t status)
+{
+    IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::ReportError(const app::ReadClient * apReadClient, CHIP_ERROR aError)
+{
+    app::ClusterInfo path;
+    path.mNodeId = apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId();
+    IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, EMBER_ZCL_STATUS_FAILURE);
+    return CHIP_NO_ERROR;
+}
+
 void BasicSuccess(void * context, uint16_t val)
 {
     ChipLogProgress(Controller, "Received success response 0x%x\n", val);

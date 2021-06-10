@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <app/ClusterInfo.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
@@ -59,6 +60,19 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    /**
+     * Notification that the interaction model has received a list of attribute data in response to a Read request.
+     *
+     * @param[in]  apReadClient   The read client object, the application can use GetAppIdentifier() for the read client to
+     *                            distinguish different read requests.
+     * @param[in]  aPath          The path of the attribute, contains node id, endpoint id, cluster id, field id etc.
+     * @param[in]  apData         The attribute data TLV
+     * @param[in]  status         Interaction model status code
+     *
+     */
+    virtual void OnReportData(const ReadClient * apReadClient, const ClusterInfo & aPath, TLV::TLVReader * apData, uint8_t status)
+    {}
 
     /**
      * Notification that the last message for a Report Data action for the given ReadClient has been received and processed.

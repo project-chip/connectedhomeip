@@ -73,6 +73,9 @@ public:
                                size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
                                size_t aAttributePathParamsListSize, EventNumber aEventNumber);
 
+    intptr_t GetAppIdentifier() const { return mAppIdentifier; }
+    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
@@ -92,12 +95,13 @@ private:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    aAppState        Application defined object to distinguish different read requests.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, intptr_t aAppIdentifier);
 
     virtual ~ReadClient() = default;
 
@@ -124,6 +128,7 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
+    intptr_t mAppIdentifier                    = 0;
 };
 
 }; // namespace app

@@ -40,7 +40,8 @@ enum
     kCsTag_AttributePath       = 0,
     kCsTag_DataVersion         = 1,
     kCsTag_Data                = 2,
-    kCsTag_MoreClusterDataFlag = 3,
+    kCsTag_Status              = 3,
+    kCsTag_MoreClusterDataFlag = 4,
 };
 
 class Parser : public chip::app::Parser

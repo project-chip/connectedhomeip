@@ -104,20 +104,21 @@ exit:
     return;
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter)
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(apWriter != nullptr, /* no op */);
 
     if (aClusterInfo.mFieldId == kRootFieldId || aClusterInfo.mFieldId == 1)
     {
-        err = aWriter.Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
+        err = apWriter->Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
         SuccessOrExit(err);
     }
     if (aClusterInfo.mFieldId == kRootFieldId || aClusterInfo.mFieldId == 2)
     {
-        err = aWriter.Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
+        err = apWriter->Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
         SuccessOrExit(err);
     }
 

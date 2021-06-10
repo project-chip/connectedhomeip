@@ -8,6 +8,7 @@
 #include "gen/CHIPClientCallbacks.h"
 #include "gen/CHIPClusters.h"
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/SafeInt.h>
 
 static void OnDefaultSuccessResponse(void * context)
 {
@@ -33,25 +34,37 @@ static void OnBooleanAttributeResponse(void * context, bool value)
     command->SetCommandExitStatus(true);
 }
 
-static void OnInt8uAttributeResponse(void * context, uint8_t value)
+static void OnInt8uAttributeResponse(void * context, uint64_t value)
 {
-    ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
+    if (!chip::CanCastTo<uint8_t>(value))
+    {
+        ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into uint8", value);
+    }
+    ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, static_cast<uint8_t>(value));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
 }
 
-static void OnInt16uAttributeResponse(void * context, uint16_t value)
+static void OnInt16uAttributeResponse(void * context, uint64_t value)
 {
-    ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
+    if (!chip::CanCastTo<uint16_t>(value))
+    {
+        ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into uint16", value);
+    }
+    ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, static_cast<uint16_t>(value));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
 }
 
-static void OnInt32uAttributeResponse(void * context, uint32_t value)
+static void OnInt32uAttributeResponse(void * context, uint64_t value)
 {
-    ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
+    if (!chip::CanCastTo<uint32_t>(value))
+    {
+        ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into uint32", value);
+    }
+    ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, static_cast<uint32_t>(value));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
@@ -59,31 +72,47 @@ static void OnInt32uAttributeResponse(void * context, uint32_t value)
 
 static void OnInt64uAttributeResponse(void * context, uint64_t value)
 {
-    ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
+    if (!chip::CanCastTo<uint64_t>(value))
+    {
+        ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into uint64", value);
+    }
+    ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, static_cast<uint64_t>(value));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
 }
 
-static void OnInt8sAttributeResponse(void * context, int8_t value)
+static void OnInt8sAttributeResponse(void * context, int64_t value)
 {
-    ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
+    if (!chip::CanCastTo<int8_t>(value))
+    {
+        ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into int8", value);
+    }
+    ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, static_cast<int8_t>(value));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
 }
 
-static void OnInt16sAttributeResponse(void * context, int16_t value)
+static void OnInt16sAttributeResponse(void * context, int64_t value)
 {
-    ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
+    if (!chip::CanCastTo<int16_t>(value))
+    {
+        ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into int16", value);
+    }
+    ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, static_cast<int16_t>(value));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
 }
 
-static void OnInt32sAttributeResponse(void * context, int32_t value)
+static void OnInt32sAttributeResponse(void * context, int64_t value)
 {
-    ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
+    if (!chip::CanCastTo<int32_t>(value))
+    {
+        ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into int32", value);
+    }
+    ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, static_cast<int32_t>(value));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
@@ -91,7 +120,11 @@ static void OnInt32sAttributeResponse(void * context, int32_t value)
 
 static void OnInt64sAttributeResponse(void * context, int64_t value)
 {
-    ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
+    if (!chip::CanCastTo<int64_t>(value))
+    {
+        ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into int64", value);
+    }
+    ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, static_cast<int64_t>(value));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);

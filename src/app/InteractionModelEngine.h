@@ -50,8 +50,8 @@
 // TODO: Make number of command handler and command sender configurable
 #define CHIP_MAX_NUM_COMMAND_HANDLER 4
 #define CHIP_MAX_NUM_COMMAND_SENDER 4
-#define CHIP_MAX_NUM_READ_CLIENT 1
-#define CHIP_MAX_NUM_READ_HANDLER 1
+#define CHIP_MAX_NUM_READ_CLIENT 4
+#define CHIP_MAX_NUM_READ_HANDLER 4
 #define CHIP_MAX_REPORTS_IN_FLIGHT 1
 #define IM_SERVER_MAX_NUM_PATH_GROUPS 8
 
@@ -112,15 +112,15 @@ public:
     CHIP_ERROR NewCommandSender(CommandSender ** const apCommandSender);
 
     /**
-     *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer
-     *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
+     *  Creates a new read client and send ReadRequest message to the node using the read client. User should use this method since
+     * it takes care of the life cycle of ReadClient.
      *
-     *  @param[out]    apReadClient    A pointer to the ReadClient object.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
+     *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient);
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
+                               size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
+                               size_t aAttributePathParamsListSize, EventNumber aEventNumber, intptr_t aAppIdentifier = 0);
 
     /**
      *  Get read client index in mReadClients
@@ -153,6 +153,17 @@ private:
     void OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
+    /**
+     *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer
+     *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
+     *
+     *  @param[out]    apReadClient    A pointer to the ReadClient object.
+     *
+     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
+     *  @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, intptr_t aAppIdentifier);
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER];
@@ -178,7 +189,24 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
  * otherwise.
  */
 bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId);
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter);
+
+/**
+ *  Fetch attribute value and version info and write to the TLVWriter provided.
+ *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
+ * error code will be put into the writer, and CHIP_NO_ERROR will returnm and apDataExists will be set to false.
+ *  If the data exists on the server, the data (with tag kCsTag_Data) and the data version (with tag kCsTag_DataVersion) will be put
+ * into the TLVWriter and apDataExists will be set to true. TLVWriter error will be returned if any error occurred during
+ * encoding these values.
+ *  This function is implemented by CHIP as a part of cluster data storage & management.
+ *  The apWriter and apDataExists can be nullptr if the caller does not care the detailed value of if it exists.
+ *
+ *  @param[in]    aClusterInfo      The cluster info object, for the path of cluster data.
+ *  @param[in]    apWriter          The TLVWriter for holding cluster data.
+ *  @param[out]   apDataExists      Tell whether the cluster data exist on server.
+ *
+ *  @retval  CHIP_NO_ERROR on success
+ */
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists);
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader);
 } // namespace app
 } // namespace chip
