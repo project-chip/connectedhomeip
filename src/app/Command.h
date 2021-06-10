@@ -92,7 +92,7 @@ public:
      */
     CHIP_ERROR FinalizeCommandsMessage();
 
-    CHIP_ERROR PrepareCommand(const CommandPathParams &aCommandPathParams, bool aIsStatus = false);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus = false);
     TLV::TLVWriter * GetCommandDataElementTLVWriter();
     CHIP_ERROR FinishCommand(bool aIsStatus = false);
     virtual CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
