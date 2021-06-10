@@ -1,0 +1,38 @@
+#!/bin/sh
+
+here=${0%/*}
+
+CHIP_ROOT=$(cd "$here/.." && pwd)
+
+git diff --quiet
+STASHED=$?
+
+# If there are unstaged files, stash them for now
+if [[ $STASHED -ne 0 ]]; then
+    git stash push -q --keep-index
+fi
+
+# Try restyling the code
+"$CHIP_ROOT"/scripts/helpers/restyle-diff.sh
+
+git diff --quiet
+RESTYLED=$?
+# If restyle created a diff, it means the code needs restyling
+if [[ $RESTYLED -ne 0 ]]; then
+    # Reset the changes introduced by restyle
+    git stash save --keep-index -q
+    git stash drop -q
+fi
+
+# Restore any unstaged changes that were previously stashed
+if [[ $STASHED -ne 0 ]]; then
+    git stash pop -q
+fi
+
+if [[ $RESTYLED -ne 0 ]]; then
+    echo "Comming Failed: Code needs restyling before committing."
+    echo "Restyling can be done by running $CHIP_ROOT/scripts/helpers/restyle-diff.sh"
+    exit 1
+fi
+
+echo "Code doesn't need restyling. Committing."
