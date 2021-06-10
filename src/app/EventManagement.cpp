@@ -670,7 +670,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
     {
         // checkpoint the writer
         checkpoint = loadOutContext->mWriter;
-        err = CopyEvent(aReader, loadOutContext->mWriter, loadOutContext);
+        err        = CopyEvent(aReader, loadOutContext->mWriter, loadOutContext);
 
         // CHIP_NO_ERROR and CHIP_END_OF_TLV signify a
         // successful copy.  In all other cases, roll back the
@@ -679,9 +679,9 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         VerifyOrExit((err == CHIP_NO_ERROR) || (err == CHIP_END_OF_TLV), loadOutContext->mWriter = checkpoint);
 
         loadOutContext->mPreviousSystemTime.mValue = loadOutContext->mCurrentSystemTime.mValue;
-        loadOutContext->mPreviousEventNumber = loadOutContext->mCurrentEventNumber;
-        loadOutContext->mEventCount ++;
-        loadOutContext->mFirst                     = false;
+        loadOutContext->mPreviousEventNumber       = loadOutContext->mCurrentEventNumber;
+        loadOutContext->mEventCount++;
+        loadOutContext->mFirst = false;
     }
 
 exit:
@@ -719,7 +719,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
 
 exit:
     aEventNumber = context.mCurrentEventNumber;
-    aEventCount = context.mEventCount;
+    aEventCount  = context.mEventCount;
 
     return err;
 }
