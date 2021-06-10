@@ -750,31 +750,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster OTA Software Update Server
- *
- */
-@interface CHIPOtaSoftwareUpdateServer : CHIPCluster
-
-- (void)applyUpdateRequest:(NSData *)updateToken newVersion:(uint32_t)newVersion responseHandler:(ResponseHandler)responseHandler;
-- (void)notifyUpdateApplied:(NSData *)updateToken
-             currentVersion:(uint32_t)currentVersion
-            responseHandler:(ResponseHandler)responseHandler;
-- (void)queryImage:(uint16_t)vendorId
-             productId:(uint16_t)productId
-             imageType:(uint16_t)imageType
-       hardwareVersion:(uint16_t)hardwareVersion
-        currentVersion:(uint32_t)currentVersion
-    protocolsSupported:(uint8_t)protocolsSupported
-              location:(NSString *)location
-      clientCanConsent:(uint8_t)clientCanConsent
-     metadataForServer:(NSData *)metadataForServer
-       responseHandler:(ResponseHandler)responseHandler;
-
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
-
-@end
-
-/**
  * Cluster On/off
  *
  */
