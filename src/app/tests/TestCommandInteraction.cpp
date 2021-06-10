@@ -75,7 +75,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                   aCommandId, aEndPointId);
 
     apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+                                Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
 
     chip::isCommandDispatched = true;
 }
@@ -182,7 +182,7 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
     if (aNeedStatusCode)
     {
         apCommand->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                 Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
     }
     else
     {
