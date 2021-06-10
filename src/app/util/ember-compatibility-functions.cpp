@@ -71,7 +71,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
                                                        imCompatibilityEmberAfCluster.commandId,
                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
 
-    CHIP_ERROR err = currentCommandObject->AddStatusCode(&returnStatusParam,
+    CHIP_ERROR err = currentCommandObject->AddStatusCode(returnStatusParam,
                                                          status == EMBER_ZCL_STATUS_SUCCESS
                                                              ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                                              : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,

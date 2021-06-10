@@ -105,7 +105,7 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
     uint8_t effectVariant    = 1;
     chip::TLV::TLVWriter * writer;
 
-    err = commandSender->PrepareCommand(&commandPathParams);
+    err = commandSender->PrepareCommand(commandPathParams);
     SuccessOrExit(err);
 
     writer = commandSender->GetCommandDataElementTLVWriter();
@@ -149,7 +149,7 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
                                                        0xFE,   // Bad CommandId
                                                        chip::app::CommandPathFlags::kEndpointIdValid };
 
-    err = commandSender->PrepareCommand(&commandPathParams);
+    err = commandSender->PrepareCommand(commandPathParams);
     SuccessOrExit(err);
 
     err = commandSender->FinishCommand();
