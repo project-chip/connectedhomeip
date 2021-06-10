@@ -445,6 +445,7 @@ std::string createSetupPayload()
         ESP_LOGE(TAG, "Couldn't get discriminator: %s", ErrorStr(err));
         return result;
     }
+    ESP_LOGI(TAG, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
 
     uint32_t setupPINCode;
     err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
@@ -453,6 +454,7 @@ std::string createSetupPayload()
         ESP_LOGE(TAG, "Couldn't get setupPINCode: %s", ErrorStr(err));
         return result;
     }
+    ESP_LOGI(TAG, "Setup PIN code: %u (0x%x)", setupPINCode, setupPINCode);
 
     uint16_t vendorId;
     err = ConfigurationMgr().GetVendorId(vendorId);
