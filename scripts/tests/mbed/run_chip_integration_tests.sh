@@ -17,8 +17,14 @@ source $CHIP_DIR/scripts/tests/mbed/common.sh
 echo "Downloading artifact from $GITHUB_ACTION_ID action in $GITHUB_REPOSITORY"
 download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN binaries
 
+echo "Get test sets"
 IFS=$'\n' read -d '' -r -a test_sets <$CHIP_DIR/src/test_driver/mbed-functional/test_set.in
 echo ${#test_sets[@]}
 for i in "${test_sets[@]}"; do
     echo $i
 done
+
+targer_number=$(cat devices.json | jq length)
+echo $targer_number
+
+flash_image_to_device shell CY8CPROTO_062_4343W binaries

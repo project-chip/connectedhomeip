@@ -155,3 +155,25 @@ mount_mbed_device() {
         fi
     done
 }
+
+flash_image_to_device() {
+    if [ $# -lt 3 ]; then
+        echo "flash_image_to_device requires at least 3 arguments. Please define image and target name and images directory" && exit 1
+    fi
+
+    image_name=$1
+    target_name=$2
+    images_dir=$3
+
+    image=$(find $images_dir -name '${image_name}_${target_name}*')
+
+    echo $image
+
+    if [ -z "$image" ]; then
+        echo "Image does not exists"
+        exit 1
+    fi
+
+    # Flash the binary
+    #mbedflash flash -i $BINARY_PATH --tid $TID
+}
