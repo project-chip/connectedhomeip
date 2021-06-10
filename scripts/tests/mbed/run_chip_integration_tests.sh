@@ -19,12 +19,7 @@ download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN binarie
 
 echo "Get test sets"
 mapfile -t test_sets <$CHIP_DIR/src/test_driver/mbed-functional/test_set.in
-echo "${#test_sets[@]}"
-for i in "${test_sets[@]}"; do
-    echo "$i"
-done
 
 targer_number=$(cat devices.json | jq length)
-echo "$targer_number"
 
 flash_image_to_device shell CY8CPROTO_062_4343W binaries

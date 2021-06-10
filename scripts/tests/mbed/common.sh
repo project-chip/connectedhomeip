@@ -165,7 +165,7 @@ flash_image_to_device() {
     target_name=$2
     images_dir=$3
 
-    image=$(find $images_dir -name '${image_name}_${target_name}*')
+    image=$(find $images_dir/ -name ""$image_name"_"$target_name"*")
 
     echo "$image"
 
@@ -177,9 +177,9 @@ flash_image_to_device() {
     targer_number=$(cat devices.json | jq length)
 
     for index in {1 .. $targer_number}; do
-        platform_name = $(cat devices.json | jq '.[${index}] .platform_name')
+        platform_name = $(cat devices.json | jq '.["$index"] .platform_name')
         if [ "$target_name" = "$platform_name" ]; then
-            target_id = $(cat devices.json | jq '.[${index}] .target_id')
+            target_id = $(cat devices.json | jq '.["$index"] .target_id')
         fi
     done
 
