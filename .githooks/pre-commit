@@ -4,32 +4,58 @@ here=${0%/*}
 
 CHIP_ROOT=$(cd "$here/.." && pwd)
 
-git diff --quiet
-STASHED=$?
+SAVED_UNSTAGED=0
+SAVED_UNSTAGED_FILE=$(git rev-parse --short HEAD)-unstaged.diff
 
-# If there are unstaged files, stash them for now
-if [[ $STASHED -ne 0 ]]; then
-    git stash push -q --keep-index
-fi
+RESTYLED=0
+
+save_unstaged() {
+    if [[ $SAVED_UNSTAGED -ne 0 ]]; then
+        git diff --output="$SAVED_UNSTAGED_FILE"
+        git apply -R "$SAVED_UNSTAGED_FILE"
+    fi
+}
+
+revert_unstaged() {
+    if [[ $SAVED_UNSTAGED -ne 0 ]]; then
+        git apply "$SAVED_UNSTAGED_FILE"
+        rm "$SAVED_UNSTAGED_FILE"
+    fi
+    SAVED_UNSTAGED=0
+}
+
+revert_restyled() {
+    if [[ $RESTYLED -ne 0 ]]; then
+        # Reset the changes introduced by restyle
+        git stash push -q --keep-index
+        git stash drop -q
+    fi
+    RESTYLED=0
+}
+
+revert_if_needed() {
+    revert_restyled
+    revert_unstaged
+}
+
+trap "revert_if_needed; exit 1" SIGINT SIGTERM SIGKILL
+
+git diff --quiet
+SAVED_UNSTAGED=$?
+
+# If there are unstaged files, save them for now
+save_unstaged
 
 # Try restyling the code
 "$CHIP_ROOT"/scripts/helpers/restyle-diff.sh
 
 git diff --quiet
 RESTYLED=$?
-# If restyle created a diff, it means the code needs restyling
-if [[ $RESTYLED -ne 0 ]]; then
-    # Reset the changes introduced by restyle
-    git stash save --keep-index -q
-    git stash drop -q
-fi
+FAILED_COMMIT="$RESTYLED"
 
-# Restore any unstaged changes that were previously stashed
-if [[ $STASHED -ne 0 ]]; then
-    git stash pop -q
-fi
+revert_if_needed
 
-if [[ $RESTYLED -ne 0 ]]; then
+if [[ $FAILED_COMMIT -ne 0 ]]; then
     echo "Comming Failed: Code needs restyling before committing."
     echo "Restyling can be done by running $CHIP_ROOT/scripts/helpers/restyle-diff.sh"
     exit 1
