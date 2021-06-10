@@ -90,7 +90,7 @@ public:
      * @return CHIP_ERROR
      *
      */
-    CHIP_ERROR FinalizeCommandsMessage();
+    CHIP_ERROR FinalizeCommandsMessage(System::PacketBufferHandle & commandPacket);
 
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus = false);
     TLV::TLVWriter * GetCommandDataElementTLVWriter();
@@ -130,9 +130,8 @@ protected:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
-    chip::System::PacketBufferHandle mCommandMessageBuf;
-    uint8_t mCommandIndex = 0;
-    CommandState mState   = CommandState::Uninitialized;
+    uint8_t mCommandIndex                      = 0;
+    CommandState mState                        = CommandState::Uninitialized;
 
 private:
     friend class TestCommandInteraction;
