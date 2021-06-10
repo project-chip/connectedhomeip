@@ -173,7 +173,7 @@ exit:
 CHIP_ERROR SendReadRequest(void)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
-    chip::EventNumber number = 0;
+    chip::EventNumber number = 1;
     chip::app::EventPathParams eventPathParams(kTestNodeId, kTestEndpointId, kTestClusterId, kLivenessChangeEvent,
                                                false /*not urgent*/);
 

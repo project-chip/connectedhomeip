@@ -456,7 +456,7 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
     // right after the priority to keep tags ordered
     if (aReader.GetTag() == TLV::ContextTag(EventDataElement::kCsTag_PriorityLevel))
     {
-        if (ctx->mpContext->mFirst)
+        if (ctx->mpContext->mFirst || (ctx->mpContext->mCurrentEventNumber - ctx->mpContext->mPreviousEventNumber > 1))
         {
             err = ctx->mpWriter->Put(TLV::ContextTag(EventDataElement::kCsTag_Number), ctx->mpContext->mCurrentEventNumber);
         }
@@ -670,8 +670,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
     {
         // checkpoint the writer
         checkpoint = loadOutContext->mWriter;
-
-        err = CopyEvent(aReader, loadOutContext->mWriter, loadOutContext);
+        err        = CopyEvent(aReader, loadOutContext->mWriter, loadOutContext);
 
         // CHIP_NO_ERROR and CHIP_END_OF_TLV signify a
         // successful copy.  In all other cases, roll back the
@@ -680,7 +679,9 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         VerifyOrExit((err == CHIP_NO_ERROR) || (err == CHIP_END_OF_TLV), loadOutContext->mWriter = checkpoint);
 
         loadOutContext->mPreviousSystemTime.mValue = loadOutContext->mCurrentSystemTime.mValue;
-        loadOutContext->mFirst                     = false;
+        loadOutContext->mPreviousEventNumber       = loadOutContext->mCurrentEventNumber;
+        loadOutContext->mEventCount++;
+        loadOutContext->mFirst = false;
     }
 
 exit:
@@ -688,9 +689,8 @@ exit:
 }
 
 CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
-                                             EventNumber & aEventNumber)
+                                             EventNumber & aEventNumber, EventNumber & aEventCount)
 {
-    // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths
     CHIP_ERROR err     = CHIP_NO_ERROR;
     const bool recurse = false;
     TLVReader reader;
@@ -719,6 +719,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
 
 exit:
     aEventNumber = context.mCurrentEventNumber;
+    aEventCount  = context.mEventCount;
 
     return err;
 }

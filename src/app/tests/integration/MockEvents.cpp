@@ -53,43 +53,43 @@ void LivenessEventGenerator::Generate(void)
     switch (mState)
     {
     case 0:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 1:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 2:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 3:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_UNREACHABLE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_UNREACHABLE);
         break;
 
     case 4:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 5:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_REBOOTING);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_REBOOTING);
         break;
 
     case 6:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 7:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 8:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 9:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     default:
