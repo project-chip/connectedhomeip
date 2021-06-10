@@ -100,7 +100,6 @@ struct EventEnvelopeContext
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                            CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
     CircularEventBuffer * next    = nullptr;
@@ -137,11 +136,13 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
     mState        = EventManagementStates::Idle;
     mBytesWritten = 0;
 
-    err = chip::System::Mutex::Init(mAccessLock);
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    CHIP_ERROR err = chip::System::Mutex::Init(mAccessLock);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(EventLogging, "mutex init fails with error %s", ErrorStr(err));
     }
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 }
 
 CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer)
@@ -383,7 +384,9 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
  */
 void EventManagement::DestroyEventManagement()
 {
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     ScopedLock lock(sInstance);
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
     sInstance.mState        = EventManagementStates::Shutdown;
     sInstance.mpEventBuffer = nullptr;
     sInstance.mpExchangeMgr = nullptr;
@@ -471,7 +474,9 @@ CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOpt
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     {
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
         ScopedLock lock(sInstance);
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
         VerifyOrExit(mState != EventManagementStates::Shutdown, err = CHIP_ERROR_INCORRECT_STATE);
         VerifyOrExit(aEventOptions.mpEventSchema != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -700,7 +705,9 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
     EventLoadOutContext context(aWriter, aPriority, aEventNumber);
 
     CircularEventBuffer * buf = mpEventBuffer;
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     ScopedLock lock(sInstance);
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     while (!buf->IsFinalDestinationForPriority(aPriority))
     {
@@ -841,7 +848,9 @@ void EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)
 {
     CircularEventBuffer * eventBuffer = mpEventBuffer;
 
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     ScopedLock lock(sInstance);
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     while (eventBuffer != nullptr)
     {

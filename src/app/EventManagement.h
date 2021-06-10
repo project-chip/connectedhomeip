@@ -289,6 +289,7 @@ public:
 
     static void DestroyEventManagement();
 
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     class ScopedLock
     {
     public:
@@ -298,6 +299,8 @@ public:
     private:
         EventManagement & mEventManagement;
     };
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
+
     /**
      * @brief
      *   Log an event via a EventLoggingDelegate, with options.
@@ -566,7 +569,9 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     EventManagementStates mState               = EventManagementStates::Shutdown;
     uint32_t mBytesWritten                     = 0;
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     System::Mutex mAccessLock;
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 };
 } // namespace app
 } // namespace chip
