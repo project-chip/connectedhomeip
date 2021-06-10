@@ -167,19 +167,18 @@ flash_image_to_device() {
 
     image=$(find $images_dir/ -name ""$image_name"_"$target_name"*")
 
-    echo "$image"
-
     if [ -z "$image" ]; then
         echo "Image does not exists"
         exit 1
     fi
 
-    targer_number=$(cat devices.json | jq length)
+    target_number=$(cat devices.json | jq length)
 
-    for index in {1 .. $targer_number}; do
-        platform_name = $(cat devices.json | jq '.["$index"] .platform_name')
-        if [ "$target_name" = "$platform_name" ]; then
-            target_id = $(cat devices.json | jq '.["$index"] .target_id')
+    for index in $(eval echo "{0..$(($target_number - 1))}"); do
+        platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
+        if [[ "$target_name" = "$platform_name" ]]; then
+            target_id=$(cat devices.json | jq -r ".[$index] .target_id")
+            echo $target_id
         fi
     done
 
