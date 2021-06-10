@@ -178,11 +178,8 @@ flash_image_to_device() {
         platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
         if [[ "$target_name" = "$platform_name" ]]; then
             target_id=$(cat devices.json | jq -r ".[$index] .target_id")
-            echo $target_id
         fi
     done
-
-    echo "$target_id"
 
     if [ -z "$target_id" ]; then
         echo "Target not available"
