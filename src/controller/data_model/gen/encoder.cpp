@@ -733,7 +733,7 @@ PacketBufferHandle encodeBasicClusterWriteUserLabelAttribute(uint8_t seqNum, End
     size_t userLabelStrLen = userLabel.size();
     if (!CanCastTo<uint8_t>(userLabelStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, userLabelStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, userLabelStrLen);
         return PacketBufferHandle();
     }
 
@@ -763,7 +763,7 @@ PacketBufferHandle encodeBasicClusterWriteLocationAttribute(uint8_t seqNum, Endp
     size_t locationStrLen = location.size();
     if (!CanCastTo<uint8_t>(locationStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, locationStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, locationStrLen);
         return PacketBufferHandle();
     }
 
@@ -1120,7 +1120,7 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterWriteUserLabelAttribute(uint8_
     size_t userLabelStrLen = userLabel.size();
     if (!CanCastTo<uint8_t>(userLabelStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, userLabelStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, userLabelStrLen);
         return PacketBufferHandle();
     }
 
@@ -3982,7 +3982,7 @@ PacketBufferHandle encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seq
     size_t octetStringStrLen = octetString.size();
     if (!CanCastTo<uint8_t>(octetStringStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, octetStringStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, octetStringStrLen);
         return PacketBufferHandle();
     }
 

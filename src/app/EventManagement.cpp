@@ -173,7 +173,8 @@ CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer
     err = writer.Finalize();
     SuccessOrExit(err);
 
-    ChipLogProgress(EventLogging, "Copy Event to next buffer with priority %d", nextBuffer->GetPriorityLevel());
+    ChipLogProgress(EventLogging, "Copy Event to next buffer with priority %u",
+                    static_cast<unsigned>(nextBuffer->GetPriorityLevel()));
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -399,7 +400,8 @@ EventNumber CircularEventBuffer::VendEventNumber()
     err = mpEventNumberCounter->Advance();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(EventLogging, "%s Advance() for priority %d failed with %d", __FUNCTION__, mPriority, err);
+        ChipLogError(EventLogging, "%s Advance() for priority %u failed with %" PRId32, __FUNCTION__,
+                     static_cast<unsigned>(mPriority), err);
     }
 
     return mLastEventNumber;
@@ -561,11 +563,11 @@ exit:
         currentBuffer->UpdateFirstLastEventTime(opts.mTimestamp);
 
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
-        ChipLogDetail(
-            EventLogging,
-            "LogEvent event number: %u schema priority: %u cluster id: 0x%x event id: 0x%x sys timestamp: 0x" ChipLogFormatX64,
-            aEventNumber, opts.mpEventSchema->mPriority, opts.mpEventSchema->mClusterId, opts.mpEventSchema->mEventId,
-            ChipLogValueX64(opts.mTimestamp.mValue));
+        ChipLogDetail(EventLogging,
+                      "LogEvent event number: 0x" ChipLogFormatX64
+                      " schema priority: %u cluster id: 0x%x event id: 0x%x sys timestamp: 0x" ChipLogFormatX64,
+                      ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mpEventSchema->mPriority),
+                      opts.mpEventSchema->mClusterId, opts.mpEventSchema->mEventId, ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
         ScheduleFlushIfNeeded(opts.mUrgent);
@@ -812,9 +814,11 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
         EventNumber numEventsToDrop = 1;
         eventBuffer->RemoveEvent(numEventsToDrop);
         eventBuffer->SetFirstEventSystemTimestamp(eventBuffer->GetFirstEventSystemTimestamp() + context.mDeltaSystemTime.mValue);
-        ChipLogProgress(EventLogging,
-                        "Dropped events from buffer with priority %d due to overflow: { event priority_level: %d, count: %d };",
-                        eventBuffer->GetPriorityLevel(), imp, numEventsToDrop);
+        ChipLogProgress(
+            EventLogging,
+            "Dropped events from buffer with priority %u due to overflow: { event priority_level: %u, count: 0x" ChipLogFormatX64
+            " };",
+            static_cast<unsigned>(eventBuffer->GetPriorityLevel()), static_cast<unsigned>(imp), ChipLogValueX64(numEventsToDrop));
         ctx->mSpaceNeededForMovedEvent = 0;
     }
     else

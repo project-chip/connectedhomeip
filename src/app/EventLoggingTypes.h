@@ -83,6 +83,9 @@ enum class PriorityLevel : uint8_t
 
 };
 
+static_assert(sizeof(std::underlying_type_t<PriorityLevel>) <= sizeof(unsigned),
+              "Logging that converts PriorityLevel to unsigned will be lossy");
+
 /**
  * @brief
  *   The structure that provides a full resolution of the cluster.
