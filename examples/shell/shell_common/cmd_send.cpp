@@ -130,8 +130,8 @@ CHIP_ERROR SendMessage(streamer_t * stream)
 
     Messaging::SendFlags sendFlags;
     System::PacketBufferHandle payloadBuf;
-    char * requestData = nullptr;
-    uint32_t size      = 0;
+    char requestData[kMsgBufSize];
+    uint32_t size = 0;
 
     // Discard any existing exchange context. Effectively we can only have one exchange with
     // a single node at any one time.
@@ -146,12 +146,9 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     size = gSendArguments.GetPayloadSize();
-    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(size >= kMsgBufSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    requestData = static_cast<char *>(chip::Platform::MemoryAlloc(size));
-    VerifyOrExit(requestData != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    snprintf(requestData, size, "CHIP Message");
+    snprintf(requestData, kMsgBufSize, "CHIP Message");
     payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
     VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
@@ -181,11 +178,6 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     }
 
 exit:
-    if (requestData != nullptr)
-    {
-        chip::Platform::MemoryFree(requestData);
-    }
-
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Send CHIP message failed, err: %s\n", ErrorStr(err));

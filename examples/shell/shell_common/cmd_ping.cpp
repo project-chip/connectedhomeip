@@ -143,15 +143,12 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
 
     Messaging::SendFlags sendFlags;
     System::PacketBufferHandle payloadBuf;
-    char * requestData = nullptr;
+    char requestData[kMsgBufSize];
 
     uint32_t size = gPingArguments.GetEchoReqSize();
-    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrExit(size >= kMsgBufSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    requestData = static_cast<char *>(chip::Platform::MemoryAlloc(size));
-    VerifyOrExit(requestData != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    snprintf(requestData, size, "Echo Message %" PRIu64 "\n", gPingArguments.GetEchoCount());
+    snprintf(requestData, kMsgBufSize, "Echo Message %" PRIu64 "\n", gPingArguments.GetEchoCount());
 
     payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
     VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -179,11 +176,6 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
 
 exit:
-    if (requestData != nullptr)
-    {
-        chip::Platform::MemoryFree(requestData);
-    }
-
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Send echo request failed, err: %s\n", ErrorStr(err));
