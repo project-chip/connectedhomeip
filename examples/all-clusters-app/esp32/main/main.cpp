@@ -42,6 +42,7 @@
 #include <string>
 #include <vector>
 
+#include <app/common/gen/att-storage.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
@@ -49,6 +50,8 @@
 #include <app/server/Mdns.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <app/util/af-types.h>
+#include <app/util/af.h>
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -363,6 +366,16 @@ public:
 
 #endif // CONFIG_DEVICE_TYPE_M5STACK
 
+void SetupInitialLevelControlValues(chip::EndpointId endpointId)
+{
+    uint8_t level = UINT8_MAX;
+
+    emberAfWriteAttribute(endpointId, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
+                          ZCL_DATA8_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(endpointId, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_ON_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
+                          ZCL_DATA8_ATTRIBUTE_TYPE);
+}
+
 void SetupPretendDevices()
 {
     AddDevice("Watch");
@@ -380,9 +393,13 @@ void SetupPretendDevices()
     AddEndpoint("1");
     AddCluster("OnOff");
     AddAttribute("OnOff", "Off");
+    AddCluster("Level Control");
+    AddAttribute("Current Level", "255");
     AddEndpoint("2");
     AddCluster("OnOff");
     AddAttribute("OnOff", "Off");
+    AddCluster("Level Control");
+    AddAttribute("Current Level", "255");
 
     AddDevice("Thermometer");
     AddEndpoint("External");
@@ -614,6 +631,8 @@ extern "C" void app_main()
 #endif
 
     SetupPretendDevices();
+    SetupInitialLevelControlValues(/* endpointId = */ 1);
+    SetupInitialLevelControlValues(/* endpointId = */ 2);
 
     std::string qrCodeText = createSetupPayload();
     ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
