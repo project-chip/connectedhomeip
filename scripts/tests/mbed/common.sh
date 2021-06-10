@@ -174,6 +174,22 @@ flash_image_to_device() {
         exit 1
     fi
 
+    targer_number=$(cat devices.json | jq length)
+
+    for index in {1 .. $targer_number}; do
+        platform_name = $(cat devices.json | jq '.[${index}] .platform_name')
+        if [ "$target_name" = "$platform_name" ]; then
+            target_id = $(cat devices.json | jq '.[${index}] .target_id')
+        fi
+    done
+
+    echo "$target_id"
+
+    if [ -z "$target_id" ]; then
+        echo "Target not available"
+        exit 1
+    fi
+
     # Flash the binary
-    #mbedflash flash -i $BINARY_PATH --tid $TID
+    mbedflash flash -i $image --tid $target_id
 }

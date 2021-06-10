@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 if [ $# -lt 4 ]; then
     echo "Illegal number of parameters. Please define Github parameters: repository name, action ID, access token and CHIP directory path"
