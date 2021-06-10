@@ -75,7 +75,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
                                                          status == EMBER_ZCL_STATUS_SUCCESS
                                                              ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                                              : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                         chip::Protocols::InteractionModel::Id, status);
+                                                         chip::Protocols::InteractionModel::Id, static_cast<Protocols::InteractionModel::ProtocolCode>(status));
     return CHIP_NO_ERROR == err;
 }
 
