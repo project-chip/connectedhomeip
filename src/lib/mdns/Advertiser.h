@@ -267,6 +267,9 @@ public:
 
     /// Provides the system-wide implementation of the service advertiser
     static ServiceAdvertiser & Instance();
+
+    /// Returns DNS-SD instance name formatted as hex string
+    virtual CHIP_ERROR GetCommissionableInstanceName(char * serviceName, size_t maxLength) = 0;
 };
 
 } // namespace Mdns

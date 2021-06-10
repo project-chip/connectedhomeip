@@ -207,11 +207,11 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mExchangeMgr->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    err = Mdns::Resolver::Instance().SetResolverDelegate(this);
+    SuccessOrExit(err);
+
     if (params.mDeviceAddressUpdateDelegate != nullptr)
     {
-        err = Mdns::Resolver::Instance().SetResolverDelegate(this);
-        SuccessOrExit(err);
-
         mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
     }
     Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
@@ -727,13 +727,16 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
 
 void DeviceController::OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData)
 {
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().OnCommissionableNodeFound(nodeData);
+
     for (int i = 0; i < kMaxCommissionableNodes; ++i)
     {
         if (!mCommissionableNodes[i].IsValid())
         {
             continue;
         }
-        if (strcmp(mCommissionableNodes[i].hostName, nodeData.hostName) == 0)
+        if (strcmp(mCommissionableNodes[i].hostName, nodeData.hostName) == 0 &&
+            strcmp(mCommissionableNodes[i].instanceName, nodeData.instanceName) == 0)
         {
             mCommissionableNodes[i] = nodeData;
             return;
@@ -745,6 +748,9 @@ void DeviceController::OnCommissionableNodeFound(const chip::Mdns::Commissionabl
         if (!mCommissionableNodes[i].IsValid())
         {
             mCommissionableNodes[i] = nodeData;
+            printf("DeviceController::OnCommissionableNodeFound hostName=%s instanceName=%s ", nodeData.hostName,
+                   nodeData.instanceName);
+            printf(" adding entry at index %d\n", i);
             return;
         }
     }
@@ -789,6 +795,9 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     }
     mPairingDelegate = params.pairingDelegate;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().SetUDCHelper(this);
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -1443,6 +1452,16 @@ CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t l
     return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
 }
 
+CHIP_ERROR DeviceCommissioner::DiscoverCommissioningInstanceName(char * instanceName)
+{
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        mCommissionableNodes[i].Reset();
+    }
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kInstanceName, instanceName);
+    return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+}
+
 const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
 {
     // TODO(cecille): Add assertion about main loop.
@@ -1452,6 +1471,23 @@ const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int
     }
     return nullptr;
 }
+
+void DeviceCommissioner::FindCommissionableNode(Messaging::ExchangeContext * ec, char * instanceName)
+{
+    printf("DeviceCommissioner FindCommissionableNode instance=%s\n", instanceName);
+    DiscoverCommissioningInstanceName(instanceName);
+}
+
+void DeviceCommissioner::OnUserDirectedCommissioningRequest(const Mdns::CommissionableNodeData & nodeData)
+{
+    printf("------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s\n", nodeData.instanceName);
+}
+
+void DeviceCommissioner::ResetUserDirectedCommissioningStates()
+{
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().ResetUDCClientProcessingStates();
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
@@ -1617,11 +1653,13 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
     device = &mActiveDevices[mDeviceBeingPaired];
 
+#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
     // TODO(cecille): We probably want something better than this for breadcrumbs.
     uint64_t breadcrumb = static_cast<uint64_t>(nextStage);
 
     // TODO(cecille): This should be customized per command.
     constexpr uint32_t kCommandTimeoutMs = 3000;
+#endif
 
     switch (nextStage)
     {
@@ -1631,10 +1669,13 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Arming failsafe");
         // TODO(cecille): Find a way to enumerate the clusters here.
         GeneralCommissioningCluster genCom;
-        uint16_t commissioningExpirySeconds = 5;
         // TODO: should get the endpoint information from the descriptor cluster.
         genCom.Associate(device, 0);
+        // genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
+#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
+        uint16_t commissioningExpirySeconds = 5;
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
+#endif
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
@@ -1675,8 +1716,10 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
+#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
         genCom.SetRegulatoryConfig(mSuccess.Cancel(), mFailure.Cancel(), static_cast<uint8_t>(regulatoryLocation), countryCode,
                                    breadcrumb, kCommandTimeoutMs);
+#endif
     }
     break;
     case CommissioningStage::kCheckCertificates: {
@@ -1710,10 +1753,12 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         // TODO: Once network credential sending is implemented, attempting to set wifi credential on an ethernet only device
         // will cause an error to be sent back. At that point, we should scan and we shoud see the proper ethernet network ID
         // returned in the scan results. For now, we use magic.
+#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
         char magicNetworkEnableCode[] = "ETH0";
         netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(),
                              ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
                              breadcrumb, kCommandTimeoutMs);
+#endif
     }
     break;
     case CommissioningStage::kFindOperational: {
@@ -1729,7 +1774,9 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Calling commissioning complete");
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
+#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
         genCom.CommissioningComplete(mSuccess.Cancel(), mFailure.Cancel());
+#endif
     }
     break;
     case CommissioningStage::kCleanup:
@@ -1762,6 +1809,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 } // namespace Controller
 } // namespace chip
 
+#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 namespace chip {
 namespace Platform {
 namespace PersistedStorage {
@@ -1785,3 +1833,4 @@ CHIP_ERROR Write(const char * aKey, uint32_t aValue)
 } // namespace PersistedStorage
 } // namespace Platform
 } // namespace chip
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

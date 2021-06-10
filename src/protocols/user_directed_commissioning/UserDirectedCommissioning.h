@@ -25,7 +25,9 @@
 
 #pragma once
 
+#include "UDCClients.h"
 #include <core/CHIPCore.h>
+#include <mdns/Resolver.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -46,7 +48,33 @@ enum class MsgType : uint8_t
     IdentificationDeclaration = 0x00,
 };
 
-using UDCFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload);
+class DLL_EXPORT UDCHelper
+{
+public:
+    /**
+     * @brief
+     *   Called when a UDC message is received specifying the given instanceName
+     * This method indicates that UDC Server needs the Commissionable Node corresponding to
+     * the given instance name to be found. UDC Server will wait for OnCommissionableNodeFound.
+     *
+     * @param instanceName DNS-SD instance name for the client requesting commissioning
+     *
+     */
+    virtual void FindCommissionableNode(Messaging::ExchangeContext * ec, char * instanceName) {}
+
+    /**
+     * @brief
+     *   Called when a UDC message has been received and corresponding nodeData has been found.
+     * It is expected that the implementer will prompt the user to confirm their intention to
+     * commission the given node, and provide the setup code to allow commissioning to proceed.
+     *
+     * @param nodeData DNS-SD node information for the client requesting commissioning
+     *
+     */
+    virtual void OnUserDirectedCommissioningRequest(const Mdns::CommissionableNodeData & nodeData) {}
+
+    virtual ~UDCHelper() {}
+};
 
 class DLL_EXPORT UserDirectedCommissioningClient : public Messaging::ExchangeDelegate
 {
@@ -76,14 +104,6 @@ public:
     void Shutdown();
 
     /**
-     * Set the application callback to be invoked when an echo response is received.
-     *
-     *  @param[in]    callback    The callback function to receive echo response message.
-     *
-     */
-    void SetUDCResponseReceived(UDCFunct callback) { OnUDCResponseReceived = callback; }
-
-    /**
      * Send a User Directed Commissioning message to a CHIP node.
      *
      * @param payload       A PacketBufferHandle with the payload.
@@ -100,7 +120,6 @@ public:
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
-    UDCFunct OnUDCResponseReceived            = nullptr;
     SecureSessionHandle mSecureSession;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -126,6 +145,12 @@ public:
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr);
 
+    static UserDirectedCommissioningServer & GetInstance()
+    {
+        static UserDirectedCommissioningServer instance;
+        return instance;
+    }
+
     /**
      *  Shutdown the EchoServer. This terminates this instance
      *  of the object and releases all held resources.
@@ -134,20 +159,55 @@ public:
     void Shutdown();
 
     /**
-     * Set the application callback to be invoked when an echo request is received.
+     * Set the listener to be called when a UDC request is received.
      *
-     *  @param[in]    callback    The callback function to receive echo request message.
+     *  @param[in]    listener    The callback function to receive UDC request instance name.
      *
      */
-    void SetUDCRequestReceived(UDCFunct callback) { OnUDCRequestReceived = callback; }
+    void SetUDCHelper(UDCHelper * helper) { mHelper = helper; }
+
+    /**
+     * Update the processing state for a UDC Client based upon instance name.
+     *
+     * This can be used by the UX to set the state to one of the following values:
+     * - kUserDeclined
+     * - kObtainingOnboardingPayload
+     * - kCommissioningNode
+     * - kCommissioningFailed
+     *
+     *  @param[in]    instanceName    The instance name for the UDC Client.
+     *  @param[in]    state           The state for the UDC Client.
+     *
+     */
+    void SetUDCClientProcessingState(char * instanceName, UDCClientProcessingState state);
+
+    /**
+     * Reset the processing states for all UDC Clients
+     *
+     */
+    void ResetUDCClientProcessingStates() { mUdcClients.ResetUDCClientStates(); }
+
+    /**
+     * Called when a CHIP Node in commissioning mode is found.
+     *
+     * Lookup instanceName from nodeData in the active UDC Client states
+     * and if current state is kDiscoveringNode then change to kPromptingUser and
+     * call UX Prompt callback
+     *
+     *  @param[in]    nodeData        DNS-SD response data.
+     *
+     */
+    void OnCommissionableNodeFound(const Mdns::CommissionableNodeData & nodeData);
 
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
-    UDCFunct OnUDCRequestReceived             = nullptr;
+    UDCHelper * mHelper                       = nullptr;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+
+    UDCClients<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mUdcClients; // < Active UDC clients
 };
 
 } // namespace UserDirectedCommissioning

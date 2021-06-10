@@ -86,8 +86,10 @@ chip::ByteSpan FillMAC(uint8_t (&mac)[8])
 
 CHIP_ERROR GetInstanceName(char * buffer, size_t bufferLen)
 {
-    uint8_t mac[8];
-    return chip::Mdns::MakeHostName(buffer, bufferLen, FillMAC(mac));
+    // uint8_t mac[8];
+    // return chip::Mdns::MakeHostName(buffer, bufferLen, FillMAC(mac));
+    auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
+    return mdnsAdvertiser.GetCommissionableInstanceName(buffer, bufferLen);
 }
 
 /// Set MDNS operational advertisement

@@ -50,5 +50,11 @@ void RegisterConfigCommands();
  */
 void RegisterWiFiCommands();
 
+/**
+ * This function registers the commissioning commands.
+ *
+ */
+void RegisterCommissioningCommands();
+
 } // namespace Shell
 } // namespace chip

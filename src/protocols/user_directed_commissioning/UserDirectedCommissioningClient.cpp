@@ -35,10 +35,9 @@ CHIP_ERROR UserDirectedCommissioningClient::Init(Messaging::ExchangeManager * ex
     if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    mExchangeMgr          = exchangeMgr;
-    mSecureSession        = session;
-    OnUDCResponseReceived = nullptr;
-    mExchangeCtx          = nullptr;
+    mExchangeMgr   = exchangeMgr;
+    mSecureSession = session;
+    mExchangeCtx   = nullptr;
 
     return CHIP_NO_ERROR;
 }
@@ -51,8 +50,7 @@ void UserDirectedCommissioningClient::Shutdown()
         mExchangeCtx = nullptr;
     }
 
-    OnUDCResponseReceived = nullptr;
-    mExchangeMgr          = nullptr;
+    mExchangeMgr = nullptr;
 }
 
 CHIP_ERROR UserDirectedCommissioningClient::SendUDCRequest(System::PacketBufferHandle && payload,

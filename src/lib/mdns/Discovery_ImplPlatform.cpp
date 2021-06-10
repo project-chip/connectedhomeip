@@ -120,6 +120,22 @@ CHIP_ERROR DiscoveryImplPlatform::SetupHostname(chip::ByteSpan macOrEui64)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * serviceName, size_t maxLength)
+{
+    if (max_length < 17)
+    {
+        // TODO: find correct error code
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    size_t len = snprintf(serviceName, maxLength, "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
+                          static_cast<uint32_t>(mCommissionInstanceName));
+    if (len >= maxLength)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -155,8 +171,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
     ReturnErrorOnFailure(SetupHostname(params.GetMac()));
 
-    snprintf(service.mName, sizeof(service.mName), "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
-             static_cast<uint32_t>(mCommissionInstanceName));
+    ReturnErrorOnFailure(GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
+
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         strncpy(service.mType, "_chipc", sizeof(service.mType));

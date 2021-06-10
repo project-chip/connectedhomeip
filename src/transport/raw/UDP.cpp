@@ -89,7 +89,7 @@ void UDP::Close()
 
 CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
-    msgBuf->DebugDump("UDP::SendMessage");
+    // msgBuf->DebugDump("UDP::SendMessage");
 
     VerifyOrReturnError(address.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);

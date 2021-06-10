@@ -28,6 +28,8 @@ CHIP_ERROR DiscoverCommand::Run(PersistentStorage & storage, NodeId localId, Nod
     params.mDeviceAddressUpdateDelegate   = this;
     params.operationalCredentialsDelegate = &mOpCredsIssuer;
 
+    ReturnErrorOnFailure(mOpCredsIssuer.Initialize(storage));
+
     ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
     ReturnErrorOnFailure(mCommissioner.Init(localId, params));
     ReturnErrorOnFailure(mCommissioner.ServiceEvents());

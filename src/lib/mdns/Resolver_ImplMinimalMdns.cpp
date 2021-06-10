@@ -230,11 +230,15 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
 {
     // Host name is the first part of the qname
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
-    if (!it.Next())
+    if (it.Next())
     {
-        return;
+        strncpy(mCommissionableNodeData.hostName, it.Value(), sizeof(CommissionableNodeData::hostName));
     }
-    strncpy(mCommissionableNodeData.hostName, it.Value(), sizeof(CommissionableNodeData::hostName));
+    if (name.Next())
+    {
+        strncpy(mCommissionableNodeData.instanceName, name.Value(), sizeof(CommissionableNodeData::instanceName));
+    }
+    // printf("PacketDataReporter::OnCommissionableNodeSrvRecord name=%.*s host=%.*s\n", 5, name.Value(), 5, it.Value());
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
@@ -294,6 +298,18 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         }
         break;
     }
+    case QType::PTR: {
+        if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+        {
+            SerializedQNameIterator qname;
+            ParsePtrRecord(data.GetData(), mPacketRange, &qname);
+            if (qname.Next())
+            {
+                strncpy(mCommissionableNodeData.instanceName, qname.Value(), sizeof(CommissionableNodeData::instanceName));
+            }
+        }
+        break;
+    }
     case QType::TXT:
         if (mDiscoveryType == DiscoveryType::kCommissionableNode)
         {
@@ -350,6 +366,7 @@ void PacketDataReporter::OnComplete()
 {
     if (mDiscoveryType == DiscoveryType::kCommissionableNode && mCommissionableNodeData.IsValid())
     {
+        // printf("PacketDataReporter::OnComplete - calling OnCommissionableNodeFound\n");
         mDelegate->OnCommissionableNodeFound(mCommissionableNodeData);
     }
 }
@@ -455,7 +472,7 @@ CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
     mDiscoveryType    = type;
-    char subtypeStr[] = "_Xdddddd";
+    char subtypeStr[] = "_X34567890123456";
 
     mdns::Minimal::FullQName qname;
 
@@ -470,6 +487,10 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
         if (filter.type == DiscoveryFilterType::kNone)
         {
             qname = CheckAndAllocateQName("_chipc", "_udp", "local");
+        }
+        else if (filter.type == DiscoveryFilterType::kInstanceName)
+        {
+            qname = CheckAndAllocateQName(subtypeStr, "_chipc", "_udp", "local");
         }
         else
         {

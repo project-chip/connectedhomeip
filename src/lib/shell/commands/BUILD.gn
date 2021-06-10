@@ -19,6 +19,7 @@ import("${chip_root}/src/platform/device.gni")
 
 source_set("commands") {
   sources = [
+    "Commissioning.cpp",
     "Base64.cpp",
     "Help.cpp",
     "Help.h",

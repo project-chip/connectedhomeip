@@ -47,6 +47,12 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#include <controller/CHIPDeviceController.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <core/CHIPPersistentStorageDelegate.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <app/server/Mdns.h>
 #endif
@@ -58,12 +64,6 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Messaging;
 
 namespace {
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-// TODO: remove Echo Server - this is just temporary for debugging
-// chip::Protocols::Echo::EchoServer gEchoServer;
-chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer gUDCServer;
-#endif
 
 constexpr bool isRendezvousBypassed()
 {
@@ -584,7 +584,7 @@ void InitServer(AppDelegate * delegate)
     // err = gEchoServer.Init(&gExchangeMgr);
     // SuccessOrExit(err);
 
-    err = gUDCServer.Init(&gExchangeMgr);
+    err = chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().Init(&gExchangeMgr);
     SuccessOrExit(err);
 #endif
 
@@ -632,7 +632,7 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
     err = gSessions.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
                                chip::SecureSession::SessionRole::kInitiator, gAdminId);
 
-    char nameBuffer[17];
+    char nameBuffer[USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME];
     err = app::Mdns::GetInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {
@@ -721,3 +721,106 @@ AdminPairingTable & GetGlobalAdminPairingTable()
 {
     return gAdminPairings;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
+ChipDeviceCommissioner mCommissioner;
+bool mCommissionerInited = false;
+
+CHIP_ERROR InitCommissioner()
+{
+    if (mCommissionerInited)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    NodeId localId = chip::kAnyNodeId;
+
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+    chip::Controller::CommissionerInitParams params;
+
+    params.storageDelegate = &gServerStorage;
+    // params.mDeviceAddressUpdateDelegate   = this;
+    params.operationalCredentialsDelegate = &mOpCredsIssuer;
+
+    ReturnErrorOnFailure(mOpCredsIssuer.Initialize(gServerStorage));
+
+    // ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
+    ReturnErrorOnFailure(mCommissioner.Init(localId, params));
+    ReturnErrorOnFailure(mCommissioner.ServiceEvents());
+
+    mCommissionerInited = true;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoverCommissionableNodes()
+{
+    printf("discover 3\n");
+
+    InitCommissioner();
+
+    sleep(2);
+    printf("done sleeping\n");
+
+    printf(" DiscoverCommand\n");
+    mCommissioner.DiscoverAllCommissioning();
+    sleep(1);
+    printf(" DiscoverAllCommissioning done\n");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoverCommissionableNodes(char * instance)
+{
+    printf("discover 3\n");
+
+    InitCommissioner();
+
+    sleep(2);
+    printf("done sleeping\n");
+
+    printf(" DiscoverCommand\n");
+    mCommissioner.DiscoverCommissioningInstanceName(instance);
+    sleep(1);
+    printf(" DiscoverAllCommissioning done\n");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DisplayCommissionableNodes()
+{
+    printf("DisplayCommissionableNodes\n");
+
+    InitCommissioner();
+
+    for (int i = 0; i < 10; i++)
+    {
+        printf(" Entry %d", i);
+        const chip::Mdns::CommissionableNodeData * next = mCommissioner.GetDiscoveredDevice(i);
+        if (next == nullptr)
+        {
+            printf(" null\n");
+        }
+        else
+        {
+            printf(" instanceName=%s host=%s longDiscriminator=%d vendorId=%d productId=%d\n", next->instanceName, next->hostName,
+                   next->longDiscriminator, next->vendorId, next->productId);
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ResetUDCStates()
+{
+    printf("ResetUDCStates\n");
+
+    InitCommissioner();
+
+    mCommissioner.ResetUserDirectedCommissioningStates();
+    printf(" ResetUDCStates done\n");
+
+    return CHIP_NO_ERROR;
+}
+#endif

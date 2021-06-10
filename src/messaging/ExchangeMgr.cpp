@@ -206,7 +206,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d on exchange %d", payloadHeader.GetMessageType(),
                     payloadHeader.GetProtocolID(), payloadHeader.GetExchangeID());
 
-    msgBuf->DebugDump("ExchangeManager::OnMessageReceived");
+    // msgBuf->DebugDump("ExchangeManager::OnMessageReceived");
 
     // Search for an existing exchange that the message applies to. If a match is found...
     bool found = false;

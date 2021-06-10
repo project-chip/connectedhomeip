@@ -121,6 +121,7 @@ public:
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
     CHIP_ERROR StopPublishDevice() override;
+    CHIP_ERROR GetCommissionableInstanceName(char * serviceName, size_t maxLength) override;
 
     // MdnsPacketDelegate
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -208,6 +209,8 @@ private:
 
     QueryResponder<kMaxRecords> mQueryResponder;
     ResponseSender mResponseSender;
+    uint32_t mCommissionInstanceName1;
+    uint32_t mCommissionInstanceName2;
 
     // current request handling
     const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
@@ -256,6 +259,11 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
 CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t port)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
+
+    Clear();
+
+    mCommissionInstanceName1 = GetRandU32();
+    mCommissionInstanceName2 = GetRandU32();
 
     ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port));
 
@@ -361,15 +369,26 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
+CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * serviceName, size_t maxLength)
 {
-    // TODO: need to detect colisions here
-    char nameBuffer[64] = "";
-    size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), ChipLogFormatX64, GetRandU32(), GetRandU32());
-    if (len >= sizeof(nameBuffer))
+    if (maxLength < 17)
+    {
+        // TODO: find correct error code
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    size_t len = snprintf(serviceName, maxLength, ChipLogFormatX64, mCommissionInstanceName1, mCommissionInstanceName2);
+    if (len >= maxLength)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
+{
+    char nameBuffer[64] = "";
+    ReturnErrorOnFailure(GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer)));
+
     const char * serviceType =
         params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode ? "_chipc" : "_chipd";
 

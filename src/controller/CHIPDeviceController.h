@@ -41,6 +41,7 @@
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
@@ -362,7 +363,11 @@ public:
  *   required to provide write access to the persistent storage, where the paired device information
  *   will be stored.
  */
-class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEstablishmentDelegate
+class DLL_EXPORT DeviceCommissioner : public DeviceController,
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+                                      public Protocols::UserDirectedCommissioning::UDCHelper,
+#endif
+                                      public SessionEstablishmentDelegate
 
 {
 public:
@@ -445,6 +450,13 @@ public:
 
     /**
      * @brief
+     *   Discover devices advertising as commissionable that match the instance name.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR DiscoverCommissioningInstanceName(char * instanceName);
+
+    /**
+     * @brief
      *   Discover all devices advertising as commissionable.
      *   Should be called on main loop thread.
      * @return CHIP_ERROR   The return status
@@ -469,6 +481,33 @@ public:
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
 
+    /**
+     * @brief
+     *   Called when a UDC message is received specifying the given instanceName
+     * This method indicates that UDC Server needs the Commissionable Node corresponding to
+     * the given instance name to be found. UDC Server will wait for OnCommissionableNodeFound.
+     *
+     * @param instanceName DNS-SD instance name for the client requesting commissioning
+     *
+     */
+    void FindCommissionableNode(Messaging::ExchangeContext * ec, char * instanceName) override;
+
+    /**
+     * @brief
+     *   Called when a UDC message has been received and corresponding nodeData has been found.
+     * It is expected that the implementer will prompt the user to confirm their intention to
+     * commission the given node, and provide the setup code to allow commissioning to proceed.
+     *
+     * @param nodeData DNS-SD node information for the client requesting commissioning
+     *
+     */
+    void OnUserDirectedCommissioningRequest(const Mdns::CommissionableNodeData & nodeData) override;
+
+    /**
+     * Reset the processing states for all UDC Clients
+     *
+     */
+    void ResetUserDirectedCommissioningStates();
 #endif
 
 private:

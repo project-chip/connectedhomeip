@@ -43,6 +43,7 @@ struct CommissionableNodeData
     static constexpr int kHostNameSize = 16;
 
     char hostName[kHostNameSize + 1];
+    char instanceName[kHostNameSize + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
@@ -51,6 +52,7 @@ struct CommissionableNodeData
     void Reset()
     {
         memset(hostName, 0, sizeof(hostName));
+        memset(instanceName, 0, sizeof(instanceName));
         longDiscriminator = 0;
         vendorId          = 0;
         productId         = 0;
@@ -74,13 +76,19 @@ enum class DiscoveryFilterType : uint8_t
     kDeviceType,
     kCommissioningMode,
     kCommissioningModeFromCommand,
+    kInstanceName,
 };
 struct DiscoveryFilter
 {
+    // Largest host name is 64-bits in hex.
+    static constexpr int kHostNameSize = 16;
+
     DiscoveryFilterType type;
     uint16_t code;
+    char * instanceName;
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
     DiscoveryFilter(DiscoveryFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
+    DiscoveryFilter(DiscoveryFilterType newType, char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
 };
 /// Groups callbacks for CHIP service resolution requests
 class ResolverDelegate

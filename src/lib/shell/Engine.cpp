@@ -106,6 +106,7 @@ void Engine::RegisterDefaultCommands()
 #if CONFIG_DEVICE_LAYER
     RegisterConfigCommands();
 #endif
+    RegisterCommissioningCommands();
 }
 
 } // namespace Shell
