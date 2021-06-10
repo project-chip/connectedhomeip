@@ -1208,7 +1208,7 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
     ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(noc.Get(), nocLen), ByteSpan(ica.Get(), icaLen), chipOpCert.Get(),
                                                          kMaxCHIPOpCertLength * 2, chipOpCertLen));
 
-    ChipLogProgress(Controller, "Sending operational certificate to the device. Op Cert Len %" PRIu32, opCertLen);
+    ChipLogProgress(Controller, "Sending operational certificate to the device. Op Cert Len %" PRIu32, chipOpCertLen);
     ReturnErrorOnFailure(SendOperationalCertificate(device, ByteSpan(chipOpCert.Get(), chipOpCertLen)));
 
     return CHIP_NO_ERROR;
