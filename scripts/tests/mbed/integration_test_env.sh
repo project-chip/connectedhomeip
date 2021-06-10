@@ -34,18 +34,21 @@ if [[ "$COMMAND" == *"start"* ]]; then
     bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh start --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
     bash $CHIP_DIR/scripts/tests/mbed/echo_server.sh
 
+    # Disable for now, it takes too long to build CHIP tools
     # Build CHIP main
-    pwd=$PWD
-    cd $CHIP_DIR
-    bash scripts/build/default.sh
-    cd $pwd
+    #pwd=$PWD
+    #cd $CHIP_DIR
+    #bash scripts/build/default.sh
+    #cd $pwd
 
     # Install Python Chip Device Controller
-    pip install $CHIP_DIR/out/default/controller/python/chip*.whl
-    pip install -r $CHIP_DIR/src/test_driver/mbed-functional/requirements.txt
+    #pip install $CHIP_DIR/out/default/controller/python/chip*.whl
+    #pip install -r $CHIP_DIR/src/test_driver/mbed-functional/requirements.txt
+    pip install mbed-flasher pytest
 
     source $CHIP_DIR/scripts/tests/mbed/common.sh
     mount_mbed_device
+    mbedls
 fi
 
 #####################################################################
