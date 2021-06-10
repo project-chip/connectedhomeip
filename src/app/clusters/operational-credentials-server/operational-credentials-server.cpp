@@ -272,7 +272,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
         VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         writer = commandObj->GetCommandDataElementTLVWriter();
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), commandObj->GetExchangeContext()->GetSecureSession().GetPeerNodeId()));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -397,7 +397,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
     writer = commandObj->GetCommandDataElementTLVWriter();
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(csr.Get(), csrLength)));
     SuccessOrExit(err = writer->Put(TLV::ContextTag(1), CSRNonce));

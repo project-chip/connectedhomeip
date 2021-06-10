@@ -76,7 +76,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     if (statusCodeFlipper)
     {
         printf("responder constructing status code in command");
-        apCommandObj->AddStatusCode(&commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+        apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                     Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
     }
     else
@@ -85,7 +85,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 
         chip::TLV::TLVWriter * writer;
 
-        err = apCommandObj->PrepareCommand(&commandPathParams);
+        err = apCommandObj->PrepareCommand(commandPathParams);
         SuccessOrExit(err);
 
         writer = apCommandObj->GetCommandDataElementTLVWriter();
