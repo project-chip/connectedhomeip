@@ -392,7 +392,7 @@ public:
      *
      */
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
-                                EventNumber & aEventNumber);
+                                EventNumber & aEventNumber, EventNumber & aEventCount);
 
     /**
      * @brief

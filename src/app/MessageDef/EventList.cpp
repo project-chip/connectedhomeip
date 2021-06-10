@@ -77,12 +77,6 @@ CHIP_ERROR EventList::Parser::CheckSchemaValidity() const
         {
             err = CHIP_NO_ERROR;
         }
-        // NOTE: temporarily disable this check, to allow test to continue
-        else
-        {
-            ChipLogError(DataManagement, "PROTOCOL ERROR: Empty event list");
-            err = CHIP_NO_ERROR;
-        }
     }
     SuccessOrExit(err);
     err = reader.ExitContainer(mOuterContainerType);
