@@ -121,7 +121,7 @@ exit:
             ChipLogDetail(DataManagement, "No Cluster 0x%" PRIx16 " on Endpoint 0x%" PRIx8, clusterId, endpointId);
         }
 
-        AddStatusCode(&returnStatusParam,
+        AddStatusCode(returnStatusParam,
                       err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
                       Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
     }
@@ -130,14 +130,14 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPathParams,
+CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams &aCommandPathParams,
                                          const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                          const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
 
-    err = PrepareCommand(apCommandPathParams, true /* isStatus */);
+    err = PrepareCommand(aCommandPathParams, true /* isStatus */);
     SuccessOrExit(err);
 
     statusElementBuilder =

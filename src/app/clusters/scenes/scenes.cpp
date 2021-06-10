@@ -272,7 +272,7 @@ bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, Gr
                                                  ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID,
                                                  (chip::app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -336,7 +336,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj
                                                  ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID,
                                                  (chip::app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -380,7 +380,7 @@ bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, Gro
                                                  ZCL_STORE_SCENE_RESPONSE_COMMAND_ID,
                                                  (chip::app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -497,7 +497,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * command
                                              ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1),
@@ -1088,7 +1088,7 @@ kickout:
             cmdParams.mCommandId = ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID;
         }
         TLV::TLVWriter * writer = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -1148,7 +1148,7 @@ bool emberAfPluginScenesServerParseViewScene(chip::app::Command * commandObj, co
         cmdParams.mCommandId = ZCL_ENHANCED_VIEW_SCENE_RESPONSE_COMMAND_ID;
     }
     TLV::TLVWriter * writer = nullptr;
-    SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
     VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
     SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));

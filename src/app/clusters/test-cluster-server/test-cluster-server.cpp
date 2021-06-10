@@ -143,7 +143,7 @@ bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * apComman
 
     VerifyOrExit(apCommandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = apCommandObj->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = apCommandObj->PrepareCommand(cmdParams));
     writer = apCommandObj->GetCommandDataElementTLVWriter();
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), returnValue));
     SuccessOrExit(err = apCommandObj->FinishCommand());
