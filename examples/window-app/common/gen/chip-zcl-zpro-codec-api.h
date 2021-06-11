@@ -36,7 +36,6 @@
 | OperationalCredentials                                              | 0x003E |
 | SoftwareDiagnostics                                                 | 0x0034 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
-| TrustedRootCertificates                                             | 0x003F |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
 | WindowCovering                                                      | 0x0102 |
 | WindowCovering                                                      | 0x0102 |
@@ -83,15 +82,6 @@ chip::System::PacketBufferHandle encodeWindowCoveringClusterReadWindowCoveringTy
 
 /**
  * @brief
- *    Encode a Window Covering server configure report command for the window covering type attribute into buffer including the APS
- * frame
- */
-chip::System::PacketBufferHandle
-encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                                uint16_t minInterval, uint16_t maxInterval);
-
-/**
- * @brief
  *    Encode a Window Covering server read command for the current position - lift attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeWindowCoveringClusterReadCurrentPositionLiftAttribute(uint8_t seqNum,
@@ -131,28 +121,10 @@ chip::System::PacketBufferHandle encodeWindowCoveringClusterReadConfigStatusAttr
 
 /**
  * @brief
- *    Encode a Window Covering server configure report command for the config status attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeWindowCoveringClusterConfigureConfigStatusAttribute(uint8_t seqNum,
-                                                                                           chip::EndpointId destinationEndpoint,
-                                                                                           uint16_t minInterval,
-                                                                                           uint16_t maxInterval);
-
-/**
- * @brief
  *    Encode a Window Covering server read command for the installed open limit - lift attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
 encodeWindowCoveringClusterReadInstalledOpenLimitLiftAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a Window Covering server configure report command for the installed open limit - lift attribute into buffer including
- * the APS frame
- */
-chip::System::PacketBufferHandle
-encodeWindowCoveringClusterConfigureInstalledOpenLimitLiftAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                                    uint16_t minInterval, uint16_t maxInterval, uint16_t change);
 
 /**
  * @brief
@@ -164,28 +136,10 @@ encodeWindowCoveringClusterReadInstalledClosedLimitLiftAttribute(uint8_t seqNum,
 
 /**
  * @brief
- *    Encode a Window Covering server configure report command for the installed closed limit - lift attribute into buffer including
- * the APS frame
- */
-chip::System::PacketBufferHandle
-encodeWindowCoveringClusterConfigureInstalledClosedLimitLiftAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                                      uint16_t minInterval, uint16_t maxInterval, uint16_t change);
-
-/**
- * @brief
  *    Encode a Window Covering server read command for the installed open limit - tilt attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
 encodeWindowCoveringClusterReadInstalledOpenLimitTiltAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a Window Covering server configure report command for the installed open limit - tilt attribute into buffer including
- * the APS frame
- */
-chip::System::PacketBufferHandle
-encodeWindowCoveringClusterConfigureInstalledOpenLimitTiltAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                                    uint16_t minInterval, uint16_t maxInterval, uint16_t change);
 
 /**
  * @brief
@@ -194,15 +148,6 @@ encodeWindowCoveringClusterConfigureInstalledOpenLimitTiltAttribute(uint8_t seqN
  */
 chip::System::PacketBufferHandle
 encodeWindowCoveringClusterReadInstalledClosedLimitTiltAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a Window Covering server configure report command for the installed closed limit - tilt attribute into buffer including
- * the APS frame
- */
-chip::System::PacketBufferHandle
-encodeWindowCoveringClusterConfigureInstalledClosedLimitTiltAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
-                                                                      uint16_t minInterval, uint16_t maxInterval, uint16_t change);
 
 /**
  * @brief

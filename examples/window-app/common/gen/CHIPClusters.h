@@ -66,10 +66,6 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                   uint8_t value);
-    CHIP_ERROR ConfigureAttributeWindowCoveringType(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                    uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeWindowCoveringType(Callback::Cancelable * onReportCallback);
     CHIP_ERROR ConfigureAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                      uint16_t maxInterval, uint16_t change);
@@ -78,25 +74,6 @@ public:
                                                      Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                      uint16_t maxInterval, uint16_t change);
     CHIP_ERROR ReportAttributeCurrentPositionTilt(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ConfigureAttributeConfigStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeConfigStatus(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ConfigureAttributeInstalledOpenLimitLift(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval, uint16_t change);
-    CHIP_ERROR ReportAttributeInstalledOpenLimitLift(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ConfigureAttributeInstalledClosedLimitLift(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval, uint16_t change);
-    CHIP_ERROR ReportAttributeInstalledClosedLimitLift(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ConfigureAttributeInstalledOpenLimitTilt(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval, uint16_t change);
-    CHIP_ERROR ReportAttributeInstalledOpenLimitTilt(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ConfigureAttributeInstalledClosedLimitTilt(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval, uint16_t change);
-    CHIP_ERROR ReportAttributeInstalledClosedLimitTilt(Callback::Cancelable * onReportCallback);
 
 private:
     static constexpr CommandId kWindowCoveringDownCloseCommandId          = 0x01;

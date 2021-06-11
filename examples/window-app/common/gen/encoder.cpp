@@ -62,7 +62,6 @@ using namespace chip::Encoding::LittleEndian;
 | OperationalCredentials                                              | 0x003E |
 | SoftwareDiagnostics                                                 | 0x0034 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
-| TrustedRootCertificates                                             | 0x003F |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
 | WindowCovering                                                      | 0x0102 |
 | WindowCovering                                                      | 0x0102 |
@@ -157,21 +156,6 @@ PacketBufferHandle encodeWindowCoveringClusterReadWindowCoveringTypeAttribute(ui
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
-{
-    COMMAND_HEADER("ReportWindowCoveringWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0000)
-        .Put8(48)
-        .Put16(minInterval)
-        .Put16(maxInterval);
-    COMMAND_FOOTER();
-}
-
 /*
  * Attribute CurrentPositionLift
  */
@@ -236,21 +220,6 @@ PacketBufferHandle encodeWindowCoveringClusterReadConfigStatusAttribute(uint8_t 
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureConfigStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    COMMAND_HEADER("ReportWindowCoveringConfigStatus", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0007)
-        .Put8(24)
-        .Put16(minInterval)
-        .Put16(maxInterval);
-    COMMAND_FOOTER();
-}
-
 /*
  * Attribute InstalledOpenLimitLift
  */
@@ -258,24 +227,6 @@ PacketBufferHandle encodeWindowCoveringClusterReadInstalledOpenLimitLiftAttribut
 {
     COMMAND_HEADER("ReadWindowCoveringInstalledOpenLimitLift", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0010);
-    COMMAND_FOOTER();
-}
-
-PacketBufferHandle encodeWindowCoveringClusterConfigureInstalledOpenLimitLiftAttribute(uint8_t seqNum,
-                                                                                       EndpointId destinationEndpoint,
-                                                                                       uint16_t minInterval, uint16_t maxInterval,
-                                                                                       uint16_t change)
-{
-    COMMAND_HEADER("ReportWindowCoveringInstalledOpenLimitLift", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0010)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
-    buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
 
@@ -289,24 +240,6 @@ PacketBufferHandle encodeWindowCoveringClusterReadInstalledClosedLimitLiftAttrib
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureInstalledClosedLimitLiftAttribute(uint8_t seqNum,
-                                                                                         EndpointId destinationEndpoint,
-                                                                                         uint16_t minInterval, uint16_t maxInterval,
-                                                                                         uint16_t change)
-{
-    COMMAND_HEADER("ReportWindowCoveringInstalledClosedLimitLift", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0011)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
-    buf.Put16(static_cast<uint16_t>(change));
-    COMMAND_FOOTER();
-}
-
 /*
  * Attribute InstalledOpenLimitTilt
  */
@@ -317,24 +250,6 @@ PacketBufferHandle encodeWindowCoveringClusterReadInstalledOpenLimitTiltAttribut
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureInstalledOpenLimitTiltAttribute(uint8_t seqNum,
-                                                                                       EndpointId destinationEndpoint,
-                                                                                       uint16_t minInterval, uint16_t maxInterval,
-                                                                                       uint16_t change)
-{
-    COMMAND_HEADER("ReportWindowCoveringInstalledOpenLimitTilt", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0012)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
-    buf.Put16(static_cast<uint16_t>(change));
-    COMMAND_FOOTER();
-}
-
 /*
  * Attribute InstalledClosedLimitTilt
  */
@@ -342,24 +257,6 @@ PacketBufferHandle encodeWindowCoveringClusterReadInstalledClosedLimitTiltAttrib
 {
     COMMAND_HEADER("ReadWindowCoveringInstalledClosedLimitTilt", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0013);
-    COMMAND_FOOTER();
-}
-
-PacketBufferHandle encodeWindowCoveringClusterConfigureInstalledClosedLimitTiltAttribute(uint8_t seqNum,
-                                                                                         EndpointId destinationEndpoint,
-                                                                                         uint16_t minInterval, uint16_t maxInterval,
-                                                                                         uint16_t change)
-{
-    COMMAND_HEADER("ReportWindowCoveringInstalledClosedLimitTilt", WINDOW_COVERING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
-        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put16(0x0013)
-        .Put8(33)
-        .Put16(minInterval)
-        .Put16(maxInterval);
-    buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
 
