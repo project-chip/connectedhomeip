@@ -1021,7 +1021,6 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(void * conte
 | TemperatureMeasurement                                              | 0x0402 |
 | TestCluster                                                         | 0x050F |
 | Thermostat                                                          | 0x0201 |
-| TrustedRootCertificates                                             | 0x003F |
 | WakeOnLan                                                           | 0x0503 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
@@ -1065,7 +1064,6 @@ constexpr chip::ClusterId kTargetNavigatorClusterId             = 0x0505;
 constexpr chip::ClusterId kTemperatureMeasurementClusterId      = 0x0402;
 constexpr chip::ClusterId kTestClusterClusterId                 = 0x050F;
 constexpr chip::ClusterId kThermostatClusterId                  = 0x0201;
-constexpr chip::ClusterId kTrustedRootCertificatesClusterId     = 0x003F;
 constexpr chip::ClusterId kWakeOnLanClusterId                   = 0x0503;
 constexpr chip::ClusterId kWindowCoveringClusterId              = 0x0102;
 
@@ -12382,9 +12380,11 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddOpCert                                                         |   0x06 |
+| * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
+| * RemoveTrustedRootCertificate                                      |   0xA2 |
 | * SetFabric                                                         |   0x00 |
 | * UpdateFabricLabel                                                 |   0x09 |
 |------------------------------------------------------------------------------|
@@ -12401,8 +12401,7 @@ class OperationalCredentialsAddOpCert : public ModelCommand
 public:
     OperationalCredentialsAddOpCert() : ModelCommand("add-op-cert")
     {
-        AddArgument("noc", &mNoc);
-        AddArgument("iCACertificate", &mICACertificate);
+        AddArgument("operationalCert", &mOperationalCert);
         AddArgument("iPKValue", &mIPKValue);
         AddArgument("caseAdminNode", 0, UINT64_MAX, &mCaseAdminNode);
         AddArgument("adminVendorId", 0, UINT16_MAX, &mAdminVendorId);
@@ -12420,7 +12419,7 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddOpCert(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNoc, mICACertificate, mIPKValue,
+        return cluster.AddOpCert(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mOperationalCert, mIPKValue,
                                  mCaseAdminNode, mAdminVendorId);
     }
 
@@ -12430,11 +12429,44 @@ private:
             OnOperationalCredentialsClusterOpCertResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mNoc;
-    chip::ByteSpan mICACertificate;
+    chip::ByteSpan mOperationalCert;
     chip::ByteSpan mIPKValue;
     chip::NodeId mCaseAdminNode;
     uint16_t mAdminVendorId;
+};
+
+/*
+ * Command AddTrustedRootCertificate
+ */
+class OperationalCredentialsAddTrustedRootCertificate : public ModelCommand
+{
+public:
+    OperationalCredentialsAddTrustedRootCertificate() : ModelCommand("add-trusted-root-certificate")
+    {
+        AddArgument("rootCertificate", &mRootCertificate);
+        ModelCommand::AddArguments();
+    }
+    ~OperationalCredentialsAddTrustedRootCertificate()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0xA1) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.AddTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mRootCertificate);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::ByteSpan mRootCertificate;
 };
 
 /*
@@ -12538,6 +12570,41 @@ private:
     chip::FabricId mFabricId;
     chip::NodeId mNodeId;
     uint16_t mVendorId;
+};
+
+/*
+ * Command RemoveTrustedRootCertificate
+ */
+class OperationalCredentialsRemoveTrustedRootCertificate : public ModelCommand
+{
+public:
+    OperationalCredentialsRemoveTrustedRootCertificate() : ModelCommand("remove-trusted-root-certificate")
+    {
+        AddArgument("trustedRootIdentifier", &mTrustedRootIdentifier);
+        ModelCommand::AddArguments();
+    }
+    ~OperationalCredentialsRemoveTrustedRootCertificate()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0xA2) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.RemoveTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                    mTrustedRootIdentifier);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::ByteSpan mTrustedRootIdentifier;
 };
 
 /*
@@ -16837,150 +16904,6 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster TrustedRootCertificates                                     | 0x003F |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * AddTrustedRootCertificate                                         |   0x00 |
-| * RemoveTrustedRootCertificate                                      |   0x01 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command AddTrustedRootCertificate
- */
-class TrustedRootCertificatesAddTrustedRootCertificate : public ModelCommand
-{
-public:
-    TrustedRootCertificatesAddTrustedRootCertificate() : ModelCommand("add-trusted-root-certificate")
-    {
-        AddArgument("rootCertificate", &mRootCertificate);
-        ModelCommand::AddArguments();
-    }
-    ~TrustedRootCertificatesAddTrustedRootCertificate()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::TrustedRootCertificatesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.AddTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mRootCertificate);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mRootCertificate;
-};
-
-/*
- * Command RemoveTrustedRootCertificate
- */
-class TrustedRootCertificatesRemoveTrustedRootCertificate : public ModelCommand
-{
-public:
-    TrustedRootCertificatesRemoveTrustedRootCertificate() : ModelCommand("remove-trusted-root-certificate")
-    {
-        AddArgument("trustedRootIdentifier", &mTrustedRootIdentifier);
-        ModelCommand::AddArguments();
-    }
-    ~TrustedRootCertificatesRemoveTrustedRootCertificate()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x01) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::TrustedRootCertificatesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.RemoveTrustedRootCertificate(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                    mTrustedRootIdentifier);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mTrustedRootIdentifier;
-};
-
-/*
- * Discover Attributes
- */
-class DiscoverTrustedRootCertificatesAttributes : public ModelCommand
-{
-public:
-    DiscoverTrustedRootCertificatesAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
-
-    ~DiscoverTrustedRootCertificatesAttributes()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::TrustedRootCertificatesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ClusterRevision
- */
-class ReadTrustedRootCertificatesClusterRevision : public ModelCommand
-{
-public:
-    ReadTrustedRootCertificatesClusterRevision() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "cluster-revision");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTrustedRootCertificatesClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::TrustedRootCertificatesCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*----------------------------------------------------------------------------*\
 | Cluster WakeOnLan                                                   | 0x0503 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -18453,8 +18376,9 @@ void registerClusterOperationalCredentials(Commands & commands)
     const char * clusterName = "OperationalCredentials";
 
     commands_list clusterCommands = {
-        make_unique<OperationalCredentialsAddOpCert>(),           make_unique<OperationalCredentialsOpCSRRequest>(),
-        make_unique<OperationalCredentialsRemoveAllFabrics>(),    make_unique<OperationalCredentialsRemoveFabric>(),
+        make_unique<OperationalCredentialsAddOpCert>(),           make_unique<OperationalCredentialsAddTrustedRootCertificate>(),
+        make_unique<OperationalCredentialsOpCSRRequest>(),        make_unique<OperationalCredentialsRemoveAllFabrics>(),
+        make_unique<OperationalCredentialsRemoveFabric>(),        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(),
         make_unique<OperationalCredentialsSetFabric>(),           make_unique<OperationalCredentialsUpdateFabricLabel>(),
         make_unique<DiscoverOperationalCredentialsAttributes>(),  make_unique<ReadOperationalCredentialsFabricsList>(),
         make_unique<ReadOperationalCredentialsClusterRevision>(),
@@ -18650,19 +18574,6 @@ void registerClusterThermostat(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterTrustedRootCertificates(Commands & commands)
-{
-    const char * clusterName = "TrustedRootCertificates";
-
-    commands_list clusterCommands = {
-        make_unique<TrustedRootCertificatesAddTrustedRootCertificate>(),
-        make_unique<TrustedRootCertificatesRemoveTrustedRootCertificate>(),
-        make_unique<DiscoverTrustedRootCertificatesAttributes>(),
-        make_unique<ReadTrustedRootCertificatesClusterRevision>(),
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}
 void registerClusterWakeOnLan(Commands & commands)
 {
     const char * clusterName = "WakeOnLan";
@@ -18749,7 +18660,6 @@ void registerClusters(Commands & commands)
     registerClusterTemperatureMeasurement(commands);
     registerClusterTestCluster(commands);
     registerClusterThermostat(commands);
-    registerClusterTrustedRootCertificates(commands);
     registerClusterWakeOnLan(commands);
     registerClusterWindowCovering(commands);
 }

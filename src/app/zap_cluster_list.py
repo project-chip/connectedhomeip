@@ -54,7 +54,6 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TARGET_NAVIGATOR_CLUSTER': ['target-navigator-server'],
     'TEMP_MEASUREMENT_CLUSTER': ['temperature-measurement-server'],
     'TEST_CLUSTER': ['test-cluster-server'],
-    'TRUSTED_ROOT_CERTIFICATES_CLUSTER': ['trusted-root-certificates-server'],
     'TV_CHANNEL_CLUSTER': ['tv-channel-server'],
     'THERMOSTAT_CLUSTER': [],
     'THREAD_NETWORK_DIAGNOSTICS_CLUSTER': [],

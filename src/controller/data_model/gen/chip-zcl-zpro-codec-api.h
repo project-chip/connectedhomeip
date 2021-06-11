@@ -67,7 +67,6 @@
 | TemperatureMeasurement                                              | 0x0402 |
 | TestCluster                                                         | 0x050F |
 | Thermostat                                                          | 0x0201 |
-| TrustedRootCertificates                                             | 0x003F |
 | WakeOnLan                                                           | 0x0503 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
@@ -2025,9 +2024,11 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddOpCert                                                         |   0x06 |
+| * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
+| * RemoveTrustedRootCertificate                                      |   0xA2 |
 | * SetFabric                                                         |   0x00 |
 | * UpdateFabricLabel                                                 |   0x09 |
 |------------------------------------------------------------------------------|
@@ -2882,31 +2883,6 @@ encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNum, chip::EndpointId
  */
 chip::System::PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                      chip::EndpointId destinationEndpoint);
-
-/*----------------------------------------------------------------------------*\
-| Cluster TrustedRootCertificates                                     | 0x003F |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * AddTrustedRootCertificate                                         |   0x00 |
-| * RemoveTrustedRootCertificate                                      |   0x01 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/**
- * @brief
- *    Encode a Trusted Root Certificates server discover command into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeTrustedRootCertificatesClusterDiscoverAttributes(uint8_t seqNum,
-                                                                                        chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a Trusted Root Certificates server read command for the cluster revision attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle
-encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster WakeOnLan                                                   | 0x0503 |

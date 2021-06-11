@@ -2720,16 +2720,25 @@ CHIP_ERROR chip_ime_ReadAttribute_OnOff_ClusterRevision(chip::Controller::Device
 
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_AddOpCert(chip::Controller::Device * device,
                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                   const uint8_t * noc, uint32_t noc_Len,
-                                                                   const uint8_t * iCACertificate, uint32_t iCACertificate_Len,
+                                                                   const uint8_t * operationalCert, uint32_t operationalCert_Len,
                                                                    const uint8_t * iPKValue, uint32_t iPKValue_Len,
                                                                    chip::NodeId caseAdminNode, uint16_t adminVendorId)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.AddOpCert(nullptr, nullptr, chip::ByteSpan(noc, noc_Len), chip::ByteSpan(iCACertificate, iCACertificate_Len),
+    return cluster.AddOpCert(nullptr, nullptr, chip::ByteSpan(operationalCert, operationalCert_Len),
                              chip::ByteSpan(iPKValue, iPKValue_Len), caseAdminNode, adminVendorId);
+}
+CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                   const uint8_t * rootCertificate,
+                                                                                   uint32_t rootCertificate_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.AddTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(rootCertificate, rootCertificate_Len));
 }
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(chip::Controller::Device * device,
                                                                       chip::EndpointId ZCLendpointId, chip::GroupId,
@@ -2757,6 +2766,16 @@ CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(chip::Cont
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.RemoveFabric(nullptr, nullptr, fabricId, nodeId, vendorId);
+}
+CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_RemoveTrustedRootCertificate(chip::Controller::Device * device,
+                                                                                      chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                      const uint8_t * trustedRootIdentifier,
+                                                                                      uint32_t trustedRootIdentifier_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.RemoveTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(trustedRootIdentifier, trustedRootIdentifier_Len));
 }
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_SetFabric(chip::Controller::Device * device,
                                                                    chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t vendorId)
@@ -3612,41 +3631,6 @@ CHIP_ERROR chip_ime_ReadAttribute_Thermostat_ClusterRevision(chip::Controller::D
 }
 
 // End of Cluster Thermostat
-// Cluster TrustedRootCertificates
-
-CHIP_ERROR chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertificate(chip::Controller::Device * device,
-                                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                                    const uint8_t * rootCertificate,
-                                                                                    uint32_t rootCertificate_Len)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::TrustedRootCertificatesCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.AddTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(rootCertificate, rootCertificate_Len));
-}
-CHIP_ERROR chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate(chip::Controller::Device * device,
-                                                                                       chip::EndpointId ZCLendpointId,
-                                                                                       chip::GroupId,
-                                                                                       const uint8_t * trustedRootIdentifier,
-                                                                                       uint32_t trustedRootIdentifier_Len)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::TrustedRootCertificatesCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.RemoveTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(trustedRootIdentifier, trustedRootIdentifier_Len));
-}
-
-CHIP_ERROR chip_ime_ReadAttribute_TrustedRootCertificates_ClusterRevision(chip::Controller::Device * device,
-                                                                          chip::EndpointId ZCLendpointId,
-                                                                          chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::TrustedRootCertificatesCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-// End of Cluster TrustedRootCertificates
 // Cluster WakeOnLan
 
 CHIP_ERROR chip_ime_ReadAttribute_WakeOnLan_WakeOnLanMacAddress(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
