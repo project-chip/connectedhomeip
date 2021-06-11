@@ -52,7 +52,7 @@ jobs:
           GITHUB_REPOSITORY_URL="$GITHUB_SERVER_URL"/"$GITHUB_REPOSITORY".git
           yq e -i ".environment.GITHUB_REPOSITORY = \"$GITHUB_REPOSITORY\"" $JOB_FILE
           yq e -i ".environment.GITHUB_REPOSITORY_URL = \"$GITHUB_REPOSITORY_URL\"" $JOB_FILE
-          yq e -i ".environment.GITHUB_ACTION_ID = \"${{github.event.workflow_run.run_id}}\"" $JOB_FILE
+          yq e -i ".environment.GITHUB_ACTION_ID = \"${{ github.event.workflow_run.run_id }}\"" $JOB_FILE
           yq e -i ".environment.GITHUB_SHA = \"$GITHUB_SHA\"" $JOB_FILE
           yq e -i ".secrets.GITHUB_TOKEN = \"$GITHUB_TOKEN\"" $JOB_FILE  
           cat $JOB_FILE
@@ -61,12 +61,15 @@ jobs:
           LAVA_SERVER_TOKEN: ${{ secrets.LAVA_SERVER_TOKEN }}
           LAVA_SERVER_URL: ${{ secrets.LAVA_SERVER_URL }}
         run: |
-          echo "Add id to lavacli"
           lavacli identities add --uri "$LAVA_SERVER_URL" --username lava-admin --token "$LAVA_SERVER_TOKEN" default
-          echo "Submit job to lava"
           LAVA_JOB_ID=`lavacli jobs submit $GITHUB_WORKSPACE/scripts/tests/mbed/lava_integration_tests.yml`
-          echo "job id: $LAVA_JOB_ID"
+          lavacli jobs logs $LAVA_JOB_ID | tee integration-test.log
           lavacli jobs wait $LAVA_JOB_ID
+      - name: Upload unit test logs
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: integration-test-log
+          path: integration-test.log
   faillure-report:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
