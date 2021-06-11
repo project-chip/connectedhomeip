@@ -303,7 +303,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         else
         {
             // This is a general error of internal consistency: every address has a known type
-            // Fail completly otherwise.
+            // Fail completely otherwise.
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
