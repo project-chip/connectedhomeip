@@ -39,9 +39,9 @@ during the commissioning process and CHIPTool must use DNS Service Discovery
 IPv6-based communication.
 
 Since a typical smartphone does not have a Thread radio built-in, extra effort
-is needed to prepare a fully-fledged testing environment. Refer to
-the [OpenThread Border Router](openthread_border_router_pi.md) article to set up
-a Thread Border Router on a Raspberry Pi.
+is needed to prepare a fully-fledged testing environment. Refer to the
+[OpenThread Border Router](openthread_border_router_pi.md) article to set up a
+Thread Border Router on a Raspberry Pi.
 
 The following diagram shows the connectivity between network components required
 to allow communication between devices running the CHIPTool and Lock
