@@ -345,12 +345,7 @@ public:
 
     CASESession & GetCASESession() { return mCASESession; }
 
-    CHIP_ERROR GenerateCSRNonce(ByteSpan & nonce)
-    {
-        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce)));
-        nonce = ByteSpan(mCSRNonce, sizeof(mCSRNonce));
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR GenerateCSRNonce() { return Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce)); }
 
     const ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
