@@ -132,7 +132,7 @@ private:
             NL_TEST_ASSERT(mInSuite, foundRecord[i] == true);
         }
     }
-}; // namespace
+};
 
 struct CommonTestElements
 {
