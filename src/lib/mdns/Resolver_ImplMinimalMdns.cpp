@@ -145,23 +145,6 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
         return;
     }
 
-    // Before attempting to parse hex values for node/fabrid, validate
-    // that he response is indeed from a chip tcp service.
-    {
-        SerializedQNameIterator suffix = name;
-
-        constexpr const char * kExpectedSuffix[] = { "_chip", "_tcp", "local" };
-
-        if (suffix != FullQName(kExpectedSuffix))
-        {
-#ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
-            ChipLogError(Discovery, "mDNS packet is not for a CHIP device");
-#endif
-            mHasNodePort = false;
-            return;
-        }
-    }
-
     if (ExtractIdFromInstanceName(name.Value(), &mNodeData.mPeerId) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to parse peer id from %s", name.Value());
@@ -171,11 +154,6 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
 
     mNodeData.mPort = srv.GetPort();
     mHasNodePort    = true;
-
-    if (mHasIP)
-    {
-        mDelegate->OnNodeIdResolved(mNodeData);
-    }
 }
 
 void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
@@ -199,11 +177,6 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // (if multi-admin decides to use unique ports for every ecosystem).
     mNodeData.mAddress = addr;
     mHasIP             = true;
-
-    if (mHasNodePort)
-    {
-        mDelegate->OnNodeIdResolved(mNodeData);
-    }
 }
 
 void PacketDataReporter::OnCommissionableNodeIPAddress(const chip::Inet::IPAddress & addr)
@@ -213,6 +186,18 @@ void PacketDataReporter::OnCommissionableNodeIPAddress(const chip::Inet::IPAddre
         return;
     }
     mCommissionableNodeData.ipAddress[mCommissionableNodeData.numIPs++] = addr;
+}
+
+bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
+{
+    while (qname.Next())
+    {
+        if (strcmp(qname.Value(), part) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data)
@@ -238,11 +223,26 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         }
         else if (mDiscoveryType == DiscoveryType::kOperational)
         {
-            OnOperationalSrvRecord(data.GetName(), srv);
+            // Ensure this is our record.
+            if (HasQNamePart(data.GetName(), kOperationalServiceName))
+            {
+                OnOperationalSrvRecord(data.GetName(), srv);
+            }
+            else
+            {
+                mValid = false;
+            }
         }
         else if (mDiscoveryType == DiscoveryType::kCommissionableNode)
         {
-            OnCommissionableNodeSrvRecord(data.GetName(), srv);
+            if (HasQNamePart(data.GetName(), kCommissionableServiceName))
+            {
+                OnCommissionableNodeSrvRecord(data.GetName(), srv);
+            }
+            else
+            {
+                mValid = false;
+            }
         }
         break;
     }
@@ -303,6 +303,10 @@ void PacketDataReporter::OnComplete()
     if (mDiscoveryType == DiscoveryType::kCommissionableNode && mCommissionableNodeData.IsValid())
     {
         mDelegate->OnCommissionableNodeFound(mCommissionableNodeData);
+    }
+    else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
+    {
+        mDelegate->OnNodeIdResolved(mNodeData);
     }
 }
 
