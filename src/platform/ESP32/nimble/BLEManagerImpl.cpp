@@ -883,7 +883,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
 {
-    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (con %" PRIu16, " reason 0x%02 " PRIx8 ")",
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (con %" PRIu16 " reason 0x%02" PRIx8 ")",
                     gapEvent->disconnect.conn.conn_handle, gapEvent->disconnect.reason);
 
     // Update the number of GAP connections.
@@ -1113,7 +1113,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             err = MapBLEError(ble_gap_adv_stop());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %d, cannot restart", ErrorStr(err));
+                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s, cannot restart", ErrorStr(err));
                 return err;
             }
         }
@@ -1122,7 +1122,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             err = MapBLEError(ble_hs_pvcy_rpa_config(NIMBLE_HOST_ENABLE_RPA));
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "RPA not set: %d", ErrorStr(err));
+                ChipLogError(DeviceLayer, "RPA not set: %s", ErrorStr(err));
                 return err;
             }
         }
@@ -1133,7 +1133,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         }
         else
         {
-            ChipLogError(DeviceLayer, "ble_gap_adv_start() failed: %d", ErrorStr(err));
+            ChipLogError(DeviceLayer, "ble_gap_adv_start() failed: %s", ErrorStr(err));
             return err;
         }
     }

@@ -668,7 +668,7 @@ exit:
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to initialize the device list with error: %d\n", err);
+        ChipLogError(Controller, "Failed to initialize the device list with error: %" PRId32, err);
     }
 
     return err;
@@ -680,7 +680,8 @@ CHIP_ERROR DeviceController::SetPairedDeviceList(ByteSpan serialized)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to recreate the device list with buffer %s\n", serialized);
+        ChipLogError(Controller, "Failed to recreate the device list with buffer %.*s\n", static_cast<int>(serialized.size()),
+                     serialized.data());
     }
     else
     {
@@ -1100,10 +1101,10 @@ void DeviceCommissioner::OnSessionEstablished()
 
     if (sendOperationalCertsImmediately)
     {
-        err = SendOperationalCertificateSigningRequestCommand(device);
+        err = SendTrustedRootCertificate(device);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Ble, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+            ChipLogError(Ble, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }
@@ -1170,52 +1171,50 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> opCert;
-    ReturnErrorCodeIf(!opCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-
     // TODO: Validate CSR Nonce and signature
 
-    uint32_t opCertLen = 0;
-    ChipLogProgress(Controller, "Generating operational certificate for device %llx", device->GetDeviceId());
+    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+    ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t nocLen = 0;
+    ChipLogProgress(Controller, "Generating operational certificate for device " ChipLogFormatX64,
+                    ChipLogValueX64(device->GetDeviceId()));
     ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
-        PeerId().SetNodeId(device->GetDeviceId()), CSR, 1, opCert.Get(), kMaxCHIPOpCertLength, opCertLen));
+        PeerId().SetNodeId(device->GetDeviceId()), CSR, 1, noc.Get(), kMaxCHIPOpCertLength, nocLen));
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> issuerCert;
-    ReturnErrorCodeIf(!issuerCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(nocLen == 0, CHIP_ERROR_CERT_NOT_FOUND);
 
+    chip::Platform::ScopedMemoryBuffer<uint8_t> ica;
+    ReturnErrorCodeIf(!ica.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t icaLen = 0;
     ChipLogProgress(Controller, "Getting intermediate CA certificate from the issuer");
-    uint32_t issuerCertLen = 0;
-    CHIP_ERROR err =
-        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, issuerCert.Get(), kMaxCHIPOpCertLength, issuerCertLen);
-    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %d", err);
+    CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, ica.Get(), kMaxCHIPOpCertLength, icaLen);
+    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" PRId32, err);
     if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
         // This implies that the commissioner application uses root CA to sign the operational
         // certificates, and an intermediate CA is not needed. It's not an error condition, so
         // let's just send operational certificate and root CA certificate to the device.
-        err           = CHIP_NO_ERROR;
-        issuerCertLen = 0;
+        err    = CHIP_NO_ERROR;
+        icaLen = 0;
         ChipLogProgress(Controller, "Intermediate CA is not needed");
     }
     ReturnErrorOnFailure(err);
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> chipOpCert;
+    ReturnErrorCodeIf(!chipOpCert.Alloc(kMaxCHIPOpCertLength * 2), CHIP_ERROR_NO_MEMORY);
+    uint32_t chipOpCertLen = 0;
+    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(noc.Get(), nocLen), ByteSpan(ica.Get(), icaLen), chipOpCert.Get(),
+                                                         kMaxCHIPOpCertLength * 2, chipOpCertLen));
 
-    ReturnErrorCodeIf(!chipCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(ConvertX509CertToChipCert(opCert.Get(), opCertLen, chipCert.Get(), kMaxCHIPOpCertLength, opCertLen));
-
-    // TODO - convert ICA cert to ChipCert format and send it to the device.
-
-    ChipLogProgress(Controller, "Sending operational certificate to the device. Op Cert Len %d, ICA Cert Len %d", opCertLen,
-                    issuerCertLen);
-    ReturnErrorOnFailure(
-        SendOperationalCertificate(device, ByteSpan(chipCert.Get(), opCertLen), ByteSpan(issuerCert.Get(), issuerCertLen)));
+    ChipLogProgress(Controller, "Sending operational certificate to the device. Op Cert Len %" PRIu32, chipOpCertLen);
+    ReturnErrorOnFailure(SendOperationalCertificate(device, ByteSpan(chipOpCert.Get(), chipOpCertLen)));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf)
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
@@ -1224,8 +1223,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(
-        cluster.AddOpCert(successCallback, failureCallback, opCertBuf, icaCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, 0));
+    ReturnErrorOnFailure(cluster.AddOpCert(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, 0));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1260,7 +1258,7 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uin
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
-    err = commissioner->SendTrustedRootCertificate(device);
+    err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1282,7 +1280,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
 
     ChipLogProgress(Controller, "Sending root certificate to the device");
 
-    chip::Controller::TrustedRootCertificatesCluster cluster;
+    chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
     Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
@@ -1312,7 +1310,7 @@ void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
-    err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
+    err = commissioner->SendOperationalCertificateSigningRequestCommand(device);
     SuccessOrExit(err);
 
 exit:
@@ -1670,10 +1668,10 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Exchanging certificates");
         // TODO(cecille): Once this is implemented through the clusters, it should be moved to the proper stage and the callback
         // should advance the commissioning stage
-        CHIP_ERROR status = SendOperationalCertificateSigningRequestCommand(device);
+        CHIP_ERROR status = SendTrustedRootCertificate(device);
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+            ChipLogError(Controller, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }

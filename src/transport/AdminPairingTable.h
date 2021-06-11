@@ -194,8 +194,8 @@ private:
 
         Crypto::P256SerializedKeypair mOperationalKey;
         uint8_t mRootCert[kMaxChipCertSize];
-        uint8_t mOperationalCert[kMaxChipCertSize];
-
+        // The operationa credentials set can have up to two certs -> ICAC and NOC
+        uint8_t mOperationalCert[kMaxChipCertSize * 2];
         char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
     };
 };

@@ -251,7 +251,8 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
         return CHIP_NO_ERROR;
     }
 
-    VerifyOrReturnError(cert.size() <= kMaxChipCertSize, CHIP_ERROR_INVALID_ARGUMENT);
+    // There could be two certs in the set -> ICA and NOC
+    VerifyOrReturnError(cert.size() <= kMaxChipCertSize * 2, CHIP_ERROR_INVALID_ARGUMENT);
     if (mOpCertLen != 0 && mOpCertAllocatedLen < cert.size())
     {
         ReleaseOperationalCert();
@@ -279,8 +280,6 @@ CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentia
     ReturnErrorOnFailure(
         certificates.LoadCert(mRootCert, mRootCertLen,
                               BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor).Set(CertDecodeFlags::kGenerateTBSHash)));
-
-    // TODO - Add support of ICA certificates
 
     credentials.Release();
     ReturnErrorOnFailure(credentials.Init(&certificates, certificates.GetCertCount()));
@@ -352,7 +351,8 @@ AdminPairingInfo * AdminPairingTable::FindAdminForNode(FabricId fabricId, NodeId
         if (state.IsInitialized())
         {
             ChipLogProgress(Discovery,
-                            "Checking ind:%d [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64 " vendorId %d] vs"
+                            "Checking ind:%" PRIu32 " [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64
+                            " vendorId %" PRIu16 "] vs"
                             " [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64 " vendorId %d]",
                             index, ChipLogValueX64(state.GetFabricId()), ChipLogValueX64(state.GetNodeId()), state.GetVendorId(),
                             ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);

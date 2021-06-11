@@ -34,6 +34,10 @@
 
 #include <utility>
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#include <dispatch/dispatch.h>
+#endif
+
 namespace chip {
 
 namespace Transport {
@@ -688,6 +692,11 @@ private:
     void ReceiveData();
     void HandleIncomingConnection();
     INET_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_source_t mReadableSource  = nullptr;
+    dispatch_source_t mWriteableSource = nullptr;
+#endif
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 
