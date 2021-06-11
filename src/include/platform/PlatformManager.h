@@ -270,6 +270,7 @@ inline CHIP_ERROR PlatformManager::StartChipTimer(uint32_t durationMS)
 
 inline CHIP_ERROR PlatformManager::Shutdown()
 {
+    mInitialized = false;
     return static_cast<ImplClass *>(this)->_Shutdown();
 }
 
