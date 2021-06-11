@@ -29,7 +29,12 @@ jobs:
         with:
             fetch-depth: 0
             submodules: false
-
+      - uses: hmarr/debug-action@v2
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
       - name: Install dependencies
         run: |
           apt-get update
@@ -62,7 +67,9 @@ jobs:
           LAVA_SERVER_URL: ${{ secrets.LAVA_SERVER_URL }}
         run: |
           lavacli identities add --uri "$LAVA_SERVER_URL" --username artur --token "$LAVA_SERVER_TOKEN" default
+          echo $?
           LAVA_JOB_ID=`lavacli jobs submit $GITHUB_WORKSPACE/scripts/tests/mbed/lava_integration_tests.yml`
+          echo $?
           lavacli jobs logs $LAVA_JOB_ID | tee integration-test.log
           lavacli jobs wait $LAVA_JOB_ID
       - name: Upload unit test logs
