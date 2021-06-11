@@ -102,7 +102,6 @@ constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
 constexpr uint32_t kMaxCHIPOpCertLength = 1024;
 constexpr uint32_t kMaxCHIPCSRLength    = 1024;
-constexpr uint32_t kOpCSRNonceLength    = 32;
 
 DeviceController::DeviceController()
 {
@@ -1125,10 +1124,9 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
-    uint8_t CSRNonce[kOpCSRNonceLength];
-    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(CSRNonce, sizeof(CSRNonce)));
-
-    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, ByteSpan(CSRNonce, sizeof(CSRNonce))));
+    ByteSpan nonce;
+    ReturnErrorOnFailure(device->GenerateCSRNonce(nonce));
+    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, nonce));
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
 }
@@ -1171,7 +1169,13 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    // TODO: Validate CSR Nonce and signature
+    // TODO: Verify the OpCSR signature using pubkey from DAC
+    //       This will be done when device attestation is implemented.
+
+    // Verify that Nonce matches with what we sent
+    const ByteSpan nonce = device->GetCSRNonce();
+    VerifyOrReturnError(CSRNonce.size() == nonce.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(memcmp(CSRNonce.data(), nonce.data(), CSRNonce.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);

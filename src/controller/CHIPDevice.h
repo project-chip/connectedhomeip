@@ -59,6 +59,7 @@ class DeviceStatusDelegate;
 struct SerializedDevice;
 
 constexpr size_t kMaxBlePendingPackets = 1;
+constexpr uint32_t kOpCSRNonceLength   = 32;
 
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
@@ -344,6 +345,15 @@ public:
 
     CASESession & GetCASESession() { return mCASESession; }
 
+    CHIP_ERROR GenerateCSRNonce(ByteSpan & nonce)
+    {
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce)));
+        nonce = ByteSpan(mCSRNonce, sizeof(mCSRNonce));
+        return CHIP_NO_ERROR;
+    }
+
+    const ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
+
 private:
     enum class ConnectionState
     {
@@ -426,6 +436,8 @@ private:
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
+
+    uint8_t mCSRNonce[kOpCSRNonceLength];
 };
 
 /**
