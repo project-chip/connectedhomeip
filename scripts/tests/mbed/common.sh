@@ -187,5 +187,5 @@ flash_image_to_device() {
     fi
 
     # Flash the binary
-    mbedflash flash -i $image --tid $target_id
+    mbedflash -vvv flash -i $image --tid $target_id
 }

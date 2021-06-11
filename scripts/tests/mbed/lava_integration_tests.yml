@@ -56,7 +56,7 @@ actions:
           - . $PWD/CHIP/scripts/tests/mbed/integration_test_env_config.sh
           - /bin/bash CHIP/scripts/tests/mbed/integration_test_env.sh start CHIP
           - echo "Integration tests execution..."
-          - /bin/bash repo/scripts/tests/mbed/run_chip_integration_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
+          - /bin/bash repo/scripts/tests/mbed/run_integration_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
           - echo "Integration tests completed"
           - echo "Cleanup"
           - /bin/bash CHIP/scripts/tests/mbed/integration_test_env.sh stop

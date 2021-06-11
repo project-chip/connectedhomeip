@@ -25,7 +25,9 @@ targer_number=$(cat devices.json | jq length)
 for index in $(eval echo "{0..$(($target_number - 1))}"); do
     platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
     for test in "${test_sets[@]}"; do
+        echo "Flash $test application image to $platform_name device"
         flash_image_to_device "$test" "$platform_name" binaries
+        echo "Run integration test for $test application image on $platform_name device"
         pytest -rAV --platforms="$platform_name" --network=$AP_SSID:$AP_PASSWORD --echo_server=$AP_GATEWAY:$ECHO_SERVER_PORT $CHIP_DIR/src/test_driver/mbed-functional/"$test"
     done
 done
