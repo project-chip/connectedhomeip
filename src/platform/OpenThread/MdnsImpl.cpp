@@ -44,7 +44,8 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     VerifyOrExit(service, result = CHIP_ERROR_INVALID_ARGUMENT);
     if (strcmp(service->mHostName, "") != 0)
     {
-        ThreadStackMgr().SetupSrpHost(service->mHostName);
+        CHIP_ERROR hostNameErr = ThreadStackMgr().SetupSrpHost(service->mHostName);
+        VerifyOrExit(hostNameErr == CHIP_NO_ERROR, result = hostNameErr);
     }
 
     char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];

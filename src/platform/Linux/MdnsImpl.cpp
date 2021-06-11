@@ -765,7 +765,7 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
     if (strcmp(service->mHostName, "") != 0)
     {
-        MdnsAvahi::GetInstance().SetHostname(service->mHostName);
+        ReturnErrorOnFailure(MdnsAvahi::GetInstance().SetHostname(service->mHostName));
     }
     return MdnsAvahi::GetInstance().PublishService(*service);
 }
