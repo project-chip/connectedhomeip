@@ -297,7 +297,7 @@ CHIP_ERROR DeviceController::Shutdown()
     // stack lock.
     //
     // Actually stopping the event queue is a separable call that applications will have to sequence.
-    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling 
+    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
     // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
     //
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
