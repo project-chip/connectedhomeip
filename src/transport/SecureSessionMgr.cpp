@@ -214,6 +214,16 @@ exit:
     return err;
 }
 
+void SecureSessionMgr::ExpirePairing(SecureSessionHandle session)
+{
+    PeerConnectionState * state = GetPeerConnectionState(session);
+    if (state != nullptr)
+    {
+        mPeerConnections.MarkConnectionExpired(
+            state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+    }
+}
+
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                                         PairingSession * pairing, SecureSession::SessionRole direction, Transport::AdminId admin,
                                         Transport::Base * transport)

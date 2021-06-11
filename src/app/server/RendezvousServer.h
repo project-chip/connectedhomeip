@@ -22,6 +22,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/SessionIDAllocator.h>
 
 namespace chip {
 
@@ -31,11 +32,12 @@ public:
     CHIP_ERROR WaitForPairing(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,
                               TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin);
 
-    CHIP_ERROR Init(AppDelegate * delegate, PersistentStorageDelegate * storage)
+    CHIP_ERROR Init(AppDelegate * delegate, PersistentStorageDelegate * storage, SessionIDAllocator * idAllocator)
     {
         VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mDelegate = delegate;
-        mStorage  = storage;
+        mDelegate    = delegate;
+        mStorage     = storage;
+        mIDAllocator = idAllocator;
         return CHIP_NO_ERROR;
     }
 
@@ -45,8 +47,6 @@ public:
 
     void Cleanup();
 
-    uint16_t GetNextKeyId() const { return mNextKeyId; }
-    void SetNextKeyId(uint16_t id) { mNextKeyId = id; }
     void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
 
 private:
@@ -55,10 +55,11 @@ private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
     PASESession mPairingSession;
-    uint16_t mNextKeyId            = 0;
     SecureSessionMgr * mSessionMgr = nullptr;
 
     Transport::AdminPairingInfo * mAdmin = nullptr;
+
+    SessionIDAllocator * mIDAllocator = nullptr;
 
     const RendezvousAdvertisementDelegate * mAdvDelegate;
 

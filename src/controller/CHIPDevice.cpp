@@ -125,8 +125,7 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
     }
     else
     {
-        Transport::PeerConnectionState * connectionState = nullptr;
-        connectionState                                  = mSessionManager->GetPeerConnectionState(mSecureSession);
+        Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
 
         // Check if the connection state has the correct transport information
         if (connectionState == nullptr || connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined ||
@@ -172,8 +171,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     serializable.mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(localMessageCounter);
     serializable.mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(peerMessageCounter);
 
-    serializable.mCASESessionKeyId           = Encoding::LittleEndian::HostSwap16(mCASESessionKeyId);
-    serializable.mDeviceProvisioningComplete = (mDeviceProvisioningComplete) ? 1 : 0;
+    serializable.mDeviceOperationalCertProvisioned = (mDeviceOperationalCertProvisioned) ? 1 : 0;
 
     static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
                   "The underlying type of Transport::Type is not uint8_t.");
@@ -232,8 +230,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     // the old counter value (which is 1 less than the updated counter).
     mLocalMessageCounter++;
 
-    mCASESessionKeyId           = Encoding::LittleEndian::HostSwap16(serializable.mCASESessionKeyId);
-    mDeviceProvisioningComplete = (serializable.mDeviceProvisioningComplete != 0);
+    mDeviceOperationalCertProvisioned = (serializable.mDeviceOperationalCertProvisioned != 0);
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
@@ -309,6 +306,8 @@ void Device::OnNewConnection(SecureSessionHandle session)
 
 void Device::OnConnectionExpired(SecureSessionHandle session)
 {
+    VerifyOrReturn(session == mSecureSession,
+                   ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
     mState         = ConnectionState::NotConnected;
     mSecureSession = SecureSessionHandle{};
 }
@@ -426,9 +425,6 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
 
-    err = pairingSession.FromSerializable(mPairing);
-    SuccessOrExit(err);
-
     if (resetNeeded == ResetTransport::kYes)
     {
         err = mTransportMgr->ResetTransport(
@@ -445,16 +441,20 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         SuccessOrExit(err);
     }
 
-    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
-                                      SecureSession::SessionRole::kInitiator, mAdminId);
-    SuccessOrExit(err);
+    if (IsOperationalCertProvisioned())
+    {
+        err = WarmupCASESession();
+        SuccessOrExit(err);
+    }
+    else
+    {
+        err = pairingSession.FromSerializable(mPairing);
+        SuccessOrExit(err);
 
-    // TODO - Enable CASE Session setup before message is sent to a fully provisioned device
-    // if (IsProvisioningComplete())
-    // {
-    //     err = EstablishCASESession();
-    //     SuccessOrExit(err);
-    // }
+        err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
+                                          SecureSession::SessionRole::kInitiator, mAdminId);
+        SuccessOrExit(err);
+    }
 
 exit:
 
@@ -475,35 +475,65 @@ bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
     return true;
 }
 
-CHIP_ERROR Device::EstablishCASESession()
+void Device::OperationalCertProvisioned()
 {
+    VerifyOrReturn(!mDeviceOperationalCertProvisioned,
+                   ChipLogDetail(Controller, "Operational certificates already provisioned for this device"));
+
+    ChipLogDetail(Controller, "Enabling CASE session establishment for the device");
+    mDeviceOperationalCertProvisioned = true;
+
+    if (mState == ConnectionState::SecureConnected)
+    {
+        mSessionManager->ExpirePairing(mSecureSession);
+        mState = ConnectionState::NotConnected;
+    }
+
+    WarmupCASESession();
+}
+
+CHIP_ERROR Device::WarmupCASESession()
+{
+    VerifyOrReturnError(mDeviceOperationalCertProvisioned, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == ConnectionState::NotConnected, CHIP_NO_ERROR);
+
     Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(SecureSessionHandle(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
     ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
     mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);
 
-    ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, mCredentials, mDeviceId, 0, exchange, this));
+    uint16_t keyID = 0;
+    ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
+
+    mLocalMessageCounter = 0;
+    mPeerMessageCounter  = 0;
+
+    ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, mCredentials, mDeviceId, keyID, exchange, this));
+
+    mState = ConnectionState::Connecting;
 
     return CHIP_NO_ERROR;
 }
 
-void Device::OnSessionEstablishmentError(CHIP_ERROR error) {}
+void Device::OnSessionEstablishmentError(CHIP_ERROR error)
+{
+    mState = ConnectionState::NotConnected;
+    mIDAllocator->Free(mCASESession.GetLocalKeyId());
+}
 
 void Device::OnSessionEstablished()
 {
     mCASESession.PeerConnection().SetPeerNodeId(mDeviceId);
 
-    // TODO - Enable keys derived from CASE Session
-    // CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId,
-    // &mCASESession,
-    //                                              SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
-    // if (err != CHIP_NO_ERROR)
-    // {
-    //     ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
-    //     OnSessionEstablishmentError(err);
-    //     return;
-    // }
+    CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
+                                                 SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
+        OnSessionEstablishmentError(err);
+        return;
+    }
 }
 
 void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)

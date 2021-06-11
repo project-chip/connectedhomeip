@@ -55,7 +55,8 @@ constexpr uint8_t kIVSR2[] = { 0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0
 constexpr uint8_t kIVSR3[] = { 0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x52, 0x33 };
 constexpr size_t kIVLength = sizeof(kIVSR2);
 
-constexpr size_t kTAGSize = 16;
+constexpr size_t kTAGSize               = 16;
+constexpr uint32_t kMaxCHIPOpCertLength = 1024;
 
 using namespace Crypto;
 using namespace Credentials;
@@ -1021,30 +1022,34 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen,
 CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIterator, P256PublicKey & responderID,
                                                          const uint8_t ** responderOpCert, uint16_t & responderOpCertLen)
 {
-    ChipCertificateData chipCertData;
     ChipCertificateData * resultCert = nullptr;
+
+    ChipCertificateSet certSet;
+    // Certificate set can contain up to 3 certs (NOC, ICA cert, and Root CA cert)
+    ReturnErrorOnFailure(certSet.Init(3, kMaxCHIPOpCertLength * 3));
 
     responderOpCertLen = chip::Encoding::LittleEndian::Read16(*msgIterator);
     *responderOpCert   = *msgIterator;
     *msgIterator += responderOpCertLen;
 
     Encoding::LittleEndian::BufferWriter bbuf(responderID, responderID.Length());
-    ReturnErrorOnFailure(DecodeChipCert(*responderOpCert, responderOpCertLen, chipCertData));
+    ReturnErrorOnFailure(
+        certSet.LoadCerts(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
 
-    bbuf.Put(chipCertData.mPublicKey, chipCertData.mPublicKeyLen);
+    bbuf.Put(certSet.GetCertSet()[0].mPublicKey, certSet.GetCertSet()[0].mPublicKeyLen);
 
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
     // Validate responder identity located in msg_r2_encrypted
     ReturnErrorOnFailure(
         mOpCredSet->FindCertSet(mTrustedRootId)
-            ->LoadCert(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+            ->LoadCerts(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
 
     ReturnErrorOnFailure(SetEffectiveTime());
     // Locate the subject DN and key id that will be used as input the FindValidCert() method.
     {
-        const ChipDN & subjectDN              = chipCertData.mSubjectDN;
-        const CertificateKeyId & subjectKeyId = chipCertData.mSubjectKeyId;
+        const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;
+        const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
         ReturnErrorOnFailure(mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert));
     }

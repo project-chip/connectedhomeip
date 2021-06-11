@@ -334,7 +334,7 @@ protected:
     Credentials::OperationalCredentialSet mCredentials;
     Credentials::CertificateKeyId mRootKeyId;
 
-    uint16_t mNextKeyId = 0;
+    SessionIDAllocator mIDAllocator;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     //////////// ResolverDelegate Implementation ///////////////
@@ -342,6 +342,9 @@ protected:
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
     Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mCommissionableNodes; }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+
+    CHIP_ERROR GenerateOperationalCertificates(const ByteSpan & CSR, NodeId deviceId, uint8_t * certBuf, uint32_t certBufSize,
+                                               uint32_t & outCertLen);
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
@@ -444,6 +447,17 @@ public:
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
+
+    /**
+     * @brief
+     *   This function is called by the commissioner application when a device (being paired) is
+     *   discovered on the operational network.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OperationalDiscoveryComplete(NodeId remoteDeviceId);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;

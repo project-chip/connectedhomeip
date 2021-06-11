@@ -220,6 +220,8 @@ public:
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
                           SecureSession::SessionRole direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
 
+    void ExpirePairing(SecureSessionHandle session);
+
     /**
      * @brief
      *   Return the System Layer pointer used by current SecureSessionMgr.

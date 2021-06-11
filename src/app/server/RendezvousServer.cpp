@@ -100,15 +100,18 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
     ReturnErrorOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
 
+    uint16_t keyID = 0;
+    ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
+
     if (params.HasPASEVerifier())
     {
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetPASEVerifier(), mNextKeyId++, this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetPASEVerifier(), keyID, this));
     }
     else
     {
         ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetSetupPINCode(), kSpake2p_Iteration_Count,
                                                             reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
-                                                            strlen(kSpake2pKeyExchangeSalt), mNextKeyId++, this));
+                                                            strlen(kSpake2pKeyExchangeSalt), keyID, this));
     }
 
     ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
@@ -181,6 +184,9 @@ void RendezvousServer::OnSessionEstablished()
     VerifyOrReturn(connection.StoreIntoKVS(*mStorage) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to store the connection state"));
 
-    mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &mNextKeyId, sizeof(mNextKeyId));
+    uint16_t keyID = 0;
+    mIDAllocator->Peek(keyID);
+
+    mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &keyID, sizeof(keyID));
 }
 } // namespace chip

@@ -98,6 +98,7 @@ class ServerStorageDelegate : public PersistentStorageDelegate
 };
 
 ServerStorageDelegate gServerStorage;
+SessionIDAllocator gSessionIDAllocator;
 
 CHIP_ERROR PersistAdminPairingToKVS(AdminPairingInfo * admin, AdminId nextAvailableId)
 {
@@ -149,7 +150,7 @@ void EraseAllAdminPairingsUpTo(AdminId nextAvailableId)
     }
 }
 
-static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, RendezvousServer & server)
+static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
 {
     uint16_t nextSessionKeyId = 0;
     // It's not an error if the key doesn't exist. Just return right away.
@@ -173,13 +174,13 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
                                   session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
                                   connection.GetAdminId(), nullptr);
+            gSessionIDAllocator.Reserve(keyId);
             session->Clear();
         }
     }
 
     chip::Platform::Delete(session);
 
-    server.SetNextKeyId(nextSessionKeyId);
     return CHIP_NO_ERROR;
 }
 
@@ -189,6 +190,7 @@ void EraseAllSessionsUpTo(uint16_t nextSessionKeyId)
 
     for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
     {
+        gSessionIDAllocator.Free(keyId);
         StorablePeerConnection::DeleteFromKVS(gServerStorage, keyId);
     }
 }
@@ -427,7 +429,8 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
 
     if (resetAdmins == ResetAdmins::kYes)
     {
-        uint16_t nextKeyId = gRendezvousServer.GetNextKeyId();
+        uint16_t nextKeyId;
+        ReturnErrorOnFailure(gSessionIDAllocator.Peek(nextKeyId));
         EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
         EraseAllSessionsUpTo(nextKeyId);
         // Only resetting gNextAvailableAdminId at reboot otherwise previously paired device with adminID 0
@@ -462,7 +465,7 @@ void InitServer(AppDelegate * delegate)
     PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_server_kvs");
 #endif
 
-    err = gRendezvousServer.Init(delegate, &gServerStorage);
+    err = gRendezvousServer.Init(delegate, &gServerStorage, &gSessionIDAllocator);
     SuccessOrExit(err);
 
     gAdvDelegate.SetDelegate(delegate);
@@ -517,7 +520,7 @@ void InitServer(AppDelegate * delegate)
         VerifyOrExit(CHIP_NO_ERROR == RestoreAllAdminPairingsFromKVS(gAdminPairings, gNextAvailableAdminId),
                      ChipLogError(AppServer, "Could not restore admin table"));
 
-        VerifyOrExit(CHIP_NO_ERROR == RestoreAllSessionsFromKVS(gSessions, gRendezvousServer),
+        VerifyOrExit(CHIP_NO_ERROR == RestoreAllSessionsFromKVS(gSessions),
                      ChipLogError(AppServer, "Could not restore previous sessions"));
     }
     else
@@ -542,7 +545,8 @@ void InitServer(AppDelegate * delegate)
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
-    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable());
+    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable(),
+                                                    &gSessionIDAllocator);
     SuccessOrExit(err);
 
 exit:
