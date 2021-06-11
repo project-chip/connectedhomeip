@@ -55,6 +55,12 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
 exit:
     mCommissioner.ServiceEventSignal();
     mCommissioner.Shutdown();
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
+    }
+
     return err;
 }
 

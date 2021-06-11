@@ -92,7 +92,6 @@ using namespace chip::Encoding::LittleEndian;
 | TemperatureMeasurement                                              | 0x0402 |
 | TestCluster                                                         | 0x050F |
 | Thermostat                                                          | 0x0201 |
-| TrustedRootCertificates                                             | 0x003F |
 | WakeOnLan                                                           | 0x0503 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
@@ -277,9 +276,11 @@ using namespace chip::Encoding::LittleEndian;
 
 #define OPERATIONAL_CREDENTIALS_CLUSTER_ID 0x003E
 #define ZCL_ADD_OP_CERT_COMMAND_ID (0x06)
+#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0xA1)
 #define ZCL_OP_CSR_REQUEST_COMMAND_ID (0x04)
 #define ZCL_REMOVE_ALL_FABRICS_COMMAND_ID (0x0B)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
+#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0xA2)
 #define ZCL_SET_FABRIC_COMMAND_ID (0x00)
 #define ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID (0x09)
 
@@ -323,10 +324,6 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_GET_WEEKLY_SCHEDULE_COMMAND_ID (0x02)
 #define ZCL_SET_WEEKLY_SCHEDULE_COMMAND_ID (0x01)
 #define ZCL_SETPOINT_RAISE_LOWER_COMMAND_ID (0x00)
-
-#define TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID 0x003F
-#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x00)
-#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x01)
 
 #define WAKE_ON_LAN_CLUSTER_ID 0x0503
 
@@ -733,7 +730,7 @@ PacketBufferHandle encodeBasicClusterWriteUserLabelAttribute(uint8_t seqNum, End
     size_t userLabelStrLen = userLabel.size();
     if (!CanCastTo<uint8_t>(userLabelStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, userLabelStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, userLabelStrLen);
         return PacketBufferHandle();
     }
 
@@ -763,7 +760,7 @@ PacketBufferHandle encodeBasicClusterWriteLocationAttribute(uint8_t seqNum, Endp
     size_t locationStrLen = location.size();
     if (!CanCastTo<uint8_t>(locationStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, locationStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, locationStrLen);
         return PacketBufferHandle();
     }
 
@@ -1120,7 +1117,7 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterWriteUserLabelAttribute(uint8_
     size_t userLabelStrLen = userLabel.size();
     if (!CanCastTo<uint8_t>(userLabelStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, userLabelStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, userLabelStrLen);
         return PacketBufferHandle();
     }
 
@@ -2970,9 +2967,11 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddOpCert                                                         |   0x06 |
+| * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
+| * RemoveTrustedRootCertificate                                      |   0xA2 |
 | * SetFabric                                                         |   0x00 |
 | * UpdateFabricLabel                                                 |   0x09 |
 |------------------------------------------------------------------------------|
@@ -3982,7 +3981,7 @@ PacketBufferHandle encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seq
     size_t octetStringStrLen = octetString.size();
     if (!CanCastTo<uint8_t>(octetStringStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, octetStringStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, octetStringStrLen);
         return PacketBufferHandle();
     }
 
@@ -4187,34 +4186,6 @@ PacketBufferHandle encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNu
 PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadThermostatClusterRevision", THERMOSTAT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
-    COMMAND_FOOTER();
-}
-
-/*----------------------------------------------------------------------------*\
-| Cluster TrustedRootCertificates                                     | 0x003F |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * AddTrustedRootCertificate                                         |   0x00 |
-| * RemoveTrustedRootCertificate                                      |   0x01 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-PacketBufferHandle encodeTrustedRootCertificatesClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("DiscoverTrustedRootCertificatesAttributes", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ClusterRevision
- */
-PacketBufferHandle encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadTrustedRootCertificatesClusterRevision", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

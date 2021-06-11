@@ -144,7 +144,7 @@ private:
     /// interfaces on which the mDNS server is listening
     bool ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr);
 
-    QueryResponderSettings AddAllocatedResponder(Responder * responder)
+    QueryResponderSettings AddAllocatedResponder(RecordResponder * responder)
     {
         if (responder == nullptr)
         {
@@ -230,7 +230,7 @@ private:
     uint32_t mMessageId                             = 0;
 
     // dynamically allocated items
-    Responder * mAllocatedResponders[kMaxAllocatedResponders];
+    RecordResponder * mAllocatedResponders[kMaxAllocatedResponders];
     void * mAllocatedQNameParts[kMaxAllocatedQNameData];
 
     const char * mEmptyTextEntries[1] = {

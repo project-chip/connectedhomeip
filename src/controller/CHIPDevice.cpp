@@ -294,7 +294,7 @@ CHIP_ERROR Device::Persist()
                           error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed to persist device %d", error);
+            ChipLogError(Controller, "Failed to persist device %" PRId32, error);
         }
     }
 exit:
@@ -314,7 +314,7 @@ void Device::OnNewConnection(SecureSessionHandle session)
     MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
     if (localCounter.SetCounter(mLocalMessageCounter))
     {
-        ChipLogError(Controller, "Unable to restore local counter to %d", mLocalMessageCounter);
+        ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
     }
     Transport::PeerMessageCounter & peerCounter = connectionState->GetSessionMessageCounter().GetPeerMessageCounter();
     peerCounter.SetCounter(mPeerMessageCounter);
@@ -473,7 +473,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "LoadSecureSessionParameters returning error %d\n", err);
+        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" PRId32, err);
     }
     return err;
 }

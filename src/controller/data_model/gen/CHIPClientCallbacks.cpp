@@ -415,7 +415,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
             {
                 CHECK_MESSAGE_LENGTH(2);
                 uint16_t count = chip::Encoding::LittleEndian::Read16(message);
-                ChipLogProgress(Zcl, "  count: %lu", count);
+                ChipLogProgress(Zcl, "  count: %" PRIu16, count);
 
                 switch (clusterId)
                 {
@@ -916,7 +916,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
             {
                 CHECK_MESSAGE_LENGTH(8);
                 uint64_t value = chip::Encoding::LittleEndian::Read64(message);
-                ChipLogProgress(Zcl, "  value: 0x%16x", value);
+                ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
 
                 Callback::Callback<Int64uAttributeCallback> * cb =
                     Callback::Callback<Int64uAttributeCallback>::FromCancelable(onSuccessCallback);
@@ -1188,7 +1188,7 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint1
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -1208,7 +1208,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -2630,7 +2630,7 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
         {
             CHECK_MESSAGE_LENGTH(8);
             uint64_t value = chip::Encoding::LittleEndian::Read64(message);
-            ChipLogProgress(Zcl, "  value: 0x%16x", value);
+            ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
 
             Callback::Callback<Int64uAttributeCallback> * cb =
                 Callback::Callback<Int64uAttributeCallback>::FromCancelable(onReportCallback);

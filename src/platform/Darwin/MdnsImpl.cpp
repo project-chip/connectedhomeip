@@ -192,40 +192,9 @@ CHIP_ERROR MdnsContexts::GetRegisterType(const char * type, GenericContext ** co
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-void MdnsContexts::PrepareSelect(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout)
-{
-    std::vector<DNSServiceRef> serviceRefs(mContexts.size());
-    std::transform(mContexts.begin(), mContexts.end(), serviceRefs.begin(),
-                   [](GenericContext * context) { return context->serviceRef; });
+void MdnsContexts::PrepareSelect(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout) {}
 
-    std::vector<DNSServiceRef>::iterator iter;
-    for (iter = serviceRefs.begin(); iter != serviceRefs.end(); iter++)
-    {
-        int fd = DNSServiceRefSockFD(*iter);
-        FD_SET(fd, &readFdSet);
-        if (maxFd < fd)
-        {
-            maxFd = fd;
-        }
-    }
-}
-
-void MdnsContexts::HandleSelectResult(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet)
-{
-    std::vector<DNSServiceRef> serviceRefs(mContexts.size());
-    std::transform(mContexts.begin(), mContexts.end(), serviceRefs.begin(),
-                   [](GenericContext * context) { return context->serviceRef; });
-
-    std::vector<DNSServiceRef>::iterator iter;
-    for (iter = serviceRefs.begin(); iter != serviceRefs.end(); iter++)
-    {
-        int fd = DNSServiceRefSockFD(*iter);
-        if (FD_ISSET(fd, &readFdSet))
-        {
-            DNSServiceProcessResult(*iter);
-        }
-    }
-}
+void MdnsContexts::HandleSelectResult(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet) {}
 
 CHIP_ERROR PopulateTextRecord(TXTRecordRef * record, char * buffer, uint16_t bufferLen, TextEntry * textEntries,
                               size_t textEntrySize)
@@ -322,11 +291,14 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
     }
 
     sdCtx = chip::Platform::New<RegisterContext>(type, nullptr);
-    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, NULL, port, recordLen, recordBytesPtr,
-                             OnRegister, sdCtx);
+    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, NULL, ntohs(port), recordLen,
+                             recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
 
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
+
+    err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
@@ -572,15 +544,9 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interf
     return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
 }
 
-void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout)
-{
-    MdnsContexts::GetInstance().PrepareSelect(readFdSet, writeFdSet, errorFdSet, maxFd, timeout);
-}
+void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout) {}
 
-void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet)
-{
-    MdnsContexts::GetInstance().HandleSelectResult(readFdSet, writeFdSet, errorFdSet);
-}
+void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet) {}
 
 } // namespace Mdns
 } // namespace chip
