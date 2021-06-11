@@ -19,7 +19,10 @@ download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN binarie
 
 targer_number=$(cat devices.json | jq length)
 
-flash_image_to_device unittest CY8CPROTO_062_4343W binaries
-
-# Run tests
-pytest -rAV $CHIP_DIR/src/test_driver/mbed-functional/unit-tests/test_unittests.py
+for index in $(eval echo "{0..$(($target_number - 1))}"); do
+    platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
+    for test in "${test_sets[@]}"; do
+        flash_image_to_device unit-test "$platform_name" binaries
+        pytest -rAV $CHIP_DIR/src/test_driver/mbed-functional/unit-tests/test_unittests.py
+    done
+done
