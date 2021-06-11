@@ -39,7 +39,7 @@ CHIP_ERROR ReportingCommand::Run(NodeId localId, NodeId remoteId)
     // set the variable to true, which will cause it to block indefinitely.
     //
     UpdateWaitForResponse(true);
-    
+
     {
         chip::DeviceLayer::StackLock lock;
 
