@@ -29,7 +29,6 @@ jobs:
         with:
             fetch-depth: 0
             submodules: false
-      - uses: hmarr/debug-action@v2
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -57,7 +56,7 @@ jobs:
           GITHUB_REPOSITORY_URL="$GITHUB_SERVER_URL"/"$GITHUB_REPOSITORY".git
           yq e -i ".environment.GITHUB_REPOSITORY = \"$GITHUB_REPOSITORY\"" $JOB_FILE
           yq e -i ".environment.GITHUB_REPOSITORY_URL = \"$GITHUB_REPOSITORY_URL\"" $JOB_FILE
-          yq e -i ".environment.GITHUB_ACTION_ID = \"${{ github.event.run_id }}\"" $JOB_FILE
+          yq e -i ".environment.GITHUB_ACTION_ID = \"${{ github.event.id }}\"" $JOB_FILE
           yq e -i ".environment.GITHUB_SHA = \"$GITHUB_SHA\"" $JOB_FILE
           yq e -i ".secrets.GITHUB_TOKEN = \"$GITHUB_TOKEN\"" $JOB_FILE  
           cat $JOB_FILE
@@ -67,11 +66,9 @@ jobs:
           LAVA_SERVER_URL: ${{ secrets.LAVA_SERVER_URL }}
         run: |
           lavacli identities add --uri "$LAVA_SERVER_URL" --username artur --token "$LAVA_SERVER_TOKEN" default
-          echo $?
-          LAVA_JOB_ID=`lavacli jobs submit $GITHUB_WORKSPACE/scripts/tests/mbed/lava_integration_tests.yml`
-          echo $?
-          lavacli jobs logs $LAVA_JOB_ID | tee integration-test.log
-          lavacli jobs wait $LAVA_JOB_ID
+          lavacli jobs submit $GITHUB_WORKSPACE/scripts/tests/mbed/lava_integration_tests.yml
+          # lavacli jobs logs $LAVA_JOB_ID | tee integration-test.log
+          # lavacli jobs wait $LAVA_JOB_ID
       - name: Upload unit test logs
         uses: actions/upload-artifact@v2.2.3
         with:
