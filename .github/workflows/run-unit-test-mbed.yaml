@@ -1,0 +1,81 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Mbed OS - Run unit test
+
+# Controls when the action will run. 
+on:
+  workflow_run:
+    workflows: ["Mbed OS - Build unit test"]
+    types: 
+      - completed
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    # Container definition that will run the test
+    container:
+        image: ubuntu:latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+        with:
+            fetch-depth: 0
+            submodules: false
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y lavacli wget
+          wget https://github.com/mikefarah/yq/releases/download/v4.9.3/yq_linux_amd64 -O /usr/bin/yq 
+          chmod +x /usr/bin/yq
+      - name: Binary artifact suffix
+        id: outsuffix
+        uses: haya14busa/action-cond@v1.0.0
+        with:
+            cond: ${{ github.event.pull_request.number == '' }}
+            if_true: "${{ github.sha }}"
+            if_false: "pull-${{ github.event.pull_request.number }}"
+
+      - name: Prepare lava job
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          JOB_FILE=$GITHUB_WORKSPACE/scripts/tests/lava/mbed-unit-tests.yml
+          GITHUB_REPOSITORY_URL="$GITHUB_SERVER_URL"/"$GITHUB_REPOSITORY".git
+          yq e -i ".environment.GITHUB_REPOSITORY = \"$GITHUB_REPOSITORY\"" $JOB_FILE
+          yq e -i ".environment.GITHUB_REPOSITORY_URL = \"$GITHUB_REPOSITORY_URL\"" $JOB_FILE
+          yq e -i ".environment.GITHUB_ACTION_ID = ${{ github.event.workflow_run.id }}" $JOB_FILE
+          yq e -i ".environment.GITHUB_SHA = \"$GITHUB_SHA\"" $JOB_FILE
+          yq e -i ".secrets.GITHUB_TOKEN = \"$GITHUB_TOKEN\"" $JOB_FILE  
+          cat $JOB_FILE
+      - name: launch lava job
+        env:
+          LAVA_SERVER_TOKEN: ${{ secrets.LAVA_SERVER_TOKEN }}
+          LAVA_SERVER_URL: ${{ secrets.LAVA_SERVER_URL }}
+        run: |
+          lavacli identities add --uri "$LAVA_SERVER_URL" --username lava-admin --token "$LAVA_SERVER_TOKEN" default
+          LAVA_JOB_ID=`lavacli jobs submit $GITHUB_WORKSPACE/scripts/tests/mbed/lava_integration_tests.yml`
+          lavacli jobs logs $LAVA_JOB_ID | tee unit-test.log
+          lavacli jobs wait $LAVA_JOB_ID
+      - name: Upload unit test logs
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: unit-test.log
+          path: unit-test.log
+  faillure-report:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion != 'success' }}
+
+    steps:
+      - name: Build of unit test fail => Run of unit test fail
+        run: exit 1
