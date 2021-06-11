@@ -22,7 +22,7 @@ jobs:
         name: Shuffle names
         runs-on: ubuntu-latest
         container:
-            image: connectedhomeip/chip-build-esp32:latest
+            image: connectedhomeip/chip-build:latest
 
         steps:
             - name: Pick fixit rotation order
