@@ -286,8 +286,6 @@ CHIP_ERROR CC13X2_26X2Config::WriteKVS(const char * key, const void * value, siz
         // key does not exist, likely case
         intptr_t lock_key = sNvoctpFps.lockNV();
 
-        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-
         NVINTF_itemID_t key_item = CC13X2_26X2Config::kConfigKey_KVS_key.nvID;
         NVINTF_itemID_t val_item = CC13X2_26X2Config::kConfigKey_KVS_value.nvID;
 
@@ -307,7 +305,6 @@ CHIP_ERROR CC13X2_26X2Config::WriteKVS(const char * key, const void * value, siz
         // write they key item
         if (sNvoctpFps.writeItem(key_item, (uint16_t) strlen(key), (void *) key) == NVINTF_SUCCESS)
         {
-            // write the value item
             if (sNvoctpFps.writeItem(val_item, (uint16_t) value_size, (void *) value) != NVINTF_SUCCESS)
             {
                 // try to delete the key item
