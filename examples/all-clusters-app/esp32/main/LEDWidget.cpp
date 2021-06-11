@@ -27,10 +27,11 @@
 
 #include "ScreenManager.h"
 
-#include "driver/gpio.h"
+#include "driver/ledc.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
+#include "hal/ledc_types.h"
 
 void LEDWidget::Init(gpio_num_t gpioNum)
 {
@@ -46,7 +47,25 @@ void LEDWidget::Init(gpio_num_t gpioNum)
 
     if (gpioNum < GPIO_NUM_MAX)
     {
-        gpio_set_direction(gpioNum, GPIO_MODE_OUTPUT);
+        ledc_timer_config_t ledc_timer = {
+            .speed_mode      = LEDC_LOW_SPEED_MODE, // timer mode
+            .duty_resolution = LEDC_TIMER_8_BIT,    // resolution of PWM duty
+            .timer_num       = LEDC_TIMER_1,        // timer index
+            .freq_hz         = 5000,                // frequency of PWM signal
+            .clk_cfg         = LEDC_AUTO_CLK,       // Auto select the source clock
+        };
+        ledc_timer_config(&ledc_timer);
+        ledc_channel_config_t ledc_channel = {
+            .gpio_num   = gpioNum,
+            .speed_mode = LEDC_LOW_SPEED_MODE,
+            .channel    = LEDC_CHANNEL_0,
+            .intr_type  = LEDC_INTR_DISABLE,
+            .timer_sel  = LEDC_TIMER_1,
+            .duty       = 0,
+            .hpoint     = 0,
+        };
+        ledc_channel_config(&ledc_channel);
+        mDefaultOnBrightness = UINT8_MAX;
     }
 }
 
@@ -54,6 +73,25 @@ void LEDWidget::Set(bool state)
 {
     mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
     DoSet(state);
+}
+
+void LEDWidget::SetBrightness(uint8_t brightness)
+{
+    if (mGPIONum < GPIO_NUM_MAX)
+    {
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, brightness);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+    }
+    if (brightness > 0)
+    {
+        mDefaultOnBrightness = brightness;
+    }
+#if CONFIG_HAVE_DISPLAY
+    if (mVLED1 != -1)
+    {
+        ScreenManager::SetVLED(mVLED1, mState);
+    }
+#endif // CONFIG_HAVE_DISPLAY
 }
 
 void LEDWidget::Blink(uint32_t changeRateMS)
@@ -119,7 +157,8 @@ void LEDWidget::DoSet(bool state)
     mState           = state;
     if (mGPIONum < GPIO_NUM_MAX)
     {
-        gpio_set_level(mGPIONum, (state) ? 1 : 0);
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, state ? mDefaultOnBrightness : 0);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
     }
     if (stateChange)
     {

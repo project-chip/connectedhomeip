@@ -110,7 +110,7 @@ CHIP_ERROR AdvertiseOperational()
             .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
             .SetMac(FillMAC(mac))
             .SetPort(CHIP_PORT)
-            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
+            .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL, CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .EnableIpV4(true);
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
@@ -241,7 +241,7 @@ CHIP_ERROR Advertise(bool commissionableNode)
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
     ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
-                    advertiseParameters.GetVendorId(), advertiseParameters.GetProductId(),
+                    advertiseParameters.GetVendorId().ValueOr(0), advertiseParameters.GetProductId().ValueOr(0),
                     advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }

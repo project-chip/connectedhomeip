@@ -35,18 +35,30 @@ struct ResolvedNodeData
     Inet::IPAddress mAddress;
     uint16_t mPort;
 };
+
+constexpr size_t kMaxDeviceNameLen         = 32;
+constexpr size_t kMaxRotatingIdLen         = 50;
+constexpr size_t kMaxPairingInstructionLen = 128;
 struct CommissionableNodeData
 {
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
     // Largest host name is 64-bits in hex.
     static constexpr int kHostNameSize = 16;
-
     char hostName[kHostNameSize + 1];
     char instanceName[kHostNameSize + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
+    uint8_t additionalPairing;
+    uint8_t commissioningMode;
+    // TODO: possibly 32-bit - see spec issue #3226
+    uint16_t deviceType;
+    char deviceName[kMaxDeviceNameLen + 1];
+    uint8_t rotatingId[kMaxRotatingIdLen];
+    size_t rotatingIdLen;
+    char pairingInstruction[kMaxPairingInstructionLen + 1];
+    uint16_t pairingHint;
     int numIPs;
     Inet::IPAddress ipAddress[kMaxIPAddresses];
     void Reset()
@@ -56,7 +68,15 @@ struct CommissionableNodeData
         longDiscriminator = 0;
         vendorId          = 0;
         productId         = 0;
-        numIPs            = 0;
+        additionalPairing = 0;
+        commissioningMode = 0;
+        deviceType        = 0;
+        memset(deviceName, 0, sizeof(deviceName));
+        memset(rotatingId, 0, sizeof(rotatingId));
+        rotatingIdLen = 0;
+        memset(pairingInstruction, 0, sizeof(pairingInstruction));
+        pairingHint = 0;
+        numIPs      = 0;
         for (int i = 0; i < kMaxIPAddresses; ++i)
         {
             ipAddress[i] = chip::Inet::IPAddress::Any;

@@ -36,7 +36,6 @@
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
@@ -47,7 +46,6 @@ chip::Protocols::Echo::EchoServer gEchoServer;
 chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer gUDCServer;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.

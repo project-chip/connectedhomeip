@@ -148,26 +148,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     return CHIP_NO_ERROR;
 }
 
-JNIEnv * KeyValueStoreManagerImpl::GetEnvForCurrentThread()
-{
-    if (mJvm == nullptr)
-    {
-        ChipLogError(DeviceLayer, "Missing Java VM in persistent storage");
-        return nullptr;
-    }
-
-    JNIEnv * env = nullptr;
-
-    jint err = mJvm->AttachCurrentThread(&env, nullptr);
-    if (err != JNI_OK)
-    {
-        ChipLogError(DeviceLayer, "Failed to get JNIEnv for the current thread");
-        return nullptr;
-    }
-
-    return env;
-}
-
 void KeyValueStoreManagerImpl::InitializeMethodForward(JavaVM * vm, JNIEnv * env)
 {
     mJvm = vm;

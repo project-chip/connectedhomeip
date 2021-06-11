@@ -67,7 +67,7 @@ CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHa
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed in sending cluster command. Err %d", err);
+        ChipLogError(Controller, "Failed in sending cluster command. Err %" PRId32, err);
         mDevice->CancelResponseHandler(seqNum);
     }
 

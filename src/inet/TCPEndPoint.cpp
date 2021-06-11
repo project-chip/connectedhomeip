@@ -242,6 +242,36 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
             res = INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
+    if (dispatchQueue != nullptr)
+    {
+        unsigned long fd = static_cast<unsigned long>(mSocket);
+
+        mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
+        ReturnErrorCodeIf(mReadableSource == nullptr, INET_ERROR_NO_MEMORY);
+
+        mWriteableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, fd, 0, dispatchQueue);
+        ReturnErrorCodeIf(mWriteableSource == nullptr, INET_ERROR_NO_MEMORY);
+
+        dispatch_source_set_event_handler(mReadableSource, ^{
+            SocketEvents events;
+            events.SetRead();
+            this->mPendingIO = events;
+            this->HandlePendingIO();
+        });
+
+        dispatch_source_set_event_handler(mWriteableSource, ^{
+            SocketEvents events;
+            events.SetWrite();
+            this->mPendingIO = events;
+            this->HandlePendingIO();
+        });
+
+        dispatch_resume(mReadableSource);
+        dispatch_resume(mWriteableSource);
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (res == INET_NO_ERROR)
@@ -694,6 +724,67 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return res;
+}
+
+INET_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
+{
+    if (!IsConnected())
+        return INET_ERROR_INCORRECT_STATE;
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // TODO: Does netif_get_by_index(mTCP->netif_idx) do the right thing?  I
+    // can't quite tell whether LwIP supports a specific interface id for TCP at
+    // all.  For now just claim no particular interface id.
+    *retInterface = INET_NULL_INTERFACEID;
+    return INET_NO_ERROR;
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    union
+    {
+        sockaddr any;
+        sockaddr_in6 in6;
+#if INET_CONFIG_ENABLE_IPV4
+        sockaddr_in in;
+#endif // INET_CONFIG_ENABLE_IPV4
+    } sa;
+
+    memset(&sa, 0, sizeof(sa));
+    socklen_t saLen = sizeof(sa);
+
+    if (getpeername(mSocket, &sa.any, &saLen) != 0)
+    {
+        return chip::System::MapErrorPOSIX(errno);
+    }
+
+    if (sa.any.sa_family == AF_INET6)
+    {
+        if (IPAddress::FromIPv6(sa.in6.sin6_addr).IsIPv6LinkLocal())
+        {
+            *retInterface = sa.in6.sin6_scope_id;
+        }
+        else
+        {
+            // TODO: Is there still a meaningful interface id in this case?
+            *retInterface = INET_NULL_INTERFACEID;
+        }
+        return INET_NO_ERROR;
+    }
+
+#if INET_CONFIG_ENABLE_IPV4
+    if (sa.any.sa_family == AF_INET)
+    {
+        // No interface id available for IPv4 sockets.
+        *retInterface = INET_NULL_INTERFACEID;
+    }
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    return INET_ERROR_INCORRECT_STATE;
+
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+    *retInterface = INET_NULL_INTERFACEID;
+    return INET_NO_ERROR;
 }
 
 INET_ERROR TCPEndPoint::Send(System::PacketBufferHandle && data, bool push)
@@ -1584,6 +1675,19 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
             lSystemLayer.WakeSelect();
         }
     }
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    if (mReadableSource)
+    {
+        dispatch_source_cancel(mReadableSource);
+        dispatch_release(mReadableSource);
+    }
+    if (mWriteableSource)
+    {
+        dispatch_source_cancel(mWriteableSource);
+        dispatch_release(mWriteableSource);
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     // Clear any results from select() that indicate pending I/O for the socket.
     mPendingIO.Clear();

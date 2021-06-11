@@ -46,13 +46,18 @@ bool IsVendorTag(uint8_t tag)
 // Check the Setup Payload for validity
 //
 // `vendor_id` and `product_id` are allowed all of uint16_t
-// `requiresCustomFlow` is not checked since it is a bool
 bool SetupPayload::isValidQRCodePayload()
 {
     if (version >= 1 << kVersionFieldLengthInBits)
     {
         return false;
     }
+
+    if (static_cast<uint8_t>(commissioningFlow) > static_cast<uint8_t>((1 << kCommissioningFlowFieldLengthInBits) - 1))
+    {
+        return false;
+    }
+
     chip::RendezvousInformationFlags allvalid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
                                               RendezvousInformationFlag::kSoftAP);
     if (!rendezvousInformation.HasOnly(allvalid))
@@ -287,7 +292,7 @@ bool SetupPayload::operator==(SetupPayload & input)
     std::vector<OptionalQRCodeInfoExtension> inputOptionalExtensionData;
 
     VerifyOrExit(this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
-                     this->requiresCustomFlow == input.requiresCustomFlow &&
+                     this->commissioningFlow == input.commissioningFlow &&
                      this->rendezvousInformation == input.rendezvousInformation && this->discriminator == input.discriminator &&
                      this->setUpPINCode == input.setUpPINCode,
                  isIdentical = false);

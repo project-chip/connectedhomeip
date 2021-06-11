@@ -235,6 +235,14 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(serializable.mLocalMessageCounter);
     mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(serializable.mPeerMessageCounter);
 
+    // TODO - Remove the hack that's incrementing message counter while deserializing device
+    // This hack was added as a quick workaround for TE3 testing. The commissioning code
+    // is closing the exchange after the device has already been serialized and persisted to the storage.
+    // While closing the exchange, the outstanding ack gets sent to the device, thus incrementing
+    // the local message counter. As the device information was stored prior to sending the ack, it now has
+    // the old counter value (which is 1 less than the updated counter).
+    mLocalMessageCounter++;
+
     mCASESessionKeyId           = Encoding::LittleEndian::HostSwap16(serializable.mCASESessionKeyId);
     mDeviceProvisioningComplete = (serializable.mDeviceProvisioningComplete != 0);
 
@@ -286,7 +294,7 @@ CHIP_ERROR Device::Persist()
                           error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed to persist device %d", error);
+            ChipLogError(Controller, "Failed to persist device %" PRId32, error);
         }
     }
 exit:
@@ -306,7 +314,7 @@ void Device::OnNewConnection(SecureSessionHandle session)
     MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
     if (localCounter.SetCounter(mLocalMessageCounter))
     {
-        ChipLogError(Controller, "Unable to restore local counter to %d", mLocalMessageCounter);
+        ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
     }
     Transport::PeerMessageCounter & peerCounter = connectionState->GetSessionMessageCounter().GetPeerMessageCounter();
     peerCounter.SetCounter(mPeerMessageCounter);
@@ -391,6 +399,36 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
     return CHIP_NO_ERROR;
 }
 
+void Device::Reset()
+{
+    if (IsActive() && mStorageDelegate != nullptr && mSessionManager != nullptr)
+    {
+        // If a session can be found, persist the device so that we track the newest message counter values
+        Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
+        if (connectionState != nullptr)
+        {
+            Persist();
+        }
+    }
+
+    SetActive(false);
+    mState          = ConnectionState::NotConnected;
+    mSessionManager = nullptr;
+    mStatusDelegate = nullptr;
+    mInetLayer      = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    mBleLayer = nullptr;
+#endif
+    if (mExchangeMgr)
+    {
+        // Ensure that any exchange contexts we have open get closed now,
+        // because we don't want them to call back in to us after this
+        // point.
+        mExchangeMgr->CloseAllContextsForDelegate(this);
+    }
+    mExchangeMgr = nullptr;
+}
+
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -424,17 +462,18 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
                                       SecureSession::SessionRole::kInitiator, mAdminId);
     SuccessOrExit(err);
 
-    if (IsProvisioningComplete())
-    {
-        err = EstablishCASESession();
-        SuccessOrExit(err);
-    }
+    // TODO - Enable CASE Session setup before message is sent to a fully provisioned device
+    // if (IsProvisioningComplete())
+    // {
+    //     err = EstablishCASESession();
+    //     SuccessOrExit(err);
+    // }
 
 exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "LoadSecureSessionParameters returning error %d\n", err);
+        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" PRId32, err);
     }
     return err;
 }
@@ -526,16 +565,6 @@ Device::~Device()
         // because we don't want them to call back in to us after this
         // point.
         mExchangeMgr->CloseAllContextsForDelegate(this);
-    }
-
-    if (mStorageDelegate != nullptr && mSessionManager != nullptr)
-    {
-        // If a session can be found, persist the device so that we track the newest message counter values
-        Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
-        if (connectionState != nullptr)
-        {
-            Persist();
-        }
     }
 }
 

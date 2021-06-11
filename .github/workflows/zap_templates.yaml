@@ -21,6 +21,7 @@ on:
 jobs:
     zap_templates:
         name: ZAP templates generation
+        timeout-minutes: 60
 
         runs-on: ubuntu-18.04
         if: github.actor != 'restyled-io[bot]'
@@ -38,6 +39,7 @@ jobs:
             - run: sudo apt-get update
             - run: sudo apt-get install --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev
             - name: Setup ZAP
+              timeout-minutes: 5
               run: |
                 cd third_party/zap/repo/
                 npm ci
@@ -45,6 +47,7 @@ jobs:
                 npm rebuild canvas --update-binary
                 npm run build-spa
             - name: Generate all
+              timeout-minutes: 5
               run: scripts/tools/zap_regen_all.py
             - name: Check for uncommited changes
               run: |

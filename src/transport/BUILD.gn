@@ -33,7 +33,6 @@ static_library("transport") {
     "SecureSession.h",
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
-    "SessionEstablishmentDelegate.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",

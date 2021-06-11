@@ -34,6 +34,10 @@
 
 #include <utility>
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#include <dispatch/dispatch.h>
+#endif
+
 namespace chip {
 
 namespace Transport {
@@ -191,6 +195,17 @@ public:
      *  Do not use \c NULL pointer values for either argument.
      */
     INET_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort);
+
+    /**
+     * @brief   Extract the interface id of the TCP endpoint.
+     *
+     * @param[out]  retInterface  The interface id.
+     *
+     * @retval  INET_NO_ERROR           success: address and port extracted.
+     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  INET_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
+     */
+    INET_ERROR GetInterfaceId(InterfaceId * retInterface);
 
     /**
      * @brief   Send message text on TCP connection.
@@ -677,6 +692,11 @@ private:
     void ReceiveData();
     void HandleIncomingConnection();
     INET_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_source_t mReadableSource  = nullptr;
+    dispatch_source_t mWriteableSource = nullptr;
+#endif
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 

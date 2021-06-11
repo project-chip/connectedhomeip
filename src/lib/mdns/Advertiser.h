@@ -96,7 +96,7 @@ public:
     // Amount of mDNS text entries required for this advertising type
     static constexpr uint8_t kNumAdvertisingTxtEntries = 2;
     static constexpr uint8_t kTxtMaxKeySize            = 3 + 1; // "CRI"/"CRA" as possible keys
-    static constexpr uint8_t kTxtMaxValueSize          = 7 + 1; // Max for text representation of the 32-bit CRMP intervals
+    static constexpr uint8_t kTxtMaxValueSize          = 7 + 1; // Max for text representation of the 32-bit MRP intervals
 
     OperationalAdvertisingParameters & SetPeerId(const PeerId & peerId)
     {
@@ -105,22 +105,22 @@ public:
     }
     PeerId GetPeerId() const { return mPeerId; }
 
-    OperationalAdvertisingParameters & SetCRMPRetryIntervals(uint32_t intervalIdle, uint32_t intervalActive)
+    OperationalAdvertisingParameters & SetMRPRetryIntervals(uint32_t intervalIdle, uint32_t intervalActive)
     {
-        mCrmpRetryIntervalIdle   = intervalIdle;
-        mCrmpRetryIntervalActive = intervalActive;
+        mMrpRetryIntervalIdle   = intervalIdle;
+        mMrpRetryIntervalActive = intervalActive;
         return *this;
     }
-    void GetCRMPRetryIntervals(uint32_t & intervalIdle, uint32_t & intervalActive) const
+    void GetMRPRetryIntervals(uint32_t & intervalIdle, uint32_t & intervalActive) const
     {
-        intervalIdle   = mCrmpRetryIntervalIdle;
-        intervalActive = mCrmpRetryIntervalActive;
+        intervalIdle   = mMrpRetryIntervalIdle;
+        intervalActive = mMrpRetryIntervalActive;
     }
 
 private:
     PeerId mPeerId;
-    uint32_t mCrmpRetryIntervalIdle   = 0;
-    uint32_t mCrmpRetryIntervalActive = 0;
+    uint32_t mMrpRetryIntervalIdle   = 0;
+    uint32_t mMrpRetryIntervalActive = 0;
 };
 
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>

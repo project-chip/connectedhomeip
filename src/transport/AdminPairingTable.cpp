@@ -30,6 +30,16 @@ using namespace Crypto;
 
 namespace Transport {
 
+CHIP_ERROR AdminPairingInfo::SetFabricLabel(const uint8_t * fabricLabel)
+{
+    const char * charFabricLabel = Uint8::to_const_char(fabricLabel);
+    size_t stringLength          = strnlen(charFabricLabel, kFabricLabelMaxLengthInBytes);
+    memcpy(mFabricLabel, charFabricLabel, stringLength);
+    mFabricLabel[stringLength] = '\0'; // Set null terminator
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -44,6 +54,10 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     info->mAdmin    = Encoding::LittleEndian::HostSwap16(mAdmin);
     info->mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
     info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
+
+    size_t stringLength = strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes);
+    memcpy(info->mFabricLabel, mFabricLabel, stringLength);
+    info->mFabricLabel[stringLength] = '\0'; // Set null terminator
 
     if (mOperationalKey != nullptr)
     {
@@ -103,6 +117,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 
     AdminId id;
     uint16_t rootCertLen, opCertLen;
+    size_t stringLength;
 
     SuccessOrExit(err = kvs->SyncGetKeyValue(key, info, infoSize));
 
@@ -112,6 +127,10 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
     rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
     opCertLen   = Encoding::LittleEndian::HostSwap16(info->mOpCertLen);
+
+    stringLength = strnlen(info->mFabricLabel, kFabricLabelMaxLengthInBytes);
+    memcpy(mFabricLabel, info->mFabricLabel, stringLength);
+    mFabricLabel[stringLength] = '\0'; // Set null terminator
 
     VerifyOrExit(mAdmin == id, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -333,7 +352,8 @@ AdminPairingInfo * AdminPairingTable::FindAdminForNode(FabricId fabricId, NodeId
         if (state.IsInitialized())
         {
             ChipLogProgress(Discovery,
-                            "Checking ind:%d [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64 " vendorId %d] vs"
+                            "Checking ind:%" PRIu32 " [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64
+                            " vendorId %" PRIu16 "] vs"
                             " [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64 " vendorId %d]",
                             index, ChipLogValueX64(state.GetFabricId()), ChipLogValueX64(state.GetNodeId()), state.GetVendorId(),
                             ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);

@@ -59,8 +59,9 @@ namespace chip {
 namespace app {
 
 constexpr size_t kMaxSecureSduLengthBytes = 1024;
-constexpr uint32_t kImMessageTimeoutMsec  = 6000;
-constexpr FieldId kRootFieldId            = 0;
+/* TODO: https://github.com/project-chip/connectedhomeip/issues/7489 */
+constexpr uint32_t kImMessageTimeoutMsec = 12000;
+constexpr FieldId kRootFieldId           = 0;
 
 /**
  * @class InteractionModelEngine

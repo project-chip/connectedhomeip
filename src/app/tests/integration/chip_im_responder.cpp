@@ -35,7 +35,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -131,9 +130,7 @@ exit:
 
 namespace {
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
 LivenessEventGenerator gLivenessGenerator;
 
 uint8_t gDebugEventBuffer[2048];

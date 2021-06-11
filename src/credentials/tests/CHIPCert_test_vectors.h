@@ -71,6 +71,7 @@ enum class TestCertLoadFlags : uint8_t
 extern CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, const uint8_t *& certData,
                               uint32_t & certDataLen);
 extern const char * GetTestCertName(uint8_t certType);
+extern CHIP_ERROR GetTestCertPubkey(uint8_t certType, const uint8_t *& certPubkey, uint32_t & certPubkeyLen);
 extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags,
                                BitFlags<CertDecodeFlags> decodeFlags);
 

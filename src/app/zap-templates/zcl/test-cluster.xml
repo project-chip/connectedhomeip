@@ -73,6 +73,12 @@ limitations under the License.
       </description>
     </command>
 
+    <command source="client" code="0x03" name="TestUnknownCommand" optional="true">
+      <description>
+          Simple command that should not be added to the server.
+      </description>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
       <description>
           Simple response for TestWithResponse with a simple return value

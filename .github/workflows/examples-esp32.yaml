@@ -22,6 +22,7 @@ jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
         name: ESP32
+        timeout-minutes: 60
 
         env:
             BUILD_TYPE: esp32
@@ -34,6 +35,7 @@ jobs:
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
+                - "/tmp/base_binaries:/tmp/base_binaries"
 
         steps:
             - name: Checkout
@@ -46,7 +48,19 @@ jobs:
 #               uses: github/codeql-action/init@v1
 #               with:
 #                   languages: "cpp, python"
+            - name: Bootstrap
+              timeout-minutes: 15
+              run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                   .environment/gn_out/.ninja_log
+                   .environment/pigweed-venv/*.log
             - name: Build example All Clusters App
+              timeout-minutes: 15
               run: scripts/examples/esp_example.sh all-clusters-app
             - name: Copy aside build products
               run: |
@@ -54,6 +68,7 @@ jobs:
                   cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
             - name: Build example Pigweed App
+              timeout-minutes: 5
               run: scripts/examples/esp_example.sh pigweed-app
             - name: Copy aside build products
               run: |
@@ -84,3 +99,24 @@ jobs:
 #             - name: Perform CodeQL Analysis
 #               if: ${{ github.event_name == 'push' }}
 #               uses: github/codeql-action/analyze@v1
+            - name: Download Base Binaries
+              uses: dawidd6/action-download-artifact@v2
+              if: ${{ github.event_name == 'pull_request' }}
+              with:
+                  workflow: examples-esp32.yaml
+                  name: esp32-example-build-${{ github.event.pull_request.base.sha }}
+                  commit: ${{ github.event.pull_request.base.sha }}
+                  path: /tmp/base_binaries
+                  repo: project-chip/connectedhomeip
+            - name: Report symbol diff
+              if: ${{ github.event_name == 'pull_request' }}
+              run: |
+                pip3 install cxxfilt pyelftools humanfriendly pandas && \
+                ./scripts/tools/memory/diffsyms.py --report-demangle \
+                    /tmp/base_binaries/chip-all-clusters-app.elf \
+                    /tmp/output_binaries/esp32-build/chip-all-clusters-app.elf \
+                | scripts/helpers/post_comment.py \
+                    --github-api-token "${{ secrets.GITHUB_TOKEN }}" \
+                    --github-repository project-chip/connectedhomeip \
+                    --pr "${{ github.event.pull_request.number }}" \
+                    --title "ESP32 Symbols Diff"

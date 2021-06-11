@@ -86,7 +86,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
     sessionMgr->SetDelegate(this);
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
-    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(&mReliableMessageMgr, mSessionMgr));
+    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionMgr));
 
     mState = State::kState_Initialized;
 
@@ -203,8 +203,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
-    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d on exchange %d", payloadHeader.GetMessageType(),
-                    payloadHeader.GetProtocolID(), payloadHeader.GetExchangeID());
+    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %" PRIu32 " on exchange %d",
+                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
+                    payloadHeader.GetExchangeID());
 
     // msgBuf->DebugDump("ExchangeManager::OnMessageReceived");
 
@@ -213,7 +214,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->MatchExchange(session, packetHeader, payloadHeader))
         {
-            // Found a matching exchange. Set flag for correct subsequent CRMP
+            // Found a matching exchange. Set flag for correct subsequent MRP
             // retransmission timeout selection.
             if (!ec->HasRcvdMsgFromPeer())
             {
@@ -287,7 +288,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%x", ec->GetExchangeId(), ec->GetDelegate());
+        ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
 
         ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
 

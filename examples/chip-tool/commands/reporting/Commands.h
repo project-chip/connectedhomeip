@@ -30,6 +30,8 @@ public:
 
     ~Listen()
     {
+        delete onReportBinaryInputBasicPresentValueCallback;
+        delete onReportBinaryInputBasicStatusFlagsCallback;
         delete onReportColorControlCurrentHueCallback;
         delete onReportColorControlCurrentSaturationCallback;
         delete onReportColorControlCurrentXCallback;
@@ -39,6 +41,7 @@ public:
         delete onReportLevelControlCurrentLevelCallback;
         delete onReportOnOffOnOffCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
+        delete onReportRelativeHumidityMeasurementMeasuredValueCallback;
         delete onReportSwitchCurrentPositionCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
         delete onReportThermostatLocalTemperatureCallback;
@@ -51,6 +54,10 @@ public:
     void AddReportCallbacks(uint8_t endpointId) override
     {
         chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x000F, 0x0055,
+                                       onReportBinaryInputBasicPresentValueCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x000F, 0x006F,
+                                       onReportBinaryInputBasicStatusFlagsCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0000,
                                        onReportColorControlCurrentHueCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0001,
@@ -68,6 +75,8 @@ public:
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0200, 0x0013,
                                        onReportPumpConfigurationAndControlCapacityCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0405, 0x0000,
+                                       onReportRelativeHumidityMeasurementMeasuredValueCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x003B, 0x0001,
                                        onReportSwitchCurrentPositionCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0402, 0x0000,
@@ -117,6 +126,10 @@ public:
     }
 
 private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onReportBinaryInputBasicPresentValueCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportBinaryInputBasicStatusFlagsCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentHueCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentSaturationCallback =
@@ -135,6 +148,8 @@ private:
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlCapacityCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMeasuredValueCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportSwitchCurrentPositionCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportTemperatureMeasurementMeasuredValueCallback =

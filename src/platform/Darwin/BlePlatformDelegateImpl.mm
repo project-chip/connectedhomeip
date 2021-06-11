@@ -21,6 +21,10 @@
  *          Provides an implementation of BlePlatformDelegate for Darwin platforms.
  */
 
+#if !__has_feature(objc_arc)
+#error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #include <ble/BleConfig.h>
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
@@ -43,7 +47,7 @@ namespace DeviceLayer {
             bool found = false;
             CBUUID * serviceId = nil;
             CBUUID * characteristicId = nil;
-            CBPeripheral * peripheral = (CBPeripheral *) connObj;
+            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
 
             if (NULL != svcId) {
                 serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
@@ -74,7 +78,7 @@ namespace DeviceLayer {
             bool found = false;
             CBUUID * serviceId = nil;
             CBUUID * characteristicId = nil;
-            CBPeripheral * peripheral = (CBPeripheral *) connObj;
+            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
 
             if (NULL != svcId) {
                 serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
@@ -100,7 +104,8 @@ namespace DeviceLayer {
 
         bool BlePlatformDelegateImpl::CloseConnection(BLE_CONNECTION_OBJECT connObj)
         {
-            CBPeripheral * peripheral = (CBPeripheral *) connObj;
+            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+
             // CoreBluetooth API requires a CBCentralManager to close a connection which is a property of the peripheral.
             CBCentralManager * manager = (CBCentralManager *) [peripheral valueForKey:@"manager"];
             if (manager != nil)
@@ -124,7 +129,7 @@ namespace DeviceLayer {
             CBUUID * serviceId = nil;
             CBUUID * characteristicId = nil;
             NSData * data = nil;
-            CBPeripheral * peripheral = (CBPeripheral *) connObj;
+            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
 
             if (NULL != svcId) {
                 serviceId = [UUIDHelper GetShortestServiceUUID:svcId];

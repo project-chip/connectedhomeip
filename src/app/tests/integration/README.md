@@ -14,7 +14,7 @@ must create an ExchangeContext object before initiating a CHIP conversation.
 
 After constructing a CHIP ExchangeContext, CHIP messages are sent and received
 using the ChipMessageLayer class which sends the CHIP message over a chosen
-transport (TCP, UDP, or CRMP).
+transport (TCP, UDP, or MRP).
 
 ## Example Applications Walk Through
 

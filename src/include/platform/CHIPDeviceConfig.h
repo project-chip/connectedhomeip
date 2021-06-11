@@ -307,7 +307,7 @@
  * consists of the final two bytes of the device's primary WiFi MAC address in hex.
  */
 #ifndef CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
-#define CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX "CHIP-"
+#define CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX "MATTER-"
 #endif
 
 /**
@@ -424,7 +424,7 @@
  * may need to be shorter.
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX
-#define CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX "CHIP-"
+#define CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX "MATTER-"
 #endif
 
 /**
@@ -732,6 +732,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_CONNECTIVITY_TIMEOUT
 #define CHIP_DEVICE_CONFIG_THREAD_CONNECTIVITY_TIMEOUT 30000
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+ *
+ * Enable Thread CLI interface at initialisation.
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#define CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI 0
 #endif
 
 // -------------------- Trait Manager Configuration --------------------

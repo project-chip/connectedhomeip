@@ -81,7 +81,7 @@ if (chip_device_platform != "none") {
 
     stack_log_tracking = chip_stack_lock_tracking
     if (stack_log_tracking == "auto") {
-      if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      if (chip_device_platform == "linux") {
         # TODO: should be fatal for development. Change once bugs are fixed
         stack_log_tracking = "log"
       } else {
@@ -180,6 +180,11 @@ if (chip_device_platform != "none") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_K32W=1",
         "CHIP_DEVICE_LAYER_TARGET=K32W",
+      ]
+    } else if (chip_device_platform == "telink") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_TELINK=1",
+        "CHIP_DEVICE_LAYER_TARGET=telink",
       ]
     }
   }
@@ -336,6 +341,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         ]
       }
     } else if (chip_device_platform == "darwin") {
+      cflags += [ "-fobjc-arc" ]
+
       sources += [
         "Darwin/BLEManagerImpl.cpp",
         "Darwin/BLEManagerImpl.h",
@@ -638,6 +645,39 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "OpenThread/OpenThreadUtils.cpp",
           "qpg6100/ThreadStackManagerImpl.cpp",
           "qpg6100/ThreadStackManagerImpl.h",
+        ]
+      }
+    } else if (chip_device_platform == "telink") {
+      sources += [
+        "Zephyr/BLEManagerImpl.cpp",
+        "Zephyr/ConfigurationManagerImpl.cpp",
+        "Zephyr/KeyValueStoreManagerImpl.cpp",
+        "Zephyr/Logging.cpp",
+        "Zephyr/PlatformManagerImpl.cpp",
+        "Zephyr/SystemTimeSupport.cpp",
+        "Zephyr/ZephyrConfig.cpp",
+        "Zephyr/ZephyrConfig.h",
+        "telink/BLEManagerImpl.h",
+        "telink/BlePlatformConfig.h",
+        "telink/CHIPDevicePlatformConfig.h",
+        "telink/CHIPDevicePlatformEvent.h",
+        "telink/CHIPPlatformConfig.h",
+        "telink/ConfigurationManagerImpl.h",
+        "telink/ConnectivityManagerImpl.cpp",
+        "telink/ConnectivityManagerImpl.h",
+        "telink/DeviceNetworkProvisioningDelegateImpl.cpp",
+        "telink/DeviceNetworkProvisioningDelegateImpl.h",
+        "telink/InetPlatformConfig.h",
+        "telink/KeyValueStoreManagerImpl.h",
+        "telink/PlatformManagerImpl.h",
+        "telink/SystemPlatformConfig.h",
+      ]
+
+      if (chip_enable_openthread) {
+        sources += [
+          "OpenThread/OpenThreadUtils.cpp",
+          "Zephyr/ThreadStackManagerImpl.cpp",
+          "telink/ThreadStackManagerImpl.h",
         ]
       }
     }

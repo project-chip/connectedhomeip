@@ -336,8 +336,8 @@ public:
         VerifyOrExit(packetHeader.GetSourceNodeId().Value() != kUndefinedNodeId,
                      ChipLogError(AppServer, "Unknown source for received message"));
 
-        ChipLogProgress(AppServer, "Packet received from Node:%x: %u bytes", packetHeader.GetSourceNodeId().Value(),
-                        buffer->DataLength());
+        ChipLogProgress(AppServer, "Packet received from Node 0x" ChipLogFormatX64 ": %u bytes",
+                        ChipLogValueX64(packetHeader.GetSourceNodeId().Value()), buffer->DataLength());
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
@@ -368,7 +368,7 @@ public:
                 }
             }
 
-            ChipLogProgress(AppServer, "Pairing Window timeout %d seconds", timeout);
+            ChipLogProgress(AppServer, "Pairing Window timeout %" PRIu32 " seconds", timeout);
 
             if (err != CHIP_NO_ERROR)
             {
@@ -452,34 +452,6 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
 
     return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32
-static void ChipEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
-{
-    const auto advertise = [] {
-        CHIP_ERROR err = app::Mdns::AdvertiseOperational();
-        if (err != CHIP_NO_ERROR)
-            ChipLogError(AppServer, "Failed to start operational advertising: %s", chip::ErrorStr(err));
-    };
-
-    switch (event->Type)
-    {
-    case DeviceLayer::DeviceEventType::kInternetConnectivityChange:
-        VerifyOrReturn(event->InternetConnectivityChange.IPv4 == DeviceLayer::kConnectivity_Established);
-        // TODO : Need to check if we're properly commissioned.
-        advertise();
-        break;
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    case DeviceLayer::DeviceEventType::kThreadStateChange:
-        VerifyOrReturn(event->ThreadStateChange.AddressChanged);
-        advertise();
-        break;
-#endif
-    default:
-        break;
-    }
-}
-#endif
 
 // The function will initialize datamodel handler and then start the server
 // The server assumes the platform's networking has been setup already
@@ -567,7 +539,6 @@ void InitServer(AppDelegate * delegate)
 // ESP32 examples have a custom logic for enabling DNS-SD
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32
     app::Mdns::StartServer();
-    PlatformMgr().AddEventHandler(ChipEventHandler, {});
 #endif
 
     gCallbacks.SetSessionMgr(&gSessions);
@@ -581,14 +552,9 @@ void InitServer(AppDelegate * delegate)
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-    // err = gEchoServer.Init(&gExchangeMgr);
-    // SuccessOrExit(err);
-
     err = chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().Init(&gExchangeMgr);
     SuccessOrExit(err);
-#endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     err = InitCommissioner();
     SuccessOrExit(err);
 #endif

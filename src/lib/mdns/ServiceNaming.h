@@ -27,6 +27,18 @@
 
 namespace chip {
 namespace Mdns {
+constexpr size_t kMaxSubtypeDescSize        = 16; // max 16 char service name
+constexpr char kSubtypeServiceNamePart[]    = "_sub";
+constexpr char kCommissionableServiceName[] = "_chipc";
+constexpr char kOperationalServiceName[]    = "_chip";
+constexpr char kCommissionerServiceName[]   = "_chipd";
+constexpr char kOperationalProtocol[]       = "_tcp";
+constexpr char kCommissionProtocol[]        = "_udp";
+constexpr char kLocalDomain[]               = "local";
+
+// each includes space for a null terminator, which becomes a . when the names are appended.
+constexpr size_t kMaxCommisisonableServiceNameSize =
+    kMaxSubtypeDescSize + sizeof(kSubtypeServiceNamePart) + sizeof(kCommissionableServiceName);
 
 /// builds the MDNS advertising name for a given fabric + nodeid pair
 CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId);

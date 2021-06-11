@@ -720,6 +720,93 @@ CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// BinaryInputBasic Cluster Commands
+// BinaryInputBasic Cluster Attributes
+CHIP_ERROR BinaryInputBasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBinaryInputBasicClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR BinaryInputBasicCluster::ReadAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBinaryInputBasicClusterReadOutOfServiceAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BinaryInputBasicCluster::WriteAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint8_t value)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBinaryInputBasicClusterWriteOutOfServiceAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BinaryInputBasicCluster::ReadAttributePresentValue(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBinaryInputBasicClusterReadPresentValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BinaryInputBasicCluster::WriteAttributePresentValue(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint8_t value)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBinaryInputBasicClusterWritePresentValueAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BinaryInputBasicCluster::ConfigureAttributePresentValue(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                   uint16_t maxInterval)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeBinaryInputBasicClusterConfigurePresentValueAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BinaryInputBasicCluster::ReportAttributePresentValue(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0055, onReportCallback);
+}
+
+CHIP_ERROR BinaryInputBasicCluster::ReadAttributeStatusFlags(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBinaryInputBasicClusterReadStatusFlagsAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BinaryInputBasicCluster::ConfigureAttributeStatusFlags(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                  uint16_t maxInterval)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeBinaryInputBasicClusterConfigureStatusFlagsAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BinaryInputBasicCluster::ReportAttributeStatusFlags(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x006F, onReportCallback);
+}
+
+CHIP_ERROR BinaryInputBasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBinaryInputBasicClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 // Binding Cluster Commands
 CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                 chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
@@ -6326,6 +6413,67 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Call
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// RelativeHumidityMeasurement Cluster Commands
+// RelativeHumidityMeasurement Cluster Attributes
+CHIP_ERROR RelativeHumidityMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeRelativeHumidityMeasurementClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeRelativeHumidityMeasurementClusterReadMeasuredValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR RelativeHumidityMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback,
+                                                                               uint16_t minInterval, uint16_t maxInterval,
+                                                                               uint16_t change)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeRelativeHumidityMeasurementClusterConfigureMeasuredValueAttribute(
+        seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR RelativeHumidityMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
+}
+
+CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeRelativeHumidityMeasurementClusterReadMinMeasuredValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeRelativeHumidityMeasurementClusterReadMaxMeasuredValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                            Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeRelativeHumidityMeasurementClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 // Scenes Cluster Commands
 CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                    uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::ByteSpan sceneName,
@@ -7186,6 +7334,45 @@ CHIP_ERROR TestClusterCluster::TestSpecific(Callback::Cancelable * onSuccessCall
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kTestSpecificCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(&cmdParams));
+
+    // Command takes no arguments.
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR TestClusterCluster::TestUnknownCommand(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kTestUnknownCommandCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));

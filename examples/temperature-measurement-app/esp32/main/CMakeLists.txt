@@ -16,7 +16,6 @@
 #
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
-# The list of src and include dirs must be in sync with that in temperature-measurement-app/esp32/main/component.mk
 idf_component_register(PRIV_INCLUDE_DIRS 
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlio/repo/include"

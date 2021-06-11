@@ -116,7 +116,7 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHan
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
-    PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
+    PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort, pktInfo->Interface);
 
     udp->HandleMessageReceived(peerAddress, std::move(buffer));
 

@@ -53,13 +53,18 @@ namespace chip {
  *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
-class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
+class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() {}
     EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 
     void operator=(EncryptedPacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
+
+    using System::PacketBufferHandle::IsNull;
+    // Pass-through to HasChainedBuffer on our underlying buffer without
+    // exposing operator->
+    bool HasChainedBuffer() const { return (*this)->HasChainedBuffer(); }
 
     uint32_t GetMsgId() const;
 
@@ -96,6 +101,16 @@ public:
     {
         return EncryptedPacketBufferHandle(std::move(aBuffer));
     }
+
+    /**
+     * Get a handle to the data that allows mutating the bytes.  This should
+     * only be used if absolutely necessary, because EncryptedPacketBufferHandle
+     * represents a buffer that we want to resend as-is.
+     *
+     * We only allow doing this with an rvalue reference, so the fact that we
+     * are moving out of the EncryptedPacketBufferHandle is clear.
+     */
+    PacketBufferHandle CastToWritable() && { return PacketBufferHandle(std::move(*this)); }
 
 private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}

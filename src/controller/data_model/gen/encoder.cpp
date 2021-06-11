@@ -60,6 +60,7 @@ using namespace chip::Encoding::LittleEndian;
 | AudioOutput                                                         | 0x050B |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
+| BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
@@ -82,6 +83,7 @@ using namespace chip::Encoding::LittleEndian;
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
+| RelativeHumidityMeasurement                                         | 0x0405 |
 | Scenes                                                              | 0x0005 |
 | SoftwareDiagnostics                                                 | 0x0034 |
 | Switch                                                              | 0x003B |
@@ -140,6 +142,8 @@ using namespace chip::Encoding::LittleEndian;
 
 #define BASIC_CLUSTER_ID 0x0028
 #define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
+
+#define BINARY_INPUT_BASIC_CLUSTER_ID 0x000F
 
 #define BINDING_CLUSTER_ID 0xF000
 #define ZCL_BIND_COMMAND_ID (0x00)
@@ -281,6 +285,8 @@ using namespace chip::Encoding::LittleEndian;
 
 #define PUMP_CONFIG_CONTROL_CLUSTER_ID 0x0200
 
+#define RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID 0x0405
+
 #define SCENES_CLUSTER_ID 0x0005
 #define ZCL_ADD_SCENE_COMMAND_ID (0x00)
 #define ZCL_GET_SCENE_MEMBERSHIP_COMMAND_ID (0x06)
@@ -309,6 +315,7 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_TEST_COMMAND_ID (0x00)
 #define ZCL_TEST_NOT_HANDLED_COMMAND_ID (0x01)
 #define ZCL_TEST_SPECIFIC_COMMAND_ID (0x02)
+#define ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID (0x03)
 
 #define THERMOSTAT_CLUSTER_ID 0x0201
 #define ZCL_CLEAR_WEEKLY_SCHEDULE_COMMAND_ID (0x03)
@@ -726,7 +733,7 @@ PacketBufferHandle encodeBasicClusterWriteUserLabelAttribute(uint8_t seqNum, End
     size_t userLabelStrLen = userLabel.size();
     if (!CanCastTo<uint8_t>(userLabelStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, userLabelStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, userLabelStrLen);
         return PacketBufferHandle();
     }
 
@@ -756,7 +763,7 @@ PacketBufferHandle encodeBasicClusterWriteLocationAttribute(uint8_t seqNum, Endp
     size_t locationStrLen = location.size();
     if (!CanCastTo<uint8_t>(locationStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, locationStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, locationStrLen);
         return PacketBufferHandle();
     }
 
@@ -894,6 +901,121 @@ PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(uint8_t seqNum
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster BinaryInputBasic                                            | 0x000F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * OutOfService                                                      | 0x0051 |
+| * PresentValue                                                      | 0x0055 |
+| * StatusFlags                                                       | 0x006F |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeBinaryInputBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverBinaryInputBasicAttributes", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OutOfService
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadOutOfServiceAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicOutOfService", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0051);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterWriteOutOfServiceAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                           uint8_t outOfService)
+{
+    COMMAND_HEADER("WriteBinaryInputBasicOutOfService", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0051)
+        .Put8(16)
+        .Put8(static_cast<uint8_t>(outOfService));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PresentValue
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadPresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0055);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterWritePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                           uint8_t presentValue)
+{
+    COMMAND_HEADER("WriteBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0055)
+        .Put8(16)
+        .Put8(static_cast<uint8_t>(presentValue));
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterConfigurePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                               uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0055)
+        .Put8(16)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StatusFlags
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadStatusFlagsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicStatusFlags", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x006F);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterConfigureStatusFlagsAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                              uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportBinaryInputBasicStatusFlags", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x006F)
+        .Put8(24)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicClusterRevision", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster Binding                                                     | 0xF000 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -998,7 +1120,7 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterWriteUserLabelAttribute(uint8_
     size_t userLabelStrLen = userLabel.size();
     if (!CanCastTo<uint8_t>(userLabelStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, userLabelStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, userLabelStrLen);
         return PacketBufferHandle();
     }
 
@@ -3026,6 +3148,87 @@ PacketBufferHandle encodePumpConfigurationAndControlClusterReadClusterRevisionAt
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster RelativeHumidityMeasurement                                 | 0x0405 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverRelativeHumidityMeasurementAttributes", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MeasuredValue
+ */
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadRelativeHumidityMeasurementMeasuredValue", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum,
+                                                                                           EndpointId destinationEndpoint,
+                                                                                           uint16_t minInterval,
+                                                                                           uint16_t maxInterval, uint16_t change)
+{
+    COMMAND_HEADER("ReportRelativeHumidityMeasurementMeasuredValue", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0000)
+        .Put8(33)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    buf.Put16(static_cast<uint16_t>(change));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MinMeasuredValue
+ */
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum,
+                                                                                         EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadRelativeHumidityMeasurementMinMeasuredValue", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MaxMeasuredValue
+ */
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum,
+                                                                                         EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadRelativeHumidityMeasurementMaxMeasuredValue", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeRelativeHumidityMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                        EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadRelativeHumidityMeasurementClusterRevision", RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -3400,6 +3603,7 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * Test                                                              |   0x00 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
+| * TestUnknownCommand                                                |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Boolean                                                           | 0x0000 |
@@ -3778,7 +3982,7 @@ PacketBufferHandle encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seq
     size_t octetStringStrLen = octetString.size();
     if (!CanCastTo<uint8_t>(octetStringStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, octetStringStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, octetStringStrLen);
         return PacketBufferHandle();
     }
 

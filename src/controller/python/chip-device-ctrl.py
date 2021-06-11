@@ -39,6 +39,7 @@ import textwrap
 import time
 import string
 import re
+import traceback
 from cmd import Cmd
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 from chip.setup_payload import SetupPayload
@@ -151,8 +152,13 @@ class DeviceMgrCmd(Cmd):
 
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
-            self.bleMgr = BleManager(self.devCtrl)
-            self.bleMgr.ble_adapter_select("hci{}".format(bluetoothAdapter))
+            try:
+                self.bleMgr = BleManager(self.devCtrl)
+                self.bleMgr.ble_adapter_select("hci{}".format(bluetoothAdapter))
+            except Exception as ex:
+                traceback.print_exc()
+                print("Failed to initialize BLE, if you don't have BLE, run chip-device-ctrl with --no-ble")
+                raise ex
 
         self.historyFileName = os.path.expanduser(
             "~/.chip-device-ctrl-history")
@@ -473,6 +479,8 @@ class DeviceMgrCmd(Cmd):
             elif args[0] == "-ble" and len(args) >= 3:
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
             elif args[0] == '-qr' and len(args) >=2:
+                if len(args) == 3:
+                    nodeid = int(args[2])
                 print("Parsing QR code {}".format(args[1]))
                 setupPayload = SetupPayload().ParseQrCode(args[1])
                 self.ConnectFromSetupPayload(setupPayload, nodeid)
@@ -743,8 +751,14 @@ def main():
             dest="bluetoothAdapter",
             default="hci0",
             type="str",
-            help="Controller bluetooth adapter ID",
+            help="Controller bluetooth adapter ID, use --no-ble to disable bluetooth functions.",
             metavar="<bluetooth-adapter>",
+        )
+        optParser.add_option(
+            "--no-ble",
+            action="store_true",
+            dest="disableBluetooth",
+            help="Disable bluetooth, calling BLE related feature with this flag results in undefined behavior.",
         )
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
@@ -754,7 +768,9 @@ def main():
 
     adapterId = None
     if sys.platform.startswith("linux"):
-        if not options.bluetoothAdapter.startswith("hci"):
+        if options.disableBluetooth:
+            adapterId = None
+        elif not options.bluetoothAdapter.startswith("hci"):
             print(
                 "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
             sys.exit(-1)
@@ -766,8 +782,14 @@ def main():
                     "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
                 sys.exit(-1)
 
-    devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr,
-                             controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
+    try:
+        devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr,
+                                 controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
+    except Exception as ex:
+        print(ex)
+        print("Failed to bringup CHIPDeviceController CLI")
+        sys.exit(1)
+
     print("Chip Device Controller Shell")
     if options.rendezvousAddr:
         print("Rendezvous address set to %s" % options.rendezvousAddr)

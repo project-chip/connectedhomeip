@@ -36,7 +36,6 @@
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
@@ -62,7 +61,6 @@ chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDC
 
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-chip::SecureSessionMgr gSessionManager;
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Echo was attempted to be sent.

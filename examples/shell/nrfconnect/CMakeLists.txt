@@ -27,6 +27,8 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrfconnect-shell-example)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
+
 target_compile_options(app PRIVATE -Werror)
 
 target_include_directories(app PRIVATE

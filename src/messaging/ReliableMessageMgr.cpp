@@ -151,8 +151,8 @@ void ReliableMessageMgr::ExecuteActions()
         {
             err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
-            ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
-                         msgId, sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+            ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %d", msgId,
+                         sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // Remove from Table
             ClearRetransTable(entry);
@@ -296,7 +296,8 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
-    VerifyOrDie(entry != nullptr && entry->rc != nullptr);
+    VerifyOrReturn(entry != nullptr && entry->rc != nullptr,
+                   ChipLogError(ExchangeManager, "StartRetransmission was called for invalid entry"));
 
     entry->nextRetransTimeTick = static_cast<uint16_t>(entry->rc->GetInitialRetransmitTimeoutTick() +
                                                        GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));

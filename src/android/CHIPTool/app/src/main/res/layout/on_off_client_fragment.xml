@@ -4,24 +4,50 @@
     android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/deviceIdEd"
-        android:layout_width="match_parent"
+        android:id="@+id/fabricIdEd"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/enter_fabric_id_hint_text"/>
+
+    <EditText
+        android:id="@+id/deviceIdEd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/fabricIdEd"
         android:inputType="text"
         android:textSize="20sp"
         android:hint="@string/enter_device_id_hint_text"/>
+
+    <TextView
+        android:id="@+id/updateAddressBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="center"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/deviceIdEd"
+        android:background="@android:color/darker_gray"
+        android:text="@string/update_device_address_btn_text"
+        android:textSize="16sp"/>
 
     <TextView
         android:id="@+id/onBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:layout_margin="32dp"
+        android:layout_margin="16dp"
         android:layout_gravity="center"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/deviceIdEd"
+        android:layout_below="@id/updateAddressBtn"
         android:background="@android:color/darker_gray"
         android:text="@string/send_command_on_btn_text"
         android:textSize="16sp"/>
@@ -32,10 +58,10 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:layout_marginStart="48dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="48dp"
         android:layout_gravity="center"
-        android:layout_below="@id/deviceIdEd"
+        android:layout_below="@id/updateAddressBtn"
         android:layout_toEndOf="@id/onBtn"
         android:layout_toStartOf="@+id/offBtn"
         android:background="@android:color/darker_gray"
@@ -47,11 +73,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:layout_margin="32dp"
+        android:layout_margin="16dp"
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/deviceIdEd"
+        android:layout_below="@id/updateAddressBtn"
         android:background="@android:color/darker_gray"
         android:text="@string/send_command_off_btn_text"
         android:textSize="16sp"/>

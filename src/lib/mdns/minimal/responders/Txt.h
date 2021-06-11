@@ -18,15 +18,15 @@
 #pragma once
 
 #include <mdns/minimal/records/Txt.h>
-#include <mdns/minimal/responders/Responder.h>
+#include <mdns/minimal/responders/RecordResponder.h>
 
 namespace mdns {
 namespace Minimal {
 
-class TxtResponder : public Responder
+class TxtResponder : public RecordResponder
 {
 public:
-    TxtResponder(const TxtResourceRecord & record) : Responder(QType::TXT, record.GetName()), mRecord(record) {}
+    TxtResponder(const TxtResourceRecord & record) : RecordResponder(QType::TXT, record.GetName()), mRecord(record) {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
     {

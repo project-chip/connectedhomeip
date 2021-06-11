@@ -24,7 +24,6 @@
 #include "app/common/gen/cluster-id.h"
 #include "app/common/gen/command-id.h"
 #include "app/util/util.h"
-#include "call-command-handler.h"
 #include "callback.h"
 
 #include <app/InteractionModelEngine.h>
@@ -226,8 +225,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(&returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32
-                        " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
+                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
@@ -914,8 +913,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(&returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32
-                        " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
+                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
@@ -1303,8 +1302,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(&returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32
-                        " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
+                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
@@ -1477,8 +1476,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(&returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32
-                        " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
+                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
