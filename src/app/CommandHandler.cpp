@@ -130,7 +130,7 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams &aCommandPathParams,
+CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathParams,
                                          const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                          const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
 {
