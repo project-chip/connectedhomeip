@@ -94,13 +94,13 @@ enum
 enum
 {
     // Base year of the CHIP epoch time.
-    kChipEpochBaseYear = 2020,
+    kChipEpochBaseYear = 2000,
 
     // Last fully-representable year that can be stored in an unsigned 32-bit CHIP Epoch seconds value.
-    kChipEpochMaxYear = 2155,
+    kChipEpochMaxYear = 2135,
 
     // Offset, in days, from the Unix Epoch to the CHIP Epoch.
-    kChipEpochDaysSinceUnixEpoch = 18262,
+    kChipEpochDaysSinceUnixEpoch = 10957,
 
     // Offset, in non-leap seconds, from the Unix Epoch to the CHIP Epoch.
     kChipEpochSecondsSinceUnixEpoch = kChipEpochDaysSinceUnixEpoch * kSecondsPerDay,
