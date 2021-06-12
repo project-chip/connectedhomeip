@@ -28,9 +28,9 @@
 #include <openthread/heap.h>
 
 #include <ChipShellCollection.h>
+#include <core/CHIPError.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
-#include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 #include <support/CHIPMem.h>

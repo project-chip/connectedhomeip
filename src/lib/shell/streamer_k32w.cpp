@@ -23,9 +23,9 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 
+#include "app_config.h"
 #include <stdio.h>
 #include <string.h>
-#include "app_config.h"
 
 #include "SerialManager.h"
 extern uint8_t mOtSerMgrIfLog;
@@ -34,7 +34,7 @@ namespace chip {
 namespace Shell {
 namespace {
 extern "C" void K32WWriteBlocking(const uint8_t * aBuf, uint32_t len);
-extern "C" serialStatus_t Serial_Read( uint8_t InterfaceId, uint8_t *pData, uint16_t dataSize, uint16_t *bytesRead );
+extern "C" serialStatus_t Serial_Read(uint8_t InterfaceId, uint8_t * pData, uint16_t dataSize, uint16_t * bytesRead);
 
 int streamer_k32w_init(streamer_t * streamer)
 {
@@ -48,7 +48,7 @@ ssize_t streamer_k32w_read(streamer_t * streamer, char * buffer, size_t length)
     uint16_t bytesRead = 0;
 
     (void) streamer;
-    Serial_Read(mOtSerMgrIfLog, (uint8_t*)buffer, length, &bytesRead);
+    Serial_Read(mOtSerMgrIfLog, (uint8_t *) buffer, length, &bytesRead);
 
     return bytesRead;
 }
@@ -56,7 +56,7 @@ ssize_t streamer_k32w_read(streamer_t * streamer, char * buffer, size_t length)
 ssize_t streamer_k32w_write(streamer_t * streamer, const char * buffer, size_t length)
 {
     (void) streamer;
-    K32WWriteBlocking((uint8_t*)buffer, length);
+    K32WWriteBlocking((uint8_t *) buffer, length);
 
     return length;
 }
