@@ -73,10 +73,10 @@
 #define EMBER_AF_PLUGIN_AUDIO_OUTPUT_SERVER
 #define EMBER_AF_PLUGIN_AUDIO_OUTPUT
 
-// Use this macro to check if the server side of the Content Launch cluster is included
+// Use this macro to check if the server side of the Content Launcher cluster is included
 #define ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_CONTENT_LAUNCH_SERVER
-#define EMBER_AF_PLUGIN_CONTENT_LAUNCH
+#define EMBER_AF_PLUGIN_CONTENT_LAUNCHER_SERVER
+#define EMBER_AF_PLUGIN_CONTENT_LAUNCHER
 
 // Use this macro to check if the server side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_SERVER

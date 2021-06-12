@@ -165,7 +165,7 @@
             /* Endpoint: 1, Cluster: Keypad Input (client) */                                                                      \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Content Launch (client) */                                                                    \
+            /* Endpoint: 1, Cluster: Content Launcher (client) */                                                                  \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Audio Output (client) */                                                                      \
@@ -286,7 +286,7 @@
             }, /* Endpoint: 1, Cluster: Keypad Input (client) */                                                                   \
             {                                                                                                                      \
                 0x050A, ZAP_ATTRIBUTE_INDEX(32), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Content Launch (client) */                                                                 \
+            }, /* Endpoint: 1, Cluster: Content Launcher (client) */                                                               \
             {                                                                                                                      \
                 0x050B, ZAP_ATTRIBUTE_INDEX(33), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Audio Output (client) */                                                                   \
@@ -369,7 +369,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (212)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (213)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -624,7 +624,7 @@
             { 0x0509, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SendKey */                                                     \
             { 0x0509, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* SendKeyResponse */                                             \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Content Launch (client) */                                                                    \
+            /* Endpoint: 1, Cluster: Content Launcher (client) */                                                                  \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* LaunchContent */                                               \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* LaunchContentResponse */                                       \
             { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* LaunchURL */                                                   \
@@ -637,6 +637,9 @@
             /* Endpoint: 1, Cluster: Application Launcher (client) */                                                              \
             { 0x050C, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* LaunchApp */                                                   \
             { 0x050C, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* LaunchAppResponse */                                           \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Application Basic (client) */                                                                 \
+            { 0x050D, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ChangeStatus */                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Account Login (client) */                                                                     \
             { 0x050E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* GetSetupPIN */                                                 \

@@ -64,7 +64,7 @@ using namespace chip::Encoding::LittleEndian;
 | Binding                                                             | 0xF000 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
-| ContentLaunch                                                       | 0x050A |
+| ContentLauncher                                                     | 0x050A |
 | Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
@@ -127,6 +127,7 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_LOGIN_COMMAND_ID (0x01)
 
 #define APPLICATION_BASIC_CLUSTER_ID 0x050D
+#define ZCL_CHANGE_STATUS_COMMAND_ID (0x00)
 
 #define APPLICATION_LAUNCHER_CLUSTER_ID 0x050C
 #define ZCL_LAUNCH_APP_COMMAND_ID (0x00)
@@ -380,6 +381,7 @@ PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t
 | Cluster ApplicationBasic                                            | 0x050D |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ChangeStatus                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * VendorName                                                        | 0x0000 |
@@ -2086,7 +2088,7 @@ PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster ContentLaunch                                               | 0x050A |
+| Cluster ContentLauncher                                             | 0x050A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * LaunchContent                                                     |   0x00 |
@@ -2098,9 +2100,9 @@ PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeContentLauncherClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverContentLaunchAttributes", CONTENT_LAUNCH_CLUSTER_ID);
+    COMMAND_HEADER("DiscoverContentLauncherAttributes", CONTENT_LAUNCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
@@ -2108,9 +2110,9 @@ PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, 
 /*
  * Attribute AcceptsHeaderList
  */
-PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeContentLauncherClusterReadAcceptsHeaderListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadContentLaunchAcceptsHeaderList", CONTENT_LAUNCH_CLUSTER_ID);
+    COMMAND_HEADER("ReadContentLauncherAcceptsHeaderList", CONTENT_LAUNCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
     COMMAND_FOOTER();
 }
@@ -2118,9 +2120,9 @@ PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint
 /*
  * Attribute SupportedStreamingTypes
  */
-PacketBufferHandle encodeContentLaunchClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeContentLauncherClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadContentLaunchSupportedStreamingTypes", CONTENT_LAUNCH_CLUSTER_ID);
+    COMMAND_HEADER("ReadContentLauncherSupportedStreamingTypes", CONTENT_LAUNCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
     COMMAND_FOOTER();
 }
@@ -2128,9 +2130,9 @@ PacketBufferHandle encodeContentLaunchClusterReadSupportedStreamingTypesAttribut
 /*
  * Attribute ClusterRevision
  */
-PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeContentLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadContentLaunchClusterRevision", CONTENT_LAUNCH_CLUSTER_ID);
+    COMMAND_HEADER("ReadContentLauncherClusterRevision", CONTENT_LAUNCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

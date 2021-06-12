@@ -61,6 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPApplicationBasic : CHIPCluster
 
+- (void)changeStatus:(uint8_t)status responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeApplicationNameWithResponseHandler:(ResponseHandler)responseHandler;
@@ -397,10 +399,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Content Launch
+ * Cluster Content Launcher
  *
  */
-@interface CHIPContentLaunch : CHIPCluster
+@interface CHIPContentLauncher : CHIPCluster
 
 - (void)launchContent:(uint8_t)autoPlay data:(NSString *)data responseHandler:(ResponseHandler)responseHandler;
 - (void)launchURL:(NSString *)contentURL displayString:(NSString *)displayString responseHandler:(ResponseHandler)responseHandler;

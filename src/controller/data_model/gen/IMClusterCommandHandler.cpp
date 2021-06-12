@@ -259,7 +259,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 } // namespace ApplicationLauncher
 
-namespace ContentLaunch {
+namespace ContentLauncher {
 
 void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
@@ -336,8 +336,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfContentLaunchClusterLaunchContentResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
-                                                                                      contentLaunchStatus);
+                wasHandled = emberAfContentLauncherClusterLaunchContentResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
+                                                                                        contentLaunchStatus);
             }
             break;
         }
@@ -401,8 +401,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfContentLaunchClusterLaunchURLResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
-                                                                                  contentLaunchStatus);
+                wasHandled = emberAfContentLauncherClusterLaunchURLResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
+                                                                                    contentLaunchStatus);
             }
             break;
         }
@@ -435,7 +435,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
     }
 }
 
-} // namespace ContentLaunch
+} // namespace ContentLauncher
 
 namespace DoorLock {
 
@@ -5103,7 +5103,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         clusters::ApplicationLauncher::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
-        clusters::ContentLaunch::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        clusters::ContentLauncher::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case ZCL_DOOR_LOCK_CLUSTER_ID:
         clusters::DoorLock::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);

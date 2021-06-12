@@ -60,7 +60,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         emberAfColorControlClusterInitCallback(endpoint);
         break;
     case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
-        emberAfContentLaunchClusterInitCallback(endpoint);
+        emberAfContentLauncherClusterInitCallback(endpoint);
         break;
     case ZCL_DESCRIPTOR_CLUSTER_ID:
         emberAfDescriptorClusterInitCallback(endpoint);
@@ -223,7 +223,7 @@ void __attribute__((weak)) emberAfColorControlClusterInitCallback(EndpointId end
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfContentLaunchClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
