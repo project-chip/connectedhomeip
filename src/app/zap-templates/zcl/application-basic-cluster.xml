@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>Application Basic</name>
     <code>0x050d</code>
     <define>APPLICATION_BASIC_CLUSTER</define>
@@ -31,6 +31,11 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="APPLICATION_ID" type="CHAR_STRING" length="32" writable="false" optional="false">application id</attribute>
     <attribute side="server" code="0x0006" define="CATALOG_VENDOR_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">catalog vendor id</attribute>
     <attribute side="server" code="0x0007" define="APPLICATION_STATUS" type="ENUM8" min="0x00" max="0xFF" writable="false" default="0x01" optional="false">application satus</attribute>
+
+    <command source="client" code="0x00" name="ChangeStatus" optional="false">
+      <description>Upon receipt, this SHALL change the running status of the application.</description>
+      <arg name="status" type="ApplicationBasicStatus"/>
+    </command>
   </cluster>
 
   <enum name="ApplicationBasicStatus" type="ENUM8">

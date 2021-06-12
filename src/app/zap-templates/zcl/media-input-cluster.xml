@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>Media Input</name>
     <code>0x0507</code>
     <define>MEDIA_INPUT_CLUSTER</define>
