@@ -17,8 +17,8 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
-    <name>Content Launch</name>
+    <domain>Media</domain>
+    <name>Content Launcher</name>
     <code>0x050a</code>
     <define>CONTENT_LAUNCH_CLUSTER</define>
     <client init="false" tick="false">true</client>
