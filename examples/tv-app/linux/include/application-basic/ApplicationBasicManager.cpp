@@ -47,7 +47,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
                                     (uint8_t *) &application->vendorName, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (vendorNameStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to store vendor name attribute.");
+        ChipLogError(Zcl, "Failed to store vendor name attribute.");
     }
 
     EmberAfStatus vendorIdStatus =
@@ -55,7 +55,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
                                     (uint8_t *) &application->vendorId, ZCL_INT16U_ATTRIBUTE_TYPE);
     if (vendorIdStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to store vendor id attribute.");
+        ChipLogError(Zcl, "Failed to store vendor id attribute.");
     }
 
     EmberAfStatus nameStatus =
@@ -63,7 +63,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
                                     (uint8_t *) &application->name, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (nameStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to store name attribute.");
+        ChipLogError(Zcl, "Failed to store name attribute.");
     }
 
     EmberAfStatus productIdStatus =
@@ -71,7 +71,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
                                     (uint8_t *) &application->productId, ZCL_INT16U_ATTRIBUTE_TYPE);
     if (productIdStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to store product id attribute.");
+        ChipLogError(Zcl, "Failed to store product id attribute.");
     }
 
     EmberAfStatus idStatus =
@@ -79,7 +79,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
                                     (uint8_t *) &application->id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (idStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to store id attribute.");
+        ChipLogError(Zcl, "Failed to store id attribute.");
     }
 
     EmberAfStatus catalogVendorIdStatus =
@@ -87,7 +87,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
                                     (uint8_t *) &application->catalogVendorId, ZCL_INT16U_ATTRIBUTE_TYPE);
     if (catalogVendorIdStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to store catalog vendor id attribute.");
+        ChipLogError(Zcl, "Failed to store catalog vendor id attribute.");
     }
 
     EmberAfStatus applicationStatus =
@@ -95,7 +95,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
                                     (uint8_t *) &application->status, ZCL_ENUM8_ATTRIBUTE_TYPE);
     if (applicationStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to store status attribute.");
+        ChipLogError(Zcl, "Failed to store status attribute.");
     }
 }
 
@@ -109,37 +109,37 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
     CHIP_ERROR err = es->get(section, "name", app.name, size);
     if (err != CHIP_NO_ERROR)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to get app name. ERR:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to get app name. Error:%s", chip::ErrorStr(err));
     }
 
     err = es->get(section, "vendorName", app.vendorName, size);
     if (err != CHIP_NO_ERROR)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to get app vendor name. ERR:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to get app vendor name. Error:%s", chip::ErrorStr(err));
     }
 
     err = es->get(section, "id", app.id, size);
     if (err != CHIP_NO_ERROR)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to get app id. ERR:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to get app id. Error:%s", chip::ErrorStr(err));
     }
 
     err = es->get(section, "catalogVendorId", app.catalogVendorId);
     if (err != CHIP_NO_ERROR)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to get app catalog vendor id. ERR:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to get app catalog vendor id. Error:%s", chip::ErrorStr(err));
     }
 
     err = es->get(section, "productId", app.productId);
     if (err != CHIP_NO_ERROR)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to get app product id. ERR:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to get app product id. Error:%s", chip::ErrorStr(err));
     }
 
     err = es->get(section, "vendorId", app.vendorId);
     if (err != CHIP_NO_ERROR)
     {
-        emberAfApplicationBasicClusterPrintln("Failed to get app vendor id. ERR:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to get app vendor id. Error:%s", chip::ErrorStr(err));
     }
 
     return app;

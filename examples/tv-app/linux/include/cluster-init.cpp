@@ -50,6 +50,10 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
         Application application = aManager.getApplicationForEndpoint(endpoint);
         aManager.store(endpoint, &application);
     }
+    else
+    {
+        ChipLogError(Zcl, "Failed to store application for endpoint: %d. Error:%s", endpoint, chip::ErrorStr(err));
+    }
 }
 
 /** @brief Wake On LAN Cluster Init
@@ -71,6 +75,10 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
         char macAddress[17] = "";
         wolManager.setMacAddress(endpoint, macAddress);
         wolManager.store(endpoint, macAddress);
+    }
+    else
+    {
+        ChipLogError(Zcl, "Failed to store mac address for endpoint: %d. Error:%s", endpoint, chip::ErrorStr(err));
     }
 }
 
