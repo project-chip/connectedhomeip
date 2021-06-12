@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,31 +51,20 @@ k32w_sdk("sdk") {
   }
 }
 
-k32w_executable("lock_app") {
-  output_name = "chip-k32w061-lock-example"
+k32w_executable("shell_app") {
+  output_name = "chip-k32w061-shell-example"
 
   sources = [
-    "${k32w_platform_dir}/util/LEDWidget.cpp",
-    "${k32w_platform_dir}/util/include/LEDWidget.h",
-    "main/AppTask.cpp",
-    "main/BoltLockManager.cpp",
-    "main/ZclCallbacks.cpp",
-    "main/include/AppEvent.h",
-    "main/include/AppTask.h",
-    "main/include/BoltLockManager.h",
     "main/main.cpp",
   ]
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lock-app/lock-common",
-    "${chip_root}/src/crypto",
+    "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${chip_root}/third_party/simw-top-mini:se05x",
     "${k32w_platform_dir}/app/support:freertos_mbedtls_utils",
-    "${openthread_root}:libopenthread-cli-ftd",
     "${openthread_root}:libopenthread-ftd",
   ]
 
@@ -91,7 +80,7 @@ k32w_executable("lock_app") {
 }
 
 group("k32w") {
-  deps = [ ":lock_app" ]
+  deps = [ ":shell_app" ]
 }
 
 group("default") {

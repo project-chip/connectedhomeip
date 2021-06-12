@@ -53,6 +53,11 @@ static_library("shell") {
       "MainLoopDefault.cpp",
       "streamer_efr32.cpp",
     ]
+  } else if (chip_device_platform == "k32w") {
+    sources += [
+      "MainLoopDefault.cpp",
+      "streamer_k32w.cpp",
+    ]
   } else {
     sources += [ "MainLoopDefault.cpp" ]
   }
