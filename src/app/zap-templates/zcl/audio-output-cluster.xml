@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>Audio Output</name>
     <code>0x050b</code>
     <define>AUDIO_OUTPUT_CLUSTER</define>
