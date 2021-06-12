@@ -17,11 +17,12 @@
  */
 
 #include "ApplicationBasicManager.h"
-
+#include <app/Command.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
+#include <app/common/gen/enums.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 
@@ -143,4 +144,20 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
     }
 
     return app;
+}
+
+bool ApplicationBasicManager::proxyChangeApplicationStatusRequest(EmberAfApplicationBasicStatus status, chip::EndpointId endpoint)
+{
+    // TODO: Insert code here
+    ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", status, endpoint);
+    return true;
+}
+
+bool emberAfApplicationBasicClusterChangeStatusCallback(chip::app::Command * commandObj, uint8_t newApplicationStatus)
+{
+    bool success = ApplicationBasicManager().proxyChangeApplicationStatusRequest(
+        static_cast<EmberAfApplicationBasicStatus>(newApplicationStatus), emberAfCurrentEndpoint());
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
 }
