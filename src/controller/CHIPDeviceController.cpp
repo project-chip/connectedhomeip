@@ -293,9 +293,7 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * 
             MutableByteSpan rootCertSpan(rootCert.Get(), kMaxCHIPDERCertLength);
             ReturnErrorOnFailure(mOperationalCredentialsDelegate->GetRootCACertificate(0, rootCertSpan));
             VerifyOrReturnError(CanCastTo<uint32_t>(rootCertSpan.size()), CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorOnFailure(ConvertX509CertToChipCert(rootCertSpan.data(), static_cast<uint32_t>(rootCertSpan.size()),
-                                                           chipCert.Get(), chipCertAllocatedLen, chipCertLen));
-
+            ReturnErrorOnFailure(ConvertX509CertToChipCert(rootCertSpan, chipCert.Get(), chipCertAllocatedLen, chipCertLen));
             ReturnErrorOnFailure(admin->SetRootCert(ByteSpan(chipCert.Get(), chipCertLen)));
         }
 

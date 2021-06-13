@@ -56,8 +56,7 @@ extern const uint8_t gTestCerts[] = {
 
 extern const size_t gNumTestCerts = sizeof(gTestCerts) / sizeof(gTestCerts[0]);
 
-CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, const uint8_t *& certData,
-                       uint32_t & certDataLen)
+CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert)
 {
     CHIP_ERROR err;
     bool derForm = certLoadFlags.Has(TestCertLoadFlags::kDERForm);
@@ -69,13 +68,11 @@ CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFla
         {                                                                                                                          \
             if (derForm)                                                                                                           \
             {                                                                                                                      \
-                certData    = sTestCert_##NAME##_DER;                                                                              \
-                certDataLen = sTestCert_##NAME##_DER_Len;                                                                          \
+                cert = ByteSpan(sTestCert_##NAME##_DER, sTestCert_##NAME##_DER_Len);                                               \
             }                                                                                                                      \
             else                                                                                                                   \
             {                                                                                                                      \
-                certData    = sTestCert_##NAME##_Chip;                                                                             \
-                certDataLen = sTestCert_##NAME##_Chip_Len;                                                                         \
+                cert = ByteSpan(sTestCert_##NAME##_Chip, sTestCert_##NAME##_Chip_Len);                                             \
             }                                                                                                                      \
             ExitNow(err = CHIP_NO_ERROR);                                                                                          \
         }                                                                                                                          \
@@ -176,39 +173,38 @@ CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags
                         BitFlags<CertDecodeFlags> decodeFlags)
 {
     CHIP_ERROR err;
-    ChipCertificateData * cert;
-    const uint8_t * certData;
-    uint32_t certDataLen;
+    ChipCertificateData * certData;
+    ByteSpan cert;
 
     // Get the requested certificate data.
-    err = GetTestCert(certType, certLoadFlags, certData, certDataLen);
+    err = GetTestCert(certType, certLoadFlags, cert);
     SuccessOrExit(err);
 
     // Load it into the certificate set.
-    err = certSet.LoadCert(certData, certDataLen, decodeFlags);
+    err = certSet.LoadCert(cert.data(), static_cast<uint32_t>(cert.size()), decodeFlags);
     SuccessOrExit(err);
 
     // Get loaded certificate data.
-    cert = const_cast<ChipCertificateData *>(certSet.GetLastCert());
-    VerifyOrExit(cert != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    certData = const_cast<ChipCertificateData *>(certSet.GetLastCert());
+    VerifyOrExit(certData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Apply load flags.
     if (certLoadFlags.Has(TestCertLoadFlags::kSuppressIsCA))
     {
-        cert->mCertFlags.Clear(CertFlags::kIsCA);
+        certData->mCertFlags.Clear(CertFlags::kIsCA);
     }
     if (certLoadFlags.Has(TestCertLoadFlags::kSuppressKeyUsage))
     {
-        cert->mCertFlags.Clear(CertFlags::kExtPresent_KeyUsage);
+        certData->mCertFlags.Clear(CertFlags::kExtPresent_KeyUsage);
     }
     if (certLoadFlags.Has(TestCertLoadFlags::kSuppressKeyCertSign))
     {
-        cert->mKeyUsageFlags.Clear(KeyUsageFlags::kKeyCertSign);
+        certData->mKeyUsageFlags.Clear(KeyUsageFlags::kKeyCertSign);
     }
     if (certLoadFlags.Has(TestCertLoadFlags::kSetPathLenConstZero))
     {
-        cert->mCertFlags.Set(CertFlags::kPathLenConstraintPresent);
-        cert->mPathLenConstraint = 0;
+        certData->mCertFlags.Set(CertFlags::kPathLenConstraintPresent);
+        certData->mPathLenConstraint = 0;
     }
 
 exit:
