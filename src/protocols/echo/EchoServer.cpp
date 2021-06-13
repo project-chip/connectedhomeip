@@ -35,8 +35,7 @@ CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
     if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    mExchangeMgr          = exchangeMgr;
-    OnEchoRequestReceived = nullptr;
+    mExchangeMgr = exchangeMgr;
 
     // Register to receive unsolicited Echo Request messages from the exchange manager.
     mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MsgType::EchoRequest, this);
@@ -61,10 +60,10 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     // NOTE: we already know this is an Echo Request message because we explicitly registered with the
     // Exchange Manager for unsolicited Echo Requests.
 
-    // Call the registered OnEchoRequestReceived handler, if any.
-    if (OnEchoRequestReceived != nullptr)
+    // Call the registered delegate handler, if any.
+    if (mDelegate != nullptr)
     {
-        OnEchoRequestReceived(ec, payload.Retain());
+        mDelegate->OnMessageReceived(ec, payload.Retain());
     }
 
     // Since we are re-using the inbound EchoRequest buffer to send the EchoResponse, if necessary,

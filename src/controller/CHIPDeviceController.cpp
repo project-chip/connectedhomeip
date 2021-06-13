@@ -787,8 +787,6 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
     };
 }
 
-PingParams DeviceCommissioner::mPingParams;
-
 DeviceCommissioner::DeviceCommissioner() :
     mSuccess(BasicSuccess, this), mFailure(BasicFailure, this),
     mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
@@ -1044,93 +1042,17 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::SendEchoRequest(NodeId remoteDeviceId)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    Messaging::SendFlags sendFlags;
-    System::PacketBufferHandle payloadBuf;
-
-    payloadBuf = MessagePacketBuffer::New(mPingParams.GetEchoReqSize());
-    VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-
-    payloadBuf->SetDataLength(mPingParams.GetEchoReqSize());
-
-    if (mPingParams.IsUsingMRP())
-    {
-        sendFlags.Set(Messaging::SendMessageFlags::kNone);
-    }
-    else
-    {
-        sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
-    }
-
-    mPingParams.SetLastEchoTime(System::Timer::GetCurrentEpoch());
-
-    ChipLogDetail(Controller, "Send echo request message with payload size: %d bytes to Node: 0x" ChipLogFormatX64,
-                  mPingParams.GetEchoReqSize(), ChipLogValueX64(remoteDeviceId));
-
-    mPingParams.SetWaitingForEchoResp(true);
-    err = mEchoClient.SendEchoRequest(std::move(payloadBuf), sendFlags);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        mPingParams.IncrementEchoReqCount();
-    }
-    else
-    {
-        mPingParams.SetWaitingForEchoResp(false);
-    }
-
-exit:
-    return err;
-}
-
 CHIP_ERROR DeviceCommissioner::PingDevice(NodeId remoteDeviceId, uint32_t waitTimeMillis, uint16_t maxCount, uint16_t payloadSize,
                                           bool usingMRP)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in
-    // issue:4451
-    ReturnErrorOnFailure(mEchoClient.Init(mExchangeMgr, { remoteDeviceId, 0, 0 }));
+    mPingClient.Reset();
+    mPingClient.SetEchoIntervalMillis(waitTimeMillis);
+    mPingClient.SetEchoReqSize(payloadSize);
+    mPingClient.SetUsingMRP(usingMRP);
 
-    // Arrange to get a callback whenever an Echo Response is received.
-    mEchoClient.SetEchoResponseReceived(OnHandleEchoResponse);
-
-    mPingParams.Reset();
-    mPingParams.SetEchoInterval(waitTimeMillis);
-    mPingParams.SetEchoReqSize(payloadSize);
-    mPingParams.SetUsingMRP(usingMRP);
-
-    // Connection has been established. Now send the EchoRequests.
-    for (unsigned int i = 0; i < maxCount; i++)
-    {
-        err = SendEchoRequest(remoteDeviceId);
-
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Send request failed: %s", ErrorStr(err));
-            break;
-        }
-
-        // Wait for response until the Echo interval.
-        while (!EchoIntervalExpired())
-        {
-            // We can use condition_varible to suspend the current thread and wake it up when response arrive after
-            // condition_varible are supported on all embedded platforms.
-            sleep(1);
-        }
-
-        // Check if expected response was received.
-        if (mPingParams.IsWaitingForEchoResp())
-        {
-            ChipLogError(Controller, "No response received");
-            mPingParams.SetWaitingForEchoResp(false);
-        }
-    }
-
-    mEchoClient.Shutdown();
+    err = mPingClient.PingDevice(remoteDeviceId, maxCount, mExchangeMgr);
 
     if ((err != CHIP_NO_ERROR))
     {
@@ -1480,27 +1402,6 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     }
 
     return CHIP_NO_ERROR;
-}
-
-void DeviceCommissioner::OnHandleEchoResponse(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
-{
-    uint64_t respTime    = static_cast<uint64_t>(System::Timer::GetCurrentEpoch());
-    uint64_t transitTime = respTime - mPingParams.GetLastEchoTime();
-
-    mPingParams.SetWaitingForEchoResp(false);
-    mPingParams.IncrementEchoRespCount();
-
-    ChipLogProgress(Controller, "Echo Response: %" PRIu32 "/%" PRIu32 "(%.2f%%) len=%u time=%.3fms\n",
-                    mPingParams.GetEchoRespCount(), mPingParams.GetEchoReqCount(),
-                    static_cast<double>(mPingParams.GetEchoRespCount()) * 100 / mPingParams.GetEchoReqCount(),
-                    payload->DataLength(), static_cast<double>(transitTime) / 1000);
-}
-
-bool DeviceCommissioner::EchoIntervalExpired(void)
-{
-    uint64_t now = System::Timer::GetCurrentEpoch();
-
-    return (now >= mPingParams.GetLastEchoTime() + mPingParams.GetEchoInterval());
 }
 
 void DeviceCommissioner::PersistDeviceList()

@@ -47,7 +47,27 @@ enum class MsgType : uint8_t
     EchoResponse = 0x02
 };
 
-using EchoFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload);
+/**
+ * @brief
+ *   This class provides a skeleton for the callback functions. The functions will be
+ *   called by EchoClient/EchoServer object on specific events. If the user of EchoClient/EchoServer
+ *   is interested in receiving these callbacks, they can specialize this class and handle
+ *   each trigger in their implementation of this class.
+ */
+class DLL_EXPORT EchoDelegate
+{
+public:
+    virtual ~EchoDelegate() {}
+
+    /**
+     * @brief
+     *   This function is the protocol callback for handling a received CHIP message.
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
+     */
+    virtual void OnMessageReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload) = 0;
+};
 
 class DLL_EXPORT EchoClient : public Messaging::ExchangeDelegate
 {
@@ -76,13 +96,9 @@ public:
      */
     void Shutdown();
 
-    /**
-     * Set the application callback to be invoked when an echo response is received.
-     *
-     *  @param[in]    callback    The callback function to receive echo response message.
-     *
-     */
-    void SetEchoResponseReceived(EchoFunct callback) { OnEchoResponseReceived = callback; }
+    EchoDelegate * GetDelegate() const { return mDelegate; }
+
+    void SetDelegate(EchoDelegate * delegate) { mDelegate = delegate; }
 
     /**
      * Send an echo request to a CHIP node.
@@ -100,7 +116,7 @@ public:
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
-    EchoFunct OnEchoResponseReceived          = nullptr;
+    EchoDelegate * mDelegate                  = nullptr;
     SecureSessionHandle mSecureSession;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -133,17 +149,13 @@ public:
      */
     void Shutdown();
 
-    /**
-     * Set the application callback to be invoked when an echo request is received.
-     *
-     *  @param[in]    callback    The callback function to receive echo request message.
-     *
-     */
-    void SetEchoRequestReceived(EchoFunct callback) { OnEchoRequestReceived = callback; }
+    EchoDelegate * GetDelegate() const { return mDelegate; }
+
+    void SetDelegate(EchoDelegate * delegate) { mDelegate = delegate; }
 
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
-    EchoFunct OnEchoRequestReceived           = nullptr;
+    EchoDelegate * mDelegate                  = nullptr;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && payload) override;

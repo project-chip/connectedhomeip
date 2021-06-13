@@ -46,11 +46,14 @@ chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 
-// Callback handler when a CHIP EchoRequest is received.
-void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
+class EchoServerDelegate : public chip::Protocols::Echo::EchoDelegate
 {
-    printf("Echo Request, len=%u ... sending response.\n", payload->DataLength());
-}
+public:
+    void OnMessageReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload) override
+    {
+        printf("Echo Request, len=%u ... sending response.\n", payload->DataLength());
+    }
+} gEchoServerDelegate;
 
 } // namespace
 
@@ -126,8 +129,7 @@ int main(int argc, char * argv[])
 
     if (!disableEcho)
     {
-        // Arrange to get a callback whenever an Echo Request is received.
-        gEchoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
+        gEchoServer.SetDelegate(&gEchoServerDelegate);
     }
 
     printf("Listening for Echo requests...\n");

@@ -35,10 +35,9 @@ CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SecureSess
     if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    mExchangeMgr           = exchangeMgr;
-    mSecureSession         = session;
-    OnEchoResponseReceived = nullptr;
-    mExchangeCtx           = nullptr;
+    mExchangeMgr   = exchangeMgr;
+    mSecureSession = session;
+    mExchangeCtx   = nullptr;
 
     return CHIP_NO_ERROR;
 }
@@ -51,8 +50,7 @@ void EchoClient::Shutdown()
         mExchangeCtx = nullptr;
     }
 
-    OnEchoResponseReceived = nullptr;
-    mExchangeMgr           = nullptr;
+    mExchangeMgr = nullptr;
 }
 
 CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, const Messaging::SendFlags & sendFlags)
@@ -111,10 +109,10 @@ void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     mExchangeCtx->Abort();
     mExchangeCtx = nullptr;
 
-    // Call the registered OnEchoResponseReceived handler, if any.
-    if (OnEchoResponseReceived != nullptr)
+    // Call the registered delegate handler, if any.
+    if (mDelegate != nullptr)
     {
-        OnEchoResponseReceived(ec, std::move(payload));
+        mDelegate->OnMessageReceived(ec, std::move(payload));
     }
 }
 

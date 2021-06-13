@@ -76,6 +76,23 @@ uint64_t gEchoRespCount = 0;
 
 bool gUseTCP = false;
 
+class EchoClientDelegate : public chip::Protocols::Echo::EchoDelegate
+{
+public:
+    void OnMessageReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload) override
+    {
+        uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
+        uint32_t transitTime = respTime - gLastEchoTime;
+
+        gWaitingForEchoResp = false;
+        gEchoRespCount++;
+
+        printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
+               static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(),
+               static_cast<double>(transitTime) / 1000);
+    }
+} gEchoClientDelegate;
+
 bool EchoIntervalExpired(void)
 {
     uint64_t now = chip::System::Timer::GetCurrentEpoch();
@@ -150,18 +167,6 @@ exit:
     }
 
     return err;
-}
-
-void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
-{
-    uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
-    uint32_t transitTime = respTime - gLastEchoTime;
-
-    gWaitingForEchoResp = false;
-    gEchoRespCount++;
-
-    printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
-           static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
 }
 
 void RunPinging()
@@ -269,8 +274,7 @@ int main(int argc, char * argv[])
     err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
     SuccessOrExit(err);
 
-    // Arrange to get a callback whenever an Echo Response is received.
-    gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
+    gEchoClient.SetDelegate(&gEchoClientDelegate);
 
     RunPinging();
 

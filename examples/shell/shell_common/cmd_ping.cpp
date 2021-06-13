@@ -128,6 +128,25 @@ private:
     bool mUsingMRP;
 } gPingArguments;
 
+class EchoClientDelegate : public chip::Protocols::Echo::EchoDelegate
+{
+public:
+    void OnMessageReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload) override
+    {
+        uint32_t respTime    = System::Timer::GetCurrentEpoch();
+        uint32_t transitTime = respTime - gPingArguments.GetLastEchoTime();
+        streamer_t * sout    = streamer_get();
+
+        gPingArguments.SetWaitingForEchoResp(false);
+        gPingArguments.IncrementEchoRespCount();
+
+        streamer_printf(sout, "Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n",
+                        gPingArguments.GetEchoRespCount(), gPingArguments.GetEchoCount(),
+                        static_cast<double>(gPingArguments.GetEchoRespCount()) * 100 / gPingArguments.GetEchoCount(),
+                        payload->DataLength(), static_cast<double>(transitTime) / 1000);
+    }
+} gEchoClientDelegate;
+
 Protocols::Echo::EchoClient gEchoClient;
 Transport::AdminPairingTable gAdmins;
 
@@ -265,21 +284,6 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
-{
-    uint32_t respTime    = System::Timer::GetCurrentEpoch();
-    uint32_t transitTime = respTime - gPingArguments.GetLastEchoTime();
-    streamer_t * sout    = streamer_get();
-
-    gPingArguments.SetWaitingForEchoResp(false);
-    gPingArguments.IncrementEchoRespCount();
-
-    streamer_printf(sout, "Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gPingArguments.GetEchoRespCount(),
-                    gPingArguments.GetEchoCount(),
-                    static_cast<double>(gPingArguments.GetEchoRespCount()) * 100 / gPingArguments.GetEchoCount(),
-                    payload->DataLength(), static_cast<double>(transitTime) / 1000);
-}
-
 void StartPinging(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -339,8 +343,7 @@ void StartPinging(streamer_t * stream, char * destination)
     err = gEchoClient.Init(&gExchangeManager, { kTestDeviceNodeId, 0, gAdminId });
     SuccessOrExit(err);
 
-    // Arrange to get a callback whenever an Echo Response is received.
-    gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
+    gEchoClient.SetDelegate(&gEchoClientDelegate);
 
     err = SendEchoRequest(stream);
     if (err != CHIP_NO_ERROR)
