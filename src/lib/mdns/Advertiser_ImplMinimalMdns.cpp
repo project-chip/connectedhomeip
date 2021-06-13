@@ -568,13 +568,15 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     size_t numTxtFields = 0;
 
     char txtVidPid[chip::Mdns::kKeyVendorProductMaxLength + 4];
-    if (params.GetProductId().HasValue())
+    if (params.GetProductId().HasValue() && params.GetVendorId().HasValue())
     {
         sprintf(txtVidPid, "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
+        txtFields[numTxtFields++] = txtVidPid;
     }
-    else
+    else if (params.GetVendorId().HasValue())
     {
         sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
+        txtFields[numTxtFields++] = txtVidPid;
     }
 
     char txtDeviceType[chip::Mdns::kKeyDeviceTypeMaxLength + 4];
