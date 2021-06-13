@@ -71,7 +71,8 @@ struct BrowseContext : public GenericContext
 struct ResolveContext : public GenericContext
 {
     MdnsResolveCallback callback;
-    char name[kMdnsNameMaxSize + 1];
+
+    char name[kMdnsInstanceNameMaxSize + 1];
     chip::Inet::IPAddressType addressType;
 
     ResolveContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName, chip::Inet::IPAddressType cbAddressType)
@@ -88,7 +89,7 @@ struct GetAddrInfoContext : public GenericContext
 {
     MdnsResolveCallback callback;
     std::vector<TextEntry> textEntries;
-    char name[kMdnsNameMaxSize + 1];
+    char name[kMdnsInstanceNameMaxSize + 1];
     uint32_t interfaceId;
     uint16_t port;
 

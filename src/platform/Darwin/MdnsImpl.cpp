@@ -319,7 +319,7 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
     service.mProtocol   = context->protocol;
 
     strncpy(service.mName, name, sizeof(service.mName));
-    service.mName[kMdnsNameMaxSize] = 0;
+    service.mName[kMdnsInstanceNameMaxSize] = 0;
 
     strncpy(service.mType, regtype, sizeof(service.mType));
     service.mType[kMdnsTypeMaxSize] = 0;
@@ -483,17 +483,15 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback successCallback, MdnsAsyncReturn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
-{
-    MdnsContexts::GetInstance().SetHostname(hostname);
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
 
+    if (strcmp(service->mHostName, "") != 0)
+    {
+        MdnsContexts::GetInstance().SetHostname(service->mHostName);
+    }
     std::string regtype  = GetFullTypeWithSubTypes(service->mType, service->mProtocol, service->mSubTypes, service->mSubTypeSize);
     uint32_t interfaceId = GetInterfaceId(service->mInterface);
 
