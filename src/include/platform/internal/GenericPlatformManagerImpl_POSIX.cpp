@@ -110,9 +110,9 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
     mChipStackIsLocked = false;
 #endif
 
-    int err = pthread_mutex_unlock(&mChipStackLock);
-    assert(err == 0);
-}
+int err = pthread_mutex_unlock(&mChipStackLock);
+assert(err == 0);
+} // namespace Internal
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
 template <class ImplClass>
@@ -276,8 +276,8 @@ exit:
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
 
-} // namespace Internal
 } // namespace DeviceLayer
+} // namespace chip
 } // namespace chip
 
 #endif // GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP
