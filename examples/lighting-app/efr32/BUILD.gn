@@ -25,6 +25,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
 }
 
 assert(current_os == "freertos")
@@ -135,6 +136,8 @@ efr32_executable("lighting_app") {
       "${chip_root}/examples/lighting-app/lighting-common:lighting_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     ]
+
+    deps += pw_build_LINK_DEPS
 
     include_dirs += [
       "${chip_root}/examples/common",
