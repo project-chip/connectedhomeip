@@ -27,8 +27,8 @@ k32w_platform_dir = "${chip_root}/examples/platform/k32w"
 k32w_sdk("sdk") {
   sources = [
     "${k32w_platform_dir}/app/project_include/OpenThreadConfig.h",
-    "include/FreeRTOSConfig.h",
     "include/CHIPProjectConfig.h",
+    "include/FreeRTOSConfig.h",
     "main/include/app_config.h",
   ]
 
