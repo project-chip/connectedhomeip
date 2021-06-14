@@ -33,6 +33,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include <sys/time.h>
 
@@ -43,11 +44,7 @@ extern "C" {
 #endif
 
 #ifndef LWIP_NOASSERT
-#ifdef DEBUG
 #define LWIP_PLATFORM_ASSERT(MSG) assert(0)
-#else
-#define LWIP_PLATFORM_ASSERT(MSG) assert(0)
-#endif
 #else
 #define LWIP_PLATFORM_ASSERT(message)
 #endif

@@ -248,7 +248,7 @@ exit:
 
 bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::Command * commandObj, uint8_t groupCount, uint8_t * groupList)
 {
-    EmberStatus status;
+    EmberStatus status = EMBER_ZCL_STATUS_FAILURE;
     uint8_t i, j;
     uint8_t count = 0;
     uint8_t list[EMBER_BINDING_TABLE_SIZE << 1];
