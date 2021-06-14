@@ -392,7 +392,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
      * because for the devices which call Advertise() method more than 1 times i.e. advertise operational, commissionable, and
      * commissioner needs the result to be additive. If Clear() is called at the beginning of these Advertise methods, then only the
      * last call to Advertise will take effect.
-     */    
+     */
     // TODO: need to detect colisions here
     char nameBuffer[64] = "";
     size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), ChipLogFormatX64, GetRandU32(), GetRandU32());
