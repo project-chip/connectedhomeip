@@ -24,16 +24,58 @@
 
 #include <controller/PingClient.h>
 
+#include <platform/CHIPDeviceLayer.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Controller {
 
-bool PingClient::EchoIntervalExpired(void)
+void PingClient::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr)
 {
-    uint64_t now = System::Timer::GetCurrentEpoch();
+    mSystemLayer = systemLayer;
+    mExchangeMgr = exchangeMgr;
+}
 
-    return (now >= mLastEchoTimeMillis + mEchoIntervalMillis);
+void PingClient::Reset()
+{
+    mEchoIntervalMillis = 1000;
+    mLastEchoTimeMillis = 0;
+    mRemoteDeviceId     = 0;
+    mEchoReqCount       = 0;
+    mEchoRespCount      = 0;
+    mEchoMaxCount       = 3;
+    mEchoReqSize        = 32;
+    mWaitingForEchoResp = false;
+    mUsingMRP           = false;
+    mSystemLayer        = nullptr;
+    mExchangeMgr        = nullptr;
+}
+
+void PingClient::HandlePingTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+{
+    PingClient * pingclient = static_cast<PingClient *>(appState);
+
+    if (pingclient->mEchoRespCount != pingclient->mEchoReqCount)
+    {
+        ChipLogError(Controller, "No response received");
+
+        // Reset mEchoRespCount for next iteration, if any
+        pingclient->mEchoRespCount = pingclient->mEchoReqCount;
+    }
+
+    if (pingclient->mEchoReqCount < pingclient->mEchoMaxCount)
+    {
+        CHIP_ERROR err = pingclient->SendEchoRequest();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Send request failed with error: %s", ErrorStr(err));
+            pingclient->Shutdown();
+        }
+    }
+    else
+    {
+        pingclient->Shutdown();
+    }
 }
 
 void PingClient::OnMessageReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
@@ -49,7 +91,7 @@ void PingClient::OnMessageReceived(Messaging::ExchangeContext * ec, System::Pack
                     static_cast<double>(transitTime) / 1000);
 }
 
-CHIP_ERROR PingClient::SendEchoRequest(NodeId remoteDeviceId)
+CHIP_ERROR PingClient::SendEchoRequest()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -57,7 +99,7 @@ CHIP_ERROR PingClient::SendEchoRequest(NodeId remoteDeviceId)
     System::PacketBufferHandle payloadBuf;
 
     payloadBuf = MessagePacketBuffer::New(mEchoReqSize);
-    VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!payloadBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     memset(payloadBuf->Start(), 0, mEchoReqSize);
     payloadBuf->SetDataLength(mEchoReqSize);
@@ -73,8 +115,13 @@ CHIP_ERROR PingClient::SendEchoRequest(NodeId remoteDeviceId)
 
     mLastEchoTimeMillis = System::Timer::GetCurrentEpoch();
 
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    const chip::System::Error timerErr = mSystemLayer->StartTimer(mEchoIntervalMillis, HandlePingTimeout, this);
+    VerifyOrReturnError(timerErr == CHIP_SYSTEM_NO_ERROR, CHIP_SYSTEM_ERROR_START_TIMER_FAILED);
+
     ChipLogDetail(Controller, "Send echo request message with payload size: %d bytes to Node: 0x" ChipLogFormatX64, mEchoReqSize,
-                  ChipLogValueX64(remoteDeviceId));
+                  ChipLogValueX64(mRemoteDeviceId));
 
     mWaitingForEchoResp = true;
     err                 = mEchoClient.SendEchoRequest(std::move(payloadBuf), sendFlags);
@@ -88,58 +135,44 @@ CHIP_ERROR PingClient::SendEchoRequest(NodeId remoteDeviceId)
         mWaitingForEchoResp = false;
     }
 
-exit:
     return err;
 }
 
-CHIP_ERROR PingClient::PingDevice(NodeId remoteDeviceId, uint16_t maxCount, Messaging::ExchangeManager * exchangeMgr)
+CHIP_ERROR PingClient::PingDevice(NodeId remoteDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in
     // issue:4451
-    ReturnErrorOnFailure(mEchoClient.Init(exchangeMgr, { remoteDeviceId, 0, 0 }));
+    ReturnErrorOnFailure(mEchoClient.Init(mExchangeMgr, { remoteDeviceId, 0, 0 }));
 
     // Arrange to get a callback whenever an Echo Response is received.
     mEchoClient.SetDelegate(this);
 
-    // Connection has been established. Now send the EchoRequests.
-    for (unsigned int i = 0; i < maxCount; i++)
-    {
-        err = SendEchoRequest(remoteDeviceId);
+    mRemoteDeviceId = remoteDeviceId;
 
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Send request failed: %s", ErrorStr(err));
-            break;
-        }
-
-        // Wait for response until the Echo interval.
-        while (!EchoIntervalExpired())
-        {
-            // We can use condition_varible to suspend the current thread and wake it up when response arrive after
-            // condition_varible are supported on all embedded platforms.
-            sleep(1);
-        }
-
-        // Check if expected response was received.
-        if (mWaitingForEchoResp)
-        {
-            ChipLogError(Controller, "No response received");
-            mWaitingForEchoResp = false;
-        }
-    }
-
-    mEchoClient.Shutdown();
+    err = SendEchoRequest();
 
     if ((err != CHIP_NO_ERROR))
     {
-        ChipLogError(Controller, "Ping failed with error: %s", ErrorStr(err));
+        ChipLogError(Controller, "Send request failed with error: %s", ErrorStr(err));
+        Shutdown();
     }
 
     return err;
+}
+
+void PingClient::Shutdown()
+{
+    // Cancel any existing connect timer.
+    if (mSystemLayer)
+    {
+        mSystemLayer->CancelTimer(HandlePingTimeout, this);
+    }
+
+    mEchoClient.Shutdown();
 }
 
 } // namespace Controller

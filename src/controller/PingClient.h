@@ -33,26 +33,23 @@ namespace Controller {
 class PingClient : public Protocols::Echo::EchoDelegate
 {
 public:
-    void Reset()
-    {
-        mEchoIntervalMillis = 1000;
-        mLastEchoTimeMillis = 0;
-        mEchoReqCount       = 0;
-        mEchoRespCount      = 0;
-        mEchoReqSize        = 32;
-        mWaitingForEchoResp = false;
-        mUsingMRP           = false;
-    }
+    void Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr);
+
+    void Reset();
+
+    void Shutdown();
 
     void SetEchoIntervalMillis(uint32_t value) { mEchoIntervalMillis = value; }
 
     void SetEchoReqSize(uint16_t value) { mEchoReqSize = value; }
 
+    void SetEchoMaxCount(uint16_t value) { mEchoMaxCount = value; }
+
     void SetUsingMRP(bool value) { mUsingMRP = value; }
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload) override;
 
-    CHIP_ERROR PingDevice(NodeId remoteDeviceId, uint16_t maxCount, Messaging::ExchangeManager * exchangeMgr);
+    CHIP_ERROR PingDevice(NodeId remoteDeviceId);
 
 private:
     // The last time a echo request was attempted to be sent.
@@ -67,6 +64,9 @@ private:
     // Count of the number of echo responses received.
     uint16_t mEchoRespCount = 0;
 
+    // Max value for the number of EchoRequests sent.
+    uint16_t mEchoMaxCount = 3;
+
     // The CHIP Echo request payload size in bytes.
     uint16_t mEchoReqSize = 32;
 
@@ -76,11 +76,16 @@ private:
 
     bool mUsingMRP = false;
 
+    NodeId mRemoteDeviceId = 0;
+
     Protocols::Echo::EchoClient mEchoClient;
+    System::Layer * mSystemLayer;
+    Messaging::ExchangeManager * mExchangeMgr;
 
-    bool EchoIntervalExpired(void);
+    CHIP_ERROR SendEchoRequest();
 
-    CHIP_ERROR SendEchoRequest(NodeId remoteDeviceId);
+    // Timer expired callbacks:
+    static void HandlePingTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error error);
 };
 
 } // namespace Controller

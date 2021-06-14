@@ -159,6 +159,9 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_SYSTEM_ERROR_ACCESS_DENIED:
         desc = "Access denied";
         break;
+    case CHIP_SYSTEM_ERROR_START_TIMER_FAILED:
+        desc = "Failed to start timer";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

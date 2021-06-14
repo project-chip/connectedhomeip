@@ -152,6 +152,15 @@
  */
 #define CHIP_SYSTEM_ERROR_ACCESS_DENIED _CHIP_SYSTEM_ERROR(7)
 
+/**
+ *  @def CHIP_SYSTEM_ERROR_START_TIMER_FAILED
+ *
+ *  @brief
+ *    A timer failed to start.
+ *
+ */
+#define CHIP_SYSTEM_ERROR_START_TIMER_FAILED _CHIP_SYSTEM_ERROR(8)
+
 //                        !!!!! IMPORTANT !!!!!
 //
 // If you add new CHIP System Layer errors, please update the translation of error

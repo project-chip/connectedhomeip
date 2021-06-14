@@ -1048,11 +1048,13 @@ CHIP_ERROR DeviceCommissioner::PingDevice(NodeId remoteDeviceId, uint32_t waitTi
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mPingClient.Reset();
+    mPingClient.Init(mSystemLayer, mExchangeMgr);
     mPingClient.SetEchoIntervalMillis(waitTimeMillis);
     mPingClient.SetEchoReqSize(payloadSize);
+    mPingClient.SetEchoMaxCount(maxCount);
     mPingClient.SetUsingMRP(usingMRP);
 
-    err = mPingClient.PingDevice(remoteDeviceId, maxCount, mExchangeMgr);
+    err = mPingClient.PingDevice(remoteDeviceId);
 
     if ((err != CHIP_NO_ERROR))
     {
