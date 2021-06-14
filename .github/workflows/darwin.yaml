@@ -52,6 +52,9 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
+            - name: Run Build
+              timeout-minutes: 10
+              run: scripts/build/gn_build.sh
             - name: Run iOS Build
               timeout-minutes: 15
               working-directory: src/darwin/Framework
