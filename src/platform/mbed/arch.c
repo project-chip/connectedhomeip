@@ -1,5 +1,6 @@
 #include "platform/mbed_toolchain.h"
 #include "platform/mbed_atomic.h"
+#include "platform/mbed_wait_api.h"
 
 // TODO: Remove!
 // This file is a temporary workaround until atomic integration has been solved
@@ -48,4 +49,9 @@ uint64_t __atomic_exchange_8(volatile void* ptr, uint64_t val, int memorder) {
 bool __atomic_compare_exchange_8(volatile void *ptr, void*expected, unsigned long long desired, int success_memorder, int failure_memorder)
 {
     return core_util_atomic_cas_explicit_u64((volatile uint64_t*)ptr, (uint64_t*)expected, desired, mem_order(success_memorder), mem_order(failure_memorder));
+}
+
+void usleep(unsigned int usec) 
+{
+    wait_us(usec);
 }
