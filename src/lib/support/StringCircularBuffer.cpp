@@ -38,7 +38,7 @@ void StringCircularBuffer::Read(uint8_t * dest, size_t length, size_t offset) co
 {
     VerifyOrDie(Size() >= offset + length);
 
-    std::size_t start = Advance(mDataStart, offset);
+    size_t start = Advance(mDataStart, offset);
     if (mCapacity - start >= length)
     {
         ::memcpy(dest, mStorage + start, length);
