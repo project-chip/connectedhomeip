@@ -179,10 +179,10 @@ public:
 
     /**
      * @brief
-     *   This function takes the payload and returns encrypted message which can be sent multiple times.
+     *   This function takes the payload and returns an encrypted message which can be sent multiple times.
      *
      * @details
-     *   It contains following preparation:
+     *   It does the following:
      *    1. Encrypt the msgBuf
      *    2. construct the packet header
      *    3. Encode the packet header and prepend it to message.
