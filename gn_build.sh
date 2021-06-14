@@ -54,17 +54,19 @@ echo 'To re-create the build environment from scratch, run:'
 echo source "$CHIP_ROOT/scripts/bootstrap.sh"
 
 echo
-echo 'To build a debug build:'
-echo gn gen "$CHIP_ROOT/out/debug" --args=\''target_os="all"'"$extra_args"\'
+echo 'To compile the generated debug build:'
 echo ninja -C "$CHIP_ROOT/out/debug"
 
 echo
-echo 'To run tests (idempotent):'
+echo 'To test the generated debug build (idempotent):'
 echo ninja -C "$CHIP_ROOT/out/debug" check
 
 echo
-echo 'To build & test an optimized build:'
-echo gn gen "$CHIP_ROOT/out/release" --args=\''target_os="all" is_debug=false'"$extra_args"\'
+echo 'To compile the generated release build':
+echo ninja -C "$CHIP_ROOT/out/release"
+
+echo
+echo 'To test the generated release build (idempotent):'
 echo ninja -C "$CHIP_ROOT/out/release" check
 
 echo
