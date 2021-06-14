@@ -85,14 +85,15 @@ void InteractionModelEngine::Shutdown()
     for (auto & readClient : mReadClients)
     {
         if (!readClient.IsFree())
-            {
-                readClient.Shutdown();
-            }
+        {
+            readClient.Shutdown();
+        }
     }
 
     for (auto & readHandler : mReadHandlers)
     {
-        if (!readHandler.IsFree()) {
+        if (!readHandler.IsFree())
+        {
             readHandler.Shutdown();
         }
     }
