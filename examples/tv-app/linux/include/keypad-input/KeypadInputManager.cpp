@@ -51,7 +51,7 @@ EmberAfKeypadInputStatus KeypadInputManager::proxyKeypadInputRequest(EmberAfKeyp
     return EMBER_ZCL_KEYPAD_INPUT_STATUS_SUCCESS;
 }
 
-static void sendResponse(const char * responseName, uint8_t keypadInputStatus)
+static void sendResponse(const char * responseName, EmberAfKeypadInputStatus keypadInputStatus)
 {
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_KEYPAD_INPUT_CLUSTER_ID,
                               ZCL_SEND_KEY_RESPONSE_COMMAND_ID, "u", keypadInputStatus);

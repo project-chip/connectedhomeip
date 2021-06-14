@@ -81,7 +81,7 @@ void MediaPlaybackManager::storeNewPlaybackState(chip::EndpointId endpoint, uint
     }
 }
 
-static void sendResponse(const char * responseName, chip::CommandId commandId, uint8_t mediaPlaybackStatus)
+static void sendResponse(const char * responseName, chip::CommandId commandId, EmberAfMediaPlaybackStatus mediaPlaybackStatus)
 {
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_MEDIA_PLAYBACK_CLUSTER_ID,
                               commandId, "u", mediaPlaybackStatus);
