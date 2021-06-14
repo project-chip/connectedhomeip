@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <string.h>
 
 namespace chip {
 
@@ -38,6 +39,11 @@ public:
 
     const T * data() const { return mDataBuf; }
     size_t size() const { return mDataLen; }
+    bool empty() const { return size() == 0; }
+    bool data_equal(const Span & other) const
+    {
+        return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
+    }
 
 private:
     const T * mDataBuf;
@@ -53,6 +59,12 @@ public:
 
     const T * data() const { return mDataBuf; }
     size_t size() const { return N; }
+    bool empty() const { return data() == nullptr; }
+    bool data_equal(const FixedSpan & other) const
+    {
+        return (empty() && other.empty()) ||
+            (!empty() && !other.empty() && (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
+    }
 
 private:
     const T * mDataBuf;

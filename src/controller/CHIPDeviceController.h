@@ -190,6 +190,15 @@ public:
 
     CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
 
+    /**
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This expects to be called with external thread synchronization, and will not internally
+     *  grab the CHIP stack lock.
+     *
+     *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
+     *  ensure this happend before calling this method.
+     */
     virtual CHIP_ERROR Shutdown();
 
     /**
@@ -236,6 +245,10 @@ public:
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
     virtual void ReleaseDevice(Device * device);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
+#endif
 
     // ----- IO -----
     /**
@@ -374,6 +387,13 @@ public:
      */
     CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
 
+    /**
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This is not a thread-safe API, and should be called with external synchronization.
+     *
+     *  Please see implementation for more details.
+     */
     CHIP_ERROR Shutdown() override;
 
     // ----- Connection Management -----
@@ -470,6 +490,8 @@ public:
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
 
 #endif
+
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
 private:
     DevicePairingDelegate * mPairingDelegate;

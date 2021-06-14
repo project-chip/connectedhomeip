@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/lib/core/core.gni")
@@ -119,10 +120,11 @@ template("chip_data_model") {
       _cluster_sources = invoker.cluster_sources
     } else if (defined(invoker.zap_file)) {
       _zap_path = rebase_path(invoker.zap_file, root_build_dir)
+      _script_path = rebase_path(_zap_cluster_list_script, root_build_dir)
       _script_args = [ "--zap_file=" + _zap_path ]
 
-      _cluster_sources = exec_script(_zap_cluster_list_script,
-                                     _script_args,
+      _cluster_sources = exec_script("${build_root}/gn_run_binary.py",
+                                     [ _script_path ] + _script_args,
                                      "list lines",
                                      [ invoker.zap_file ])
     }

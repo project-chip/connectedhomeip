@@ -33,6 +33,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'GeneralCommissioning':
   case 'GeneralDiagnostics':
   case 'SoftwareDiagnostics':
+  case 'ThreadNetworkDiagnostics':
   case 'EthernetNetworkDiagnostics':
   case 'GroupKeyManagement':
   case 'NetworkCommissioning':
@@ -41,7 +42,6 @@ function asExpectedEndpointForCluster(clusterName)
   case 'OtaSoftwareUpdateServer':
     return 0;
   }
-
   return 1;
 }
 
@@ -52,7 +52,7 @@ function asTestValue()
   } else if (StringHelper.isCharString(this.type)) {
     return '@"Test"';
   } else {
-    return this.min || this.max || 0;
+    return this.min || this.max || 0;
   }
 }
 

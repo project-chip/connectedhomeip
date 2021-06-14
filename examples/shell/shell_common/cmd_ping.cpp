@@ -53,7 +53,7 @@ public:
         mLastEchoTime       = 0;
         mEchoCount          = 0;
         mEchoRespCount      = 0;
-        mEchoReqSize        = 32;
+        mPayloadSize        = 32;
         mWaitingForEchoResp = false;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mUsingTCP = false;
@@ -79,8 +79,8 @@ public:
     uint32_t GetEchoInterval() const { return mEchoInterval; }
     void SetEchoInterval(uint32_t value) { mEchoInterval = value; }
 
-    uint32_t GetEchoReqSize() const { return mEchoReqSize; }
-    void SetEchoReqSize(uint32_t value) { mEchoReqSize = value; }
+    uint32_t GetPayloadSize() const { return mPayloadSize; }
+    void SetPayloadSize(uint32_t value) { mPayloadSize = value; }
 
     uint16_t GetEchoPort() const { return mEchoPort; }
     void SetEchoPort(uint16_t value) { mEchoPort = value; }
@@ -107,7 +107,7 @@ private:
     uint64_t mEchoRespCount;
 
     // The CHIP Echo request payload size in bytes.
-    uint32_t mEchoReqSize;
+    uint32_t mPayloadSize;
 
     // Max value for the number of echo requests sent.
     uint32_t mMaxEchoCount;
@@ -143,18 +143,13 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
 
     Messaging::SendFlags sendFlags;
     System::PacketBufferHandle payloadBuf;
-    char * requestData = nullptr;
+    uint32_t payloadSize = gPingArguments.GetPayloadSize();
 
-    uint32_t size = gPingArguments.GetEchoReqSize();
-    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_MESSAGE_TOO_LONG);
-
-    requestData = static_cast<char *>(chip::Platform::MemoryAlloc(size));
-    VerifyOrExit(requestData != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    snprintf(requestData, size, "Echo Message %" PRIu64 "\n", gPingArguments.GetEchoCount());
-
-    payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
+    payloadBuf = MessagePacketBuffer::New(payloadSize);
     VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    memset(payloadBuf->Start(), 0, payloadSize);
+    payloadBuf->SetDataLength(payloadSize);
 
     if (gPingArguments.IsUsingMRP())
     {
@@ -167,7 +162,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
 
     gPingArguments.SetLastEchoTime(System::Timer::GetCurrentEpoch());
 
-    streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", size,
+    streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
 
     err = gEchoClient.SendEchoRequest(std::move(payloadBuf), sendFlags);
@@ -179,11 +174,6 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
 
 exit:
-    if (requestData != nullptr)
-    {
-        chip::Platform::MemoryFree(requestData);
-    }
-
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Send echo request failed, err: %s\n", ErrorStr(err));
@@ -364,7 +354,7 @@ void PrintUsage(streamer_t * stream)
     streamer_printf(stream, "  -i  <interval>  ping interval time in seconds\n");
     streamer_printf(stream, "  -c  <count>     stop after <count> replies\n");
     streamer_printf(stream, "  -r  <1|0>       enable or disable MRP\n");
-    streamer_printf(stream, "  -s  <size>      payload size in bytes\n");
+    streamer_printf(stream, "  -s  <size>      application payload size in bytes\n");
 }
 
 int cmd_ping(int argc, char ** argv)
@@ -431,7 +421,7 @@ int cmd_ping(int argc, char ** argv)
             }
             else
             {
-                gPingArguments.SetEchoReqSize(atol(argv[optIndex]));
+                gPingArguments.SetPayloadSize(atol(argv[optIndex]));
             }
             break;
         case 'r':

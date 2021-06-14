@@ -65,6 +65,10 @@ jobs:
               timeout-minutes: 5
               run: scripts/examples/k32w_example.sh
                    examples/lighting-app/k32w out/lighting_app_debug
+            - name: Build example K32W Shell App
+              timeout-minutes: 5
+              run: scripts/examples/k32w_example.sh
+                   examples/shell/k32w out/shell_app_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

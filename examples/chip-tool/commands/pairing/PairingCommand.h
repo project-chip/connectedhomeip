@@ -97,7 +97,7 @@ public:
     }
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -143,7 +143,6 @@ private:
     chip::Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> * mOnAddWiFiNetworkCallback;
     chip::Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> * mOnEnableNetworkCallback;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback;
-    ChipDeviceCommissioner mCommissioner;
     ChipDevice * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;

@@ -143,7 +143,7 @@ exit:
     return;
 }
 
-CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus)
+CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandDataElement::Builder commandDataElement;
@@ -152,11 +152,8 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPath
     err                = commandDataElement.GetError();
     SuccessOrExit(err);
 
-    if (apCommandPathParams != nullptr)
-    {
-        err = ConstructCommandPath(*apCommandPathParams, commandDataElement);
-        SuccessOrExit(err);
-    }
+    err = ConstructCommandPath(aCommandPathParams, commandDataElement);
+    SuccessOrExit(err);
 
     if (!aIsStatus)
     {
