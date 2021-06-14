@@ -83,3 +83,13 @@ jobs:
 #             - name: Perform CodeQL Analysis
 #               if: ${{ github.event_name == 'push' }}
 #               uses: github/codeql-action/analyze@v1
+
+            - name: Archive production artifacts
+              uses: actions/upload-artifact@v2
+              if: contains(env.BUILD_TYPE, 'release')
+              with:
+                name: ${{env.BUILD_TYPE}}
+                path: |
+                      out/${{env.BUILD_TYPE}}/chip-*
+                      !out/${{env.BUILD_TYPE}}/*.map
+                      out/${{env.BUILD_TYPE}}/controller/
