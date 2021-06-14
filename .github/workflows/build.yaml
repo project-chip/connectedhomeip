@@ -17,10 +17,11 @@ name: Builds
 on:
     push:
     pull_request:
+    workflow_dispatch:
 
 jobs:
-    build:
-        name: Build
+    build_linux:
+        name: Build on Linux
         timeout-minutes: 60
 
         strategy:
@@ -95,3 +96,60 @@ jobs:
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
+    build_darwin:
+        name: Build on Darwin
+        timeout-minutes: 60
+
+        env:
+            BUILD_TYPE: clang
+
+        runs-on: macos-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+            - name: Setup Environment
+              run: brew install openssl pkg-config
+            - name: Fix pkgconfig link
+              working-directory: /usr/local/lib/pkgconfig
+              run: |
+                  pwd
+                  ls -la /usr/local/Cellar/
+                  ls -la /usr/local/Cellar/openssl@1.1
+                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
+                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                   .environment/gn_out/.ninja_log
+                   .environment/pigweed-venv/*.log
+            - name: Setup Build
+              # Just go ahead and do the "all" build; on Darwin that's fairly
+              # fast.  If this ever becomes slow, we can think about ways to do
+              # the examples-linux-standalone.yaml tests on darwin without too
+              # much code duplication.
+              run: |
+                  scripts/build/gn_gen.sh --args='is_clang=true target_os="all"'
+            - name: Run Build
+              timeout-minutes: 10
+              run: scripts/build/gn_build.sh
+            - name: Run Tests
+              timeout-minutes: 2
+              run: scripts/tests/gn_tests.sh
+            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
+            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
+            # - name: Run Code Coverage
+            #   if: ${{ contains('main', env.BUILD_TYPE) }}
+            #   run: scripts/tools/codecoverage.sh
+            # - name: Upload Code Coverage
+            #   if: ${{ contains('main', env.BUILD_TYPE) }}
+            #   run: bash <(curl -s https://codecov.io/bash)
