@@ -310,6 +310,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         if (err == CHIP_NO_ERROR)
         {
             hadSuccesfulSend = true;
+            ChipLogProgress(Discovery, "mDNS broadcast success");
         }
         else
         {
