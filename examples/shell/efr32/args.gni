@@ -21,4 +21,3 @@ efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
 pw_assert_BACKEND = "$dir_pw_assert_log"
 chip_enable_openthread = true
-chip_build_shell_lib = true
