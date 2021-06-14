@@ -17,6 +17,7 @@ ROTATION_CHOICES = [
   'Ricardo (Silabs)',
   'Rob (Google)',
   'Song (Google)',
+  'Timothy (Qorvo)',
   'Victor (Samsung)',
   'Vivien (Apple)',
   'Yufeng (Google)',
