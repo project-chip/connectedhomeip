@@ -114,6 +114,7 @@ template("k32w_sdk") {
     ]
 
     defines = [
+      "gMainThreadPriority_c=6",
       "CPU_K32W061HN",
       "CPU_JN518X",
       "CPU_JN518X_REV=2",
