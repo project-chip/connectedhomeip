@@ -204,9 +204,9 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     SerializableDevice serializable;
-    size_t maxlen            = BASE64_ENCODED_LEN(sizeof(serializable));
-    size_t len               = strnlen(Uint8::to_const_char(&input.inner[0]), maxlen);
-    uint16_t deserializedLen = 0;
+    size_t maxlen             = BASE64_ENCODED_LEN(sizeof(serializable));
+    size_t len                = strnlen(Uint8::to_const_char(&input.inner[0]), maxlen);
+    uint16_t deserializedLen  = 0;
     Inet::IPAddress ipAddress = {};
 
     VerifyOrExit(len < sizeof(SerializedDevice), error = CHIP_ERROR_INVALID_ARGUMENT);
