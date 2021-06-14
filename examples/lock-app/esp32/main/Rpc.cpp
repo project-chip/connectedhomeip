@@ -38,7 +38,7 @@ using chip::DeviceLayer::ConfigurationMgr;
 
 static bool uartInitialised;
 
-extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, const char *format, ...)
+extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, const char * format, ...)
 {
     va_list v;
     va_start(v, format);
@@ -67,7 +67,7 @@ public:
     pw::Status Set(ServerContext &, const chip_rpc_LockingState & request, pw_protobuf_Empty & response)
     {
         BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock,
-                                 request.on ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
+                                     request.on ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
         return pw::OkStatus();
     }
 
@@ -107,8 +107,8 @@ public:
     }
     pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
     {
-        response.vendor_id = 1234;
-        response.product_id = 5678;
+        response.vendor_id        = 1234;
+        response.product_id       = 5678;
         response.software_version = 0;
         return pw::OkStatus();
     }

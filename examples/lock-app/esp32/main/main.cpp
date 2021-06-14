@@ -68,7 +68,7 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "chip-esp32-lock-example starting");
     ESP_LOGI(TAG, "==================================================");
 
-    CHIPDeviceManager &deviceMgr = CHIPDeviceManager::GetInstance();
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
