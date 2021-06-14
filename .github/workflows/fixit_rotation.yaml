@@ -25,6 +25,8 @@ jobs:
             image: connectedhomeip/chip-build:latest
 
         steps:
+            - name: Checkout
+              uses: actions/checkout@v2
             - name: Pick fixit rotation order
               run: scripts/fixit_rotation.py
 
