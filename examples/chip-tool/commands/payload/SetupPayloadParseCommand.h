@@ -25,7 +25,7 @@ class SetupPayloadParseCommand : public Command
 {
 public:
     SetupPayloadParseCommand() : Command("parse-setup-payload") { AddArgument("payload", &mCode); }
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
 
 private:
     char * mCode;
