@@ -42,7 +42,8 @@ enum class SocketEventFlags : uint8_t
 {
     kRead  = 0x1, /**< Bit flag indicating if there is a read event on a socket. */
     kWrite = 0x2, /**< Bit flag indicating if there is a write event on a socket. */
-    kError = 0x4, /**< Bit flag indicating if there is an error event on a socket. */
+    kExcept = 0x4, /**< Bit flag indicating if there is an exceptional condition on a socket (e.g. out-of-band data). */
+    kError = 0x8, /**< Bit flag indicating if there is an error event on a socket. */
 };
 
 using SocketEvents = BitFlags<SocketEventFlags>;
@@ -218,6 +219,12 @@ public:
      * Inside a callback function, test whether the file descriptor is ready to write.
      */
     bool HasPendingWrite() const { return mPendingIO.Has(SocketEventFlags::kWrite); }
+
+    /**
+     * Inside a callback function, test whether there is an exceptional condition (e.g. out-of-band data)
+     * associated with the file descriptor.
+     */
+    bool HasPendingException() const { return mPendingIO.Has(SocketEventFlags::kExcept); }
 
     /**
      * Inside a callback function, test whether there is an error condition associated with the file descriptor.

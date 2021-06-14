@@ -84,7 +84,7 @@ SocketEvents WatchableEventManager::SocketEventsFromFDs(int socket, const fd_set
         if (FD_ISSET(socket, const_cast<fd_set *>(&writefds)))
             res.Set(SocketEventFlags::kWrite);
         if (FD_ISSET(socket, const_cast<fd_set *>(&exceptfds)))
-            res.Set(SocketEventFlags::kError);
+            res.Set(SocketEventFlags::kExcept);
     }
 
     return res;
