@@ -22,7 +22,6 @@ chip_test_suite("tests") {
   output_name = "libMdnsTests"
 
   test_sources = [
-    "TestMinimalMdnsAllocator.cpp",
     "TestServiceNaming.cpp",
     "TestTxtFields.cpp",
   ]
