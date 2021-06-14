@@ -132,7 +132,8 @@ exit:
 
 CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathParams,
                                          const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                         const Protocols::Id aProtocolId, const Protocols::InteractionModel::ProtocolCode aProtocolCode)
+                                         const Protocols::Id aProtocolId,
+                                         const Protocols::InteractionModel::ProtocolCode aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
@@ -142,7 +143,9 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathP
 
     statusElementBuilder =
         mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), Protocols::InteractionModel::ToUint16(aProtocolCode))
+    statusElementBuilder
+        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(),
+                             Protocols::InteractionModel::ToUint16(aProtocolCode))
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);

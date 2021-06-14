@@ -26,8 +26,8 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
-#include <protocols/secure_channel/Constants.h>
 #include <protocols/interaction_model/Constants.h>
+#include <protocols/secure_channel/Constants.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
