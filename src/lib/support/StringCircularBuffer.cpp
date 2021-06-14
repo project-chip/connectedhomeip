@@ -26,7 +26,7 @@
 
 namespace chip {
 
-std::size_t StringCircularBuffer::Advance(std::size_t dataLocation, size_t amount) const
+size_t StringCircularBuffer::Advance(size_t dataLocation, size_t amount) const
 {
     dataLocation += amount;
     if (dataLocation >= mCapacity)
