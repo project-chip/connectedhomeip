@@ -196,7 +196,7 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
     return true;
 }
 
-void chip::app::clusters::OTAServer::SetDelegate(chip::EndpointId endpointId, OTAServerDelegate * delegate)
+void OTAServer::SetDelegate(chip::EndpointId endpointId, OTAServerDelegate * delegate)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpointId, ZCL_OTA_SERVER_CLUSTER_ID);
     if (ep != 0xFF)
