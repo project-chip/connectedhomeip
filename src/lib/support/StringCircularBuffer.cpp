@@ -54,7 +54,8 @@ void StringCircularBuffer::Read(uint8_t * dest, size_t length, size_t offset) co
 
 void StringCircularBuffer::Write(const uint8_t * source, size_t length)
 {
-    // Always reserve 1 byte to prevent mDataStart == mDataEnd.
+    // Always reserve 1 byte to prevent mDataStart == mDataEnd because then it would be
+    // ambiguous whether we have 0 bytes or mCapacity bytes stored.
     VerifyOrDie(mCapacity - Size() - 1 >= length);
 
     if (mCapacity - mDataEnd >= length)
