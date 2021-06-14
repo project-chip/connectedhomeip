@@ -5897,7 +5897,7 @@ CHIP_ERROR OtaSoftwareUpdateServerCluster::ApplyUpdateRequest(Callback::Cancelab
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
 
-    SuccessOrExit(err = sender->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // updateToken: octetString
@@ -5941,7 +5941,7 @@ CHIP_ERROR OtaSoftwareUpdateServerCluster::NotifyUpdateApplied(Callback::Cancela
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
 
-    SuccessOrExit(err = sender->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // updateToken: octetString
@@ -5987,7 +5987,7 @@ CHIP_ERROR OtaSoftwareUpdateServerCluster::QueryImage(Callback::Cancelable * onS
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
 
-    SuccessOrExit(err = sender->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // vendorId: int16u
