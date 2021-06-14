@@ -85,7 +85,7 @@ extern "C" void app_main()
     {
         ESP_LOGE(TAG, "GetAppTask().Init() failed");
     }
- 
+
     while (true)
     {
         vTaskDelay(500 / portTICK_PERIOD_MS);
