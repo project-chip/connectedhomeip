@@ -52,8 +52,8 @@ limitations under the License.
   <struct name="MediaInputInfo">
     <item name="index" type="INT8U"/>
     <item name="inputType" type="MediaInputType"/>
-    <item name="name" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
-    <item name="description" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
+    <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
+    <item name="description" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
   </struct>
 
   <enum name="MediaInputType" type="ENUM8">

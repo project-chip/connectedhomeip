@@ -3706,17 +3706,16 @@
 /** @brief Command description for AddOpCert
  *
  * Command: AddOpCert
- * @param NOC OCTET_STRING
- * @param ICACertificate OCTET_STRING
+ * @param OperationalCert OCTET_STRING
  * @param IPKValue OCTET_STRING
  * @param CaseAdminNode NODE_ID
  * @param AdminVendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterAddOpCert(NOC, ICACertificate, IPKValue, CaseAdminNode, AdminVendorId) emberAfFillExternalBuffer(            \
-        mask,                                                                                                                      \
+    CredentialsClusterAddOpCert(OperationalCert, IPKValue, CaseAdminNode, AdminVendorId)                                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-        ZCL_ADD_OP_CERT_COMMAND_ID, "uuuuu", NOC, ICACertificate, IPKValue, CaseAdminNode, AdminVendorId);
+                                  ZCL_ADD_OP_CERT_COMMAND_ID, "uuuu", OperationalCert, IPKValue, CaseAdminNode, AdminVendorId);
 
 /** @brief Command description for OpCertResponse
  *
@@ -3768,8 +3767,8 @@
  * Command: AddTrustedRootCertificate
  * @param RootCertificate OCTET_STRING
  */
-#define emberAfFillCommandTrusted                                                                                                  \
-    Root CertificatesClusterAddTrustedRootCertificate(RootCertificate)                                                             \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAddTrustedRootCertificate(RootCertificate)                                                                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", RootCertificate);
@@ -3779,8 +3778,8 @@
  * Command: RemoveTrustedRootCertificate
  * @param TrustedRootIdentifier OCTET_STRING
  */
-#define emberAfFillCommandTrusted                                                                                                  \
-    Root CertificatesClusterRemoveTrustedRootCertificate(TrustedRootIdentifier)                                                    \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveTrustedRootCertificate(TrustedRootIdentifier)                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", TrustedRootIdentifier);

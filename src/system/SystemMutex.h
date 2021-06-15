@@ -39,9 +39,15 @@
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+#if defined(ESP_PLATFORM)
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
+#else
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include <task.h>
+#endif
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
 namespace chip {
@@ -78,8 +84,8 @@ private:
 #if (configSUPPORT_STATIC_ALLOCATION == 1)
     StaticSemaphore_t mFreeRTOSSemaphoreObj;
 #endif // (configSUPPORT_STATIC_ALLOCATION == 1)
-    volatile SemaphoreHandle_t mFreeRTOSSemaphore;
-    volatile int mInitialized;
+    volatile SemaphoreHandle_t mFreeRTOSSemaphore = nullptr;
+    volatile int mInitialized                     = 0;
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
     Mutex(const Mutex &) = delete;

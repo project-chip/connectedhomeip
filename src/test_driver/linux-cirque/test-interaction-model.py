@@ -35,14 +35,16 @@ DEVICE_CONFIG = {
     'device0': {
         'type': 'CHIP-IM-Initiator',
         'base_image': 'chip_im_initiator',
-        'capability': ['Thread', 'Interactive'],
+        'capability': ['Thread', 'Interactive', 'TrafficControl'],
         'rcp_mode': True,
+        'traffic_control': {'latencyMs': 100}
     },
     'device1': {
         'type': 'CHIP-IM-Responder',
         'base_image': 'chip_im_responder',
-        'capability': ['Thread', 'Interactive'],
+        'capability': ['Thread', 'Interactive', 'TrafficControl'],
         'rcp_mode': True,
+        'traffic_control': {'latencyMs': 100}
     }
 }
 

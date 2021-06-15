@@ -28,53 +28,11 @@ using chip::Controller::DeviceCommissioner;
 
 extern chip::Ble::BleLayer * GetJNIBleLayer();
 
-namespace {
-
-bool FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId)
-{
-    if ((env == nullptr) || (object == nullptr))
-    {
-        ChipLogError(Controller, "Missing java object for %s", methodName);
-        return false;
-    }
-
-    jclass javaClass = env->GetObjectClass(object);
-    if (javaClass == NULL)
-    {
-        ChipLogError(Controller, "Failed to get class for %s", methodName);
-        return false;
-    }
-
-    *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
-    if (*methodId == NULL)
-    {
-        ChipLogError(Controller, "Failed to find method %s", methodName);
-        return false;
-    }
-
-    return true;
-}
-
-void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument)
-{
-    jmethodID method;
-
-    if (!FindMethod(env, object, methodName, "(I)V", &method))
-    {
-        return;
-    }
-
-    env->ExceptionClear();
-    env->CallVoidMethod(object, method, argument);
-}
-
-} // namespace
-
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
     if ((mJavaVM != nullptr) && (mJavaObjectRef != nullptr))
     {
-        GetJavaEnv()->DeleteGlobalRef(mJavaObjectRef);
+        GetEnvForCurrentThread()->DeleteGlobalRef(mJavaObjectRef);
     }
     mController->Shutdown();
 }
@@ -82,25 +40,12 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
 {
     mJavaVM        = vm;
-    mJavaObjectRef = GetJavaEnv()->NewGlobalRef(obj);
+    mJavaObjectRef = GetEnvForCurrentThread()->NewGlobalRef(obj);
 }
 
 void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jint argument)
 {
-    CallVoidInt(GetJavaEnv(), mJavaObjectRef, methodName, argument);
-}
-
-JNIEnv * AndroidDeviceControllerWrapper::GetJavaEnv()
-{
-    if (mJavaVM == nullptr)
-    {
-        return nullptr;
-    }
-
-    JNIEnv * env = nullptr;
-    mJavaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
-
-    return env;
+    CallVoidInt(GetEnvForCurrentThread(), mJavaObjectRef, methodName, argument);
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,

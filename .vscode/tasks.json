@@ -276,6 +276,19 @@
                     "${workspaceFolder}/examples/shell/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
                 ]
             }
+        },
+        {
+            "label": "Build Telink Lighting Example (TLSR9518ADK80D)",
+            "type": "shell",
+            "command": "source scripts/activate.sh && scripts/examples/telink_example.sh lighting-app tlsr9518adk80d",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/lighting-app/telink/build/tlsr9518adk80d"
+                ]
+            }
         }
     ]
 }

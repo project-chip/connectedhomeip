@@ -415,7 +415,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
             {
                 CHECK_MESSAGE_LENGTH(2);
                 uint16_t count = chip::Encoding::LittleEndian::Read16(message);
-                ChipLogProgress(Zcl, "  count: %lu", count);
+                ChipLogProgress(Zcl, "  count: %" PRIu16, count);
 
                 switch (clusterId)
                 {
@@ -854,6 +854,193 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     }
                     }
                     break;
+                case 0x0035:
+                    switch (attributeId)
+                    {
+                    case 0x0007: // NeighborTable
+                    {
+                        _NeighborTable data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].Age = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].LinkFrameCounter = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].MleFrameCounter = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LQI = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].AverageRssi = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LastRssi = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FrameErrorRate = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].MessageErrorRate = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].RxOnWhenIdle = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FullThreadDevice = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FullNetworkData = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].IsChild = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0008: // RouteTable
+                    {
+                        _RouteTable data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].RouterId = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].NextHop = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PathCost = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LQIIn = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LQIOut = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Age = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Allocated = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LinkEstablished = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x003B: // SecurityPolicy
+                    {
+                        _SecurityPolicy data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].RotationTime = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Flags = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x003D: // OperationalDatasetComponents
+                    {
+                        _OperationalDatasetComponents data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ActiveTimestampPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PendingTimestampPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].MasterKeyPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].NetworkNamePresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ExtendedPanIdPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].MeshLocalPrefixPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].DelayPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PanIdPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ChannelPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PskcPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].SecurityPolicyPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ChannelMaskPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>::
+                                FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x003E: // NetworkFault
+                    {
+                        uint8_t data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i] = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>::
+                                FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
                 }
                 break;
             }
@@ -916,7 +1103,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
             {
                 CHECK_MESSAGE_LENGTH(8);
                 uint64_t value = chip::Encoding::LittleEndian::Read64(message);
-                ChipLogProgress(Zcl, "  value: 0x%16x", value);
+                ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
 
                 Callback::Callback<Int64uAttributeCallback> * cb =
                     Callback::Callback<Int64uAttributeCallback>::FromCancelable(onSuccessCallback);
@@ -1188,7 +1375,7 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint1
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -1208,7 +1395,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -2630,7 +2817,7 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
         {
             CHECK_MESSAGE_LENGTH(8);
             uint64_t value = chip::Encoding::LittleEndian::Read64(message);
-            ChipLogProgress(Zcl, "  value: 0x%16x", value);
+            ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
 
             Callback::Callback<Int64uAttributeCallback> * cb =
                 Callback::Callback<Int64uAttributeCallback>::FromCancelable(onReportCallback);

@@ -43,9 +43,7 @@ CHIP_ERROR AttributeDataElement::Parser::Init(const chip::TLV::TLVReader & aRead
 
     VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    // This is just a dummy, as we're not going to exit this container ever
-    chip::TLV::TLVType OuterContainerType;
-    err = mReader.EnterContainer(OuterContainerType);
+    err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -322,6 +320,8 @@ CHIP_ERROR AttributeDataElement::Parser::CheckSchemaValidity() const
             err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT;
         }
     }
+    SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);

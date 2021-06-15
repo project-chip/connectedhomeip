@@ -749,7 +749,7 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
     else if (!isBroadcastDestination(emberAfResponseDestination))
     {
         label  = 'U';
-        status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_VIA_EXCHANGE, MessageSendDestination(emberAfResponseDestination),
+        status = emberAfSendUnicastWithCallback(MessageSendDestination::ViaExchange(emberAfResponseDestination),
                                                 &emberAfResponseApsFrame, appResponseLength, appResponseData, callback);
     }
     else

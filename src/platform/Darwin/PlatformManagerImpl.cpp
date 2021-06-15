@@ -25,14 +25,16 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+
+// Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
+#include <platform/internal/GenericPlatformManagerImpl.cpp>
 
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     CHIP_ERROR err;
 
@@ -42,13 +44,27 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
     SystemLayer.SetDispatchQueue(GetWorkQueue());
 
 exit:
     return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_Shutdown()
+{
+    // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
+    return System::MapErrorPOSIX(GenericPlatformManagerImpl<ImplClass>::_Shutdown());
+}
+
+void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
+{
+    const ChipDeviceEvent eventCopy = *event;
+    dispatch_async(mWorkQueue, ^{
+        Impl()->DispatchEvent(&eventCopy);
+    });
 }
 
 } // namespace DeviceLayer

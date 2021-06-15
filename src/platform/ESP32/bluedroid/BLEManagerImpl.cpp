@@ -721,7 +721,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): ", ErrorStr(err));
+        ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): %s", ErrorStr(err));
         ExitNow();
     }
 

@@ -42,11 +42,7 @@ CHIP_ERROR AttributePath::Parser::Init(const chip::TLV::TLVReader & aReader)
 
     VerifyOrExit(chip::TLV::kTLVType_List == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    // This is just a dummy, as we're not going to exit this container ever
-    chip::TLV::TLVType dummyContainerType;
-    // enter into the Path
-    err = mReader.EnterContainer(dummyContainerType);
-    SuccessOrExit(err);
+    err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -151,19 +147,19 @@ CHIP_ERROR AttributePath::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // check for required fields:
-        const uint16_t RequiredFields = (1 << kCsTag_EndpointId) | (1 << kCsTag_ClusterId);
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
+        // Not allow for situation where ListIndex exists, but FieldId not exists
+        if ((TagPresenceMask & (1 << kCsTag_FieldId)) == 0 && (TagPresenceMask & (1 << kCsTag_ListIndex)) != 0)
         {
             err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
         }
+        else
+        {
+            err = CHIP_NO_ERROR;
+        }
     }
+
     SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);

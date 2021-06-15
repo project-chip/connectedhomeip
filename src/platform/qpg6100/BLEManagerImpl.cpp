@@ -50,12 +50,13 @@ namespace {
 #define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
 
 #define CHIP_ADV_SHORT_UUID_LEN 2
-#define CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 0xFFF6
 
 // FreeeRTOS sw timer
 TimerHandle_t sbleAdvTimeoutTimer;
 
 // Full service UUID - CHIP_BLE_SVC_ID - taken from BleUUID.h header
+const uint8_t chipUUID_CHIPoBLE_Service[CHIP_ADV_SHORT_UUID_LEN] = { 0xFF, 0xF6 };
+
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
 
@@ -88,6 +89,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     appCbacks.chrReadCback  = HandleTXCharRead;
     appCbacks.chrWriteCback = HandleRXCharWrite;
     appCbacks.cccCback      = _handleTXCharCCCDWrite;
+    qvCHIP_BleSetUUIDs((uint8_t *) chipUUID_CHIPoBLE_Service, (uint8_t *) chipUUID_CHIPoBLEChar_TX.bytes,
+                       (uint8_t *) chipUUID_CHIPoBLEChar_RX.bytes);
     qvCHIP_BleInit(&appCbacks);
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
@@ -302,17 +305,17 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     uint16_t dataLen = data->DataLength();
 
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE Client RX characteristic (con %u, len %u)", conId, dataLen);
+    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE Client TX (con %u, len %u)", conId, dataLen);
 
-    isRxHandle = UUIDsMatch(&chipUUID_CHIPoBLEChar_TX, charId);
+    isRxHandle = UUIDsMatch(&chipUUID_CHIPoBLEChar_RX, charId);
     cId        = qvCHIP_BleGetHandle(isRxHandle);
 
-    qvCHIP_BleSendIndication(conId, cId, dataLen, data->Start());
+    qvCHIP_BleSendNotification(conId, cId, dataLen, data->Start());
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendNotification() failed: %s", ErrorStr(err));
         return false;
     }
     return true;
@@ -462,8 +465,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     mAdvDataBuf[index++] = static_cast<uint8_t>(mDeviceIdInfoLength + CHIP_ADV_SHORT_UUID_LEN + 1); // AD length
     mAdvDataBuf[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
-    mAdvDataBuf[index++] = CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 & 0xFF;                            // AD value
-    mAdvDataBuf[index++] = (CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 >> 8) & 0xFF;
+    mAdvDataBuf[index++] = chipUUID_CHIPoBLE_Service[1];                                            // AD value
+    mAdvDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
     memcpy(&mAdvDataBuf[index], (void *) &mDeviceIdInfo, mDeviceIdInfoLength); // AD value
     index = static_cast<uint8_t>(index + mDeviceIdInfoLength);
 
@@ -476,10 +479,10 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     // Fill in scan response data
     index                     = 0;
-    mScanRespDataBuf[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;                  // AD length
-    mScanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_UUID;                      // AD type : uuid
-    mScanRespDataBuf[index++] = CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 & 0xFF; // AD value
-    mScanRespDataBuf[index++] = (CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 >> 8) & 0xFF;
+    mScanRespDataBuf[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;  // AD length
+    mScanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_UUID;      // AD type : uuid
+    mScanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[1]; // AD value
+    mScanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
 
     qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_SCAN, index, mScanRespDataBuf);
 
@@ -587,7 +590,7 @@ void BLEManagerImpl::HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t 
 {
     uint8_t rsp = 0;
 
-    ChipLogProgress(DeviceLayer, "Read request received for CHIPoBLE Client RX characteristic (con %u)", connId);
+    ChipLogProgress(DeviceLayer, "Read request received for CHIPoBLE Client TX characteristic (con %u)", connId);
 
     // Send a zero-length response.
     qvCHIP_BleWriteAttr(connId, handle, 0, &rsp);
@@ -598,7 +601,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE Client TX characteristic (con %u, len %u)", connId, len);
+    ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE Client RX characteristic (con %u, len %u)", connId, len);
 
     // Copy the data to a packet buffer.
     PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(pValue, len, 0, 0);
@@ -623,20 +626,20 @@ exit:
 void BLEManagerImpl::HandleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * pEvt)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    bool indicationsEnabled;
+    bool notificationsEnabled;
 
     ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE TX characteristic CCCD (con %u, len %u)", pEvt->hdr.param, 0);
 
-    // Determine if the client is enabling or disabling indications.
-    indicationsEnabled = (pEvt->value != 0);
+    // Determine if the client is enabling or disabling notifications
+    notificationsEnabled = (pEvt->value != 0);
 
-    // If the client has requested to enabled indications
-    if (indicationsEnabled)
+    // If the client has requested to enable notifications
+    if (notificationsEnabled)
     {
         // Set subcription only the first time
         if (!IsSubscribed(pEvt->hdr.param))
         {
-            // Record that indications have been enabled for this connection.
+            // Record that notifications have been enabled for this connection.
             err = SetSubscribed(pEvt->hdr.param);
             VerifyOrExit(err != CHIP_ERROR_NO_MEMORY, err = CHIP_NO_ERROR);
             SuccessOrExit(err);
@@ -645,21 +648,20 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * pEvt)
 
     else
     {
-        // If indications had previously been enabled for this connection, record that they are no longer
-        // enabled.
+        // If notifications had previously been enabled for this connection, record that they are no longer enabled
         UnsetSubscribed(pEvt->hdr.param);
     }
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
-    // whether the client is enabling or disabling indications.
+    // whether the client is enabling or disabling notifications
     {
         ChipDeviceEvent event;
-        event.Type = (indicationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type = (notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = pEvt->hdr.param;
         PlatformMgr().PostEvent(&event);
     }
 
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", indicationsEnabled ? "subscribe" : "unsubscribe");
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", notificationsEnabled ? "subscribe" : "unsubscribe");
 
 exit:
     if (err != CHIP_NO_ERROR)

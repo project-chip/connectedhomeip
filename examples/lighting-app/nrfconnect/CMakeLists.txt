@@ -88,7 +88,6 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               ${CHIP_ROOT}/src/app/clusters/trusted-root-certificates-server/trusted-root-certificates-server.cpp
                )
 
 if (CONFIG_CHIP_PW_RPC)

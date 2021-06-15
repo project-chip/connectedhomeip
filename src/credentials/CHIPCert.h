@@ -63,7 +63,7 @@ enum
     kTag_EllipticCurveIdentifier = 8,  /**< [ unsigned int ] For EC certs, identifies the elliptic curve used. */
     kTag_EllipticCurvePublicKey  = 9,  /**< [ byte string ] The elliptic curve public key, in X9.62 encoded format. */
     kTag_Extensions              = 10, /**< [ list ] Certificate extensions. */
-    kTag_ECDSASignature          = 11, /**< [ structure ] The ECDSA signature for the certificate. */
+    kTag_ECDSASignature          = 11, /**< [ byte string ] The ECDSA signature for the certificate. */
 
     // ---- Context-specific Tags for certificate extensions ----
     kTag_BasicConstraints       = 1, /**< [ structure ] Identifies whether the subject of the certificate is a CA. */
@@ -72,10 +72,6 @@ enum
     kTag_SubjectKeyIdentifier   = 4, /**< [ byte string ] Identifier of the certificate's public key. */
     kTag_AuthorityKeyIdentifier = 5, /**< [ byte string ] Identifier of the public key used to sign the certificate. */
     kTag_FutureExtension        = 6, /**< [ byte string ] Arbitrary extention. DER encoded SEQUENCE as in X.509 form. */
-
-    // ---- Context-specific Tags for ECDSASignature Structure ----
-    kTag_ECDSASignature_r = 1, /**< [ byte string ] ECDSA r value, in ASN.1 integer encoding. */
-    kTag_ECDSASignature_s = 2, /**< [ byte string ] ECDSA s value, in ASN.1 integer encoding. */
 
     // ---- Context-specific Tags for BasicConstraints Structure ----
     kTag_BasicConstraints_IsCA = 1,              /**< [ boolean ] True if the certificate can be used to verify certificate
@@ -282,9 +278,9 @@ public:
  */
 struct CertificateKeyId
 {
-    const uint8_t * mId; /**< Pointer to the key identifier. Encoded as Octet String and represented as the ASN.1 DER Integer (X.690
-                            standard). */
-    uint8_t mLen;        /**< Key identifier length. */
+    const uint8_t * mId = nullptr; /**< Pointer to the key identifier. Encoded as Octet String and represented as the ASN.1 DER
+                                        Integer (X.690 standard). */
+    uint8_t mLen = 0;              /**< Key identifier length. */
 
     bool IsEqual(const CertificateKeyId & other) const;
     bool IsEmpty() const { return mId == nullptr; }
@@ -310,6 +306,7 @@ struct ChipCertificateData
     void Clear();
     bool IsEqual(const ChipCertificateData & other) const;
 
+    // TODO: Review and consider replacing some data pointer/len pairs with ByteSpan and FixedByteSpan types.
     ByteSpan mCertificate;                      /**< Original raw buffer data. */
     ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
     ChipDN mIssuerDN;                           /**< Certificate Issuer DN. */
@@ -326,14 +323,10 @@ struct ChipCertificateData
     BitFlags<KeyUsageFlags> mKeyUsageFlags;     /**< Certificate key usage extensions flags. */
     BitFlags<KeyPurposeFlags> mKeyPurposeFlags; /**< Certificate extended key usage extensions flags. */
     uint8_t mPathLenConstraint;                 /**< Basic constraint: path length. */
-    struct
-    {
-        const uint8_t * R; /**< Pointer to the R element of the signature, encoded as ASN.1 DER Integer. */
-        uint8_t RLen;      /**< Length of R. */
-        const uint8_t * S; /**< Pointer to the S element of the signature, encoded as ASN.1 DER Integer. */
-        uint8_t SLen;      /**< Length of R. */
-    } mSignature;          /**< Certificate signature structure. */
-    uint8_t mTBSHash[chip::Crypto::kSHA256_Hash_Length]; /**< Certificate TBS hash. */
+    const uint8_t * mSignature;                 /**< Pointer to the certificate signature. */
+    uint8_t mSignatureLen;                      /**< Certificate signature length. */
+
+    uint8_t mTBSHash[Crypto::kSHA256_Hash_Length]; /**< Certificate TBS hash. */
 };
 
 /**
@@ -640,6 +633,27 @@ CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509Cert
                                      uint32_t chipCertBufSize, uint32_t & chipCertLen);
 
 /**
+ * @brief Convert standard X.509 certificates to CHIP certificate array.
+ *        This function takes NOC, and ICA cert X.509 certificates and
+ *        encodes into CHIP certificate array.
+ *
+ *        NOC certificate must be provided.
+ *        ICA certificate is optional. It can be omitted by providing a 0 length ByteSpan.
+ *
+ *        The API enforces that the NOC is issued by ICA (if ICA is provided).
+ *
+ * @param x509NOC              Node operational credentials certificate in X.509 DER encoding.
+ * @param x509ICAC             Intermediate CA certificate in X.509 DER encoding.
+ * @param chipCertArrayBuf     Buffer to store converted certificates in CHIP format.
+ * @param chipCertArrayBufSize The size of the buffer to store converted certificates.
+ * @param chipCertBufLen[out]  The length of the converted certificates.
+ *
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteSpan & x509ICAC, uint8_t * chipCertArrayBuf,
+                                           uint32_t chipCertArrayBufSize, uint32_t & chipCertBufLen);
+
+/**
  * @brief Convert CHIP certificate to the standard X.509 DER encoded certificate.
  *
  * @param chipCert        Buffer containing CHIP certificate.
@@ -788,6 +802,69 @@ inline bool IsChipDNAttr(chip::ASN1::OID oid)
 {
     return (IsChip64bitDNAttr(oid) || IsChip32bitDNAttr(oid));
 }
+
+/**
+ * @brief Convert an ASN.1 DER encoded integer to a raw big-endian integer.
+ *
+ * @param derInt     Buffer that holds ASN.1 DER encoded integer.
+ * @param derIntLen  The length of the ASN.1 DER encoded integer.
+ * @param rawInt     Buffer to store converted raw integer.
+ * @param rawIntLen  The length of the converted raw integer.
+ *
+ * @retval  #CHIP_NO_ERROR  If the integer value was successfully converted.
+ */
+CHIP_ERROR ConvertIntegerDERToRaw(const uint8_t * derInt, uint16_t derIntLen, uint8_t * rawInt, const uint16_t rawIntLen);
+
+/**
+ * @brief Convert a raw integer in big-endian form to an ASN.1 DER encoded integer.
+ *
+ * @param rawInt        Buffer that holds raw integer.
+ * @param rawIntLen     The length of the raw integer.
+ * @param derInt        Buffer to store converted ASN.1 DER encoded integer.
+ * @param derIntBufSize The size of the buffer to store ASN.1 DER encoded integer.
+ * @param derIntLen     The length of the ASN.1 DER encoded integer.
+ *
+ * @retval  #CHIP_NO_ERROR  If the integer value was successfully converted.
+ */
+CHIP_ERROR ConvertIntegerRawToDER(const uint8_t * rawInt, uint16_t rawIntLen, uint8_t * derInt, const uint16_t derIntBufSize,
+                                  uint16_t & derIntLen);
+
+/**
+ * @brief Convert a raw CHIP signature to an ASN.1 DER encoded signature structure.
+ *
+ * @param rawSig        Buffer that holds raw CHIP signature.
+ * @param rawSigLen     The length of the raw CHIP signature.
+ * @param derSig        Buffer to store converted ASN.1 DER encoded signature.
+ * @param derSigBufSize The size of the buffer to store ASN.1 DER encoded signature.
+ * @param derSigLen     The length of the ASN.1 DER encoded signature.
+ *
+ * @retval  #CHIP_NO_ERROR  If the signature value was successfully converted.
+ */
+CHIP_ERROR ConvertECDSASignatureRawToDER(const uint8_t * rawSig, uint16_t rawSigLen, uint8_t * derSig, const uint16_t derSigBufSize,
+                                         uint16_t & derSigLen);
+
+/**
+ * @brief Convert a raw CHIP ECDSA signature to an ASN.1 DER encoded signature structure.
+ *
+ * @param rawSig        Buffer that holds raw CHIP signature.
+ * @param rawSigLen     The length of the raw CHIP signature.
+ * @param writer        A reference to the ASN1Writer to store ASN.1 DER encoded signature.
+ *
+ * @retval  #CHIP_NO_ERROR  If the signature value was successfully converted.
+ */
+CHIP_ERROR ConvertECDSASignatureRawToDER(const uint8_t * rawSig, uint16_t rawSigLen, ASN1::ASN1Writer & writer);
+
+/**
+ * @brief Convert an ASN.1 DER encoded ECDSA signature to a raw CHIP signature.
+ *
+ * @param reader        A reference to the ASN1Reader positioned at the beginning of the
+ *                      DER encoded ECDSA signature.
+ * @param writer        A reference to the TLVWriter to store TLV encoded ECDSA signature element.
+ * @param tag           Tag to use for TLV encoded signature.
+ *
+ * @retval  #CHIP_NO_ERROR  If the signature value was successfully converted.
+ */
+CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::TLVWriter & writer, uint64_t tag);
 
 } // namespace Credentials
 } // namespace chip

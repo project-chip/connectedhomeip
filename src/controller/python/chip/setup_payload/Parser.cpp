@@ -34,7 +34,7 @@ void YieldSetupPayloadAttributes(const SetupPayload & payload, AttributeVisitor 
     attrVisitor("Version", std::to_string(payload.version).c_str());
     attrVisitor("VendorID", std::to_string(payload.vendorID).c_str());
     attrVisitor("ProductID", std::to_string(payload.productID).c_str());
-    attrVisitor("RequiresCustomFlow", std::to_string(payload.requiresCustomFlow).c_str());
+    attrVisitor("CommissioningFlow", std::to_string(static_cast<uint8_t>(payload.commissioningFlow)).c_str());
     attrVisitor("RendezvousInformation", std::to_string(payload.rendezvousInformation.Raw()).c_str());
     attrVisitor("Discriminator", std::to_string(payload.discriminator).c_str());
     attrVisitor("SetUpPINCode", std::to_string(payload.setUpPINCode).c_str());

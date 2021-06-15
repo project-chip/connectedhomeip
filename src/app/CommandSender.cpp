@@ -37,10 +37,11 @@ namespace app {
 CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle commandPacket;
 
     VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = FinalizeCommandsMessage();
+    err = FinalizeCommandsMessage(commandPacket);
     SuccessOrExit(err);
 
     // Discard any existing exchange context. Effectively we can only have one exchange per CommandSender
@@ -62,7 +63,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(
-        Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
+        Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(commandPacket),
         Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
     SuccessOrExit(err);
     MoveToState(CommandState::Sending);

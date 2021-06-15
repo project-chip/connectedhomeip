@@ -90,14 +90,14 @@ public:
      * @return CHIP_ERROR
      *
      */
-    CHIP_ERROR FinalizeCommandsMessage();
+    CHIP_ERROR FinalizeCommandsMessage(System::PacketBufferHandle & commandPacket);
 
-    CHIP_ERROR PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus = false);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus = false);
     TLV::TLVWriter * GetCommandDataElementTLVWriter();
     CHIP_ERROR FinishCommand(bool aIsStatus = false);
-    virtual CHIP_ERROR AddStatusCode(const CommandPathParams * apCommandPathParams,
+    virtual CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                     const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+                                     const Protocols::Id aProtocolId, const Protocols::InteractionModel::ProtocolCode aProtocolCode)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     };
@@ -130,9 +130,8 @@ protected:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
-    chip::System::PacketBufferHandle mCommandMessageBuf;
-    uint8_t mCommandIndex = 0;
-    CommandState mState   = CommandState::Uninitialized;
+    uint8_t mCommandIndex                      = 0;
+    CommandState mState                        = CommandState::Uninitialized;
 
 private:
     friend class TestCommandInteraction;
