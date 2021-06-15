@@ -207,11 +207,13 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     /// need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
 
-    FullQName operationalServiceName = mQueryResponderAllocator.AllocateQName("_chip", "_tcp", "local");
-    FullQName operationalServerName  = mQueryResponderAllocator.AllocateQName(nameBuffer, "_chip", "_tcp", "local");
+    FullQName operationalServiceName =
+        mQueryResponderAllocator.AllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
+    FullQName operationalServerName =
+        mQueryResponderAllocator.AllocateQName(nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
 
     ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
-    FullQName serverName = mQueryResponderAllocator.AllocateQName(nameBuffer, "local");
+    FullQName serverName = mQueryResponderAllocator.AllocateQName(nameBuffer, kLocalDomain);
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {

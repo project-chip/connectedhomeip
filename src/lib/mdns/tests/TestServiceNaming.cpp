@@ -83,7 +83,6 @@ void TestExtractIdFromInstanceName(nlTestSuite * inSuite, void * inContext)
 
 void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
 {
-    // TODO(cecille): These need to be changed to remove leading zeros
     constexpr size_t kSize = 16;
     char buffer[kSize];
     DiscoveryFilter filter;
@@ -92,7 +91,7 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     filter.type = DiscoveryFilterType::kLong;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_L0003") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_L3") == 0);
 
     filter.code = (1 << 12) - 1;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
@@ -105,7 +104,7 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     filter.type = DiscoveryFilterType::kShort;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S003") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S3") == 0);
 
     filter.code = (1 << 8) - 1;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
@@ -118,15 +117,17 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     filter.type = DiscoveryFilterType::kVendor;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_V003") == 0);
-    // TODO:add tests for longer vendor codes once the leading zero issue is fixed.
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_V3") == 0);
+    filter.code = 0xFFFF;
+    NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_V65535") == 0);
 
     // Device Type tests
     filter.type = DiscoveryFilterType::kDeviceType;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_T003") == 0);
-    // TODO: Add tests for longer device types once the leadng zero issue is fixed.
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_T3") == 0);
+    // TODO: Add tests for longer device types once spec issue #3226 is closed.
 
     // Commisioning mode tests
     filter.type = DiscoveryFilterType::kCommissioningMode;
@@ -165,12 +166,12 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     filter.code = 3;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_L0003._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_L3._sub._matterc") == 0);
 
     filter.code = (1 << 12) - 1;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_L4095._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_L4095._sub._matterc") == 0);
 
     filter.code = 1 << 12;
     NL_TEST_ASSERT(inSuite,
@@ -182,12 +183,12 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
     printf("buffer: %s\n", buffer);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S003._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S3._sub._matterc") == 0);
 
     filter.code = (1 << 8) - 1;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S255._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S255._sub._matterc") == 0);
 
     filter.code = 1 << 8;
     NL_TEST_ASSERT(inSuite,
@@ -198,7 +199,7 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     filter.code = 3;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_V003._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_V3._sub._matterc") == 0);
     // TODO:add tests for longer vendor codes once the leading zero issue is fixed.
 
     // Device Type tests
@@ -206,7 +207,7 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     filter.code = 3;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_T003._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_T3._sub._matterc") == 0);
     // TODO: Add tests for longer device types once the leadng zero issue is fixed.
 
     // Commisioning mode tests
@@ -214,11 +215,11 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     filter.code = 0;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C0._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C0._sub._matterc") == 0);
     filter.code = 1;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C1._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C1._sub._matterc") == 0);
     filter.code = 2; // only or or 1 allwoed
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) != CHIP_NO_ERROR);
@@ -228,7 +229,7 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     filter.code = 1;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_A1._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_A1._sub._matterc") == 0);
     filter.code = 0; // 1 is only value allowed
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) != CHIP_NO_ERROR);
@@ -237,26 +238,26 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     filter.type = DiscoveryFilterType::kNone;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_matterc") == 0);
 
     filter.type = DiscoveryFilterType::kNone;
     NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionerNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_chipd") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_matterd") == 0);
 
     // Test buffer exactly the right size - "_chipc" = 6 + nullptr = 7
     filter.type = DiscoveryFilterType::kNone;
     NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 6, filter, DiscoveryType::kCommissionableNode) == CHIP_ERROR_NO_MEMORY);
 
-    // Test buffer exactly the right size - "_chipc" = 6 + nullptr = 7
+    // Test buffer exactly the right size - "_matterc" = 8 + nullptr = 9
     filter.type = DiscoveryFilterType::kNone;
     NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 7, filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_matterc") == 0);
 
-    // Test buffer exactly the right size for subtype - "_C1._sub._chipc" = 15 + nullptr = 16
+    // Test buffer exactly the right size for subtype - "_C1._sub._matter" = 17 + nullptr = 18
     filter.type = DiscoveryFilterType::kCommissioningMode;
     filter.code = 1;
     NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 16, filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C1._sub._chipc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C1._sub._matterc") == 0);
 }
 
 const nlTest sTests[] = {

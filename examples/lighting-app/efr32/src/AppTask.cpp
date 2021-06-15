@@ -176,7 +176,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     EFR32_LOG("App Task started");
-    SetDeviceName("EFR32LightingDemo._chip._udp.local.");
+    SetDeviceName("EFR32LightingDemo._matter._udp.local.");
 
     while (true)
     {
