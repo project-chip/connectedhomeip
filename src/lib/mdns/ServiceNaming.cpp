@@ -175,8 +175,6 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
 
 CHIP_ERROR MakeCommissionableNodeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc)
 {
-    char subtypeQualifier[] = "_sub";
-    char type[]             = "_chipc";
     size_t requiredSize;
     if (nameDesc.type == DiscoveryFilterType::kNone)
     {
@@ -186,7 +184,8 @@ CHIP_ERROR MakeCommissionableNodeServiceTypeName(char * buffer, size_t bufferLen
     {
         ReturnErrorOnFailure(MakeServiceSubtype(buffer, bufferLen, nameDesc));
         size_t subtypeLen = strlen(buffer);
-        requiredSize      = snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", subtypeQualifier, type);
+        requiredSize =
+            snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionableServiceName);
     }
 
     return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;

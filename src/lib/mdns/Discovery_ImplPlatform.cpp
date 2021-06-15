@@ -21,6 +21,7 @@
 
 #include "ServiceNaming.h"
 #include "lib/core/CHIPSafeCasts.h"
+#include "lib/mdns/TxtFields.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
@@ -458,7 +459,6 @@ void DiscoveryImplPlatform::HandleCommissionableNodeResolve(void * context, Mdns
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
-        void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommissionableNodeData * nodeData);
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
         FillNodeDataFromTxt(key, val, &data);

@@ -224,6 +224,21 @@ void TestMakeCommissionableNodeServiceTypeName(nlTestSuite * inSuite, void * inC
     filter.type = DiscoveryFilterType::kNone;
     NL_TEST_ASSERT(inSuite, MakeCommissionableNodeServiceTypeName(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_chipc") == 0);
+
+    // Test buffer exactly the right size - "_chipc" = 6 + nullptr = 7
+    filter.type = DiscoveryFilterType::kNone;
+    NL_TEST_ASSERT(inSuite, MakeCommissionableNodeServiceTypeName(buffer, 6, filter) == CHIP_ERROR_NO_MEMORY);
+
+    // Test buffer exactly the right size - "_chipc" = 6 + nullptr = 7
+    filter.type = DiscoveryFilterType::kNone;
+    NL_TEST_ASSERT(inSuite, MakeCommissionableNodeServiceTypeName(buffer, 7, filter) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_chipc") == 0);
+
+    // Test buffer exactly the right size for subtype - "_C1._sub._chipc" = 15 + nullptr = 16
+    filter.type = DiscoveryFilterType::kCommissioningMode;
+    filter.code = 1;
+    NL_TEST_ASSERT(inSuite, MakeCommissionableNodeServiceTypeName(buffer, 16, filter) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C1._sub._chipc") == 0);
 }
 
 const nlTest sTests[] = {

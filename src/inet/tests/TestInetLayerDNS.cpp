@@ -298,6 +298,7 @@ static void TestDNSResolution_NoRecord(nlTestSuite * testSuite, void * testConte
 static void TestDNSResolution_NoHostRecord(nlTestSuite * testSuite, void * testContext)
 {
     // clang-format off
+#ifndef DISABLE_BROKEN_DNS_TESTS
 
     // Test resolving a name that has no host records (A or AAAA).
     RunTestCase(testSuite,
@@ -339,6 +340,8 @@ static void TestDNSResolution_NoHostRecord(nlTestSuite * testSuite, void * testC
             false
         }
     );
+    #endif
+
     // clang-format on
 }
 
