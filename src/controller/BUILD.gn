@@ -19,6 +19,7 @@ static_library("controller") {
 
   sources = [
     "${chip_root}/src/app/util/CHIPDeviceCallbacksMgr.cpp",
+    "AbstractMdnsDiscoveryController.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
     "CHIPCommissionableNodeController.cpp",
@@ -26,7 +27,6 @@ static_library("controller") {
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
-    "AbstractMdnsDiscoveryController.cpp",
     "DeviceAddressUpdateDelegate.h",
     "EmptyDataModelHandler.cpp",
     "ExampleOperationalCredentialsIssuer.cpp",
