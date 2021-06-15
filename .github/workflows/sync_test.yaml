@@ -15,6 +15,19 @@ jobs:
         name: test_sync
 
         steps:
+          - uses: actions/checkout@v2
           - uses: ahmadnassri/action-workflow-run-wait@v1
-          - name: Send some dummy message
-            run: echo test message
+          
+          - name: Download CHIP-app linux artifacts
+            uses: dawidd6/action-download-artifact@v2
+            with:
+              workflow: build.yaml
+              workflow_conclusion: success
+              path: build_artifacts
+
+          - name: Download test target artifacts
+            uses: dawidd6/action-download-artifact@v2
+            with:
+              workflow: examples-mbed.yaml
+              workflow_conclusion: success
+              path: examples_mbed_artifacts
