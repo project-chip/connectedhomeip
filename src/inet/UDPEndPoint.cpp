@@ -249,15 +249,13 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
     dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
-        unsigned long fd = static_cast<unsigned long>(mSocket);
+        unsigned long fd = static_cast<unsigned long>(mSocket.GetFD());
 
         mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
         ReturnErrorCodeIf(mReadableSource == nullptr, INET_ERROR_NO_MEMORY);
 
         dispatch_source_set_event_handler(mReadableSource, ^{
-            SocketEvents res;
-            res.SetRead();
-            this->mPendingIO = res;
+            this->mSocket.SetPendingIO(System::SocketEventFlags::kRead);
             this->HandlePendingIO();
         });
         dispatch_resume(mReadableSource);
