@@ -34,6 +34,7 @@ const kIndexName         = 'index';
 const kValuesName        = 'values';
 const kArgumentsName     = 'arguments';
 const kResponseName      = 'response';
+const kDisabledName      = 'disabled';
 const kResponseErrorName = 'error';
 
 function setDefault(test, name, defaultValue)
@@ -113,15 +114,16 @@ function setDefaultResponse(test)
   delete test[kResponseName].value;
 }
 
-function setDefaults(test, index, defaultConfig)
+function setDefaults(test, defaultConfig)
 {
   const defaultClusterName = defaultConfig[kClusterName] || null;
   const defaultEndpointId  = defaultConfig[kEndpointName] || null;
+  const defaultDisabled    = false;
 
   setDefaultType(test);
-  setDefault(test, kIndexName, index);
   setDefault(test, kClusterName, defaultClusterName);
   setDefault(test, kEndpointName, defaultEndpointId);
+  setDefault(test, kDisabledName, defaultDisabled);
   setDefaultArguments(test);
   setDefaultResponse(test);
 }
@@ -133,9 +135,15 @@ function parse(filename)
   const yaml     = YAML.parse(data);
 
   const defaultConfig = yaml.config || [];
-  yaml.tests.forEach((test, index) => {
+  yaml.tests.forEach(test => {
     test.testName = yaml.name;
-    setDefaults(test, index, defaultConfig);
+    setDefaults(test, defaultConfig);
+  });
+
+  // Filter disabled tests
+  yaml.tests = yaml.tests.filter(test => !test.disabled);
+  yaml.tests.forEach((test, index) => {
+    setDefault(test, kIndexName, index);
   });
 
   yaml.filename   = filename;
@@ -195,7 +203,6 @@ function assertCommandOrAttribute(context)
 //
 // Templates
 //
-
 function chip_tests(items, options)
 {
   const names = items.split(',').map(name => name.trim());
