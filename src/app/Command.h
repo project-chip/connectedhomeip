@@ -97,7 +97,7 @@ public:
     CHIP_ERROR FinishCommand(bool aIsStatus = false);
     virtual CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                     const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+                                     const Protocols::Id aProtocolId, const Protocols::InteractionModel::ProtocolCode aProtocolCode)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     };
