@@ -12,14 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: OnOff Tests
+name: 3.2.2. [TC-OO-3] Primary functionality with server as DUT
 
 config:
     cluster: "On/Off"
     endpoint: 1
 
 tests:
-    - label: "Check on/off attribute value is false when starting"
+    - label: "Send Off Command"
+      command: "off"
+
+    - label: "Check on/off attribute value is false after off command"
+      command: "readAttribute"
+      attribute: "on/off"
+      response:
+          value: 0
+
+    - label: "Send On Command"
+      command: "on"
+
+    - label: "Check on/off attribute value is true after on command"
+      command: "readAttribute"
+      attribute: "on/off"
+      response:
+          value: 1
+
+    - label: "Send Off Command"
+      command: "off"
+
+    - label: "Check on/off attribute value is false after off command"
+      command: "readAttribute"
+      attribute: "on/off"
+      response:
+          value: 0
+
+    - label: "Send Toggle Command"
+      command: "toggle"
+
+    - label: "Check on/off attribute value is true after toggle command"
+      command: "readAttribute"
+      attribute: "on/off"
+      response:
+          value: 1
+
+    - label: "Send Toggle Command"
+      command: "toggle"
+
+    - label: "Check on/off attribute value is false after toggle command"
       command: "readAttribute"
       attribute: "on/off"
       response:
