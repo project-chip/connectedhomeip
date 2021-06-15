@@ -1419,23 +1419,12 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
+CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Mdns::DiscoveryFilter filter)
 {
     for (int i = 0; i < kMaxCommissionableNodes; ++i)
     {
         mCommissionableNodes[i].Reset();
     }
-    return Mdns::Resolver::Instance().FindCommissionableNodes();
-}
-
-CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
-{
-    // TODO(cecille): Add assertion about main loop.
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
-    {
-        mCommissionableNodes[i].Reset();
-    }
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
     return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
 }
 

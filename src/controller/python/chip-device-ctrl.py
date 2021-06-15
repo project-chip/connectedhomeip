@@ -516,10 +516,33 @@ class DeviceMgrCmd(Cmd):
             print(str(ex))
             return
 
+    def wait_for_one_discovered_device(self):
+        print("Waiting for device responses...")
+        strlen = 100;
+        addrStrStorage = ctypes.create_string_buffer(strlen)
+        count = 0
+        maxWaitTime = 2
+        while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
+            time.sleep(0.2)
+            count = count + 0.2
+
+    def wait_for_many_discovered_devices(self):
+        # Discovery happens through mdns, which means we need to wait for responses to come back.
+        # TODO(cecille): I suppose we could make this a command line arg. Or Add a callback when
+        # x number of responses are received. For now, just 2 seconds. We can all wait that long.
+        print("Waiting for device responses...")
+        time.sleep(2)
+
     def do_discover(self, line):
         """
         discover -qr qrcode
         discover -all
+        discover -l long_discriminator
+        discover -s short_discriminator
+        discover -v vendor_id
+        discover -t device_type
+        discover -c commissioning_enabled
+        discover -a
 
         discover command is used to discover available devices.
         """
@@ -533,22 +556,29 @@ class DeviceMgrCmd(Cmd):
             if args[0] == "-qr" and len(args) >= 2:
                 setupPayload = SetupPayload().ParseQrCode(args[1])
                 longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
-                self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
-                print("Waiting for device responses...")
-                strlen = 100;
-                addrStrStorage = ctypes.create_string_buffer(strlen)
-                count = 0
-                maxWaitTime = 2
-                while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
-                    time.sleep(0.2)
-                    count = count + 0.2
+                self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(longDiscriminator)
+                self.wait_for_one_discovered_device()
             elif args[0] == "-all":
                 self.devCtrl.DiscoverAllCommissioning()
-                # Discovery happens through mdns, which means we need to wait for responses to come back.
-                # TODO(cecille): I suppose we could make this a command line arg. Or Add a callback when
-                # x number of responses are received. For now, just 2 seconds. We can all wait that long.
-                print("Waiting for device responses...")
-                time.sleep(2)
+                self.wait_for_many_discovered_devices()
+            elif args[0] == '-l' and len(args) >=2:
+                self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(ctypes.c_uint16(int(args[1])))
+                self.wait_for_one_discovered_device()
+            elif args[0] == '-s' and len(args) >=2:
+                self.devCtrl.DiscoverCommissionableNodesShortDiscriminator(ctypes.c_uint16(int(args[1])))
+                self.wait_for_one_discovered_device()
+            elif args[0] == '-v' and len(args) >=2:
+                self.devCtrl.DiscoverCommissionableNodesVendor(ctypes.c_uint16(int(args[1])))
+                self.wait_for_many_discovered_devices()
+            elif args[0] == '-t' and len(args) >=2:
+                self.devCtrl.DiscoverCommissionableNodesDeviceType(ctypes.c_uint16(int(args[1])))
+                self.wait_for_many_discovered_devices()
+            elif args[0] == '-c' and len(args) >=2:
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled(ctypes.c_uint16(int(args[1])))
+                self.wait_for_many_discovered_devices()
+            elif args[0] == '-a':
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabledFromCommand()
+                self.wait_for_many_discovered_devices()                
             else:
                 print("Usage:")
                 self.do_help("discover")
