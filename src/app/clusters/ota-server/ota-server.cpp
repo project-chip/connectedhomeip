@@ -31,9 +31,6 @@
 #include "ota-server-delegate.h"
 #include "ota-server.h"
 
-using namespace chip;
-using namespace chip::app::clusters;
-
 using chip::app::clusters::OTAServerDelegate;
 
 namespace {
@@ -70,7 +67,7 @@ bool SendStatusIfDelegateNull(chip::EndpointId endpointId)
  * @param newVersion The SoftwareVersion value of the new Software Image that the client is ready to apply.
  */
 
-bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Command * commandObj, chip::ByteSpan updateToken,
+bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(chip::app::Command * commandObj, chip::ByteSpan updateToken,
                                                                      uint32_t newVersion)
 {
     EmberAfStatus status         = EMBER_ZCL_STATUS_SUCCESS;
@@ -108,7 +105,7 @@ bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Comman
  *                       OTA Client's Basic Information Cluster.
  */
 
-bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(app::Command * commandObj, chip::ByteSpan updateToken,
+bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::app::Command * commandObj, chip::ByteSpan updateToken,
                                                                       uint32_t currentVersion)
 {
     EmberAfStatus status         = EMBER_ZCL_STATUS_SUCCESS;
@@ -155,7 +152,7 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(app::Comma
  */
 
 bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
-    app::Command * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
+    chip::app::Command * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
     uint32_t currentVersion,
     /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location, uint8_t clientCanConsent,
     chip::ByteSpan metadataForServer)
@@ -196,6 +193,10 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
     return true;
 }
 
+namespace chip {
+namespace app {
+namespace clusters {
+
 void OTAServer::SetDelegate(chip::EndpointId endpointId, OTAServerDelegate * delegate)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpointId, ZCL_OTA_SERVER_CLUSTER_ID);
@@ -204,3 +205,7 @@ void OTAServer::SetDelegate(chip::EndpointId endpointId, OTAServerDelegate * del
         gDelegateTable[ep] = delegate;
     }
 }
+
+} // namespace clusters
+} // namespace app
+} // namespace chip
