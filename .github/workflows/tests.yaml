@@ -103,7 +103,8 @@ jobs:
               with:
                   submodules: true
             - name: Setup Environment
-              run: brew install openssl pkg-config
+              # coreutils for stdbuf
+              run: brew install openssl pkg-config coreutils
             - name: Try to ensure the directories for core dumping and diagnostic log collection exist and we can write them.
               run: |
                   sudo chown ${USER} /cores || true
