@@ -83,7 +83,7 @@ private:
     pointer mDataBuf;
 };
 
-using ByteSpan      = Span<const uint8_t>;
+using ByteSpan        = Span<const uint8_t>;
 using MutableByteSpan = Span<uint8_t>;
 template <size_t N>
 using FixedByteSpan = FixedSpan<const uint8_t, N>;
