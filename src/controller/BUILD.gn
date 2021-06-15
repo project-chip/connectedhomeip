@@ -26,6 +26,7 @@ static_library("controller") {
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
+    "AbstractMdnsDiscoveryController.cpp",
     "DeviceAddressUpdateDelegate.h",
     "EmptyDataModelHandler.cpp",
     "ExampleOperationalCredentialsIssuer.cpp",

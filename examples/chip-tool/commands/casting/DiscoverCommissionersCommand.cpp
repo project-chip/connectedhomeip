@@ -27,7 +27,7 @@ using namespace ::chip;
 CHIP_ERROR DiscoverCommissionersCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     mCommissionableNodeController.Init();
-    mCommissionableNodeController.DiscoverAllCommissioners();
+    mCommissionableNodeController.DiscoverCommissioners();
 
     uint32_t waitTime     = 500;
     System::Timer * timer = nullptr;
@@ -44,9 +44,9 @@ CHIP_ERROR DiscoverCommissionersCommand::Run(PersistentStorage & storage, NodeId
     DeviceLayer::PlatformMgr().RunEventLoop();
 
     int commissionerCount = 0;
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; i++)
+    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
-        const Mdns::CommissionableNodeData * commissioner = mCommissionableNodeController.GetDiscoveredDevice(i);
+        const Mdns::DiscoveredNodeData * commissioner = mCommissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
             printf("Discovered Commisioner #%d\n", ++commissionerCount);

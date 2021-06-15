@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <controller/AbstractMdnsDiscoveryController.h>
 #include <mdns/Resolver.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <support/logging/CHIPLogging.h>
@@ -27,9 +28,7 @@ namespace chip {
 
 namespace Controller {
 
-constexpr uint16_t kMdnsPort = 5353;
-
-class DLL_EXPORT CommissionableNodeController : public Mdns::ResolverDelegate
+class DLL_EXPORT CommissionableNodeController : public AbstractMdnsDiscoveryController
 {
 public:
     CommissionableNodeController(){};
@@ -37,31 +36,27 @@ public:
 
     CHIP_ERROR Init();
 
-    CHIP_ERROR DiscoverAllCommissionersLongDiscriminator(uint16_t long_discriminator);
+    CHIP_ERROR DiscoverCommissionersLongDiscriminator(uint16_t long_discriminator);
 
-    CHIP_ERROR DiscoverAllCommissioners();
+    CHIP_ERROR DiscoverCommissioners();
 
-    const Mdns::CommissionableNodeData * GetDiscoveredDevice(int idx);
-
-    void OnCommissionerFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
+    const Mdns::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
 
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override
     {
-        ChipLogError(chipTool, "Unsupported operation CommissionableNodeController::OnNodeIdResolved");
+        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolved");
     };
 
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
     {
-        ChipLogError(chipTool, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
+        ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
     };
 
-    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override
-    {
-        ChipLogError(chipTool, "Unsupported operation CommissionableNodeController::OnCommissionableNodeFound");
-    };
+protected:
+    Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mDiscoveredCommissioners; }
 
 private:
-    Mdns::CommissionableNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS];
+    Mdns::DiscoveredNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES];
 };
 
 } // namespace Controller

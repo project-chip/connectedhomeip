@@ -50,11 +50,11 @@ enum class DiscoveryType
 class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
 {
 public:
-    TxtRecordDelegateImpl(CommissionableNodeData * nodeData) : mNodeData(nodeData) {}
+    TxtRecordDelegateImpl(DiscoveredNodeData * nodeData) : mNodeData(nodeData) {}
     void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value);
 
 private:
-    CommissionableNodeData * mNodeData;
+    DiscoveredNodeData * mNodeData;
 };
 
 const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
@@ -102,17 +102,17 @@ private:
     ResolverDelegate * mDelegate = nullptr;
     DiscoveryType mDiscoveryType;
     ResolvedNodeData mNodeData;
-    CommissionableNodeData mCommissionableNodeData;
+    DiscoveredNodeData mDiscoveredNodeData;
     BytesRange mPacketRange;
 
     bool mValid       = false;
     bool mHasNodePort = false;
     bool mHasIP       = false;
 
-    void OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
+    void OnDiscoveredNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
     void OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
 
-    void OnCommissionableNodeIPAddress(const chip::Inet::IPAddress & addr);
+    void OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr);
     void OnOperationalIPAddress(const chip::Inet::IPAddress & addr);
 };
 
@@ -179,7 +179,7 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
     }
 }
 
-void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
+void PacketDataReporter::OnDiscoveredNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
 {
     // Host name is the first part of the qname
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
@@ -187,7 +187,7 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     {
         return;
     }
-    strncpy(mCommissionableNodeData.hostName, it.Value(), sizeof(CommissionableNodeData::hostName));
+    strncpy(mDiscoveredNodeData.hostName, it.Value(), sizeof(DiscoveredNodeData::hostName));
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
@@ -207,13 +207,13 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     }
 }
 
-void PacketDataReporter::OnCommissionableNodeIPAddress(const chip::Inet::IPAddress & addr)
+void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
 {
-    if (mCommissionableNodeData.numIPs >= CommissionableNodeData::kMaxIPAddresses)
+    if (mDiscoveredNodeData.numIPs >= DiscoveredNodeData::kMaxIPAddresses)
     {
         return;
     }
-    mCommissionableNodeData.ipAddress[mCommissionableNodeData.numIPs++] = addr;
+    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs++] = addr;
 }
 
 void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data)
@@ -243,14 +243,14 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         }
         else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
-            OnCommissionableNodeSrvRecord(data.GetName(), srv);
+            OnDiscoveredNodeSrvRecord(data.GetName(), srv);
         }
         break;
     }
     case QType::TXT:
         if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
-            TxtRecordDelegateImpl textRecordDelegate(&mCommissionableNodeData);
+            TxtRecordDelegateImpl textRecordDelegate(&mDiscoveredNodeData);
             ParseTxtRecord(data.GetData(), &textRecordDelegate);
         }
         break;
@@ -269,7 +269,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             }
             else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnCommissionableNodeIPAddress(addr);
+                OnDiscoveredNodeIPAddress(addr);
             }
         }
         break;
@@ -289,7 +289,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             }
             else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnCommissionableNodeIPAddress(addr);
+                OnDiscoveredNodeIPAddress(addr);
             }
         }
         break;
@@ -301,13 +301,10 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
 
 void PacketDataReporter::OnComplete()
 {
-    if (mDiscoveryType == DiscoveryType::kCommissionableNode && mCommissionableNodeData.IsValid())
+    if ((mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode) &&
+        mDiscoveredNodeData.IsValid())
     {
-        mDelegate->OnCommissionableNodeFound(mCommissionableNodeData);
-    }
-    else if (mDiscoveryType == DiscoveryType::kCommissionerNode && mCommissionableNodeData.IsValid())
-    {
-        mDelegate->OnCommissionerFound(mCommissionableNodeData);
+        mDelegate->OnNodeDiscoveryComplete(mDiscoveredNodeData);
     }
 }
 

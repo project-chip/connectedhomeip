@@ -75,69 +75,29 @@ CHIP_ERROR CommissionableNodeController::Init()
     return err;
 }
 
-CHIP_ERROR CommissionableNodeController::DiscoverAllCommissioners()
+CHIP_ERROR CommissionableNodeController::DiscoverCommissioners()
 {
-    chip::Mdns::Resolver::Instance().SetResolverDelegate(this);
-#if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
-#endif
-
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; ++i)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if ((err = SetUpNodeDiscovery()) == CHIP_NO_ERROR)
     {
-        mDiscoveredCommissioners[i].Reset();
+        return chip::Mdns::Resolver::Instance().FindCommissioners();
     }
-    return chip::Mdns::Resolver::Instance().FindCommissioners();
+    return err;
 }
 
-CHIP_ERROR CommissionableNodeController::DiscoverAllCommissionersLongDiscriminator(uint16_t long_discriminator)
+CHIP_ERROR CommissionableNodeController::DiscoverCommissionersLongDiscriminator(uint16_t long_discriminator)
 {
-    chip::Mdns::Resolver::Instance().SetResolverDelegate(this);
-#if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
-#endif
-
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; ++i)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if ((err = SetUpNodeDiscoveryLongDiscriminator(long_discriminator)) == CHIP_NO_ERROR)
     {
-        mDiscoveredCommissioners[i].Reset();
+        return chip::Mdns::Resolver::Instance().FindCommissioners(filter);
     }
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
-    return Mdns::Resolver::Instance().FindCommissioners(filter);
+    return err;
 }
 
-const Mdns::CommissionableNodeData * CommissionableNodeController::GetDiscoveredDevice(int idx)
+const Mdns::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
 {
-    // TODO(cecille): Add assertion about main loop.
-    if (mDiscoveredCommissioners[idx].IsValid())
-    {
-        return &mDiscoveredCommissioners[idx];
-    }
-    return nullptr;
-}
-
-void CommissionableNodeController::OnCommissionerFound(const chip::Mdns::CommissionableNodeData & nodeData)
-{
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; ++i)
-    {
-        if (!mDiscoveredCommissioners[i].IsValid())
-        {
-            continue;
-        }
-        if (strcmp(mDiscoveredCommissioners[i].hostName, nodeData.hostName) == 0)
-        {
-            mDiscoveredCommissioners[i] = nodeData;
-            return;
-        }
-    }
-    // Didn't find the host name already in our list, return an invalid
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_COMMISSIONERS; ++i)
-    {
-        if (!mDiscoveredCommissioners[i].IsValid())
-        {
-            mDiscoveredCommissioners[i] = nodeData;
-            return;
-        }
-    }
-    ChipLogError(Discovery, "Failed to add discovered commisisoners - Insufficient space");
+    return GetDiscoveredNode(idx);
 }
 
 } // namespace Controller

@@ -66,8 +66,7 @@ public:
         }
     }
 
-    void OnCommissionableNodeFound(const CommissionableNodeData & nodeData) override {}
-    void OnCommissionerFound(const CommissionableNodeData & nodeData) override {}
+    void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) override {}
 
     void SetSuccessCallback(DiscoverSuccessCallback cb) { mSuccessCallback = cb; }
     void SetFailureCallback(DiscoverFailureCallback cb) { mFailureCallback = cb; }
