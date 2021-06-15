@@ -14,4 +14,4 @@ jobs:
 
         steps:
           - name: Send some dummy message
-          - run: echo test message
+            run: echo test message
