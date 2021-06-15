@@ -1,0 +1,15 @@
+name: Sync test
+
+on:
+  workflow_run:
+    workflows: ["Builds", "Build examples - Mbed OS"]
+    types: 
+      - completed
+
+jobs:
+    test_sync:
+        name: test_sync
+
+        steps:
+          - name: Send some dummy message
+          - run: echo test message
