@@ -45,6 +45,8 @@ done
 echo ""
 echo ""
 
+ulimit -c unlimited || true
+
 declare -a iter_array="($(seq "$iterations"))"
 for j in "${iter_array[@]}"; do
     echo " ===== Iteration $j starting"

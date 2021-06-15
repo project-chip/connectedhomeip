@@ -17,6 +17,7 @@ name: Tests
 on:
     push:
     pull_request:
+    workflow_dispatch:
 
 jobs:
     test_suites_linux:
@@ -75,6 +76,11 @@ jobs:
                   submodules: true
             - name: Setup Environment
               run: brew install openssl pkg-config
+            - name: Try to ensure the directories for core dumping and diagnostic log collection exist and we can write them.
+              run: |
+                  sudo chown ${USER} /cores || true
+                  mkdir -p ~/Library/Logs/DiagnosticReports || true
+                  mkdir objdir-clone || true
             - name: Fix pkgconfig link
               working-directory: /usr/local/lib/pkgconfig
               run: |
@@ -102,8 +108,34 @@ jobs:
               timeout-minutes: 5
               run: |
                   scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+            - name: Copy objdir
+              run: |
+                  # The idea is to not upload our objdir unless builds have
+                  # actually succeeded, because that just wastes space.
+                  rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Test Suites
               timeout-minutes: 5
               run: |
                   scripts/tests/test_suites.sh
-
+            - name: Uploading core files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-core
+                  path: /cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            - name: Uploading diagnostic logs
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-log
+                  path: ~/Library/Logs/DiagnosticReports/
+            - name: Uploading objdir for debugging
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-objdir
+                  path: objdir-clone/
+                  # objdirs are big; don't hold on to them too long.
+                  retention-days: 5
