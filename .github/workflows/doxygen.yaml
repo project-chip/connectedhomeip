@@ -19,6 +19,10 @@ on:
     pull_request:
     workflow_dispatch:
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.number || github.workflow }}
+    cancel-in-progress: true
+  
 jobs:
     doxygen:
         name: Build Doxygen
