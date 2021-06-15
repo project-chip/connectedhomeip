@@ -8,6 +8,8 @@ on:
 
 jobs:
     test_sync:
+        runs-on: ubuntu-latest
+
         name: test_sync
 
         steps:
