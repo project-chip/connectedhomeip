@@ -24,6 +24,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestBufferReader.cpp",
     "TestBufferWriter.cpp",
+    "TestBytesCircularBuffer.cpp",
     "TestBytesToHex.cpp",
     "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",
@@ -38,7 +39,6 @@ chip_test_suite("tests") {
     "TestSerializableIntegerSet.cpp",
     "TestSpan.cpp",
     "TestStringBuilder.cpp",
-    "TestStringCircularBuffer.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
     "TestVariant.cpp",
