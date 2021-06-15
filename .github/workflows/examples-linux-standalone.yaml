@@ -72,6 +72,10 @@ jobs:
               run:
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux
                   out/all_clusters_debug chip_bypass_rendezvous=true
+            - name: Build example TV app
+              timeout-minutes: 5
+              run:
+                  scripts/examples/gn_build_example.sh examples/tv-app/linux out/tv_app_debug
             - name: Build example lighting app with RPCs
               timeout-minutes: 5
               run:
