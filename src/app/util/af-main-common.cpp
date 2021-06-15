@@ -202,9 +202,8 @@ void emAfInitializeMessageSentCallbackArray(void)
     }
 }
 
-static EmberStatus send(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                        uint16_t messageLength, uint8_t * message, bool broadcast, EmberNodeId alias, uint8_t sequence,
-                        EmberAfMessageSentFunction callback)
+static EmberStatus send(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+                        uint8_t * message, bool broadcast, EmberNodeId alias, uint8_t sequence, EmberAfMessageSentFunction callback)
 {
     EmberStatus status;
     uint8_t index;
@@ -268,7 +267,7 @@ static EmberStatus send(EmberOutgoingMessageType type, MessageSendDestination de
 
     {
         EmberAfMessageStruct messageStruct = {
-            callback, apsFrame, message, destination, messageLength, type, broadcast,
+            callback, apsFrame, message, destination, messageLength, broadcast,
         };
         // Called prior to fragmentation in case the mesasge does not go out over the
         // Zigbee radio, and instead goes to some other transport that does not require
@@ -285,7 +284,7 @@ static EmberStatus send(EmberOutgoingMessageType type, MessageSendDestination de
 
     if (messageLength <= EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH)
     {
-        status = emAfSend(type, destination, apsFrame, (uint8_t) messageLength, message, &messageTag, alias, sequence);
+        status = emAfSend(destination, apsFrame, (uint8_t) messageLength, message, &messageTag, alias, sequence);
     }
     else
     {
@@ -297,7 +296,7 @@ static EmberStatus send(EmberOutgoingMessageType type, MessageSendDestination de
     if ((status != EMBER_SUCCESS) &&
         (callback == emberAfPluginCriticalMessageQueueEnqueueCallback || callback == emAfPluginCriticalMessageQueueRetryCallback))
     {
-        callback(type, destination, apsFrame, messageLength, message, status);
+        callback(destination, apsFrame, messageLength, message, status);
     }
 #endif // EMBER_AF_PLUGIN_CRITICAL_MESSAGE_QUEUE
 
@@ -331,8 +330,9 @@ EmberStatus emberAfSendMulticastWithAliasWithCallback(GroupId multicastId, Ember
                                                       uint8_t * message, EmberNodeId alias, uint8_t sequence,
                                                       EmberAfMessageSentFunction callback)
 {
-    apsFrame->groupId = multicastId;
-    return send(EMBER_OUTGOING_MULTICAST_WITH_ALIAS, MessageSendDestination(multicastId), apsFrame, messageLength, message,
+    apsFrame->groupId      = multicastId;
+    const auto destination = MessageSendDestination::MulticastWithAlias(multicastId);
+    return send(destination, apsFrame, messageLength, message,
                 true, // broadcast
                 alias, sequence, callback);
 }
@@ -340,8 +340,9 @@ EmberStatus emberAfSendMulticastWithAliasWithCallback(GroupId multicastId, Ember
 EmberStatus emberAfSendMulticastWithCallback(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
                                              uint8_t * message, EmberAfMessageSentFunction callback)
 {
-    apsFrame->groupId = multicastId;
-    return send(EMBER_OUTGOING_MULTICAST, MessageSendDestination(multicastId), apsFrame, messageLength, message,
+    apsFrame->groupId      = multicastId;
+    const auto destination = MessageSendDestination::Multicast(multicastId);
+    return send(destination, apsFrame, messageLength, message,
                 true, // broadcast?
                 0,    // alias
                 0,    // sequence
@@ -422,13 +423,12 @@ EmberStatus emberAfSendMulticastToBindings(EmberApsFrame * apsFrame, uint16_t me
 //    return emberAfSendBroadcastWithCallback(destination, apsFrame, messageLength, message, NULL);
 //}
 
-EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, MessageSendDestination destination,
-                                           EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message,
-                                           EmberAfMessageSentFunction callback)
+EmberStatus emberAfSendUnicastWithCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                           uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback)
 {
     // The source endpoint in the APS frame MAY NOT be valid at this point if the
     // outgoing type is "via binding."
-    if (type == EMBER_OUTGOING_VIA_BINDING)
+    if (destination.IsViaBinding())
     {
         // If using binding, set the endpoints based on those in the binding.  The
         // cluster in the binding is not used because bindings can be used to send
@@ -436,7 +436,7 @@ EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, Messag
         EmberBindingTableEntry binding;
         // TODO: This cast should go away once
         // https://github.com/project-chip/connectedhomeip/issues/3584 is fixed.
-        EmberStatus status = emberGetBinding(destination.mBindingIndex, &binding);
+        EmberStatus status = emberGetBinding(destination.GetBindingIndex(), &binding);
         if (status != EMBER_SUCCESS)
         {
             return status;
@@ -444,17 +444,17 @@ EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, Messag
         apsFrame->sourceEndpoint      = binding.local;
         apsFrame->destinationEndpoint = binding.remote;
     }
-    return send(type, destination, apsFrame, messageLength, message,
+    return send(destination, apsFrame, messageLength, message,
                 false, // broadcast?
                 0,     // alias
                 0,     // sequence
                 callback);
 }
 
-EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                               uint16_t messageLength, uint8_t * message)
+EmberStatus emberAfSendUnicast(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+                               uint8_t * message)
 {
-    return emberAfSendUnicastWithCallback(type, destination, apsFrame, messageLength, message, NULL);
+    return emberAfSendUnicastWithCallback(destination, apsFrame, messageLength, message, NULL);
 }
 
 EmberStatus emberAfSendUnicastToBindingsWithCallback(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message,
@@ -474,8 +474,9 @@ EmberStatus emberAfSendUnicastToBindingsWithCallback(EmberApsFrame * apsFrame, u
         if (binding.type == EMBER_UNICAST_BINDING && binding.local == apsFrame->sourceEndpoint &&
             binding.clusterId == apsFrame->clusterId)
         {
-            apsFrame->destinationEndpoint = binding.remote;
-            status = send(EMBER_OUTGOING_VIA_BINDING, MessageSendDestination(i), apsFrame, messageLength, message,
+            apsFrame->destinationEndpoint            = binding.remote;
+            const MessageSendDestination destination = MessageSendDestination::ViaBinding(i);
+            status                                   = send(destination, apsFrame, messageLength, message,
                           false, // broadcast?
                           0,     // alias
                           0,     // sequence
@@ -547,7 +548,7 @@ void emAfPrintStatus(const char * task, EmberStatus status)
 // Functions called by the Serial Command Line Interface (CLI)
 // ******************************************************************
 
-static void printMessage(EmberIncomingMessageType type, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * messageContents)
+static void printMessage(EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * messageContents)
 {
     emberAfAppPrint("Cluster: 0x%2X, %d bytes,", apsFrame->clusterId, messageLength);
     if (messageLength >= 3)
@@ -558,14 +559,14 @@ static void printMessage(EmberIncomingMessageType type, EmberApsFrame * apsFrame
     emberAfAppPrintln("");
 }
 
-void emAfMessageSentHandler(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                            EmberStatus status, uint16_t messageLength, uint8_t * messageContents, uint8_t messageTag)
+void emAfMessageSentHandler(const MessageSendDestination & destination, EmberApsFrame * apsFrame, EmberStatus status,
+                            uint16_t messageLength, uint8_t * messageContents, uint8_t messageTag)
 {
     EmberAfMessageSentFunction callback;
     if (status != EMBER_SUCCESS)
     {
         emberAfAppPrint("%ptx %x, ", "ERROR: ", status);
-        printMessage(type, apsFrame, messageLength, messageContents);
+        printMessage(apsFrame, messageLength, messageContents);
     }
 
     callback = getMessageSentCallback(messageTag);
@@ -576,7 +577,7 @@ void emAfMessageSentHandler(EmberOutgoingMessageType type, MessageSendDestinatio
     if (messageContents != NULL && messageContents[0] & ZCL_CLUSTER_SPECIFIC_COMMAND)
     {
         emberAfClusterMessageSentWithMfgCodeCallback(
-            type, destination, apsFrame, messageLength, messageContents, status,
+            destination, apsFrame, messageLength, messageContents, status,
             // If the manufacturer specific flag is set
             // get read it as next part of message
             // else use null code.
@@ -587,24 +588,23 @@ void emAfMessageSentHandler(EmberOutgoingMessageType type, MessageSendDestinatio
 
     if (callback != NULL)
     {
-        (*callback)(type, destination, apsFrame, messageLength, messageContents, status);
+        (*callback)(destination, apsFrame, messageLength, messageContents, status);
     }
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_MESSAGE_SENT_FUNCTION_CALLS
     EMBER_AF_GENERATED_PLUGIN_MESSAGE_SENT_FUNCTION_CALLS
 #endif
 
-    emberAfMessageSentCallback(type, destination, apsFrame, messageLength, messageContents, status);
+    emberAfMessageSentCallback(destination, apsFrame, messageLength, messageContents, status);
 }
 
 #ifdef EMBER_AF_PLUGIN_FRAGMENTATION
-void emAfFragmentationMessageSentHandler(EmberOutgoingMessageType type, MessageSendDestination destination,
-                                         EmberApsFrame * apsFrame, uint8_t * buffer, uint16_t bufLen, EmberStatus status,
-                                         uint8_t messageTag)
+void emAfFragmentationMessageSentHandler(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint8_t * buffer,
+                                         uint16_t bufLen, EmberStatus status, uint8_t messageTag)
 {
     // the fragmented message is no longer in process
     emberAfDebugPrintln("%pend.", "Fragmentation:");
-    emAfMessageSentHandler(type, destination, apsFrame, status, bufLen, buffer, messageTag);
+    emAfMessageSentHandler(destination, apsFrame, status, bufLen, buffer, messageTag);
 
     // EMZIGBEE-4437: setting back the buffers to the original in case someone set
     // that to something else.
@@ -612,8 +612,8 @@ void emAfFragmentationMessageSentHandler(EmberOutgoingMessageType type, MessageS
 }
 #endif // EMBER_AF_PLUGIN_FRAGMENTATION
 
-EmberStatus emAfSend(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                     uint8_t messageLength, uint8_t * message, uint8_t * messageTag, EmberNodeId alias, uint8_t sequence)
+EmberStatus emAfSend(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint8_t messageLength, uint8_t * message,
+                     uint8_t * messageTag, EmberNodeId alias, uint8_t sequence)
 {
     // TODO: There's an impedance mismatch here in a few ways:
     // 1) The caller expects to get a messageTag out that will identify this
@@ -630,52 +630,31 @@ EmberStatus emAfSend(EmberOutgoingMessageType type, MessageSendDestination desti
     // tracks this.
     *messageTag        = INVALID_MESSAGE_TAG;
     EmberStatus status = EMBER_SUCCESS;
-    switch (type)
+    if (destination.IsViaBinding())
     {
-    case EMBER_OUTGOING_VIA_BINDING: {
         EmberBindingTableEntry binding;
-        status = emberGetBinding(destination.mBindingIndex, &binding);
+        status = emberGetBinding(destination.GetBindingIndex(), &binding);
         if (status != EMBER_SUCCESS)
         {
-            break;
+            return status;
         }
         if (binding.type != EMBER_UNICAST_BINDING)
         {
-            status = EMBER_INVALID_BINDING_INDEX;
-            break;
+            return EMBER_INVALID_BINDING_INDEX;
         }
-        status = chipSendUnicast(binding.nodeId, apsFrame, messageLength, message);
-        break;
+        return chipSendUnicast(binding.nodeId, apsFrame, messageLength, message);
     }
-    case EMBER_OUTGOING_VIA_ADDRESS_TABLE:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case EMBER_OUTGOING_DIRECT:
-        status = chipSendUnicast(destination.mNodeId, apsFrame, messageLength, message);
-        break;
-    case EMBER_OUTGOING_MULTICAST:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case EMBER_OUTGOING_MULTICAST_WITH_ALIAS:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case EMBER_OUTGOING_BROADCAST:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case EMBER_OUTGOING_BROADCAST_WITH_ALIAS:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
-        break;
-    case EMBER_OUTGOING_VIA_EXCHANGE:
-        status = chipSendUnicast(destination.mExchangeContext, apsFrame, messageLength, message);
-        break;
-    default:
-        status = EMBER_BAD_ARGUMENT;
-        break;
+    else if (destination.IsDirect())
+    {
+        return chipSendUnicast(destination.GetDirectNodeId(), apsFrame, messageLength, message);
     }
-    return status;
+    else if (destination.IsViaExchange())
+    {
+        return chipSendUnicast(destination.GetExchangeContext(), apsFrame, messageLength, message);
+    }
+    else
+    {
+        // No implementation yet.
+        return EMBER_ERR_FATAL;
+    }
 }

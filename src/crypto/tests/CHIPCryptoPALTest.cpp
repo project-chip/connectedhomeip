@@ -49,6 +49,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if CHIP_CRYPTO_OPENSSL
+#include "X509_PKCS7Extraction_test_vectors.h"
+#endif
+
+#include <credentials/CHIPCert.h>
+#include <credentials/tests/CHIPCert_test_vectors.h>
+
 #define HSM_ECC_KEYID 0x11223344
 
 using namespace chip;
@@ -1428,6 +1435,54 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
 
+#if CHIP_CRYPTO_OPENSSL
+static void TestX509_PKCS7Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    X509DerCertificate x509list[3];
+    uint32_t max_certs = sizeof(x509list) / sizeof(X509DerCertificate);
+
+    err = LoadCertsFromPKCS7(pem_pkcs7_blob, x509list, &max_certs);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = memcmp(certificate_blob_leaf, x509list[0], x509list[0].Length());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = memcmp(certificate_blob_intermediate, x509list[1], x509list[1].Length());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = memcmp(certificate_blob_root, x509list[2], x509list[2].Length());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
+static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    P256PublicKey publicKey;
+
+    const uint8_t * cert;
+    uint32_t certLen;
+    const uint8_t * certPubkey;
+    uint32_t certPubkeyLen;
+
+    for (size_t i = 0; i < gNumTestCerts; i++)
+    {
+        uint8_t certType = TestCerts::gTestCerts[i];
+
+        err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert, certLen);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        err = GetTestCertPubkey(certType, certPubkey, certPubkeyLen);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = ExtractPubkeyFromX509Cert(ByteSpan(cert, certLen), publicKey);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, memcmp(publicKey, certPubkey, certPubkeyLen) == 0);
+    }
+}
+#endif // CHIP_CRYPTO_OPENSSL
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -1482,6 +1537,10 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointLoad/PointWrite", TestSPAKE2P_spake2p_PointLoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
     NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
+#if CHIP_CRYPTO_OPENSSL
+    NL_TEST_DEF("Test x509 Certificate Extraction from PKCS7", TestX509_PKCS7Extraction),
+    NL_TEST_DEF("Test Pubkey Extraction from x509 Certificate", TestPubkey_x509Extraction),
+#endif // CHIP_CRYPTO_OPENSSL
     NL_TEST_SENTINEL()
 };
 

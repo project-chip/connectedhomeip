@@ -50,7 +50,7 @@ void QueryResponderBase::Init()
     }
 }
 
-QueryResponderSettings QueryResponderBase::AddResponder(Responder * responder)
+QueryResponderSettings QueryResponderBase::AddResponder(RecordResponder * responder)
 {
     if (responder == nullptr)
     {

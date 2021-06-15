@@ -6,6 +6,7 @@
 
 #include "lib/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceLayer.h"
+#include "platform/PlatformManager.h"
 #include "support/CHIPMem.h"
 #include "support/UnitTestRegistration.h"
 
@@ -57,6 +58,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mPort      = 80;
     strcpy(service.mName, "test");
     strcpy(service.mType, "_mock");
+    service.mAddressType   = chip::Inet::kIPAddressType_Any;
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     entry.mKey             = key;
     entry.mData            = reinterpret_cast<const uint8_t *>(val);
@@ -88,6 +90,7 @@ void TestMdnsPubSub(nlTestSuite * inSuite, void * inContext)
 
     ChipLogProgress(DeviceLayer, "Start EventLoop");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    ChipLogProgress(DeviceLayer, "End EventLoop");
 }
 
 static const nlTest sTests[] = { NL_TEST_DEF("Test Mdns::PubSub", TestMdnsPubSub), NL_TEST_SENTINEL() };
@@ -132,13 +135,13 @@ int TestMdns()
         {
             fprintf(stderr, "mDNS test timeout, is avahi daemon running?\n");
 
-            chip::DeviceLayer::PlatformMgr().LockChipStack();
+            //
+            // This will stop the event loop above, and wait till it has actually stopped
+            // (i.e exited RunEventLoop()).
+            //
+            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
             chip::DeviceLayer::PlatformMgr().Shutdown();
-            chip::DeviceLayer::SystemLayer.WakeSelect();
-            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-            // TODO: the above does not seem to actually reliably shut down the chip stack.
-            // Program will abort with core because chip thread will still run.
             doneCondition.wait_for(lock, std::chrono::seconds(1));
             if (!done)
             {

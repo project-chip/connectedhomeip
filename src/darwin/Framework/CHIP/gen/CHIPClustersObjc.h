@@ -774,18 +774,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOperationalCredentials : CHIPCluster
 
-- (void)addOpCert:(NSData *)noc
-     iCACertificate:(NSData *)iCACertificate
+- (void)addOpCert:(NSData *)operationalCert
            iPKValue:(NSData *)iPKValue
       caseAdminNode:(uint64_t)caseAdminNode
       adminVendorId:(uint16_t)adminVendorId
     responseHandler:(ResponseHandler)responseHandler;
+- (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler;
 - (void)opCSRRequest:(NSData *)cSRNonce responseHandler:(ResponseHandler)responseHandler;
 - (void)removeAllFabrics:(ResponseHandler)responseHandler;
 - (void)removeFabric:(uint64_t)fabricId
               nodeId:(uint64_t)nodeId
             vendorId:(uint16_t)vendorId
      responseHandler:(ResponseHandler)responseHandler;
+- (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler;
 - (void)setFabric:(uint16_t)vendorId responseHandler:(ResponseHandler)responseHandler;
 - (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler;
 
@@ -1033,14 +1034,71 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Trusted Root Certificates
+ * Cluster Thread Network Diagnostics
  *
  */
-@interface CHIPTrustedRootCertificates : CHIPCluster
+@interface CHIPThreadNetworkDiagnostics : CHIPCluster
 
-- (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler;
-- (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler;
-
+- (void)readAttributeChannelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRoutingRoleWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNetworkNameWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePanIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeExtendedPanIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMeshLocalPrefixWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNeighborTableListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRouteTableListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePartitionIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWeightingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDataVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStableDataVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLeaderRouterIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDetachedRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeChildRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRouterRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLeaderRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePartitionIdChangeCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBetterPartitionAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeParentChangeCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxTotalCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxAckedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxNoAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxDataCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxRetryCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxDirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxIndirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxErrCcaCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxErrAbortCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTxErrBusyChannelCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxTotalCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxDataCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxAddressFilteredCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxDestAddrFilteredCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxDuplicatedCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrNoFrameCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrUnknownNeighborCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrInvalidSrcAddrCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrSecCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrFcsCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSecurityPolicyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeChannelMaskWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOperationalDatasetComponentsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveNetworkFaultsListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

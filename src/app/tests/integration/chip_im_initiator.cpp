@@ -33,7 +33,6 @@
 #include <core/CHIPCore.h>
 #include <mutex>
 #include <platform/CHIPDeviceLayer.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -55,9 +54,6 @@ constexpr chip::Transport::AdminId gAdminId       = 0;
 chip::app::ReadClient * gpReadClient = nullptr;
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
-
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Command was attempted to be sent.
@@ -109,7 +105,7 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
     uint8_t effectVariant    = 1;
     chip::TLV::TLVWriter * writer;
 
-    err = commandSender->PrepareCommand(&commandPathParams);
+    err = commandSender->PrepareCommand(commandPathParams);
     SuccessOrExit(err);
 
     writer = commandSender->GetCommandDataElementTLVWriter();
@@ -153,7 +149,7 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
                                                        0xFE,   // Bad CommandId
                                                        chip::app::CommandPathFlags::kEndpointIdValid };
 
-    err = commandSender->PrepareCommand(&commandPathParams);
+    err = commandSender->PrepareCommand(commandPathParams);
     SuccessOrExit(err);
 
     err = commandSender->FinishCommand();
@@ -182,7 +178,7 @@ CHIP_ERROR SendReadRequest(void)
                                                false /*not urgent*/);
 
     chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, 1, 0,
-                                                       chip::app::AttributePathFlags::kFieldIdValid);
+                                                       chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 

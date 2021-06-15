@@ -81,10 +81,13 @@ void MediaPlaybackManager::storeNewPlaybackState(chip::EndpointId endpoint, uint
     }
 }
 
-static void sendResponse(const char * responseName, chip::CommandId commandId, uint8_t mediaPlaybackStatus)
+static void sendResponse(const char * responseName, chip::CommandId commandId, EmberAfMediaPlaybackStatus mediaPlaybackStatus)
 {
+    // TODO: Once our enums are sized properly, or once we stop depending on the
+    // value being a certain type, we can remove the static_cast.  For now the
+    // cast is safe because all EmberAfKeypadInputStatus values fit in uint32_t.
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_MEDIA_PLAYBACK_CLUSTER_ID,
-                              commandId, "u", mediaPlaybackStatus);
+                              commandId, "u", static_cast<uint8_t>(mediaPlaybackStatus));
 
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
@@ -169,21 +172,21 @@ bool emberAfMediaPlaybackClusterMediaRewindCallback(chip::app::Command *)
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::Command *, unsigned long long deltaPositionMilliseconds)
+bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::Command *, uint64_t deltaPositionMilliseconds)
 {
     EmberAfMediaPlaybackStatus status = MediaPlaybackManager().proxyMediaPlaybackRequest(MediaPlaybackRequest::SkipBackward);
     sendResponse("MediaSkipBackward", ZCL_MEDIA_SKIP_BACKWARD_RESPONSE_COMMAND_ID, status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::Command *, unsigned long long deltaPositionMilliseconds)
+bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::Command *, uint64_t deltaPositionMilliseconds)
 {
     EmberAfMediaPlaybackStatus status = MediaPlaybackManager().proxyMediaPlaybackRequest(MediaPlaybackRequest::SkipForward);
     sendResponse("MediaSkipForward", ZCL_MEDIA_SKIP_FORWARD_RESPONSE_COMMAND_ID, status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipSeekCallback(chip::app::Command *, unsigned long long positionMilliseconds)
+bool emberAfMediaPlaybackClusterMediaSkipSeekCallback(chip::app::Command *, uint64_t positionMilliseconds)
 {
     EmberAfMediaPlaybackStatus status = MediaPlaybackManager().proxyMediaPlaybackRequest(MediaPlaybackRequest::Seek);
     sendResponse("MediaSeek", ZCL_MEDIA_SKIP_FORWARD_RESPONSE_COMMAND_ID, status);

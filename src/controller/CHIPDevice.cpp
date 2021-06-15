@@ -163,6 +163,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
                   "Size of serializable should be <= size of output");
 
     CHIP_ZERO_AT(serializable);
+    CHIP_ZERO_AT(output);
 
     serializable.mOpsCreds   = mPairing;
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
@@ -203,9 +204,10 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     SerializableDevice serializable;
-    size_t maxlen            = BASE64_ENCODED_LEN(sizeof(serializable));
-    size_t len               = strnlen(Uint8::to_const_char(&input.inner[0]), maxlen);
-    uint16_t deserializedLen = 0;
+    size_t maxlen             = BASE64_ENCODED_LEN(sizeof(serializable));
+    size_t len                = strnlen(Uint8::to_const_char(&input.inner[0]), maxlen);
+    uint16_t deserializedLen  = 0;
+    Inet::IPAddress ipAddress = {};
 
     VerifyOrExit(len < sizeof(SerializedDevice), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(CanCastTo<uint16_t>(len), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -217,7 +219,6 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    Inet::IPAddress ipAddress;
     uint16_t port;
     Inet::InterfaceId interfaceId;
 
@@ -294,7 +295,7 @@ CHIP_ERROR Device::Persist()
                           error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed to persist device %d", error);
+            ChipLogError(Controller, "Failed to persist device %" PRId32, error);
         }
     }
 exit:
@@ -314,7 +315,7 @@ void Device::OnNewConnection(SecureSessionHandle session)
     MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
     if (localCounter.SetCounter(mLocalMessageCounter))
     {
-        ChipLogError(Controller, "Unable to restore local counter to %d", mLocalMessageCounter);
+        ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
     }
     Transport::PeerMessageCounter & peerCounter = connectionState->GetSessionMessageCounter().GetPeerMessageCounter();
     peerCounter.SetCounter(mPeerMessageCounter);
@@ -473,7 +474,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "LoadSecureSessionParameters returning error %d\n", err);
+        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" PRId32, err);
     }
     return err;
 }

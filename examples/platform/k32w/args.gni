@@ -20,7 +20,6 @@ arm_float_abi = "soft"
 arm_cpu = "cortex-m4"
 arm_arch = "armv7e-m"
 
-openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_deps = []
 openthread_core_config_deps = [ "${chip_root}/examples/platform/k32w:openthread_core_config_k32w_chip_examples" ]
 

@@ -47,7 +47,7 @@ static CHIP_ERROR readBits(std::vector<uint8_t> buf, size_t & index, uint64_t & 
     dest = 0;
     if (index + numberOfBitsToRead > buf.size() * 8 || numberOfBitsToRead > sizeof(uint64_t) * 8)
     {
-        ChipLogError(SetupPayload, "Error parsing QR code. startIndex %d numberOfBitsToLoad %zu buf_len %zu ", index,
+        ChipLogError(SetupPayload, "Error parsing QR code. startIndex %zu numberOfBitsToLoad %zu buf_len %zu ", index,
                      numberOfBitsToRead, buf.size());
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -376,13 +376,16 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     static_assert(kProductIDFieldLengthInBits <= 16, "Won't fit in uint16_t");
     outPayload.productID = static_cast<uint16_t>(dest);
 
-    err = readBits(buf, indexToReadFrom, dest, kCustomFlowRequiredFieldLengthInBits);
+    err = readBits(buf, indexToReadFrom, dest, kCommissioningFlowFieldLengthInBits);
     SuccessOrExit(err);
-    static_assert(kCustomFlowRequiredFieldLengthInBits <= 8, "Won't fit in uint8_t");
-    outPayload.requiresCustomFlow = static_cast<uint8_t>(dest);
+    static_assert(kCommissioningFlowFieldLengthInBits <= std::numeric_limits<std::underlying_type_t<CommissioningFlow>>::digits,
+                  "Won't fit in CommissioningFlow");
+    outPayload.commissioningFlow = static_cast<CommissioningFlow>(dest);
 
     err = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
     SuccessOrExit(err);
+    static_assert(kRendezvousInfoFieldLengthInBits <= 8 * sizeof(RendezvousInformationFlag),
+                  "Won't fit in RendezvousInformationFlags");
     outPayload.rendezvousInformation = RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(dest));
 
     err = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);

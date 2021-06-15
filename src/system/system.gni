@@ -40,7 +40,9 @@ declare_args() {
 }
 
 if (chip_system_config_locking == "") {
-  if (current_os != "freertos") {
+  if (current_os == "freertos") {
+    chip_system_config_locking = "freertos"
+  } else if (chip_system_config_use_dispatch == false) {
     chip_system_config_locking = "posix"
   } else {
     chip_system_config_locking = "none"

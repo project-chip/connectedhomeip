@@ -130,3 +130,6 @@ labelPRBasedOnFilePath:
 
     zephyr:
         - src/platform/Zephyr/*
+
+    telink:
+        - src/platform/telink/*

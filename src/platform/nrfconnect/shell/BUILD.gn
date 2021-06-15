@@ -23,6 +23,4 @@ static_library("chip-zephyr-shell") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [ "${chip_root}/src/app/server" ]
-
-  complete_static_lib = true
 }

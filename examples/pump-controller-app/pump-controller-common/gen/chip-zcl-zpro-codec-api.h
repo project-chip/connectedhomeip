@@ -41,7 +41,6 @@
 | TemperatureMeasurement                                              | 0x0402 |
 | TemperatureMeasurement                                              | 0x0402 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
-| TrustedRootCertificates                                             | 0x003F |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
 \*----------------------------------------------------------------------------*/
 

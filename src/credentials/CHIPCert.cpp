@@ -257,8 +257,10 @@ CHIP_ERROR ChipCertificateSet::LoadCerts(const uint8_t * chipCerts, uint32_t chi
     tag  = reader.GetTag();
 
     VerifyOrExit(
-        (type == kTLVType_Structure && tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate)) ||
-            (type == kTLVType_Array && tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificateArray)),
+        (type == kTLVType_Structure &&
+         (tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) || tag == AnonymousTag)) ||
+            (type == kTLVType_Array &&
+             (tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificateArray) || tag == AnonymousTag)),
         err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     err = LoadCerts(reader, decodeFlags);
@@ -374,47 +376,20 @@ exit:
 
 CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
 {
-    static constexpr size_t kMaxBytesForDeferredLenList = sizeof(uint8_t *) + // size of a single pointer in the deferred list
-        4 + // extra memory allocated for the deferred length field (kLengthFieldReserveSize - 1)
-        3;  // the deferred length list is alligned to 32bit boundary
-
-    CHIP_ERROR err;
     P256PublicKey caPublicKey;
     P256ECDSASignature signature;
-    uint8_t tmpBuf[signature.Capacity() + kMaxBytesForDeferredLenList];
-    ASN1Writer writer;
+    uint16_t derSigLen;
 
-    writer.Init(tmpBuf, static_cast<uint32_t>(sizeof(tmpBuf)));
+    ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(cert->mSignature, cert->mSignatureLen, signature,
+                                                       static_cast<uint16_t>(signature.Capacity()), derSigLen));
 
-    // Ecdsa-Sig-Value ::= SEQUENCE
-    ASN1_START_SEQUENCE
-    {
-        // r INTEGER
-        err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, cert->mSignature.R, cert->mSignature.RLen);
-        SuccessOrExit(err);
-
-        // s INTEGER
-        err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, cert->mSignature.S, cert->mSignature.SLen);
-        SuccessOrExit(err);
-    }
-    ASN1_END_SEQUENCE;
-
-    err = writer.Finalize();
-    SuccessOrExit(err);
-
-    VerifyOrExit(writer.GetLengthWritten() <= signature.Capacity(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    memcpy(signature, tmpBuf, writer.GetLengthWritten());
-    err = signature.SetLength(writer.GetLengthWritten());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(signature.SetLength(derSigLen));
 
     memcpy(caPublicKey, caCert->mPublicKey, caCert->mPublicKeyLen);
 
-    err = caPublicKey.ECDSA_validate_hash_signature(cert->mTBSHash, chip::Crypto::kSHA256_Hash_Length, signature);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(caPublicKey.ECDSA_validate_hash_signature(cert->mTBSHash, chip::Crypto::kSHA256_Hash_Length, signature));
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
@@ -607,10 +582,8 @@ void ChipCertificateData::Clear()
     mKeyUsageFlags.ClearAll();
     mKeyPurposeFlags.ClearAll();
     mPathLenConstraint = 0;
-    mSignature.R       = nullptr;
-    mSignature.RLen    = 0;
-    mSignature.S       = nullptr;
-    mSignature.SLen    = 0;
+    mSignature         = nullptr;
+    mSignatureLen      = 0;
     memset(mTBSHash, 0, sizeof(mTBSHash));
 }
 
@@ -624,10 +597,8 @@ bool ChipCertificateData::IsEqual(const ChipCertificateData & other) const
         (mPubKeyCurveOID == other.mPubKeyCurveOID) && (mPubKeyAlgoOID == other.mPubKeyAlgoOID) &&
         (mSigAlgoOID == other.mSigAlgoOID) && (mCertFlags.Raw() == other.mCertFlags.Raw()) &&
         (mKeyUsageFlags.Raw() == other.mKeyUsageFlags.Raw()) && (mKeyPurposeFlags.Raw() == other.mKeyPurposeFlags.Raw()) &&
-        (mPathLenConstraint == other.mPathLenConstraint) && (mSignature.RLen == other.mSignature.RLen) &&
-        (memcmp(mSignature.R, other.mSignature.R, mSignature.RLen) == 0) && (mSignature.SLen == other.mSignature.SLen) &&
-        (memcmp(mSignature.S, other.mSignature.S, mSignature.SLen) == 0) &&
-        (memcmp(mTBSHash, other.mTBSHash, sizeof(mTBSHash)) == 0);
+        (mPathLenConstraint == other.mPathLenConstraint) && (mSignatureLen == other.mSignatureLen) &&
+        (memcmp(mSignature, other.mSignature, mSignatureLen) == 0) && (memcmp(mTBSHash, other.mTBSHash, sizeof(mTBSHash)) == 0);
 }
 
 void ValidationContext::Reset()
@@ -871,6 +842,120 @@ DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1Un
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConvertIntegerDERToRaw(const uint8_t * derInt, uint16_t derIntLen, uint8_t * rawInt, const uint16_t rawIntLen)
+{
+    VerifyOrReturnError(derInt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(derIntLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(rawInt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    /* one leading zero is allowed for positive integer in ASN1 DER format */
+    if (*derInt == 0)
+    {
+        derInt++;
+        derIntLen--;
+    }
+
+    VerifyOrReturnError(derIntLen <= rawIntLen, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (derIntLen > 0)
+    {
+        VerifyOrReturnError(*derInt != 0, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    memset(rawInt, 0, (rawIntLen - derIntLen));
+    memcpy(rawInt + (rawIntLen - derIntLen), derInt, derIntLen);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConvertIntegerRawToDER(const uint8_t * rawInt, uint16_t rawIntLen, uint8_t * derInt, const uint16_t derIntBufSize,
+                                  uint16_t & derIntLen)
+{
+    VerifyOrReturnError(rawInt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(rawIntLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(derInt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    while (*rawInt == 0)
+    {
+        rawInt++;
+        rawIntLen--;
+    }
+
+    if (*rawInt & 0x80) /* Need Leading Zero */
+    {
+        VerifyOrReturnError(rawIntLen <= UINT16_MAX - 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(derIntBufSize >= rawIntLen + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        *derInt++ = 0;
+        derIntLen = static_cast<uint16_t>(rawIntLen + 1);
+    }
+    else
+    {
+        VerifyOrReturnError(derIntBufSize >= rawIntLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        derIntLen = rawIntLen;
+    }
+
+    memcpy(derInt, rawInt, rawIntLen);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConvertECDSASignatureRawToDER(const uint8_t * rawSig, uint16_t rawSigLen, uint8_t * derSig, const uint16_t derSigBufSize,
+                                         uint16_t & derSigLen)
+{
+    static constexpr size_t kMaxBytesForDeferredLenList = sizeof(uint8_t *) + // size of a single pointer in the deferred list
+        4 + // extra memory allocated for the deferred length field (kLengthFieldReserveSize - 1)
+        3;  // the deferred length list is alligned to 32bit boundary
+
+    uint8_t localDERSigBuf[kMax_ECDSA_Signature_Length + kMaxBytesForDeferredLenList];
+    ASN1Writer writer;
+
+    VerifyOrReturnError(rawSig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(rawSigLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(derSig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    writer.Init(localDERSigBuf, sizeof(localDERSigBuf));
+
+    ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(rawSig, rawSigLen, writer));
+
+    ReturnErrorOnFailure(writer.Finalize());
+
+    derSigLen = writer.GetLengthWritten();
+
+    VerifyOrReturnError(derSigLen <= derSigBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(derSig, localDERSigBuf, derSigLen);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConvertECDSASignatureRawToDER(const uint8_t * rawSig, uint16_t rawSigLen, ASN1Writer & writer)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t derInt[kP256_FE_Length + 1];
+    uint16_t derIntLen;
+
+    VerifyOrReturnError(rawSig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(rawSigLen == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Ecdsa-Sig-Value ::= SEQUENCE
+    ASN1_START_SEQUENCE
+    {
+        // r INTEGER
+        ReturnErrorOnFailure(ConvertIntegerRawToDER(rawSig, kP256_FE_Length, derInt, sizeof(derInt), derIntLen));
+        ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derInt, derIntLen));
+
+        // s INTEGER
+        ReturnErrorOnFailure(ConvertIntegerRawToDER(rawSig + kP256_FE_Length, kP256_FE_Length, derInt, sizeof(derInt), derIntLen));
+        ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derInt, derIntLen));
+    }
+    ASN1_END_SEQUENCE;
+
+exit:
+    return err;
 }
 
 } // namespace Credentials

@@ -92,7 +92,11 @@
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+#if defined(ESP_PLATFORM)
+#include "freertos/FreeRTOS.h"
+#else
 #include <FreeRTOS.h>
+#endif
 #include <semphr.h>
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 

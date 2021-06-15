@@ -24,6 +24,7 @@
 #include "gen/CHIPClusters.h"
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <support/Span.h>
 
 enum class PairingMode
 {
@@ -96,7 +97,7 @@ public:
     }
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -134,15 +135,14 @@ private:
     uint64_t mFabricId;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
-    char * mOperationalDataset;
-    char * mSSID;
-    char * mPassword;
+    chip::ByteSpan mOperationalDataset;
+    chip::ByteSpan mSSID;
+    chip::ByteSpan mPassword;
 
     chip::Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> * mOnAddThreadNetworkCallback;
     chip::Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> * mOnAddWiFiNetworkCallback;
     chip::Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> * mOnEnableNetworkCallback;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback;
-    ChipDeviceCommissioner mCommissioner;
     ChipDevice * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;
