@@ -1,32 +1,83 @@
 name: Sync test
 
 on:
-  workflow_run:
-    workflows: 
-     - "Builds" 
-     - "Build examples - Mbed OS"
-    types: 
-      - requested
-      - completed
+  push:
 
 jobs:
-    test_sync:
-        runs-on: ubuntu-latest
+  sync-with-chip-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for 'build' workflow to finish
+        uses: tomchv/wait-my-workflow@v1.1.0
+        id: wait-chip-build
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: build
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          intervalSeconds: 30
+          timeoutSeconds: 1200
 
-        steps:
-          - uses: actions/checkout@v2
-          - uses: ahmadnassri/action-workflow-run-wait@v1
+      - name: Download CHIP-app linux artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build.yaml
+          workflow_conclusion: success
+          commit: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: build_artifacts
+
+  sync-with-mbed-os-examples-build:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Wait for 'chip-examples' workflow to finish
+        uses: tomchv/wait-my-workflow@v1.1.0
+        id: wait-mbed-os-examples
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName:  mbedos
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          intervalSeconds: 30
+          timeoutSeconds: 1200
+
+      - name: Download CHIP-app linux artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: examples-mbed.yaml
+          workflow_conclusion: success
+          commit: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: build_artifacts
+
+  send-lava-job:
+      runs-on: ubuntu-latest
+      needs: 
+        - sync-with-mbed-os-examples-build
+        - sync-with-chip-build
+      steps:
+        - name: Send lava job request
+          run: echo "Request sent"
+
+# jobs:
+#     test_sync:
+#         runs-on: ubuntu-latest
+
+#         steps:
+#           - uses: actions/checkout@v2
+#           - uses: ahmadnassri/action-workflow-run-wait@v1
+#             with:
+#               timeout: 1200000
+#               delay: 30000
           
-          - name: Download CHIP-app linux artifacts
-            uses: dawidd6/action-download-artifact@v2
-            with:
-              workflow: build.yaml
-              workflow_conclusion: success
-              path: build_artifacts
+#           - name: Download CHIP-app linux artifacts
+#             uses: dawidd6/action-download-artifact@v2
+#             with:
+#               workflow: build.yaml
+#               workflow_conclusion: success
+#               commit: ${{github.sha}}
+#               path: build_artifacts
 
-          - name: Download test target artifacts
-            uses: dawidd6/action-download-artifact@v2
-            with:
-              workflow: examples-mbed.yaml
-              workflow_conclusion: success
-              path: examples_mbed_artifacts
+#           - name: Download test target artifacts
+#             uses: dawidd6/action-download-artifact@v2
+#             with:
+#               workflow: examples-mbed.yaml
+#               workflow_conclusion: success
+#               commit: ${{github.sha}}
+#               path: examples_mbed_artifacts
