@@ -3,16 +3,15 @@ name: Sync test
 on:
   workflow_run:
     workflows: 
-     - Builds 
-     - Build examples - Mbed OS
+     - "Builds" 
+     - "Build examples - Mbed OS"
     types: 
+      - requested
       - completed
 
 jobs:
     test_sync:
         runs-on: ubuntu-latest
-
-        name: test_sync
 
         steps:
           - uses: actions/checkout@v2
