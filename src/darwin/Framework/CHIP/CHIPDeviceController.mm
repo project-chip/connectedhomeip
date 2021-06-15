@@ -118,7 +118,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 - (BOOL)shutdown
 {
-    dispatch_sync(_chipWorkQueue, ^{
+    dispatch_async(_chipWorkQueue, ^{
         if (_cppCommissioner) {
             CHIP_LOG_DEBUG("%@", kInfoStackShutdown);
             _cppCommissioner->Shutdown();
@@ -127,11 +127,16 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         }
     });
 
+    // StopEventLoopTask will block until blocks are executed
+    chip::DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
+
     return YES;
 }
 
 - (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
 {
+    chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+
     __block BOOL commissionerInitialized = NO;
     dispatch_sync(_chipWorkQueue, ^{
         if ([self _isRunning]) {
@@ -176,8 +181,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             return;
         }
 
-        // Start the IO pump
-        self.cppCommissioner->ServiceEvents();
         commissionerInitialized = YES;
     });
 
