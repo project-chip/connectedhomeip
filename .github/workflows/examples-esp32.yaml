@@ -18,6 +18,10 @@ on:
     push:
     pull_request:
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.number || github.sha }}
+    cancel-in-progress: true
+  
 jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
