@@ -266,6 +266,15 @@ public:
      */
     CHIP_ERROR ServiceEventSignal();
 
+    /**
+     * @brief Get the Fabric ID assigned to the device.
+     *
+     * @param[out] fabricId   Fabric ID of the device.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    CHIP_ERROR GetFabricId(uint64_t & fabricId);
+
 protected:
     enum class State
     {
