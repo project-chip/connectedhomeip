@@ -177,8 +177,7 @@ int Teardown(void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestPushPop), NL_TEST_DEF_FN(TestPushInvalid), NL_TEST_DEF_FN(TestPushWrap),
-    NL_TEST_DEF_FN(TestPushWrapAtEdge),
-                                 NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF_FN(TestPushWrapAtEdge), NL_TEST_SENTINEL() };
 
 int TestBytesCircularBuffer()
 {

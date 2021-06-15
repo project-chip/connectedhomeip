@@ -94,7 +94,7 @@ size_t BytesCircularBuffer::StorageUsed() const
 CHIP_ERROR BytesCircularBuffer::Push(const ByteSpan & payload)
 {
     size_t maxStorageAvailable = mCapacity - (sizeof(SizeType) + 1);
-    size_t length = payload.size();
+    size_t length              = payload.size();
     if (length > maxStorageAvailable)
         return CHIP_ERROR_INVALID_ARGUMENT;
     if (length > std::numeric_limits<SizeType>::max())

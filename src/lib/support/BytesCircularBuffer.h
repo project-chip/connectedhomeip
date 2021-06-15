@@ -42,7 +42,8 @@ public:
      * @param storage  The underlying storage. This class doesn't take the ownership of the storage.
      * @param capacity The length of the storage.
      */
-    BytesCircularBuffer(uint8_t * storage, size_t capacity) : mStorage(storage), mCapacity(capacity), mDataStart(0), mDataEnd(0) {
+    BytesCircularBuffer(uint8_t * storage, size_t capacity) : mStorage(storage), mCapacity(capacity), mDataStart(0), mDataEnd(0)
+    {
         VerifyOrDie(mCapacity > sizeof(SizeType) + 1);
     }
 
@@ -80,7 +81,7 @@ private:
     void Read(uint8_t * dest, size_t length, size_t offset) const; // read length bytes into dest
     void Write(const uint8_t * source, size_t length);
     void Drop(size_t length);
-    size_t StorageUsed() const;                                                // returns number of bytes stored
+    size_t StorageUsed() const; // returns number of bytes stored
 
     /** @brief advance dataLocation by amount, wrap around on mCapacity
      *
