@@ -47,6 +47,7 @@ namespace Credentials {
 using namespace chip::ASN1;
 using namespace chip::TLV;
 using namespace chip::Protocols;
+using namespace chip::Crypto;
 
 static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipDN & dn)
 {
@@ -674,77 +675,27 @@ exit:
 
 CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certData)
 {
-    CHIP_ERROR err;
-    TLVType containerType;
-    uint32_t len;
+    ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, ContextTag(kTag_ECDSASignature)));
 
-    err = reader.Next(kTLVType_Structure, ContextTag(kTag_ECDSASignature));
-    SuccessOrExit(err);
+    VerifyOrReturnError(reader.GetLength() == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+    certData.mSignatureLen = kP256_ECDSA_Signature_Length_Raw;
 
-    err = reader.EnterContainer(containerType);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.GetDataPtr(certData.mSignature));
 
-    // r INTEGER
-    err = reader.Next(kTLVType_ByteString, ContextTag(kTag_ECDSASignature_r));
-    SuccessOrExit(err);
-
-    err = reader.GetDataPtr(certData.mSignature.R);
-    SuccessOrExit(err);
-
-    len = reader.GetLength();
-    VerifyOrExit(len <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
-
-    certData.mSignature.RLen = static_cast<uint8_t>(len);
-
-    // s INTEGER
-    err = reader.Next(kTLVType_ByteString, ContextTag(kTag_ECDSASignature_s));
-    SuccessOrExit(err);
-
-    err = reader.GetDataPtr(certData.mSignature.S);
-    SuccessOrExit(err);
-
-    len = reader.GetLength();
-    VerifyOrExit(len <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
-
-    certData.mSignature.SLen = static_cast<uint8_t>(len);
-
-    // Verify no more elements in the signature.
-    reader.Next();
-    err = reader.VerifyEndOfContainer();
-    SuccessOrExit(err);
-
-    err = reader.ExitContainer(containerType);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR DecodeConvertECDSASignature(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = DecodeECDSASignature(reader, certData);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(DecodeECDSASignature(reader, certData));
 
     // signatureValue BIT STRING
     // Per RFC3279, the ECDSA signature value is encoded in DER encapsulated in the signatureValue BIT STRING.
     ASN1_START_BIT_STRING_ENCAPSULATED
     {
-        // Ecdsa-Sig-Value ::= SEQUENCE
-        ASN1_START_SEQUENCE
-        {
-            // r INTEGER
-            err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, certData.mSignature.R,
-                                  certData.mSignature.RLen);
-            SuccessOrExit(err);
-
-            // s INTEGER
-            err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, certData.mSignature.S,
-                                  certData.mSignature.SLen);
-            SuccessOrExit(err);
-        }
-        ASN1_END_SEQUENCE;
+        ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(certData.mSignature, certData.mSignatureLen, writer));
     }
     ASN1_END_ENCAPSULATED;
 

@@ -96,6 +96,23 @@ inline CHIP_ERROR BytesToLowercaseHexString(const uint8_t * src_bytes, size_t sr
     return BytesToHex(src_bytes, src_size, dest_hex_str, dest_size_max, HexFlags::kNullTerminate);
 }
 
+/**
+ * Convert a buffer of hexadecimal characters to bytes.  Supports both lowercase
+ * and uppercase (or a mix of cases) hexadecimal characters. Supported input is
+ * [0-9a-fA-F].
+ *
+ * @param srcHex a pointer to the character buffer to convert.  It is not
+ *               assumed to be null-terminated.
+ * @param srcLen the length of the character buffer to convert.
+ * @param destBytes the buffer to fill with the decoded bytes.
+ * @param destMaxLen the total size of the buffer to be filled.
+ *
+ * @return 0 on errors:
+ *           - destMaxLen not big enough.
+ *           - srcLen not even.
+ *           - Some character not in [0-9a-fA-F] is present in srcHex.
+ *         number of bytes actually decoded from the string on success.
+ */
 size_t HexToBytes(const char * srcHex, const size_t srcLen, uint8_t * destBytes, size_t destMaxLen);
 
 } // namespace Encoding

@@ -82,7 +82,7 @@ restart:
 #else
         aThis.mFreeRTOSSemaphore = xSemaphoreCreateMutex();
 #endif
-        if (aThis.mFreeRTOSSemaphore == NULL)
+        if (aThis.mFreeRTOSSemaphore == nullptr)
         {
             aThis.mInitialized = 0;
 
@@ -91,7 +91,7 @@ restart:
     }
     else
     {
-        while (aThis.mFreeRTOSSemaphore == NULL)
+        while (aThis.mFreeRTOSSemaphore == nullptr)
         {
             vTaskDelay(1);
 

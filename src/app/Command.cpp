@@ -54,14 +54,12 @@ CHIP_ERROR Command::Reset()
     CommandList::Builder commandListBuilder;
     AbortExistingExchangeContext();
 
-    if (mCommandMessageBuf.IsNull())
-    {
-        // TODO: Calculate the packet buffer size
-        mCommandMessageBuf = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-        VerifyOrExit(!mCommandMessageBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    }
+    mCommandMessageWriter.Reset();
 
-    mCommandMessageWriter.Init(std::move(mCommandMessageBuf));
+    System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    VerifyOrExit(!commandPacket.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    mCommandMessageWriter.Init(std::move(commandPacket));
     err = mInvokeCommandBuilder.Init(&mCommandMessageWriter);
     SuccessOrExit(err);
 
@@ -130,7 +128,6 @@ void Command::Shutdown()
 {
     VerifyOrExit(mState != CommandState::Uninitialized, );
     mCommandMessageWriter.Reset();
-    mCommandMessageBuf = nullptr;
 
     AbortExistingExchangeContext();
 
@@ -143,7 +140,7 @@ exit:
     return;
 }
 
-CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus)
+CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandDataElement::Builder commandDataElement;
@@ -152,11 +149,8 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPath
     err                = commandDataElement.GetError();
     SuccessOrExit(err);
 
-    if (apCommandPathParams != nullptr)
-    {
-        err = ConstructCommandPath(*apCommandPathParams, commandDataElement);
-        SuccessOrExit(err);
-    }
+    err = ConstructCommandPath(aCommandPathParams, commandDataElement);
+    SuccessOrExit(err);
 
     if (!aIsStatus)
     {
@@ -225,7 +219,7 @@ CHIP_ERROR Command::AbortExistingExchangeContext()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Command::FinalizeCommandsMessage()
+CHIP_ERROR Command::FinalizeCommandsMessage(System::PacketBufferHandle & commandPacket)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandList::Builder commandListBuilder;
@@ -238,7 +232,7 @@ CHIP_ERROR Command::FinalizeCommandsMessage()
     err = mInvokeCommandBuilder.GetError();
     SuccessOrExit(err);
 
-    err = mCommandMessageWriter.Finalize(&mCommandMessageBuf);
+    err = mCommandMessageWriter.Finalize(&commandPacket);
     SuccessOrExit(err);
 exit:
     ChipLogFunctError(err);

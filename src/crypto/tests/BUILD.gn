@@ -44,6 +44,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",

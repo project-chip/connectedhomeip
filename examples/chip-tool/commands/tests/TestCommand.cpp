@@ -20,27 +20,29 @@
 
 constexpr uint16_t kWaitDurationInSeconds = 30;
 
-CHIP_ERROR TestCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR TestCommand::Run(NodeId localId, NodeId remoteId)
 {
-    chip::Controller::CommissionerInitParams params;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    params.storageDelegate                = &storage;
-    params.operationalCredentialsDelegate = &mOpCredsIssuer;
-
-    ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
-    ReturnErrorOnFailure(mCommissioner.Init(localId, params));
-    ReturnErrorOnFailure(mCommissioner.ServiceEvents());
-    ReturnErrorOnFailure(mCommissioner.GetDevice(remoteId, &mDevice));
-
-    ReturnErrorOnFailure(NextTest());
-
+    //
+    // Set this to true first BEFORE we send commands to ensure we don't
+    // end up in a situation where the response comes back faster than we can
+    // set the variable to true, which will cause it to block indefinitely.
+    //
     UpdateWaitForResponse(true);
+
+    {
+        chip::DeviceLayer::StackLock lock;
+
+        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
+        ReturnErrorOnFailure(err);
+
+        err = NextTest();
+        ReturnErrorOnFailure(err);
+    }
+
     WaitForResponse(kWaitDurationInSeconds);
 
-    mCommissioner.ServiceEventSignal();
-    mCommissioner.Shutdown();
-
     VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
-
     return CHIP_NO_ERROR;
 }

@@ -39,7 +39,7 @@
 #include <openthread/ip6.h>
 #include <openthread/link.h>
 #include <openthread/thread.h>
-#ifdef EFR32_OPENTHREAD_API
+#if OPENTHREAD_API_VERSION >= 85
 #ifndef SHELL_OTCLI_TX_BUFFER_SIZE
 #define SHELL_OTCLI_TX_BUFFER_SIZE 1024
 #endif
@@ -105,7 +105,7 @@ int cmd_otcli_dispatch(int argc, char ** argv)
         }
     }
     buff_ptr = 0;
-#ifdef EFR32_OPENTHREAD_API
+#if OPENTHREAD_API_VERSION >= 85
     otCliInputLine(buff);
 #else
     otCliConsoleInputLine(buff, buff_ptr - buff);
@@ -166,7 +166,7 @@ exit:
 static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
 
 #if CHIP_TARGET_STYLE_EMBEDDED
-#ifdef EFR32_OPENTHREAD_API
+#if OPENTHREAD_API_VERSION >= 85
 static int OnOtCliOutput(void * aContext, const char * aFormat, va_list aArguments)
 {
     int rval = vsnprintf(sTxBuffer, sTxLength, aFormat, aArguments);
@@ -189,7 +189,7 @@ void cmd_otcli_init()
 {
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_TARGET_STYLE_EMBEDDED
-#ifdef EFR32_OPENTHREAD_API
+#if OPENTHREAD_API_VERSION >= 85
     otCliInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
 #else
     otCliConsoleInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);

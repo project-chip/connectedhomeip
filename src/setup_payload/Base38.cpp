@@ -191,7 +191,14 @@ CHIP_ERROR base38Decode(std::string base38, std::vector<uint8_t> & result)
 
         for (int i = 0; i < bytesInDecodedChunk; i++)
         {
-            result.push_back(static_cast<uint8_t>(value >> (8 * i)));
+            result.push_back(static_cast<uint8_t>(value));
+            value >>= 8;
+        }
+
+        if (value > 0)
+        {
+            // encoded value is too big to represent a correct chunk of size 1, 2 or 3 bytes
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
     return CHIP_NO_ERROR;

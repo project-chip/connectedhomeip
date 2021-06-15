@@ -178,9 +178,10 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         // Start the IO pump
         self.cppCommissioner->ServiceEvents();
+        commissionerInitialized = YES;
     });
 
-    return YES;
+    return commissionerInitialized;
 }
 
 - (NSNumber *)getControllerNodeId

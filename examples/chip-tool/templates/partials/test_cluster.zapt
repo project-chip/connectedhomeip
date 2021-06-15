@@ -2,14 +2,24 @@
 class {{asCamelCased filename false}}: public TestCommand
 {
   public:
-    {{asCamelCased filename false}}(): TestCommand("{{filename}}") {}
+    {{asCamelCased filename false}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     CHIP_ERROR NextTest() override
     {
       CHIP_ERROR err = CHIP_NO_ERROR;
 
-      switch (mTestIndex)
+      if (mTestCount == mTestIndex)
+      {
+          ChipLogProgress(chipTool, "{{filename}}: Test complete");
+          SetCommandExitStatus(true);
+      }
+
+      // Ensure we increment mTestIndex before we start running the relevant
+      // command.  That way if we lose the timeslice after we send the message
+      // but before our function call returns, we won't end up with an
+      // incorrect mTestIndex value observed when we get the response.
+      switch (mTestIndex++)
       {
         {{#chip_tests_items}}
         case {{index}}:
@@ -17,12 +27,11 @@ class {{asCamelCased filename false}}: public TestCommand
           break;
         {{/chip_tests_items}}
       }
-      mTestIndex++;
 
-      if (mTestCount == mTestIndex || CHIP_NO_ERROR != err)
+      if (CHIP_NO_ERROR != err)
       {
           ChipLogProgress(chipTool, "{{filename}}: %s", chip::ErrorStr(err));
-          SetCommandExitStatus(CHIP_NO_ERROR == err);
+          SetCommandExitStatus(false);
       }
 
       return err;
@@ -30,8 +39,8 @@ class {{asCamelCased filename false}}: public TestCommand
 
 
   private:
-    uint16_t mTestIndex = 0;
-    uint16_t mTestCount = {{totalTests}};
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = {{totalTests}};
 
     //
     // Tests methods

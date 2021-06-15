@@ -62,6 +62,57 @@ enum class MsgType : uint8_t
     TimedRequest          = 0x0a,
 };
 
+// This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
+enum class ProtocolCode : uint16_t
+{
+    Success                = 0x0,
+    Failure                = 0x01,
+    InvalidSubscription    = 0x7d,
+    UnsupportedAccess      = 0x7e,
+    UnsupportedEndpoint    = 0x7f,
+    InvalidAction          = 0x80,
+    UnsupportedCommand     = 0x81,
+    Reserved82             = 0x82,
+    Reserved83             = 0x83,
+    Reserved84             = 0x84,
+    InvalidCommand         = 0x85,
+    UnsupportedAttribute   = 0x86,
+    InvalidValue           = 0x87,
+    UnsupportedWrite       = 0x88,
+    ResourceExhausted      = 0x89,
+    Reserved8a             = 0x8a,
+    NotFound               = 0x8b,
+    UnreportableAttribute  = 0x8c,
+    InvalidDataType        = 0x8d,
+    Reserved8e             = 0x8e,
+    UnsupportedRead        = 0x8f,
+    Reserved90             = 0x90,
+    Reserved91             = 0x91,
+    Reserved92             = 0x92,
+    Reserved93             = 0x93,
+    Timeout                = 0x94,
+    Reserved95             = 0x95,
+    Reserved96             = 0x96,
+    Reserved97             = 0x97,
+    Reserved98             = 0x98,
+    Reserved99             = 0x99,
+    Reserved9a             = 0x9a,
+    ConstraintError        = 0x9b,
+    Busy                   = 0x9c,
+    Reservedc0             = 0xc0,
+    Reservedc1             = 0xc1,
+    Reservedc2             = 0xc2,
+    UnsupportedCluster     = 0xc3,
+    Reservedc4             = 0xc4,
+    NoUpstreamSubscription = 0xc5,
+    InvalidArgument        = 0xc6,
+};
+
+inline uint16_t ToUint16(ProtocolCode aProtocolCode)
+{
+    static_assert(std::is_same<uint16_t, std::underlying_type_t<ProtocolCode>>::value, "Cast might not be right");
+    return static_cast<uint16_t>(aProtocolCode);
+}
 } // namespace InteractionModel
 
 template <>

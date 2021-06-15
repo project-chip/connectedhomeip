@@ -20,6 +20,7 @@
 
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <map>
 
 class Commands
@@ -32,7 +33,7 @@ public:
     int Run(NodeId localId, NodeId remoteId, int argc, char ** argv);
 
 private:
-    CHIP_ERROR RunCommand(PersistentStorage & storage, NodeId localId, NodeId remoteId, int argc, char ** argv);
+    CHIP_ERROR RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv);
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
     Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
@@ -44,4 +45,7 @@ private:
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
 
     std::map<std::string, CommandsVector> mClusters;
+    chip::Controller::DeviceCommissioner mController;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+    PersistentStorage mStorage;
 };

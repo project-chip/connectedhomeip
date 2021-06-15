@@ -60,16 +60,16 @@ static const char * GetProtocolString(MdnsServiceProtocol protocol)
     return protocol == MdnsServiceProtocol::kMdnsProtocolTcp ? "_tcp" : "_udp";
 }
 
-CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
-{
-    return mdns_hostname_set(hostname) == ESP_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
-}
-
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
     CHIP_ERROR error        = CHIP_NO_ERROR;
     mdns_txt_item_t * items = nullptr;
     esp_err_t espError;
+
+    if (strcmp(service->mHostName, "") != 0)
+    {
+        VerifyOrExit(mdns_hostname_set(service->mHostName) == ESP_OK, error = CHIP_ERROR_INTERNAL);
+    }
 
     VerifyOrExit(service->mTextEntrySize <= UINT8_MAX, error = CHIP_ERROR_INVALID_ARGUMENT);
     if (service->mTextEntries)

@@ -390,7 +390,7 @@ static void removeServer(uint8_t * ieeeAddress)
 static EmberStatus sendCommand(EmberNodeId destAddress)
 {
     emberAfSetCommandEndpoints(myEndpoint, emberAfIasZoneClientKnownServers[currentIndex].endpoint);
-    EmberStatus status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, destAddress);
+    EmberStatus status = emberAfSendCommandUnicast(MessageSendDestination::Direct(destAddress));
     emberAfIasZoneClusterPrintln("Sent IAS Zone Client Command to 0x%2X (%d -> %d) status: 0x%X", destAddress, myEndpoint,
                                  emberAfIasZoneClientKnownServers[currentIndex].endpoint, status);
     if (status != EMBER_SUCCESS)

@@ -9,6 +9,7 @@ import coloredlogs
 _LOG = logging.getLogger(__name__)
 
 ROOT = 'examples/all-clusters-app/esp32'
+idf_path = os.environ['IDF_PATH']
 
 class IDFExecutor:
   """Runs specified commands via an executor that activates the CHIP build environment."""
@@ -26,7 +27,7 @@ class IDFExecutor:
   
   def execute(self, command):
     os.chdir(self.chip_root)
-    subprocess.call([self.run_cmd, 'source "%s/%s/idf.sh"; idf %s' % (self.chip_root, ROOT, command)])
+    subprocess.call([self.run_cmd, 'source "%s/export.sh"; cd %s; idf.py %s' % (idf_path, ROOT, command)])
 
 
 def main():
@@ -60,13 +61,13 @@ def main():
     if os.path.exists(curr_sdkconfig):
       os.remove(curr_sdkconfig)
 
-    e.execute('SDKCONFIG_DEFAULTS="{sdkname}" make -j{cpus} -C {example_root} defconfig'.format(
-      sdkname=sdkconfig, cpus=os.cpu_count(), example_root = ROOT
+    e.execute('-D SDKCONFIG_DEFAULTS="{sdkname}" build'.format(
+      sdkname=sdkconfig
     ))
 
 
   logging.info('Compiling')
-  e.execute('make -j{cpus} -C {example_root}'.format(cpus=os.cpu_count(), example_root=ROOT))
+  e.execute('build')
 
 
 if __name__ == '__main__':

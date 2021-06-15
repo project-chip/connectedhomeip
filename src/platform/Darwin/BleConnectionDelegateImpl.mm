@@ -203,7 +203,7 @@ namespace DeviceLayer {
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
     if (nil != error) {
-        ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%@]", error.localizedDescription);
+        ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%s]", [error.localizedDescription UTF8String]);
     }
 
     bool found;
@@ -225,7 +225,8 @@ namespace DeviceLayer {
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
     if (nil != error) {
-        ChipLogError(Ble, "BLE:Error finding Characteristics in Chip service on the device: [%@]", error.localizedDescription);
+        ChipLogError(
+            Ble, "BLE:Error finding Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
     }
 
     // XXX error ?
@@ -244,7 +245,8 @@ namespace DeviceLayer {
             _mBleLayer->HandleWriteConfirmation((__bridge void *) peripheral, &svcId, &charId);
         });
     } else {
-        ChipLogError(Ble, "BLE:Error writing Characteristics in Chip service on the device: [%@]", error.localizedDescription);
+        ChipLogError(
+            Ble, "BLE:Error writing Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
         dispatch_async(_chipWorkQueue, ^{
             _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_WRITE_FAILED);
         });
@@ -270,7 +272,8 @@ namespace DeviceLayer {
             }
         });
     } else {
-        ChipLogError(Ble, "BLE:Error subscribing/unsubcribing some characteristic on the device: [%@]", error.localizedDescription);
+        ChipLogError(Ble, "BLE:Error subscribing/unsubcribing some characteristic on the device: [%s]",
+            [error.localizedDescription UTF8String]);
         dispatch_async(_chipWorkQueue, ^{
             if (isNotifying) {
                 // we're still notifying, so we must failed the unsubscription
@@ -311,7 +314,8 @@ namespace DeviceLayer {
             });
         }
     } else {
-        ChipLogError(Ble, "BLE:Error receiving indication of Characteristics on the device: [%@]", error.localizedDescription);
+        ChipLogError(
+            Ble, "BLE:Error receiving indication of Characteristics on the device: [%s]", [error.localizedDescription UTF8String]);
         dispatch_async(_chipWorkQueue, ^{
             _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_INDICATE_FAILED);
         });

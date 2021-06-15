@@ -251,6 +251,55 @@ void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
 }
 
+void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
+{
+    TestSecurePairingDelegate delegateCommissioner;
+    PASESession pairingCommissioner;
+
+    TestSecurePairingDelegate delegateAccessory;
+    PASESession pairingAccessory;
+
+    gLoopback.Reset();
+    gLoopback.mSentMessageCount = 0;
+
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+
+    TestContext & ctx                     = *reinterpret_cast<TestContext *>(inContext);
+    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
+
+    pairingCommissioner.MessageDispatch().SetPeerAddress(PeerAddress(Type::kUdp));
+    pairingAccessory.MessageDispatch().SetPeerAddress(PeerAddress(Type::kUdp));
+
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = contextCommissioner->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+    NL_TEST_ASSERT(inSuite, rc != nullptr);
+
+    rc->SetConfig({
+        1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    });
+    gLoopback.mContext = &ctx;
+
+    NL_TEST_ASSERT(inSuite,
+                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
+                       Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite,
+                   pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "saltSALT", 8, 0, &delegateAccessory) ==
+                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 4321, 0, contextCommissioner,
+                                            &delegateCommissioner) == CHIP_NO_ERROR);
+
+    gLoopback.mContext = nullptr;
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 1);
+}
+
 void SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, PASESession & pairingCommissioner,
                               PASESession & deserialized)
 {
@@ -323,6 +372,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Start",       SecurePairingStartTest),
     NL_TEST_DEF("Handshake",   SecurePairingHandshakeTest),
     NL_TEST_DEF("Handshake with packet loss", SecurePairingHandshakeWithPacketLossTest),
+    NL_TEST_DEF("Failed Handshake", SecurePairingFailedHandshake),
     NL_TEST_DEF("Serialize",   SecurePairingSerializeTest),
 
     NL_TEST_SENTINEL()
