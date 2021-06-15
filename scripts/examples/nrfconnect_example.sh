@@ -16,29 +16,27 @@
 #    limitations under the License.
 #
 
-# Run bootstrap and activate to set up e.g. Pigweed correctly
-source "$(dirname "$0")/../../scripts/activate.sh"
-
 cd "$(dirname "$0")/../../examples"
 
 APP="$1"
 BOARD="$2"
 shift 2
 
-if [[ ! -f "$APP/nrfconnect/CMakeLists.txt" ]]; then
-    echo "Usage: $0 <application>" >&2
+if [[ ! -f "$APP/nrfconnect/CMakeLists.txt" || -z "$BOARD" ]]; then
+    echo "Usage: $0 <application> <board>" >&2
     echo "Applications:" >&2
     ls */nrfconnect/CMakeLists.txt | awk -F/ '{print "  "$1}' >&2
     exit 1
 fi
 
-if [ -z "$BOARD" ]; then
-    echo "No mandatory BOARD argument supplied!"
-    exit 1
-fi
-
 set -x
+
+# Activate Matter environment
+source "../scripts/activate.sh"
+
+# Activate Zephyr environment
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR"
 env
 
 west build -b "$BOARD" -d "$APP/nrfconnect/build/$BOARD" "$APP/nrfconnect" -- "$@"

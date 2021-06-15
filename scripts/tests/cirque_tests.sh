@@ -45,7 +45,9 @@ BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
 
 function __screen() {
-    if [[ "x$GITHUB_ACTION_RUN" != "x1" ]]; then
+    if [[ "x$GITHUB_ACTION_RUN" == "x1" ]]; then
+        "$@"
+    elif which screen; then
         screen -dm "$@"
     else
         "$@"
@@ -55,7 +57,7 @@ function __screen() {
 function __kill_grep() {
     ps aux | grep "$1" | awk '{print $2}' | sort -k2 -rn |
         while read -r pid; do
-            kill -2 "$pid"
+            kill -2 -"$pid"
         done
 }
 
@@ -146,11 +148,11 @@ function cirquetest_run_test() {
     # Start Cirque flash server
     export CURRENT_TEST="$1"
     export DEVICE_LOG_DIR="$LOG_DIR/$CURRENT_TEST"/device_logs
+    shift
     mkdir -p "$DEVICE_LOG_DIR"
     __cirquetest_start_flask &
     sleep 5
-    cd "$TEST_DIR"
-    ./"$1.sh"
+    "$TEST_DIR/$CURRENT_TEST.sh" "$@"
     exitcode=$?
     __cirquetest_clean_flask
     # TODO: Do docker system prune, we cannot filter which container

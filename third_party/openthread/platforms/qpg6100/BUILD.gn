@@ -63,7 +63,7 @@ source_set("libopenthread-qpg6100") {
   ]
   include_dirs += [ "${openthread_root}/examples/apps" ]
 
-  libs = [ "${qpg6100_sdk_root}/qpg6100/lib/libOpenThread_qpg6100.a" ]
+  libs = [ "${qpg6100_sdk_root}/qpg6100/lib/libOpenThread_qpg6100_mtd.a" ]
 
   public_deps = [
     ":openthread_core_config_qpg6100",

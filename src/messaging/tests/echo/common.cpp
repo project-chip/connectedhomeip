@@ -30,7 +30,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <support/ErrorStr.h>
 
-// The ExchangeManager global object.
+chip::SecureSessionMgr gSessionManager;
 chip::Messaging::ExchangeManager gExchangeManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 
@@ -58,6 +58,9 @@ exit:
 
 void ShutdownChip(void)
 {
-    gExchangeManager.Shutdown();
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     chip::DeviceLayer::PlatformMgr().Shutdown();
+    gMessageCounterManager.Shutdown();
+    gExchangeManager.Shutdown();
+    gSessionManager.Shutdown();
 }

@@ -26,6 +26,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
+#include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/Constants.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -93,8 +94,8 @@ public:
      */
     virtual CHIP_ERROR CommandResponseStatus(const CommandSender * apCommandSender,
                                              const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                             const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId,
-                                             const chip::ClusterId aClusterId, chip::CommandId aCommandId, uint8_t aCommandIndex)
+                                             const uint32_t aProtocolId, const uint16_t aProtocolCode, EndpointId aEndpointId,
+                                             const ClusterId aClusterId, CommandId aCommandId, uint8_t aCommandIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

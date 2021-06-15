@@ -35,7 +35,7 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
 
-    SuccessOrExit(err = sender->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
 {{#chip_server_cluster_command_arguments}}
 {{#first}}

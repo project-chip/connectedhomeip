@@ -68,22 +68,34 @@ void InteractionModelEngine::Shutdown()
 {
     for (auto & commandSender : mCommandSenderObjs)
     {
-        commandSender.Shutdown();
+        if (!commandSender.IsFree())
+        {
+            commandSender.Shutdown();
+        }
     }
 
     for (auto & commandHandler : mCommandHandlerObjs)
     {
-        commandHandler.Shutdown();
+        if (!commandHandler.IsFree())
+        {
+            commandHandler.Shutdown();
+        }
     }
 
     for (auto & readClient : mReadClients)
     {
-        readClient.Shutdown();
+        if (!readClient.IsFree())
+        {
+            readClient.Shutdown();
+        }
     }
 
     for (auto & readHandler : mReadHandlers)
     {
-        readHandler.Shutdown();
+        if (!readHandler.IsFree())
+        {
+            readHandler.Shutdown();
+        }
     }
 
     for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
@@ -247,7 +259,7 @@ CHIP_ERROR __attribute__((weak)) ReadSingleClusterData(ClusterInfo & aClusterInf
 {
     ChipLogDetail(DataManagement,
                   "Received Cluster Command: Cluster=%" PRIx16 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8
-                  " ListIndex=%" PRIx8,
+                  " ListIndex=%" PRIx16,
                   aClusterInfo.mClusterId, ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId, aClusterInfo.mFieldId,
                   aClusterInfo.mListIndex);
     ChipLogError(DataManagement,
@@ -259,9 +271,9 @@ CHIP_ERROR __attribute__((weak)) WriteSingleClusterData(ClusterInfo & aClusterIn
 {
     ChipLogDetail(DataManagement,
                   "Received Cluster Attribute: Cluster=%" PRIx16 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx8
-                  " FieldId=%" PRIx8,
-                  " ListIndex=%" PRIx8, aClusterInfo.mClusterId, ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId,
-                  aClusterInfo.mFieldId, aClusterInfo.mListIndex);
+                  " FieldId=%" PRIx8 " ListIndex=%" PRIx16,
+                  aClusterInfo.mClusterId, ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId, aClusterInfo.mFieldId,
+                  aClusterInfo.mListIndex);
     ChipLogError(DataManagement,
                  "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
     return CHIP_NO_ERROR;
@@ -286,7 +298,7 @@ void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
         lastClusterInfo = lastClusterInfo->mpNext;
     }
     lastClusterInfo->ClearDirty();
-    lastClusterInfo->mType     = ClusterInfo::Type::kInvalid;
+    lastClusterInfo->mFlags.ClearAll();
     lastClusterInfo->mpNext    = mpNextAvailableClusterInfo;
     mpNextAvailableClusterInfo = aClusterInfo;
     aClusterInfo               = nullptr;

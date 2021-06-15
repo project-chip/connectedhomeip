@@ -65,7 +65,7 @@ constexpr ClusterId kTargetNavigatorClusterId             = 0x0505;
 constexpr ClusterId kTemperatureMeasurementClusterId      = 0x0402;
 constexpr ClusterId kTestClusterClusterId                 = 0x050F;
 constexpr ClusterId kThermostatClusterId                  = 0x0201;
-constexpr ClusterId kTrustedRootCertificatesClusterId     = 0x003F;
+constexpr ClusterId kThreadNetworkDiagnosticsClusterId    = 0x0035;
 constexpr ClusterId kWakeOnLanClusterId                   = 0x0503;
 constexpr ClusterId kWindowCoveringClusterId              = 0x0102;
 
@@ -926,14 +926,18 @@ public:
     ~OperationalCredentialsCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR AddOpCert(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan noc,
-                         chip::ByteSpan iCACertificate, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
+    CHIP_ERROR AddOpCert(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                         chip::ByteSpan operationalCert, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
                          uint16_t adminVendorId);
+    CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         chip::ByteSpan rootCertificate);
     CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             chip::ByteSpan cSRNonce);
     CHIP_ERROR RemoveAllFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             chip::FabricId fabricId, chip::NodeId nodeId, uint16_t vendorId);
+    CHIP_ERROR RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            chip::ByteSpan trustedRootIdentifier);
     CHIP_ERROR SetFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t vendorId);
     CHIP_ERROR UpdateFabricLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                  chip::ByteSpan label);
@@ -944,12 +948,14 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kAddOpCertCommandId         = 0x06;
-    static constexpr CommandId kOpCSRRequestCommandId      = 0x04;
-    static constexpr CommandId kRemoveAllFabricsCommandId  = 0x0B;
-    static constexpr CommandId kRemoveFabricCommandId      = 0x0A;
-    static constexpr CommandId kSetFabricCommandId         = 0x00;
-    static constexpr CommandId kUpdateFabricLabelCommandId = 0x09;
+    static constexpr CommandId kAddOpCertCommandId                    = 0x06;
+    static constexpr CommandId kAddTrustedRootCertificateCommandId    = 0xA1;
+    static constexpr CommandId kOpCSRRequestCommandId                 = 0x04;
+    static constexpr CommandId kRemoveAllFabricsCommandId             = 0x0B;
+    static constexpr CommandId kRemoveFabricCommandId                 = 0x0A;
+    static constexpr CommandId kRemoveTrustedRootCertificateCommandId = 0xA2;
+    static constexpr CommandId kSetFabricCommandId                    = 0x00;
+    static constexpr CommandId kUpdateFabricLabelCommandId            = 0x09;
 };
 
 class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
@@ -1257,25 +1263,89 @@ private:
     static constexpr CommandId kSetpointRaiseLowerCommandId  = 0x00;
 };
 
-class DLL_EXPORT TrustedRootCertificatesCluster : public ClusterBase
+class DLL_EXPORT ThreadNetworkDiagnosticsCluster : public ClusterBase
 {
 public:
-    TrustedRootCertificatesCluster() : ClusterBase(kTrustedRootCertificatesClusterId) {}
-    ~TrustedRootCertificatesCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         chip::ByteSpan rootCertificate);
-    CHIP_ERROR RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            chip::ByteSpan trustedRootIdentifier);
+    ThreadNetworkDiagnosticsCluster() : ClusterBase(kThreadNetworkDiagnosticsClusterId) {}
+    ~ThreadNetworkDiagnosticsCluster() {}
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRoutingRole(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeNetworkName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePanId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeExtendedPanId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMeshLocalPrefix(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOverrunCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeNeighborTableList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRouteTableList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePartitionId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeWeighting(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeDataVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeStableDataVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLeaderRouterId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeDetachedRoleCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeChildRoleCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRouterRoleCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLeaderRoleCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeAttachAttemptCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePartitionIdChangeCount(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBetterPartitionAttachAttemptCount(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeParentChangeCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxTotalCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxUnicastCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxBroadcastCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxAckRequestedCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxAckedCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxNoAckRequestedCount(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxDataCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxDataPollCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxBeaconCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxBeaconRequestCount(Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxOtherCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxRetryCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxDirectMaxRetryExpiryCount(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxIndirectMaxRetryExpiryCount(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxErrCcaCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxErrAbortCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTxErrBusyChannelCount(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxTotalCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxUnicastCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxBroadcastCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxDataCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxDataPollCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxBeaconCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxBeaconRequestCount(Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxOtherCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxAddressFilteredCount(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxDestAddrFilteredCount(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxDuplicatedCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxErrNoFrameCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxErrUnknownNeighborCount(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxErrInvalidSrcAddrCount(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxErrSecCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxErrFcsCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRxErrOtherCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSecurityPolicy(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeChannelMask(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOperationalDatasetComponents(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeActiveNetworkFaultsList(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-private:
-    static constexpr CommandId kAddTrustedRootCertificateCommandId    = 0x00;
-    static constexpr CommandId kRemoveTrustedRootCertificateCommandId = 0x01;
 };
 
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase

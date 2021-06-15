@@ -17,6 +17,8 @@
  */
 #pragma once
 
+#include "JniReferences.h"
+
 #include <memory>
 
 #include <jni.h>
@@ -91,10 +93,6 @@ private:
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
-
-    JNIEnv * GetJavaEnv();
-
-    jclass GetPersistentStorageClass() { return GetJavaEnv()->FindClass("chip/devicecontroller/PersistentStorage"); }
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, pthread_mutex_t * stackLock) :
         mController(std::move(controller)), mStackLock(stackLock)

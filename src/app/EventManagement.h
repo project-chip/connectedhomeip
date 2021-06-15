@@ -34,6 +34,7 @@
 #include <core/CHIPCircularTLVBuffer.h>
 #include <messaging/ExchangeMgr.h>
 #include <support/PersistedCounter.h>
+#include <system/SystemMutex.h>
 
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug
 
@@ -241,8 +242,6 @@ class EventManagement
 public:
     /**
      * @brief
-     *   EventManagement constructor
-     *
      * Initialize the EventManagement with an array of LogStorageResources.  The
      * array must provide a resource for each valid priority level, the elements
      * of the array must be in increasing numerical value of priority (and in
@@ -259,16 +258,8 @@ public:
      * @param[in] apLogStorageResources  An array of LogStorageResources for each priority level.
      *
      */
-    EventManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-                    const LogStorageResources * const apLogStorageResources);
-
-    void Init(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
+    void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
               const LogStorageResources * const apLogStorageResources);
-    /**
-     * @brief
-     *   EventManagement default constructor. Provided primarily to make the compiler happy.
-     */
-    EventManagement(){};
 
     static EventManagement & GetInstance();
 
@@ -292,11 +283,23 @@ public:
      *
      * @note This function must be called prior to the logging being used.
      */
-    static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, int aNumBuffers,
+    static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                                       CircularEventBuffer * apCircularEventBuffer,
                                       const LogStorageResources * const apLogStorageResources);
 
     static void DestroyEventManagement();
+
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    class ScopedLock
+    {
+    public:
+        ScopedLock(EventManagement & aEventManagement) : mEventManagement(aEventManagement) { mEventManagement.mAccessLock.Lock(); }
+        ~ScopedLock() { mEventManagement.mAccessLock.Unlock(); }
+
+    private:
+        EventManagement & mEventManagement;
+    };
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     /**
      * @brief
@@ -566,6 +569,9 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     EventManagementStates mState               = EventManagementStates::Shutdown;
     uint32_t mBytesWritten                     = 0;
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    System::Mutex mAccessLock;
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 };
 } // namespace app
 } // namespace chip

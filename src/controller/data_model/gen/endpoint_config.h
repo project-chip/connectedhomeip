@@ -104,6 +104,9 @@
             /* Endpoint: 1, Cluster: Software Diagnostics (client) */                                                              \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
                                                                                                                                    \
+            /* Endpoint: 1, Cluster: Thread Network Diagnostics (client) */                                                        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (client) */                                                      \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
                                                                                                                                    \
@@ -115,9 +118,6 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Operational Credentials (client) */                                                           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: Trusted Root Certificates (client) */                                                         \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Fixed Label (client) */                                                                       \
@@ -230,18 +230,18 @@
                 0x0034, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Software Diagnostics (client) */                                                           \
             {                                                                                                                      \
-                0x0037, ZAP_ATTRIBUTE_INDEX(12), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0035, ZAP_ATTRIBUTE_INDEX(12), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Thread Network Diagnostics (client) */                                                     \
+            {                                                                                                                      \
+                0x0037, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (client) */                                                   \
             {                                                                                                                      \
-                0x0039, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0039, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Bridged Device Basic (client) */                                                           \
-            { 0x003B, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Switch (client) */ \
+            { 0x003B, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Switch (client) */ \
             {                                                                                                                      \
-                0x003E, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x003E, ZAP_ATTRIBUTE_INDEX(16), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Operational Credentials (client) */                                                        \
-            {                                                                                                                      \
-                0x003F, ZAP_ATTRIBUTE_INDEX(16), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Trusted Root Certificates (client) */                                                      \
             {                                                                                                                      \
                 0x0040, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Fixed Label (client) */                                                                    \
@@ -375,7 +375,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (212)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (213)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -463,6 +463,9 @@
             /* Endpoint: 1, Cluster: Software Diagnostics (client) */                                                              \
             { 0x0034, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetWatermarks */                                             \
                                                                                                                                    \
+            /* Endpoint: 1, Cluster: Thread Network Diagnostics (client) */                                                        \
+            { 0x0035, 0x00, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* ResetCounts */                                                 \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (client) */                                                      \
             { 0x0037, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetCounts */                                                 \
                                                                                                                                    \
@@ -482,10 +485,8 @@
             { 0x003E, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateFabricLabel */                                           \
             { 0x003E, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveFabric */                                                \
             { 0x003E, 0x0B, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveAllFabrics */                                            \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: Trusted Root Certificates (client) */                                                         \
-            { 0x003F, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddTrustedRootCertificate */                                   \
-            { 0x003F, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveTrustedRootCertificate */                                \
+            { 0x003E, 0xA1, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddTrustedRootCertificate */                                   \
+            { 0x003E, 0xA2, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveTrustedRootCertificate */                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Door Lock (client) */                                                                         \
             { 0x0101, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },                                     /* LockDoor */                \

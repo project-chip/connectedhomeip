@@ -124,8 +124,6 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
     CHIP_ERROR err;
-    ChipLogError(DeviceLayer, "System Layer shutdown");
-    err = SystemLayer.Shutdown();
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
     err = InetLayer.Shutdown();
 
@@ -133,6 +131,10 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
     ChipLogError(DeviceLayer, "BLE layer shutdown");
     err = BLEMgr().GetBleLayer()->Shutdown();
 #endif
+
+    ChipLogError(DeviceLayer, "System Layer shutdown");
+    err = SystemLayer.Shutdown();
+
     return err;
 }
 

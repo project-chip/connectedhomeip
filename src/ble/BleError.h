@@ -91,6 +91,12 @@
 typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
 
 /**
+ *  Format specifier for the BLE_ERROR type.
+ *
+ */
+#define BleErrorFormat BLE_CONFIG_ERROR_FORMAT
+
+/**
  *  @name Error Definitions
  *
  *  @{

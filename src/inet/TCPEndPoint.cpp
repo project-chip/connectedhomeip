@@ -242,6 +242,36 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
             res = INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
+    if (dispatchQueue != nullptr)
+    {
+        unsigned long fd = static_cast<unsigned long>(mSocket);
+
+        mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
+        ReturnErrorCodeIf(mReadableSource == nullptr, INET_ERROR_NO_MEMORY);
+
+        mWriteableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, fd, 0, dispatchQueue);
+        ReturnErrorCodeIf(mWriteableSource == nullptr, INET_ERROR_NO_MEMORY);
+
+        dispatch_source_set_event_handler(mReadableSource, ^{
+            SocketEvents events;
+            events.SetRead();
+            this->mPendingIO = events;
+            this->HandlePendingIO();
+        });
+
+        dispatch_source_set_event_handler(mWriteableSource, ^{
+            SocketEvents events;
+            events.SetWrite();
+            this->mPendingIO = events;
+            this->HandlePendingIO();
+        });
+
+        dispatch_resume(mReadableSource);
+        dispatch_resume(mWriteableSource);
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (res == INET_NO_ERROR)
@@ -1645,6 +1675,19 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
             lSystemLayer.WakeSelect();
         }
     }
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    if (mReadableSource)
+    {
+        dispatch_source_cancel(mReadableSource);
+        dispatch_release(mReadableSource);
+    }
+    if (mWriteableSource)
+    {
+        dispatch_source_cancel(mWriteableSource);
+        dispatch_release(mWriteableSource);
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     // Clear any results from select() that indicate pending I/O for the socket.
     mPendingIO.Clear();

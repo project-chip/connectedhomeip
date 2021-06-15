@@ -33,10 +33,10 @@ chip_mdns = "platform"
 mbedtls_target = "${chip_root}/third_party/k32w_sdk:mbedtls"
 openthread_external_mbedtls = mbedtls_target
 
-openthread_project_core_config_file = "openthread-core-k32w061-config.h"
+openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_platform_check_file =
     "openthread-core-k32w061-config-check.h"
-openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/k32w:libopenthread-k32w-config" ]
+openthread_core_config_deps = [ "${chip_root}/examples/platform/k32w:openthread_core_config_k32w_chip_examples" ]
 
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/k32w:libopenthread-k32w"

@@ -98,7 +98,9 @@ PacketBuffer * PacketBuffer::BuildFreeList()
         lHead          = lCursor;
     }
 
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     Mutex::Init(sBufferPoolMutex);
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     return static_cast<PacketBuffer *>(lHead);
 }

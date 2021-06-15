@@ -17,6 +17,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC
 #include <platform/NFCManager.h>
 
 #include <support/CHIPPlatformMemory.h>
@@ -333,3 +334,4 @@ NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagUnlockWriteAccess(void)
 
 } // namespace DeviceLayer
 } // namespace chip
+#endif

@@ -18,15 +18,15 @@
 #pragma once
 
 #include <mdns/minimal/records/Srv.h>
-#include <mdns/minimal/responders/Responder.h>
+#include <mdns/minimal/responders/RecordResponder.h>
 
 namespace mdns {
 namespace Minimal {
 
-class SrvResponder : public Responder
+class SrvResponder : public RecordResponder
 {
 public:
-    SrvResponder(const SrvResourceRecord & record) : Responder(QType::SRV, record.GetName()), mRecord(record) {}
+    SrvResponder(const SrvResourceRecord & record) : RecordResponder(QType::SRV, record.GetName()), mRecord(record) {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
     {

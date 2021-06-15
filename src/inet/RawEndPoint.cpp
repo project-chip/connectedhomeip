@@ -215,6 +215,26 @@ INET_ERROR RawEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, Int
     ReturnErrorOnFailure(GetSocket(addrType));
     ReturnErrorOnFailure(IPEndPointBasis::Bind(addrType, addr, 0, intfId));
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
+    if (dispatchQueue != nullptr)
+    {
+        unsigned long fd = static_cast<unsigned long>(mSocket);
+
+        mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
+        ReturnErrorCodeIf(mReadableSource == nullptr, INET_ERROR_NO_MEMORY);
+
+        dispatch_source_set_event_handler(mReadableSource, ^{
+            SocketEvents res;
+            res.SetRead();
+            this->mPendingIO = res;
+            this->HandlePendingIO();
+        });
+
+        dispatch_resume(mReadableSource);
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
     mBoundIntfId = intfId;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -470,6 +490,13 @@ void RawEndPoint::Close()
         // Do not wait for I/O on this endpoint.
         mRequestIO.Clear();
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        if (mReadableSource)
+        {
+            dispatch_source_cancel(mReadableSource);
+            dispatch_release(mReadableSource);
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
         mState = kState_Closed;

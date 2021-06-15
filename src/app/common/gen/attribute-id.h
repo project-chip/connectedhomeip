@@ -584,12 +584,6 @@
 // Server attributes
 #define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
 
-// Attribute ids for cluster: Trusted Root Certificates
-
-// Client attributes
-
-// Server attributes
-
 // Attribute ids for cluster: Fixed Label
 
 // Client attributes

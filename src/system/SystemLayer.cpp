@@ -247,6 +247,14 @@ static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
  */
 void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback)
 {
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    if (mDispatchQueue != nullptr)
+    {
+        ChipLogError(chipSystemLayer, "%s is not supported with libdispatch", __PRETTY_FUNCTION__);
+        chipDie();
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
     assertChipStackLockedByCurrentThread();
 
     Cancelable * ca = aCallback->Cancel();
@@ -579,17 +587,7 @@ void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
         // one-shot
         chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromCancelable(ready.mNext);
         cb->Cancel();
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-        if (mDispatchQueue != nullptr)
-        {
-            dispatch_sync(mDispatchQueue, ^{
-                cb->mCall(cb->mContext);
-            });
-        }
-        else
-#endif
-            cb->mCall(cb->mContext);
+        cb->mCall(cb->mContext);
     }
 }
 
@@ -674,7 +672,9 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
 {
     assertChipStackLockedByCurrentThread();
 
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_t lThreadSelf;
+#endif
     Error lReturn;
 
     if (this->State() != kLayerState_Initialized)
@@ -712,16 +712,7 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
 
         if (lTimer != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
         {
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-            if (mDispatchQueue != nullptr)
-            {
-                dispatch_sync(mDispatchQueue, ^{
-                    lTimer->HandleComplete();
-                });
-            }
-            else
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-                lTimer->HandleComplete();
+            lTimer->HandleComplete();
         }
     }
 

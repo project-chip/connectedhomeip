@@ -71,14 +71,17 @@ struct BrowseContext : public GenericContext
 struct ResolveContext : public GenericContext
 {
     MdnsResolveCallback callback;
-    char name[kMdnsNameMaxSize + 1];
 
-    ResolveContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName)
+    char name[kMdnsInstanceNameMaxSize + 1];
+    chip::Inet::IPAddressType addressType;
+
+    ResolveContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName, chip::Inet::IPAddressType cbAddressType)
     {
         type     = ContextType::Resolve;
         context  = cbContext;
         callback = cb;
         strncpy(name, cbContextName, sizeof(name));
+        addressType = cbAddressType;
     }
 };
 
@@ -86,15 +89,18 @@ struct GetAddrInfoContext : public GenericContext
 {
     MdnsResolveCallback callback;
     std::vector<TextEntry> textEntries;
-    char name[kMdnsNameMaxSize + 1];
+    char name[kMdnsInstanceNameMaxSize + 1];
+    uint32_t interfaceId;
     uint16_t port;
 
-    GetAddrInfoContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName, uint16_t cbContextPort)
+    GetAddrInfoContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName, uint32_t cbInterfaceId,
+                       uint16_t cbContextPort)
     {
-        type     = ContextType::GetAddrInfo;
-        context  = cbContext;
-        callback = cb;
-        port     = cbContextPort;
+        type        = ContextType::GetAddrInfo;
+        context     = cbContext;
+        callback    = cb;
+        interfaceId = cbInterfaceId;
+        port        = cbContextPort;
         strncpy(name, cbContextName, sizeof(name));
     }
 };
