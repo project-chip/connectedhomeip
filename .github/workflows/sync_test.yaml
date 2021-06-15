@@ -2,7 +2,9 @@ name: Sync test
 
 on:
   workflow_run:
-    workflows: ["Builds", "Build examples - Mbed OS"]
+    workflows: 
+     - Builds 
+     - Build examples - Mbed OS
     types: 
       - completed
 
@@ -13,5 +15,6 @@ jobs:
         name: test_sync
 
         steps:
+          - uses: ahmadnassri/action-workflow-run-wait@v1
           - name: Send some dummy message
             run: echo test message
