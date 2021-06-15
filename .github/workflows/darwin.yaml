@@ -52,11 +52,11 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Run iOS Build
+            - name: Run iOS Build Debug
               timeout-minutes: 15
               working-directory: src/darwin/Framework
               run: xcodebuild -target "CHIP" -sdk iphoneos
-            - name: Run iOS Build (Release)
+            - name: Run iOS Build Release
               timeout-minutes: 15
               working-directory: src/darwin/Framework
               run: xcodebuild -target "CHIP" -sdk iphoneos -configuration Release
