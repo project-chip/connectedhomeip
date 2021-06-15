@@ -134,6 +134,7 @@ function parse(filename)
 
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach((test, index) => {
+    test.testName = yaml.name;
     setDefaults(test, index, defaultConfig);
   });
 
@@ -141,6 +142,54 @@ function parse(filename)
   yaml.totalTests = yaml.tests.length;
 
   return yaml;
+}
+
+// Templates Internal Utils
+
+function printErrorAndExit(context, msg)
+{
+  console.log(context.testName, ': ', context.label);
+  console.log(msg);
+  process.exit(1);
+}
+
+function assertCommandOrAttribute(context)
+{
+  const clusterName = context.cluster;
+  let filterName;
+  let items;
+
+  if (context.isCommand) {
+    filterName = context.command;
+    items      = Clusters.getClientCommands(clusterName);
+  } else if (context.isAttribute) {
+    filterName = context.attribute;
+    items      = Clusters.getServerAttributes(clusterName);
+  } else {
+    printErrorAndExit(context, 'Unsupported command type: ', context);
+  }
+
+  return items.then(items => {
+    const filter = item => item.name.toLowerCase() == filterName.toLowerCase();
+    const item          = items.find(filter);
+    const itemType      = (context.isCommand ? 'Command' : 'Attribute');
+
+    // If the command or attribute is not found, it could be because of a typo in the test
+    // description, or an attribute name not matching the spec, or a wrongly configured zap
+    // file.
+    if (!item) {
+      const names = items.map(item => item.name);
+      printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" in: \n\t* ' + names.join('\n\t* '));
+    }
+
+    // If the command or attribute has been found but the response can not be found, it could be
+    // because of a wrongly configured cluster definition.
+    if (!item.response) {
+      printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" response');
+    }
+
+    return item;
+  });
 }
 
 //
@@ -161,30 +210,14 @@ function chip_tests_items(options)
 
 function chip_tests_item_parameters(options)
 {
-  const clusterName   = this.cluster;
   const commandValues = this.arguments.values;
 
-  let filterName;
-  let items;
-
-  if (this.isCommand) {
-    filterName = this.command;
-    items      = Clusters.getClientCommands(clusterName);
-  } else if (this.isAttribute) {
-    filterName = this.attribute;
-    items      = Clusters.getServerAttributes(clusterName);
-  } else {
-    throw new Error("Unsupported command type: ", this);
-  }
-
-  const promise = items.then(items => {
-    const filter = item => item.name.toLowerCase() == filterName.toLowerCase();
-    const commandArgs   = items.find(filter).arguments;
-
-    const commands = commandArgs.map(commandArg => {
+  const promise = assertCommandOrAttribute(this).then(item => {
+    const commandArgs = item.arguments;
+    const commands    = commandArgs.map(commandArg => {
       commandArg = JSON.parse(JSON.stringify(commandArg));
 
-      const expected          = commandValues.find(value => value.name == commandArg.name);
+      const expected          = commandValues.find(value => value.name.toLowerCase() == commandArg.name.toLowerCase());
       commandArg.definedValue = expected.value;
 
       return commandArg;
@@ -198,30 +231,15 @@ function chip_tests_item_parameters(options)
 
 function chip_tests_item_response_parameters(options)
 {
-  const clusterName    = this.cluster;
   const responseValues = this.response.values;
 
-  let filterName;
-  let items;
-
-  if (this.isCommand) {
-    filterName = this.command;
-    items      = Clusters.getClientCommands(clusterName);
-  } else if (this.isAttribute) {
-    filterName = this.attribute;
-    items      = Clusters.getServerAttributes(clusterName);
-  } else {
-    throw new Error("Unsupported command type: ", this);
-  }
-
-  const promise = items.then(items => {
-    const filter = item => item.name.toLowerCase() == filterName.toLowerCase();
-    const responseArgs  = items.find(filter).response.arguments;
+  const promise = assertCommandOrAttribute(this).then(item => {
+    const responseArgs = item.response.arguments;
 
     const responses = responseArgs.map(responseArg => {
       responseArg = JSON.parse(JSON.stringify(responseArg));
 
-      const expected = responseValues.find(value => value.name == responseArg.name);
+      const expected = responseValues.find(value => value.name.toLowerCase() == responseArg.name.toLowerCase());
       if (expected) {
         responseArg.hasExpectedValue = true;
         responseArg.expectedValue    = expected.value;
