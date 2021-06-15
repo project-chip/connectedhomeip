@@ -21,6 +21,8 @@
 #include <cstdlib>
 #include <string.h>
 
+#include <support/CodeUtils.h>
+
 namespace chip {
 
 /**
@@ -31,13 +33,15 @@ template <class T>
 class Span
 {
 public:
+    using pointer = T *;
+
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
-    constexpr Span(const T * databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
+    constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
     template <size_t N>
-    constexpr explicit Span(const T (&databuf)[N]) : Span(databuf, N)
+    constexpr explicit Span(T (&databuf)[N]) : Span(databuf, N)
     {}
 
-    const T * data() const { return mDataBuf; }
+    constexpr pointer data() const { return mDataBuf; }
     size_t size() const { return mDataLen; }
     bool empty() const { return size() == 0; }
     bool data_equal(const Span & other) const
@@ -45,8 +49,15 @@ public:
         return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
     }
 
+    Span SubSpan(size_t offset, size_t length) const
+    {
+        VerifyOrDie(offset <= mDataLen);
+        VerifyOrDie(length <= mDataLen - offset);
+        return Span(mDataBuf + offset, length);
+    }
+
 private:
-    const T * mDataBuf;
+    pointer mDataBuf;
     size_t mDataLen;
 };
 
@@ -54,10 +65,12 @@ template <class T, size_t N>
 class FixedSpan
 {
 public:
-    constexpr FixedSpan() : mDataBuf(nullptr) {}
-    constexpr explicit FixedSpan(const T * databuf) : mDataBuf(databuf) {}
+    using pointer = T *;
 
-    const T * data() const { return mDataBuf; }
+    constexpr FixedSpan() : mDataBuf(nullptr) {}
+    constexpr explicit FixedSpan(pointer databuf) : mDataBuf(databuf) {}
+
+    constexpr pointer data() const { return mDataBuf; }
     size_t size() const { return N; }
     bool empty() const { return data() == nullptr; }
     bool data_equal(const FixedSpan & other) const
@@ -67,11 +80,12 @@ public:
     }
 
 private:
-    const T * mDataBuf;
+    pointer mDataBuf;
 };
 
-using ByteSpan = Span<uint8_t>;
+using ByteSpan        = Span<const uint8_t>;
+using MutableByteSpan = Span<uint8_t>;
 template <size_t N>
-using FixedByteSpan = FixedSpan<uint8_t, N>;
+using FixedByteSpan = FixedSpan<const uint8_t, N>;
 
 } // namespace chip
