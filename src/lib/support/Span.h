@@ -49,11 +49,11 @@ public:
         return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
     }
 
-    Span<T> SubSpan(size_t offset, size_t length) const
+    Span SubSpan(size_t offset, size_t length) const
     {
         VerifyOrDie(offset <= mDataLen);
         VerifyOrDie(length <= mDataLen - offset);
-        return Span<T>(mDataBuf + offset, length);
+        return Span(mDataBuf + offset, length);
     }
 
 private:
