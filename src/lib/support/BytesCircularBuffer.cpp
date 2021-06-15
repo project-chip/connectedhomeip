@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <support/StringCircularBuffer.h>
+#include <support/BytesCircularBuffer.h>
 
 #include <limits>
 #include <nlassert.h>
@@ -26,7 +26,7 @@
 
 namespace chip {
 
-size_t StringCircularBuffer::Advance(size_t dataLocation, size_t amount) const
+size_t BytesCircularBuffer::Advance(size_t dataLocation, size_t amount) const
 {
     dataLocation += amount;
     if (dataLocation >= mCapacity)
@@ -34,9 +34,9 @@ size_t StringCircularBuffer::Advance(size_t dataLocation, size_t amount) const
     return dataLocation;
 }
 
-void StringCircularBuffer::Read(uint8_t * dest, size_t length, size_t offset) const
+void BytesCircularBuffer::Read(uint8_t * dest, size_t length, size_t offset) const
 {
-    VerifyOrDie(Size() >= offset + length);
+    VerifyOrDie(StorageUsed() >= offset + length);
 
     size_t start = Advance(mDataStart, offset);
     if (mCapacity - start >= length)
@@ -52,11 +52,11 @@ void StringCircularBuffer::Read(uint8_t * dest, size_t length, size_t offset) co
     }
 }
 
-void StringCircularBuffer::Write(const uint8_t * source, size_t length)
+void BytesCircularBuffer::Write(const uint8_t * source, size_t length)
 {
     // Always reserve 1 byte to prevent mDataStart == mDataEnd because then it would be
     // ambiguous whether we have 0 bytes or mCapacity bytes stored.
-    VerifyOrDie(mCapacity - Size() - 1 >= length);
+    VerifyOrDie(mCapacity - StorageUsed() - 1 >= length);
 
     if (mCapacity - mDataEnd >= length)
     {
@@ -73,13 +73,13 @@ void StringCircularBuffer::Write(const uint8_t * source, size_t length)
     }
 }
 
-void StringCircularBuffer::Drop(size_t length)
+void BytesCircularBuffer::Drop(size_t length)
 {
-    VerifyOrDie(Size() >= length);
+    VerifyOrDie(StorageUsed() >= length);
     mDataStart = Advance(mDataStart, length);
 }
 
-size_t StringCircularBuffer::Size() const
+size_t BytesCircularBuffer::StorageUsed() const
 {
     if (mDataStart <= mDataEnd)
     {
@@ -91,18 +91,19 @@ size_t StringCircularBuffer::Size() const
     }
 }
 
-CHIP_ERROR StringCircularBuffer::Push(const ByteSpan & payload)
+CHIP_ERROR BytesCircularBuffer::Push(const ByteSpan & payload)
 {
+    size_t maxStorageAvailable = mCapacity - (sizeof(SizeType) + 1);
     size_t length = payload.size();
-    if (length + sizeof(SizeType) + 1 > mCapacity)
+    if (length > maxStorageAvailable)
         return CHIP_ERROR_INVALID_ARGUMENT;
     if (length > std::numeric_limits<SizeType>::max())
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     // Free up space until there is enough space.
-    while (length + sizeof(SizeType) + 1 > mCapacity - Size())
+    while (length > maxStorageAvailable - StorageUsed())
     {
-        Pop();
+        VerifyOrDie(Pop() == CHIP_NO_ERROR);
     }
 
     SizeType size = static_cast<SizeType>(length);
@@ -112,7 +113,7 @@ CHIP_ERROR StringCircularBuffer::Push(const ByteSpan & payload)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StringCircularBuffer::Pop()
+CHIP_ERROR BytesCircularBuffer::Pop()
 {
     if (IsEmpty())
         return CHIP_ERROR_INCORRECT_STATE;
@@ -124,28 +125,33 @@ CHIP_ERROR StringCircularBuffer::Pop()
     return CHIP_NO_ERROR;
 }
 
-bool StringCircularBuffer::IsEmpty() const
+bool BytesCircularBuffer::IsEmpty() const
 {
-    return Size() == 0;
+    return StorageUsed() == 0;
 }
 
-size_t StringCircularBuffer::GetFrontSize() const
+size_t BytesCircularBuffer::GetFrontSize() const
 {
     if (IsEmpty())
         return 0;
 
     SizeType length;
-    Read(reinterpret_cast<uint8_t *>(&length), sizeof(length), 0);
+    Read(reinterpret_cast<uint8_t *>(&length), sizeof(length), 0 /* offset */);
     return length;
 }
 
-CHIP_ERROR StringCircularBuffer::ReadFront(uint8_t * dest) const
+CHIP_ERROR BytesCircularBuffer::ReadFront(MutableByteSpan & dest) const
 {
     if (IsEmpty())
         return CHIP_ERROR_INCORRECT_STATE;
 
     size_t length = GetFrontSize();
-    Read(dest, length, sizeof(SizeType));
+    if (dest.size() < length)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    dest = dest.SubSpan(0, length);
+
+    Read(dest.data(), length, sizeof(SizeType) /* offset */);
     return CHIP_NO_ERROR;
 }
 

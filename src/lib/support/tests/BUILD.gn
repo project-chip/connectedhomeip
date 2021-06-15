@@ -38,7 +38,7 @@ chip_test_suite("tests") {
     "TestSerializableIntegerSet.cpp",
     "TestSpan.cpp",
     "TestStringBuilder.cpp",
-    "TestStringCircularBuffer.cpp",
+    "TestBytesCircularBuffer.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
     "TestVariant.cpp",
