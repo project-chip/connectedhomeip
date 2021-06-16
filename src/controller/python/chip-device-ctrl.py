@@ -27,6 +27,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
 from chip import exceptions
+import argparse
 import ctypes
 import sys
 import os
@@ -547,48 +548,59 @@ class DeviceMgrCmd(Cmd):
         discover command is used to discover available devices.
         """
         try:
-            args = shlex.split(line)
-            if len(args) < 1:
+            arglist = shlex.split(line)
+            if len(arglist) < 1:
                 print("Usage:")
                 self.do_help("discover")
                 return
-
-            if args[0] == "-qr" and len(args) >= 2:
-                setupPayload = SetupPayload().ParseQrCode(args[1])
+            parser = argparse.ArgumentParser()
+            group = parser.add_mutually_exclusive_group()
+            group.add_argument('-all', help='discover all commissionable nodes', action='store_true')
+            group.add_argument('-qr', help='discover devices matching provided QR code', type=str)
+            group.add_argument('-l', help='discover devices with given long discriminator', type=int)
+            group.add_argument('-s', help='discover devices with given short discriminator', type=int)
+            group.add_argument('-v', help='discover devices wtih given vendor ID', type=int)
+            group.add_argument('-t', help='discover devices with given device type', type=int)
+            group.add_argument('-c', help='discover devices with given commissioning mode', type=int)
+            group.add_argument('-a', help='discover devices put in commissioning mode from command', action='store_true')
+            args=parser.parse_args(arglist)
+            if args.all:
+                self.devCtrl.DiscoverAllCommissioning()
+                self.wait_for_many_discovered_devices()
+            elif args.qr is not None:
+                setupPayload = SetupPayload().ParseQrCode(args.qr)
                 longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
                 self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(longDiscriminator)
                 self.wait_for_one_discovered_device()
-            elif args[0] == "-all":
-                self.devCtrl.DiscoverAllCommissioning()
-                self.wait_for_many_discovered_devices()
-            elif args[0] == '-l' and len(args) >=2:
-                self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(ctypes.c_uint16(int(args[1])))
+            elif args.l is not None:
+                self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(ctypes.c_uint16(args.l))
                 self.wait_for_one_discovered_device()
-            elif args[0] == '-s' and len(args) >=2:
-                self.devCtrl.DiscoverCommissionableNodesShortDiscriminator(ctypes.c_uint16(int(args[1])))
+            elif args.s is not None:
+                self.devCtrl.DiscoverCommissionableNodesShortDiscriminator(ctypes.c_uint16(args.s))
                 self.wait_for_one_discovered_device()
-            elif args[0] == '-v' and len(args) >=2:
-                self.devCtrl.DiscoverCommissionableNodesVendor(ctypes.c_uint16(int(args[1])))
+            elif args.v is not None:
+                self.devCtrl.DiscoverCommissionableNodesVendor(ctypes.c_uint16(args.v))
                 self.wait_for_many_discovered_devices()
-            elif args[0] == '-t' and len(args) >=2:
-                self.devCtrl.DiscoverCommissionableNodesDeviceType(ctypes.c_uint16(int(args[1])))
+            elif args.t is not None:
+                self.devCtrl.DiscoverCommissionableNodesDeviceType(ctypes.c_uint16(args.t))
                 self.wait_for_many_discovered_devices()
-            elif args[0] == '-c' and len(args) >=2:
-                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled(ctypes.c_uint16(int(args[1])))
+            elif args.c is not None:
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled(ctypes.c_uint16(args.c))
                 self.wait_for_many_discovered_devices()
-            elif args[0] == '-a':
+            elif args.a is not None:
                 self.devCtrl.DiscoverCommissionableNodesCommissioningEnabledFromCommand()
-                self.wait_for_many_discovered_devices()                
+                self.wait_for_many_discovered_devices()
             else:
-                print("Usage:")
                 self.do_help("discover")
                 return
+            self.devCtrl.PrintDiscoveredDevices()
         except exceptions.ChipStackException as ex:
             print('exception')
             print(str(ex))
             return
-
-        self.devCtrl.PrintDiscoveredDevices()
+        except:
+            self.do_help("discover")
+            return
 
     def do_zcl(self, line):
         """
