@@ -97,10 +97,12 @@ public:
     RendezvousParameters & SetRemoteNodeId(NodeId nodeId)
     {
         mRemoteNodeId.SetValue(nodeId);
+        mHasCSRNonce = true;
         return *this;
     }
 
     bool HasPASEVerifier() const { return mHasPASEVerifier; }
+    bool HasCSRNonce() const {return mHasCSRNonce;}
     const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
     RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
     {
@@ -145,10 +147,12 @@ private:
     Optional<NodeId> mRemoteNodeId;       ///< the remote node id
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
-    ByteSpan mCSRNonce; ///< CSR Nonce passed by the commissioner
+    ByteSpan mCSRNonce;                   ///< CSR Nonce passed by the commissioner
+
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
+    bool mHasCSRNonce = false;           // Set to true only if SetCSRNonce is called.
 
     RendezvousAdvertisementDelegate * mAdvDelegate = nullptr;
 

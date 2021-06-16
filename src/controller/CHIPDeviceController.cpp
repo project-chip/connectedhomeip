@@ -870,7 +870,16 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     mDeviceBeingPaired = GetInactiveDeviceIndex();
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
-    device->SetCSRNonce(params.GetCSRNonce());
+
+    // If the CSRNonce is passed in, using that else generating one to be used for commissioning.
+    if (params.HasCSRNonce())
+    {
+        device->SetCSRNonce(params.GetCSRNonce());
+    }
+    else
+    {
+        device->GenerateCSRNonce();
+    }
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
@@ -1141,9 +1150,6 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
-    if(!device->IsCSRNonceProvided()){
-      ReturnErrorOnFailure(device->GenerateCSRNonce());
-    }
     ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
