@@ -122,44 +122,54 @@ Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
     return Transport::Type::kUndefined;
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
-                                         System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                                          System::PacketBufferHandle && msgBuf,
+                                                          EncryptedPacketBufferHandle & encryptedMessage)
 {
-    PacketHeader unusedPacketHeader;
-    return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
-                       EncryptionState::kPayloadIsUnencrypted);
-}
-
-CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && msgBuf,
-                                                  EncryptedPacketBufferHandle * bufferRetainSlot)
-{
-    VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!msgBuf.HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    // Our send path needs a (writable) PacketBuffer (e.g. so it can encode a
-    // PacketHeader into it), so get that from the EncryptedPacketBufferHandle.
-    System::PacketBufferHandle mutableBuf(std::move(msgBuf).CastToWritable());
-
-    // Advancing the start to encrypted header, since SendMessage will attach the packet header on top of it.
     PacketHeader packetHeader;
-    ReturnErrorOnFailure(packetHeader.DecodeAndConsume(mutableBuf));
+    if (IsControlMessage(payloadHeader))
+    {
+        packetHeader.SetSecureSessionControlMsg(true);
+    }
 
-    PayloadHeader payloadHeader;
-    return SendMessage(session, payloadHeader, packetHeader, std::move(mutableBuf), bufferRetainSlot,
-                       EncryptionState::kPayloadIsEncrypted);
+    PeerConnectionState * state = GetPeerConnectionState(session);
+    if (state == nullptr)
+    {
+        return CHIP_ERROR_NOT_CONNECTED;
+    }
+
+    Transport::AdminPairingInfo * admin = mAdmins->FindAdminWithId(state->GetAdminId());
+    if (admin == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    NodeId localNodeId       = admin->GetNodeId();
+    MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
+    ReturnErrorOnFailure(SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf, counter));
+
+    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
+
+    encryptedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(msgBuf));
+    ChipLogProgress(Inet,
+                    "Encrypted message %p from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
+                    " on exchange %d.",
+                    &encryptedMessage, ChipLogValueX64(localNodeId), ChipLogValueX64(state->GetPeerNodeId()),
+                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
+                    payloadHeader.GetExchangeID());
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                                         System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
-                                         EncryptionState encryptionState)
+CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = nullptr;
-    NodeId localNodeId          = mLocalNodeId;
-
-    Transport::AdminPairingInfo * admin = nullptr;
+    PacketBufferHandle msgBuf;
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!preparedMessage.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    msgBuf = preparedMessage.CastToWritable();
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!msgBuf->HasChainedBuffer(), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
@@ -169,36 +179,9 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     // This marks any connection where we send data to as 'active'
     mPeerConnections.MarkConnectionActive(state);
-    admin = mAdmins->FindAdminWithId(state->GetAdminId());
-    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    localNodeId = admin->GetNodeId();
 
-    if (IsControlMessage(payloadHeader))
-    {
-        packetHeader.SetSecureSessionControlMsg(true);
-    }
-
-    if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
-    {
-        MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
-        err                      = SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf, counter);
-        SuccessOrExit(err);
-    }
-
-    err = packetHeader.EncodeBeforeData(msgBuf);
-    SuccessOrExit(err);
-
-    // Retain the packet buffer in case it's needed for retransmissions.
-    if (bufferRetainSlot != nullptr)
-    {
-        *bufferRetainSlot = EncryptedPacketBufferHandle::MarkEncrypted(msgBuf.Retain());
-    }
-
-    ChipLogProgress(Inet, "Send message of type %d and protocolId %" PRIu32 " on exchange %d", payloadHeader.GetMessageType(),
-                    payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), payloadHeader.GetExchangeID());
-
-    ChipLogProgress(Inet, "Sending msg from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec",
-                    ChipLogValueX64(localNodeId), ChipLogValueX64(state->GetPeerNodeId()), System::Layer::GetClock_MonotonicMS());
+    ChipLogProgress(Inet, "Sending msg %p to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec", &preparedMessage,
+                    ChipLogValueX64(state->GetPeerNodeId()), System::Layer::GetClock_MonotonicMS());
 
     if (state->GetTransport() != nullptr)
     {
