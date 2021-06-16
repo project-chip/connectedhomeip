@@ -1042,6 +1042,12 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label);
 
 /**
+ * @brief Thread Network Diagnostics Cluster ResetCounts Command callback
+ */
+
+bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(chip::app::Command * commandObj);
+
+/**
  * @brief Window Covering Cluster WindowCoveringGoToLiftPercentage Command callback
  */
 
