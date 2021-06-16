@@ -5,7 +5,7 @@ name: Mbed OS - Run unit test
 # Controls when the action will run. 
 on:
   workflow_run:
-    workflows: ["Mbed OS - Build unit test"]
+    workflows: ["Build unit test - Mbed OS"]
     types: 
       - completed
 
