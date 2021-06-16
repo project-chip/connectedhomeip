@@ -243,6 +243,17 @@ class ChipDeviceController(object):
         res = self._Cluster.ReadAttribute(
             device, cluster, attribute, endpoint, groupid, False)
 
+    def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
+        device = c_void_p(None)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
+            self.devCtrl, nodeid, pointer(device)))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
+        # We are not using IM for Attributes.
+        res = self._Cluster.WriteAttribute(
+            device, cluster, attribute, endpoint, groupid, value, False)
+
     def ZCLConfigureAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, change, blocking=True):
         device = c_void_p(None)
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
