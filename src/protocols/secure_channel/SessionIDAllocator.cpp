@@ -34,7 +34,7 @@ CHIP_ERROR SessionIDAllocator::Allocate(uint16_t & id)
 
 void SessionIDAllocator::Free(uint16_t id)
 {
-    if (mNextAvailable == id && mNextAvailable > 0)
+    if (mNextAvailable > 0 && (mNextAvailable - 1) == id)
     {
         mNextAvailable--;
     }
@@ -48,6 +48,8 @@ CHIP_ERROR SessionIDAllocator::Reserve(uint16_t id)
         mNextAvailable = id;
         mNextAvailable++;
     }
+
+    // TODO - Check if ID is already allocated in SessionIDAllocator::Reserve()
 
     return CHIP_NO_ERROR;
 }
