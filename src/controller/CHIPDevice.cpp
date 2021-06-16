@@ -488,6 +488,8 @@ void Device::OperationalCertProvisioned()
     ChipLogDetail(Controller, "Enabling CASE session establishment for the device");
     mDeviceOperationalCertProvisioned = true;
 
+    Persist();
+
     if (mState == ConnectionState::SecureConnected)
     {
         mSessionManager->ExpirePairing(mSecureSession);

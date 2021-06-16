@@ -221,6 +221,7 @@ public:
                           SecureSession::SessionRole direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
 
     void ExpirePairing(SecureSessionHandle session);
+    void ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin);
 
     /**
      * @brief

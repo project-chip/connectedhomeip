@@ -314,6 +314,8 @@ public:
 
     bool IsSecureConnected() const { return IsActive() && mState == ConnectionState::SecureConnected; }
 
+    bool IsSessionSetupInProgress() const { return IsActive() && mState == ConnectionState::Connecting; }
+
     void Reset();
 
     NodeId GetDeviceId() const { return mDeviceId; }
