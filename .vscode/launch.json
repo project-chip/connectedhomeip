@@ -264,7 +264,7 @@
             "name": "Debug Mbed Unit Tests DISCO_L475VG_IOT01A",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
             "executable": "./build-DISCO_L475VG_IOT01A/${input:mbedDebugProfile}/chip-tests",
             "servertype": "openocd",
             "searchDir": [
@@ -286,7 +286,7 @@
             "name": "Debug Mbed Unit Tests CY8CPROTO_062_4343W",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
             "executable": "./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-tests",
             "servertype": "openocd",
             "searchDir": [
@@ -332,7 +332,12 @@
             "type": "pickString",
             "id": "mbedApp",
             "description": "What mbed application do you want to use?",
-            "options": ["shell", "lock-app", "lighting-app", "all-clusters-app"],
+            "options": [
+                "shell",
+                "lock-app",
+                "lighting-app",
+                "all-clusters-app"
+            ],
             "default": "shell"
         }
     ]

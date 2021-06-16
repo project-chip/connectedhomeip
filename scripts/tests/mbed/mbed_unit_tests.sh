@@ -16,18 +16,18 @@
 #    limitations under the License.
 #
 
-cd "$(dirname $0)/../.."
+cd "$(dirname $0)/../../.."
 CHIP_ROOT="$PWD"
-cd "$CHIP_ROOT/src/test_driver/mbed/"
+cd "$CHIP_ROOT/src/test_driver/mbed/unit_tests"
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
-SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A NRF52840_DK CY8CPROTO_062_4343W)
+SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A CY8CPROTO_062_4343W)
 SUPPORTED_PROFILES=(release develop debug)
 SUPPORTED_COMMAND=(build flash build-flash)
 
-TARGET_BOARD=DISCO_L475VG_IOT01A
+TARGET_BOARD=CY8CPROTO_062_4343W
 TOOLCHAIN=GCC_ARM
-PROFILE=develop
+PROFILE=release
 COMMAND=build
 
 for i in "$@"; do

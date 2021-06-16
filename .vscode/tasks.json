@@ -286,14 +286,14 @@
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/examples/${input:mbedApp}/mbed/build"
+                    "${workspaceFolder}/examples/${input:mbedApp}/mbed/build-${input:mbedTarget}/${input:mbedProfile}"
                 ]
             }
         },
         {
             "label": "Run Mbed Unit Tests",
             "type": "shell",
-            "command": "scripts/tests/mbed_tests.sh",
+            "command": "scripts/tests/mbed/mbed_unit_tests.sh",
             "args": [
                 "-c=${input:mbedCommand}",
                 "-b=${input:mbedTarget}",
@@ -304,7 +304,7 @@
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/src/test_driver/mbed/build"
+                    "${workspaceFolder}/src/test_driver/mbed/unit_tests/build-${input:mbedTarget}/${input:mbedProfile}"
                 ]
             }
         }
@@ -321,7 +321,12 @@
             "type": "pickString",
             "id": "mbedApp",
             "description": "What mbed application do you want to use?",
-            "options": ["shell", "lock-app", "lighting-app", "all-clusters-app"],
+            "options": [
+                "shell",
+                "lock-app",
+                "lighting-app",
+                "all-clusters-app"
+            ],
             "default": "shell"
         },
         {
