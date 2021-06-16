@@ -497,7 +497,8 @@ CHIP_ERROR Device::EstablishCASESession()
     ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
     mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);
 
-    ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, mCredentials, mDeviceId, 0, exchange, this));
+    ReturnErrorOnFailure(
+        mCASESession.EstablishSession(mDeviceAddress, mCredentials, *mTrustedRootId, mDeviceId, 0, exchange, this));
 
     return CHIP_NO_ERROR;
 }

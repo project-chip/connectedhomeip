@@ -107,6 +107,13 @@ public:
         return *this;
     }
 
+    Credentials::CertificateKeyId & GetTrustedRootId() const { return *mCaseParameters.mTrustedRootId; }
+    ChannelBuilder & SetTrustedRootId(Credentials::CertificateKeyId * trustedRootId)
+    {
+        mCaseParameters.mTrustedRootId = trustedRootId;
+        return *this;
+    }
+
     Optional<Inet::IPAddress> GetForcePeerAddress() const { return mForcePeerAddr; }
     ChannelBuilder & SetForcePeerAddress(Inet::IPAddress peerAddr)
     {
@@ -121,6 +128,7 @@ private:
     {
         uint16_t mPeerKeyId;
         Credentials::OperationalCredentialSet * mOperationalCredentialSet;
+        Credentials::CertificateKeyId * mTrustedRootId;
     } mCaseParameters;
 
     Optional<Inet::IPAddress> mForcePeerAddr;

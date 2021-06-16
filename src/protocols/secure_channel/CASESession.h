@@ -54,17 +54,14 @@ constexpr uint16_t kMaxTrustedRootIds          = 5;
 
 constexpr uint16_t kIPKSize = 32;
 
-using namespace Crypto;
-using namespace Credentials;
-
 struct CASESessionSerialized;
 
 struct CASESessionSerializable
 {
     uint16_t mSharedSecretLen;
-    uint8_t mSharedSecret[kMax_ECDH_Secret_Length];
+    uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length];
     uint16_t mMessageDigestLen;
-    uint8_t mMessageDigest[kSHA256_Hash_Length];
+    uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     uint8_t mPairingComplete;
     NodeId mPeerNodeId;
     uint16_t mLocalKeyId;
@@ -93,7 +90,7 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR ListenForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+    CHIP_ERROR ListenForSessionEstablishment(Credentials::OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
                                              SessionEstablishmentDelegate * delegate);
 
     /**
@@ -110,9 +107,10 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, OperationalCredentialSet * operationalCredentialSet,
-                                NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
-                                SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress,
+                                Credentials::OperationalCredentialSet * operationalCredentialSet,
+                                const Credentials::CertificateKeyId & trustedRootId, NodeId peerNodeId, uint16_t myKeyId,
+                                Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -198,29 +196,37 @@ private:
         kUnexpected           = 0xff,
     };
 
-    CHIP_ERROR Init(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(Credentials::OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                    SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR SetTrustedRootId(const Credentials::CertificateKeyId & trustedRootId);
 
     CHIP_ERROR SendSigmaR1();
-    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR1(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR1(System::PacketBufferHandle & msg);
     CHIP_ERROR SendSigmaR2();
-    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR2(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR2(System::PacketBufferHandle & msg);
     CHIP_ERROR SendSigmaR3();
-    CHIP_ERROR HandleSigmaR3(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR3(System::PacketBufferHandle & msg);
 
     CHIP_ERROR SendSigmaR1Resume();
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-    CHIP_ERROR FindValidTrustedRoot(const uint8_t ** msgIterator, uint32_t nTrustedRoots);
-    CHIP_ERROR ConstructSaltSigmaR2(const System::PacketBufferHandle & rand, const P256PublicKey & pubkey, const uint8_t * ipk,
-                                    size_t ipkLen, System::PacketBufferHandle & salt);
-    CHIP_ERROR Validate_and_RetrieveResponderID(const uint8_t ** msgIterator, P256PublicKey & responderID,
-                                                const uint8_t ** responderOpCert, uint16_t & responderOpCertLen);
+    CHIP_ERROR GenerateDestinationID(const uint8_t * random, uint16_t randomLen,
+                                     const Credentials::CertificateKeyId * trustedRootId, NodeId nodeId, uint8_t * destinationId,
+                                     uint16_t destinationIdLen);
+    CHIP_ERROR FindDestinationIdCandidate(const uint8_t * destinationId, uint16_t destinationIdLen, const uint8_t * initiatorRandom,
+                                          uint16_t initiatorRandomLen);
+    CHIP_ERROR FindValidTrustedRoot(const Credentials::CertificateKeyId & trustedRootId);
+    CHIP_ERROR ConstructSaltSigmaR2(const uint8_t * rand, uint16_t randLen, const Credentials::P256PublicKey & pubkey,
+                                    const uint8_t * ipk, size_t ipkLen, System::PacketBufferHandle & salt);
+    CHIP_ERROR Validate_and_RetrieveResponderID(const uint8_t * responderOpCert, uint16_t responderOpCertLen,
+                                                Credentials::P256PublicKey & responderID);
     CHIP_ERROR ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen, System::PacketBufferHandle & salt);
-    CHIP_ERROR ConstructSignedCredentials(const uint8_t ** msgIterator, const uint8_t * responderOpCert,
-                                          uint16_t responderOpCertLen, System::PacketBufferHandle & signedCredentials,
-                                          P256ECDSASignature & signature, size_t sigLen);
+    CHIP_ERROR ConstructTBS2Data(const uint8_t * responderOpCert, uint32_t responderOpCertLen,
+                                 System::PacketBufferHandle & tbsData);
+    CHIP_ERROR ConstructTBS3Data(const uint8_t * responderOpCert, uint32_t responderOpCertLen,
+                                 System::PacketBufferHandle & tbsData);
     CHIP_ERROR ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen);
 
     void SendErrorMsg(SigmaErrorType errorCode);
@@ -244,17 +250,16 @@ private:
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
 
-    Hash_SHA256_stream mCommissioningHash;
-    P256PublicKey mRemotePubKey;
-    P256Keypair mEphemeralKey;
-    P256ECDHDerivedSecret mSharedSecret;
-    OperationalCredentialSet * mOpCredSet;
-    CertificateKeyId mTrustedRootId;
-    ValidationContext mValidContext;
+    Crypto::Hash_SHA256_stream mCommissioningHash;
+    Crypto::P256PublicKey mRemotePubKey;
+    Crypto::P256Keypair mEphemeralKey;
+    Crypto::P256ECDHDerivedSecret mSharedSecret;
+    Credentials::OperationalCredentialSet * mOpCredSet;
+    Credentials::CertificateKeyId mTrustedRootId;
+    Credentials::ValidationContext mValidContext;
 
-    uint8_t mMessageDigest[kSHA256_Hash_Length];
+    uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     uint8_t mIPK[kIPKSize];
-    uint8_t mRemoteIPK[kIPKSize];
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
     SessionEstablishmentExchangeDispatch mMessageDispatch;
