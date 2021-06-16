@@ -55,5 +55,5 @@ actions:
           - echo "Preparation of the environment..."
           - /bin/bash CHIP/scripts/tests/mbed/unit_test_env.sh
           - echo "Unit tests execution..."
-          - /bin/bash repo/scripts/tests/mbed/run_unit_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
+          - /bin/bash CHIP/scripts/tests/mbed/run_unit_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
           - echo "Unit tests completed"

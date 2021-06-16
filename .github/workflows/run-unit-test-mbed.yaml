@@ -48,7 +48,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          JOB_FILE=$GITHUB_WORKSPACE/scripts/tests/mbed/mbed-unit-tests.yml
+          JOB_FILE=$GITHUB_WORKSPACE/scripts/tests/mbed/lava_unit_tests.yml
           GITHUB_REPOSITORY_URL="$GITHUB_SERVER_URL"/"$GITHUB_REPOSITORY".git
           yq e -i ".environment.GITHUB_REPOSITORY = \"$GITHUB_REPOSITORY\"" $JOB_FILE
           yq e -i ".environment.GITHUB_REPOSITORY_URL = \"$GITHUB_REPOSITORY_URL\"" $JOB_FILE
