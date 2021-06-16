@@ -85,8 +85,6 @@ exit:
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    // TODO: This doesn't hold true on Darwin, issue #7557 tracks the problem.
-    //
     mController.Shutdown();
 
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
