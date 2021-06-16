@@ -10,7 +10,7 @@ secrets:
 environment:
   GITHUB_REPOSITORY: _
   GITHUB_REPOSITORY_URL: _
-  GITHUB_ARTIFACT_NAME: _
+  GITHUB_ACTION_ID: _
   GITHUB_SHA: _
 
 timeouts:
