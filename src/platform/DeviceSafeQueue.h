@@ -50,10 +50,9 @@ public:
     DeviceSafeQueue()  = default;
     ~DeviceSafeQueue() = default;
 
-    void Push(const ChipDeviceEvent * event);
-    void Pop();
+    void Push(const ChipDeviceEvent & event);
     bool Empty();
-    const ChipDeviceEvent * Front();
+    const ChipDeviceEvent PopFront();
 
 private:
     std::queue<ChipDeviceEvent> mEventQueue;

@@ -62,7 +62,6 @@ protected:
 
     // OS-specific members (pthread)
     pthread_mutex_t mChipStackLock;
-    std::queue<ChipDeviceEvent> mChipEventQueue;
 
     enum TaskType
     {

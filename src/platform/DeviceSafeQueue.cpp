@@ -28,16 +28,10 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-void DeviceSafeQueue::Push(const ChipDeviceEvent * event)
+void DeviceSafeQueue::Push(const ChipDeviceEvent & event)
 {
     std::unique_lock<std::mutex> lock(mEventQueueLock);
-    mEventQueue.push(*event);
-}
-
-void DeviceSafeQueue::Pop()
-{
-    std::unique_lock<std::mutex> lock(mEventQueueLock);
-    mEventQueue.pop();
+    mEventQueue.push(event);
 }
 
 bool DeviceSafeQueue::Empty()
@@ -46,10 +40,14 @@ bool DeviceSafeQueue::Empty()
     return mEventQueue.empty();
 }
 
-const ChipDeviceEvent * DeviceSafeQueue::Front()
+const ChipDeviceEvent DeviceSafeQueue::PopFront()
 {
     std::unique_lock<std::mutex> lock(mEventQueueLock);
-    return mEventQueue.empty() ? nullptr : &mEventQueue.front();
+
+    const ChipDeviceEvent event = mEventQueue.front();
+    mEventQueue.pop();
+
+    return event;
 }
 
 } // namespace Internal

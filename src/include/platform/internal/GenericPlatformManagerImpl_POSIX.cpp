@@ -147,7 +147,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-    mChipEventQueue.Push(event);
+    mChipEventQueue.Push(*event);
     SysOnEventSignal(this); // Trigger wake select on CHIP thread
 }
 
@@ -156,8 +156,8 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
 {
     while (!mChipEventQueue.Empty())
     {
-        Impl()->DispatchEvent(mChipEventQueue.Front());
-        mChipEventQueue.Pop();
+        const ChipDeviceEvent event = mChipEventQueue.PopFront();
+        Impl()->DispatchEvent(&event);
     }
 }
 
