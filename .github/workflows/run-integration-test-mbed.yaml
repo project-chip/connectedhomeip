@@ -62,7 +62,7 @@ jobs:
         run: |
           lavacli identities add --uri "$LAVA_SERVER_URL" --username artur --token "$LAVA_SERVER_TOKEN" default
           LAVA_JOB_ID=`lavacli jobs submit $GITHUB_WORKSPACE/scripts/tests/mbed/lava_integration_tests.yml`
-          lavacli jobs logs $LAVA_JOB_ID | tee unit-test.log
+          lavacli jobs logs $LAVA_JOB_ID | tee integration-test.log
           lavacli jobs wait $LAVA_JOB_ID
       - name: Upload unit test logs
         uses: actions/upload-artifact@v2.2.3
