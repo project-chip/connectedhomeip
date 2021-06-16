@@ -41,6 +41,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_AUDIO_OUTPUT_CLUSTER_ID:
         emberAfAudioOutputClusterInitCallback(endpoint);
         break;
+    case ZCL_BASIC_CLUSTER_ID:
+        emberAfBasicClusterInitCallback(endpoint);
+        break;
     case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
         emberAfContentLauncherClusterInitCallback(endpoint);
         break;
@@ -49,6 +52,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
+    case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
+        emberAfGeneralCommissioningClusterInitCallback(endpoint);
         break;
     case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
         emberAfGeneralDiagnosticsClusterInitCallback(endpoint);
@@ -67,6 +73,12 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
         emberAfMediaPlaybackClusterInitCallback(endpoint);
+        break;
+    case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
+        emberAfNetworkCommissioningClusterInitCallback(endpoint);
+        break;
+    case ZCL_OTA_SERVER_CLUSTER_ID:
+        emberAfOtaSoftwareUpdateServerClusterInitCallback(endpoint);
         break;
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
@@ -118,6 +130,11 @@ void __attribute__((weak)) emberAfAudioOutputClusterInitCallback(EndpointId endp
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -129,6 +146,11 @@ void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpo
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -159,6 +181,16 @@ void __attribute__((weak)) emberAfMediaInputClusterInitCallback(EndpointId endpo
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfOtaSoftwareUpdateServerClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
