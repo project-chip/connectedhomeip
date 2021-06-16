@@ -80,6 +80,7 @@ private:
     static PlatformManagerImpl sInstance;
 
     dispatch_queue_t mWorkQueue = nullptr;
+    bool mIsWorkQueueRunning    = false;
 
     inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }
 };
