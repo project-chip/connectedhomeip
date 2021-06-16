@@ -195,6 +195,8 @@ class DeviceMgrCmd(Cmd):
 
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
+
+        "get-fabricid",
     ]
 
     def parseline(self, line):
@@ -685,6 +687,28 @@ class DeviceMgrCmd(Cmd):
         Removed, use network commissioning cluster instead.
         """
         print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
+
+    def do_getfabricid(self, line):
+        """
+          get-fabricid
+
+          Read the current Fabric Id of the controller device, return 0 if not available.
+        """
+        try:
+            args = shlex.split(line)
+
+            if (len(args) > 0):
+                print("Unexpected argument: " + args[1])
+                return
+
+            fabricid = self.devCtrl.GetFabricId()
+        except exceptions.ChipStackException as ex:
+            print("An exception occurred during reading FabricID:")
+            print(str(ex))
+            return
+
+        print("Get fabric ID complete")
+        print("Fabric ID: " + hex(fabricid))
 
     def do_history(self, line):
         """
