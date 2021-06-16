@@ -51,6 +51,7 @@ jobs:
               with:
                   submodules: true
             - name: Initialize CodeQL
+              if: ${{ github.event_name == 'push' && (matrix.type == 'gcc_release' || matrix.type == 'clang' || matrix.type == 'mbedtls') }}
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
@@ -98,7 +99,7 @@ jobs:
             # - name: Remove nrfxlib binaries for CodeQL Analysis
             #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
+              if: ${{ github.event_name == 'push' && (matrix.type == 'gcc_release' || matrix.type == 'clang' || matrix.type == 'mbedtls') }}
               uses: github/codeql-action/analyze@v1
     build_darwin:
         name: Build on Darwin
