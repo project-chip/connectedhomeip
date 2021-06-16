@@ -47,7 +47,7 @@ jobs:
 
             - name: Build unit test
               run:
-                  scripts/tests/mbed_tests.sh -c=build -b=${{matrix.EXAMPLE_TARGET}} -p=$EXAMPLE_PROFILE
+                  scripts/tests/mbed/mbed_unit_tests.sh -c=build -b=${{matrix.EXAMPLE_TARGET}} -p=$EXAMPLE_PROFILE
 
             - name: Binary artifact suffix
               id: outsuffix
@@ -59,11 +59,11 @@ jobs:
 
             - name: Copy aside binaries
               run: |
-                  cp src/test_driver/mbed/build-${{matrix.EXAMPLE_TARGET}}/$EXAMPLE_PROFILE/chip-tests.hex /tmp/output_binaries/
+                  cp src/test_driver/mbed/unit_tests/build-${{matrix.EXAMPLE_TARGET}}/$EXAMPLE_PROFILE/chip-mbed-unit-tests.hex /tmp/output_binaries/
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               with:
                   name:
                       ${{ env.BUILD_TYPE }}-unit-test-${{matrix.EXAMPLE_TARGET}}-${{ env.EXAMPLE_PROFILE}}-build-${{
                       steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/chip-tests.hex
+                  path: /tmp/output_binaries/chip-mbed-unit-tests.hex

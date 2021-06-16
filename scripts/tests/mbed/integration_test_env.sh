@@ -43,7 +43,7 @@ if [[ "$COMMAND" == *"start"* ]]; then
 
     # Install Python Chip Device Controller
     #pip install $CHIP_DIR/out/default/controller/python/chip*.whl
-    #pip install -r $CHIP_DIR/src/test_driver/mbed-functional/requirements.txt
+    #pip install -r $CHIP_DIR/src/test_driver/mbed/integration_test/requirements.txt
     pip install mbed-flasher pytest
 
     source $CHIP_DIR/scripts/tests/mbed/common.sh

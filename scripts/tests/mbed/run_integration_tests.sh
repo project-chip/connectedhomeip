@@ -18,7 +18,7 @@ echo "Downloading artifact from $GITHUB_ACTION_ID action in $GITHUB_REPOSITORY"
 download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN binaries
 
 echo "Get test sets"
-mapfile -t test_sets <$CHIP_DIR/src/test_driver/mbed-functional/test_set.in
+mapfile -t test_sets <$CHIP_DIR/src/test_driver/mbed/integration_tests/test_set.in
 
 targer_number=$(cat devices.json | jq length)
 
@@ -28,6 +28,6 @@ for index in $(eval echo "{0..$(($target_number - 1))}"); do
         echo "Flash $test application image to $platform_name device"
         flash_image_to_device "$test" "$platform_name" binaries
         echo "Run integration test for $test application image on $platform_name device"
-        pytest -rAV --platforms="$platform_name" --network=$AP_SSID:$AP_PASSWORD --echo_server=$AP_GATEWAY:$ECHO_SERVER_PORT $CHIP_DIR/src/test_driver/mbed-functional/"$test"
+        pytest -rAV --platforms="$platform_name" --network=$AP_SSID:$AP_PASSWORD --echo_server=$AP_GATEWAY:$ECHO_SERVER_PORT $CHIP_DIR/src/test_driver/mbed/integration_tests/"$test"
     done
 done
