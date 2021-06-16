@@ -32,13 +32,12 @@ CHIP_ERROR SessionIDAllocator::Allocate(uint16_t & id)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionIDAllocator::Free(uint16_t id)
+void SessionIDAllocator::Free(uint16_t id)
 {
     if (mNextAvailable == id && mNextAvailable > 0)
     {
         mNextAvailable--;
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SessionIDAllocator::Reserve(uint16_t id)
@@ -53,12 +52,9 @@ CHIP_ERROR SessionIDAllocator::Reserve(uint16_t id)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionIDAllocator::Peek(uint16_t & id)
+uint16_t SessionIDAllocator::Peek()
 {
-    VerifyOrReturnError(mNextAvailable < kMaxSessionID, CHIP_ERROR_NO_MEMORY);
-    id = mNextAvailable;
-
-    return CHIP_NO_ERROR;
+    return mNextAvailable;
 }
 
 } // namespace chip

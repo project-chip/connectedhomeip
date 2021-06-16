@@ -39,11 +39,11 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 
 CHIP_ERROR WaitForSessionSetup(chip::Controller::Device * device)
 {
-    constexpr time_t kWaitPerIteration = 1;
-    constexpr uint16_t kIterationCount = 5;
+    constexpr time_t kWaitPerIterationSec = 1;
+    constexpr uint16_t kIterationCount    = 5;
 
     struct timespec sleep_time;
-    sleep_time.tv_sec  = kWaitPerIteration;
+    sleep_time.tv_sec  = kWaitPerIterationSec;
     sleep_time.tv_nsec = 0;
 
     for (uint32_t i = 0; i < kIterationCount && device->IsSessionSetupInProgress(); i++)
@@ -73,12 +73,12 @@ CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
         err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
 
-        if (mDevice->IsSessionSetupInProgress())
-        {
-            err = WaitForSessionSetup(mDevice);
-            VerifyOrExit(err == CHIP_NO_ERROR,
-                         ChipLogError(chipTool, "Timed out while waiting for session setup for device: %" PRIu64, localId));
-        }
+        // TODO - Implement notification from device object when the secure session is available.
+        // Current code is polling the device object to check for secure session availability. This should
+        // be updated to a notification/callback mechanism.
+        err = WaitForSessionSetup(mDevice);
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(chipTool, "Timed out while waiting for session setup for device: %" PRIu64, localId));
 
         err = SendCommand(mDevice, mEndPointId);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));

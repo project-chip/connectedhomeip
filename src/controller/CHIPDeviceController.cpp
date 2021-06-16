@@ -236,11 +236,14 @@ CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & CS
         // This implies that the commissioner application uses root CA to sign the operational
         // certificates, and an intermediate CA is not needed. It's not an error condition, so
         // let's just send operational certificate and root CA certificate to the device.
-        err    = CHIP_NO_ERROR;
         icaLen = 0;
         ChipLogProgress(Controller, "Intermediate CA is not needed");
     }
-    ReturnErrorOnFailure(err);
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
     ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(noc.Get(), nocLen), ByteSpan(ica.Get(), icaLen), certBuf,
                                                          certBufSize, outCertLen));
 
@@ -732,8 +735,7 @@ void DeviceController::PersistNextKeyId()
 {
     if (mStorageDelegate != nullptr && mState == State::Initialized)
     {
-        uint16_t nextKeyID = 0;
-        mIDAllocator.Peek(nextKeyID);
+        uint16_t nextKeyID = mIDAllocator.Peek();
         mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &nextKeyID, sizeof(nextKeyID));
     }
 }
@@ -811,7 +813,7 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     }
     for (uint16_t i = 0; i < nextKeyID; i++)
     {
-        mIDAllocator.Reserve(i);
+        ReturnErrorOnFailure(mIDAllocator.Reserve(i));
     }
     mPairingDelegate = params.pairingDelegate;
 

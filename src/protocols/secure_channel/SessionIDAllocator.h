@@ -28,9 +28,9 @@ public:
     ~SessionIDAllocator() {}
 
     CHIP_ERROR Allocate(uint16_t & id);
-    CHIP_ERROR Free(uint16_t id);
+    void Free(uint16_t id);
     CHIP_ERROR Reserve(uint16_t id);
-    CHIP_ERROR Peek(uint16_t & id);
+    uint16_t Peek();
 
 private:
     // Session ID is a 15 bit value (16th bit indicates unicast/group key)

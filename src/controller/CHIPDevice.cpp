@@ -165,16 +165,23 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
 
-    uint32_t localMessageCounter = 0;
-    uint32_t peerMessageCounter  = 0;
+    // The connection state could be null if the device is moving from PASE connection to CASE connection.
+    // The device parameters (e.g. mDeviceOperationalCertProvisioned) are updated during this transition.
+    // The state during this transistion is being persisted so that the next access of the device will
+    // trigger the CASE based secure session.
     if (connectionState != nullptr)
     {
-        localMessageCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter().Value();
-        peerMessageCounter  = connectionState->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
-    }
+        const uint32_t localMessageCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter().Value();
+        const uint32_t peerMessageCounter  = connectionState->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
 
-    serializable.mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(localMessageCounter);
-    serializable.mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(peerMessageCounter);
+        serializable.mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(localMessageCounter);
+        serializable.mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(peerMessageCounter);
+    }
+    else
+    {
+        serializable.mLocalMessageCounter = 0;
+        serializable.mPeerMessageCounter  = 0;
+    }
 
     serializable.mDeviceOperationalCertProvisioned = (mDeviceOperationalCertProvisioned) ? 1 : 0;
 

@@ -35,9 +35,14 @@ public:
     CHIP_ERROR Init(AppDelegate * delegate, PersistentStorageDelegate * storage, SessionIDAllocator * idAllocator)
     {
         VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mDelegate    = delegate;
-        mStorage     = storage;
+        mStorage = storage;
+
+        VerifyOrReturnError(idAllocator != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mIDAllocator = idAllocator;
+
+        // The caller may chose to not provide a delegate object. The RendezvousServer checks for null delegate before calling
+        // it's methods.
+        mDelegate = delegate;
         return CHIP_NO_ERROR;
     }
 

@@ -184,9 +184,12 @@ void RendezvousServer::OnSessionEstablished()
     VerifyOrReturn(connection.StoreIntoKVS(*mStorage) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to store the connection state"));
 
-    uint16_t keyID = 0;
-    mIDAllocator->Peek(keyID);
-
+    // The Peek() is used to find the highest key ID that's been assigned to any session.
+    // This value is persisted, and on reboot, it is used to revive any previously
+    // active secure sessions.
+    // We support one active PASE session at any time. So the key ID should not be updated
+    // in another thread, while we retrieve it here.
+    uint16_t keyID = mIDAllocator->Peek();
     mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &keyID, sizeof(keyID));
 }
 } // namespace chip

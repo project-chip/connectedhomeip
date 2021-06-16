@@ -171,10 +171,16 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
 
             ChipLogProgress(AppServer, "Fetched the session information: from 0x" ChipLogFormatX64,
                             ChipLogValueX64(session->PeerConnection().GetPeerNodeId()));
-            sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
-                                  session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
-                                  connection.GetAdminId(), nullptr);
-            gSessionIDAllocator.Reserve(keyId);
+            if (gSessionIDAllocator.Reserve(keyId) == CHIP_NO_ERROR)
+            {
+                sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
+                                      session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
+                                      connection.GetAdminId(), nullptr);
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "Session Key ID %d cannot be used. Skipping over this session", keyId);
+            }
             session->Clear();
         }
     }
@@ -429,10 +435,8 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
 
     if (resetAdmins == ResetAdmins::kYes)
     {
-        uint16_t nextKeyId;
-        ReturnErrorOnFailure(gSessionIDAllocator.Peek(nextKeyId));
         EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
-        EraseAllSessionsUpTo(nextKeyId);
+        EraseAllSessionsUpTo(gSessionIDAllocator.Peek());
         // Only resetting gNextAvailableAdminId at reboot otherwise previously paired device with adminID 0
         // can continue sending messages to accessory as next available admin will also be 0.
         // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
