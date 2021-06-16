@@ -408,7 +408,7 @@ class DeviceMgrCmd(Cmd):
         if int(setupPayload.attributes["RendezvousInformation"]) & onnetwork:
             print("Attempting to find device on Network")
             longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
-            self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
+            self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(longDiscriminator)
             print("Waiting for device responses...")
             strlen = 100;
             addrStrStorage = ctypes.create_string_buffer(strlen)
