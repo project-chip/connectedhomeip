@@ -32,7 +32,7 @@
 namespace chip {
 namespace Platform {
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
 
 namespace Internal {
 

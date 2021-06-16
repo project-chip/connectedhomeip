@@ -1,6 +1,9 @@
-/*
+//
+//  CHIPControllerTests.m
+//  CHIPControllerTests
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,29 +18,26 @@
  *    limitations under the License.
  */
 
-/**
- * This is a sample unit test.
- */
+#import <CHIP/CHIP.h>
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <unistd.h>
+// system dependencies
+#import <XCTest/XCTest.h>
 
-//#include "standalone/TapInterface.c"
+@interface CHIPControllerTests : XCTestCase
 
-void TapInterface_Init_test1()
+@end
+
+@implementation CHIPControllerTests
+
+- (void)testControllerLifecycle
 {
-    printf("---Running Test--- %s\n", __FUNCTION__);
-    // assert(TapInterface_Init(NULL, NULL, NULL) == ERR_ARG);
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    XCTAssertTrue([controller startup:nil]);
+    XCTAssertTrue([controller shutdown]);
+
+    // now try to restart the controller
+    XCTAssertTrue([controller startup:nil]);
+    XCTAssertTrue([controller shutdown]);
 }
 
-int main()
-{
-    printf("---Running Test--- tests from %s\n", __FILE__);
-    TapInterface_Init_test1();
-    return 0;
-}
+@end

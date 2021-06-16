@@ -1,8 +1,8 @@
 {{#chip_tests tests}}
-class {{asCamelCased filename false}}: public TestCommand
+class {{filename}}: public TestCommand
 {
   public:
-    {{asCamelCased filename false}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
+    {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     CHIP_ERROR NextTest() override
@@ -88,7 +88,7 @@ class {{asCamelCased filename false}}: public TestCommand
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Failure Response");
 
-        {{asCamelCased parent.filename false}} * runner = reinterpret_cast<{{asCamelCased parent.filename false}} *>(context);
+        {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
 
         delete runner->mOnFailureCallback_{{index}};
         delete runner->mOnSuccessCallback_{{index}};
@@ -106,7 +106,7 @@ class {{asCamelCased filename false}}: public TestCommand
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Success Response");
 
-        {{asCamelCased parent.filename false}} * runner = reinterpret_cast<{{asCamelCased parent.filename false}} *>(context);
+        {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
 
         delete runner->mOnFailureCallback_{{index}};
         delete runner->mOnSuccessCallback_{{index}};

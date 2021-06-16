@@ -102,7 +102,6 @@ constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
 constexpr uint32_t kMaxCHIPOpCertLength = 1024;
 constexpr uint32_t kMaxCHIPCSRLength    = 1024;
-constexpr uint32_t kOpCSRNonceLength    = 32;
 
 DeviceController::DeviceController()
 {
@@ -207,13 +206,11 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mExchangeMgr->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    if (params.mDeviceAddressUpdateDelegate != nullptr)
-    {
-        err = Mdns::Resolver::Instance().SetResolverDelegate(this);
-        SuccessOrExit(err);
+    err = Mdns::Resolver::Instance().SetResolverDelegate(this);
+    SuccessOrExit(err);
 
-        mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
-    }
+    RegisterDeviceAddressUpdateDelegate(params.mDeviceAddressUpdateDelegate);
+
     Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
@@ -293,15 +290,19 @@ CHIP_ERROR DeviceController::Shutdown()
     ChipLogDetail(Controller, "Shutting down the controller");
 
 #if CONFIG_DEVICE_LAYER
-    // Start by shutting down the PlatformManager.  This will ensure, with
-    // reasonable synchronization, that we stop processing of incoming messages
-    // before doing any other shutdown work.  Otherwise we can end up trying to
-    // process incoming messages in a partially shut down state, which is not
-    // great at all.
+    //
+    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
+    // expects to be called with external thread synchronization and will not try to acquire the
+    // stack lock.
+    //
+    // Actually stopping the event queue is a separable call that applications will have to sequence.
+    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
+    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
+    //
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
-    mInetLayer->Shutdown();
-    mSystemLayer->Shutdown();
+    VerifyOrReturnError(mInetLayer->Shutdown() == INET_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSystemLayer->Shutdown() == CHIP_SYSTEM_NO_ERROR, CHIP_ERROR_INTERNAL);
     chip::Platform::Delete(mInetLayer);
     chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
@@ -310,6 +311,10 @@ CHIP_ERROR DeviceController::Shutdown()
     mInetLayer   = nullptr;
 
     mState = State::NotInitialized;
+
+    // Shut down the interaction model before we try shuttting down the exchange
+    // manager.
+    app::InteractionModelEngine::GetInstance()->Shutdown();
 
     // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
     // if (mExchangeMgr != nullptr)
@@ -1125,10 +1130,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
-    uint8_t CSRNonce[kOpCSRNonceLength];
-    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(CSRNonce, sizeof(CSRNonce)));
-
-    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, ByteSpan(CSRNonce, sizeof(CSRNonce))));
+    ReturnErrorOnFailure(device->GenerateCSRNonce());
+    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
 }
@@ -1171,7 +1174,13 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    // TODO: Validate CSR Nonce and signature
+    // TODO: Verify the OpCSR signature using pubkey from DAC
+    //       This will be done when device attestation is implemented.
+
+    // Verify that Nonce matches with what we sent
+    const ByteSpan nonce = device->GetCSRNonce();
+    VerifyOrReturnError(CSRNonce.size() == nonce.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(memcmp(CSRNonce.data(), nonce.data(), CSRNonce.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
@@ -1450,17 +1459,15 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
     const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
     chip::CommandId aCommandId, uint8_t aCommandIndex)
 {
-    // #6308, #6559: Invoking success Callbacks in `CommandResponseProcessed` is not desired, but this is used to met current
-    // requirement of current callback framework that we should be able to send another command once ResponseCallback is called. By
-    // resolving #6308, the app can wait for the right event, and by #6559 the app can send command in a now command sender.
-    VerifyOrReturnError(aProtocolCode != 0, CHIP_NO_ERROR);
-
     // Generally IM has more detailed errors than ember library, here we always use the, the actual handling of the
     // commands should implement full IMDelegate.
     // #6308 By implement app side IM delegate, we should be able to accept detailed error codes.
     // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
     // instead of IM status code.
-    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_FAILURE);
+    IMDefaultResponseCallback(apCommandSender,
+                              (aProtocolCode == 0 && aGeneralCode == Protocols::SecureChannel::GeneralStatusCode::kSuccess)
+                                  ? EMBER_ZCL_STATUS_SUCCESS
+                                  : EMBER_ZCL_STATUS_FAILURE);
 
     return CHIP_NO_ERROR;
 }
@@ -1493,11 +1500,8 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseError(const 
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(const app::CommandSender * apCommandSender)
 {
-    // #6308, #6559: Invoking Callbacks in `CommandResponseProcessed` is not desired, but this is used to met current requirement of
-    // current callback framework that we should be able to send another command once ResponseCallback is called.
-    // By resolving #6308, the app can wait for the right event, and by #6559 the app can send command in a now command sender.
-    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_SUCCESS);
-
+    // No thing is needed in this case. The success callback is called in CommandResponseStatus, and failure callback is called in
+    // CommandResponseStatus, CommandResponseProtocolError and CommandResponseError.
     return CHIP_NO_ERROR;
 }
 void BasicSuccess(void * context, uint16_t val)

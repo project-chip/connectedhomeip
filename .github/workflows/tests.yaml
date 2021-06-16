@@ -17,6 +17,7 @@ name: Tests
 on:
     push:
     pull_request:
+    workflow_dispatch:
 
 jobs:
     test_suites_linux:
@@ -37,6 +38,13 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
+            - name: Try to ensure the directories for core dumping exist and we can write them.
+              run: |
+                  apt-get update
+                  apt-get -y install --fix-missing rsync
+                  mkdir /tmp/cores || true
+                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+                  mkdir objdir-clone || true
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -56,11 +64,32 @@ jobs:
               timeout-minutes: 5
               run: |
                   scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+            - name: Copy objdir
+              run: |
+                  # The idea is to not upload our objdir unless builds have
+                  # actually succeeded, because that just wastes space.
+                  rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Tests
               timeout-minutes: 5
               run: |
                   ifconfig -a
                   scripts/tests/test_suites.sh
+            - name: Uploading core files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-core-linux
+                  path: /tmp/cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            - name: Uploading objdir for debugging
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-objdir-linux
+                  path: objdir-clone/
+                  # objdirs are big; don't hold on to them too long.
+                  retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
         timeout-minutes: 60
@@ -74,7 +103,13 @@ jobs:
               with:
                   submodules: true
             - name: Setup Environment
-              run: brew install openssl pkg-config
+              # coreutils for stdbuf
+              run: brew install openssl pkg-config coreutils
+            - name: Try to ensure the directories for core dumping and diagnostic log collection exist and we can write them.
+              run: |
+                  sudo chown ${USER} /cores || true
+                  mkdir -p ~/Library/Logs/DiagnosticReports || true
+                  mkdir objdir-clone || true
             - name: Fix pkgconfig link
               working-directory: /usr/local/lib/pkgconfig
               run: |
@@ -102,8 +137,35 @@ jobs:
               timeout-minutes: 5
               run: |
                   scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+            - name: Copy objdir
+              run: |
+                  # The idea is to not upload our objdir unless builds have
+                  # actually succeeded, because that just wastes space.
+                  rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Test Suites
               timeout-minutes: 5
               run: |
-                  scripts/tests/test_suites.sh
-
+                  # Force 1 iteration for now until we sort out our threading issues.
+                  scripts/tests/test_suites.sh 1
+            - name: Uploading core files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-core-darwin
+                  path: /cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            - name: Uploading diagnostic logs
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-log-darwin
+                  path: ~/Library/Logs/DiagnosticReports/
+            - name: Uploading objdir for debugging
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-objdir-darwin
+                  path: objdir-clone/
+                  # objdirs are big; don't hold on to them too long.
+                  retention-days: 5

@@ -20,27 +20,33 @@
 
 constexpr uint16_t kWaitDurationInSeconds = 30;
 
-CHIP_ERROR DiscoverCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR DiscoverCommand::Run(NodeId localId, NodeId remoteId)
 {
-    chip::Controller::CommissionerInitParams params;
+    CHIP_ERROR err;
 
-    params.storageDelegate                = &storage;
-    params.mDeviceAddressUpdateDelegate   = this;
-    params.operationalCredentialsDelegate = &mOpCredsIssuer;
-
-    ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
-    ReturnErrorOnFailure(mCommissioner.Init(localId, params));
-    ReturnErrorOnFailure(mCommissioner.ServiceEvents());
-
-    ReturnErrorOnFailure(RunCommand(mNodeId, mFabricId));
-
+    //
+    // Set this to true first BEFORE we send commands to ensure we don't
+    // end up in a situation where the response comes back faster than we can
+    // set the variable to true, which will cause it to block indefinitely.
+    //
     UpdateWaitForResponse(true);
+
+    {
+        chip::DeviceLayer::StackLock lock;
+
+        GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
+        err = RunCommand(mNodeId, mFabricId);
+        SuccessOrExit(err);
+    }
+
     WaitForResponse(kWaitDurationInSeconds);
 
-    mCommissioner.ServiceEventSignal();
-    mCommissioner.Shutdown();
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
 
     VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
-
     return CHIP_NO_ERROR;
 }

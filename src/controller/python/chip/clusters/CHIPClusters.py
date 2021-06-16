@@ -484,6 +484,27 @@ class ChipClusters:
                     "timeoutMs": "int",
                 },
             },
+            "OtaSoftwareUpdateServer": {
+                "ApplyUpdateRequest": {
+                    "updateToken": "bytes",
+                    "newVersion": "int",
+                },
+                "NotifyUpdateApplied": {
+                    "updateToken": "bytes",
+                    "currentVersion": "int",
+                },
+                "QueryImage": {
+                    "vendorId": "int",
+                    "productId": "int",
+                    "imageType": "int",
+                    "hardwareVersion": "int",
+                    "currentVersion": "int",
+                    "protocolsSupported": "int",
+                    "location": "str",
+                    "clientCanConsent": "int",
+                    "metadataForServer": "bytes",
+                },
+            },
             "OnOff": {
                 "Off": {
                 },
@@ -615,6 +636,8 @@ class ChipClusters:
                     "mode": "int",
                     "amount": "int",
                 },
+            },
+            "ThreadNetworkDiagnostics": {
             },
             "WakeOnLan": {
             },
@@ -842,6 +865,9 @@ class ChipClusters:
             "NetworkCommissioning": [
                 "ClusterRevision",
             ],
+            "OtaSoftwareUpdateServer": [
+                "ClusterRevision",
+            ],
             "OnOff": [
                 "OnOff",
                 "ClusterRevision",
@@ -927,6 +953,69 @@ class ChipClusters:
                 "OccupiedHeatingSetpoint",
                 "ControlSequenceOfOperation",
                 "SystemMode",
+                "ClusterRevision",
+            ],
+            "ThreadNetworkDiagnostics": [
+                "Channel",
+                "RoutingRole",
+                "NetworkName",
+                "PanId",
+                "ExtendedPanId",
+                "MeshLocalPrefix",
+                "OverrunCount",
+                "NeighborTableList",
+                "RouteTableList",
+                "PartitionId",
+                "Weighting",
+                "DataVersion",
+                "StableDataVersion",
+                "LeaderRouterId",
+                "DetachedRoleCount",
+                "ChildRoleCount",
+                "RouterRoleCount",
+                "LeaderRoleCount",
+                "AttachAttemptCount",
+                "PartitionIdChangeCount",
+                "BetterPartitionAttachAttemptCount",
+                "ParentChangeCount",
+                "TxTotalCount",
+                "TxUnicastCount",
+                "TxBroadcastCount",
+                "TxAckRequestedCount",
+                "TxAckedCount",
+                "TxNoAckRequestedCount",
+                "TxDataCount",
+                "TxDataPollCount",
+                "TxBeaconCount",
+                "TxBeaconRequestCount",
+                "TxOtherCount",
+                "TxRetryCount",
+                "TxDirectMaxRetryExpiryCount",
+                "TxIndirectMaxRetryExpiryCount",
+                "TxErrCcaCount",
+                "TxErrAbortCount",
+                "TxErrBusyChannelCount",
+                "RxTotalCount",
+                "RxUnicastCount",
+                "RxBroadcastCount",
+                "RxDataCount",
+                "RxDataPollCount",
+                "RxBeaconCount",
+                "RxBeaconRequestCount",
+                "RxOtherCount",
+                "RxAddressFilteredCount",
+                "RxDestAddrFilteredCount",
+                "RxDuplicatedCount",
+                "RxErrNoFrameCount",
+                "RxErrUnknownNeighborCount",
+                "RxErrInvalidSrcAddrCount",
+                "RxErrSecCount",
+                "RxErrFcsCount",
+                "RxErrOtherCount",
+                "SecurityPolicy",
+                "ChannelMask",
+                "OperationalDatasetComponents",
+                "ActiveNetworkFaultsList",
                 "ClusterRevision",
             ],
             "WakeOnLan": [
@@ -1369,6 +1458,19 @@ class ChipClusters:
     def ClusterNetworkCommissioning_CommandUpdateWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateWiFiNetwork(
                 device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
+        )
+    def ClusterOtaSoftwareUpdateServer_CommandApplyUpdateRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateToken: bytes, newVersion: int):
+        return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_ApplyUpdateRequest(
+                device, ZCLendpoint, ZCLgroupid, updateToken, len(updateToken), newVersion
+        )
+    def ClusterOtaSoftwareUpdateServer_CommandNotifyUpdateApplied(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateToken: bytes, currentVersion: int):
+        return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_NotifyUpdateApplied(
+                device, ZCLendpoint, ZCLgroupid, updateToken, len(updateToken), currentVersion
+        )
+    def ClusterOtaSoftwareUpdateServer_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, imageType: int, hardwareVersion: int, currentVersion: int, protocolsSupported: int, location: bytes, clientCanConsent: int, metadataForServer: bytes):
+        location = location.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_QueryImage(
+                device, ZCLendpoint, ZCLgroupid, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, location, len(location), clientCanConsent, metadataForServer, len(metadataForServer)
         )
     def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Off(
@@ -1847,6 +1949,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterNetworkCommissioning_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOtaSoftwareUpdateServer_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateServer_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ConfigureAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
@@ -1985,6 +2089,128 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Channel(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRoutingRole(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RoutingRole(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeNetworkName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_NetworkName(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributePanId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PanId(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeExtendedPanId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ExtendedPanId(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeMeshLocalPrefix(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_MeshLocalPrefix(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeOverrunCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_OverrunCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeNeighborTableList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_NeighborTableList(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRouteTableList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RouteTableList(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributePartitionId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PartitionId(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeWeighting(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Weighting(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeDataVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_DataVersion(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeStableDataVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_StableDataVersion(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeLeaderRouterId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_LeaderRouterId(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeDetachedRoleCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_DetachedRoleCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeChildRoleCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ChildRoleCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRouterRoleCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RouterRoleCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeLeaderRoleCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_LeaderRoleCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeAttachAttemptCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_AttachAttemptCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributePartitionIdChangeCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PartitionIdChangeCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeBetterPartitionAttachAttemptCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_BetterPartitionAttachAttemptCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeParentChangeCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ParentChangeCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxTotalCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxTotalCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxUnicastCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxUnicastCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxBroadcastCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxBroadcastCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxAckRequestedCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxAckRequestedCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxAckedCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxAckedCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxNoAckRequestedCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxNoAckRequestedCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxDataCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxDataCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxDataPollCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxDataPollCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxBeaconCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxBeaconCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxBeaconRequestCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxBeaconRequestCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxOtherCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxOtherCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxRetryCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxRetryCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxDirectMaxRetryExpiryCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxDirectMaxRetryExpiryCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxIndirectMaxRetryExpiryCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxIndirectMaxRetryExpiryCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxErrCcaCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxErrCcaCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxErrAbortCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxErrAbortCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeTxErrBusyChannelCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxErrBusyChannelCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxTotalCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxTotalCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxUnicastCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxUnicastCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxBroadcastCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxBroadcastCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxDataCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDataCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxDataPollCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDataPollCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxBeaconCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxBeaconCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxBeaconRequestCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxBeaconRequestCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxOtherCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxOtherCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxAddressFilteredCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxAddressFilteredCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxDestAddrFilteredCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDestAddrFilteredCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxDuplicatedCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDuplicatedCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxErrNoFrameCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrNoFrameCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxErrUnknownNeighborCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrUnknownNeighborCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxErrInvalidSrcAddrCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrInvalidSrcAddrCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxErrSecCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrSecCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxErrFcsCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrFcsCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeRxErrOtherCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrOtherCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeSecurityPolicy(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_SecurityPolicy(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeChannelMask(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ChannelMask(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeOperationalDatasetComponents(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_OperationalDatasetComponents(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeActiveNetworkFaultsList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ActiveNetworkFaultsList(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterWakeOnLan_ReadAttributeWakeOnLanMacAddress(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WakeOnLan_WakeOnLanMacAddress(device, ZCLendpoint, ZCLgroupid)
     def ClusterWakeOnLan_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -2809,6 +3035,19 @@ class ChipClusters:
         # Cluster NetworkCommissioning ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateServer
+        # Cluster OtaSoftwareUpdateServer Command ApplyUpdateRequest
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_ApplyUpdateRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_ApplyUpdateRequest.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateServer Command NotifyUpdateApplied
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_NotifyUpdateApplied.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_NotifyUpdateApplied.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateServer Command QueryImage
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_QueryImage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_QueryImage.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateServer ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateServer_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateServer_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OnOff
         # Cluster OnOff Command Off
         self._chipLib.chip_ime_AppendCommand_OnOff_Off.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -3124,6 +3363,190 @@ class ChipClusters:
         # Cluster Thermostat ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics
+        # Cluster ThreadNetworkDiagnostics ReadAttribute Channel
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Channel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Channel.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RoutingRole
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RoutingRole.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RoutingRole.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute NetworkName
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_NetworkName.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_NetworkName.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute PanId
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PanId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PanId.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute ExtendedPanId
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ExtendedPanId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ExtendedPanId.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute MeshLocalPrefix
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_MeshLocalPrefix.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_MeshLocalPrefix.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute OverrunCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_OverrunCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_OverrunCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute NeighborTableList
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_NeighborTableList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_NeighborTableList.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RouteTableList
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RouteTableList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RouteTableList.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute PartitionId
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PartitionId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PartitionId.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute Weighting
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Weighting.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Weighting.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute DataVersion
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_DataVersion.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_DataVersion.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute StableDataVersion
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_StableDataVersion.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_StableDataVersion.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute LeaderRouterId
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_LeaderRouterId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_LeaderRouterId.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute DetachedRoleCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_DetachedRoleCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_DetachedRoleCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute ChildRoleCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ChildRoleCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ChildRoleCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RouterRoleCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RouterRoleCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RouterRoleCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute LeaderRoleCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_LeaderRoleCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_LeaderRoleCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute AttachAttemptCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_AttachAttemptCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_AttachAttemptCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute PartitionIdChangeCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PartitionIdChangeCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PartitionIdChangeCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute BetterPartitionAttachAttemptCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_BetterPartitionAttachAttemptCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_BetterPartitionAttachAttemptCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute ParentChangeCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ParentChangeCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ParentChangeCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxTotalCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxTotalCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxTotalCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxUnicastCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxUnicastCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxUnicastCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxBroadcastCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxBroadcastCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxBroadcastCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxAckRequestedCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxAckRequestedCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxAckRequestedCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxAckedCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxAckedCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxAckedCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxNoAckRequestedCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxNoAckRequestedCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxNoAckRequestedCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxDataCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxDataCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxDataCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxDataPollCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxDataPollCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxDataPollCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxBeaconCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxBeaconCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxBeaconCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxBeaconRequestCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxBeaconRequestCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxBeaconRequestCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxOtherCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxOtherCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxOtherCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxRetryCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxRetryCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxRetryCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxDirectMaxRetryExpiryCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxDirectMaxRetryExpiryCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxDirectMaxRetryExpiryCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxIndirectMaxRetryExpiryCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxIndirectMaxRetryExpiryCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxIndirectMaxRetryExpiryCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxErrCcaCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxErrCcaCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxErrCcaCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxErrAbortCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxErrAbortCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxErrAbortCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute TxErrBusyChannelCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxErrBusyChannelCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_TxErrBusyChannelCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxTotalCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxTotalCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxTotalCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxUnicastCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxUnicastCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxUnicastCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxBroadcastCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxBroadcastCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxBroadcastCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxDataCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDataCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDataCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxDataPollCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDataPollCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDataPollCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxBeaconCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxBeaconCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxBeaconCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxBeaconRequestCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxBeaconRequestCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxBeaconRequestCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxOtherCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxOtherCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxOtherCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxAddressFilteredCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxAddressFilteredCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxAddressFilteredCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxDestAddrFilteredCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDestAddrFilteredCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDestAddrFilteredCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxDuplicatedCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDuplicatedCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxDuplicatedCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxErrNoFrameCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrNoFrameCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrNoFrameCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxErrUnknownNeighborCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrUnknownNeighborCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrUnknownNeighborCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxErrInvalidSrcAddrCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrInvalidSrcAddrCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrInvalidSrcAddrCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxErrSecCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrSecCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrSecCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxErrFcsCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrFcsCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrFcsCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute RxErrOtherCount
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrOtherCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrOtherCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute SecurityPolicy
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_SecurityPolicy.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_SecurityPolicy.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute ChannelMask
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ChannelMask.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ChannelMask.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute OperationalDatasetComponents
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_OperationalDatasetComponents.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_OperationalDatasetComponents.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute ActiveNetworkFaultsList
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ActiveNetworkFaultsList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ActiveNetworkFaultsList.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ClusterRevision.restype = ctypes.c_uint32
         # Cluster WakeOnLan
         # Cluster WakeOnLan ReadAttribute WakeOnLanMacAddress
         self._chipLib.chip_ime_ReadAttribute_WakeOnLan_WakeOnLanMacAddress.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

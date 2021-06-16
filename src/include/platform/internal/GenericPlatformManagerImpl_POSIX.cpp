@@ -24,6 +24,7 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP
 
+#include "system/SystemError.h"
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
@@ -64,6 +65,7 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    int ret        = 0;
 
     mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -73,7 +75,20 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 
     mShouldRunEventLoop.store(true, std::memory_order_relaxed);
 
+    ret = pthread_cond_init(&mEventQueueStoppedCond, nullptr);
+    SuccessOrExit(ret);
+
+    ret = pthread_mutex_init(&mStateLock, nullptr);
+    SuccessOrExit(ret);
+
+    mHasValidChipTask = false;
+
 exit:
+    if (ret != 0)
+    {
+        err = System::MapErrorPOSIX(ret);
+    }
+
     return err;
 }
 
@@ -83,7 +98,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack()
     int err = pthread_mutex_lock(&mChipStackLock);
     assert(err == 0);
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
     mChipStackIsLocked        = true;
     mChipStackLockOwnerThread = pthread_self();
 #endif
@@ -93,7 +108,7 @@ template <class ImplClass>
 bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack()
 {
     bool locked = (pthread_mutex_trylock(&mChipStackLock) == 0);
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
     if (locked)
     {
         mChipStackIsLocked        = true;
@@ -106,7 +121,7 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack()
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 {
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
     mChipStackIsLocked = false;
 #endif
 
@@ -114,7 +129,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
     assert(err == 0);
 }
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
 template <class ImplClass>
 bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThread() const
 {
@@ -220,6 +235,23 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 {
+    pthread_mutex_lock(&mStateLock);
+
+    //
+    // If we haven't set mHasValidChipTask by now, it means that the application did not call StartEventLoopTask
+    // and consequently, are running the event loop from their own, externally managed task.
+    // Let's track his appropriately since we need this info later when stopping the event queues.
+    //
+    if (!mHasValidChipTask)
+    {
+        mHasValidChipTask = true;
+        mChipTask         = pthread_self();
+        mTaskType         = kExternallyManagedTask;
+    }
+
+    mEventQueueHasStopped = false;
+    pthread_mutex_unlock(&mStateLock);
+
     Impl()->LockChipStack();
 
     do
@@ -229,6 +261,18 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
 
     Impl()->UnlockChipStack();
+
+    pthread_mutex_lock(&mStateLock);
+    mEventQueueHasStopped = true;
+    pthread_mutex_unlock(&mStateLock);
+
+    //
+    // Wake up anyone blocked waiting for the event queue to stop in
+    // StopEventLoopTask().
+    //
+    pthread_cond_signal(&mEventQueueStoppedCond);
+
+    return;
 }
 
 template <class ImplClass>
@@ -250,27 +294,94 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
     SuccessOrExit(err);
     err = pthread_attr_setschedpolicy(&mChipTaskAttr, SCHED_RR);
     SuccessOrExit(err);
+
+    //
+    // We need to grab the lock here since we have to protect setting
+    // mHasValidChipTask, which will be read right away upon creating the
+    // thread below.
+    //
+    pthread_mutex_lock(&mStateLock);
+
     err = pthread_create(&mChipTask, &mChipTaskAttr, EventLoopTaskMain, this);
-    SuccessOrExit(err);
+    if (err == 0)
+    {
+        mHasValidChipTask = true;
+        mTaskType         = kInternallyManagedTask;
+    }
+
+    pthread_mutex_unlock(&mStateLock);
+
 exit:
+    return System::MapErrorPOSIX(err);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
+{
+    int err = 0;
+
+    //
+    // Signal to the runloop to stop.
+    //
+    mShouldRunEventLoop.store(false, std::memory_order_relaxed);
+
+    pthread_mutex_lock(&mStateLock);
+
+    //
+    // If we're calling this from a different thread than the one running chip, then
+    // we need to wait till the event queue has completely stopped before proceeding.
+    //
+    if (mHasValidChipTask && (pthread_equal(pthread_self(), mChipTask) == 0))
+    {
+        pthread_mutex_unlock(&mStateLock);
+
+        //
+        // We need to grab the lock to protect critical sections accessed by the WakeSelect() call within
+        // SystemLayer.
+        //
+        Impl()->LockChipStack();
+        SystemLayer.WakeSelect();
+        Impl()->UnlockChipStack();
+
+        pthread_mutex_lock(&mStateLock);
+
+        while (!mEventQueueHasStopped)
+        {
+            err = pthread_cond_wait(&mEventQueueStoppedCond, &mStateLock);
+            SuccessOrExit(err);
+        }
+
+        pthread_mutex_unlock(&mStateLock);
+
+        //
+        // Wait further for the thread to terminate if we had previously created it.
+        //
+        if (mTaskType == kInternallyManagedTask)
+        {
+            err = pthread_join(mChipTask, nullptr);
+            SuccessOrExit(err);
+        }
+    }
+    else
+    {
+        pthread_mutex_unlock(&mStateLock);
+    }
+
+exit:
+    pthread_mutex_destroy(&mStateLock);
+    pthread_cond_destroy(&mEventQueueStoppedCond);
+    mHasValidChipTask = false;
     return System::MapErrorPOSIX(err);
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
 {
-    int err = 0;
-    mShouldRunEventLoop.store(false, std::memory_order_relaxed);
-    if (mChipTask)
-    {
-        SystemLayer.WakeSelect();
-        SuccessOrExit(err = pthread_join(mChipTask, nullptr));
-    }
-    // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
-    err = GenericPlatformManagerImpl<ImplClass>::_Shutdown();
-
-exit:
-    return System::MapErrorPOSIX(err);
+    //
+    // Call up to the base class _Shutdown() to perform the actual stack de-initialization
+    // and clean-up
+    //
+    return System::MapErrorPOSIX(GenericPlatformManagerImpl<ImplClass>::_Shutdown());
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.

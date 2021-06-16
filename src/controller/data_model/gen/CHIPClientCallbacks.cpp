@@ -854,6 +854,193 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     }
                     }
                     break;
+                case 0x0035:
+                    switch (attributeId)
+                    {
+                    case 0x0007: // NeighborTable
+                    {
+                        _NeighborTable data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].Age = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].LinkFrameCounter = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].MleFrameCounter = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LQI = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].AverageRssi = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LastRssi = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FrameErrorRate = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].MessageErrorRate = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].RxOnWhenIdle = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FullThreadDevice = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FullNetworkData = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].IsChild = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0008: // RouteTable
+                    {
+                        _RouteTable data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].RouterId = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].NextHop = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PathCost = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LQIIn = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LQIOut = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Age = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Allocated = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LinkEstablished = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x003B: // SecurityPolicy
+                    {
+                        _SecurityPolicy data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].RotationTime = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Flags = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x003D: // OperationalDatasetComponents
+                    {
+                        _OperationalDatasetComponents data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ActiveTimestampPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PendingTimestampPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].MasterKeyPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].NetworkNamePresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ExtendedPanIdPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].MeshLocalPrefixPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].DelayPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PanIdPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ChannelPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PskcPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].SecurityPolicyPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ChannelMaskPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>::
+                                FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x003E: // NetworkFault
+                    {
+                        uint8_t data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i] = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>::
+                                FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
                 }
                 break;
             }
@@ -2216,6 +2403,52 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(chip::app::Command * commandObj, uint8_t action,
+                                                                             uint32_t delayedActionTime)
+{
+    ChipLogProgress(Zcl, "ApplyUpdateRequestResponse:");
+    ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
+    ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback");
+
+    Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, action, delayedActionTime);
+    return true;
+}
+
+bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
+                                                                     uint32_t delayedActionTime, uint8_t * imageURI,
+                                                                     uint32_t softwareVersion, chip::ByteSpan updateToken,
+                                                                     uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
+{
+    ChipLogProgress(Zcl, "QueryImageResponse:");
+    LogStatus(status);
+    ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
+    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
+    // ChipLogProgress(Zcl, "  imageURI: %.*s", imageURI.size(), imageURI.data());
+    ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", softwareVersion);
+    ChipLogProgress(Zcl, "  updateToken: %zu", updateToken.size());
+    ChipLogProgress(Zcl, "  userConsentNeeded: %" PRIu8 "", userConsentNeeded);
+    ChipLogProgress(Zcl, "  metadataForClient: %zu", metadataForClient.size());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterQueryImageResponseCallback");
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
+        return true;
+    }
+
+    Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded, metadataForClient);
     return true;
 }
 

@@ -44,7 +44,7 @@ limitations under the License.
   <struct name="AudioOutputInfo">
     <item name="index" type="INT8U"/>
     <item name="outputType" type="AudioOutputType"/>
-    <item name="name" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
+    <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
   </struct>
 
   <enum name="AudioOutputType" type="ENUM8">
