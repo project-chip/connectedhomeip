@@ -4196,7 +4196,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                                ZCL_OTA_SERVER_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_OTA_SERVER_CLUSTER_ID);
             return;
         }
@@ -4210,7 +4211,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                            ZCL_OTA_SERVER_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
                         ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
