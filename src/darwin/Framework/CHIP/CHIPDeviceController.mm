@@ -119,11 +119,11 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 - (BOOL)shutdown
 {
     dispatch_async(_chipWorkQueue, ^{
-        if (_cppCommissioner) {
+        if (self->_cppCommissioner) {
             CHIP_LOG_DEBUG("%@", kInfoStackShutdown);
-            _cppCommissioner->Shutdown();
-            delete _cppCommissioner;
-            _cppCommissioner = nullptr;
+            self->_cppCommissioner->Shutdown();
+            delete self->_cppCommissioner;
+            self->_cppCommissioner = nullptr;
         }
     });
 
