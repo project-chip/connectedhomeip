@@ -41,28 +41,24 @@ tests:
           value: 0
 
     - label: "read LT attribute: GlobalSceneControl"
-      disabled: true
       command: "readAttribute"
       attribute: "Global Scene Control"
       response:
           value: 1
 
     - label: "read LT attribute: OnTime"
-      disabled: true
       command: "readAttribute"
       attribute: "On Time"
       response:
           value: 0
 
     - label: "read LT attribute: OffWaitTime"
-      disabled: true
       command: "readAttribute"
       attribute: "Off Wait Time"
       response:
           value: 0
 
     - label: "read LT attribute: StartUpOnOff"
-      disabled: true
       command: "readAttribute"
       attribute: "Start Up On Off"
       response:
@@ -78,21 +74,18 @@ tests:
           error: 1
 
     - label: "write the default value to LT attribute: OnTime"
-      disabled: true
       command: "writeAttribute"
       attribute: "On Time"
       arguments:
           value: 0
 
     - label: "write the default value to LT attribute: OffWaitTime"
-      disabled: true
       command: "writeAttribute"
       attribute: "Off Wait Time"
       arguments:
           value: 0
 
     - label: "write the default value to LT attribute: StartUpOnOff"
-      disabled: true
       command: "writeAttribute"
       attribute: "Start Up On Off"
       arguments:
@@ -106,21 +99,18 @@ tests:
           value: 1
 
     - label: "reads back LT attribute: OnTime"
-      disabled: true
       command: "readAttribute"
       attribute: "On Time"
       response:
           value: 0
 
     - label: "reads back LT attribute: OffWaitTime"
-      disabled: true
       command: "readAttribute"
       attribute: "Off Wait Time"
       response:
           value: 0
 
     - label: "reads back LT attribute: StartUpOnOff"
-      disabled: true
       command: "readAttribute"
       attribute: "Start Up On Off"
       response:
