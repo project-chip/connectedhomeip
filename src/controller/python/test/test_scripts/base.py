@@ -142,7 +142,7 @@ class BaseTestHelper:
             return False
         return True
 
-    def TestWriteBasicAttribiutes(self, nodeid: int, endpoint: int, group: int):
+    def TestWriteBasicAttributes(self, nodeid: int, endpoint: int, group: int):
         basic_cluster_attrs = [
             ("UserLabel", "Test"),
         ]

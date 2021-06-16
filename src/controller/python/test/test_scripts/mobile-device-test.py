@@ -61,13 +61,13 @@ def main():
                                    nodeid=1),
               "Failed to finish key exchange")
 
-    # logger.info("Testing network commissioning")
-    # FailIfNot(test.TestNetworkCommissioning(nodeid=1,
-    #                                         endpoint=ENDPOINT_ID,
-    #                                         group=GROUP_ID,
-    #                                         dataset=TEST_THREAD_NETWORK_DATASET_TLV,
-    #                                         network_id=TEST_THREAD_NETWORK_ID),
-    #           "Failed to finish network commissioning")
+    logger.info("Testing network commissioning")
+    FailIfNot(test.TestNetworkCommissioning(nodeid=1,
+                                            endpoint=ENDPOINT_ID,
+                                            group=GROUP_ID,
+                                            dataset=TEST_THREAD_NETWORK_DATASET_TLV,
+                                            network_id=TEST_THREAD_NETWORK_ID),
+              "Failed to finish network commissioning")
 
     logger.info("Testing on off cluster")
     FailIfNot(test.TestOnOffCluster(nodeid=1,
@@ -86,7 +86,7 @@ def main():
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing attribute writing")
-    FailIfNot(test.TestWriteBasicAttribiutes(nodeid=1,
+    FailIfNot(test.TestWriteBasicAttributes(nodeid=1,
                                              endpoint=ENDPOINT_ID,
                                              group=GROUP_ID),
               "Failed to test Write Basic Attributes")
