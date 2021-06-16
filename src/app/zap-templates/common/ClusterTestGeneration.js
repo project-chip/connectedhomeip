@@ -224,7 +224,12 @@ function chip_tests_item_parameters(options)
     const commands    = commandArgs.map(commandArg => {
       commandArg = JSON.parse(JSON.stringify(commandArg));
 
-      const expected          = commandValues.find(value => value.name.toLowerCase() == commandArg.name.toLowerCase());
+      const expected = commandValues.find(value => value.name.toLowerCase() == commandArg.name.toLowerCase());
+      if (!expected) {
+        printErrorAndExit(this,
+            'Missing "' + commandArg.name + '" in arguments list: \n\t* '
+                + commandValues.map(command => command.name).join('\n\t* '));
+      }
       commandArg.definedValue = expected.value;
 
       return commandArg;
