@@ -61,8 +61,8 @@ ti_simplelink_executable("persistent_storage") {
   output_name = "chip-${ti_simplelink_board}-persistent_storage.out"
 
   sources = [
-    "${project_dir}/main.cpp",
     "${project_dir}/../KeyValueStorageTest.cpp",
+    "${project_dir}/main.cpp",
   ]
 
   deps = [
