@@ -117,6 +117,12 @@ typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(v
                                                                                uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                              uint8_t * debugText);
+typedef void (*OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
+                                                                                 uint32_t delayedActionTime);
+typedef void (*OtaSoftwareUpdateServerClusterQueryImageResponseCallback)(void * context, uint32_t delayedActionTime,
+                                                                         uint8_t * imageURI, uint32_t softwareVersion,
+                                                                         chip::ByteSpan updateToken, uint8_t userConsentNeeded,
+                                                                         chip::ByteSpan metadataForClient);
 typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
                                                                    chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
                                                                    chip::ByteSpan VendorReserved3, chip::ByteSpan Signature);
