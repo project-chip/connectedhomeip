@@ -164,9 +164,14 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
-    VerifyOrReturnError(connectionState != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    const uint32_t localMessageCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter().Value();
-    const uint32_t peerMessageCounter  = connectionState->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
+
+    uint32_t localMessageCounter = 0;
+    uint32_t peerMessageCounter  = 0;
+    if (connectionState != nullptr)
+    {
+        localMessageCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter().Value();
+        peerMessageCounter  = connectionState->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
+    }
 
     serializable.mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(localMessageCounter);
     serializable.mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(peerMessageCounter);
