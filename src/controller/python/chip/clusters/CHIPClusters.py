@@ -48,6 +48,9 @@ class ChipClusters:
                 },
             },
             "ApplicationBasic": {
+                "ChangeStatus": {
+                    "status": "int",
+                },
             },
             "ApplicationLauncher": {
                 "LaunchApp": {
@@ -189,7 +192,7 @@ class ChipClusters:
                     "optionsOverride": "int",
                 },
             },
-            "ContentLaunch": {
+            "ContentLauncher": {
                 "LaunchContent": {
                     "autoPlay": "int",
                     "data": "str",
@@ -794,7 +797,7 @@ class ChipClusters:
                 "StartUpColorTemperatureMireds",
                 "ClusterRevision",
             ],
-            "ContentLaunch": [
+            "ContentLauncher": [
                 "AcceptsHeaderList",
                 "SupportedStreamingTypes",
                 "ClusterRevision",
@@ -1079,6 +1082,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_AccountLogin_Login(
                 device, ZCLendpoint, ZCLgroupid, tempAccountIdentifier, len(tempAccountIdentifier), setupPIN, len(setupPIN)
         )
+    def ClusterApplicationBasic_CommandChangeStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, status: int):
+        return self._chipLib.chip_ime_AppendCommand_ApplicationBasic_ChangeStatus(
+                device, ZCLendpoint, ZCLgroupid, status
+        )
     def ClusterApplicationLauncher_CommandLaunchApp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, data: bytes, catalogVendorId: int, applicationId: bytes):
         data = data.encode("utf-8") + b'\x00'
         applicationId = applicationId.encode("utf-8") + b'\x00'
@@ -1170,15 +1177,15 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep(
                 device, ZCLendpoint, ZCLgroupid, optionsMask, optionsOverride
         )
-    def ClusterContentLaunch_CommandLaunchContent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, autoPlay: int, data: bytes):
+    def ClusterContentLauncher_CommandLaunchContent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, autoPlay: int, data: bytes):
         data = data.encode("utf-8") + b'\x00'
-        return self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent(
+        return self._chipLib.chip_ime_AppendCommand_ContentLauncher_LaunchContent(
                 device, ZCLendpoint, ZCLgroupid, autoPlay, data, len(data)
         )
-    def ClusterContentLaunch_CommandLaunchURL(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, contentURL: bytes, displayString: bytes):
+    def ClusterContentLauncher_CommandLaunchURL(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, contentURL: bytes, displayString: bytes):
         contentURL = contentURL.encode("utf-8") + b'\x00'
         displayString = displayString.encode("utf-8") + b'\x00'
-        return self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL(
+        return self._chipLib.chip_ime_AppendCommand_ContentLauncher_LaunchURL(
                 device, ZCLendpoint, ZCLgroupid, contentURL, len(contentURL), displayString, len(displayString)
         )
     def ClusterDoorLock_CommandClearAllPins(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1874,12 +1881,12 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_StartUpColorTemperatureMireds(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterContentLaunch_ReadAttributeAcceptsHeaderList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ContentLaunch_AcceptsHeaderList(device, ZCLendpoint, ZCLgroupid)
-    def ClusterContentLaunch_ReadAttributeSupportedStreamingTypes(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ContentLaunch_SupportedStreamingTypes(device, ZCLendpoint, ZCLgroupid)
-    def ClusterContentLaunch_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ContentLaunch_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterContentLauncher_ReadAttributeAcceptsHeaderList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ContentLauncher_AcceptsHeaderList(device, ZCLendpoint, ZCLgroupid)
+    def ClusterContentLauncher_ReadAttributeSupportedStreamingTypes(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ContentLauncher_SupportedStreamingTypes(device, ZCLendpoint, ZCLgroupid)
+    def ClusterContentLauncher_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ContentLauncher_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterDescriptor_ReadAttributeDeviceList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Descriptor_DeviceList(device, ZCLendpoint, ZCLgroupid)
     def ClusterDescriptor_ReadAttributeServerList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -2285,6 +2292,9 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_AccountLogin_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_AccountLogin_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ApplicationBasic
+        # Cluster ApplicationBasic Command ChangeStatus
+        self._chipLib.chip_ime_AppendCommand_ApplicationBasic_ChangeStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ApplicationBasic_ChangeStatus.restype = ctypes.c_uint32
         # Cluster ApplicationBasic ReadAttribute VendorName
         self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorName.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorName.restype = ctypes.c_uint32
@@ -2698,22 +2708,22 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision.restype = ctypes.c_uint32
-        # Cluster ContentLaunch
-        # Cluster ContentLaunch Command LaunchContent
-        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent.restype = ctypes.c_uint32
-        # Cluster ContentLaunch Command LaunchURL
-        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.restype = ctypes.c_uint32
-        # Cluster ContentLaunch ReadAttribute AcceptsHeaderList
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_AcceptsHeaderList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_AcceptsHeaderList.restype = ctypes.c_uint32
-        # Cluster ContentLaunch ReadAttribute SupportedStreamingTypes
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_SupportedStreamingTypes.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_SupportedStreamingTypes.restype = ctypes.c_uint32
-        # Cluster ContentLaunch ReadAttribute ClusterRevision
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster ContentLauncher
+        # Cluster ContentLauncher Command LaunchContent
+        self._chipLib.chip_ime_AppendCommand_ContentLauncher_LaunchContent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_ContentLauncher_LaunchContent.restype = ctypes.c_uint32
+        # Cluster ContentLauncher Command LaunchURL
+        self._chipLib.chip_ime_AppendCommand_ContentLauncher_LaunchURL.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_ContentLauncher_LaunchURL.restype = ctypes.c_uint32
+        # Cluster ContentLauncher ReadAttribute AcceptsHeaderList
+        self._chipLib.chip_ime_ReadAttribute_ContentLauncher_AcceptsHeaderList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ContentLauncher_AcceptsHeaderList.restype = ctypes.c_uint32
+        # Cluster ContentLauncher ReadAttribute SupportedStreamingTypes
+        self._chipLib.chip_ime_ReadAttribute_ContentLauncher_SupportedStreamingTypes.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ContentLauncher_SupportedStreamingTypes.restype = ctypes.c_uint32
+        # Cluster ContentLauncher ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_ContentLauncher_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ContentLauncher_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Descriptor
         # Cluster Descriptor ReadAttribute DeviceList
         self._chipLib.chip_ime_ReadAttribute_Descriptor_DeviceList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
