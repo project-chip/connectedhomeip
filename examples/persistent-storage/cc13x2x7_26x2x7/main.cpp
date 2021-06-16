@@ -21,8 +21,8 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <AppConfig.h>
 #include "KeyValueStorageTest.h"
+#include <AppConfig.h>
 
 #include <FreeRTOS.h>
 #include <task.h>
