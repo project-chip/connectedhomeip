@@ -47,5 +47,9 @@ CHIP_ERROR AdditionalDataParseCommand::Run()
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
 
 exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
     return err;
 }

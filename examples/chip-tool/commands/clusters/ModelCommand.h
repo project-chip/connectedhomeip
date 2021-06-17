@@ -40,6 +40,7 @@ public:
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
+    uint16_t GetWaitDurationInSeconds() const override { return 10; }
 
     virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
 

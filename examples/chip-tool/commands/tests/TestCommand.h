@@ -28,8 +28,9 @@ public:
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
+    uint16_t GetWaitDurationInSeconds() const override { return 30; }
 
-    virtual CHIP_ERROR NextTest() = 0;
+    virtual void NextTest() = 0;
 
 protected:
     ChipDevice * mDevice;

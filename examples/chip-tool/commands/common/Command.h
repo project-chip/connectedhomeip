@@ -164,7 +164,20 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64);
     }
 
+    // Will be called in a setting in which it's safe to touch the CHIP
+    // stack. The rules for Run() are as follows:
+    //
+    // 1) If error is returned, Run() must not call SetCommandExitStatus.
+    // 2) If success is returned Run() must either have called
+    //    SetCommandExitStatus() or scheduled async work that will do that.
     virtual CHIP_ERROR Run() = 0;
+
+    // Get the wait duration, in seconds, before the command times out.
+    virtual uint16_t GetWaitDurationInSeconds() const = 0;
+
+    // Shut down the command, in case any work needs to be done after the event
+    // loop has been stopped.
+    virtual void Shutdown() {}
 
     CHIP_ERROR GetCommandExitStatus() const { return mCommandExitStatus; }
     void SetCommandExitStatus(CHIP_ERROR status)

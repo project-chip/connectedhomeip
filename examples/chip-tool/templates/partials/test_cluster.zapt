@@ -5,7 +5,7 @@ class {{filename}}: public TestCommand
     {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
       CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -33,8 +33,6 @@ class {{filename}}: public TestCommand
           ChipLogProgress(chipTool, "{{filename}}: %s", chip::ErrorStr(err));
           SetCommandExitStatus(err);
       }
-
-      return err;
     }
 
 

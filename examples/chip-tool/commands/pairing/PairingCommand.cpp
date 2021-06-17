@@ -22,7 +22,6 @@
 
 using namespace ::chip;
 
-constexpr uint16_t kWaitDurationInSeconds     = 120;
 constexpr uint64_t kBreadcrumb                = 0;
 constexpr uint32_t kTimeoutMs                 = 6000;
 constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
@@ -31,23 +30,13 @@ CHIP_ERROR PairingCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    {
-        chip::DeviceLayer::StackLock lock;
-
-        GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
-        GetExecContext()->commissioner->RegisterPairingDelegate(this);
-    }
+    GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
+    GetExecContext()->commissioner->RegisterPairingDelegate(this);
 
     err = RunInternal(GetExecContext()->remoteId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", ErrorStr(err)));
 
 exit:
-
-    if (err == CHIP_NO_ERROR)
-    {
-        return GetCommandExitStatus();
-    }
-
     return err;
 }
 
@@ -59,44 +48,25 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 
     InitCallbacks();
 
-    //
-    // Set this to true first BEFORE we send commands to ensure we don't
-    // end up in a situation where the response comes back faster than we can
-    // set the variable to true, which will cause it to block indefinitely.
-    //
-    UpdateWaitForResponse(true);
-
-    //
-    // We're about to call methods into the stack, so lock
-    // appropriately. None of the following calls below before the unlock are, nor should be,
-    // blocking.
-    //
+    switch (mPairingMode)
     {
-        chip::DeviceLayer::StackLock lock;
-
-        switch (mPairingMode)
-        {
-        case PairingMode::None:
-            err = Unpair(remoteId);
-            break;
-        case PairingMode::Bypass:
-            err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-            break;
-        case PairingMode::Ble:
-            err = Pair(remoteId, PeerAddress::BLE());
-            break;
-        case PairingMode::OnNetwork:
-        case PairingMode::SoftAP:
-            err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-            break;
-        case PairingMode::Ethernet:
-            err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-            break;
-        }
+    case PairingMode::None:
+        err = Unpair(remoteId);
+        break;
+    case PairingMode::Bypass:
+        err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        break;
+    case PairingMode::Ble:
+        err = Pair(remoteId, PeerAddress::BLE());
+        break;
+    case PairingMode::OnNetwork:
+    case PairingMode::SoftAP:
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        break;
+    case PairingMode::Ethernet:
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        break;
     }
-
-    WaitForResponse(kWaitDurationInSeconds);
-    ReleaseCallbacks();
 
     return err;
 }
@@ -217,7 +187,7 @@ void PairingCommand::InitCallbacks()
     mOnFailureCallback = new Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 }
 
-void PairingCommand::ReleaseCallbacks()
+void PairingCommand::Shutdown()
 {
     delete mOnAddThreadNetworkCallback;
     delete mOnAddWiFiNetworkCallback;

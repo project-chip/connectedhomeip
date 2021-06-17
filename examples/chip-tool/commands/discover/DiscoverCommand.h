@@ -36,6 +36,7 @@ public:
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
+    uint16_t GetWaitDurationInSeconds() const override { return 30; }
 
     virtual CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) = 0;
 

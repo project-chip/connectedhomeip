@@ -18,32 +18,15 @@
 
 #include "TestCommand.h"
 
-constexpr uint16_t kWaitDurationInSeconds = 30;
-
 CHIP_ERROR TestCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    //
-    // Set this to true first BEFORE we send commands to ensure we don't
-    // end up in a situation where the response comes back faster than we can
-    // set the variable to true, which will cause it to block indefinitely.
-    //
-    UpdateWaitForResponse(true);
+    auto * ctx = GetExecContext();
 
-    {
-        chip::DeviceLayer::StackLock lock;
+    err = ctx->commissioner->GetDevice(ctx->remoteId, &mDevice);
+    ReturnErrorOnFailure(err);
 
-        auto * ctx = GetExecContext();
-
-        err = ctx->commissioner->GetDevice(ctx->remoteId, &mDevice);
-        ReturnErrorOnFailure(err);
-
-        err = NextTest();
-        ReturnErrorOnFailure(err);
-    }
-
-    WaitForResponse(kWaitDurationInSeconds);
-
-    return GetCommandExitStatus();
+    NextTest();
+    return CHIP_NO_ERROR;
 }

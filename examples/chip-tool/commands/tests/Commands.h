@@ -27,7 +27,7 @@ public:
     TestCluster() : TestCommand("TestCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -353,8 +353,6 @@ public:
             ChipLogProgress(chipTool, "TestCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
-
-        return err;
     }
 
 private:
@@ -7827,7 +7825,7 @@ public:
     Test_3_1_1() : TestCommand("Test_3_1_1"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -7862,8 +7860,6 @@ public:
             ChipLogProgress(chipTool, "Test_3_1_1: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
-
-        return err;
     }
 
 private:
@@ -8185,7 +8181,7 @@ public:
     Test_3_2_1() : TestCommand("Test_3_2_1"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -8244,8 +8240,6 @@ public:
             ChipLogProgress(chipTool, "Test_3_2_1: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
-
-        return err;
     }
 
 private:
@@ -9159,7 +9153,7 @@ public:
     Test_3_2_2() : TestCommand("Test_3_2_2"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -9224,8 +9218,6 @@ public:
             ChipLogProgress(chipTool, "Test_3_2_2: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
-
-        return err;
     }
 
 private:

@@ -35,6 +35,10 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
     err = Print(payload);
     SuccessOrExit(err);
 exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
     return err;
 }
 
