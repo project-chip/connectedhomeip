@@ -62,9 +62,13 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     //    ReturnErrorCodeIf(mAdminId == Transport::kUndefinedAdminId, CHIP_ERROR_INVALID_ARGUMENT);
     mAdminId = 0;
 
-    mAdmins->LoadFromStorage(mAdminId);
-
     Transport::AdminPairingInfo * admin = mAdmins->FindAdminWithId(mAdminId);
+
+    if (admin == nullptr)
+    {
+        ReturnErrorOnFailure(mAdmins->LoadFromStorage(mAdminId));
+        admin = mAdmins->FindAdminWithId(mAdminId);
+    }
     ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(admin->GetCredentials(mCredentials, mCertificates, mRootKeyId));
@@ -100,6 +104,7 @@ void CASEServer::Cleanup()
     mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, this);
     mAdminId = Transport::kUndefinedAdminId;
     mCredentials.Release();
+    mCertificates.Release();
 }
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
