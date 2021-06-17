@@ -85,6 +85,12 @@ def main():
                                             group=GROUP_ID),
               "Failed to test Read Basic Attributes")
 
+    logger.info("Testing attribute writing")
+    FailIfNot(test.TestWriteBasicAttributes(nodeid=1,
+                                             endpoint=ENDPOINT_ID,
+                                             group=GROUP_ID),
+              "Failed to test Write Basic Attributes")
+
     timeoutTicker.stop()
 
     logger.info("Test finished")

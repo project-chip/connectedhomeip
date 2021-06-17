@@ -449,7 +449,7 @@ void DiscoveryImplPlatform::HandleCommissionableNodeResolve(void * context, Mdns
         return;
     }
     DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
-    CommissionableNodeData data;
+    DiscoveredNodeData data;
     Platform::CopyString(data.hostName, result->mHostName);
 
     if (result->mAddress.HasValue())
@@ -463,7 +463,7 @@ void DiscoveryImplPlatform::HandleCommissionableNodeResolve(void * context, Mdns
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
         FillNodeDataFromTxt(key, val, &data);
     }
-    mgr->mResolverDelegate->OnCommissionableNodeFound(data);
+    mgr->mResolverDelegate->OnNodeDiscoveryComplete(data);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
