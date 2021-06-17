@@ -179,6 +179,7 @@ void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, chip::
         if (err != CHIP_NO_ERROR)
         {
             streamer_printf(streamer_get(), "Send request failed: %s\n", ErrorStr(err));
+            Shutdown();
         }
     }
     else
