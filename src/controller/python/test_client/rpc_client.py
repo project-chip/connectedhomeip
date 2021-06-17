@@ -96,6 +96,9 @@ async def main():
         print(f"connect: {connect}")
         pase_data = server_1.get_pase_data()
         print(f"pase_data: {pase_data}")
+        fabric_id = server_1.get_fabric_id()
+        print(f"fabric_id: {fabric_id}")
+
     except Exception as e:
         print(e)
 

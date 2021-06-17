@@ -849,6 +849,15 @@ def qr_code_parse(qr_code):
     except Exception as e:
          return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
 
+def get_fabric_id():
+    try:
+        fabricID = device_manager.devCtrl.GetFabricId()
+        if fabricID == 0:
+            return __get_response_dict(status = StatusCodeEnum.FAILED, error = "Fabric ID not created or encountered an error")
+        return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = fabricID)
+    except Exception as e:
+         return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
+
 def get_pase_data() -> Dict[Any, Any]:
     """
     This method will return valid data only after the ble_connect, ip_connect method has been called
@@ -871,6 +880,7 @@ def start_rpc_server():
         server.register_function(resolve)
         server.register_function(qr_code_parse)
         server.register_function(get_pase_data)
+        server.register_function(get_fabric_id)
         server.register_multicall_functions()
         print('Serving XML-RPC on localhost port 5000')
         try:
