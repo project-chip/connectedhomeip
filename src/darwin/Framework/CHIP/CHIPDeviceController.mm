@@ -130,8 +130,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
     __block BOOL commissionerInitialized = NO;
-    if ([self isRunning])
-    {
+    if ([self isRunning]) {
         CHIP_LOG_DEBUG("Ignoring duplicate call to startup, Controller already started...");
         return YES;
     }
@@ -217,8 +216,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
-    if (![self isRunning])
-    {
+    if (![self isRunning]) {
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
@@ -244,8 +242,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
-    if (![self isRunning])
-    {
+    if (![self isRunning]) {
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
@@ -274,8 +271,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
-    if (![self isRunning])
-    {
+    if (![self isRunning]) {
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
@@ -317,8 +313,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
-    if (![self isRunning])
-    {
+    if (![self isRunning]) {
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
@@ -336,8 +331,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
-    if (![self isRunning])
-    {
+    if (![self isRunning]) {
         success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return success;
     }
@@ -355,8 +349,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 {
     __block CHIPDevice * chipDevice = nil;
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    if (![self isRunning])
-    {
+    if (![self isRunning]) {
         [self checkForError:errorCode logMsg:kErrorNotRunning error:error];
         return chipDevice;
     }
@@ -385,8 +378,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 - (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    if (![self isRunning])
-    {
+    if (![self isRunning]) {
         [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
         return;
     }
