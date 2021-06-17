@@ -1,5 +1,5 @@
 device_type: mbed
-job_name: test tag
+job_name: Mbed CHIP unit tests
 
 tags:
 - chip
@@ -53,7 +53,7 @@ actions:
           - . $PWD/../../../secrets
           - set -x
           - echo "Preparation of the environment..."
-          - /bin/bash CHIP/scripts/tests/mbed/unit_test_env.sh
+          - /bin/bash CHIP/scripts/tests/mbed/unit_test_env.sh CHIP
           - echo "Unit tests execution..."
           - /bin/bash CHIP/scripts/tests/mbed/run_unit_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
           - echo "Unit tests completed"
