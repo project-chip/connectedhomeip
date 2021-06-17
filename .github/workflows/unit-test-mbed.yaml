@@ -23,12 +23,12 @@ jobs:
         strategy:
             fail-fast: False
             matrix:
-                EXAMPLE_TARGET: [CY8CPROTO_062_4343W]
+                APP_TARGET: [CY8CPROTO_062_4343W]
         
-        name: "Unit tests: ${{matrix.EXAMPLE_TARGET}}"
+        name: "Unit tests: ${{matrix.APP_TARGET}}"
         env:
             BUILD_TYPE: mbedos
-            EXAMPLE_PROFILE: release
+            APP_PROFILE: release
 
         runs-on: ubuntu-latest
 
@@ -46,8 +46,13 @@ jobs:
                   submodules: true
 
             - name: Build unit test
-              run:
-                  scripts/tests/mbed/mbed_unit_tests.sh -c=build -b=${{matrix.EXAMPLE_TARGET}} -p=$EXAMPLE_PROFILE
+              run: scripts/tests/mbed/mbed_unit_tests.sh -c=build -b=${{matrix.APP_TARGET}} -p=$APP_PROFILE
+
+            - name: Copy aside build products
+              run: |
+                  mkdir -p binaries/$BUILD_TYPE-build/
+                  cp src/test_driver/mbed/unit_tests/build-${{matrix.APP_TARGET}}/$APP_PROFILE/chip-mbed-unit-tests.hex \
+                     binaries/$BUILD_TYPE-build/unit-tests_${{matrix.APP_TARGET}}_$APP_PROFILE.hex
 
             - name: Binary artifact suffix
               id: outsuffix
@@ -59,11 +64,11 @@ jobs:
 
             - name: Copy aside binaries
               run: |
-                  cp src/test_driver/mbed/unit_tests/build-${{matrix.EXAMPLE_TARGET}}/$EXAMPLE_PROFILE/chip-mbed-unit-tests.hex /tmp/output_binaries/
+                  cp -r binaries/$BUILD_TYPE-build/ /tmp/output_binaries/
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               with:
                   name:
-                      ${{ env.BUILD_TYPE }}-unit-test-${{matrix.EXAMPLE_TARGET}}-${{ env.EXAMPLE_PROFILE}}-build-${{
+                      ${{ env.BUILD_TYPE }}-unit-test-${{matrix.APP_TARGET}}-${{ env.APP_PROFILE}}-build-${{
                       steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/chip-mbed-unit-tests.hex
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build/unit-tests_${{matrix.APP_TARGET}}_${{ env.APP_PROFILE }}.hex

@@ -21,6 +21,8 @@ targer_number=$(cat devices.json | jq length)
 
 for index in $(eval echo "{0..$(($target_number - 1))}"); do
     platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
-    flash_image_to_device unit-test "$platform_name" binaries
+    echo "Flash unit-tests application image to $platform_name device"
+    flash_image_to_device unit-tests "$platform_name" binaries
+    echo "Run unit tests on $platform_name device"
     pytest -rAV --platforms="$platform_name" $CHIP_DIR/src/test_driver/mbed/integration_tests/unit-tests/test_unittests.py
 done
