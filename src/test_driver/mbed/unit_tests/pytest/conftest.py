@@ -15,7 +15,7 @@
 
 import pytest
 
-pytest_plugins = ['common.fixtures']
+pytest_plugins = ['fixtures']
 
 
 def pytest_addoption(parser):
