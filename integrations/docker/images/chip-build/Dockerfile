@@ -67,9 +67,9 @@ RUN set -x \
 # Cmake (Mbed OS requires >=3.19.0-rc3 version which is not available in Ubuntu 20.04 repository)
 RUN set -x \
     && (cd /tmp \
-    && wget --progress=dot:giga https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh \
-    && sh cmake-3.19.3-Linux-x86_64.sh --exclude-subdir --prefix=/usr/local \
-    && rm -rf cmake-3.19.3-Linux-x86_64.sh) \
+    && wget --progress=dot:giga https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-$(uname -i).sh \
+    && sh cmake-3.19.3-Linux-$(uname -i).sh --exclude-subdir --prefix=/usr/local \
+    && rm -rf cmake-3.19.3-Linux-$(uname -i).sh) \
     && exec bash \
     && : # last line
 
@@ -115,13 +115,6 @@ RUN set -x \
 # NodeJS: install a newer version than what apt-get would read
 # This installs the latest LTS version of nodejs
 RUN set -x \
-    && mkdir node_js \
-    && cd node_js \
-    && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-x64.tar.xz \
-    && tar xfvJ node-v12.19.0-linux-x64.tar.xz \
-    && mv node-v12.19.0-linux-x64 /opt/ \
-    && ln -s /opt/node-v12.19.0-linux-x64 /opt/node \
-    && ln -s /opt/node/bin/* /usr/bin \
-    && cd .. \
-    && rm -rf node_js \
+    && curl -fsSL https://deb.nodesource.com/setup_12.x | bash - \
+    && apt-get install -y nodejs \
     && : # last line
