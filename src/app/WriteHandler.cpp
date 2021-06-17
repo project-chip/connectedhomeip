@@ -33,8 +33,8 @@ CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
 {
     VerifyOrReturnError(apDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx     = nullptr;
-    mpDelegate        = apDelegate;
+    mpExchangeCtx = nullptr;
+    mpDelegate    = apDelegate;
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -73,7 +73,7 @@ CHIP_ERROR WriteHandler::ClearExistingExchangeContext()
 CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    mpExchangeCtx = apExchangeContext;
+    mpExchangeCtx  = apExchangeContext;
 
     err = ProcessWriteRequest(std::move(aPayload));
     SuccessOrExit(err);
@@ -93,7 +93,7 @@ CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
     AttributeStatusList::Builder attributeStatusList;
     VerifyOrExit(mState == State::AddAttributeStatusCode, err = CHIP_ERROR_INCORRECT_STATE);
     attributeStatusList = mWriteResponseBuilder.GetAttributeStatusListBuilder().EndOfAttributeStatusList();
-    err                = attributeStatusList.GetError();
+    err                 = attributeStatusList.GetError();
     SuccessOrExit(err);
 
     mWriteResponseBuilder.EndOfWriteResponse();
@@ -228,7 +228,7 @@ exit:
 }
 
 CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                               AttributeStatusElement::Builder aAttributeStatusElement)
+                                                AttributeStatusElement::Builder aAttributeStatusElement)
 {
     AttributePath::Builder attributePath = aAttributeStatusElement.CreateAttributePathBuilder();
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
@@ -241,20 +241,23 @@ CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAtt
         attributePath.ListIndex(aAttributePathParams.mListIndex);
     }
 
-    attributePath.NodeId(aAttributePathParams.mNodeId).ClusterId(aAttributePathParams.mClusterId).EndpointId(aAttributePathParams.mEndpointId).EndOfAttributePath();
+    attributePath.NodeId(aAttributePathParams.mNodeId)
+        .ClusterId(aAttributePathParams.mClusterId)
+        .EndpointId(aAttributePathParams.mEndpointId)
+        .EndOfAttributePath();
 
     return attributePath.GetError();
 }
 
 CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAttributePathParams,
-                                         const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                         const Protocols::Id aProtocolId,
-                                         const Protocols::InteractionModel::ProtocolCode aProtocolCode)
+                                                const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                                const Protocols::Id aProtocolId,
+                                                const Protocols::InteractionModel::ProtocolCode aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
     AttributeStatusElement::Builder attributeStatusElement =
-            mWriteResponseBuilder.GetAttributeStatusListBuilder().CreateAttributeStatusBuilder();
+        mWriteResponseBuilder.GetAttributeStatusListBuilder().CreateAttributeStatusBuilder();
     err = attributeStatusElement.GetError();
     SuccessOrExit(err);
 
@@ -263,9 +266,9 @@ CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAtt
 
     statusElementBuilder = attributeStatusElement.CreateStatusElementBuilder();
     statusElementBuilder
-            .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(),
-                                 Protocols::InteractionModel::ToUint16(aProtocolCode))
-            .EndOfStatusElement();
+        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(),
+                             Protocols::InteractionModel::ToUint16(aProtocolCode))
+        .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);
 

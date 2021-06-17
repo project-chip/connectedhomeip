@@ -28,7 +28,8 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, intptr_t aAppIdentifier)
+CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                             intptr_t aAppIdentifier)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -47,9 +48,9 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     ReturnErrorOnFailure(attributeDataListBuilder.GetError());
 
     ClearExistingExchangeContext();
-    mpExchangeMgr = apExchangeMgr;
-    mpDelegate    = apDelegate;
-    mAppIdentifier = aAppIdentifier;
+    mpExchangeMgr         = apExchangeMgr;
+    mpDelegate            = apDelegate;
+    mAppIdentifier        = aAppIdentifier;
     mAttributeStatusIndex = 0;
     MoveToState(State::Initialized);
 
@@ -63,8 +64,8 @@ void WriteClient::Shutdown()
 
     ClearExistingExchangeContext();
 
-    mpExchangeMgr = nullptr;
-    mpDelegate    = nullptr;
+    mpExchangeMgr         = nullptr;
+    mpDelegate            = nullptr;
     mAttributeStatusIndex = 0;
     ClearState();
 }
@@ -99,7 +100,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = writeResponse.CheckSchemaValidity();
-SuccessOrExit(err);
+    SuccessOrExit(err);
 #endif
     err = writeResponse.GetAttributeStatusList(&attributeStatusListParser);
     SuccessOrExit(err);
@@ -136,7 +137,7 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     AttributeDataElement::Builder attributeDataElement =
-            mWriteRequestBuilder.GetAttributeDataListBuilder().CreateAttributeDataElementBuilder();
+        mWriteRequestBuilder.GetAttributeDataListBuilder().CreateAttributeDataElementBuilder();
     err = attributeDataElement.GetError();
     SuccessOrExit(err);
 
@@ -150,7 +151,8 @@ CHIP_ERROR WriteClient::FinishAttribute()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AttributeDataElement::Builder attributeDataElement = mWriteRequestBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder();
+    AttributeDataElement::Builder attributeDataElement =
+        mWriteRequestBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder();
 
     attributeDataElement.EndOfAttributeDataElement();
     err = attributeDataElement.GetError();
@@ -168,7 +170,7 @@ TLV::TLVWriter * WriteClient::GetAttributeDataElementTLVWriter()
 }
 
 CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                         AttributeDataElement::Builder aAttributeDataElement)
+                                               AttributeDataElement::Builder aAttributeDataElement)
 {
     AttributePath::Builder attributePath = aAttributeDataElement.CreateAttributePathBuilder();
     if (aAttributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
@@ -181,7 +183,10 @@ CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttr
         attributePath.ListIndex(aAttributePathParams.mListIndex);
     }
 
-    attributePath.NodeId(aAttributePathParams.mNodeId).ClusterId(aAttributePathParams.mClusterId).EndpointId(aAttributePathParams.mEndpointId).EndOfAttributePath();
+    attributePath.NodeId(aAttributePathParams.mNodeId)
+        .ClusterId(aAttributePathParams.mClusterId)
+        .EndpointId(aAttributePathParams.mEndpointId)
+        .EndOfAttributePath();
 
     return attributePath.GetError();
 }
@@ -192,7 +197,7 @@ CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
     AttributeDataList::Builder attributeDataListBuilder;
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
     attributeDataListBuilder = mWriteRequestBuilder.GetAttributeDataListBuilder().EndOfAttributeDataList();
-    err                = attributeDataListBuilder.GetError();
+    err                      = attributeDataListBuilder.GetError();
     SuccessOrExit(err);
 
     mWriteRequestBuilder.EndOfWriteRequest();
@@ -212,16 +217,16 @@ const char * WriteClient::GetStateStr() const
 #if CHIP_DETAIL_LOGGING
     switch (mState)
     {
-        case State::Uninitialized:
+    case State::Uninitialized:
         return "Uninitialized";
 
-        case State::Initialized:
+    case State::Initialized:
         return "Initialized";
 
-        case State::AddAttribute:
+    case State::AddAttribute:
         return "AddAttribute";
 
-        case State::AwaitingResponse:
+    case State::AwaitingResponse:
         return "AwaitingResponse";
     }
 #endif // CHIP_DETAIL_LOGGING
@@ -268,8 +273,8 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdm
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(
-            Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(packet),
-            Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+        Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(packet),
+        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
     SuccessOrExit(err);
     MoveToState(State::AwaitingResponse);
 
@@ -284,7 +289,7 @@ exit:
 }
 
 void WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
@@ -371,7 +376,8 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusElement(AttributeStatusElement::Pa
     err = attributePath.GetListIndex(&(attributePathParams.mListIndex));
     if (CHIP_NO_ERROR == err)
     {
-        VerifyOrExit(attributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        VerifyOrExit(attributePathParams.mFlags.Has(AttributePathParams::Flags::kFieldIdValid),
+                     err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
         attributePathParams.mFlags.Set(AttributePathParams::Flags::kListIndexValid);
     }
 
@@ -396,5 +402,5 @@ exit:
     return err;
 }
 
-};
-};
+}; // namespace app
+}; // namespace chip

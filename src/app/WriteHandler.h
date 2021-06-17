@@ -24,8 +24,8 @@
 
 #pragma once
 #include <app/AttributePathParams.h>
-#include <app/MessageDef/WriteResponse.h>
 #include <app/InteractionModelDelegate.h>
+#include <app/MessageDef/WriteResponse.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <messaging/ExchangeContext.h>
@@ -101,23 +101,24 @@ public:
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
 
     CHIP_ERROR AddAttributeStatusCode(const AttributePathParams & aAttributePathParams,
-                                                    const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                                    const Protocols::Id aProtocolId,
-                                                    const Protocols::InteractionModel::ProtocolCode aProtocolCode);
+                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                      const Protocols::Id aProtocolId,
+                                      const Protocols::InteractionModel::ProtocolCode aProtocolCode);
+
 private:
     friend class TestWriteInteraction;
     enum class State
     {
-        Uninitialized = 0, // The handler has not been initialized
-        Initialized,       // The handler has been initialized and is ready
+        Uninitialized = 0,      // The handler has not been initialized
+        Initialized,            // The handler has been initialized and is ready
         AddAttributeStatusCode, // The handler has added attribute status code
-        Sending,           // The handler has sent out the write response
+        Sending,                // The handler has sent out the write response
     };
     CHIP_ERROR ProcessWriteRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & packet);
     CHIP_ERROR SendWriteResponse();
     CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                                    AttributeStatusElement::Builder aAttributeStatusElement);
+                                      AttributeStatusElement::Builder aAttributeStatusElement);
 
     void MoveToState(const State aTargetState);
     void ClearState();
@@ -130,5 +131,5 @@ private:
     System::PacketBufferTLVWriter mMessageWriter;
     State mState;
 };
-}
-}
+} // namespace app
+} // namespace chip

@@ -23,12 +23,12 @@
 
 #pragma once
 
+#include <app/AttributePathParams.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/Constants.h>
-#include <app/AttributePathParams.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -140,8 +140,9 @@ public:
      * Notification that a WriteClient has received an Write Response containing a status code.
      */
     virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
-                                             const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                             const uint32_t aProtocolId, const uint16_t aProtocolCode, AttributePathParams & aAttributePathParams, uint8_t aCommandIndex)
+                                           const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                           const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                                           AttributePathParams & aAttributePathParams, uint8_t aCommandIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

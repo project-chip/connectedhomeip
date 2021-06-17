@@ -26,8 +26,8 @@
 
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelDelegate.h>
-#include <app/MessageDef/AttributeStatusElement.h>
 #include <app/MessageDef/AttributeDataList.h>
+#include <app/MessageDef/AttributeStatusElement.h>
 #include <app/MessageDef/WriteRequest.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -122,7 +122,7 @@ private:
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessAttributeStatusElement(AttributeStatusElement::Parser & aAttributeStatusElement);
     CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                                   AttributeDataElement::Builder aAttributeDataElement);
+                                      AttributeDataElement::Builder aAttributeDataElement);
     CHIP_ERROR ClearExistingExchangeContext();
     const char * GetStateStr() const;
     void ClearState();
@@ -130,12 +130,12 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
-    State mState                         = State::Uninitialized;
+    State mState                               = State::Uninitialized;
     System::PacketBufferTLVWriter mMessageWriter;
     WriteRequest::Builder mWriteRequestBuilder;
-    uint8_t mAttributeStatusIndex              = 0;
-    intptr_t mAppIdentifier                    = 0;
+    uint8_t mAttributeStatusIndex = 0;
+    intptr_t mAppIdentifier       = 0;
 };
 
-};
-};
+}; // namespace app
+}; // namespace chip

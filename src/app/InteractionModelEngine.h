@@ -175,7 +175,7 @@ private:
      * the Write Request are handled entirely within this function.
      */
     void OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;

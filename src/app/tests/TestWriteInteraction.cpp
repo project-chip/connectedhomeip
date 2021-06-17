@@ -58,7 +58,7 @@ public:
     static void TestWriteHandler(nlTestSuite * apSuite, void * apContext);
 
 private:
-    static void AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClient  & aWriteClient);
+    static void AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient);
     static void AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler);
     static void GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
@@ -75,13 +75,13 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
 
 void TestWriteInteraction::AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient)
 {
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId = 1;
+    attributePathParams.mNodeId     = 1;
     attributePathParams.mEndpointId = 2;
-    attributePathParams.mClusterId = 3;
-    attributePathParams.mFieldId = 4;
-    attributePathParams.mListIndex = 5;
+    attributePathParams.mClusterId  = 3;
+    attributePathParams.mFieldId    = 4;
+    attributePathParams.mListIndex  = 5;
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     err = aWriteClient.PrepareAttribute(attributePathParams);
@@ -98,17 +98,18 @@ void TestWriteInteraction::AddAttributeDataElement(nlTestSuite * apSuite, void *
 
 void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler)
 {
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId = 1;
+    attributePathParams.mNodeId     = 1;
     attributePathParams.mEndpointId = 2;
-    attributePathParams.mClusterId = 3;
-    attributePathParams.mFieldId = 4;
-    attributePathParams.mListIndex = 5;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);;
+    attributePathParams.mClusterId  = 3;
+    attributePathParams.mFieldId    = 4;
+    attributePathParams.mListIndex  = 5;
+    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+    ;
 
     err = aWriteHandler.AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+                                               Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -160,7 +161,8 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload) {
+void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
@@ -182,7 +184,7 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
     StatusElement::Builder statusElementBuilder = attributeStatusElementBuilder.CreateStatusElementBuilder();
     NL_TEST_ASSERT(apSuite, statusElementBuilder.GetError() == CHIP_NO_ERROR);
     statusElementBuilder.EncodeStatusElement(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3)
-            .EndOfStatusElement();
+        .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 

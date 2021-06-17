@@ -177,7 +177,7 @@ CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClient ** const apWriteCl
         if (writeClient.IsFree())
         {
             *apWriteClient = &writeClient;
-            err           = writeClient.Init(mpExchangeMgr, mpDelegate, aAppIdentifier);
+            err            = writeClient.Init(mpExchangeMgr, mpDelegate, aAppIdentifier);
             if (CHIP_NO_ERROR != err)
             {
                 *apWriteClient = nullptr;
@@ -269,7 +269,7 @@ exit:
 }
 
 void InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+                                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
