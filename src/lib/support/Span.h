@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <string.h>
+#include <type_traits>
 
 #include <support/CodeUtils.h>
 
@@ -44,7 +45,10 @@ public:
     constexpr pointer data() const { return mDataBuf; }
     size_t size() const { return mDataLen; }
     bool empty() const { return size() == 0; }
-    bool data_equal(const Span & other) const
+
+    // Allow data_equal for spans that are over the same type up to const-ness.
+    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    bool data_equal(const Span<U> & other) const
     {
         return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
     }
@@ -54,6 +58,20 @@ public:
         VerifyOrDie(offset <= mDataLen);
         VerifyOrDie(length <= mDataLen - offset);
         return Span(mDataBuf + offset, length);
+    }
+
+    // Allow converting a span with non-const T into a span with const T.
+    template <class U = T>
+    operator typename std::enable_if_t<!std::is_const<U>::value, Span<const T>>() const
+    {
+        return Span<const T>(data(), size());
+    }
+
+    // Allow reducing the size of a span.
+    void reduce_size(size_t new_size)
+    {
+        VerifyOrDie(new_size <= size());
+        mDataLen = new_size;
     }
 
 private:
@@ -73,10 +91,20 @@ public:
     constexpr pointer data() const { return mDataBuf; }
     size_t size() const { return N; }
     bool empty() const { return data() == nullptr; }
-    bool data_equal(const FixedSpan & other) const
+
+    // Allow data_equal for spans that are over the same type up to const-ness.
+    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    bool data_equal(const FixedSpan<U, N> & other) const
     {
         return (empty() && other.empty()) ||
             (!empty() && !other.empty() && (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
+    }
+
+    // Allow converting a span with non-const T into a span with const T.
+    template <class U = T>
+    operator typename std::enable_if_t<!std::is_const<U>::value, FixedSpan<const T, N>>() const
+    {
+        return FixedSpan<const T, N>(data());
     }
 
 private:
