@@ -33,7 +33,6 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/temperature-measurement-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/trusted-root-certificates-server"
                       PRIV_REQUIRES chip QRCode tft spidriver bt screen-framework)
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14) 

@@ -49,7 +49,7 @@ static void writePlaybackState(chip::EndpointId endpoint, uint8_t playbackState)
                                     (uint8_t *) &playbackState, ZCL_INT8U_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to store media playback attribute.");
+        ChipLogError(Zcl, "Failed to store media playback attribute.");
     }
 }
 
@@ -61,7 +61,7 @@ static uint8_t readPlaybackStatus(chip::EndpointId endpoint)
                                    (uint8_t *) &playbackState, sizeof(uint8_t));
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to read media playback attribute.");
+        ChipLogError(Zcl, "Failed to read media playback attribute.");
     }
 
     return playbackState;
@@ -81,15 +81,18 @@ void MediaPlaybackManager::storeNewPlaybackState(chip::EndpointId endpoint, uint
     }
 }
 
-static void sendResponse(const char * responseName, chip::CommandId commandId, uint8_t mediaPlaybackStatus)
+static void sendResponse(const char * responseName, chip::CommandId commandId, EmberAfMediaPlaybackStatus mediaPlaybackStatus)
 {
+    // TODO: Once our enums are sized properly, or once we stop depending on the
+    // value being a certain type, we can remove the static_cast.  For now the
+    // cast is safe because all EmberAfKeypadInputStatus values fit in uint32_t.
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_MEDIA_PLAYBACK_CLUSTER_ID,
-                              commandId, "u", mediaPlaybackStatus);
+                              commandId, "u", static_cast<uint8_t>(mediaPlaybackStatus));
 
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to send %s: 0x%X", responseName, status);
+        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
     }
 }
 

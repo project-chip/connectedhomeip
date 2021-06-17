@@ -28,43 +28,33 @@ namespace {
 constexpr uint16_t kWaitDurationInSeconds = UINT16_MAX;
 } // namespace
 
-CHIP_ERROR ReportingCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR ReportingCommand::Run(NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     chip::Controller::BasicCluster cluster;
-    chip::Controller::CommissionerInitParams initParams;
 
-    initParams.storageDelegate = &storage;
-
-    err = mOpCredsIssuer.Initialize(storage);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", ErrorStr(err)));
-
-    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
-
-    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
-
-    err = mCommissioner.Init(localId, initParams);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
-
-    err = mCommissioner.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", ErrorStr(err)));
-
-    err = mCommissioner.GetDevice(remoteId, &mDevice);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
-
-    AddReportCallbacks(mEndPointId);
-
-    cluster.Associate(mDevice, mEndPointId);
-    err = cluster.MfgSpecificPing(nullptr, nullptr);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
-
+    //
+    // Set this to true first BEFORE we send commands to ensure we don't
+    // end up in a situation where the response comes back faster than we can
+    // set the variable to true, which will cause it to block indefinitely.
+    //
     UpdateWaitForResponse(true);
+
+    {
+        chip::DeviceLayer::StackLock lock;
+
+        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
+
+        AddReportCallbacks(mEndPointId);
+        cluster.Associate(mDevice, mEndPointId);
+
+        err = cluster.MfgSpecificPing(nullptr, nullptr);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
+    }
+
     WaitForResponse(kWaitDurationInSeconds);
 
 exit:
-    mCommissioner.ServiceEventSignal();
-    mCommissioner.Shutdown();
     return err;
 }

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "controller/ExampleOperationalCredentialsIssuer.h"
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
 #include <support/Span.h>
@@ -90,8 +91,22 @@ public:
         ::chip::Inet::InterfaceId interfaceId;
     };
 
+    /**
+     * @brief
+     *   Encapsulates key objects in the CHIP stack that need continued
+     *   access, so wrapping it in here makes it nice and compactly encapsulated.
+     */
+    struct ExecutionContext
+    {
+        ChipDeviceCommissioner * commissioner;
+        chip::Controller::ExampleOperationalCredentialsIssuer * opCredsIssuer;
+        PersistentStorage * storage;
+    };
+
     Command(const char * commandName) : mName(commandName) {}
     virtual ~Command() {}
+
+    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = &execContext; }
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
@@ -147,7 +162,7 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64);
     }
 
-    virtual CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) = 0;
+    virtual CHIP_ERROR Run(NodeId localId, NodeId remoteId) = 0;
 
     bool GetCommandExitStatus() const { return mCommandExitStatus; }
     void SetCommandExitStatus(bool status)
@@ -158,6 +173,10 @@ public:
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(uint16_t duration);
+
+protected:
+    ExecutionContext * GetExecContext() { return mExecContext; }
+    ExecutionContext * mExecContext;
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);

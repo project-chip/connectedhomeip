@@ -62,7 +62,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/af-main-common.cpp
                ${CHIP_ROOT}/src/app/util/attribute-list-byte-span.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-size.cpp
+               ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
                ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
                ${CHIP_ROOT}/src/app/util/attribute-table.cpp
                ${CHIP_ROOT}/src/app/util/binding-table.cpp
@@ -88,7 +88,6 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               ${CHIP_ROOT}/src/app/clusters/trusted-root-certificates-server/trusted-root-certificates-server.cpp
                )
 
 if (CONFIG_CHIP_PW_RPC)

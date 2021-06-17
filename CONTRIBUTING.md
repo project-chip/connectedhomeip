@@ -141,7 +141,7 @@ interactive rebase:
 
 ```bash
 # Rebase all commits on your development branch
-git checkout
+git checkout <branch-name>
 git rebase -i master
 ```
 

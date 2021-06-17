@@ -32,11 +32,6 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCal
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
-{
-    return ThreadStackMgr().SetupSrpHost(hostname);
-}
-
 const char * GetProtocolString(MdnsServiceProtocol protocol)
 {
     return protocol == MdnsServiceProtocol::kMdnsProtocolUdp ? "_udp" : "_tcp";
@@ -47,15 +42,14 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     CHIP_ERROR result = CHIP_NO_ERROR;
 
     VerifyOrExit(service, result = CHIP_ERROR_INVALID_ARGUMENT);
+    if (strcmp(service->mHostName, "") != 0)
+    {
+        CHIP_ERROR hostNameErr = ThreadStackMgr().SetupSrpHost(service->mHostName);
+        VerifyOrExit(hostNameErr == CHIP_NO_ERROR, result = hostNameErr);
+    }
 
     char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
     snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
-
-    // Try to remove service before adding it, as SRP doesn't allow to update existing services.
-    result = ThreadStackMgr().RemoveSrpService(service->mName, serviceType);
-
-    // Service should be successfully removed or not found (not exists).
-    VerifyOrExit((result == CHIP_NO_ERROR) || (result == Internal::MapOpenThreadError(OT_ERROR_NOT_FOUND)), );
 
     result =
         ThreadStackMgr().AddSrpService(service->mName, serviceType, service->mPort, service->mTextEntries, service->mTextEntrySize);

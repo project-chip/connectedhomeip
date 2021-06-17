@@ -23,7 +23,7 @@
 
 using namespace ::chip;
 
-CHIP_ERROR SetupPayloadParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR SetupPayloadParseCommand::Run(NodeId localId, NodeId remoteId)
 {
     std::string codeString(mCode);
     SetupPayload payload;
@@ -44,13 +44,14 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
     std::vector<OptionalQRCodeInfo> optionalVendorData;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(SetupPayload, "CommissioningFlow: %u", payload.commissioningFlow);
+    ChipLogProgress(SetupPayload, "CommissioningFlow: %" PRIu8,
+                    static_cast<std::underlying_type_t<decltype(payload.commissioningFlow)>>(payload.commissioningFlow));
     ChipLogProgress(SetupPayload, "VendorID: %u", payload.vendorID);
     ChipLogProgress(SetupPayload, "Version: %u", payload.version);
     ChipLogProgress(SetupPayload, "ProductID: %u", payload.productID);
     ChipLogProgress(SetupPayload, "Discriminator: %u", payload.discriminator);
     ChipLogProgress(SetupPayload, "SetUpPINCode: %u", payload.setUpPINCode);
-    ChipLogProgress(SetupPayload, "RendezvousInformation: %u", payload.rendezvousInformation);
+    ChipLogProgress(SetupPayload, "RendezvousInformation: %u", payload.rendezvousInformation.Raw());
 
     if (payload.getSerialNumber(serialNumber) == CHIP_NO_ERROR)
     {

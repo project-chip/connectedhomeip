@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 
@@ -28,14 +27,10 @@ public:
     TestCommand(const char * commandName) : Command(commandName) {}
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
 
     virtual CHIP_ERROR NextTest() = 0;
 
 protected:
-    ChipDeviceCommissioner mCommissioner;
     ChipDevice * mDevice;
-
-private:
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 };

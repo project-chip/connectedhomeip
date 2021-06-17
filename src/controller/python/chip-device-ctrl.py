@@ -195,6 +195,8 @@ class DeviceMgrCmd(Cmd):
 
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
+
+        "get-fabricid",
     ]
 
     def parseline(self, line):
@@ -627,7 +629,7 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 2 and args[0] == '?':
                 if args[1] not in all_attrs:
                     raise exceptions.UnknownCluster(args[1])
-                print('\n'.join(all_attrs.get(args[1])))
+                print('\n'.join(all_attrs.get(args[1]).keys()))
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
@@ -637,6 +639,35 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("zclread")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading ZCL attribute:")
+            print(str(ex))
+        except Exception as ex:
+            print("An exception occurred during processing input:")
+            print(str(ex))
+
+    def do_zclwrite(self, line):
+        """
+        To write ZCL attribute:
+        zclwrite <cluster> <attribute> <nodeid> <endpoint> <groupid> <value>
+        """
+        try:
+            args = shlex.split(line)
+            all_attrs = self.devCtrl.ZCLAttributeList()
+            if len(args) == 1 and args[0] == '?':
+                print('\n'.join(all_attrs.keys()))
+            elif len(args) == 2 and args[0] == '?':
+                if args[1] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[1])
+                cluster_attrs = all_attrs.get(args[1], {})
+                print('\n'.join(["{}: {}".format(key, cluster_attrs[key]["type"]) for key in cluster_attrs.keys() if cluster_attrs[key].get("writable", False)]))
+            elif len(args) == 6:
+                if args[0] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[0])
+                self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), args[5])
+            else:
+                self.do_help("zclwrite")
+        except exceptions.ChipStackException as ex:
+            print("An exception occurred during writing ZCL attribute:")
             print(str(ex))
         except Exception as ex:
             print("An exception occurred during processing input:")
@@ -655,7 +686,8 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 2 and args[0] == '?':
                 if args[1] not in all_attrs:
                     raise exceptions.UnknownCluster(args[1])
-                print('\n'.join(all_attrs.get(args[1])))
+                cluster_attrs = all_attrs.get(args[1], {})
+                print('\n'.join([key for key in cluster_attrs.keys() if cluster_attrs[key].get("reportable", False)]))
             elif len(args) == 7:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
@@ -685,6 +717,28 @@ class DeviceMgrCmd(Cmd):
         Removed, use network commissioning cluster instead.
         """
         print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
+
+    def do_getfabricid(self, line):
+        """
+          get-fabricid
+
+          Read the current Fabric Id of the controller device, return 0 if not available.
+        """
+        try:
+            args = shlex.split(line)
+
+            if (len(args) > 0):
+                print("Unexpected argument: " + args[1])
+                return
+
+            fabricid = self.devCtrl.GetFabricId()
+        except exceptions.ChipStackException as ex:
+            print("An exception occurred during reading FabricID:")
+            print(str(ex))
+            return
+
+        print("Get fabric ID complete")
+        print("Fabric ID: " + hex(fabricid))
 
     def do_history(self, line):
         """

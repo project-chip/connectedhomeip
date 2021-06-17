@@ -33,6 +33,10 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#include <dispatch/dispatch.h>
+#endif
+
 namespace chip {
 namespace Inet {
 
@@ -109,6 +113,10 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR GetSocket(IPAddressType addrType);
     void HandlePendingIO();
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_source_t mReadableSource = nullptr;
+#endif
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 

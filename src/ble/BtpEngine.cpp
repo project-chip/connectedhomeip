@@ -173,12 +173,10 @@ bool BtpEngine::IsValidAck(SequenceNumber_t ack_num) const
 
 BLE_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
 {
-    BLE_ERROR err = BLE_NO_ERROR;
-
     ChipLogDebugBtpEngine(Ble, "entered HandleAckReceived, ack_num = %u", ack_num);
 
     // Ensure ack_num falls within range of ack values we're expecting.
-    VerifyOrExit(IsValidAck(ack_num), err = BLE_ERROR_INVALID_ACK);
+    VerifyOrReturnError(IsValidAck(ack_num), BLE_ERROR_INVALID_ACK);
 
     if (mTxNewestUnackedSeqNum == ack_num) // If ack is for newest outstanding unacknowledged fragment...
     {
@@ -194,23 +192,19 @@ BLE_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
         IncSeqNum(mTxOldestUnackedSeqNum);
     }
 
-exit:
-    return err;
+    return BLE_NO_ERROR;
 }
 
 // Calling convention:
 //   EncodeStandAloneAck may only be called if data arg is commited for immediate, synchronous subsequent transmission.
 BLE_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
 {
-    BLE_ERROR err = BLE_NO_ERROR;
-    uint8_t * characteristic;
-
     // Ensure enough headroom exists for the lower BLE layers.
-    VerifyOrExit(data->EnsureReservedSize(CHIP_CONFIG_BLE_PKT_RESERVED_SIZE), err = BLE_ERROR_NO_MEMORY);
+    VerifyOrReturnError(data->EnsureReservedSize(CHIP_CONFIG_BLE_PKT_RESERVED_SIZE), BLE_ERROR_NO_MEMORY);
 
     // Ensure enough space for standalone ack payload.
-    VerifyOrExit(data->MaxDataLength() >= kTransferProtocolStandaloneAckHeaderSize, err = BLE_ERROR_NO_MEMORY);
-    characteristic = data->Start();
+    VerifyOrReturnError(data->MaxDataLength() >= kTransferProtocolStandaloneAckHeaderSize, BLE_ERROR_NO_MEMORY);
+    uint8_t * characteristic = data->Start();
 
     // Since there's no preexisting message payload, we can write BTP header without adjusting data start pointer.
     characteristic[0] = static_cast<uint8_t>(HeaderFlags::kFragmentAck);
@@ -225,8 +219,7 @@ BLE_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
     // Set ack payload data length.
     data->SetDataLength(kTransferProtocolStandaloneAckHeaderSize);
 
-exit:
-    return err;
+    return BLE_NO_ERROR;
 }
 
 // Calling convention:
@@ -372,7 +365,7 @@ exit:
         mRxState = kState_Error;
 
         // Dump protocol engine state, plus header flags and received data length.
-        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %d, rx_flags = %u", err, rx_flags.Raw());
+        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %" BleErrorFormat ", rx_flags = %u", err, rx_flags.Raw());
         if (didReceiveAck)
         {
             ChipLogError(Ble, "With rx'd ack = %u", receivedAck);

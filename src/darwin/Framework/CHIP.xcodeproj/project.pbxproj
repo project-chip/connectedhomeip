@@ -51,6 +51,7 @@
 		991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0872475F47D00C13860 /* CHIPDeviceController.mm */; };
 		991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC08A247704DC00C13860 /* CHIPLogging.h */; };
 		9956064426420367000C28DE /* CHIPSetupPayload_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 9956064326420367000C28DE /* CHIPSetupPayload_Internal.h */; };
+		99C65E10267282F1003402F6 /* CHIPControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 99C65E0F267282F1003402F6 /* CHIPControllerTests.m */; };
 		B20252972459E34F00F97062 /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B202528D2459E34F00F97062 /* CHIP.framework */; };
 		B289D4212639C0D300D4E314 /* CHIPOnboardingPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B289D41F2639C0D300D4E314 /* CHIPOnboardingPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B289D4222639C0D300D4E314 /* CHIPOnboardingPayloadParser.m in Sources */ = {isa = PBXBuildFile; fileRef = B289D4202639C0D300D4E314 /* CHIPOnboardingPayloadParser.m */; };
@@ -97,7 +98,7 @@
 		1E85731C26551A490050A4D9 /* DataModelHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DataModelHandler.cpp; path = ../../../app/util/DataModelHandler.cpp; sourceTree = "<group>"; };
 		1E85731D26551A490050A4D9 /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = ../../../app/util/util.cpp; sourceTree = "<group>"; };
 		1E85731E26551A490050A4D9 /* ember-print.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-print.cpp"; path = "../../../app/util/ember-print.cpp"; sourceTree = "<group>"; };
-		1E85731F26551A490050A4D9 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size.cpp"; path = "../../../app/util/attribute-size.cpp"; sourceTree = "<group>"; };
+		1E85731F26551A490050A4D9 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size-util.cpp"; path = "../../../app/util/attribute-size-util.cpp"; sourceTree = "<group>"; };
 		1E85732026551A490050A4D9 /* process-cluster-message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "process-cluster-message.cpp"; path = "../../../app/util/process-cluster-message.cpp"; sourceTree = "<group>"; };
 		1E85732126551A490050A4D9 /* chip-message-send.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "chip-message-send.cpp"; path = "../../../app/util/chip-message-send.cpp"; sourceTree = "<group>"; };
 		1E85733226551A700050A4D9 /* reporting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = reporting.cpp; path = ../../../app/reporting/reporting.cpp; sourceTree = "<group>"; };
@@ -122,6 +123,7 @@
 		991DC0872475F47D00C13860 /* CHIPDeviceController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceController.mm; sourceTree = "<group>"; };
 		991DC08A247704DC00C13860 /* CHIPLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPLogging.h; sourceTree = "<group>"; };
 		9956064326420367000C28DE /* CHIPSetupPayload_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPSetupPayload_Internal.h; sourceTree = "<group>"; };
+		99C65E0F267282F1003402F6 /* CHIPControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPControllerTests.m; sourceTree = "<group>"; };
 		B202528D2459E34F00F97062 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20252912459E34F00F97062 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B20252962459E34F00F97062 /* CHIPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -264,6 +266,7 @@
 			isa = PBXGroup;
 			children = (
 				1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */,
+				99C65E0F267282F1003402F6 /* CHIPControllerTests.m */,
 				B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */,
 				B202529D2459E34F00F97062 /* Info.plist */,
 			);
@@ -470,6 +473,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1EB41B7B263C4CC60048E4C1 /* CHIPClustersTests.m in Sources */,
+				99C65E10267282F1003402F6 /* CHIPControllerTests.m in Sources */,
 				B2F53AF2245B0DCF0010745E /* CHIPSetupPayloadParserTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -720,8 +724,11 @@
 					"$(CHIP_ROOT)/src/app",
 					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					.,
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
+					"$(CHIP_ROOT)/src/app/util",
+					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
+					"$(CHIP_ROOT)/src/controller/data_model",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

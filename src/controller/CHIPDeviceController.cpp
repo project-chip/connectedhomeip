@@ -94,15 +94,10 @@ namespace Controller {
 
 using namespace chip::Encoding;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-constexpr uint16_t kMdnsPort = 5353;
-#endif
-
 constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
 constexpr uint32_t kMaxCHIPOpCertLength = 1024;
 constexpr uint32_t kMaxCHIPCSRLength    = 1024;
-constexpr uint32_t kOpCSRNonceLength    = 32;
 
 DeviceController::DeviceController()
 {
@@ -207,13 +202,11 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mExchangeMgr->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    if (params.mDeviceAddressUpdateDelegate != nullptr)
-    {
-        err = Mdns::Resolver::Instance().SetResolverDelegate(this);
-        SuccessOrExit(err);
+    err = Mdns::Resolver::Instance().SetResolverDelegate(this);
+    SuccessOrExit(err);
 
-        mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
-    }
+    RegisterDeviceAddressUpdateDelegate(params.mDeviceAddressUpdateDelegate);
+
     Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
@@ -293,15 +286,19 @@ CHIP_ERROR DeviceController::Shutdown()
     ChipLogDetail(Controller, "Shutting down the controller");
 
 #if CONFIG_DEVICE_LAYER
-    // Start by shutting down the PlatformManager.  This will ensure, with
-    // reasonable synchronization, that we stop processing of incoming messages
-    // before doing any other shutdown work.  Otherwise we can end up trying to
-    // process incoming messages in a partially shut down state, which is not
-    // great at all.
+    //
+    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
+    // expects to be called with external thread synchronization and will not try to acquire the
+    // stack lock.
+    //
+    // Actually stopping the event queue is a separable call that applications will have to sequence.
+    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
+    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
+    //
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
-    mInetLayer->Shutdown();
-    mSystemLayer->Shutdown();
+    VerifyOrReturnError(mInetLayer->Shutdown() == INET_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSystemLayer->Shutdown() == CHIP_SYSTEM_NO_ERROR, CHIP_ERROR_INTERNAL);
     chip::Platform::Delete(mInetLayer);
     chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
@@ -310,6 +307,10 @@ CHIP_ERROR DeviceController::Shutdown()
     mInetLayer   = nullptr;
 
     mState = State::NotInitialized;
+
+    // Shut down the interaction model before we try shuttting down the exchange
+    // manager.
+    app::InteractionModelEngine::GetInstance()->Shutdown();
 
     // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
     // if (mExchangeMgr != nullptr)
@@ -509,6 +510,16 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceController::GetFabricId(uint64_t & fabricId)
+{
+    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
+    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    fabricId = admin->GetFabricId();
+
+    return CHIP_NO_ERROR;
+}
+
 void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
@@ -668,7 +679,7 @@ exit:
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to initialize the device list with error: %d\n", err);
+        ChipLogError(Controller, "Failed to initialize the device list with error: %" PRId32, err);
     }
 
     return err;
@@ -680,7 +691,8 @@ CHIP_ERROR DeviceController::SetPairedDeviceList(ByteSpan serialized)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to recreate the device list with buffer %s\n", serialized);
+        ChipLogError(Controller, "Failed to recreate the device list with buffer %.*s\n", static_cast<int>(serialized.size()),
+                     serialized.data());
     }
     else
     {
@@ -730,32 +742,6 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
     }
 };
-
-void DeviceController::OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData)
-{
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
-    {
-        if (!mCommissionableNodes[i].IsValid())
-        {
-            continue;
-        }
-        if (strcmp(mCommissionableNodes[i].hostName, nodeData.hostName) == 0)
-        {
-            mCommissionableNodes[i] = nodeData;
-            return;
-        }
-    }
-    // Didn't find the host name already in our list, return an invalid
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
-    {
-        if (!mCommissionableNodes[i].IsValid())
-        {
-            mCommissionableNodes[i] = nodeData;
-            return;
-        }
-    }
-    ChipLogError(Discovery, "Failed to add discovered commissionable node with hostname %s- Insufficient space", nodeData.hostName);
-}
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
@@ -1100,10 +1086,10 @@ void DeviceCommissioner::OnSessionEstablished()
 
     if (sendOperationalCertsImmediately)
     {
-        err = SendOperationalCertificateSigningRequestCommand(device);
+        err = SendTrustedRootCertificate(device);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Ble, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+            ChipLogError(Ble, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }
@@ -1124,10 +1110,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
-    uint8_t CSRNonce[kOpCSRNonceLength];
-    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(CSRNonce, sizeof(CSRNonce)));
-
-    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, ByteSpan(CSRNonce, sizeof(CSRNonce))));
+    ReturnErrorOnFailure(device->GenerateCSRNonce());
+    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
 }
@@ -1170,52 +1154,56 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> opCert;
-    ReturnErrorCodeIf(!opCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+    // TODO: Verify the OpCSR signature using pubkey from DAC
+    //       This will be done when device attestation is implemented.
 
-    // TODO: Validate CSR Nonce and signature
+    // Verify that Nonce matches with what we sent
+    const ByteSpan nonce = device->GetCSRNonce();
+    VerifyOrReturnError(CSRNonce.size() == nonce.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(memcmp(CSRNonce.data(), nonce.data(), CSRNonce.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint32_t opCertLen = 0;
-    ChipLogProgress(Controller, "Generating operational certificate for device %llx", device->GetDeviceId());
+    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+    ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t nocLen = 0;
+    ChipLogProgress(Controller, "Generating operational certificate for device " ChipLogFormatX64,
+                    ChipLogValueX64(device->GetDeviceId()));
     ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
-        PeerId().SetNodeId(device->GetDeviceId()), CSR, 1, opCert.Get(), kMaxCHIPOpCertLength, opCertLen));
+        PeerId().SetNodeId(device->GetDeviceId()), CSR, 1, noc.Get(), kMaxCHIPOpCertLength, nocLen));
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> issuerCert;
-    ReturnErrorCodeIf(!issuerCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(nocLen == 0, CHIP_ERROR_CERT_NOT_FOUND);
 
+    chip::Platform::ScopedMemoryBuffer<uint8_t> ica;
+    ReturnErrorCodeIf(!ica.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t icaLen = 0;
     ChipLogProgress(Controller, "Getting intermediate CA certificate from the issuer");
-    uint32_t issuerCertLen = 0;
-    CHIP_ERROR err =
-        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, issuerCert.Get(), kMaxCHIPOpCertLength, issuerCertLen);
-    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %d", err);
+    CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, ica.Get(), kMaxCHIPOpCertLength, icaLen);
+    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" PRId32, err);
     if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
         // This implies that the commissioner application uses root CA to sign the operational
         // certificates, and an intermediate CA is not needed. It's not an error condition, so
         // let's just send operational certificate and root CA certificate to the device.
-        err           = CHIP_NO_ERROR;
-        issuerCertLen = 0;
+        err    = CHIP_NO_ERROR;
+        icaLen = 0;
         ChipLogProgress(Controller, "Intermediate CA is not needed");
     }
     ReturnErrorOnFailure(err);
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> chipOpCert;
+    ReturnErrorCodeIf(!chipOpCert.Alloc(kMaxCHIPOpCertLength * 2), CHIP_ERROR_NO_MEMORY);
+    uint32_t chipOpCertLen = 0;
+    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(noc.Get(), nocLen), ByteSpan(ica.Get(), icaLen), chipOpCert.Get(),
+                                                         kMaxCHIPOpCertLength * 2, chipOpCertLen));
 
-    ReturnErrorCodeIf(!chipCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(ConvertX509CertToChipCert(opCert.Get(), opCertLen, chipCert.Get(), kMaxCHIPOpCertLength, opCertLen));
-
-    // TODO - convert ICA cert to ChipCert format and send it to the device.
-
-    ChipLogProgress(Controller, "Sending operational certificate to the device. Op Cert Len %d, ICA Cert Len %d", opCertLen,
-                    issuerCertLen);
-    ReturnErrorOnFailure(
-        SendOperationalCertificate(device, ByteSpan(chipCert.Get(), opCertLen), ByteSpan(issuerCert.Get(), issuerCertLen)));
+    ChipLogProgress(Controller, "Sending operational certificate to the device. Op Cert Len %" PRIu32, chipOpCertLen);
+    ReturnErrorOnFailure(SendOperationalCertificate(device, ByteSpan(chipOpCert.Get(), chipOpCertLen)));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf)
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
@@ -1224,8 +1212,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(
-        cluster.AddOpCert(successCallback, failureCallback, opCertBuf, icaCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, 0));
+    ReturnErrorOnFailure(cluster.AddOpCert(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, 0));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1260,7 +1247,7 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uin
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
-    err = commissioner->SendTrustedRootCertificate(device);
+    err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1282,7 +1269,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
 
     ChipLogProgress(Controller, "Sending root certificate to the device");
 
-    chip::Controller::TrustedRootCertificatesCluster cluster;
+    chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
     Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
@@ -1312,7 +1299,7 @@ void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
-    err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
+    err = commissioner->SendOperationalCertificateSigningRequestCommand(device);
     SuccessOrExit(err);
 
 exit:
@@ -1418,32 +1405,27 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
 {
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if ((err = SetUpNodeDiscovery()) == CHIP_NO_ERROR)
     {
-        mCommissionableNodes[i].Reset();
+        return chip::Mdns::Resolver::Instance().FindCommissionableNodes();
     }
-    return Mdns::Resolver::Instance().FindCommissionableNodes();
+    return err;
 }
 
 CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
 {
-    // TODO(cecille): Add assertion about main loop.
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if ((err = SetUpNodeDiscoveryLongDiscriminator(long_discriminator)) == CHIP_NO_ERROR)
     {
-        mCommissionableNodes[i].Reset();
+        return chip::Mdns::Resolver::Instance().FindCommissionableNodes(filter);
     }
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
-    return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+    return err;
 }
 
-const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
+const Mdns::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
 {
-    // TODO(cecille): Add assertion about main loop.
-    if (mCommissionableNodes[idx].IsValid())
-    {
-        return &mCommissionableNodes[idx];
-    }
-    return nullptr;
+    return GetDiscoveredNode(idx);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
@@ -1452,17 +1434,15 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
     const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
     chip::CommandId aCommandId, uint8_t aCommandIndex)
 {
-    // #6308, #6559: Invoking success Callbacks in `CommandResponseProcessed` is not desired, but this is used to met current
-    // requirement of current callback framework that we should be able to send another command once ResponseCallback is called. By
-    // resolving #6308, the app can wait for the right event, and by #6559 the app can send command in a now command sender.
-    VerifyOrReturnError(aProtocolCode != 0, CHIP_NO_ERROR);
-
     // Generally IM has more detailed errors than ember library, here we always use the, the actual handling of the
     // commands should implement full IMDelegate.
     // #6308 By implement app side IM delegate, we should be able to accept detailed error codes.
     // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
     // instead of IM status code.
-    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_FAILURE);
+    IMDefaultResponseCallback(apCommandSender,
+                              (aProtocolCode == 0 && aGeneralCode == Protocols::SecureChannel::GeneralStatusCode::kSuccess)
+                                  ? EMBER_ZCL_STATUS_SUCCESS
+                                  : EMBER_ZCL_STATUS_FAILURE);
 
     return CHIP_NO_ERROR;
 }
@@ -1495,11 +1475,8 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseError(const 
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(const app::CommandSender * apCommandSender)
 {
-    // #6308, #6559: Invoking Callbacks in `CommandResponseProcessed` is not desired, but this is used to met current requirement of
-    // current callback framework that we should be able to send another command once ResponseCallback is called.
-    // By resolving #6308, the app can wait for the right event, and by #6559 the app can send command in a now command sender.
-    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_SUCCESS);
-
+    // No thing is needed in this case. The success callback is called in CommandResponseStatus, and failure callback is called in
+    // CommandResponseStatus, CommandResponseProtocolError and CommandResponseError.
     return CHIP_NO_ERROR;
 }
 void BasicSuccess(void * context, uint16_t val)
@@ -1670,10 +1647,10 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Exchanging certificates");
         // TODO(cecille): Once this is implemented through the clusters, it should be moved to the proper stage and the callback
         // should advance the commissioning stage
-        CHIP_ERROR status = SendOperationalCertificateSigningRequestCommand(device);
+        CHIP_ERROR status = SendTrustedRootCertificate(device);
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+            ChipLogError(Controller, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }

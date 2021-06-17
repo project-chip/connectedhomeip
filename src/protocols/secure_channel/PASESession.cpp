@@ -328,8 +328,9 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "PASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt == nullptr || mExchangeCtxt == ec,
                    ChipLogError(SecureChannel, "PASESession::OnResponseTimeout exchange doesn't match"));
-    ChipLogError(SecureChannel, "PASESession timed out while waiting for a response from the peer. Expected message type was %d",
-                 mNextExpectedMsg);
+    ChipLogError(SecureChannel,
+                 "PASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
+                 static_cast<std::underlying_type_t<decltype(mNextExpectedMsg)>>(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
     Clear();
 }
@@ -617,6 +618,19 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
     verifier_len = static_cast<uint16_t>(verifier_len_raw);
 
     {
+        const uint8_t * hash = &buf[kMAX_Point_Length];
+        err                  = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
+        if (err != CHIP_NO_ERROR)
+        {
+            spake2pErr = Spake2pErrorType::kInvalidKeyConfirmation;
+            SuccessOrExit(err);
+        }
+
+        err = mSpake2p.GetKeys(mKe, &mKeLen);
+        SuccessOrExit(err);
+    }
+
+    {
         Encoding::PacketBufferWriter bbuf(System::PacketBufferHandle::New(verifier_len));
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
@@ -629,19 +643,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
     }
 
     ChipLogDetail(SecureChannel, "Sent spake2p msg3");
-
-    {
-        const uint8_t * hash = &buf[kMAX_Point_Length];
-        err                  = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
-        if (err != CHIP_NO_ERROR)
-        {
-            spake2pErr = Spake2pErrorType::kInvalidKeyConfirmation;
-            SuccessOrExit(err);
-        }
-
-        err = mSpake2p.GetKeys(mKe, &mKeLen);
-        SuccessOrExit(err);
-    }
 
     mPairingComplete = true;
 

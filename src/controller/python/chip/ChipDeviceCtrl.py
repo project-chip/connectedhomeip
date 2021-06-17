@@ -205,6 +205,19 @@ class ChipDeviceController(object):
             lambda: self._dmLib.pychip_DeviceController_DiscoverAllCommissioning(self.devCtrl)
         )
 
+    def GetFabricId(self):
+        fabricid = c_uint64(0)
+
+        error = self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetFabricId(
+                self.devCtrl, pointer(fabricid))
+        )
+
+        if error == 0:
+            return fabricid.value
+        else:
+            return 0
+
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = c_void_p(None)
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
@@ -229,6 +242,17 @@ class ChipDeviceController(object):
         # We are not using IM for Attributes.
         res = self._Cluster.ReadAttribute(
             device, cluster, attribute, endpoint, groupid, False)
+
+    def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
+        device = c_void_p(None)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
+            self.devCtrl, nodeid, pointer(device)))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
+        # We are not using IM for Attributes.
+        res = self._Cluster.WriteAttribute(
+            device, cluster, attribute, endpoint, groupid, value, False)
 
     def ZCLConfigureAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, change, blocking=True):
         device = c_void_p(None)
@@ -325,3 +349,6 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
             self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
+
+            self._dmLib.pychip_DeviceController_GetFabricId.argtypes = [c_void_p, POINTER(c_uint64)]
+            self._dmLib.pychip_DeviceController_GetFabricId.restype = c_uint32

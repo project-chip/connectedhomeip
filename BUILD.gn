@@ -218,7 +218,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_efr32_lock_app_build = enable_efr32_builds
 
     # Build the qpg6100 lock app example.
-    enable_qpg6100_lock_app_build = enable_qpg6100_builds
+    enable_qpg6100_lock_app_build = enable_qpg6100_builds && !is_debug
 
     # Build the efr32 lighting app example.
     enable_efr32_lighting_app_build = enable_efr32_builds
@@ -226,8 +226,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Build the efr32 window app example.
     enable_efr32_window_app_build = enable_efr32_builds
 
+    # Build the k32w lighting app example.
+    enable_k32w_lighting_app_build = enable_k32w_builds
+
     # Build the k32w lock app example.
     enable_k32w_lock_app_build = enable_k32w_builds
+
+    # Build the k32w shell app example.
+    enable_k32w_shell_app_build = enable_k32w_builds
   }
 
   if (enable_host_clang_build) {
@@ -348,9 +354,21 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  if (enable_k32w_lighting_app_build) {
+    group("k32w_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
+    }
+  }
+
   if (enable_k32w_lock_app_build) {
     group("k32w_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+    }
+  }
+
+  if (enable_k32w_shell_app_build) {
+    group("k32w_shell_app") {
+      deps = [ "${chip_root}/examples/shell/k32w(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
     }
   }
 
@@ -403,8 +421,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (enable_efr32_window_app_build) {
       deps += [ ":efr32_window_app" ]
     }
+    if (enable_k32w_lighting_app_build) {
+      deps += [ ":k32w_lighting_app" ]
+    }
     if (enable_k32w_lock_app_build) {
       deps += [ ":k32w_lock_app" ]
+    }
+    if (enable_k32w_shell_app_build) {
+      deps += [ ":k32w_shell_app" ]
     }
     if (enable_qpg6100_lock_app_build) {
       deps += [ ":qpg6100_lock_app" ]

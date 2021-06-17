@@ -475,44 +475,44 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
 
     ChipLogProgress(DeviceLayer,
                     "Rx Counters:\n"
-                    "PHY Rx Total:                 %d\n"
-                    "MAC Rx Unicast:               %d\n"
-                    "MAC Rx Broadcast:             %d\n"
-                    "MAC Rx Data:                  %d\n"
-                    "MAC Rx Data Polls:            %d\n"
-                    "MAC Rx Beacons:               %d\n"
-                    "MAC Rx Beacon Reqs:           %d\n"
-                    "MAC Rx Other:                 %d\n"
-                    "MAC Rx Filtered Whitelist:    %d\n"
-                    "MAC Rx Filtered DestAddr:     %d\n",
+                    "PHY Rx Total:                 %" PRIu32 "\n"
+                    "MAC Rx Unicast:               %" PRIu32 "\n"
+                    "MAC Rx Broadcast:             %" PRIu32 "\n"
+                    "MAC Rx Data:                  %" PRIu32 "\n"
+                    "MAC Rx Data Polls:            %" PRIu32 "\n"
+                    "MAC Rx Beacons:               %" PRIu32 "\n"
+                    "MAC Rx Beacon Reqs:           %" PRIu32 "\n"
+                    "MAC Rx Other:                 %" PRIu32 "\n"
+                    "MAC Rx Filtered Whitelist:    %" PRIu32 "\n"
+                    "MAC Rx Filtered DestAddr:     %" PRIu32 "\n",
                     macCounters->mRxTotal, macCounters->mRxUnicast, macCounters->mRxBroadcast, macCounters->mRxData,
                     macCounters->mRxDataPoll, macCounters->mRxBeacon, macCounters->mRxBeaconRequest, macCounters->mRxOther,
                     macCounters->mRxAddressFiltered, macCounters->mRxDestAddrFiltered);
 
     ChipLogProgress(DeviceLayer,
                     "Tx Counters:\n"
-                    "PHY Tx Total:                 %d\n"
-                    "MAC Tx Unicast:               %d\n"
-                    "MAC Tx Broadcast:             %d\n"
-                    "MAC Tx Data:                  %d\n"
-                    "MAC Tx Data Polls:            %d\n"
-                    "MAC Tx Beacons:               %d\n"
-                    "MAC Tx Beacon Reqs:           %d\n"
-                    "MAC Tx Other:                 %d\n"
-                    "MAC Tx Retry:                 %d\n"
-                    "MAC Tx CCA Fail:              %d\n",
+                    "PHY Tx Total:                 %" PRIu32 "\n"
+                    "MAC Tx Unicast:               %" PRIu32 "\n"
+                    "MAC Tx Broadcast:             %" PRIu32 "\n"
+                    "MAC Tx Data:                  %" PRIu32 "\n"
+                    "MAC Tx Data Polls:            %" PRIu32 "\n"
+                    "MAC Tx Beacons:               %" PRIu32 "\n"
+                    "MAC Tx Beacon Reqs:           %" PRIu32 "\n"
+                    "MAC Tx Other:                 %" PRIu32 "\n"
+                    "MAC Tx Retry:                 %" PRIu32 "\n"
+                    "MAC Tx CCA Fail:              %" PRIu32 "\n",
                     macCounters->mTxTotal, macCounters->mTxUnicast, macCounters->mTxBroadcast, macCounters->mTxData,
                     macCounters->mTxDataPoll, macCounters->mTxBeacon, macCounters->mTxBeaconRequest, macCounters->mTxOther,
                     macCounters->mTxRetry, macCounters->mTxErrCca);
 
     ChipLogProgress(DeviceLayer,
                     "Failure Counters:\n"
-                    "MAC Rx Decrypt Fail:          %d\n"
-                    "MAC Rx No Frame Fail:         %d\n"
-                    "MAC Rx Unknown Neighbor Fail: %d\n"
-                    "MAC Rx Invalid Src Addr Fail: %d\n"
-                    "MAC Rx FCS Fail:              %d\n"
-                    "MAC Rx Other Fail:            %d\n",
+                    "MAC Rx Decrypt Fail:          %" PRIu32 "\n"
+                    "MAC Rx No Frame Fail:         %" PRIu32 "\n"
+                    "MAC Rx Unknown Neighbor Fail: %" PRIu32 "\n"
+                    "MAC Rx Invalid Src Addr Fail: %" PRIu32 "\n"
+                    "MAC Rx FCS Fail:              %" PRIu32 "\n"
+                    "MAC Rx Other Fail:            %" PRIu32 "\n",
                     macCounters->mRxErrSec, macCounters->mRxErrNoFrame, macCounters->mRxErrUnknownNeighbor,
                     macCounters->mRxErrInvalidSrcAddr, macCounters->mRxErrFcs, macCounters->mRxErrOther);
 
@@ -520,10 +520,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
 
     ChipLogProgress(DeviceLayer,
                     "IP Counters:\n"
-                    "IP Tx Success:                %d\n"
-                    "IP Rx Success:                %d\n"
-                    "IP Tx Fail:                   %d\n"
-                    "IP Rx Fail:                   %d\n",
+                    "IP Tx Success:                %" PRIu32 "\n"
+                    "IP Rx Success:                %" PRIu32 "\n"
+                    "IP Tx Fail:                   %" PRIu32 "\n"
+                    "IP Rx Fail:                   %" PRIu32 "\n",
                     ipCounters->mTxSuccess, ipCounters->mRxSuccess, ipCounters->mTxFailure, ipCounters->mRxFailure);
 
     Impl()->UnlockThreadStack();
@@ -574,7 +574,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                     "Leader Router ID: %u\n"
                     "Parent Avg RSSI:  %d\n"
                     "Parent Last RSSI: %d\n"
-                    "Partition ID:     %d\n"
+                    "Partition ID:     %" PRIu32 "\n"
                     "Extended Address: %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
                     "Instant RSSI:     %d\n",
                     rloc16, routerId, leaderRouterId, parentAverageRssi, parentLastRssi, partitionId, extAddress->m8[0],
@@ -586,7 +586,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %d", err);
+        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %" PRId32, err);
     }
 
     return err;
@@ -682,7 +682,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                     "Network Data Version:          %d\n"
                     "Stable Network Data Version:   %d\n"
                     "Extended Address:              %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
-                    "Partition ID:                  %X\n"
+                    "Partition ID:                  %" PRIx32 "\n"
                     "Instant RSSI:                  %d\n"
                     "Neighbor Table Length:         %d\n"
                     "Child Table Length:            %d\n",
@@ -715,14 +715,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
         }
 
         ChipLogProgress(DeviceLayer,
-                        "TopoEntry[%u]:     %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
+                        "TopoEntry[%" PRIu32 "]:     %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
                         "RLOC:              %04X\n"
-                        "Age:               %3d\n"
+                        "Age:               %3" PRIu32 "\n"
                         "LQI:               %1d\n"
                         "AvgRSSI:           %3d\n"
                         "LastRSSI:          %3d\n"
-                        "LinkFrameCounter:  %10d\n"
-                        "MleFrameCounter:   %10d\n"
+                        "LinkFrameCounter:  %10" PRIu32 "\n"
+                        "MleFrameCounter:   %10" PRIu32 "\n"
                         "RxOnWhenIdle:      %c\n"
                         "FullFunction:      %c\n"
                         "FullNetworkData:   %c\n"
@@ -740,7 +740,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", err);
+        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", ErrorStr(err));
     }
     return err;
 }
@@ -980,7 +980,7 @@ exit:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-static_assert(OPENTHREAD_API_VERSION >= 80, "SRP Client requires a more recent OpenThread version");
+static_assert(OPENTHREAD_API_VERSION >= 120, "SRP Client requires a more recent OpenThread version");
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotification(otError aError,
@@ -1092,8 +1092,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
         }
         else
         {
-            VerifyOrExit((strcmp(service.mInstanceName, aInstanceName) != 0) || (strcmp(service.mName, aName) != 0),
-                         error = MapOpenThreadError(OT_ERROR_DUPLICATED));
+            if ((strcmp(service.mInstanceName, aInstanceName) == 0) && (strcmp(service.mName, aName) == 0))
+            {
+                VerifyOrExit(MapOpenThreadError(otSrpClientClearService(mOTInst, &(service.mService))) == CHIP_NO_ERROR,
+                             error = MapOpenThreadError(OT_ERROR_FAILED));
+
+                // Free memory immediately, as OnSrpClientNotification will not be called.
+                memset(&service, 0, sizeof(service));
+            }
         }
     }
 

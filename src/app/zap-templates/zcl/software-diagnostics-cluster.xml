@@ -18,11 +18,11 @@ limitations under the License.
   <domain name="CHIP"/>
   <struct name="ThreadMetrics">
     <item name="Id" type="INT64U"/>
-    // TODO: CHAR_STRING not supported yet in structs.
+    <!-- TODO: CHAR_STRING not supported yet in structs. -->
     <item name="Name" type="OCTET_STRING" length="8"/>
     <item name="StackFreeCurrent" type="INT32U"/>
     <item name="StackFreeMinimum" type="INT32U"/>
-    <item name="StackSize" type="INT32U"/>                
+    <item name="StackSize" type="INT32U"/>
   </struct>
   <cluster>
     <domain>General</domain>
@@ -33,9 +33,9 @@ limitations under the License.
     <attribute side="server" code="0x00" define="THREAD_METRICS" type="ARRAY" entryType="ThreadMetrics" length="254" writable="false" optional="true">ThreadMetrics</attribute>
     <attribute side="server" code="0x01" define="CURRENT_HEAP_FREE" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapFree</attribute>
     <attribute side="server" code="0x02" define="CURRENT_HEAP_USED" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapUsed</attribute>
-    <attribute side="server" code="0x03" define="CURRENT_HEAP_HIGH_WATERMARK" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="false">CurrentHeapHighWatermark</attribute>                  
+    <attribute side="server" code="0x03" define="CURRENT_HEAP_HIGH_WATERMARK" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="false">CurrentHeapHighWatermark</attribute>
     <command source="client" code="0x00" name="ResetWatermarks" optional="false" cli="chip software_diagnostics resetwatermarks">
       <description>Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute</description>
-    </command>           
+    </command>
   </cluster>
 </configurator>

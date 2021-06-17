@@ -95,7 +95,7 @@ public:
         BroadcastIpAddresses::GetIpv4Into(mIpv4BroadcastAddress);
 #endif
     }
-    ~ServerBase();
+    virtual ~ServerBase();
 
     /// Closes all currently open endpoints
     void Shutdown();
@@ -107,14 +107,14 @@ public:
     CHIP_ERROR Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port);
 
     /// Send the specified packet to a destination IP address over the specified address
-    CHIP_ERROR DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
-                          chip::Inet::InterfaceId interface);
+    virtual CHIP_ERROR DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
+                                  chip::Inet::InterfaceId interface);
 
     /// Send a specific packet broadcast to all interfaces
-    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port);
+    virtual CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port);
 
     /// Send a specific packet broadcast to a specific interface
-    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface);
+    virtual CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface);
 
     ServerBase & SetDelegate(ServerDelegate * d)
     {

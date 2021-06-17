@@ -278,9 +278,9 @@ public:
  */
 struct CertificateKeyId
 {
-    const uint8_t * mId; /**< Pointer to the key identifier. Encoded as Octet String and represented as the ASN.1 DER Integer (X.690
-                            standard). */
-    uint8_t mLen;        /**< Key identifier length. */
+    const uint8_t * mId = nullptr; /**< Pointer to the key identifier. Encoded as Octet String and represented as the ASN.1 DER
+                                        Integer (X.690 standard). */
+    uint8_t mLen = 0;              /**< Key identifier length. */
 
     bool IsEqual(const CertificateKeyId & other) const;
     bool IsEmpty() const { return mId == nullptr; }
@@ -631,6 +631,27 @@ CHIP_ERROR DecodeChipDN(chip::TLV::TLVReader & reader, ChipDN & dn);
  **/
 CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509CertLen, uint8_t * chipCertBuf,
                                      uint32_t chipCertBufSize, uint32_t & chipCertLen);
+
+/**
+ * @brief Convert standard X.509 certificates to CHIP certificate array.
+ *        This function takes NOC, and ICA cert X.509 certificates and
+ *        encodes into CHIP certificate array.
+ *
+ *        NOC certificate must be provided.
+ *        ICA certificate is optional. It can be omitted by providing a 0 length ByteSpan.
+ *
+ *        The API enforces that the NOC is issued by ICA (if ICA is provided).
+ *
+ * @param x509NOC              Node operational credentials certificate in X.509 DER encoding.
+ * @param x509ICAC             Intermediate CA certificate in X.509 DER encoding.
+ * @param chipCertArrayBuf     Buffer to store converted certificates in CHIP format.
+ * @param chipCertArrayBufSize The size of the buffer to store converted certificates.
+ * @param chipCertBufLen[out]  The length of the converted certificates.
+ *
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteSpan & x509ICAC, uint8_t * chipCertArrayBuf,
+                                           uint32_t chipCertArrayBufSize, uint32_t & chipCertBufLen);
 
 /**
  * @brief Convert CHIP certificate to the standard X.509 DER encoded certificate.

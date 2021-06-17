@@ -79,7 +79,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving data from clusterId: %08x, err = %d", aClusterInfo.mClusterId, err);
+        ChipLogError(DataManagement, "Error retrieving data from clusterId: %08x, err = %" PRId32, aClusterInfo.mClusterId, err);
     }
 
     return err;
@@ -212,12 +212,12 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportD
     SuccessOrExit(err = eventList.GetError());
 
     eventCount = CountEvents(apReadHandler, initialEvents);
-    ChipLogDetail(DataManagement, "Fetched %d events", eventCount);
+    ChipLogDetail(DataManagement, "Fetched 0x" ChipLogFormatX64 " events", ChipLogValueX64(eventCount));
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving events, err = %d", err);
+        ChipLogError(DataManagement, "Error retrieving events, err = %" PRId32, err);
     }
 
     return err;
@@ -276,9 +276,9 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     ChipLogDetail(DataManagement, "<RE> Sending report...");
     err = SendReport(apReadHandler, std::move(bufHandle));
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DataManagement, "<RE> Error sending out report data with %d!", err));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DataManagement, "<RE> Error sending out report data with %" PRId32 "!", err));
 
-    ChipLogDetail(DataManagement, "<RE> ReportsInFlight = %u with readHandler %u, RE has %s", mNumReportsInFlight,
+    ChipLogDetail(DataManagement, "<RE> ReportsInFlight = %" PRIu32 " with readHandler %" PRIu32 ", RE has %s", mNumReportsInFlight,
                   mCurReadHandlerIdx, mMoreChunkedMessages ? "more messages" : "no more messages");
 
     if (!mMoreChunkedMessages)
@@ -355,7 +355,7 @@ void Engine::OnReportConfirm()
     VerifyOrDie(mNumReportsInFlight > 0);
 
     mNumReportsInFlight--;
-    ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %d", mNumReportsInFlight);
+    ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);
 }
 
 }; // namespace reporting

@@ -19,6 +19,7 @@
 #pragma once
 
 #include "DiscoverCommand.h"
+#include "DiscoverCommissionersCommand.h"
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <mdns/Resolver.h>
 
@@ -54,7 +55,7 @@ public:
         ChipLogProgress(chipTool, "NodeId Resolution: failed!");
         SetCommandExitStatus(false);
     }
-    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override {}
+    void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override {}
 };
 
 class Update : public DiscoverCommand
@@ -66,9 +67,9 @@ public:
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
         ChipDevice * device;
-        ReturnErrorOnFailure(mCommissioner.GetDevice(remoteId, &device));
+        ReturnErrorOnFailure(GetExecContext()->commissioner->GetDevice(remoteId, &device));
         ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return mCommissioner.UpdateDevice(device, fabricId);
+        return GetExecContext()->commissioner->UpdateDevice(device, fabricId);
     }
 
     /////////// DeviceAddressUpdateDelegate Interface /////////
@@ -94,6 +95,7 @@ void registerCommandsDiscover(Commands & commands)
     commands_list clusterCommands = {
         make_unique<Resolve>(),
         make_unique<Update>(),
+        make_unique<DiscoverCommissionersCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);
