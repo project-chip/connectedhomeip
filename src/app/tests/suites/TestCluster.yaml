@@ -599,4 +599,3 @@ tests:
       attribute: "octet_string"
       arguments:
           value: ""
-
