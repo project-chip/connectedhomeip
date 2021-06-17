@@ -17,7 +17,9 @@ source $CHIP_DIR/scripts/tests/mbed/common.sh
 echo "Downloading artifact from $GITHUB_ACTION_ID action in $GITHUB_REPOSITORY"
 download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN binaries
 
+cat devices.json
 targer_number=$(cat devices.json | jq length)
+echo $targer_number
 
 for index in $(eval echo "{0..$(($target_number - 1))}"); do
     platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
