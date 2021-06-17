@@ -29,6 +29,7 @@
 #endif
 
 #include <inttypes.h>
+#include <memory>
 
 #include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/ReliableMessageContext.h>
@@ -76,25 +77,22 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
 
         // Add to Table for subsequent sending
         ReturnErrorOnFailure(reliableMessageMgr->AddToRetransTable(reliableMessageContext, &entry));
+        auto deleter = [reliableMessageMgr](ReliableMessageMgr::RetransTableEntry * e) {
+            reliableMessageMgr->ClearRetransTable(*e);
+        };
+        std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
 
-        CHIP_ERROR err = SendMessageImpl(session, payloadHeader, std::move(message), &entry->retainedBuf);
-        if (err != CHIP_NO_ERROR)
-        {
-            // Remove from table
-            ChipLogError(ExchangeManager, "Failed to send message with err %s", ::chip::ErrorStr(err));
-            reliableMessageMgr->ClearRetransTable(*entry);
-            ReturnErrorOnFailure(err);
-        }
-        else
-        {
-            reliableMessageMgr->StartRetransmision(entry);
-        }
+        ReturnErrorOnFailure(PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
+        ReturnErrorOnFailure(SendPreparedMessage(session, entryOwner->retainedBuf));
+        reliableMessageMgr->StartRetransmision(entryOwner.release());
     }
     else
     {
         // If the channel itself is providing reliability, let's not request MRP acks
         payloadHeader.SetNeedsAck(false);
-        ReturnErrorOnFailure(SendMessageImpl(session, payloadHeader, std::move(message), nullptr));
+        EncryptedPacketBufferHandle preparedMessage;
+        ReturnErrorOnFailure(PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
+        ReturnErrorOnFailure(SendPreparedMessage(session, preparedMessage));
     }
 
     return CHIP_NO_ERROR;

@@ -24,6 +24,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
@@ -386,7 +387,8 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     service.mTextEntries   = sdCtx->textEntries.empty() ? nullptr : sdCtx->textEntries.data();
     service.mTextEntrySize = sdCtx->textEntries.empty() ? 0 : sdCtx->textEntries.size();
     service.mAddress.SetValue(chip::Inet::IPAddress::FromSockAddr(*address));
-    strncpy(service.mName, sdCtx->name, sizeof(service.mName));
+    Platform::CopyString(service.mName, sdCtx->name);
+    Platform::CopyString(service.mHostName, hostname);
     service.mInterface = sdCtx->interfaceId;
 
     sdCtx->callback(sdCtx->context, &service, CHIP_NO_ERROR);

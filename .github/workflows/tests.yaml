@@ -19,6 +19,10 @@ on:
     pull_request:
     workflow_dispatch:
 
+concurrency:
+    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
@@ -145,8 +149,7 @@ jobs:
             - name: Run Test Suites
               timeout-minutes: 5
               run: |
-                  # Force 1 iteration for now until we sort out our threading issues.
-                  scripts/tests/test_suites.sh 1
+                  scripts/tests/test_suites.sh
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}

@@ -333,6 +333,7 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_SETPOINT_RAISE_LOWER_COMMAND_ID (0x00)
 
 #define THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID 0x0035
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
 #define WAKE_ON_LAN_CLUSTER_ID 0x0503
 
@@ -2955,6 +2956,11 @@ PacketBufferHandle encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttrib
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * OnOff                                                             | 0x0000 |
+| * GlobalSceneControl                                                | 0x4000 |
+| * OnTime                                                            | 0x4001 |
+| * OffWaitTime                                                       | 0x4002 |
+| * StartUpOnOff                                                      | 0x4003 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -2987,6 +2993,93 @@ PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, End
         .Put8(16)
         .Put16(minInterval)
         .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute GlobalSceneControl
+ */
+PacketBufferHandle encodeOnOffClusterReadGlobalSceneControlAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffGlobalSceneControl", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OnTime
+ */
+PacketBufferHandle encodeOnOffClusterReadOnTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffOnTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4001);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOnOffClusterWriteOnTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t onTime)
+{
+    COMMAND_HEADER("WriteOnOffOnTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x4001)
+        .Put8(33)
+        .Put16(static_cast<uint16_t>(onTime));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OffWaitTime
+ */
+PacketBufferHandle encodeOnOffClusterReadOffWaitTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffOffWaitTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4002);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOnOffClusterWriteOffWaitTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t offWaitTime)
+{
+    COMMAND_HEADER("WriteOnOffOffWaitTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x4002)
+        .Put8(33)
+        .Put16(static_cast<uint16_t>(offWaitTime));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StartUpOnOff
+ */
+PacketBufferHandle encodeOnOffClusterReadStartUpOnOffAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffStartUpOnOff", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4003);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOnOffClusterWriteStartUpOnOffAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                uint8_t startUpOnOff)
+{
+    COMMAND_HEADER("WriteOnOffStartUpOnOff", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x4003)
+        .Put8(48)
+        .Put8(static_cast<uint8_t>(startUpOnOff));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute FeatureMap
+ */
+PacketBufferHandle encodeOnOffClusterReadFeatureMapAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffFeatureMap", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFC);
     COMMAND_FOOTER();
 }
 
@@ -4232,6 +4325,7 @@ PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t s
 | Cluster ThreadNetworkDiagnostics                                    | 0x0035 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Channel                                                           | 0x0000 |

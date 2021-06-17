@@ -2752,6 +2752,51 @@ CHIP_ERROR chip_ime_ConfigureAttribute_OnOff_OnOff(chip::Controller::Device * de
     return cluster.ConfigureAttributeOnOff(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
                                            maxInterval);
 }
+CHIP_ERROR chip_ime_ReadAttribute_OnOff_GlobalSceneControl(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OnOffCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeGlobalSceneControl(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_OnOff_OnTime(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                               chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OnOffCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOnTime(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_OnOff_OffWaitTime(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                    chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OnOffCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOffWaitTime(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_OnOff_StartUpOnOff(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                     chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OnOffCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeStartUpOnOff(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_OnOff_FeatureMap(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OnOffCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeFeatureMap(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
 CHIP_ERROR chip_ime_ReadAttribute_OnOff_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                         chip::GroupId /* ZCLgroupId */)
 {
@@ -3678,6 +3723,15 @@ CHIP_ERROR chip_ime_ReadAttribute_Thermostat_ClusterRevision(chip::Controller::D
 
 // End of Cluster Thermostat
 // Cluster ThreadNetworkDiagnostics
+
+CHIP_ERROR chip_ime_AppendCommand_ThreadNetworkDiagnostics_ResetCounts(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId, chip::GroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ResetCounts(nullptr, nullptr);
+}
 
 CHIP_ERROR chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Channel(chip::Controller::Device * device,
                                                                    chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)

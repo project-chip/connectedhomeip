@@ -29,6 +29,8 @@
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
 
+#include <CoreFoundation/CoreFoundation.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -52,6 +54,40 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 exit:
     return err;
 }
+
+CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
+{
+    if (mIsWorkQueueRunning == false)
+    {
+        mIsWorkQueueRunning = true;
+        dispatch_resume(mWorkQueue);
+    }
+
+    return CHIP_NO_ERROR;
+};
+
+CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
+{
+
+    if (mIsWorkQueueRunning == true)
+    {
+        mIsWorkQueueRunning = false;
+
+        // dispatch_sync is used in order to guarantee serialization of the caller with
+        // respect to any tasks that might already be on the queue, or running.
+        dispatch_sync(mWorkQueue, ^{
+            dispatch_suspend(mWorkQueue);
+        });
+    }
+
+    return CHIP_NO_ERROR;
+};
+
+void PlatformManagerImpl::_RunEventLoop()
+{
+    _StartEventLoopTask();
+    CFRunLoopRun();
+};
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {

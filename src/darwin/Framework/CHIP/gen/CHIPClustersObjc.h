@@ -789,6 +789,14 @@ NS_ASSUME_NONNULL_BEGIN
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeGlobalSceneControlWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOnTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOnTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOffWaitTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOffWaitTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStartUpOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeStartUpOnOffWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1063,6 +1071,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface CHIPThreadNetworkDiagnostics : CHIPCluster
+
+- (void)resetCounts:(ResponseHandler)responseHandler;
 
 - (void)readAttributeChannelWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeRoutingRoleWithResponseHandler:(ResponseHandler)responseHandler;

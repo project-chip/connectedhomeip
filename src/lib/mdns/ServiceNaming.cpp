@@ -21,6 +21,7 @@
 
 #include <cstdio>
 #include <inttypes.h>
+#include <string.h>
 
 namespace chip {
 namespace Mdns {
@@ -169,6 +170,24 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         buffer[0]    = '\0';
         break;
     }
+    return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+}
+
+CHIP_ERROR MakeCommissionableNodeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc)
+{
+    size_t requiredSize;
+    if (nameDesc.type == DiscoveryFilterType::kNone)
+    {
+        requiredSize = snprintf(buffer, bufferLen, "_chipc");
+    }
+    else
+    {
+        ReturnErrorOnFailure(MakeServiceSubtype(buffer, bufferLen, nameDesc));
+        size_t subtypeLen = strlen(buffer);
+        requiredSize =
+            snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionableServiceName);
+    }
+
     return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 

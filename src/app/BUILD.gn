@@ -91,7 +91,7 @@ static_library("app") {
     "ReadClient.cpp",
     "ReadHandler.cpp",
     "decoder.cpp",
-    "encoder.cpp",
+    "encoder-common.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
   ]

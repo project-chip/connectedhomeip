@@ -48,6 +48,7 @@ public:
         if (mWorkQueue == nullptr)
         {
             mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL);
+            dispatch_suspend(mWorkQueue);
         }
         return mWorkQueue;
     }
@@ -58,9 +59,9 @@ private:
     CHIP_ERROR _Shutdown();
 
     CHIP_ERROR _StartChipTimer(int64_t aMilliseconds) { return CHIP_ERROR_NOT_IMPLEMENTED; };
-    CHIP_ERROR _StartEventLoopTask() { return CHIP_NO_ERROR; };
-    CHIP_ERROR _StopEventLoopTask() { return CHIP_NO_ERROR; };
-    void _RunEventLoop(){};
+    CHIP_ERROR _StartEventLoopTask();
+    CHIP_ERROR _StopEventLoopTask();
+    void _RunEventLoop();
     void _LockChipStack(){};
     bool _TryLockChipStack() { return false; };
     void _UnlockChipStack(){};
@@ -79,6 +80,7 @@ private:
     static PlatformManagerImpl sInstance;
 
     dispatch_queue_t mWorkQueue = nullptr;
+    bool mIsWorkQueueRunning    = false;
 
     inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }
 };
