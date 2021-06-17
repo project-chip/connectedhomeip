@@ -41,7 +41,7 @@ public:
         mIDAllocator = idAllocator;
 
         // The caller may chose to not provide a delegate object. The RendezvousServer checks for null delegate before calling
-        // it's methods.
+        // its methods.
         mDelegate = delegate;
         return CHIP_NO_ERROR;
     }

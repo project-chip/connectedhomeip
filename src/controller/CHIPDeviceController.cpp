@@ -96,8 +96,12 @@ using namespace chip::Encoding;
 
 constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
-constexpr uint32_t kMaxCHIPOpCertLength = 1024;
-constexpr uint32_t kMaxCHIPCSRLength    = 1024;
+// TODO - Reduce memory requirement for generating x509 certificates
+// As per specifications (section 6.3.7. Trusted Root CA Certificates), DER certs
+// should require 600 bytes. Currently, due to TLV writer overheads, a larger buffer
+// is needed, even though the generated certificate fits in 600 bytes limit.
+constexpr uint32_t kMaxCHIPDERCertLength = 1024;
+constexpr uint32_t kMaxCHIPCSRLength     = 1024;
 
 DeviceController::DeviceController()
 {
@@ -214,22 +218,25 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & CSR, NodeId deviceId, uint8_t * certBuf,
                                                              uint32_t certBufSize, uint32_t & outCertLen)
 {
+    // This code requires about 2K RAM to generate the certificates.
+    // The code would run as part of commissioner applications, so RAM requirements should be fine.
+    // Need to analyze if this requirement could be better managed by using static memory pools.
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
 
     uint32_t nocLen = 0;
     ChipLogProgress(Controller, "Generating operational certificate for device " ChipLogFormatX64, ChipLogValueX64(deviceId));
     ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
-        PeerId().SetNodeId(deviceId), CSR, 1, noc.Get(), kMaxCHIPOpCertLength, nocLen));
+        PeerId().SetNodeId(deviceId), CSR, 1, noc.Get(), kMaxCHIPDERCertLength, nocLen));
 
     ReturnErrorCodeIf(nocLen == 0, CHIP_ERROR_CERT_NOT_FOUND);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> ica;
-    ReturnErrorCodeIf(!ica.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!ica.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
 
     uint32_t icaLen = 0;
     ChipLogProgress(Controller, "Getting intermediate CA certificate from the issuer");
-    CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, ica.Get(), kMaxCHIPOpCertLength, icaLen);
+    CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, ica.Get(), kMaxCHIPDERCertLength, icaLen);
     ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" PRId32, err);
     if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
@@ -260,7 +267,7 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * 
     if (!admin->AreCredentialsAvailable())
     {
         chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
-        uint32_t chipCertAllocatedLen = kMaxCHIPOpCertLength * 2;
+        uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
         ReturnErrorCodeIf(!chipCert.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
         uint32_t chipCertLen = 0;
 
@@ -268,14 +275,16 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * 
         {
             ChipLogProgress(Controller, "Getting root certificate for the controller from the issuer");
             chip::Platform::ScopedMemoryBuffer<uint8_t> rootCert;
-            ReturnErrorCodeIf(!rootCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+            ReturnErrorCodeIf(!rootCert.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
             uint32_t rootCertLen = 0;
 
             ReturnErrorOnFailure(
-                mOperationalCredentialsDelegate->GetRootCACertificate(0, rootCert.Get(), kMaxCHIPOpCertLength, rootCertLen));
+                mOperationalCredentialsDelegate->GetRootCACertificate(0, rootCert.Get(), kMaxCHIPDERCertLength, rootCertLen));
+            ChipLogProgress(Controller, "Got x509 root cert (len %d). Converting to CHIP Cert", rootCertLen);
             ReturnErrorOnFailure(
                 ConvertX509CertToChipCert(rootCert.Get(), rootCertLen, chipCert.Get(), chipCertAllocatedLen, chipCertLen));
 
+            ChipLogProgress(Controller, "Got root cert (len %d). Saving it in table", chipCertLen);
             ReturnErrorOnFailure(admin->SetRootCert(ByteSpan(chipCert.Get(), chipCertLen)));
         }
 
@@ -1218,11 +1227,11 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
     VerifyOrReturnError(memcmp(CSRNonce.data(), nonce.data(), CSRNonce.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipOpCert;
-    ReturnErrorCodeIf(!chipOpCert.Alloc(kMaxCHIPOpCertLength * 2), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!chipOpCert.Alloc(kMaxCHIPCertLength * 2), CHIP_ERROR_NO_MEMORY);
     uint32_t chipOpCertLen = 0;
 
     ReturnErrorOnFailure(
-        GenerateOperationalCertificates(CSR, device->GetDeviceId(), chipOpCert.Get(), kMaxCHIPOpCertLength * 2, chipOpCertLen));
+        GenerateOperationalCertificates(CSR, device->GetDeviceId(), chipOpCert.Get(), kMaxCHIPCertLength * 2, chipOpCertLen));
 
     ChipLogProgress(Controller, "Sending operational certificate to the device. Op Cert Len %" PRIu32, chipOpCertLen);
     ReturnErrorOnFailure(SendOperationalCertificate(device, ByteSpan(chipOpCert.Get(), chipOpCertLen)));

@@ -179,7 +179,7 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
             }
             else
             {
-                ChipLogProgress(AppServer, "Session Key ID %d cannot be used. Skipping over this session", keyId);
+                ChipLogProgress(AppServer, "Session Key ID  %" PRIu16 " cannot be used. Skipping over this session", keyId);
             }
             session->Clear();
         }

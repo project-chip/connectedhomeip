@@ -343,6 +343,11 @@ protected:
     Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mCommissionableNodes; }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
+    // This function uses `OperationalCredentialsDelegate` to generate the operational certificates
+    // for the given device. The output is a TLV encoded array of compressed CHIP certificates. The
+    // array can contain up to two certificates (node operational certificate, and ICA certificate).
+    // If the certificate issuer doesn't require an ICA (i.e. NOC is signed by the root CA), the array
+    // will have only one certificate (node operational certificate).
     CHIP_ERROR GenerateOperationalCertificates(const ByteSpan & CSR, NodeId deviceId, uint8_t * certBuf, uint32_t certBufSize,
                                                uint32_t & outCertLen);
 

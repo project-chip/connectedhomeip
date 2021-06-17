@@ -44,6 +44,9 @@ static constexpr uint32_t kChip32bitAttrUTF8Length             = 8;
 static constexpr uint32_t kChip64bitAttrUTF8Length             = 16;
 static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 
+// As per specifications (section 6.3.7. Trusted Root CA Certificates)
+static constexpr uint32_t kMaxCHIPCertLength = 400;
+
 /** Data Element Tags for the CHIP Certificate
  */
 enum

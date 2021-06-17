@@ -55,8 +55,7 @@ constexpr uint8_t kIVSR2[] = { 0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0
 constexpr uint8_t kIVSR3[] = { 0x4e, 0x43, 0x41, 0x53, 0x45, 0x5f, 0x53, 0x69, 0x67, 0x6d, 0x61, 0x52, 0x33 };
 constexpr size_t kIVLength = sizeof(kIVSR2);
 
-constexpr size_t kTAGSize               = 16;
-constexpr uint32_t kMaxCHIPOpCertLength = 1024;
+constexpr size_t kTAGSize = 16;
 
 using namespace Crypto;
 using namespace Credentials;
@@ -1026,7 +1025,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIte
 
     ChipCertificateSet certSet;
     // Certificate set can contain up to 3 certs (NOC, ICA cert, and Root CA cert)
-    ReturnErrorOnFailure(certSet.Init(3, kMaxCHIPOpCertLength * 3));
+    ReturnErrorOnFailure(certSet.Init(3, kMaxCHIPCertLength * 3));
 
     responderOpCertLen = chip::Encoding::LittleEndian::Read16(*msgIterator);
     *responderOpCert   = *msgIterator;

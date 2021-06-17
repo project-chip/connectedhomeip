@@ -352,6 +352,14 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
+    /**
+     * @brief
+     *   This function triggers CASE session setup if the device has been provisioned with
+     *   operational credentials, and there is no currently active session.
+     *
+     * @return CHIP_NO_ERROR if the session setup was triggered or a session is already available.
+     */
+
     CHIP_ERROR WarmupCASESession();
 
 private:

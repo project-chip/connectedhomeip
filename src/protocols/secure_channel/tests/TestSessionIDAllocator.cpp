@@ -24,7 +24,7 @@
 
 using namespace chip;
 
-void TestStatusReport_Allocate(nlTestSuite * inSuite, void * inContext)
+void TestSessionIDAllocator_Allocate(nlTestSuite * inSuite, void * inContext)
 {
     SessionIDAllocator allocator;
 
@@ -41,7 +41,7 @@ void TestStatusReport_Allocate(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-void TestStatusReport_Free(nlTestSuite * inSuite, void * inContext)
+void TestSessionIDAllocator_Free(nlTestSuite * inSuite, void * inContext)
 {
     SessionIDAllocator allocator;
 
@@ -70,7 +70,7 @@ void TestStatusReport_Free(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, allocator.Peek() == 15);
 }
 
-void TestStatusReport_Reserve(nlTestSuite * inSuite, void * inContext)
+void TestSessionIDAllocator_Reserve(nlTestSuite * inSuite, void * inContext)
 {
     SessionIDAllocator allocator;
 
@@ -96,9 +96,9 @@ void TestStatusReport_Reserve(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("SessionIDAllocator_Allocate", TestStatusReport_Allocate),
-    NL_TEST_DEF("SessionIDAllocator_Free", TestStatusReport_Free),
-    NL_TEST_DEF("SessionIDAllocator_Reserve", TestStatusReport_Reserve),
+    NL_TEST_DEF("SessionIDAllocator_Allocate", TestSessionIDAllocator_Allocate),
+    NL_TEST_DEF("SessionIDAllocator_Free", TestSessionIDAllocator_Free),
+    NL_TEST_DEF("SessionIDAllocator_Reserve", TestSessionIDAllocator_Reserve),
 
     NL_TEST_SENTINEL()
 };
@@ -137,7 +137,7 @@ static nlTestSuite sSuite =
 /**
  *  Main
  */
-int TestStatusReport()
+int TestSessionIDAllocator()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, nullptr);
@@ -145,4 +145,4 @@ int TestStatusReport()
     return (nlTestRunnerStats(&sSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestStatusReport)
+CHIP_REGISTER_TEST_SUITE(TestSessionIDAllocator)
