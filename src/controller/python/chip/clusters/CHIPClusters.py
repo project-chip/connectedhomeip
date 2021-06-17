@@ -667,380 +667,1315 @@ class ChipClusters:
 
     def ListClusterAttributes(self):
         return {
-            "AccountLogin": [
-                "ClusterRevision",
-            ],
-            "ApplicationBasic": [
-                "VendorName",
-                "VendorId",
-                "ApplicationName",
-                "ProductId",
-                "ApplicationId",
-                "CatalogVendorId",
-                "ApplicationSatus",
-                "ClusterRevision",
-            ],
-            "ApplicationLauncher": [
-                "ApplicationLauncherList",
-                "ClusterRevision",
-            ],
-            "AudioOutput": [
-                "AudioOutputList",
-                "ClusterRevision",
-            ],
-            "BarrierControl": [
-                "BarrierMovingState",
-                "BarrierSafetyStatus",
-                "BarrierCapabilities",
-                "BarrierPosition",
-                "ClusterRevision",
-            ],
-            "Basic": [
-                "InteractionModelVersion",
-                "VendorName",
-                "VendorID",
-                "ProductName",
-                "ProductID",
-                "UserLabel",
-                "Location",
-                "HardwareVersion",
-                "HardwareVersionString",
-                "SoftwareVersion",
-                "SoftwareVersionString",
-                "ManufacturingDate",
-                "PartNumber",
-                "ProductURL",
-                "ProductLabel",
-                "SerialNumber",
-                "LocalConfigDisabled",
-                "ClusterRevision",
-            ],
-            "BinaryInputBasic": [
-                "OutOfService",
-                "PresentValue",
-                "StatusFlags",
-                "ClusterRevision",
-            ],
-            "Binding": [
-                "ClusterRevision",
-            ],
-            "BridgedDeviceBasic": [
-                "VendorName",
-                "VendorID",
-                "ProductName",
-                "UserLabel",
-                "HardwareVersion",
-                "HardwareVersionString",
-                "SoftwareVersion",
-                "SoftwareVersionString",
-                "ManufacturingDate",
-                "PartNumber",
-                "ProductURL",
-                "ProductLabel",
-                "SerialNumber",
-                "Reachable",
-                "ClusterRevision",
-            ],
-            "ColorControl": [
-                "CurrentHue",
-                "CurrentSaturation",
-                "RemainingTime",
-                "CurrentX",
-                "CurrentY",
-                "DriftCompensation",
-                "CompensationText",
-                "ColorTemperature",
-                "ColorMode",
-                "ColorControlOptions",
-                "NumberOfPrimaries",
-                "Primary1X",
-                "Primary1Y",
-                "Primary1Intensity",
-                "Primary2X",
-                "Primary2Y",
-                "Primary2Intensity",
-                "Primary3X",
-                "Primary3Y",
-                "Primary3Intensity",
-                "Primary4X",
-                "Primary4Y",
-                "Primary4Intensity",
-                "Primary5X",
-                "Primary5Y",
-                "Primary5Intensity",
-                "Primary6X",
-                "Primary6Y",
-                "Primary6Intensity",
-                "WhitePointX",
-                "WhitePointY",
-                "ColorPointRX",
-                "ColorPointRY",
-                "ColorPointRIntensity",
-                "ColorPointGX",
-                "ColorPointGY",
-                "ColorPointGIntensity",
-                "ColorPointBX",
-                "ColorPointBY",
-                "ColorPointBIntensity",
-                "EnhancedCurrentHue",
-                "EnhancedColorMode",
-                "ColorLoopActive",
-                "ColorLoopDirection",
-                "ColorLoopTime",
-                "ColorCapabilities",
-                "ColorTempPhysicalMin",
-                "ColorTempPhysicalMax",
-                "CoupleColorTempToLevelMinMireds",
-                "StartUpColorTemperatureMireds",
-                "ClusterRevision",
-            ],
-            "ContentLaunch": [
-                "AcceptsHeaderList",
-                "SupportedStreamingTypes",
-                "ClusterRevision",
-            ],
-            "Descriptor": [
-                "DeviceList",
-                "ServerList",
-                "ClientList",
-                "PartsList",
-                "ClusterRevision",
-            ],
-            "DoorLock": [
-                "LockState",
-                "LockType",
-                "ActuatorEnabled",
-                "ClusterRevision",
-            ],
-            "EthernetNetworkDiagnostics": [
-                "PacketRxCount",
-                "PacketTxCount",
-                "TxErrCount",
-                "CollisionCount",
-                "OverrunCount",
-                "ClusterRevision",
-            ],
-            "FixedLabel": [
-                "LabelList",
-                "ClusterRevision",
-            ],
-            "GeneralCommissioning": [
-                "FabricId",
-                "Breadcrumb",
-                "ClusterRevision",
-            ],
-            "GeneralDiagnostics": [
-                "NetworkInterfaces",
-                "RebootCount",
-                "ClusterRevision",
-            ],
-            "GroupKeyManagement": [
-                "Groups",
-                "GroupKeys",
-                "ClusterRevision",
-            ],
-            "Groups": [
-                "NameSupport",
-                "ClusterRevision",
-            ],
-            "Identify": [
-                "IdentifyTime",
-                "ClusterRevision",
-            ],
-            "KeypadInput": [
-                "ClusterRevision",
-            ],
-            "LevelControl": [
-                "CurrentLevel",
-                "ClusterRevision",
-            ],
-            "LowPower": [
-                "ClusterRevision",
-            ],
-            "MediaInput": [
-                "MediaInputList",
-                "ClusterRevision",
-            ],
-            "MediaPlayback": [
-                "ClusterRevision",
-            ],
-            "NetworkCommissioning": [
-                "ClusterRevision",
-            ],
-            "OtaSoftwareUpdateServer": [
-                "ClusterRevision",
-            ],
-            "OnOff": [
-                "OnOff",
-                "GlobalSceneControl",
-                "OnTime",
-                "OffWaitTime",
-                "StartUpOnOff",
-                "FeatureMap",
-                "ClusterRevision",
-            ],
-            "OperationalCredentials": [
-                "FabricsList",
-                "ClusterRevision",
-            ],
-            "PumpConfigurationAndControl": [
-                "MaxPressure",
-                "MaxSpeed",
-                "MaxFlow",
-                "EffectiveOperationMode",
-                "EffectiveControlMode",
-                "Capacity",
-                "OperationMode",
-                "ClusterRevision",
-            ],
-            "RelativeHumidityMeasurement": [
-                "MeasuredValue",
-                "MinMeasuredValue",
-                "MaxMeasuredValue",
-                "ClusterRevision",
-            ],
-            "Scenes": [
-                "SceneCount",
-                "CurrentScene",
-                "CurrentGroup",
-                "SceneValid",
-                "NameSupport",
-                "ClusterRevision",
-            ],
-            "SoftwareDiagnostics": [
-                "CurrentHeapHighWatermark",
-                "ClusterRevision",
-            ],
-            "Switch": [
-                "NumberOfPositions",
-                "CurrentPosition",
-                "ClusterRevision",
-            ],
-            "TvChannel": [
-                "TvChannelList",
-                "TvChannelLineup",
-                "CurrentTvChannel",
-                "ClusterRevision",
-            ],
-            "TargetNavigator": [
-                "TargetNavigatorList",
-                "ClusterRevision",
-            ],
-            "TemperatureMeasurement": [
-                "MeasuredValue",
-                "MinMeasuredValue",
-                "MaxMeasuredValue",
-                "ClusterRevision",
-            ],
-            "TestCluster": [
-                "Boolean",
-                "Bitmap8",
-                "Bitmap16",
-                "Bitmap32",
-                "Bitmap64",
-                "Int8u",
-                "Int16u",
-                "Int32u",
-                "Int64u",
-                "Int8s",
-                "Int16s",
-                "Int32s",
-                "Int64s",
-                "Enum8",
-                "Enum16",
-                "OctetString",
-                "ListInt8u",
-                "ListOctetString",
-                "ListStructOctetString",
-                "ClusterRevision",
-            ],
-            "Thermostat": [
-                "LocalTemperature",
-                "OccupiedCoolingSetpoint",
-                "OccupiedHeatingSetpoint",
-                "ControlSequenceOfOperation",
-                "SystemMode",
-                "ClusterRevision",
-            ],
-            "ThreadNetworkDiagnostics": [
-                "Channel",
-                "RoutingRole",
-                "NetworkName",
-                "PanId",
-                "ExtendedPanId",
-                "MeshLocalPrefix",
-                "OverrunCount",
-                "NeighborTableList",
-                "RouteTableList",
-                "PartitionId",
-                "Weighting",
-                "DataVersion",
-                "StableDataVersion",
-                "LeaderRouterId",
-                "DetachedRoleCount",
-                "ChildRoleCount",
-                "RouterRoleCount",
-                "LeaderRoleCount",
-                "AttachAttemptCount",
-                "PartitionIdChangeCount",
-                "BetterPartitionAttachAttemptCount",
-                "ParentChangeCount",
-                "TxTotalCount",
-                "TxUnicastCount",
-                "TxBroadcastCount",
-                "TxAckRequestedCount",
-                "TxAckedCount",
-                "TxNoAckRequestedCount",
-                "TxDataCount",
-                "TxDataPollCount",
-                "TxBeaconCount",
-                "TxBeaconRequestCount",
-                "TxOtherCount",
-                "TxRetryCount",
-                "TxDirectMaxRetryExpiryCount",
-                "TxIndirectMaxRetryExpiryCount",
-                "TxErrCcaCount",
-                "TxErrAbortCount",
-                "TxErrBusyChannelCount",
-                "RxTotalCount",
-                "RxUnicastCount",
-                "RxBroadcastCount",
-                "RxDataCount",
-                "RxDataPollCount",
-                "RxBeaconCount",
-                "RxBeaconRequestCount",
-                "RxOtherCount",
-                "RxAddressFilteredCount",
-                "RxDestAddrFilteredCount",
-                "RxDuplicatedCount",
-                "RxErrNoFrameCount",
-                "RxErrUnknownNeighborCount",
-                "RxErrInvalidSrcAddrCount",
-                "RxErrSecCount",
-                "RxErrFcsCount",
-                "RxErrOtherCount",
-                "SecurityPolicy",
-                "ChannelMask",
-                "OperationalDatasetComponents",
-                "ActiveNetworkFaultsList",
-                "ClusterRevision",
-            ],
-            "WakeOnLan": [
-                "WakeOnLanMacAddress",
-                "ClusterRevision",
-            ],
-            "WindowCovering": [
-                "WindowCoveringType",
-                "CurrentPositionLift",
-                "CurrentPositionTilt",
-                "ConfigStatus",
-                "InstalledOpenLimitLift",
-                "InstalledClosedLimitLift",
-                "InstalledOpenLimitTilt",
-                "InstalledClosedLimitTilt",
-                "Mode",
-                "ClusterRevision",
-            ],
+            "AccountLogin": {
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "ApplicationBasic": {
+                "VendorName": {
+                    "attributeId": 0x0000,
+                    "type": "str",
+                },
+                "VendorId": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "ApplicationName": {
+                    "attributeId": 0x0002,
+                    "type": "str",
+                },
+                "ProductId": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                },
+                "ApplicationId": {
+                    "attributeId": 0x0005,
+                    "type": "str",
+                },
+                "CatalogVendorId": {
+                    "attributeId": 0x0006,
+                    "type": "int",
+                },
+                "ApplicationSatus": {
+                    "attributeId": 0x0007,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "ApplicationLauncher": {
+                "ApplicationLauncherList": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "AudioOutput": {
+                "AudioOutputList": {
+                    "attributeId": 0x0000,
+                    "type": "",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "BarrierControl": {
+                "BarrierMovingState": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "BarrierSafetyStatus": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "BarrierCapabilities": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                },
+                "BarrierPosition": {
+                    "attributeId": 0x000A,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "Basic": {
+                "InteractionModelVersion": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "VendorName": {
+                    "attributeId": 0x0001,
+                    "type": "str",
+                },
+                "VendorID": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "ProductName": {
+                    "attributeId": 0x0003,
+                    "type": "str",
+                },
+                "ProductID": {
+                    "attributeId": 0x0004,
+                    "type": "int",
+                },
+                "UserLabel": {
+                    "attributeId": 0x0005,
+                    "type": "str",
+                    "writable": True,
+                },
+                "Location": {
+                    "attributeId": 0x0006,
+                    "type": "str",
+                    "writable": True,
+                },
+                "HardwareVersion": {
+                    "attributeId": 0x0007,
+                    "type": "int",
+                },
+                "HardwareVersionString": {
+                    "attributeId": 0x0008,
+                    "type": "str",
+                },
+                "SoftwareVersion": {
+                    "attributeId": 0x0009,
+                    "type": "int",
+                },
+                "SoftwareVersionString": {
+                    "attributeId": 0x000A,
+                    "type": "str",
+                },
+                "ManufacturingDate": {
+                    "attributeId": 0x000B,
+                    "type": "str",
+                },
+                "PartNumber": {
+                    "attributeId": 0x000C,
+                    "type": "str",
+                },
+                "ProductURL": {
+                    "attributeId": 0x000D,
+                    "type": "str",
+                },
+                "ProductLabel": {
+                    "attributeId": 0x000E,
+                    "type": "str",
+                },
+                "SerialNumber": {
+                    "attributeId": 0x000F,
+                    "type": "str",
+                },
+                "LocalConfigDisabled": {
+                    "attributeId": 0x0010,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "BinaryInputBasic": {
+                "OutOfService": {
+                    "attributeId": 0x0051,
+                    "type": "int",
+                    "writable": True,
+                },
+                "PresentValue": {
+                    "attributeId": 0x0055,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                "StatusFlags": {
+                    "attributeId": 0x006F,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "Binding": {
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "BridgedDeviceBasic": {
+                "VendorName": {
+                    "attributeId": 0x0001,
+                    "type": "str",
+                },
+                "VendorID": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "ProductName": {
+                    "attributeId": 0x0003,
+                    "type": "str",
+                },
+                "UserLabel": {
+                    "attributeId": 0x0005,
+                    "type": "str",
+                    "writable": True,
+                },
+                "HardwareVersion": {
+                    "attributeId": 0x0007,
+                    "type": "int",
+                },
+                "HardwareVersionString": {
+                    "attributeId": 0x0008,
+                    "type": "str",
+                },
+                "SoftwareVersion": {
+                    "attributeId": 0x0009,
+                    "type": "int",
+                },
+                "SoftwareVersionString": {
+                    "attributeId": 0x000A,
+                    "type": "str",
+                },
+                "ManufacturingDate": {
+                    "attributeId": 0x000B,
+                    "type": "str",
+                },
+                "PartNumber": {
+                    "attributeId": 0x000C,
+                    "type": "str",
+                },
+                "ProductURL": {
+                    "attributeId": 0x000D,
+                    "type": "str",
+                },
+                "ProductLabel": {
+                    "attributeId": 0x000E,
+                    "type": "str",
+                },
+                "SerialNumber": {
+                    "attributeId": 0x000F,
+                    "type": "str",
+                },
+                "Reachable": {
+                    "attributeId": 0x0011,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "ColorControl": {
+                "CurrentHue": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "CurrentSaturation": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "RemainingTime": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "CurrentX": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "CurrentY": {
+                    "attributeId": 0x0004,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "DriftCompensation": {
+                    "attributeId": 0x0005,
+                    "type": "int",
+                },
+                "CompensationText": {
+                    "attributeId": 0x0006,
+                    "type": "str",
+                },
+                "ColorTemperature": {
+                    "attributeId": 0x0007,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "ColorMode": {
+                    "attributeId": 0x0008,
+                    "type": "int",
+                },
+                "ColorControlOptions": {
+                    "attributeId": 0x000F,
+                    "type": "int",
+                    "writable": True,
+                },
+                "NumberOfPrimaries": {
+                    "attributeId": 0x0010,
+                    "type": "int",
+                },
+                "Primary1X": {
+                    "attributeId": 0x0011,
+                    "type": "int",
+                },
+                "Primary1Y": {
+                    "attributeId": 0x0012,
+                    "type": "int",
+                },
+                "Primary1Intensity": {
+                    "attributeId": 0x0013,
+                    "type": "int",
+                },
+                "Primary2X": {
+                    "attributeId": 0x0015,
+                    "type": "int",
+                },
+                "Primary2Y": {
+                    "attributeId": 0x0016,
+                    "type": "int",
+                },
+                "Primary2Intensity": {
+                    "attributeId": 0x0017,
+                    "type": "int",
+                },
+                "Primary3X": {
+                    "attributeId": 0x0019,
+                    "type": "int",
+                },
+                "Primary3Y": {
+                    "attributeId": 0x001A,
+                    "type": "int",
+                },
+                "Primary3Intensity": {
+                    "attributeId": 0x001B,
+                    "type": "int",
+                },
+                "Primary4X": {
+                    "attributeId": 0x0020,
+                    "type": "int",
+                },
+                "Primary4Y": {
+                    "attributeId": 0x0021,
+                    "type": "int",
+                },
+                "Primary4Intensity": {
+                    "attributeId": 0x0022,
+                    "type": "int",
+                },
+                "Primary5X": {
+                    "attributeId": 0x0024,
+                    "type": "int",
+                },
+                "Primary5Y": {
+                    "attributeId": 0x0025,
+                    "type": "int",
+                },
+                "Primary5Intensity": {
+                    "attributeId": 0x0026,
+                    "type": "int",
+                },
+                "Primary6X": {
+                    "attributeId": 0x0028,
+                    "type": "int",
+                },
+                "Primary6Y": {
+                    "attributeId": 0x0029,
+                    "type": "int",
+                },
+                "Primary6Intensity": {
+                    "attributeId": 0x002A,
+                    "type": "int",
+                },
+                "WhitePointX": {
+                    "attributeId": 0x0030,
+                    "type": "int",
+                    "writable": True,
+                },
+                "WhitePointY": {
+                    "attributeId": 0x0031,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ColorPointRX": {
+                    "attributeId": 0x0032,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ColorPointRY": {
+                    "attributeId": 0x0033,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ColorPointRIntensity": {
+                    "attributeId": 0x0034,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ColorPointGX": {
+                    "attributeId": 0x0036,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ColorPointGY": {
+                    "attributeId": 0x0037,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ColorPointGIntensity": {
+                    "attributeId": 0x0038,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ColorPointBX": {
+                    "attributeId": 0x003A,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ColorPointBY": {
+                    "attributeId": 0x003B,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ColorPointBIntensity": {
+                    "attributeId": 0x003C,
+                    "type": "int",
+                    "writable": True,
+                },
+                "EnhancedCurrentHue": {
+                    "attributeId": 0x4000,
+                    "type": "int",
+                },
+                "EnhancedColorMode": {
+                    "attributeId": 0x4001,
+                    "type": "int",
+                },
+                "ColorLoopActive": {
+                    "attributeId": 0x4002,
+                    "type": "int",
+                },
+                "ColorLoopDirection": {
+                    "attributeId": 0x4003,
+                    "type": "int",
+                },
+                "ColorLoopTime": {
+                    "attributeId": 0x4004,
+                    "type": "int",
+                },
+                "ColorCapabilities": {
+                    "attributeId": 0x400A,
+                    "type": "int",
+                },
+                "ColorTempPhysicalMin": {
+                    "attributeId": 0x400B,
+                    "type": "int",
+                },
+                "ColorTempPhysicalMax": {
+                    "attributeId": 0x400C,
+                    "type": "int",
+                },
+                "CoupleColorTempToLevelMinMireds": {
+                    "attributeId": 0x400D,
+                    "type": "int",
+                },
+                "StartUpColorTemperatureMireds": {
+                    "attributeId": 0x4010,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "ContentLaunch": {
+                "AcceptsHeaderList": {
+                    "attributeId": 0x0000,
+                    "type": "bytes",
+                },
+                "SupportedStreamingTypes": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "Descriptor": {
+                "DeviceList": {
+                    "attributeId": 0x0000,
+                    "type": "",
+                },
+                "ServerList": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "ClientList": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "PartsList": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "DoorLock": {
+                "LockState": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "LockType": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "ActuatorEnabled": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "EthernetNetworkDiagnostics": {
+                "PacketRxCount": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "PacketTxCount": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                },
+                "TxErrCount": {
+                    "attributeId": 0x0004,
+                    "type": "int",
+                },
+                "CollisionCount": {
+                    "attributeId": 0x0005,
+                    "type": "int",
+                },
+                "OverrunCount": {
+                    "attributeId": 0x0006,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "FixedLabel": {
+                "LabelList": {
+                    "attributeId": 0x0000,
+                    "type": "",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "GeneralCommissioning": {
+                "FabricId": {
+                    "attributeId": 0x0000,
+                    "type": "bytes",
+                },
+                "Breadcrumb": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "GeneralDiagnostics": {
+                "NetworkInterfaces": {
+                    "attributeId": 0x0000,
+                    "type": "",
+                },
+                "RebootCount": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "GroupKeyManagement": {
+                "Groups": {
+                    "attributeId": 0x0000,
+                    "type": "",
+                },
+                "GroupKeys": {
+                    "attributeId": 0x0001,
+                    "type": "",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "Groups": {
+                "NameSupport": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "Identify": {
+                "IdentifyTime": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "KeypadInput": {
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "LevelControl": {
+                "CurrentLevel": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "LowPower": {
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "MediaInput": {
+                "MediaInputList": {
+                    "attributeId": 0x0000,
+                    "type": "",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "MediaPlayback": {
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "NetworkCommissioning": {
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "OtaSoftwareUpdateServer": {
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "OnOff": {
+                "OnOff": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "GlobalSceneControl": {
+                    "attributeId": 0x4000,
+                    "type": "int",
+                },
+                "OnTime": {
+                    "attributeId": 0x4001,
+                    "type": "int",
+                    "writable": True,
+                },
+                "OffWaitTime": {
+                    "attributeId": 0x4002,
+                    "type": "int",
+                    "writable": True,
+                },
+                "StartUpOnOff": {
+                    "attributeId": 0x4003,
+                    "type": "int",
+                    "writable": True,
+                },
+                "FeatureMap": {
+                    "attributeId": 0xFFFC,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "OperationalCredentials": {
+                "FabricsList": {
+                    "attributeId": 0x0001,
+                    "type": "",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "PumpConfigurationAndControl": {
+                "MaxPressure": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "MaxSpeed": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "MaxFlow": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "EffectiveOperationMode": {
+                    "attributeId": 0x0011,
+                    "type": "int",
+                },
+                "EffectiveControlMode": {
+                    "attributeId": 0x0012,
+                    "type": "int",
+                },
+                "Capacity": {
+                    "attributeId": 0x0013,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "OperationMode": {
+                    "attributeId": 0x0020,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "RelativeHumidityMeasurement": {
+                "MeasuredValue": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "MinMeasuredValue": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "MaxMeasuredValue": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "Scenes": {
+                "SceneCount": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "CurrentScene": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "CurrentGroup": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "SceneValid": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                },
+                "NameSupport": {
+                    "attributeId": 0x0004,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "SoftwareDiagnostics": {
+                "CurrentHeapHighWatermark": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "Switch": {
+                "NumberOfPositions": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "CurrentPosition": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "TvChannel": {
+                "TvChannelList": {
+                    "attributeId": 0x0000,
+                    "type": "",
+                },
+                "TvChannelLineup": {
+                    "attributeId": 0x0001,
+                    "type": "bytes",
+                },
+                "CurrentTvChannel": {
+                    "attributeId": 0x0002,
+                    "type": "bytes",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "TargetNavigator": {
+                "TargetNavigatorList": {
+                    "attributeId": 0x0000,
+                    "type": "",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "TemperatureMeasurement": {
+                "MeasuredValue": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "MinMeasuredValue": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "MaxMeasuredValue": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "TestCluster": {
+                "Boolean": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Bitmap8": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Bitmap16": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Bitmap32": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Bitmap64": {
+                    "attributeId": 0x0004,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Int8u": {
+                    "attributeId": 0x0005,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Int16u": {
+                    "attributeId": 0x0006,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Int32u": {
+                    "attributeId": 0x0008,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Int64u": {
+                    "attributeId": 0x000C,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Int8s": {
+                    "attributeId": 0x000D,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Int16s": {
+                    "attributeId": 0x000E,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Int32s": {
+                    "attributeId": 0x0010,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Int64s": {
+                    "attributeId": 0x0014,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Enum8": {
+                    "attributeId": 0x0015,
+                    "type": "int",
+                    "writable": True,
+                },
+                "Enum16": {
+                    "attributeId": 0x0016,
+                    "type": "int",
+                    "writable": True,
+                },
+                "OctetString": {
+                    "attributeId": 0x0019,
+                    "type": "bytes",
+                    "writable": True,
+                },
+                "ListInt8u": {
+                    "attributeId": 0x001A,
+                    "type": "int",
+                },
+                "ListOctetString": {
+                    "attributeId": 0x001B,
+                    "type": "bytes",
+                },
+                "ListStructOctetString": {
+                    "attributeId": 0x001C,
+                    "type": "",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "Thermostat": {
+                "LocalTemperature": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "OccupiedCoolingSetpoint": {
+                    "attributeId": 0x0011,
+                    "type": "int",
+                    "writable": True,
+                },
+                "OccupiedHeatingSetpoint": {
+                    "attributeId": 0x0012,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ControlSequenceOfOperation": {
+                    "attributeId": 0x001B,
+                    "type": "int",
+                    "writable": True,
+                },
+                "SystemMode": {
+                    "attributeId": 0x001C,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "ThreadNetworkDiagnostics": {
+                "Channel": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "RoutingRole": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "NetworkName": {
+                    "attributeId": 0x0002,
+                    "type": "bytes",
+                },
+                "PanId": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                },
+                "ExtendedPanId": {
+                    "attributeId": 0x0004,
+                    "type": "int",
+                },
+                "MeshLocalPrefix": {
+                    "attributeId": 0x0005,
+                    "type": "bytes",
+                },
+                "OverrunCount": {
+                    "attributeId": 0x0006,
+                    "type": "int",
+                },
+                "NeighborTableList": {
+                    "attributeId": 0x0007,
+                    "type": "",
+                },
+                "RouteTableList": {
+                    "attributeId": 0x0008,
+                    "type": "",
+                },
+                "PartitionId": {
+                    "attributeId": 0x0009,
+                    "type": "int",
+                },
+                "Weighting": {
+                    "attributeId": 0x000A,
+                    "type": "int",
+                },
+                "DataVersion": {
+                    "attributeId": 0x000B,
+                    "type": "int",
+                },
+                "StableDataVersion": {
+                    "attributeId": 0x000C,
+                    "type": "int",
+                },
+                "LeaderRouterId": {
+                    "attributeId": 0x000D,
+                    "type": "int",
+                },
+                "DetachedRoleCount": {
+                    "attributeId": 0x000E,
+                    "type": "int",
+                },
+                "ChildRoleCount": {
+                    "attributeId": 0x000F,
+                    "type": "int",
+                },
+                "RouterRoleCount": {
+                    "attributeId": 0x0010,
+                    "type": "int",
+                },
+                "LeaderRoleCount": {
+                    "attributeId": 0x0011,
+                    "type": "int",
+                },
+                "AttachAttemptCount": {
+                    "attributeId": 0x0012,
+                    "type": "int",
+                },
+                "PartitionIdChangeCount": {
+                    "attributeId": 0x0013,
+                    "type": "int",
+                },
+                "BetterPartitionAttachAttemptCount": {
+                    "attributeId": 0x0014,
+                    "type": "int",
+                },
+                "ParentChangeCount": {
+                    "attributeId": 0x0015,
+                    "type": "int",
+                },
+                "TxTotalCount": {
+                    "attributeId": 0x0016,
+                    "type": "int",
+                },
+                "TxUnicastCount": {
+                    "attributeId": 0x0017,
+                    "type": "int",
+                },
+                "TxBroadcastCount": {
+                    "attributeId": 0x0018,
+                    "type": "int",
+                },
+                "TxAckRequestedCount": {
+                    "attributeId": 0x0019,
+                    "type": "int",
+                },
+                "TxAckedCount": {
+                    "attributeId": 0x001A,
+                    "type": "int",
+                },
+                "TxNoAckRequestedCount": {
+                    "attributeId": 0x001B,
+                    "type": "int",
+                },
+                "TxDataCount": {
+                    "attributeId": 0x001C,
+                    "type": "int",
+                },
+                "TxDataPollCount": {
+                    "attributeId": 0x001D,
+                    "type": "int",
+                },
+                "TxBeaconCount": {
+                    "attributeId": 0x001E,
+                    "type": "int",
+                },
+                "TxBeaconRequestCount": {
+                    "attributeId": 0x001F,
+                    "type": "int",
+                },
+                "TxOtherCount": {
+                    "attributeId": 0x0020,
+                    "type": "int",
+                },
+                "TxRetryCount": {
+                    "attributeId": 0x0021,
+                    "type": "int",
+                },
+                "TxDirectMaxRetryExpiryCount": {
+                    "attributeId": 0x0022,
+                    "type": "int",
+                },
+                "TxIndirectMaxRetryExpiryCount": {
+                    "attributeId": 0x0023,
+                    "type": "int",
+                },
+                "TxErrCcaCount": {
+                    "attributeId": 0x0024,
+                    "type": "int",
+                },
+                "TxErrAbortCount": {
+                    "attributeId": 0x0025,
+                    "type": "int",
+                },
+                "TxErrBusyChannelCount": {
+                    "attributeId": 0x0026,
+                    "type": "int",
+                },
+                "RxTotalCount": {
+                    "attributeId": 0x0027,
+                    "type": "int",
+                },
+                "RxUnicastCount": {
+                    "attributeId": 0x0028,
+                    "type": "int",
+                },
+                "RxBroadcastCount": {
+                    "attributeId": 0x0029,
+                    "type": "int",
+                },
+                "RxDataCount": {
+                    "attributeId": 0x002A,
+                    "type": "int",
+                },
+                "RxDataPollCount": {
+                    "attributeId": 0x002B,
+                    "type": "int",
+                },
+                "RxBeaconCount": {
+                    "attributeId": 0x002C,
+                    "type": "int",
+                },
+                "RxBeaconRequestCount": {
+                    "attributeId": 0x002D,
+                    "type": "int",
+                },
+                "RxOtherCount": {
+                    "attributeId": 0x002E,
+                    "type": "int",
+                },
+                "RxAddressFilteredCount": {
+                    "attributeId": 0x002F,
+                    "type": "int",
+                },
+                "RxDestAddrFilteredCount": {
+                    "attributeId": 0x0030,
+                    "type": "int",
+                },
+                "RxDuplicatedCount": {
+                    "attributeId": 0x0031,
+                    "type": "int",
+                },
+                "RxErrNoFrameCount": {
+                    "attributeId": 0x0032,
+                    "type": "int",
+                },
+                "RxErrUnknownNeighborCount": {
+                    "attributeId": 0x0033,
+                    "type": "int",
+                },
+                "RxErrInvalidSrcAddrCount": {
+                    "attributeId": 0x0034,
+                    "type": "int",
+                },
+                "RxErrSecCount": {
+                    "attributeId": 0x0035,
+                    "type": "int",
+                },
+                "RxErrFcsCount": {
+                    "attributeId": 0x0036,
+                    "type": "int",
+                },
+                "RxErrOtherCount": {
+                    "attributeId": 0x0037,
+                    "type": "int",
+                },
+                "SecurityPolicy": {
+                    "attributeId": 0x003B,
+                    "type": "",
+                },
+                "ChannelMask": {
+                    "attributeId": 0x003C,
+                    "type": "int",
+                },
+                "OperationalDatasetComponents": {
+                    "attributeId": 0x003D,
+                    "type": "",
+                },
+                "ActiveNetworkFaultsList": {
+                    "attributeId": 0x003E,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "WakeOnLan": {
+                "WakeOnLanMacAddress": {
+                    "attributeId": 0x0000,
+                    "type": "str",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "WindowCovering": {
+                "WindowCoveringType": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "CurrentPositionLift": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "CurrentPositionTilt": {
+                    "attributeId": 0x0004,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "ConfigStatus": {
+                    "attributeId": 0x0007,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "InstalledOpenLimitLift": {
+                    "attributeId": 0x0010,
+                    "type": "int",
+                },
+                "InstalledClosedLimitLift": {
+                    "attributeId": 0x0011,
+                    "type": "int",
+                },
+                "InstalledOpenLimitTilt": {
+                    "attributeId": 0x0012,
+                    "type": "int",
+                },
+                "InstalledClosedLimitTilt": {
+                    "attributeId": 0x0013,
+                    "type": "int",
+                },
+                "Mode": {
+                    "attributeId": 0x0017,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
         }
 
     def SendCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args, imEnabled):
@@ -1065,6 +2000,13 @@ class ChipClusters:
             raise UnknownAttribute(cluster, attribute)
         funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
         funcCaller(lambda: func(device, endpoint, minInterval, maxInterval, change))
+
+    def WriteAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, groupid: int, value, imEnabled):
+        func = getattr(self, "Cluster{}_WriteAttribute{}".format(cluster, attribute), None)
+        if not func:
+            raise UnknownAttribute(cluster, attribute)
+        funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
+        funcCaller(lambda: func(device, endpoint, groupid, value))
 
     # Cluster commands
 
@@ -1694,8 +2636,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Basic_ProductID(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_WriteAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        value = value.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_WriteAttribute_Basic_UserLabel(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterBasic_ReadAttributeLocation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_Location(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_WriteAttributeLocation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        value = value.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_WriteAttribute_Basic_Location(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterBasic_ReadAttributeHardwareVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_HardwareVersion(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeHardwareVersionString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1716,14 +2664,20 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Basic_SerialNumber(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeLocalConfigDisabled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_LocalConfigDisabled(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_WriteAttributeLocalConfigDisabled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Basic_LocalConfigDisabled(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterBasic_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBinaryInputBasic_ReadAttributeOutOfService(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_OutOfService(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBinaryInputBasic_WriteAttributeOutOfService(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_BinaryInputBasic_OutOfService(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterBinaryInputBasic_ReadAttributePresentValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_PresentValue(device, ZCLendpoint, ZCLgroupid)
     def ClusterBinaryInputBasic_ConfigureAttributePresentValue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
         return self._chipLib.chip_ime_ConfigureAttribute_BinaryInputBasic_PresentValue(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterBinaryInputBasic_WriteAttributePresentValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_BinaryInputBasic_PresentValue(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterBinaryInputBasic_ReadAttributeStatusFlags(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_StatusFlags(device, ZCLendpoint, ZCLgroupid)
     def ClusterBinaryInputBasic_ConfigureAttributeStatusFlags(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
@@ -1740,6 +2694,9 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ProductName(device, ZCLendpoint, ZCLgroupid)
     def ClusterBridgedDeviceBasic_ReadAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_UserLabel(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBridgedDeviceBasic_WriteAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        value = value.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_WriteAttribute_BridgedDeviceBasic_UserLabel(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterBridgedDeviceBasic_ReadAttributeHardwareVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersion(device, ZCLendpoint, ZCLgroupid)
     def ClusterBridgedDeviceBasic_ReadAttributeHardwareVersionString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1792,6 +2749,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorMode(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorControlOptions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorControlOptions(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorControlOptions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorControlOptions(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeNumberOfPrimaries(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_NumberOfPrimaries(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary1X(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1832,26 +2791,48 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary6Intensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeWhitePointX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointX(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeWhitePointX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_WhitePointX(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeWhitePointY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointY(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeWhitePointY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_WhitePointY(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeColorPointRX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRX(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorPointRX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointRX(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeColorPointRY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRY(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorPointRY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointRY(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeColorPointRIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRIntensity(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorPointRIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointRIntensity(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeColorPointGX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGX(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorPointGX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointGX(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeColorPointGY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGY(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorPointGY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointGY(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeColorPointGIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGIntensity(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorPointGIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointGIntensity(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeColorPointBX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBX(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorPointBX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBX(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeColorPointBY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBY(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorPointBY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBY(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeColorPointBIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBIntensity(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeColorPointBIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBIntensity(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeEnhancedCurrentHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedCurrentHue(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeEnhancedColorMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1872,6 +2853,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_CoupleColorTempToLevelMinMireds(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeStartUpColorTemperatureMireds(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_StartUpColorTemperatureMireds(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_WriteAttributeStartUpColorTemperatureMireds(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ColorControl_StartUpColorTemperatureMireds(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterColorControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterContentLaunch_ReadAttributeAcceptsHeaderList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1920,6 +2903,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeBreadcrumb(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb(device, ZCLendpoint, ZCLgroupid)
+    def ClusterGeneralCommissioning_WriteAttributeBreadcrumb(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_GeneralCommissioning_Breadcrumb(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterGeneralCommissioning_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralDiagnostics_ReadAttributeNetworkInterfaces(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1940,6 +2925,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Groups_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterIdentify_ReadAttributeIdentifyTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime(device, ZCLendpoint, ZCLgroupid)
+    def ClusterIdentify_WriteAttributeIdentifyTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Identify_IdentifyTime(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterIdentify_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterKeypadInput_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1970,10 +2957,16 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_OnOff_GlobalSceneControl(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeOnTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_OnTime(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOff_WriteAttributeOnTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_OnOff_OnTime(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterOnOff_ReadAttributeOffWaitTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_OffWaitTime(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOff_WriteAttributeOffWaitTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_OnOff_OffWaitTime(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterOnOff_ReadAttributeStartUpOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_StartUpOnOff(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOff_WriteAttributeStartUpOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_OnOff_StartUpOnOff(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterOnOff_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_FeatureMap(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1998,6 +2991,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ConfigureAttribute_PumpConfigurationAndControl_Capacity(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterPumpConfigurationAndControl_ReadAttributeOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPumpConfigurationAndControl_WriteAttributeOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_OperationMode(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterPumpConfigurationAndControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterRelativeHumidityMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -2058,36 +3053,68 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_ReadAttributeBoolean(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Boolean(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeBoolean(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Boolean(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeBitmap8(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap8(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeBitmap8(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap8(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeBitmap16(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap16(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeBitmap16(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap16(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeBitmap32(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap32(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeBitmap32(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap32(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeBitmap64(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap64(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeBitmap64(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap64(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeInt8u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Int8u(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeInt8u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Int8u(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeInt16u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Int16u(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeInt16u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Int16u(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeInt32u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Int32u(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeInt32u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Int32u(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeInt64u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Int64u(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeInt64u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Int64u(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeInt8s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Int8s(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeInt8s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Int8s(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeInt16s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Int16s(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeInt16s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Int16s(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeInt32s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Int32s(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeInt32s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Int32s(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeInt64s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Int64s(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeInt64s(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Int64s(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeEnum8(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Enum8(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeEnum8(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Enum8(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeEnum16(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Enum16(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeEnum16(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Enum16(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_OctetString(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_OctetString(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterTestCluster_ReadAttributeListInt8u(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_ListInt8u(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_ReadAttributeListOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -2102,12 +3129,20 @@ class ChipClusters:
         return self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterThermostat_ReadAttributeOccupiedCoolingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeOccupiedCoolingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedCoolingSetpoint(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterThermostat_ReadAttributeOccupiedHeatingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeOccupiedHeatingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedHeatingSetpoint(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterThermostat_ReadAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_ControlSequenceOfOperation(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterThermostat_ReadAttributeSystemMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeSystemMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_SystemMode(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterThermostat_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterThreadNetworkDiagnostics_ReadAttributeChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -2262,6 +3297,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledClosedLimitTilt(device, ZCLendpoint, ZCLgroupid)
     def ClusterWindowCovering_ReadAttributeMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_Mode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_WriteAttributeMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_WindowCovering_Mode(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterWindowCovering_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
@@ -2376,9 +3413,15 @@ class ChipClusters:
         # Cluster Basic ReadAttribute UserLabel
         self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel.restype = ctypes.c_uint32
+        # Cluster Basic WriteAttribute UserLabel
+        self._chipLib.chip_ime_WriteAttribute_Basic_UserLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_Basic_UserLabel.restype = ctypes.c_uint32
         # Cluster Basic ReadAttribute Location
         self._chipLib.chip_ime_ReadAttribute_Basic_Location.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_Location.restype = ctypes.c_uint32
+        # Cluster Basic WriteAttribute Location
+        self._chipLib.chip_ime_WriteAttribute_Basic_Location.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_Basic_Location.restype = ctypes.c_uint32
         # Cluster Basic ReadAttribute HardwareVersion
         self._chipLib.chip_ime_ReadAttribute_Basic_HardwareVersion.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_HardwareVersion.restype = ctypes.c_uint32
@@ -2409,6 +3452,9 @@ class ChipClusters:
         # Cluster Basic ReadAttribute LocalConfigDisabled
         self._chipLib.chip_ime_ReadAttribute_Basic_LocalConfigDisabled.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_LocalConfigDisabled.restype = ctypes.c_uint32
+        # Cluster Basic WriteAttribute LocalConfigDisabled
+        self._chipLib.chip_ime_WriteAttribute_Basic_LocalConfigDisabled.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_Basic_LocalConfigDisabled.restype = ctypes.c_uint32
         # Cluster Basic ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.restype = ctypes.c_uint32
@@ -2416,12 +3462,18 @@ class ChipClusters:
         # Cluster BinaryInputBasic ReadAttribute OutOfService
         self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_OutOfService.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_OutOfService.restype = ctypes.c_uint32
+        # Cluster BinaryInputBasic WriteAttribute OutOfService
+        self._chipLib.chip_ime_WriteAttribute_BinaryInputBasic_OutOfService.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_BinaryInputBasic_OutOfService.restype = ctypes.c_uint32
         # Cluster BinaryInputBasic ReadAttribute PresentValue
         self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_PresentValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_PresentValue.restype = ctypes.c_uint32
         # Cluster BinaryInputBasic ConfigureAttribute PresentValue
         self._chipLib.chip_ime_ConfigureAttribute_BinaryInputBasic_PresentValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_ConfigureAttribute_BinaryInputBasic_PresentValue.restype = ctypes.c_uint32
+        # Cluster BinaryInputBasic WriteAttribute PresentValue
+        self._chipLib.chip_ime_WriteAttribute_BinaryInputBasic_PresentValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_BinaryInputBasic_PresentValue.restype = ctypes.c_uint32
         # Cluster BinaryInputBasic ReadAttribute StatusFlags
         self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_StatusFlags.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_StatusFlags.restype = ctypes.c_uint32
@@ -2454,6 +3506,9 @@ class ChipClusters:
         # Cluster BridgedDeviceBasic ReadAttribute UserLabel
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_UserLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_UserLabel.restype = ctypes.c_uint32
+        # Cluster BridgedDeviceBasic WriteAttribute UserLabel
+        self._chipLib.chip_ime_WriteAttribute_BridgedDeviceBasic_UserLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_BridgedDeviceBasic_UserLabel.restype = ctypes.c_uint32
         # Cluster BridgedDeviceBasic ReadAttribute HardwareVersion
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersion.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersion.restype = ctypes.c_uint32
@@ -2575,6 +3630,9 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute ColorControlOptions
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorControlOptions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorControlOptions.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorControlOptions
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorControlOptions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorControlOptions.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute NumberOfPrimaries
         self._chipLib.chip_ime_ReadAttribute_ColorControl_NumberOfPrimaries.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_NumberOfPrimaries.restype = ctypes.c_uint32
@@ -2635,36 +3693,69 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute WhitePointX
         self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointX.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute WhitePointX
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_WhitePointX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_WhitePointX.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute WhitePointY
         self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointY.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute WhitePointY
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_WhitePointY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_WhitePointY.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorPointRX
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRX.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorPointRX
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointRX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointRX.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorPointRY
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRY.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorPointRY
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointRY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointRY.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorPointRIntensity
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRIntensity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRIntensity.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorPointRIntensity
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointRIntensity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointRIntensity.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorPointGX
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGX.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorPointGX
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointGX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointGX.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorPointGY
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGY.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorPointGY
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointGY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointGY.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorPointGIntensity
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGIntensity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGIntensity.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorPointGIntensity
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointGIntensity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointGIntensity.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorPointBX
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBX.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorPointBX
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBX.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorPointBY
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBY.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorPointBY
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBY.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorPointBIntensity
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBIntensity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBIntensity.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute ColorPointBIntensity
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBIntensity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBIntensity.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute EnhancedCurrentHue
         self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedCurrentHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedCurrentHue.restype = ctypes.c_uint32
@@ -2695,6 +3786,9 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute StartUpColorTemperatureMireds
         self._chipLib.chip_ime_ReadAttribute_ColorControl_StartUpColorTemperatureMireds.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_StartUpColorTemperatureMireds.restype = ctypes.c_uint32
+        # Cluster ColorControl WriteAttribute StartUpColorTemperatureMireds
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_StartUpColorTemperatureMireds.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_ColorControl_StartUpColorTemperatureMireds.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision.restype = ctypes.c_uint32
@@ -2860,6 +3954,9 @@ class ChipClusters:
         # Cluster GeneralCommissioning ReadAttribute Breadcrumb
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb.restype = ctypes.c_uint32
+        # Cluster GeneralCommissioning WriteAttribute Breadcrumb
+        self._chipLib.chip_ime_WriteAttribute_GeneralCommissioning_Breadcrumb.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_WriteAttribute_GeneralCommissioning_Breadcrumb.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision.restype = ctypes.c_uint32
@@ -2918,6 +4015,9 @@ class ChipClusters:
         # Cluster Identify ReadAttribute IdentifyTime
         self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime.restype = ctypes.c_uint32
+        # Cluster Identify WriteAttribute IdentifyTime
+        self._chipLib.chip_ime_WriteAttribute_Identify_IdentifyTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_Identify_IdentifyTime.restype = ctypes.c_uint32
         # Cluster Identify ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision.restype = ctypes.c_uint32
@@ -3091,12 +4191,21 @@ class ChipClusters:
         # Cluster OnOff ReadAttribute OnTime
         self._chipLib.chip_ime_ReadAttribute_OnOff_OnTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_OnTime.restype = ctypes.c_uint32
+        # Cluster OnOff WriteAttribute OnTime
+        self._chipLib.chip_ime_WriteAttribute_OnOff_OnTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_OnOff_OnTime.restype = ctypes.c_uint32
         # Cluster OnOff ReadAttribute OffWaitTime
         self._chipLib.chip_ime_ReadAttribute_OnOff_OffWaitTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_OffWaitTime.restype = ctypes.c_uint32
+        # Cluster OnOff WriteAttribute OffWaitTime
+        self._chipLib.chip_ime_WriteAttribute_OnOff_OffWaitTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_OnOff_OffWaitTime.restype = ctypes.c_uint32
         # Cluster OnOff ReadAttribute StartUpOnOff
         self._chipLib.chip_ime_ReadAttribute_OnOff_StartUpOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_StartUpOnOff.restype = ctypes.c_uint32
+        # Cluster OnOff WriteAttribute StartUpOnOff
+        self._chipLib.chip_ime_WriteAttribute_OnOff_StartUpOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_OnOff_StartUpOnOff.restype = ctypes.c_uint32
         # Cluster OnOff ReadAttribute FeatureMap
         self._chipLib.chip_ime_ReadAttribute_OnOff_FeatureMap.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_FeatureMap.restype = ctypes.c_uint32
@@ -3159,6 +4268,9 @@ class ChipClusters:
         # Cluster PumpConfigurationAndControl ReadAttribute OperationMode
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl WriteAttribute OperationMode
+        self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_OperationMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_PumpConfigurationAndControl_OperationMode.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision.restype = ctypes.c_uint32
@@ -3305,51 +4417,99 @@ class ChipClusters:
         # Cluster TestCluster ReadAttribute Boolean
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Boolean.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Boolean.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Boolean
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Boolean.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Boolean.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Bitmap8
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap8.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap8.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Bitmap8
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap8.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap8.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Bitmap16
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap16.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap16.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Bitmap16
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap16.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap16.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Bitmap32
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap32.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap32.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Bitmap32
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap32.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap32.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Bitmap64
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap64.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Bitmap64.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Bitmap64
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap64.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Bitmap64.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Int8u
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int8u.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int8u.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Int8u
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int8u.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int8u.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Int16u
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int16u.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int16u.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Int16u
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int16u.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int16u.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Int32u
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int32u.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int32u.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Int32u
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int32u.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int32u.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Int64u
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int64u.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int64u.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Int64u
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int64u.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int64u.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Int8s
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int8s.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int8s.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Int8s
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int8s.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int8s.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Int16s
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int16s.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int16s.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Int16s
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int16s.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int16s.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Int32s
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int32s.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int32s.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Int32s
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int32s.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int32s.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Int64s
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int64s.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Int64s.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Int64s
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int64s.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int64]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Int64s.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Enum8
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Enum8.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Enum8.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Enum8
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Enum8.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Enum8.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Enum16
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Enum16.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Enum16.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Enum16
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Enum16.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Enum16.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute OctetString
         self._chipLib.chip_ime_ReadAttribute_TestCluster_OctetString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_OctetString.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute OctetString
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_OctetString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_OctetString.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute ListInt8u
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ListInt8u.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ListInt8u.restype = ctypes.c_uint32
@@ -3387,15 +4547,27 @@ class ChipClusters:
         # Cluster Thermostat ReadAttribute OccupiedCoolingSetpoint
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute OccupiedCoolingSetpoint
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedCoolingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedCoolingSetpoint.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute OccupiedHeatingSetpoint
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute OccupiedHeatingSetpoint
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedHeatingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedHeatingSetpoint.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute ControlSequenceOfOperation
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute ControlSequenceOfOperation
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_ControlSequenceOfOperation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_ControlSequenceOfOperation.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute SystemMode
         self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute SystemMode
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_SystemMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_SystemMode.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.restype = ctypes.c_uint32
@@ -3654,6 +4826,9 @@ class ChipClusters:
         # Cluster WindowCovering ReadAttribute Mode
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_Mode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_Mode.restype = ctypes.c_uint32
+        # Cluster WindowCovering WriteAttribute Mode
+        self._chipLib.chip_ime_WriteAttribute_WindowCovering_Mode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_WindowCovering_Mode.restype = ctypes.c_uint32
         # Cluster WindowCovering ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision.restype = ctypes.c_uint32
