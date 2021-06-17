@@ -21,60 +21,54 @@
 static bool isLogInitialized;
 extern uint8_t gOtLogUartInstance;
 extern "C" void K32WWriteBlocking(const uint8_t * aBuf, uint32_t len);
+extern "C" uint32_t otPlatAlarmMilliGetNow(void);
 
 namespace chip {
 namespace Logging {
 namespace Platform {
 
-void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLevelLog)
+void GetMessageString(char * buf, uint8_t bufLen, const char * module, uint8_t category)
 {
-    if (chipCategory != kLogCategory_None)
+	int writtenLen = 0;
+	const char *categoryString;
+
+    writtenLen = snprintf(buf, bufLen, "[%lu]", otPlatAlarmMilliGetNow());
+    assert ((writtenLen > 0) && (writtenLen < bufLen));
+    bufLen -= writtenLen;
+
+    if (category != kLogCategory_None)
     {
-        switch (chipCategory)
+        switch (category)
         {
         case kLogCategory_Error:
-            memcpy(buf, "[Error]", 7);
+            categoryString = "E";
             break;
         case kLogCategory_Progress:
-        default:
-            memcpy(buf, "[Progress]", 10);
+            categoryString = "P";
             break;
         case kLogCategory_Detail:
-            memcpy(buf, "[Debug]", 7);
+            categoryString = "D";
             break;
+        default:
+            categoryString = "U";
         }
+
+        writtenLen = snprintf(buf + writtenLen, bufLen, "[%s]", categoryString);
+        assert ((writtenLen > 0) && (writtenLen < bufLen));
+        bufLen -= writtenLen;
     }
 
-    if (otLevelLog != OT_LOG_LEVEL_NONE)
-    {
-        switch (otLevelLog)
-        {
-        case OT_LOG_LEVEL_CRIT:
-            memcpy(buf, "[Error]", 7);
-            break;
-        case OT_LOG_LEVEL_WARN:
-            memcpy(buf, "[Warn]", 6);
-            break;
-        case OT_LOG_LEVEL_NOTE:
-        case OT_LOG_LEVEL_INFO:
-        default:
-            memcpy(buf, "[Info]", 6);
-            break;
-        case OT_LOG_LEVEL_DEBG:
-            memcpy(buf, "[Debug]", 7);
-            break;
-        }
-    }
+    writtenLen = snprintf(buf + writtenLen, bufLen, "[%s]", module);
+    assert ((writtenLen > 0) && (writtenLen < bufLen));
 }
 
 } // namespace Platform
 } // namespace Logging
 } // namespace chip
 
-void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLevelLog)
+void FillPrefix(char * buf, uint8_t bufLen, const char * module, uint8_t category)
 {
-    /* add the error string */
-    chip::Logging::Platform::GetMessageString(buf, chipCategory, otLevelLog);
+    chip::Logging::Platform::GetMessageString(buf, bufLen, module, category);
 }
 
 namespace chip {
@@ -91,7 +85,7 @@ void __attribute__((weak)) OnLogOutput(void) {}
 } // namespace DeviceLayer
 } // namespace chip
 
-void GenericLog(const char * format, va_list arg)
+void GenericLog(const char * format, va_list arg, const char * module, uint8_t category)
 {
 
 #if K32W_LOG_ENABLED
@@ -106,9 +100,8 @@ void GenericLog(const char * format, va_list arg)
         otPlatUartEnable();
     }
 
-    /* Prefix is composed of [Debug String][MOdule Name String] */
-    FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, chip::Logging::kLogCategory_None,
-               chip::Logging::kLogCategory_Detail);
+    /* Prefix is composed of [Time Reference][Debug String][Module Name String] */
+    FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, module, category);
     prefixLen = strlen(formattedMsg);
 
     // Append the log message.
@@ -137,7 +130,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     (void) category;
 
 #if K32W_LOG_ENABLED
-    GenericLog(msg, v);
+    GenericLog(msg, v, module, category);
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
 
@@ -157,9 +150,10 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 extern "C" void LwIPLog(const char * msg, ...)
 {
     va_list v;
+    const char *module = "LWIP";
 
     va_start(v, msg);
-    GenericLog(msg, v);
+    GenericLog(msg, v, module, chip::Logging::kLogCategory_None);
     va_end(v);
 }
 
@@ -171,12 +165,13 @@ extern "C" void LwIPLog(const char * msg, ...)
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     va_list v;
+    const char *module = "OT";
 
     (void) aLogLevel;
     (void) aLogRegion;
 
     va_start(v, aFormat);
-    GenericLog(aFormat, v);
+    GenericLog(aFormat, v, module, chip::Logging::kLogCategory_None);
     va_end(v);
 }
 
