@@ -20,7 +20,7 @@
 
 constexpr uint16_t kWaitDurationInSeconds = 30;
 
-CHIP_ERROR TestCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR TestCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -34,7 +34,9 @@ CHIP_ERROR TestCommand::Run(NodeId localId, NodeId remoteId)
     {
         chip::DeviceLayer::StackLock lock;
 
-        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
+        auto * ctx = GetExecContext();
+
+        err = ctx->commissioner->GetDevice(ctx->remoteId, &mDevice);
         ReturnErrorOnFailure(err);
 
         err = NextTest();

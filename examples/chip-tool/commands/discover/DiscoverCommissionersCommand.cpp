@@ -23,7 +23,7 @@ using namespace ::chip;
 
 constexpr uint16_t kWaitDurationInSeconds = 3;
 
-CHIP_ERROR DiscoverCommissionersCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR DiscoverCommissionersCommand::Run()
 {
     //
     // Set this to true first BEFORE we send commands to ensure we don't

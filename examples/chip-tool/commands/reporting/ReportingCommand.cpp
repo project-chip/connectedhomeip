@@ -28,7 +28,7 @@ namespace {
 constexpr uint16_t kWaitDurationInSeconds = UINT16_MAX;
 } // namespace
 
-CHIP_ERROR ReportingCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR ReportingCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Controller::BasicCluster cluster;
@@ -43,8 +43,9 @@ CHIP_ERROR ReportingCommand::Run(NodeId localId, NodeId remoteId)
     {
         chip::DeviceLayer::StackLock lock;
 
-        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
+        auto * ctx = GetExecContext();
+        err        = ctx->commissioner->GetDevice(ctx->remoteId, &mDevice);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, ctx->localId));
 
         AddReportCallbacks(mEndPointId);
         cluster.Associate(mDevice, mEndPointId);

@@ -97,7 +97,7 @@ public:
     }
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;

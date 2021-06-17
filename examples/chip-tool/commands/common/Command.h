@@ -101,6 +101,8 @@ public:
         ChipDeviceCommissioner * commissioner;
         chip::Controller::ExampleOperationalCredentialsIssuer * opCredsIssuer;
         PersistentStorage * storage;
+        chip::NodeId localId;
+        chip::NodeId remoteId;
     };
 
     Command(const char * commandName) : mName(commandName) {}
@@ -162,7 +164,7 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64);
     }
 
-    virtual CHIP_ERROR Run(NodeId localId, NodeId remoteId) = 0;
+    virtual CHIP_ERROR Run() = 0;
 
     bool GetCommandExitStatus() const { return mCommandExitStatus; }
     void SetCommandExitStatus(bool status)

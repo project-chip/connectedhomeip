@@ -27,7 +27,7 @@ constexpr uint64_t kBreadcrumb                = 0;
 constexpr uint32_t kTimeoutMs                 = 6000;
 constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
 
-CHIP_ERROR PairingCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR PairingCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -38,7 +38,7 @@ CHIP_ERROR PairingCommand::Run(NodeId localId, NodeId remoteId)
         GetExecContext()->commissioner->RegisterPairingDelegate(this);
     }
 
-    err = RunInternal(remoteId);
+    err = RunInternal(GetExecContext()->remoteId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", ErrorStr(err)));
 
 exit:

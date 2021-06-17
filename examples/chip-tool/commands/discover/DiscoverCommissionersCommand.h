@@ -25,7 +25,7 @@ class DiscoverCommissionersCommand : public Command
 {
 public:
     DiscoverCommissionersCommand() : Command("discover-commissioners") {}
-    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
 
 private:
     chip::Controller::CommissionableNodeController mCommissionableNodeController;

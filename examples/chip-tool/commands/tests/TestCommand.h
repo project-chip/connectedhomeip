@@ -27,7 +27,7 @@ public:
     TestCommand(const char * commandName) : Command(commandName) {}
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
 
     virtual CHIP_ERROR NextTest() = 0;
 

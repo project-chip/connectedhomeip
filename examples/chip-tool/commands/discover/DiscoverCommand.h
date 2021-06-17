@@ -35,7 +35,7 @@ public:
     void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override{};
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
 
     virtual CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) = 0;
 

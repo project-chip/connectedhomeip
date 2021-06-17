@@ -158,10 +158,12 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
         execContext.commissioner  = &mController;
         execContext.opCredsIssuer = &mOpCredsIssuer;
         execContext.storage       = &mStorage;
+        execContext.localId       = localId;
+        execContext.remoteId      = remoteId;
 
         command->SetExecutionContext(execContext);
 
-        err = command->Run(localId, remoteId);
+        err = command->Run();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));

@@ -20,7 +20,7 @@
 
 constexpr uint16_t kWaitDurationInSeconds = 30;
 
-CHIP_ERROR DiscoverCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR DiscoverCommand::Run()
 {
     CHIP_ERROR err;
 

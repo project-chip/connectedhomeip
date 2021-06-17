@@ -37,7 +37,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
-CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR ModelCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -51,10 +51,13 @@ CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
     {
         chip::DeviceLayer::StackLock lock;
 
-        err = GetExecContext()->commissioner->GetConnectedDevice(remoteId, &mOnDeviceConnectedCallback,
-                                                                 &mOnDeviceConnectionFailureCallback);
-        VerifyOrExit(err == CHIP_NO_ERROR,
-                     ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %d", remoteId, err));
+        auto * ctx = GetExecContext();
+
+        err =
+            ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+        VerifyOrExit(
+            err == CHIP_NO_ERROR,
+            ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %d", ctx->remoteId, err));
     }
 
     WaitForResponse(kWaitDurationInSeconds);

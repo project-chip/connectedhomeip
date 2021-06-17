@@ -24,7 +24,7 @@
 using namespace ::chip;
 using namespace ::chip::SetupPayloadData;
 
-CHIP_ERROR AdditionalDataParseCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR AdditionalDataParseCommand::Run()
 {
     std::vector<uint8_t> payloadData;
     AdditionalDataPayload resultPayload;
