@@ -728,14 +728,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteSpan & x509ICAC, uint8_t * chipCertArrayBuf,
-                                           uint32_t chipCertArrayBufSize, uint32_t & chipCertBufLen)
+CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteSpan & x509ICAC, MutableByteSpan & chipCertArray)
 {
     // NOC is mandatory
     VerifyOrReturnError(x509NOC.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     TLVWriter writer;
-    writer.Init(chipCertArrayBuf, chipCertArrayBufSize);
+
+    // We can still generate the certificate if the output chip cert buffer is bigger than UINT32_MAX,
+    // since generated cert needs less space than UINT32_MAX.
+    uint32_t chipCertBufLen = (chipCertArray.size() > UINT32_MAX) ? UINT32_MAX : static_cast<uint32_t>(chipCertArray.size());
+    writer.Init(chipCertArray.data(), chipCertBufLen);
 
     TLVType outerContainer;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Array, outerContainer));
@@ -760,7 +763,8 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
     ReturnErrorOnFailure(writer.EndContainer(outerContainer));
     ReturnErrorOnFailure(writer.Finalize());
 
-    chipCertBufLen = writer.GetLengthWritten();
+    ReturnErrorCodeIf(writer.GetLengthWritten() > chipCertBufLen, CHIP_ERROR_INTERNAL);
+    chipCertArray.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }

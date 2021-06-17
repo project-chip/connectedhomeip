@@ -348,8 +348,7 @@ protected:
     // array can contain up to two certificates (node operational certificate, and ICA certificate).
     // If the certificate issuer doesn't require an ICA (i.e. NOC is signed by the root CA), the array
     // will have only one certificate (node operational certificate).
-    CHIP_ERROR GenerateOperationalCertificates(const ByteSpan & CSR, NodeId deviceId, uint8_t * certBuf, uint32_t certBufSize,
-                                               uint32_t & outCertLen);
+    CHIP_ERROR GenerateOperationalCertificates(const ByteSpan & CSR, NodeId deviceId, MutableByteSpan & cert);
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
@@ -454,13 +453,12 @@ public:
     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
 
     /**
-     * @brief
-     *   This function is called by the commissioner application when a device (being paired) is
-     *   discovered on the operational network.
+     *   This function call indicates that the device has been provisioned with operational
+     *   credentials, and is reachable on operational network. At this point, the device is
+     *   available for CASE session establishment.
      *
-     * @param[in] remoteDeviceId        The remote device Id.
-     *
-     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
+     *   The function updates the state of device proxy object such that all subsequent messages
+     *   will use secure session established via CASE handshake.
      */
     CHIP_ERROR OperationalDiscoveryComplete(NodeId remoteDeviceId);
 
