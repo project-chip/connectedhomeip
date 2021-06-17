@@ -37,11 +37,20 @@ class ChipClusters:
     def ListClusterAttributes(self):
         return {
 {{#chip_client_clusters}}
-            "{{asCamelCased name false}}": [
+            "{{asCamelCased name false}}": {
 {{#chip_server_cluster_attributes}}
-                "{{asCamelCased name false}}",
+                "{{asCamelCased name false}}": {
+                    "attributeId": {{asHex code 4}},
+                    "type": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
+                    {{#if (isReportableAttribute)}}
+                    "reportable": True,
+                    {{/if}}
+                    {{#if (isWritableAttribute)}}
+                    "writable": True,
+                    {{/if}}
+                },
 {{/chip_server_cluster_attributes}}
-            ],
+            },
 {{/chip_client_clusters}}
         }
 
@@ -68,6 +77,13 @@ class ChipClusters:
         funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
         funcCaller(lambda: func(device, endpoint, minInterval, maxInterval, change))
 
+    def WriteAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, groupid: int, value, imEnabled):
+        func = getattr(self, "Cluster{}_WriteAttribute{}".format(cluster, attribute), None)
+        if not func:
+            raise UnknownAttribute(cluster, attribute)
+        funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
+        funcCaller(lambda: func(device, endpoint, groupid, value))
+
     # Cluster commands
 
 {{#chip_client_clusters}}
@@ -93,6 +109,13 @@ class ChipClusters:
 {{#if (isReportableAttribute)}}
     def Cluster{{asCamelCased parent.name false}}_ConfigureAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
         return self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, minInterval, maxInterval, change)
+{{/if}}
+{{#if (isWritableAttribute)}}
+    def Cluster{{asCamelCased parent.name false}}_WriteAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: {{ asPythonType chipType }}):
+{{#if (isCharString type)}}
+        value = value.encode("utf-8") + b'\x00'
+{{/if}}
+        return self._chipLib.chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, ZCLgroupid, value{{#if (isString type)}}, len(value){{/if}})
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -121,6 +144,11 @@ class ChipClusters:
         # Cluster {{asCamelCased parent.name false}} ConfigureAttribute {{asCamelCased name false}}
         self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16{{#unless (isDiscreteType)}}, ctypes.{{asPythonCType chipType}}{{/unless}}]
         self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
+{{/if}}
+{{#if (isWritableAttribute)}}
+        # Cluster {{asCamelCased parent.name false}} WriteAttribute {{asCamelCased name false}}
+        self._chipLib.chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, {{#if (isString type)}}ctypes.c_char_p, ctypes.c_uint32{{else}}ctypes.{{asPythonCType chipType}}{{/if}}]
+        self._chipLib.chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
