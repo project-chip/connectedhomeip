@@ -170,6 +170,9 @@
 // Definitions for cluster: Temperature Measurement
 #define ZCL_TEMP_MEASUREMENT_CLUSTER_ID (0x0402)
 
+// Definitions for cluster: Pressure Measurement
+#define ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID (0x0403)
+
 // Definitions for cluster: Flow Measurement
 #define ZCL_FLOW_MEASUREMENT_CLUSTER_ID (0x0404)
 
