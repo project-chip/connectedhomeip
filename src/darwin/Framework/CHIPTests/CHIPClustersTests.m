@@ -155,7 +155,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTestClusterTests_0_Test
+- (void)testSendClusterTestCluster_0_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -171,7 +171,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestClusterTests_1_TestNotHandled
+- (void)testSendClusterTestCluster_1_TestNotHandled
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Not Handled Command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -187,7 +187,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestClusterTests_2_TestSpecific
+- (void)testSendClusterTestCluster_2_TestSpecific
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Specific Command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -204,7 +204,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestClusterTests_3_WriteAttribute
+- (void)testSendClusterTestCluster_3_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BOOLEAN"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -221,7 +221,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestClusterTests_4_ReadAttribute
+- (void)testSendClusterTestCluster_4_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BOOLEAN"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -239,16 +239,50 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterOnOffTests_0_ReadAttribute
+- (void)testSendClusterTest_3_1_1_0_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false when starting"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check on/off attribute value is false when starting Error: %@", err);
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 2);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_1_1_1_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 2);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_1_1_2_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read the optional global attribute: FeatureMap"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read the optional global attribute: FeatureMap Error: %@", err);
         XCTAssertEqual(err.code, 0);
         XCTAssertEqual([values[@"value"] intValue], 0);
         [expectation fulfill];
@@ -256,7 +290,263 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterOnOffTests_1_On
+- (void)testSendClusterTest_3_1_1_3_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back optional global attribute: FeatureMap"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"reads back optional global attribute: FeatureMap Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_3_2_1_0_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read the mandatory attribute: OnOff"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read the mandatory attribute: OnOff Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_1_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back mandatory attribute: OnOff"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"reads back mandatory attribute: OnOff Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_2_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read LT attribute: GlobalSceneControl"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeGlobalSceneControlWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read LT attribute: GlobalSceneControl Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 1);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_3_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read LT attribute: OnTime"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read LT attribute: OnTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_4_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read LT attribute: OffWaitTime"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOffWaitTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read LT attribute: OffWaitTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_5_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read LT attribute: StartUpOnOff"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read LT attribute: StartUpOnOff Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_6_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"write the default value to LT attribute: OnTime"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster writeAttributeOnTimeWithValue:0
+                           responseHandler:^(NSError * err, NSDictionary * values) {
+                               NSLog(@"write the default value to LT attribute: OnTime Error: %@", err);
+                               XCTAssertEqual(err.code, 0);
+                               [expectation fulfill];
+                           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_7_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"write the default value to LT attribute: OffWaitTime"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster writeAttributeOffWaitTimeWithValue:0
+                                responseHandler:^(NSError * err, NSDictionary * values) {
+                                    NSLog(@"write the default value to LT attribute: OffWaitTime Error: %@", err);
+                                    XCTAssertEqual(err.code, 0);
+                                    [expectation fulfill];
+                                }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_8_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"write the default value to LT attribute: StartUpOnOff"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster writeAttributeStartUpOnOffWithValue:0
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"write the default value to LT attribute: StartUpOnOff Error: %@", err);
+                                     XCTAssertEqual(err.code, 0);
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_9_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back LT attribute: OnTime"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"reads back LT attribute: OnTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_10_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back LT attribute: OffWaitTime"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOffWaitTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"reads back LT attribute: OffWaitTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_1_11_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back LT attribute: StartUpOnOff"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"reads back LT attribute: StartUpOnOff Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_3_2_2_0_Off
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Off Command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster off:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Send Off Command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_1_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_2_On
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send On Command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -272,7 +562,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterOnOffTests_2_ReadAttribute
+- (void)testSendClusterTest_3_2_2_3_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is true after on command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -289,7 +579,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterOnOffTests_3_Off
+- (void)testSendClusterTest_3_2_2_4_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Off Command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -305,7 +595,141 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterOnOffTests_4_ReadAttribute
+- (void)testSendClusterTest_3_2_2_5_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_6_Toggle
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Toggle Command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster toggle:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Send Toggle Command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_7_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Check on/off attribute value is true after toggle command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check on/off attribute value is true after toggle command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 1);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_8_Toggle
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Toggle Command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster toggle:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Send Toggle Command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_9_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Check on/off attribute value is false after toggle command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check on/off attribute value is false after toggle command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_10_On
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send On Command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster on:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Send On Command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_11_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is true after on command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] intValue], 1);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_12_Off
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Off Command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster off:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Send Off Command Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_3_2_2_13_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3489,6 +3913,25 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterOtaSoftwareUpdateServerReadAttributeClusterRevisionWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"OtaSoftwareUpdateServerReadAttributeClusterRevisionWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOtaSoftwareUpdateServer * cluster = [[CHIPOtaSoftwareUpdateServer alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"OtaSoftwareUpdateServer ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterOnOffReadAttributeOnOffWithResponseHandler
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"OnOffReadAttributeOnOffWithResponseHandler"];
@@ -3500,6 +3943,153 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"OnOff OnOff Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterOnOffReadAttributeGlobalSceneControlWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"OnOffReadAttributeGlobalSceneControlWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeGlobalSceneControlWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"OnOff GlobalSceneControl Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterOnOffReadAttributeOnTimeWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"OnOffReadAttributeOnTimeWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"OnOff OnTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterOnOffWriteAttributeOnTimeWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"OnOffWriteAttributeOnTimeWithValue"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t value = 0x0000;
+    [cluster writeAttributeOnTimeWithValue:value
+                           responseHandler:^(NSError * err, NSDictionary * values) {
+                               NSLog(@"OnOff OnTime Error: %@", err);
+                               XCTAssertEqual(err.code, 0);
+                               [expectation fulfill];
+                           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterOnOffReadAttributeOffWaitTimeWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"OnOffReadAttributeOffWaitTimeWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOffWaitTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"OnOff OffWaitTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterOnOffWriteAttributeOffWaitTimeWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"OnOffWriteAttributeOffWaitTimeWithValue"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t value = 0x0000;
+    [cluster writeAttributeOffWaitTimeWithValue:value
+                                responseHandler:^(NSError * err, NSDictionary * values) {
+                                    NSLog(@"OnOff OffWaitTime Error: %@", err);
+                                    XCTAssertEqual(err.code, 0);
+                                    [expectation fulfill];
+                                }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterOnOffReadAttributeStartUpOnOffWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"OnOffReadAttributeStartUpOnOffWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeStartUpOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"OnOff StartUpOnOff Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterOnOffWriteAttributeStartUpOnOffWithValue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"OnOffWriteAttributeStartUpOnOffWithValue"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeStartUpOnOffWithValue:value
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"OnOff StartUpOnOff Error: %@", err);
+                                     XCTAssertEqual(err.code, 0);
+                                     [expectation fulfill];
+                                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterOnOffReadAttributeFeatureMapWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"OnOffReadAttributeFeatureMapWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"OnOff FeatureMap Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

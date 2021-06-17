@@ -88,6 +88,7 @@ CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::Devi
 CHIP_ERROR
 pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId, char * outAddress,
                                           uint64_t maxAddressLen, uint16_t * outPort);
+CHIP_ERROR pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 
 // Rendezvous
 CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
@@ -181,6 +182,11 @@ CHIP_ERROR pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCom
     VerifyOrReturnError(address.ToString(outAddress, maxAddressLen), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
+{
+    return devCtrl->GetFabricId(*outFabricId);
 }
 
 const char * pychip_DeviceController_ErrorToString(CHIP_ERROR err)

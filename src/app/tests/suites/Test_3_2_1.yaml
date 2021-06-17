@@ -1,0 +1,117 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.1. [TC-OO-2] Attributes with server as DUT
+
+config:
+    cluster: "On/Off"
+    endpoint: 1
+
+tests:
+    - label: "read the mandatory attribute: OnOff"
+      command: "readAttribute"
+      attribute: "On/Off"
+      response:
+          value: 0
+
+    - label: "write the default value of mandatory attribute: OnOff"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "On/Off"
+      arguments:
+          value: 0
+      response:
+          error: 1
+
+    - label: "reads back mandatory attribute: OnOff"
+      command: "readAttribute"
+      attribute: "On/Off"
+      response:
+          value: 0
+
+    - label: "read LT attribute: GlobalSceneControl"
+      command: "readAttribute"
+      attribute: "Global Scene Control"
+      response:
+          value: 1
+
+    - label: "read LT attribute: OnTime"
+      command: "readAttribute"
+      attribute: "On Time"
+      response:
+          value: 0
+
+    - label: "read LT attribute: OffWaitTime"
+      command: "readAttribute"
+      attribute: "Off Wait Time"
+      response:
+          value: 0
+
+    - label: "read LT attribute: StartUpOnOff"
+      command: "readAttribute"
+      attribute: "Start Up On Off"
+      response:
+          value: 0
+
+    - label: "write the default value to LT attribute: GlobalSceneControl"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "Global Scene Control"
+      arguments:
+          value: 0
+      response:
+          error: 1
+
+    - label: "write the default value to LT attribute: OnTime"
+      command: "writeAttribute"
+      attribute: "On Time"
+      arguments:
+          value: 0
+
+    - label: "write the default value to LT attribute: OffWaitTime"
+      command: "writeAttribute"
+      attribute: "Off Wait Time"
+      arguments:
+          value: 0
+
+    - label: "write the default value to LT attribute: StartUpOnOff"
+      command: "writeAttribute"
+      attribute: "Start Up On Off"
+      arguments:
+          value: 0
+
+    - label: "reads back LT attribute: GlobalSceneControl"
+      disabled: true
+      command: "readAttribute"
+      attribute: "Global Scene Control"
+      response:
+          value: 1
+
+    - label: "reads back LT attribute: OnTime"
+      command: "readAttribute"
+      attribute: "On Time"
+      response:
+          value: 0
+
+    - label: "reads back LT attribute: OffWaitTime"
+      command: "readAttribute"
+      attribute: "Off Wait Time"
+      response:
+          value: 0
+
+    - label: "reads back LT attribute: StartUpOnOff"
+      command: "readAttribute"
+      attribute: "Start Up On Off"
+      response:
+          value: 0

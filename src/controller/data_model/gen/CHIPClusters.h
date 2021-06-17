@@ -53,6 +53,7 @@ constexpr ClusterId kLowPowerClusterId                    = 0x0508;
 constexpr ClusterId kMediaInputClusterId                  = 0x0507;
 constexpr ClusterId kMediaPlaybackClusterId               = 0x0506;
 constexpr ClusterId kNetworkCommissioningClusterId        = 0x0031;
+constexpr ClusterId kOtaSoftwareUpdateServerClusterId     = 0x0029;
 constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
 constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
@@ -894,6 +895,32 @@ private:
     static constexpr CommandId kUpdateWiFiNetworkCommandId                 = 0x04;
 };
 
+class DLL_EXPORT OtaSoftwareUpdateServerCluster : public ClusterBase
+{
+public:
+    OtaSoftwareUpdateServerCluster() : ClusterBase(kOtaSoftwareUpdateServerClusterId) {}
+    ~OtaSoftwareUpdateServerCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  chip::ByteSpan updateToken, uint32_t newVersion);
+    CHIP_ERROR NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   chip::ByteSpan updateToken, uint32_t currentVersion);
+    CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t vendorId,
+                          uint16_t productId, uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion,
+                          uint8_t protocolsSupported, chip::ByteSpan location, uint8_t clientCanConsent,
+                          chip::ByteSpan metadataForServer);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kApplyUpdateRequestCommandId  = 0x01;
+    static constexpr CommandId kNotifyUpdateAppliedCommandId = 0x02;
+    static constexpr CommandId kQueryImageCommandId          = 0x00;
+};
+
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
@@ -908,7 +935,18 @@ public:
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeGlobalSceneControl(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint16_t value);
+    CHIP_ERROR WriteAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         uint16_t value);
+    CHIP_ERROR WriteAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t value);
     CHIP_ERROR ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                        uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeOnOff(Callback::Cancelable * onReportCallback);
@@ -1269,6 +1307,9 @@ public:
     ThreadNetworkDiagnosticsCluster() : ClusterBase(kThreadNetworkDiagnosticsClusterId) {}
     ~ThreadNetworkDiagnosticsCluster() {}
 
+    // Cluster Commands
+    CHIP_ERROR ResetCounts(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -1346,6 +1387,9 @@ public:
     CHIP_ERROR ReadAttributeActiveNetworkFaultsList(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kResetCountsCommandId = 0x00;
 };
 
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase

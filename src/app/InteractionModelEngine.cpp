@@ -68,22 +68,34 @@ void InteractionModelEngine::Shutdown()
 {
     for (auto & commandSender : mCommandSenderObjs)
     {
-        commandSender.Shutdown();
+        if (!commandSender.IsFree())
+        {
+            commandSender.Shutdown();
+        }
     }
 
     for (auto & commandHandler : mCommandHandlerObjs)
     {
-        commandHandler.Shutdown();
+        if (!commandHandler.IsFree())
+        {
+            commandHandler.Shutdown();
+        }
     }
 
     for (auto & readClient : mReadClients)
     {
-        readClient.Shutdown();
+        if (!readClient.IsFree())
+        {
+            readClient.Shutdown();
+        }
     }
 
     for (auto & readHandler : mReadHandlers)
     {
-        readHandler.Shutdown();
+        if (!readHandler.IsFree())
+        {
+            readHandler.Shutdown();
+        }
     }
 
     for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS; index++)

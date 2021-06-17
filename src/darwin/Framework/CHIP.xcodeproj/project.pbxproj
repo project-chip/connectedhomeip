@@ -98,7 +98,7 @@
 		1E85731C26551A490050A4D9 /* DataModelHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DataModelHandler.cpp; path = ../../../app/util/DataModelHandler.cpp; sourceTree = "<group>"; };
 		1E85731D26551A490050A4D9 /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = ../../../app/util/util.cpp; sourceTree = "<group>"; };
 		1E85731E26551A490050A4D9 /* ember-print.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-print.cpp"; path = "../../../app/util/ember-print.cpp"; sourceTree = "<group>"; };
-		1E85731F26551A490050A4D9 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size.cpp"; path = "../../../app/util/attribute-size.cpp"; sourceTree = "<group>"; };
+		1E85731F26551A490050A4D9 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size-util.cpp"; path = "../../../app/util/attribute-size-util.cpp"; sourceTree = "<group>"; };
 		1E85732026551A490050A4D9 /* process-cluster-message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "process-cluster-message.cpp"; path = "../../../app/util/process-cluster-message.cpp"; sourceTree = "<group>"; };
 		1E85732126551A490050A4D9 /* chip-message-send.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "chip-message-send.cpp"; path = "../../../app/util/chip-message-send.cpp"; sourceTree = "<group>"; };
 		1E85733226551A700050A4D9 /* reporting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = reporting.cpp; path = ../../../app/reporting/reporting.cpp; sourceTree = "<group>"; };
@@ -724,8 +724,11 @@
 					"$(CHIP_ROOT)/src/app",
 					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					.,
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
+					"$(CHIP_ROOT)/src/app/util",
+					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
+					"$(CHIP_ROOT)/src/controller/data_model",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

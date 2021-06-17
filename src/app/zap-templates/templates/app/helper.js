@@ -16,12 +16,12 @@
  */
 
 // Import helpers from zap core
-const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
-const queryImpexp  = require(zapPath + 'db/query-impexp.js')
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery     = require(zapPath + 'db/query-zcl.js')
-const cHelper      = require(zapPath + 'generator/helper-c.js')
+const zapPath       = '../../../../../third_party/zap/repo/src-electron/';
+const templateUtil  = require(zapPath + 'generator/template-util.js')
+const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
+const zclHelper     = require(zapPath + 'generator/helper-zcl.js')
+const zclQuery      = require(zapPath + 'db/query-zcl.js')
+const cHelper       = require(zapPath + 'generator/helper-c.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
@@ -37,7 +37,7 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
  */
 function user_cluster_has_enabled_manufacturer_command(name, side, options)
 {
-  return queryImpexp.exportEndPointTypeIds(this.global.db, this.global.sessionId)
+  return queryEndpoint.selectEndPointTypeIds(this.global.db, this.global.sessionId)
       .then((endpointTypes) => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(this.global.db, endpointTypes))
       .then((endpointsAndClusters) => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(
                 this.global.db, endpointsAndClusters))

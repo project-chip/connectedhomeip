@@ -484,6 +484,27 @@ class ChipClusters:
                     "timeoutMs": "int",
                 },
             },
+            "OtaSoftwareUpdateServer": {
+                "ApplyUpdateRequest": {
+                    "updateToken": "bytes",
+                    "newVersion": "int",
+                },
+                "NotifyUpdateApplied": {
+                    "updateToken": "bytes",
+                    "currentVersion": "int",
+                },
+                "QueryImage": {
+                    "vendorId": "int",
+                    "productId": "int",
+                    "imageType": "int",
+                    "hardwareVersion": "int",
+                    "currentVersion": "int",
+                    "protocolsSupported": "int",
+                    "location": "str",
+                    "clientCanConsent": "int",
+                    "metadataForServer": "bytes",
+                },
+            },
             "OnOff": {
                 "Off": {
                 },
@@ -617,6 +638,8 @@ class ChipClusters:
                 },
             },
             "ThreadNetworkDiagnostics": {
+                "ResetCounts": {
+                },
             },
             "WakeOnLan": {
             },
@@ -844,8 +867,16 @@ class ChipClusters:
             "NetworkCommissioning": [
                 "ClusterRevision",
             ],
+            "OtaSoftwareUpdateServer": [
+                "ClusterRevision",
+            ],
             "OnOff": [
                 "OnOff",
+                "GlobalSceneControl",
+                "OnTime",
+                "OffWaitTime",
+                "StartUpOnOff",
+                "FeatureMap",
                 "ClusterRevision",
             ],
             "OperationalCredentials": [
@@ -1435,6 +1466,19 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateWiFiNetwork(
                 device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
         )
+    def ClusterOtaSoftwareUpdateServer_CommandApplyUpdateRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateToken: bytes, newVersion: int):
+        return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_ApplyUpdateRequest(
+                device, ZCLendpoint, ZCLgroupid, updateToken, len(updateToken), newVersion
+        )
+    def ClusterOtaSoftwareUpdateServer_CommandNotifyUpdateApplied(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateToken: bytes, currentVersion: int):
+        return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_NotifyUpdateApplied(
+                device, ZCLendpoint, ZCLgroupid, updateToken, len(updateToken), currentVersion
+        )
+    def ClusterOtaSoftwareUpdateServer_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, imageType: int, hardwareVersion: int, currentVersion: int, protocolsSupported: int, location: bytes, clientCanConsent: int, metadataForServer: bytes):
+        location = location.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_QueryImage(
+                device, ZCLendpoint, ZCLgroupid, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, location, len(location), clientCanConsent, metadataForServer, len(metadataForServer)
+        )
     def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Off(
                 device, ZCLendpoint, ZCLgroupid
@@ -1566,6 +1610,10 @@ class ChipClusters:
     def ClusterThermostat_CommandSetpointRaiseLower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, mode: int, amount: int):
         return self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower(
                 device, ZCLendpoint, ZCLgroupid, mode, amount
+        )
+    def ClusterThreadNetworkDiagnostics_CommandResetCounts(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_ThreadNetworkDiagnostics_ResetCounts(
+                device, ZCLendpoint, ZCLgroupid
         )
     def ClusterWindowCovering_CommandWindowCoveringDownClose(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose(
@@ -1912,10 +1960,22 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterNetworkCommissioning_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOtaSoftwareUpdateServer_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateServer_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ConfigureAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
         return self._chipLib.chip_ime_ConfigureAttribute_OnOff_OnOff(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterOnOff_ReadAttributeGlobalSceneControl(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOff_GlobalSceneControl(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOff_ReadAttributeOnTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOff_OnTime(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOff_ReadAttributeOffWaitTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOff_OffWaitTime(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOff_ReadAttributeStartUpOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOff_StartUpOnOff(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOff_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOff_FeatureMap(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeFabricsList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -2996,6 +3056,19 @@ class ChipClusters:
         # Cluster NetworkCommissioning ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateServer
+        # Cluster OtaSoftwareUpdateServer Command ApplyUpdateRequest
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_ApplyUpdateRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_ApplyUpdateRequest.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateServer Command NotifyUpdateApplied
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_NotifyUpdateApplied.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_NotifyUpdateApplied.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateServer Command QueryImage
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_QueryImage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateServer_QueryImage.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateServer ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateServer_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateServer_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OnOff
         # Cluster OnOff Command Off
         self._chipLib.chip_ime_AppendCommand_OnOff_Off.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -3012,6 +3085,21 @@ class ChipClusters:
         # Cluster OnOff ConfigureAttribute OnOff
         self._chipLib.chip_ime_ConfigureAttribute_OnOff_OnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_ConfigureAttribute_OnOff_OnOff.restype = ctypes.c_uint32
+        # Cluster OnOff ReadAttribute GlobalSceneControl
+        self._chipLib.chip_ime_ReadAttribute_OnOff_GlobalSceneControl.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOff_GlobalSceneControl.restype = ctypes.c_uint32
+        # Cluster OnOff ReadAttribute OnTime
+        self._chipLib.chip_ime_ReadAttribute_OnOff_OnTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOff_OnTime.restype = ctypes.c_uint32
+        # Cluster OnOff ReadAttribute OffWaitTime
+        self._chipLib.chip_ime_ReadAttribute_OnOff_OffWaitTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOff_OffWaitTime.restype = ctypes.c_uint32
+        # Cluster OnOff ReadAttribute StartUpOnOff
+        self._chipLib.chip_ime_ReadAttribute_OnOff_StartUpOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOff_StartUpOnOff.restype = ctypes.c_uint32
+        # Cluster OnOff ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_OnOff_FeatureMap.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOff_FeatureMap.restype = ctypes.c_uint32
         # Cluster OnOff ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
@@ -3312,6 +3400,9 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ThreadNetworkDiagnostics
+        # Cluster ThreadNetworkDiagnostics Command ResetCounts
+        self._chipLib.chip_ime_AppendCommand_ThreadNetworkDiagnostics_ResetCounts.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_ThreadNetworkDiagnostics_ResetCounts.restype = ctypes.c_uint32
         # Cluster ThreadNetworkDiagnostics ReadAttribute Channel
         self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Channel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Channel.restype = ctypes.c_uint32

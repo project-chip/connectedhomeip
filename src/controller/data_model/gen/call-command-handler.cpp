@@ -53,6 +53,7 @@ EmberAfStatus emberAfLowPowerClusterClientCommandParse(EmberAfClusterCommand * c
 EmberAfStatus emberAfMediaInputClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfNetworkCommissioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfOtaSoftwareUpdateServerClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfPumpConfigurationAndControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -190,6 +191,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
             result = emberAfNetworkCommissioningClusterClientCommandParse(cmd);
+            break;
+        case ZCL_OTA_SERVER_CLUSTER_ID:
+            result = emberAfOtaSoftwareUpdateServerClusterClientCommandParse(cmd);
             break;
         case ZCL_ON_OFF_CLUSTER_ID:
             // No commands are enabled for cluster On/off
@@ -1469,6 +1473,105 @@ EmberAfStatus emberAfNetworkCommissioningClusterClientCommandParse(EmberAfCluste
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(nullptr, errorCode, debugText);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfOtaSoftwareUpdateServerClusterClientCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_APPLY_UPDATE_REQUEST_RESPONSE_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t action;
+            uint32_t delayedActionTime;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            action        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            delayedActionTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled =
+                emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(nullptr, action, delayedActionTime);
+            break;
+        }
+        case ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint32_t delayedActionTime;
+            uint8_t * imageURI;
+            uint32_t softwareVersion;
+            chip::ByteSpan updateToken;
+            uint8_t userConsentNeeded;
+            chip::ByteSpan metadataForClient;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            delayedActionTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset     = static_cast<uint16_t>(payloadOffset + 4);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            imageURI      = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(imageURI) + 1u);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            softwareVersion = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset   = static_cast<uint16_t>(payloadOffset + 4);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            {
+                uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                updateToken       = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
+            }
+            payloadOffset = static_cast<uint16_t>(payloadOffset + updateToken.size() + 1u);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userConsentNeeded = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset     = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            {
+                uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                metadataForClient = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
+            }
+
+            wasHandled = emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(
+                nullptr, status, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded, metadataForClient);
             break;
         }
         default: {

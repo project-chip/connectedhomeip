@@ -61,7 +61,7 @@ if (chip_device_platform != "none") {
   }
 
   if (chip_stack_lock_tracking == "auto") {
-    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+    if (chip_device_platform == "linux") {
       # TODO: should be fatal for development. Change once bugs are fixed
       chip_stack_lock_tracking = "log"
     } else {

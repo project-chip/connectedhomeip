@@ -80,6 +80,7 @@ using namespace chip::Encoding::LittleEndian;
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
+| OtaSoftwareUpdateServer                                             | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
@@ -270,6 +271,11 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID (0x08)
 #define ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID (0x04)
 
+#define OTA_SERVER_CLUSTER_ID 0x0029
+#define ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID (0x01)
+#define ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID (0x02)
+#define ZCL_QUERY_IMAGE_COMMAND_ID (0x00)
+
 #define ON_OFF_CLUSTER_ID 0x0006
 #define ZCL_OFF_COMMAND_ID (0x00)
 #define ZCL_ON_COMMAND_ID (0x01)
@@ -327,6 +333,7 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_SETPOINT_RAISE_LOWER_COMMAND_ID (0x00)
 
 #define THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID 0x0035
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
 #define WAKE_ON_LAN_CLUSTER_ID 0x0503
 
@@ -2911,6 +2918,35 @@ PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ApplyUpdateRequest                                                |   0x01 |
+| * NotifyUpdateApplied                                               |   0x02 |
+| * QueryImage                                                        |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverOtaSoftwareUpdateServerAttributes", OTA_SERVER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOtaSoftwareUpdateServerClusterRevision", OTA_SERVER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -2920,6 +2956,11 @@ PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * OnOff                                                             | 0x0000 |
+| * GlobalSceneControl                                                | 0x4000 |
+| * OnTime                                                            | 0x4001 |
+| * OffWaitTime                                                       | 0x4002 |
+| * StartUpOnOff                                                      | 0x4003 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -2952,6 +2993,93 @@ PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, End
         .Put8(16)
         .Put16(minInterval)
         .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute GlobalSceneControl
+ */
+PacketBufferHandle encodeOnOffClusterReadGlobalSceneControlAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffGlobalSceneControl", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OnTime
+ */
+PacketBufferHandle encodeOnOffClusterReadOnTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffOnTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4001);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOnOffClusterWriteOnTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t onTime)
+{
+    COMMAND_HEADER("WriteOnOffOnTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x4001)
+        .Put8(33)
+        .Put16(static_cast<uint16_t>(onTime));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OffWaitTime
+ */
+PacketBufferHandle encodeOnOffClusterReadOffWaitTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffOffWaitTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4002);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOnOffClusterWriteOffWaitTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t offWaitTime)
+{
+    COMMAND_HEADER("WriteOnOffOffWaitTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x4002)
+        .Put8(33)
+        .Put16(static_cast<uint16_t>(offWaitTime));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StartUpOnOff
+ */
+PacketBufferHandle encodeOnOffClusterReadStartUpOnOffAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffStartUpOnOff", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4003);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOnOffClusterWriteStartUpOnOffAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                uint8_t startUpOnOff)
+{
+    COMMAND_HEADER("WriteOnOffStartUpOnOff", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x4003)
+        .Put8(48)
+        .Put8(static_cast<uint8_t>(startUpOnOff));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute FeatureMap
+ */
+PacketBufferHandle encodeOnOffClusterReadFeatureMapAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffFeatureMap", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFC);
     COMMAND_FOOTER();
 }
 
@@ -4197,6 +4325,7 @@ PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t s
 | Cluster ThreadNetworkDiagnostics                                    | 0x0035 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Channel                                                           | 0x0000 |

@@ -190,6 +190,15 @@ public:
 
     CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
 
+    /**
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This expects to be called with external thread synchronization, and will not internally
+     *  grab the CHIP stack lock.
+     *
+     *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
+     *  ensure this happend before calling this method.
+     */
     virtual CHIP_ERROR Shutdown();
 
     /**
@@ -237,6 +246,10 @@ public:
 
     virtual void ReleaseDevice(Device * device);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
+#endif
+
     // ----- IO -----
     /**
      * @brief
@@ -252,6 +265,15 @@ public:
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR ServiceEventSignal();
+
+    /**
+     * @brief Get the Fabric ID assigned to the device.
+     *
+     * @param[out] fabricId   Fabric ID of the device.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    CHIP_ERROR GetFabricId(uint64_t & fabricId);
 
 protected:
     enum class State
@@ -374,6 +396,13 @@ public:
      */
     CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
 
+    /**
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This is not a thread-safe API, and should be called with external synchronization.
+     *
+     *  Please see implementation for more details.
+     */
     CHIP_ERROR Shutdown() override;
 
     // ----- Connection Management -----
@@ -470,6 +499,8 @@ public:
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
 
 #endif
+
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
 private:
     DevicePairingDelegate * mPairingDelegate;

@@ -206,13 +206,11 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mExchangeMgr->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    if (params.mDeviceAddressUpdateDelegate != nullptr)
-    {
-        err = Mdns::Resolver::Instance().SetResolverDelegate(this);
-        SuccessOrExit(err);
+    err = Mdns::Resolver::Instance().SetResolverDelegate(this);
+    SuccessOrExit(err);
 
-        mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
-    }
+    RegisterDeviceAddressUpdateDelegate(params.mDeviceAddressUpdateDelegate);
+
     Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
@@ -292,15 +290,19 @@ CHIP_ERROR DeviceController::Shutdown()
     ChipLogDetail(Controller, "Shutting down the controller");
 
 #if CONFIG_DEVICE_LAYER
-    // Start by shutting down the PlatformManager.  This will ensure, with
-    // reasonable synchronization, that we stop processing of incoming messages
-    // before doing any other shutdown work.  Otherwise we can end up trying to
-    // process incoming messages in a partially shut down state, which is not
-    // great at all.
+    //
+    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
+    // expects to be called with external thread synchronization and will not try to acquire the
+    // stack lock.
+    //
+    // Actually stopping the event queue is a separable call that applications will have to sequence.
+    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
+    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
+    //
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
-    mInetLayer->Shutdown();
-    mSystemLayer->Shutdown();
+    VerifyOrReturnError(mInetLayer->Shutdown() == INET_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSystemLayer->Shutdown() == CHIP_SYSTEM_NO_ERROR, CHIP_ERROR_INTERNAL);
     chip::Platform::Delete(mInetLayer);
     chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
@@ -309,6 +311,10 @@ CHIP_ERROR DeviceController::Shutdown()
     mInetLayer   = nullptr;
 
     mState = State::NotInitialized;
+
+    // Shut down the interaction model before we try shuttting down the exchange
+    // manager.
+    app::InteractionModelEngine::GetInstance()->Shutdown();
 
     // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
     // if (mExchangeMgr != nullptr)
@@ -504,6 +510,16 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 #else
     ReturnErrorOnFailure(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 #endif // CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceController::GetFabricId(uint64_t & fabricId)
+{
+    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
+    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    fabricId = admin->GetFabricId();
 
     return CHIP_NO_ERROR;
 }

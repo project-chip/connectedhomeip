@@ -129,12 +129,62 @@ private:
 } gPingArguments;
 
 Protocols::Echo::EchoClient gEchoClient;
+Transport::AdminPairingTable gAdmins;
 
-bool EchoIntervalExpired(void)
+CHIP_ERROR SendEchoRequest(streamer_t * stream);
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, chip::System::Error error);
+
+Transport::PeerAddress GetEchoPeerAddress()
 {
-    uint64_t now = System::Timer::GetCurrentEpoch();
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    if (gPingArguments.IsUsingTCP())
+    {
+        return Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
+    }
+    else
+#endif
+    {
 
-    return (now >= gPingArguments.GetLastEchoTime() + gPingArguments.GetEchoInterval());
+        return Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
+    }
+}
+
+void Shutdown()
+{
+    chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    if (gPingArguments.IsUsingTCP())
+    {
+        gTCPManager.Disconnect(GetEchoPeerAddress());
+    }
+    gTCPManager.Close();
+#endif
+    gUDPManager.Close();
+
+    gEchoClient.Shutdown();
+    gExchangeManager.Shutdown();
+    gSessionManager.Shutdown();
+}
+
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+{
+    if (gPingArguments.GetEchoRespCount() != gPingArguments.GetEchoCount())
+    {
+        streamer_printf(streamer_get(), "No response received\n");
+        gPingArguments.SetEchoRespCount(gPingArguments.GetEchoCount());
+    }
+    if (gPingArguments.GetEchoCount() < gPingArguments.GetMaxEchoCount())
+    {
+        CHIP_ERROR err = SendEchoRequest(streamer_get());
+        if (err != CHIP_NO_ERROR)
+        {
+            streamer_printf(streamer_get(), "Send request failed: %s\n", ErrorStr(err));
+        }
+    }
+    else
+    {
+        Shutdown();
+    }
 }
 
 CHIP_ERROR SendEchoRequest(streamer_t * stream)
@@ -161,6 +211,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
 
     gPingArguments.SetLastEchoTime(System::Timer::GetCurrentEpoch());
+    SuccessOrExit(chip::DeviceLayer::SystemLayer.StartTimer(gPingArguments.GetEchoInterval(), EchoTimerHandler, NULL));
 
     streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
@@ -172,6 +223,10 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
         gPingArguments.SetWaitingForEchoResp(true);
         gPingArguments.IncrementEchoCount();
     }
+    else
+    {
+        chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -182,7 +237,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & peerAddress)
+CHIP_ERROR EstablishSecureSession(streamer_t * stream, const Transport::PeerAddress & peerAddress)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -229,10 +284,7 @@ void StartPinging(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::AdminPairingTable admins;
-    Transport::PeerAddress peerAddress;
     Transport::AdminPairingInfo * adminInfo = nullptr;
-    uint32_t maxEchoCount                   = 0;
 
     if (!IPAddress::FromString(destination, gDestAddr))
     {
@@ -240,7 +292,7 @@ void StartPinging(streamer_t * stream, char * destination)
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    adminInfo = admins.AssignAdminId(gAdminId, kTestControllerNodeId);
+    adminInfo = gAdmins.AssignAdminId(gAdminId, kTestControllerNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -258,10 +310,8 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
-        peerAddress = Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
-
         err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &gAdmins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -270,10 +320,8 @@ void StartPinging(streamer_t * stream, char * destination)
     else
 #endif
     {
-        peerAddress = Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
-
         err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &gAdmins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -284,7 +332,7 @@ void StartPinging(streamer_t * stream, char * destination)
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP echo responder.
-    err = EstablishSecureSession(stream, peerAddress);
+    err = EstablishSecureSession(stream, GetEchoPeerAddress());
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
@@ -294,48 +342,16 @@ void StartPinging(streamer_t * stream, char * destination)
     // Arrange to get a callback whenever an Echo Response is received.
     gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    maxEchoCount = gPingArguments.GetMaxEchoCount();
-
-    // Connection has been established. Now send the EchoRequests.
-    for (unsigned int i = 0; i < maxEchoCount; i++)
+    err = SendEchoRequest(stream);
+    if (err != CHIP_NO_ERROR)
     {
-        err = SendEchoRequest(stream);
-
-        if (err != CHIP_NO_ERROR)
-        {
-            streamer_printf(stream, "Send request failed: %s\n", ErrorStr(err));
-            break;
-        }
-
-        // Wait for response until the Echo interval.
-        while (!EchoIntervalExpired())
-        {
-            // TODO:#5496: Use condition_varible to suspend the current thread and wake it up when response arrive.
-            sleep(1);
-        }
-
-        // Check if expected response was received.
-        if (gPingArguments.IsWaitingForEchoResp())
-        {
-            streamer_printf(stream, "No response received\n");
-            gPingArguments.SetWaitingForEchoResp(false);
-        }
+        streamer_printf(stream, "Send request failed: %s\n", ErrorStr(err));
     }
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    gTCPManager.Disconnect(peerAddress);
-    gTCPManager.Close();
-#endif
-    gUDPManager.Close();
-
-    gEchoClient.Shutdown();
-    gExchangeManager.Shutdown();
-    gSessionManager.Shutdown();
-
 exit:
-    if ((err != CHIP_NO_ERROR))
+    if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Ping failed with error: %s\n", ErrorStr(err));
+        Shutdown();
     }
 }
 

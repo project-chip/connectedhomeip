@@ -62,7 +62,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                                ZCL_BASIC_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_BASIC_CLUSTER_ID);
             return;
         }
@@ -76,7 +77,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                            ZCL_BASIC_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
                         ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
@@ -257,7 +258,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                                ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_GENERAL_COMMISSIONING_CLUSTER_ID);
             return;
         }
@@ -271,7 +273,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                            ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
                         ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
@@ -786,7 +788,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                                ZCL_LEVEL_CONTROL_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_LEVEL_CONTROL_CLUSTER_ID);
             return;
         }
@@ -800,7 +803,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                            ZCL_LEVEL_CONTROL_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
                         ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
@@ -1415,7 +1418,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                                ZCL_NETWORK_COMMISSIONING_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID);
             return;
         }
@@ -1429,7 +1433,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                            ZCL_NETWORK_COMMISSIONING_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
                         ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
@@ -1481,7 +1485,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                                ZCL_ON_OFF_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_ON_OFF_CLUSTER_ID);
             return;
         }
@@ -1495,7 +1500,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                            ZCL_ON_OFF_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
                         ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
@@ -1987,7 +1992,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                                ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
             ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId,
                          ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID);
             return;
@@ -2002,7 +2008,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                                            ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
                         ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
@@ -2048,9 +2054,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                                                            0, // GroupId
                                                            aClusterId, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
-
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;
     }

@@ -143,6 +143,7 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, 
 
     // At this point we can assume that value points to a bool value.
     mEndpointOnOffState[endpointId - 1] = *value;
+    endpointId == 1 ? statusLED1.Set(*value) : statusLED2.Set(*value);
 
 exit:
     return;

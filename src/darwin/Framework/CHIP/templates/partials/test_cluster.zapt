@@ -1,6 +1,6 @@
 {{#chip_tests tests}}
 {{#chip_tests_items}}
-- (void)testSendCluster{{asCamelCased parent.name false}}_{{index}}_{{asCamelCased command false}}
+- (void)testSendCluster{{parent.filename}}_{{index}}_{{asCamelCased command false}}
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"{{label}}"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);

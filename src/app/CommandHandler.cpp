@@ -56,14 +56,15 @@ exit:
 CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle commandPacket;
 
     VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = FinalizeCommandsMessage();
+    err = FinalizeCommandsMessage(commandPacket);
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(mCommandMessageBuf));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket));
     SuccessOrExit(err);
 
     MoveToState(CommandState::Sending);
@@ -123,7 +124,7 @@ exit:
 
         AddStatusCode(returnStatusParam,
                       err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
-                      Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                      Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
     }
     // We have handled the error status above and put the error status in response, now return success status so we can process
     // other commands in the invoke request.
@@ -132,7 +133,8 @@ exit:
 
 CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathParams,
                                          const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                         const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+                                         const Protocols::Id aProtocolId,
+                                         const Protocols::InteractionModel::ProtocolCode aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
@@ -142,7 +144,9 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathP
 
     statusElementBuilder =
         mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
+    statusElementBuilder
+        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(),
+                             Protocols::InteractionModel::ToUint16(aProtocolCode))
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);

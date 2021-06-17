@@ -32,4 +32,9 @@ dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
 pw_chrono_SYSTEM_CLOCK_BACKEND = "$dir_pw_chrono_stl:system_clock"
 pw_sync_MUTEX_BACKEND = "$dir_pw_sync_stl:mutex_backend"
 
+pw_build_LINK_DEPS = [
+  "$dir_pw_assert:impl",
+  "$dir_pw_log:impl",
+]
+
 chip_enable_pw_rpc = true

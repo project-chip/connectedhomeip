@@ -75,7 +75,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                   aCommandId, aEndPointId);
 
     apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+                                Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
 
     chip::isCommandDispatched = true;
 }
@@ -182,7 +182,7 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
     if (aNeedStatusCode)
     {
         apCommand->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                 Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
     }
     else
     {
@@ -312,6 +312,7 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     app::CommandHandler commandHandler;
+    System::PacketBufferHandle commandPacket;
     err = commandHandler.Init(&chip::gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -320,13 +321,13 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     commandHandler.mpExchangeCtx->SetDelegate(&delegate);
 
     AddCommandDataElement(apSuite, apContext, &commandHandler, aNeedStatusCode);
-    err = commandHandler.FinalizeCommandsMessage();
+    err = commandHandler.FinalizeCommandsMessage(commandPacket);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     chip::System::PacketBufferTLVReader reader;
     InvokeCommand::Parser invokeCommandParser;
-    reader.Init(std::move(commandHandler.mCommandMessageBuf));
+    reader.Init(std::move(commandPacket));
     err = reader.Next();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = invokeCommandParser.Init(reader);

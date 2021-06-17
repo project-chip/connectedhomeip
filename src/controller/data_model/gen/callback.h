@@ -248,6 +248,14 @@ void emberAfMediaPlaybackClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfNetworkCommissioningClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief OTA Software Update Server Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOtaSoftwareUpdateServerClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief On/off Cluster Init
  *
  * Cluster Init
@@ -2187,6 +2195,77 @@ EmberAfStatus emberAfNetworkCommissioningClusterClientPreAttributeChangedCallbac
 void emberAfNetworkCommissioningClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// OTA Software Update Server Cluster client
+//
+
+/** @brief OTA Software Update Server Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOtaSoftwareUpdateServerClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief OTA Software Update Server Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfOtaSoftwareUpdateServerClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief OTA Software Update Server Cluster Client Manufacturer Specific Attribute Changed
+ *
+ * Client Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfOtaSoftwareUpdateServerClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                             chip::AttributeId attributeId,
+                                                                                             uint16_t manufacturerCode);
+
+/** @brief OTA Software Update Server Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param type               The type of message sent
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfOtaSoftwareUpdateServerClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                                    EmberStatus status);
+
+/** @brief OTA Software Update Server Cluster Client Pre Attribute Changed
+ *
+ * client Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfOtaSoftwareUpdateServerClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
+                                                                                     EmberAfAttributeType attributeType,
+                                                                                     uint16_t size, uint8_t * value);
+
+/** @brief OTA Software Update Server Cluster Client Tick
+ *
+ * client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOtaSoftwareUpdateServerClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // On/off Cluster client
 //
 
@@ -3595,6 +3674,22 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip:
 
 bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
                                                                          uint8_t * debugText);
+
+/**
+ * @brief OTA Software Update Server Cluster ApplyUpdateRequestResponse Command callback
+ */
+
+bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(chip::app::Command * commandObj, uint8_t action,
+                                                                             uint32_t delayedActionTime);
+
+/**
+ * @brief OTA Software Update Server Cluster QueryImageResponse Command callback
+ */
+
+bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
+                                                                     uint32_t delayedActionTime, uint8_t * imageURI,
+                                                                     uint32_t softwareVersion, chip::ByteSpan updateToken,
+                                                                     uint8_t userConsentNeeded, chip::ByteSpan metadataForClient);
 
 /**
  * @brief Operational Credentials Cluster OpCSRResponse Command callback

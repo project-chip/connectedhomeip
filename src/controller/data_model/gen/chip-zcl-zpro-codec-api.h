@@ -54,6 +54,7 @@
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
+| OtaSoftwareUpdateServer                                             | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
@@ -1955,6 +1956,32 @@ chip::System::PacketBufferHandle
 encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
+| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ApplyUpdateRequest                                                |   0x01 |
+| * NotifyUpdateApplied                                               |   0x02 |
+| * QueryImage                                                        |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a OTA Software Update Server server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a OTA Software Update Server server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -1964,6 +1991,11 @@ encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, ch
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * OnOff                                                             | 0x0000 |
+| * GlobalSceneControl                                                | 0x4000 |
+| * OnTime                                                            | 0x4001 |
+| * OffWaitTime                                                       | 0x4002 |
+| * StartUpOnOff                                                      | 0x4003 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -1985,6 +2017,58 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadOnOffAttribute(uint8_t se
  */
 chip::System::PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
                                                                            uint16_t minInterval, uint16_t maxInterval);
+
+/**
+ * @brief
+ *    Encode a On/off server read command for the global scene control attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadGlobalSceneControlAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a On/off server read command for the on time attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadOnTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a On/off server write command for the on time attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterWriteOnTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                        uint16_t onTime);
+
+/**
+ * @brief
+ *    Encode a On/off server read command for the off wait time attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadOffWaitTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a On/off server write command for the off wait time attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterWriteOffWaitTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             uint16_t offWaitTime);
+
+/**
+ * @brief
+ *    Encode a On/off server read command for the start up on off attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadStartUpOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a On/off server write command for the start up on off attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterWriteStartUpOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              uint8_t startUpOnOff);
+
+/**
+ * @brief
+ *    Encode a On/off server read command for the feature map attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadFeatureMapAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -2862,6 +2946,7 @@ chip::System::PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttri
 | Cluster ThreadNetworkDiagnostics                                    | 0x0035 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Channel                                                           | 0x0000 |

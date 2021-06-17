@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,29 +16,18 @@
  *    limitations under the License.
  */
 
-/**
- * This is a sample unit test.
- */
+#pragma once
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <unistd.h>
+#include "ota-server-delegate.h"
 
-//#include "standalone/TapInterface.c"
+namespace chip {
+namespace app {
+namespace clusters {
+namespace OTAServer {
 
-void TapInterface_Init_test1()
-{
-    printf("---Running Test--- %s\n", __FUNCTION__);
-    // assert(TapInterface_Init(NULL, NULL, NULL) == ERR_ARG);
+void SetDelegate(chip::EndpointId endpointId, OTAServerDelegate * delegate);
+
 }
-
-int main()
-{
-    printf("---Running Test--- tests from %s\n", __FILE__);
-    TapInterface_Init_test1();
-    return 0;
-}
+} // namespace clusters
+} // namespace app
+} // namespace chip

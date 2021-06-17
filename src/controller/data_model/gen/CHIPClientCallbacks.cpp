@@ -2406,6 +2406,52 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
+bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(chip::app::Command * commandObj, uint8_t action,
+                                                                             uint32_t delayedActionTime)
+{
+    ChipLogProgress(Zcl, "ApplyUpdateRequestResponse:");
+    ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
+    ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback");
+
+    Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, action, delayedActionTime);
+    return true;
+}
+
+bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
+                                                                     uint32_t delayedActionTime, uint8_t * imageURI,
+                                                                     uint32_t softwareVersion, chip::ByteSpan updateToken,
+                                                                     uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
+{
+    ChipLogProgress(Zcl, "QueryImageResponse:");
+    LogStatus(status);
+    ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
+    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
+    // ChipLogProgress(Zcl, "  imageURI: %.*s", imageURI.size(), imageURI.data());
+    ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", softwareVersion);
+    ChipLogProgress(Zcl, "  updateToken: %zu", updateToken.size());
+    ChipLogProgress(Zcl, "  userConsentNeeded: %" PRIu8 "", userConsentNeeded);
+    ChipLogProgress(Zcl, "  metadataForClient: %zu", metadataForClient.size());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterQueryImageResponseCallback");
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
+        return true;
+    }
+
+    Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded, metadataForClient);
+    return true;
+}
+
 bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR,
                                                                chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
                                                                chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
