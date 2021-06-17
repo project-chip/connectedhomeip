@@ -54,6 +54,7 @@ RUN set -x \
     python3-dev \
     python3-pip \
     python3-venv \
+    rsync \
     shellcheck \
     strace \
     systemd \
