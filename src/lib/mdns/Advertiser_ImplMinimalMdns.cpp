@@ -278,14 +278,14 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
     // TODO: When multi-admin is enabled, operational does not need to be cleared here.
-if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
-{
-    mQueryResponderAllocatorCommissionable.Clear();
-}
-else
-{
-    mQueryResponderAllocatorCommissioner.Clear();
-}
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
+    {
+        mQueryResponderAllocatorCommissionable.Clear();
+    }
+    else
+    {
+        mQueryResponderAllocatorCommissioner.Clear();
+    }
 
     // TODO: need to detect colisions here
     char nameBuffer[64] = "";
