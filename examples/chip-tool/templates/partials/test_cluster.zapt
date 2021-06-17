@@ -66,11 +66,25 @@ class {{filename}}: public TestCommand
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         {{#if isCommand}}
-        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(){{#chip_tests_item_parameters}}, {{definedValue}}{{/chip_tests_item_parameters}});
+        {{#chip_tests_item_parameters}}
+        {{#if (isString type)}}
+        {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"));
+        {{else}}
+        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}};
+        {{/if}}
+        {{/chip_tests_item_parameters}}
+        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(){{#chip_tests_item_parameters}}, {{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else if isReadAttribute}}
         err = cluster.ReadAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel());
         {{else if isWriteAttribute}}
-        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(), {{#chip_tests_item_parameters}}{{definedValue}}{{/chip_tests_item_parameters}});
+        {{#chip_tests_item_parameters}}
+        {{#if (isString type)}}
+        {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"));
+        {{else}}
+        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}};
+        {{/if}}
+        {{/chip_tests_item_parameters}}
+        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(), {{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else}}
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         {{/if}}
@@ -120,7 +134,12 @@ class {{filename}}: public TestCommand
 
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
-        if ({{asCamelCased name true}} != {{expectedValue}})
+        {{#if (isString type)}}
+        {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{expectedValue}}"), strlen("{{expectedValue}}"));
+        if (!{{asCamelCased name true}}.data_equal({{asCamelCased name true}}Argument))
+        {{else}}
+        if ({{asCamelCased name true}} != {{expectedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}})
+        {{/if}}
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
             runner->SetCommandExitStatus(false);
