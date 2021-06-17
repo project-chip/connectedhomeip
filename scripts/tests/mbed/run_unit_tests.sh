@@ -24,5 +24,5 @@ for index in $(eval echo "{0..$(($target_number - 1))}"); do
     echo "Flash unit-tests application image to $platform_name device"
     flash_image_to_device unit-tests "$platform_name" binaries
     echo "Run unit tests on $platform_name device"
-    pytest -rAV --platforms="$platform_name" $CHIP_DIR/src/test_driver/mbed/integration_tests/unit-tests/test_unittests.py
+    pytest -rAV --platforms="$platform_name" $CHIP_DIR/src/test_driver/mbed/unit_tests/pytest/test_unittests.py
 done
