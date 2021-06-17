@@ -30,6 +30,7 @@ public:
     CHIP_ERROR Allocate(uint16_t & id);
     void Free(uint16_t id);
     CHIP_ERROR Reserve(uint16_t id);
+    CHIP_ERROR ReserveUpTo(uint16_t id);
     uint16_t Peek();
 
 private:

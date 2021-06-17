@@ -54,6 +54,23 @@ CHIP_ERROR SessionIDAllocator::Reserve(uint16_t id)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR SessionIDAllocator::ReserveUpTo(uint16_t id)
+{
+    VerifyOrReturnError(id < kMaxSessionID, CHIP_ERROR_NO_MEMORY);
+    if (id >= mNextAvailable)
+    {
+        mNextAvailable = id;
+        mNextAvailable++;
+    }
+
+    // TODO - Update ReserveUpTo to mark all IDs in use
+    // Current SessionIDAllocator only tracks the smallest unused session ID.
+    // If/when we change it to track all in use IDs, we should also update ReserveUpTo
+    // to reserve all individual session IDs, instead of just setting the mNextAvailable.
+
+    return CHIP_NO_ERROR;
+}
+
 uint16_t SessionIDAllocator::Peek()
 {
     return mNextAvailable;

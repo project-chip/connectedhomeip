@@ -815,10 +815,7 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     {
         nextKeyID = 0;
     }
-    for (uint16_t i = 0; i < nextKeyID; i++)
-    {
-        ReturnErrorOnFailure(mIDAllocator.Reserve(i));
-    }
+    ReturnErrorOnFailure(mIDAllocator.ReserveUpTo(nextKeyID));
     mPairingDelegate = params.pairingDelegate;
 
     return CHIP_NO_ERROR;

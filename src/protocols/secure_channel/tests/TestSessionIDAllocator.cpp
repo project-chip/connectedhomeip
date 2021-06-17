@@ -88,6 +88,14 @@ void TestSessionIDAllocator_Reserve(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, allocator.Peek() == 101);
 }
 
+void TestSessionIDAllocator_ReserveUpTo(nlTestSuite * inSuite, void * inContext)
+{
+    SessionIDAllocator allocator;
+
+    allocator.ReserveUpTo(100);
+    NL_TEST_ASSERT(inSuite, allocator.Peek() == 101);
+}
+
 // Test Suite
 
 /**
@@ -99,6 +107,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("SessionIDAllocator_Allocate", TestSessionIDAllocator_Allocate),
     NL_TEST_DEF("SessionIDAllocator_Free", TestSessionIDAllocator_Free),
     NL_TEST_DEF("SessionIDAllocator_Reserve", TestSessionIDAllocator_Reserve),
+    NL_TEST_DEF("SessionIDAllocator_ReserveUpTo", TestSessionIDAllocator_ReserveUpTo),
 
     NL_TEST_SENTINEL()
 };
