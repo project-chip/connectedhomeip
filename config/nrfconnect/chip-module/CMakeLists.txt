@@ -47,30 +47,30 @@ list(APPEND CHIP_CFLAGS_CC)
 list(APPEND CHIP_LIBRARIES)
 
 # GN meta-build system arguments passed to the make_gn_args.py script
-list(APPEND CHIP_GN_ARGS)
+string(APPEND CHIP_GN_ARGS)
 
 # ==============================================================================
 # Helper macros
 # ==============================================================================
 
 macro(chip_gn_arg_import FILE)
-    list(APPEND CHIP_GN_ARGS --module "${FILE}")
+    string(APPEND CHIP_GN_ARGS "--module\n\"${FILE}\"\n")
 endmacro()
 
 macro(chip_gn_arg_string ARG STRING)
-    list(APPEND CHIP_GN_ARGS --arg-string "${ARG}" "${STRING}")
+    string(APPEND CHIP_GN_ARGS "--arg-string\n${ARG}\n${STRING}\n")
 endmacro()
 
 macro(chip_gn_arg_bool ARG BOOLEAN)
     if (${BOOLEAN})
-        list(APPEND CHIP_GN_ARGS --arg "${ARG}" "true")
+        string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\ntrue\n")
     else()
-        list(APPEND CHIP_GN_ARGS --arg "${ARG}" "false")
+        string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\nfalse\n")
     endif()
 endmacro()
 
 macro(chip_gn_arg_cflags ARG CFLAGS)
-    list(APPEND CHIP_GN_ARGS --arg-cflags "${ARG}" "${CFLAGS}")
+    string(APPEND CHIP_GN_ARGS "--arg-cflags\n${ARG}\n${CFLAGS}\n")
 endmacro()
 
 # ==============================================================================
@@ -216,6 +216,8 @@ elseif (BOARD STREQUAL "native_posix_64")
     chip_gn_arg_string("target_cpu" "x64")
 endif()
 
+file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/args.tmp" CONTENT ${CHIP_GN_ARGS})
+
 # ==============================================================================
 # Define 'chip-gn' target that builds CHIP library(ies) with GN build system
 # ==============================================================================
@@ -225,7 +227,7 @@ ExternalProject_Add(
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
     CONFIGURE_COMMAND       ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_gn_args.py
-                                ${CHIP_GN_ARGS} > ${CMAKE_CURRENT_BINARY_DIR}/args.gn &&
+                                @${CMAKE_CURRENT_BINARY_DIR}/args.tmp > ${CMAKE_CURRENT_BINARY_DIR}/args.gn &&
                             ${GN_EXECUTABLE}
                                 --root=${CHIP_ROOT}
                                 --root-target=${GN_ROOT_TARGET}
