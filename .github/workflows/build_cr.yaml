@@ -1,0 +1,66 @@
+# Copyright (c) 2020-2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Build CHIP for lava-worker
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Triggers the workflow every day at 3:00 UTC:
+    - cron:  '0 11 * * *'
+
+jobs:
+    build-cr:
+        strategy:
+          matrix:
+            TARGET_ARCH: [amd64, arm64]
+
+        name: chip-build-${{matrix.TARGET_ARCH}}
+        runs-on: ubuntu-latest
+        env:
+            DOCKER_CR_IMAGE: lgniadzik/chip-build:latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+
+            - name: Set up QEMU
+              uses: docker/setup-qemu-action@v1
+              with:
+                image: tonistiigi/binfmt:latest
+                platforms: arm64
+
+            - name: Pull chip-build:latest (for ${{matrix.TARGET_ARCH}} platform)
+              run: docker pull ${{env.DOCKER_CR_IMAGE}} --platform=${{matrix.TARGET_ARCH}}
+
+            - name: Setup Build
+              run: |
+                    docker run --rm --platform=${{ matrix.TARGET_ARCH }} --user $(id -u):$(id -g) -v $PWD:/repo:cached --workdir=/repo ${{ env.DOCKER_CR_IMAGE }} \
+                    gn --root=./ gen --check "./out/${{matrix.TARGET_ARCH}}" --args="is_debug=false"
+           
+            - name: Run Build
+              run: |
+                    docker run --rm --platform=${{ matrix.TARGET_ARCH }} --user $(id -u):$(id -g) -v $PWD:/repo:cached --workdir=/repo ${{ env.DOCKER_CR_IMAGE }} \
+                    ninja -v -C "./out/${{matrix.TARGET_ARCH}}"
+
+            - name: Archive production artifacts
+              uses: actions/upload-artifact@v2
+              with:
+                name: chip-build-${{matrix.TARGET_ARCH}}
+                path: |
+                      out/${{matrix.TARGET_ARCH}}/chip-*
+                      !out/${{matrix.TARGET_ARCH}}/*.map
+                      out/${{matrix.TARGET_ARCH}}/controller/
