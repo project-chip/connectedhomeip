@@ -85,9 +85,7 @@ CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System
     // TODO(#5675): This code is temporary, and must be updated to use the IM API. Currently, we use a temporary Protocol
     // TempZCL to carry over legacy ZCL messages.  We need to set flag kFromInitiator to allow receiver to deliver message to
     // corresponding unsolicited message handler.
-    //
-    // TODO: Also, disable CRMP for now because it just doesn't seem to work
-    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
+    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator);
     exchange->SetDelegate(this);
 
     CHIP_ERROR err = exchange->SendMessage(protocolId, msgType, std::move(buffer), sendFlags);
