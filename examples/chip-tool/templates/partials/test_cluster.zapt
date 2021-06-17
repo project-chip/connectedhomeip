@@ -48,7 +48,7 @@ class {{filename}}: public TestCommand
 
     {{#chip_tests_items}}
     // Test {{label}}
-    typedef void (*SuccessCallback_{{index}})(void * context{{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
+    typedef void (*SuccessCallback_{{index}})(void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
     chip::Callback::Callback<SuccessCallback_{{index}}> * mOnSuccessCallback_{{index}} = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_{{index}} = nullptr;
     bool mIsFailureExpected_{{index}} = {{response.error}};
@@ -116,7 +116,7 @@ class {{filename}}: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}})
+    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}})
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Success Response");
 
@@ -134,6 +134,14 @@ class {{filename}}: public TestCommand
 
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
+        {{#if isList}}
+        if (count != {{expectedValue.length}})
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+        {{else}}
         {{#if (isString type)}}
         {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{expectedValue}}"), strlen("{{expectedValue}}"));
         if (!{{asCamelCased name true}}.data_equal({{asCamelCased name true}}Argument))
@@ -145,6 +153,7 @@ class {{filename}}: public TestCommand
             runner->SetCommandExitStatus(false);
             return;
         }
+        {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
 

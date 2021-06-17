@@ -29,8 +29,14 @@
     {{/if}}
         NSLog(@"{{label}} Error: %@", err);
         XCTAssertEqual(err.code, {{response.error}});
+        {{#unless (isStrEqual "0" response.error)}}
+        [expectation fulfill];
+        {{else}}
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
+        {{#if isList}}
+        XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
+        {{else}}
         {{#if (isString type)}}
         {{#if (isOctetString type)}}
         NSString * {{asCamelCased name true}}ArgumentString= @"{{expectedValue}}";
@@ -44,8 +50,11 @@
         XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}});
         {{/if}}
         {{/if}}
+        {{/if}}
         {{/chip_tests_item_response_parameters}}
         [expectation fulfill];
+
+        {{/unless}}
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];

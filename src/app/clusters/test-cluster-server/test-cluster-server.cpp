@@ -57,6 +57,23 @@ EmberAfStatus writeAttribute(uint8_t endpoint, AttributeId attributeId, uint8_t 
     return emAfReadOrWriteAttribute(&record, NULL, buffer, 0, true, index + 1);
 }
 
+EmberAfStatus writeTestListInt8uAttribute(uint8_t endpoint)
+{
+    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    AttributeId attributeId = ZCL_LIST_ATTRIBUTE_ID;
+
+    uint16_t attributeCount = 4;
+    for (uint8_t index = 0; index < attributeCount; index++)
+    {
+        status = writeAttribute(endpoint, attributeId, (uint8_t *) &index, index);
+        VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+    }
+
+    status = writeAttribute(endpoint, attributeId, (uint8_t *) &attributeCount);
+    VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+    return status;
+}
+
 EmberAfStatus writeTestListOctetAttribute(uint8_t endpoint)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
@@ -117,6 +134,9 @@ void emberAfPluginTestClusterServerInitCallback(void)
         {
             continue;
         }
+
+        status = writeTestListInt8uAttribute(endpoint);
+        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list int8u", status));
 
         status = writeTestListOctetAttribute(endpoint);
         VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list octet", status));
