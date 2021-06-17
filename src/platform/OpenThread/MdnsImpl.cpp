@@ -51,12 +51,6 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
     snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
 
-    // Try to remove service before adding it, as SRP doesn't allow to update existing services.
-    result = ThreadStackMgr().RemoveSrpService(service->mName, serviceType);
-
-    // Service should be successfully removed or not found (not exists).
-    VerifyOrExit((result == CHIP_NO_ERROR) || (result == Internal::MapOpenThreadError(OT_ERROR_NOT_FOUND)), );
-
     result =
         ThreadStackMgr().AddSrpService(service->mName, serviceType, service->mPort, service->mTextEntries, service->mTextEntrySize);
 
