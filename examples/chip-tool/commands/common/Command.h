@@ -166,8 +166,8 @@ public:
 
     virtual CHIP_ERROR Run() = 0;
 
-    bool GetCommandExitStatus() const { return mCommandExitStatus; }
-    void SetCommandExitStatus(bool status)
+    CHIP_ERROR GetCommandExitStatus() const { return mCommandExitStatus; }
+    void SetCommandExitStatus(CHIP_ERROR status)
     {
         mCommandExitStatus = status;
         UpdateWaitForResponse(false);
@@ -185,8 +185,8 @@ private:
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out);
 
-    bool mCommandExitStatus = false;
-    const char * mName      = nullptr;
+    CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
+    const char * mName            = nullptr;
     std::vector<Argument> mArgs;
 
     std::condition_variable cvWaitingForResponse;

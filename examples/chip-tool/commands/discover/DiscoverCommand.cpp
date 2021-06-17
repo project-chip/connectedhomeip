@@ -47,6 +47,5 @@ exit:
         return err;
     }
 
-    VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
-    return CHIP_NO_ERROR;
+    return GetCommandExitStatus();
 }

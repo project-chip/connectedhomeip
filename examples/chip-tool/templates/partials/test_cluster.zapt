@@ -12,7 +12,7 @@ class {{filename}}: public TestCommand
       if (mTestCount == mTestIndex)
       {
           ChipLogProgress(chipTool, "{{filename}}: Test complete");
-          SetCommandExitStatus(true);
+          SetCommandExitStatus(CHIP_NO_ERROR);
       }
 
       // Ensure we increment mTestIndex before we start running the relevant
@@ -31,7 +31,7 @@ class {{filename}}: public TestCommand
       if (CHIP_NO_ERROR != err)
       {
           ChipLogProgress(chipTool, "{{filename}}: %s", chip::ErrorStr(err));
-          SetCommandExitStatus(false);
+          SetCommandExitStatus(err);
       }
 
       return err;
@@ -109,7 +109,7 @@ class {{filename}}: public TestCommand
 
         if (runner->mIsFailureExpected_{{index}} == false) {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -128,7 +128,7 @@ class {{filename}}: public TestCommand
         if (runner->mIsFailureExpected_{{index}} == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -138,7 +138,7 @@ class {{filename}}: public TestCommand
         if (count != {{expectedValue.length}})
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
         {{else}}
@@ -150,7 +150,7 @@ class {{filename}}: public TestCommand
         {{/if}}
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
         {{/if}}

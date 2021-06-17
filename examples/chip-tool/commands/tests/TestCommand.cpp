@@ -45,6 +45,5 @@ CHIP_ERROR TestCommand::Run()
 
     WaitForResponse(kWaitDurationInSeconds);
 
-    VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
-    return CHIP_NO_ERROR;
+    return GetCommandExitStatus();
 }

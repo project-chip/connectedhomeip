@@ -62,7 +62,7 @@ CHIP_ERROR ModelCommand::Run()
 
     WaitForResponse(kWaitDurationInSeconds);
 
-    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
+    err = GetCommandExitStatus();
 
 exit:
     return err;
@@ -81,5 +81,5 @@ void ModelCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ModelCommand context is null"));
-    command->SetCommandExitStatus(false);
+    command->SetCommandExitStatus(error);
 }
