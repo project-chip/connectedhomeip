@@ -113,7 +113,7 @@ bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::Command * com
 }
 
 bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::Command * command, unsigned char * contentUrl,
-                                                  unsigned char * displayString)
+                                                    unsigned char * displayString)
 {
     string contentUrlString(reinterpret_cast<char *>(contentUrl));
     string displayStringString(reinterpret_cast<char *>(displayString));
