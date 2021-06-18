@@ -145,7 +145,6 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEve
 #endif                          // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 }
 
-
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
 {
