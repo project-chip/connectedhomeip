@@ -50,7 +50,7 @@ inline int SetNonBlockingMode(int fd)
 }
 } // anonymous namespace
 
-Error SystemWakeEvent::Open(WatchableEventManager & watchState)
+Error WakeEvent::Open(WatchableEventManager & watchState)
 {
     enum
     {
@@ -78,7 +78,7 @@ Error SystemWakeEvent::Open(WatchableEventManager & watchState)
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-Error SystemWakeEvent::Close()
+Error WakeEvent::Close()
 {
     int res = 0;
 
@@ -94,7 +94,7 @@ Error SystemWakeEvent::Close()
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-void SystemWakeEvent::Confirm()
+void WakeEvent::Confirm()
 {
     uint8_t buffer[128];
     ssize_t res;
@@ -110,7 +110,7 @@ void SystemWakeEvent::Confirm()
     } while (res == sizeof(buffer));
 }
 
-Error SystemWakeEvent::Notify()
+Error WakeEvent::Notify()
 {
     char byte = 1;
 
@@ -124,7 +124,7 @@ Error SystemWakeEvent::Notify()
 
 #else // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
-Error SystemWakeEvent::Open(WatchableEventManager & watchState)
+Error WakeEvent::Open(WatchableEventManager & watchState)
 {
     mFD.Init(watchState);
 
@@ -141,7 +141,7 @@ Error SystemWakeEvent::Open(WatchableEventManager & watchState)
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-Error SystemWakeEvent::Close()
+Error WakeEvent::Close()
 {
     int res = mFD.Close();
 
@@ -153,7 +153,7 @@ Error SystemWakeEvent::Close()
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-void SystemWakeEvent::Confirm()
+void WakeEvent::Confirm()
 {
     uint64_t value;
 
@@ -163,7 +163,7 @@ void SystemWakeEvent::Confirm()
     }
 }
 
-Error SystemWakeEvent::Notify()
+Error WakeEvent::Notify()
 {
     uint64_t value = 1;
 

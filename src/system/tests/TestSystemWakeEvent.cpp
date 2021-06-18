@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This is a unit test suite for <tt>chip::System::SystemWakeEvent</tt>
+ *      This is a unit test suite for <tt>chip::System::WakeEvent</tt>
  *
  */
 
@@ -48,7 +48,7 @@ struct TestContext
 {
     ::chip::System::Layer mSystemLayer;
     WatchableEventManager mWatchableEvents;
-    SystemWakeEvent mWakeEvent;
+    WakeEvent mWakeEvent;
     fd_set mReadSet;
     fd_set mWriteSet;
     fd_set mErrorSet;

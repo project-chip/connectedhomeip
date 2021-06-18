@@ -202,7 +202,7 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     WatchableEventManager mWatchableEvents;
-    SystemWakeEvent mWakeEvent;
+    WakeEvent mWakeEvent;
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_t mHandleSelectThread;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING

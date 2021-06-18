@@ -268,7 +268,7 @@ namespace System {
 
 using ::chip::System::Error;
 
-class SystemWakeEvent
+class WakeEvent
 {
 public:
     Error Open(WatchableEventManager & watchState); /**< Initialize the pipeline */
@@ -278,7 +278,7 @@ public:
 
     Error Notify(); /**< Set the event. */
     void Confirm(); /**< Clear the event. */
-    static void Confirm(WatchableSocket & socket) { static_cast<SystemWakeEvent *>(socket.GetCallbackData())->Confirm(); }
+    static void Confirm(WatchableSocket & socket) { static_cast<WakeEvent *>(socket.GetCallbackData())->Confirm(); }
 
 private:
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
