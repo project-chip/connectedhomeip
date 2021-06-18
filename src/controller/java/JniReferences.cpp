@@ -23,6 +23,7 @@
 
 pthread_mutex_t JniReferences::sStackLock  = PTHREAD_MUTEX_INITIALIZER;
 JavaVM * JniReferences::sJvm               = nullptr;
+jclass JniReferences::sClusterExceptionCls = nullptr;
 
 void JniReferences::SetJavaVm(JavaVM * jvm)
 {
@@ -31,6 +32,8 @@ void JniReferences::SetJavaVm(JavaVM * jvm)
     JNIEnv * env   = GetEnvForCurrentThread();
 
     VerifyOrReturn(env != NULL, ChipLogError(Controller, "Could not get JNI env for current thread"));
+    err = GetClassRef(env, "chip/devicecontroller/ChipClusterException", sClusterExceptionCls);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find ChipClusterException class"));
 }
 
 JNIEnv * JniReferences::GetEnvForCurrentThread()
