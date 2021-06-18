@@ -338,7 +338,8 @@ CHIP_ERROR __attribute__((weak)) ReadSingleClusterData(ClusterInfo & aClusterInf
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR __attribute__((weak)) WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR __attribute__((weak))
+WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     ChipLogDetail(DataManagement,
                   "Received Cluster Attribute: Cluster=%" PRIx16 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx8

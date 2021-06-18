@@ -154,7 +154,7 @@ CHIP_ERROR WriteClient::FinishAttribute()
     AttributeDataElement::Builder attributeDataElement =
         mWriteRequestBuilder.GetAttributeDataListBuilder().GetAttributeDataElementBuilder();
 
-    //TODO: Add attribute version support
+    // TODO: Add attribute version support
     attributeDataElement.DataVersion(0);
     attributeDataElement.EndOfAttributeDataElement();
     err = attributeDataElement.GetError();

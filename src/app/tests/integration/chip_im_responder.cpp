@@ -138,7 +138,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     err = apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                               Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+                                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
     ChipLogFunctError(err);
     return err;
 }

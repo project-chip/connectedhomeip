@@ -47,7 +47,7 @@ namespace {
 constexpr size_t kMaxCommandMessageCount          = 3;
 constexpr size_t kTotalFailureCommandMessageCount = 1;
 constexpr size_t kMaxReadMessageCount             = 3;
-constexpr size_t kMaxWriteMessageCount             = 3;
+constexpr size_t kMaxWriteMessageCount            = 3;
 constexpr int32_t gMessageIntervalSeconds         = 1;
 constexpr chip::Transport::AdminId gAdminId       = 0;
 
@@ -286,7 +286,7 @@ void HandleWriteComplete()
     gWriteRespCount++;
 
     printf("Write Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gWriteRespCount, gWriteCount,
-            static_cast<double>(gWriteRespCount) * 100 / gWriteCount, static_cast<double>(transitTime) / 1000);
+           static_cast<double>(gWriteRespCount) * 100 / gWriteCount, static_cast<double>(transitTime) / 1000);
 
     gCond.notify_one();
 }
