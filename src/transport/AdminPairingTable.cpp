@@ -80,6 +80,16 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
         memcpy(info->mRootCert, mRootCert, mRootCertLen);
     }
 
+    if (mICACert == nullptr || mICACertLen == 0)
+    {
+        info->mICACertLen = 0;
+    }
+    else
+    {
+        info->mICACertLen = Encoding::LittleEndian::HostSwap16(mICACertLen);
+        memcpy(info->mICACert, mICACert, mICACertLen);
+    }
+
     if (mOperationalCert == nullptr || mOpCertLen == 0)
     {
         info->mOpCertLen = 0;
@@ -143,6 +153,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 
     ChipLogProgress(Inet, "Loading certs from KVS");
     SuccessOrExit(SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
+    SuccessOrExit(SetICACert(ByteSpan(info->mICACert, info->mICACertLen)));
     SuccessOrExit(SetOperationalCert(ByteSpan(info->mOperationalCert, opCertLen)));
 
 exit:
@@ -232,6 +243,44 @@ CHIP_ERROR AdminPairingInfo::SetRootCert(const ByteSpan & cert)
     return CHIP_NO_ERROR;
 }
 
+void AdminPairingInfo::ReleaseICACert()
+{
+    if (mICACert != nullptr)
+    {
+        chip::Platform::MemoryFree(mICACert);
+    }
+    mICACertAllocatedLen = 0;
+    mICACertLen          = 0;
+    mICACert             = nullptr;
+}
+
+CHIP_ERROR AdminPairingInfo::SetICACert(const ByteSpan & cert)
+{
+    if (cert.size() == 0)
+    {
+        ReleaseICACert();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(cert.size() <= kMaxChipCertSize, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mICACertLen != 0 && mICACertAllocatedLen < cert.size())
+    {
+        ReleaseICACert();
+    }
+
+    if (mICACert == nullptr)
+    {
+        mICACert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(cert.size()));
+    }
+    VerifyOrReturnError(mICACert != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(CanCastTo<uint16_t>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    mICACertLen          = static_cast<uint16_t>(cert.size());
+    mICACertAllocatedLen = (mICACertLen > mICACertAllocatedLen) ? mICACertLen : mICACertAllocatedLen;
+    memcpy(mICACert, cert.data(), mICACertLen);
+
+    return CHIP_NO_ERROR;
+}
+
 void AdminPairingInfo::ReleaseOperationalCert()
 {
     if (mOperationalCert != nullptr)
@@ -258,15 +307,24 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
         ReleaseOperationalCert();
     }
 
+    ByteSpan noc;
+    ByteSpan icac;
+    ConvertChipCertArrayToChipCerts(cert, noc, icac);
+
+    if (icac.data() != nullptr && icac.size() != 0)
+    {
+        ReturnErrorOnFailure(SetICACert(icac));
+    }
+
     if (mOperationalCert == nullptr)
     {
-        mOperationalCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(cert.size()));
+        mOperationalCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(noc.size()));
     }
     VerifyOrReturnError(mOperationalCert != nullptr, CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(CanCastTo<uint16_t>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    mOpCertLen          = static_cast<uint16_t>(cert.size());
+    VerifyOrReturnError(CanCastTo<uint16_t>(noc.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    mOpCertLen          = static_cast<uint16_t>(noc.size());
     mOpCertAllocatedLen = (mOpCertLen > mOpCertAllocatedLen) ? mOpCertLen : mOpCertAllocatedLen;
-    memcpy(mOperationalCert, cert.data(), mOpCertLen);
+    memcpy(mOperationalCert, noc.data(), mOpCertLen);
 
     return CHIP_NO_ERROR;
 }
@@ -280,6 +338,12 @@ CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentia
     ReturnErrorOnFailure(
         certificates.LoadCert(mRootCert, mRootCertLen,
                               BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor).Set(CertDecodeFlags::kGenerateTBSHash)));
+
+    if (mICACert != nullptr && mICACertLen > 0)
+    {
+        ReturnErrorOnFailure(
+            certificates.LoadCert(mICACert, mICACertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+    }
 
     credentials.Release();
     ReturnErrorOnFailure(credentials.Init(&certificates, certificates.GetCertCount()));

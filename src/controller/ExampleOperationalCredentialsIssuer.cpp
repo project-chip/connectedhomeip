@@ -24,7 +24,8 @@
 namespace chip {
 namespace Controller {
 
-constexpr const char kOperationalCredentialsIssuerKeypairStorage[] = "ExampleOpCredsCAKey";
+constexpr const char kOperationalCredentialsIssuerKeypairStorage[]             = "ExampleOpCredsCAKey";
+constexpr const char kOperationalCredentialsIntermediateIssuerKeypairStorage[] = "ExampleOpCredsICAKey";
 
 using namespace Credentials;
 using namespace Crypto;
@@ -59,6 +60,24 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
 
+    keySize = static_cast<uint16_t>(sizeof(serializedKey));
+
+    if (storage.SyncGetKeyValue(kOperationalCredentialsIntermediateIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
+    {
+        // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
+        ReturnErrorOnFailure(mIntermediateIssuer.Initialize());
+        ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
+
+        keySize = static_cast<uint16_t>(sizeof(serializedKey));
+        ReturnErrorOnFailure(
+            storage.SyncSetKeyValue(kOperationalCredentialsIntermediateIssuerKeypairStorage, &serializedKey, keySize));
+    }
+    else
+    {
+        // Use the keypair from the storage
+        ReturnErrorOnFailure(mIntermediateIssuer.Deserialize(serializedKey));
+    }
+
     mInitialized = true;
     return CHIP_NO_ERROR;
 }
@@ -88,10 +107,24 @@ ExampleOperationalCredentialsIssuer::GenerateNodeOperationalCertificate(const Op
     ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     uint32_t nocLen = 0;
 
-    ReturnErrorOnFailure(NewNodeOperationalX509Cert(request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, noc.Get(),
-                                                    kMaxCHIPDERCertLength, nocLen));
+    ReturnErrorOnFailure(NewNodeOperationalX509Cert(request, CertificateIssuerLevel::kIssuerIsIntermediateCA, pubkey,
+                                                    mIntermediateIssuer, noc.Get(), kMaxCHIPDERCertLength, nocLen));
 
     onNOCGenerated->mCall(onNOCGenerated->mContext, ByteSpan(noc.Get(), nocLen));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GetIntermediateCACertificate(FabricId fabricId, MutableByteSpan & outCert)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+
+    size_t outCertSize  = (outCert.size() > UINT32_MAX) ? UINT32_MAX : outCert.size();
+    uint32_t outCertLen = 0;
+    ReturnErrorOnFailure(NewICAX509Cert(request, request.Issuer, mIntermediateIssuer.Pubkey(), mIssuer, outCert.data(),
+                                        static_cast<uint32_t>(outCertSize), outCertLen));
+    outCert.reduce_size(outCertLen);
 
     return CHIP_NO_ERROR;
 }

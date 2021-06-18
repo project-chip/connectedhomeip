@@ -260,7 +260,7 @@ void DeviceController::OnLocalNOCGenerated(void * context, const ByteSpan & noc)
         err = controller->GenerateOperationalCertificates(noc, chipCertSpan);
         SuccessOrExit(err);
 
-        err = admin->SetOperationalCert(chipCertSpan);
+        err = admin->SetOperationalCertsFromCertArray(chipCertSpan);
         SuccessOrExit(err);
     }
 
