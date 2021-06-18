@@ -243,6 +243,11 @@ exit:
     return *this;
 }
 
+AttributeDataList::Builder & WriteRequest::Builder::GetAttributeDataListBuilder()
+{
+    return mAttributeDataListBuilder;
+}
+
 WriteRequest::Builder & WriteRequest::Builder::EndOfWriteRequest()
 {
     EndOfContainer();
