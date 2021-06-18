@@ -131,7 +131,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
-    case 0x050A: // Content Launch Cluster
+    case 0x050A: // Content Launcher Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
@@ -684,7 +684,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         }
         break;
-    case 0x050A: // Content Launch Cluster
+    case 0x050A: // Content Launcher Cluster
         switch (attributeId)
         {
         case 0x0000: // accepts header list

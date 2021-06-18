@@ -136,7 +136,7 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
  * @param endpoint   Ver.: always
  *
  */
-void emberAfContentLaunchClusterInitCallback(EndpointId endpoint)
+void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
     ClusterManager().writeListAttribute(endpoint, ZCL_CONTENT_LAUNCH_CLUSTER_ID, ZCL_CONTENT_LAUNCHER_ACCEPTS_HEADER_ATTRIBUTE_ID,
                                         ContentLauncherManager().proxyGetAcceptsHeader());

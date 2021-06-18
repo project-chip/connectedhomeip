@@ -5856,9 +5856,9 @@
  * @param autoPlay BOOLEAN
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchContent(autoPlay) emberAfFillExternalBuffer(mask,                                                           \
+    LauncherClusterLaunchContent(autoPlay) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
-                                                                   ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", autoPlay);
+                                                                     ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", autoPlay);
 
 /** @brief Command description for LaunchContentResponse
  *
@@ -5866,9 +5866,9 @@
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchContentResponse(data) emberAfFillExternalBuffer(mask,                                                       \
+    LauncherClusterLaunchContentResponse(data) emberAfFillExternalBuffer(mask,                                                     \
                                                                                                                                    \
-                                                                       ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID, "u", data);
+                                                                         ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID, "u", data);
 
 /** @brief Command description for LaunchContent
  *
@@ -5876,9 +5876,9 @@
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchContent(data) emberAfFillExternalBuffer(mask,                                                               \
+    LauncherClusterLaunchContent(data) emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
-                                                               ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", data);
+                                                                 ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", data);
 
 /** @brief Command description for LaunchContentResponse
  *
@@ -5886,7 +5886,7 @@
  * @param contentLaunchStatus ContentLaunchStatus
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchContentResponse(contentLaunchStatus)                                                                        \
+    LauncherClusterLaunchContentResponse(contentLaunchStatus)                                                                      \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID, "u", contentLaunchStatus);
@@ -5897,9 +5897,9 @@
  * @param contentURL CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchURL(contentURL) emberAfFillExternalBuffer(mask,                                                             \
+    LauncherClusterLaunchURL(contentURL) emberAfFillExternalBuffer(mask,                                                           \
                                                                                                                                    \
-                                                                 ZCL_LAUNCH_URL_COMMAND_ID, "u", contentURL);
+                                                                   ZCL_LAUNCH_URL_COMMAND_ID, "u", contentURL);
 
 /** @brief Command description for LaunchURLResponse
  *
@@ -5907,9 +5907,9 @@
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchURLResponse(data) emberAfFillExternalBuffer(mask,                                                           \
+    LauncherClusterLaunchURLResponse(data) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
-                                                                   ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID, "u", data);
+                                                                     ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID, "u", data);
 
 /** @brief Command description for LaunchURL
  *
@@ -5917,9 +5917,9 @@
  * @param displayString CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchURL(displayString) emberAfFillExternalBuffer(mask,                                                          \
+    LauncherClusterLaunchURL(displayString) emberAfFillExternalBuffer(mask,                                                        \
                                                                                                                                    \
-                                                                    ZCL_LAUNCH_URL_COMMAND_ID, "u", displayString);
+                                                                      ZCL_LAUNCH_URL_COMMAND_ID, "u", displayString);
 
 /** @brief Command description for LaunchURLResponse
  *
@@ -5927,7 +5927,7 @@
  * @param contentLaunchStatus ContentLaunchStatus
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchURLResponse(contentLaunchStatus)                                                                            \
+    LauncherClusterLaunchURLResponse(contentLaunchStatus)                                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID, "u", contentLaunchStatus);
@@ -5994,6 +5994,16 @@
     LauncherClusterLaunchAppResponse(data) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
                                                                      ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, "u", data);
+
+/** @brief Command description for ChangeStatus
+ *
+ * Command: ChangeStatus
+ * @param status ApplicationBasicStatus
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    BasicClusterChangeStatus(status) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_CHANGE_STATUS_COMMAND_ID, "u", status);
 
 /** @brief Command description for GetSetupPIN
  *

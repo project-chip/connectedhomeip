@@ -78,22 +78,21 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(void * context, ui
 chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> gAudioOutputAudioOutputListListAttributeCallback{
     OnAudioOutputAudioOutputListListAttributeResponse, nullptr
 };
-static void OnContentLaunchAcceptsHeaderListListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
+static void OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
 {
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
-chip::Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback> gContentLaunchAcceptsHeaderListListAttributeCallback{
-    OnContentLaunchAcceptsHeaderListListAttributeResponse, nullptr
-};
-static void OnContentLaunchSupportedStreamingTypesListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
+chip::Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>
+    gContentLauncherAcceptsHeaderListListAttributeCallback{ OnContentLauncherAcceptsHeaderListListAttributeResponse, nullptr };
+static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
 {
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
-chip::Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback>
-    gContentLaunchSupportedStreamingTypesListAttributeCallback{ OnContentLaunchSupportedStreamingTypesListAttributeResponse,
-                                                                nullptr };
+chip::Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>
+    gContentLauncherSupportedStreamingTypesListAttributeCallback{ OnContentLauncherSupportedStreamingTypesListAttributeResponse,
+                                                                  nullptr };
 static void OnDescriptorDeviceListListAttributeResponse(void * context, uint16_t count, _DeviceType * entries)
 {
     if (gSuccessResponseDelegate != nullptr)
@@ -321,6 +320,15 @@ CHIP_ERROR chip_ime_ReadAttribute_AccountLogin_ClusterRevision(chip::Controller:
 
 // End of Cluster AccountLogin
 // Cluster ApplicationBasic
+
+CHIP_ERROR chip_ime_AppendCommand_ApplicationBasic_ChangeStatus(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId, uint8_t status)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ApplicationBasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ChangeStatus(nullptr, nullptr, status);
+}
 
 CHIP_ERROR chip_ime_ReadAttribute_ApplicationBasic_VendorName(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                               chip::GroupId /* ZCLgroupId */)
@@ -1752,59 +1760,59 @@ CHIP_ERROR chip_ime_ReadAttribute_ColorControl_ClusterRevision(chip::Controller:
 }
 
 // End of Cluster ColorControl
-// Cluster ContentLaunch
+// Cluster ContentLauncher
 
-CHIP_ERROR chip_ime_AppendCommand_ContentLaunch_LaunchContent(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                              chip::GroupId, uint8_t autoPlay, const uint8_t * data,
-                                                              uint32_t data_Len)
+CHIP_ERROR chip_ime_AppendCommand_ContentLauncher_LaunchContent(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId, uint8_t autoPlay, const uint8_t * data,
+                                                                uint32_t data_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::ContentLaunchCluster cluster;
+    chip::Controller::ContentLauncherCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.LaunchContent(nullptr, nullptr, autoPlay, chip::ByteSpan(data, data_Len));
 }
-CHIP_ERROR chip_ime_AppendCommand_ContentLaunch_LaunchURL(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                          chip::GroupId, const uint8_t * contentURL, uint32_t contentURL_Len,
-                                                          const uint8_t * displayString, uint32_t displayString_Len)
+CHIP_ERROR chip_ime_AppendCommand_ContentLauncher_LaunchURL(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                            chip::GroupId, const uint8_t * contentURL, uint32_t contentURL_Len,
+                                                            const uint8_t * displayString, uint32_t displayString_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::ContentLaunchCluster cluster;
+    chip::Controller::ContentLauncherCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.LaunchURL(nullptr, nullptr, chip::ByteSpan(contentURL, contentURL_Len),
                              chip::ByteSpan(displayString, displayString_Len));
 }
 
-CHIP_ERROR chip_ime_ReadAttribute_ContentLaunch_AcceptsHeaderList(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                                  chip::GroupId /* ZCLgroupId */)
+CHIP_ERROR chip_ime_ReadAttribute_ContentLauncher_AcceptsHeaderList(chip::Controller::Device * device,
+                                                                    chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::ContentLaunchCluster cluster;
+    chip::Controller::ContentLauncherCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeAcceptsHeaderList(gContentLaunchAcceptsHeaderListListAttributeCallback.Cancel(),
+    return cluster.ReadAttributeAcceptsHeaderList(gContentLauncherAcceptsHeaderListListAttributeCallback.Cancel(),
                                                   gDefaultFailureCallback.Cancel());
 }
 
-CHIP_ERROR chip_ime_ReadAttribute_ContentLaunch_SupportedStreamingTypes(chip::Controller::Device * device,
-                                                                        chip::EndpointId ZCLendpointId,
-                                                                        chip::GroupId /* ZCLgroupId */)
+CHIP_ERROR chip_ime_ReadAttribute_ContentLauncher_SupportedStreamingTypes(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId,
+                                                                          chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::ContentLaunchCluster cluster;
+    chip::Controller::ContentLauncherCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeSupportedStreamingTypes(gContentLaunchSupportedStreamingTypesListAttributeCallback.Cancel(),
+    return cluster.ReadAttributeSupportedStreamingTypes(gContentLauncherSupportedStreamingTypesListAttributeCallback.Cancel(),
                                                         gDefaultFailureCallback.Cancel());
 }
 
-CHIP_ERROR chip_ime_ReadAttribute_ContentLaunch_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                                chip::GroupId /* ZCLgroupId */)
+CHIP_ERROR chip_ime_ReadAttribute_ContentLauncher_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                  chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::ContentLaunchCluster cluster;
+    chip::Controller::ContentLauncherCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
 }
 
-// End of Cluster ContentLaunch
+// End of Cluster ContentLauncher
 // Cluster Descriptor
 
 CHIP_ERROR chip_ime_ReadAttribute_Descriptor_DeviceList(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,

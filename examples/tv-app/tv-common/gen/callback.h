@@ -88,13 +88,13 @@ void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfBindingClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Content Launch Cluster Init
+/** @brief Content Launcher Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfContentLaunchClusterInitCallback(chip::EndpointId endpoint);
+void emberAfContentLauncherClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Descriptor Cluster Init
  *
@@ -684,27 +684,27 @@ EmberAfStatus emberAfBindingClusterServerPreAttributeChangedCallback(chip::Endpo
 void emberAfBindingClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Content Launch Cluster server
+// Content Launcher Cluster server
 //
 
-/** @brief Content Launch Cluster Server Init
+/** @brief Content Launcher Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfContentLaunchClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfContentLauncherClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Content Launch Cluster Server Attribute Changed
+/** @brief Content Launcher Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param endpoint    Endpoint that is being initialized
  * @param attributeId Attribute that changed
  */
-void emberAfContentLaunchClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void emberAfContentLauncherClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief Content Launch Cluster Server Manufacturer Specific Attribute Changed
+/** @brief Content Launcher Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
  *
@@ -712,11 +712,11 @@ void emberAfContentLaunchClusterServerAttributeChangedCallback(chip::EndpointId 
  * @param attributeId       Attribute that changed
  * @param manufacturerCode  Manufacturer Code of the attribute that changed
  */
-void emberAfContentLaunchClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId,
-                                                                                   uint16_t manufacturerCode);
+void emberAfContentLauncherClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
+                                                                                     uint16_t manufacturerCode);
 
-/** @brief Content Launch Cluster Server Message Sent
+/** @brief Content Launcher Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -727,11 +727,11 @@ void emberAfContentLaunchClusterServerManufacturerSpecificAttributeChangedCallba
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfContentLaunchClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                          EmberStatus status);
+void emberAfContentLauncherClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                            EmberStatus status);
 
-/** @brief Content Launch Cluster Server Pre Attribute Changed
+/** @brief Content Launcher Cluster Server Pre Attribute Changed
  *
  * server Pre Attribute Changed
  *
@@ -741,17 +741,18 @@ void emberAfContentLaunchClusterServerMessageSentCallback(const chip::MessageSen
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfContentLaunchClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           EmberAfAttributeType attributeType, uint16_t size,
-                                                                           uint8_t * value);
+EmberAfStatus emberAfContentLauncherClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
+                                                                             EmberAfAttributeType attributeType, uint16_t size,
+                                                                             uint8_t * value);
 
-/** @brief Content Launch Cluster Server Tick
+/** @brief Content Launcher Cluster Server Tick
  *
  * server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfContentLaunchClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfContentLauncherClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Descriptor Cluster server
@@ -2229,6 +2230,12 @@ EmberAfStatus emberAfWiFiNetworkDiagnosticsClusterServerPreAttributeChangedCallb
 void emberAfWiFiNetworkDiagnosticsClusterServerTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
+
+/**
+ * @brief Application Basic Cluster ChangeStatus Command callback
+ */
+
+bool emberAfApplicationBasicClusterChangeStatusCallback(chip::app::Command * commandObj, uint8_t status);
 
 /**
  * @brief Audio Output Cluster RenameOutput Command callback

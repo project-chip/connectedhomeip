@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>Account Login</name>
     <code>0x050e</code>
     <define>ACCOUNT_LOGIN_CLUSTER</define>

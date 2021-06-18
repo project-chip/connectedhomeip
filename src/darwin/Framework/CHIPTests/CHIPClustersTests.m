@@ -4629,18 +4629,18 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterContentLaunchReadAttributeAcceptsHeaderListWithResponseHandler
+- (void)testSendClusterContentLauncherReadAttributeAcceptsHeaderListWithResponseHandler
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"ContentLaunchReadAttributeAcceptsHeaderListWithResponseHandler"];
+        [self expectationWithDescription:@"ContentLauncherReadAttributeAcceptsHeaderListWithResponseHandler"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPContentLaunch * cluster = [[CHIPContentLaunch alloc] initWithDevice:device endpoint:1 queue:queue];
+    CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeAcceptsHeaderListWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"ContentLaunch AcceptsHeaderList Error: %@", err);
+        NSLog(@"ContentLauncher AcceptsHeaderList Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
@@ -4648,18 +4648,18 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterContentLaunchReadAttributeSupportedStreamingTypesWithResponseHandler
+- (void)testSendClusterContentLauncherReadAttributeSupportedStreamingTypesWithResponseHandler
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"ContentLaunchReadAttributeSupportedStreamingTypesWithResponseHandler"];
+        [self expectationWithDescription:@"ContentLauncherReadAttributeSupportedStreamingTypesWithResponseHandler"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPContentLaunch * cluster = [[CHIPContentLaunch alloc] initWithDevice:device endpoint:1 queue:queue];
+    CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeSupportedStreamingTypesWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"ContentLaunch SupportedStreamingTypes Error: %@", err);
+        NSLog(@"ContentLauncher SupportedStreamingTypes Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
@@ -4667,18 +4667,18 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterContentLaunchReadAttributeClusterRevisionWithResponseHandler
+- (void)testSendClusterContentLauncherReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"ContentLaunchReadAttributeClusterRevisionWithResponseHandler"];
+        [self expectationWithDescription:@"ContentLauncherReadAttributeClusterRevisionWithResponseHandler"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPContentLaunch * cluster = [[CHIPContentLaunch alloc] initWithDevice:device endpoint:1 queue:queue];
+    CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"ContentLaunch ClusterRevision Error: %@", err);
+        NSLog(@"ContentLauncher ClusterRevision Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
