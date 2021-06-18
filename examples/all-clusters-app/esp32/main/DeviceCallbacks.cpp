@@ -33,10 +33,8 @@
 #include <app/Command.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/cluster-id.h>
-#include <app/server/Mdns.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
-#include <lib/mdns/Advertiser.h>
 #include <support/CodeUtils.h>
 
 static const char * TAG = "app-devicecallbacks";
@@ -60,18 +58,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kSessionEstablished:
         OnSessionEstablished(event);
         break;
-    case DeviceEventType::kInterfaceIpAddressChanged:
-        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
-            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
-        {
-            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
-            // will not trigger a 'internet connectivity change' as there is no internet
-            // connectivity. MDNS still wants to refresh its listening interfaces to include the
-            // newly selected address.
-            chip::app::Mdns::StartServer();
-        }
-        break;
-    }
 
     ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
@@ -110,7 +96,6 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
-        chip::app::Mdns::StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -120,7 +105,6 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
-        chip::app::Mdns::StartServer();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
