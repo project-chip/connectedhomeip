@@ -136,6 +136,7 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
 #if !defined(NDEBUG)
             ChipLogDetail(ExchangeManager, "Flushed pending ack for MsgId:%08" PRIX32, mPendingPeerAckId);
 #endif
+            SetAckPending(false);
         }
     }
 

@@ -49,8 +49,8 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(exchangeId).SetMessageType(protocol, type).SetInitiator(isInitiator);
 
-    // If there is a pending acknowledgment piggyback it on this message.
-    if (reliableMessageContext->HasPeerRequestedAck())
+    // If there is a pending acknowledgment piggyback it on this message, and we have not send ACK before.
+    if (reliableMessageContext->HasPeerRequestedAck() && reliableMessageContext->IsAckPending())
     {
         payloadHeader.SetAckId(reliableMessageContext->GetPendingPeerAckId());
 
