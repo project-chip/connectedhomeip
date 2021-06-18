@@ -17,10 +17,9 @@ source $CHIP_DIR/scripts/tests/mbed/common.sh
 echo "Downloading artifact from $GITHUB_ACTION_ID action in $GITHUB_REPOSITORY"
 download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN binaries
 
-targer_number=$(cat devices.json | jq length)
+target_number=$(cat devices.json | jq length)
 
 for index in $(eval echo "{0..$(($target_number - 1))}"); do
-    echo "$index"
     platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
     echo "Flash unit-tests application image to $platform_name device"
     flash_image_to_device unit-tests "$platform_name" binaries
