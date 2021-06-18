@@ -55,6 +55,8 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    Cleanup();
+
     // TODO - Use PK of the root CA for the initiator to figure out the admin.
     mAdminId = ec->GetSecureSession().GetAdminId();
 
@@ -93,18 +95,15 @@ void CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     mPairingSession.OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
 
     // TODO - Enable multiple concurrent CASE session establishment
-    // This will prevent CASEServer to process another CASE session establishment request until the current
-    // one completes (successfully or failed)
-    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
 }
 
 void CASEServer::Cleanup()
 {
     // Let's re-register for CASE SigmaR1 message, so that the next CASE session setup request can be processed.
-    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, this);
     mAdminId = Transport::kUndefinedAdminId;
     mCredentials.Release();
     mCertificates.Release();
+    mPairingSession.Clear();
 }
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)

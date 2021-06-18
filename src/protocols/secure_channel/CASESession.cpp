@@ -969,6 +969,11 @@ CHIP_ERROR CASESession::FindValidTrustedRoot(const uint8_t ** msgIterator, uint3
 
         if (mOpCredSet->IsTrustedRootIn(trustedRoot[i]))
         {
+            if (mTrustedRootId.mId != nullptr)
+            {
+                chip::Platform::MemoryFree(const_cast<uint8_t *>(mTrustedRootId.mId));
+                mTrustedRootId.mId = nullptr;
+            }
             mTrustedRootId.mId = reinterpret_cast<const uint8_t *>(chip::Platform::MemoryAlloc(kTrustedRootIdSize));
             VerifyOrReturnError(mTrustedRootId.mId != nullptr, CHIP_ERROR_NO_MEMORY);
 
