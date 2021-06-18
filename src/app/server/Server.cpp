@@ -527,9 +527,10 @@ void InitServer(AppDelegate * delegate)
 #endif
     }
 
-// ESP32 examples have a custom logic for enabling DNS-SD
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32
     app::Mdns::StartServer();
+#elif CHIP_DEVICE_CONFIG_ENABLE_MDNS && CHIP_DEVICE_LAYER_TARGET_ESP32
+    app::Mdns::StartServerOnNetworkChange();
 #endif
 
     gCallbacks.SetSessionMgr(&gSessions);
