@@ -89,6 +89,8 @@ class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEsta
 {
 public:
     ~Device();
+    Device()               = default;
+    Device(const Device &) = delete;
 
     enum class PairingWindowOption
     {

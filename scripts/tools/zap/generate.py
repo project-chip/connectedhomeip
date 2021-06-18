@@ -21,6 +21,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import urllib.request
 
 CHIP_ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '../../..'))
 
@@ -81,23 +82,49 @@ def runGeneration(zap_file, zcl_file, templates_file, output_dir):
     os.chdir(generator_dir)
     subprocess.check_call(['node', './src-script/zap-generate.js', '-z', zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir])
 
-def runPrettifier(templates_file, output_dir):
+def runClangPrettifier(templates_file, output_dir):
     listOfSupportedFileExtensions = ['.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm']
 
     try:
         jsonData = json.loads(Path(templates_file).read_text())
         outputs = [(os.path.join(output_dir, template['output'])) for template in jsonData['templates']]
-        outputs = list(filter(lambda filepath: os.path.splitext(filepath)[1] in listOfSupportedFileExtensions, outputs))
-        os.system('clang-format -i ' + ' '.join(outputs))
+        clangOutputs = list(filter(lambda filepath: os.path.splitext(filepath)[1] in listOfSupportedFileExtensions, outputs))
+
+        if len(clangOutputs) > 0:
+            args = ['clang-format', '-i']
+            args.extend(clangOutputs)
+            subprocess.check_call(args)
     except Exception as err:
         print('clang-format error:', err)
+
+def runJavaPrettifier(templates_file, output_dir):
+    try:
+        jsonData = json.loads(Path(templates_file).read_text())
+        outputs = [(os.path.join(output_dir, template['output'])) for template in jsonData['templates']]
+        javaOutputs = list(filter(lambda filepath: os.path.splitext(filepath)[1] == ".java", outputs))
+
+        if len(javaOutputs) > 0:
+            # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
+            google_java_format_version = "1.6"
+            google_java_format_url = 'https://github.com/google/google-java-format/releases/download/google-java-format-' + google_java_format_version + '/'
+            google_java_format_jar = 'google-java-format-' + google_java_format_version + '-all-deps.jar'
+            jar_url = google_java_format_url + google_java_format_jar
+            
+            home = str(Path.home())
+            path, http_message = urllib.request.urlretrieve(jar_url, home + '/' + google_java_format_jar)
+            args = ['java', '-jar', path, '--replace']
+            args.extend(javaOutputs)
+            subprocess.check_call(args)
+    except Exception as err:
+        print('google-java-format error:', err)
 
 def main():
     checkPythonVersion()
 
     zap_file, zcl_file, templates_file, output_dir = runArgumentsParser()
     runGeneration(zap_file, zcl_file, templates_file, output_dir)
-    runPrettifier(templates_file, output_dir)
+    runClangPrettifier(templates_file, output_dir)
+    runJavaPrettifier(templates_file, output_dir)
 
 if __name__ == '__main__':
     main()

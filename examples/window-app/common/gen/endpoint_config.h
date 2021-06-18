@@ -589,7 +589,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 107
+#define GENERATED_ATTRIBUTE_COUNT 106
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -711,9 +711,6 @@
             { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1288) }, /* fabrics list */                                 \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* cluster revision */                             \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: Window Covering (client) */                                                                   \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(3) }, /* cluster revision */             \
-                                                                                                                                   \
             /* Endpoint: 1, Cluster: Window Covering (server) */                                                                   \
             { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* window covering type */                             \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* current position - lift */                          \
@@ -737,7 +734,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 11
+#define GENERATED_CLUSTER_COUNT 10
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0028,                                                                                                                  \
@@ -771,10 +768,7 @@
                 0x003E, ZAP_ATTRIBUTE_INDEX(94), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
             {                                                                                                                      \
-                0x0102, ZAP_ATTRIBUTE_INDEX(96), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 0, Cluster: Window Covering (client) */                                                                \
-            {                                                                                                                      \
-                0x0102, ZAP_ATTRIBUTE_INDEX(97), 10, 17, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+                0x0102, ZAP_ATTRIBUTE_INDEX(96), 10, 17, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 1, Cluster: Window Covering (server) */                                                                \
     }
 
@@ -783,7 +777,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 10, 1602 }, { ZAP_CLUSTER_INDEX(10), 1, 17 },                                                      \
+        { ZAP_CLUSTER_INDEX(0), 9, 1600 }, { ZAP_CLUSTER_INDEX(9), 1, 17 },                                                        \
     }
 
 // Largest attribute size is needed for various buffers
@@ -793,7 +787,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (254)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1619)
+#define ATTRIBUTE_MAX_SIZE (1617)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
@@ -837,7 +831,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (48)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (46)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -876,9 +870,6 @@
             /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                              \
             { 0x0034, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetWatermarks */                                             \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                        \
-            { 0x0035, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetCounts */                                                 \
-                                                                                                                                   \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                      \
             { 0x0037, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetCounts */                                                 \
                                                                                                                                    \
@@ -892,11 +883,8 @@
             { 0x003E, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateFabricLabel */                                           \
             { 0x003E, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveFabric */                                                \
             { 0x003E, 0x0B, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveAllFabrics */                                            \
-                                                                                                                                   \
-            /* Endpoint: 0, Cluster: Window Covering (client) */                                                                   \
-            { 0x0102, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringUpOpen */                                        \
-            { 0x0102, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringDownClose */                                     \
-            { 0x0102, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringStop */                                          \
+            { 0x003E, 0xA1, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddTrustedRootCertificate */                                   \
+            { 0x003E, 0xA2, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveTrustedRootCertificate */                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Window Covering (server) */                                                                   \
             { 0x0102, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringUpOpen */                                        \
@@ -940,36 +928,10 @@
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
 // User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (8)
+#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (0)
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
 
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (8)
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (0)
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
     {                                                                                                                              \
-                                                                                                                                   \
-        /* Endpoint: 1, Cluster: Window Covering (server) */                                                                       \
-        {                                                                                                                          \
-            ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }          \
-        }, /* window covering type */                                                                                              \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0003, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* current position - lift */                                                                                       \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0004, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* current position - tilt */                                                                                       \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0007, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* config status */                                                                                                 \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0010, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* installed open limit - lift */                                                                                   \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0011, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* installed closed limit - lift */                                                                                 \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0012, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* installed open limit - tilt */                                                                                   \
-            {                                                                                                                      \
-                ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0013, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* installed closed limit - tilt */                                                                                 \
     }

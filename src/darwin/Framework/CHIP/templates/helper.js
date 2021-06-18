@@ -67,39 +67,46 @@ function asObjectiveCBasicType(type)
   }
 }
 
-function asObjectiveCNumberType(label, type)
+function asObjectiveCNumberType(label, type, asLowerCased)
 {
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'uint8_t':
-        return 'UnsignedChar';
-      case 'uint16_t':
-        return 'UnsignedShort';
-      case 'uint32_t':
-        return 'UnsignedLong';
-      case 'uint64_t':
-        return 'UnsignedLongLong';
-      case 'int8_t':
-        return 'Char';
-      case 'int16_t':
-        return 'Short';
-      case 'int32_t':
-        return 'Long';
-      case 'int64_t':
-        return 'LongLong';
-      default:
-        error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
-        throw error;
-      }
-    })
+    return zclHelper.asUnderlyingZclType.call(this, type, options)
+        .then(zclType => {
+          const basicType = ChipTypesHelper.asBasicType(zclType);
+          switch (basicType) {
+          case 'uint8_t':
+            return 'UnsignedChar';
+          case 'uint16_t':
+            return 'UnsignedShort';
+          case 'uint32_t':
+            return 'UnsignedLong';
+          case 'uint64_t':
+            return 'UnsignedLongLong';
+          case 'int8_t':
+            return 'Char';
+          case 'int16_t':
+            return 'Short';
+          case 'int32_t':
+            return 'Long';
+          case 'int64_t':
+            return 'LongLong';
+          default:
+            error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
+            throw error;
+          }
+        })
+        .then(typeName => asLowerCased ? (typeName[0].toLowerCase() + typeName.substring(1)) : typeName);
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
   return templateUtil.templatePromise(this.global, promise)
+}
+
+function asTestIndex(index)
+{
+  return index.toString().padStart(6, 0);
 }
 
 //
@@ -108,4 +115,5 @@ function asObjectiveCNumberType(label, type)
 exports.asObjectiveCBasicType        = asObjectiveCBasicType;
 exports.asObjectiveCNumberType       = asObjectiveCNumberType;
 exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
+exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;

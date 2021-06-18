@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -92,10 +92,11 @@ private:
 
     INET_ERROR GetSocket(IPAddressType addrType);
     void HandlePendingIO();
+    static void HandlePendingIO(System::WatchableSocket & socket);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_source_t mReadableSource = nullptr;
-#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 

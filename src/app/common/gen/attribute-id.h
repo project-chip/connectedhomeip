@@ -1350,7 +1350,7 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Content Launch
+// Attribute ids for cluster: Content Launcher
 
 // Client attributes
 

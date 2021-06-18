@@ -98,11 +98,28 @@ void InteractionModelEngine::Shutdown()
         }
     }
 
+    for (auto & writeClient : mWriteClients)
+    {
+        if (!writeClient.IsFree())
+        {
+            writeClient.Shutdown();
+        }
+    }
+
+    for (auto & writeHandler : mWriteHandlers)
+    {
+        if (!writeHandler.IsFree())
+        {
+            writeHandler.Shutdown();
+        }
+    }
+
     for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
     {
         mClusterInfoPool[index].mpNext = nullptr;
         mClusterInfoPool[index].ClearDirty();
     }
+
     mpNextAvailableClusterInfo = nullptr;
 }
 
@@ -149,6 +166,25 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
     }
 
     return err;
+}
+
+CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClient ** const apWriteClient)
+{
+    *apWriteClient = nullptr;
+
+    for (auto & writeClient : mWriteClients)
+    {
+        if (!writeClient.IsFree())
+        {
+            continue;
+        }
+
+        ReturnErrorOnFailure(writeClient.Init(mpExchangeMgr, mpDelegate));
+        *apWriteClient = &writeClient;
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_NO_MEMORY;
 }
 
 void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
@@ -230,6 +266,35 @@ exit:
     }
 }
 
+void InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogDetail(DataManagement, "Receive Write request");
+
+    for (auto & writeHandler : mWriteHandlers)
+    {
+        if (writeHandler.IsFree())
+        {
+            err = writeHandler.Init(mpDelegate);
+            SuccessOrExit(err);
+            err = writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload));
+            SuccessOrExit(err);
+            apExchangeContext = nullptr;
+            break;
+        }
+    }
+
+exit:
+    ChipLogFunctError(err);
+
+    if (nullptr != apExchangeContext)
+    {
+        apExchangeContext->Abort();
+    }
+}
+
 void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
@@ -241,6 +306,10 @@ void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apEx
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
         OnReadRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
+    {
+        OnWriteRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
     }
     else
     {
@@ -267,7 +336,8 @@ CHIP_ERROR __attribute__((weak)) ReadSingleClusterData(ClusterInfo & aClusterInf
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR __attribute__((weak)) WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader)
+CHIP_ERROR __attribute__((weak))
+WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     ChipLogDetail(DataManagement,
                   "Received Cluster Attribute: Cluster=%" PRIx16 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx8
@@ -282,6 +352,11 @@ CHIP_ERROR __attribute__((weak)) WriteSingleClusterData(ClusterInfo & aClusterIn
 uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const
 {
     return static_cast<uint16_t>(apReadClient - mReadClients);
+}
+
+uint16_t InteractionModelEngine::GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const
+{
+    return static_cast<uint16_t>(apWriteClient - mWriteClients);
 }
 
 void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)

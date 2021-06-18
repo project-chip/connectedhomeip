@@ -49,8 +49,8 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint1
 // Cluster Specific Response Callbacks
 typedef void (*AccountLoginClusterGetSetupPINResponseCallback)(void * context, uint8_t * setupPIN);
 typedef void (*ApplicationLauncherClusterLaunchAppResponseCallback)(void * context, uint8_t * data);
-typedef void (*ContentLaunchClusterLaunchContentResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
-typedef void (*ContentLaunchClusterLaunchURLResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
+typedef void (*ContentLauncherClusterLaunchContentResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
+typedef void (*ContentLauncherClusterLaunchURLResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
 typedef void (*DoorLockClusterClearAllPinsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearAllRfidsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearHolidayScheduleResponseCallback)(void * context);
@@ -148,8 +148,8 @@ typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, u
 // List specific responses
 typedef void (*ApplicationLauncherApplicationLauncherListListAttributeCallback)(void * context, uint16_t count, uint16_t * entries);
 typedef void (*AudioOutputAudioOutputListListAttributeCallback)(void * context, uint16_t count, _AudioOutputInfo * entries);
-typedef void (*ContentLaunchAcceptsHeaderListListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
-typedef void (*ContentLaunchSupportedStreamingTypesListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
+typedef void (*ContentLauncherAcceptsHeaderListListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
+typedef void (*ContentLauncherSupportedStreamingTypesListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
 typedef void (*DescriptorDeviceListListAttributeCallback)(void * context, uint16_t count, _DeviceType * entries);
 typedef void (*DescriptorServerListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
 typedef void (*DescriptorClientListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);

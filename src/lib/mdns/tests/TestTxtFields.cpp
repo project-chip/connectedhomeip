@@ -279,7 +279,7 @@ void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(ret, data) == 0);
 }
 
-bool NodeDataIsEmpty(const CommissionableNodeData & node)
+bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 {
 
     if (node.longDiscriminator != 0 || node.vendorId != 0 || node.productId != 0 || node.additionalPairing != 0 ||
@@ -291,7 +291,7 @@ bool NodeDataIsEmpty(const CommissionableNodeData & node)
     {
         return false;
     }
-    for (size_t i = 0; i < sizeof(CommissionableNodeData::rotatingId); ++i)
+    for (size_t i = 0; i < sizeof(DiscoveredNodeData::rotatingId); ++i)
     {
         if (node.rotatingId[i] != 0)
         {
@@ -306,7 +306,7 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
 {
     char key[3];
     char val[16];
-    CommissionableNodeData filled;
+    DiscoveredNodeData filled;
 
     // Long discriminator
     sprintf(key, "D");
