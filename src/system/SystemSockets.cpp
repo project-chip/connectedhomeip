@@ -70,7 +70,7 @@ Error WakeEvent::Open(WatchableEventManager & watchState)
 
     mFD.Init(watchState);
     mFD.Attach(fds[FD_READ]);
-    mFD.SetCallback(Confirm, this);
+    mFD.SetCallback(Confirm, reinterpret_cast<intptr_t>(this));
     mFD.RequestCallbackOnPendingRead();
 
     mWriteFD = fds[FD_WRITE];
@@ -135,7 +135,7 @@ Error WakeEvent::Open(WatchableEventManager & watchState)
     }
 
     mFD.Attach(fd);
-    mFD.SetCallback(Confirm, this);
+    mFD.SetCallback(Confirm, reinterpret_cast<intptr_t>(this));
     mFD.RequestCallbackOnPendingRead();
 
     return CHIP_SYSTEM_NO_ERROR;
