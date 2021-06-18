@@ -29,5 +29,6 @@ void SetJavaVm(JavaVM * jvm);
 JNIEnv * GetEnvForCurrentThread();
 
 CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
+CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray);
 CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId);
 void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);

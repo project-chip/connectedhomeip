@@ -79,7 +79,6 @@ static void HandleNewConnection(void * appState, const uint16_t discriminator);
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * cbName);
 static void * IOThreadMain(void * arg);
-static CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 
 namespace {
@@ -1116,20 +1115,6 @@ void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)
     }
 }
 
-CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    outArray = env->NewByteArray((int) inArrayLen);
-    VerifyOrExit(outArray != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-    env->ExceptionClear();
-    env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-exit:
-    return err;
-}
 
 CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
 {

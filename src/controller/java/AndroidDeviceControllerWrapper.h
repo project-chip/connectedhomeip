@@ -25,6 +25,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <support/TimeUtils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 /**
@@ -35,6 +36,7 @@
  */
 class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
                                        public chip::Controller::DeviceStatusDelegate,
+                                       public chip::Controller::OperationalCredentialsDelegate,
                                        public chip::PersistentStorageDelegate
 {
 public:
@@ -59,11 +61,18 @@ public:
     jlong ToJNIHandle();
 
     void CallJavaMethod(const char * methodName, jint argument);
+    CHIP_ERROR Initialize();
 
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
+
+    // OperationalCredentialsDelegate implementation
+    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr, int64_t serialNumber,
+                                                    uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+
+    CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,uint32_t & outCertLen) override;
 
     // DeviceStatusDelegate implementation
     void OnMessage(chip::System::PacketBufferHandle && msg) override;
@@ -85,6 +94,11 @@ public:
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
+    chip::Crypto::P256Keypair mIssuer;
+    bool mInitialized  = false;
+    uint32_t mIssuerId = 0;
+    uint32_t mNow      = chip::CalendarToChipEpochTime(2021, 06, 10, 0, 0, 0, mNow);
+    uint32_t mValidity = 10 * chip::kSecondsPerStandardYear;
 
     ChipDeviceControllerPtr mController;
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
