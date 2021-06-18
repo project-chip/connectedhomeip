@@ -59,128 +59,129 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         OnSessionEstablished(event);
         break;
 
-    ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
-}
-
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
-{
-    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
-             endpointId, attributeId);
-
-    switch (clusterId)
-    {
-    case ZCL_ON_OFF_CLUSTER_ID:
-        OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
-        break;
-
-    case ZCL_IDENTIFY_CLUSTER_ID:
-        OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
-        break;
-
-    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
-        OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
-        break;
-
-    default:
-        ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
-        break;
+        ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
     }
 
-    ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
-}
-
-void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
-{
-    if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
+    void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
+                                                      uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size,
+                                                      uint8_t * value)
     {
-        ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
-        wifiLED.Set(true);
+        ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'",
+                 clusterId, endpointId, attributeId);
+
+        switch (clusterId)
+        {
+        case ZCL_ON_OFF_CLUSTER_ID:
+            OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
+            break;
+
+        case ZCL_IDENTIFY_CLUSTER_ID:
+            OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
+            break;
+
+        case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+            OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
+            break;
+
+        default:
+            ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
+            break;
+        }
+
+        ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
     }
-    else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
+
+    void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
     {
-        ESP_LOGE(TAG, "Lost IPv4 connectivity...");
-        wifiLED.Set(false);
+        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
+        {
+            ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
+            wifiLED.Set(true);
+        }
+        else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
+        {
+            ESP_LOGE(TAG, "Lost IPv4 connectivity...");
+            wifiLED.Set(false);
+        }
+        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+        {
+            ESP_LOGI(TAG, "IPv6 Server ready...");
+        }
+        else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
+        {
+            ESP_LOGE(TAG, "Lost IPv6 connectivity...");
+        }
     }
-    if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+
+    void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
     {
-        ESP_LOGI(TAG, "IPv6 Server ready...");
+        if (event->SessionEstablished.IsCommissioner)
+        {
+            ESP_LOGI(TAG, "Commissioner detected!");
+        }
     }
-    else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
+
+    void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
     {
-        ESP_LOGE(TAG, "Lost IPv6 connectivity...");
-    }
-}
+        VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+        VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
-{
-    if (event->SessionEstablished.IsCommissioner)
+        // At this point we can assume that value points to a bool value.
+        mEndpointOnOffState[endpointId - 1] = *value;
+        endpointId == 1 ? statusLED1.Set(*value) : statusLED2.Set(*value);
+
+    exit:
+        return;
+    }
+
+    void DeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
     {
-        ESP_LOGI(TAG, "Commissioner detected!");
+        bool onOffState    = mEndpointOnOffState[endpointId - 1];
+        uint8_t brightness = onOffState ? *value : 0;
+
+        VerifyOrExit(attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+        VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+
+        // At this point we can assume that value points to a bool value.
+        endpointId == 1 ? statusLED1.SetBrightness(brightness) : statusLED2.SetBrightness(brightness);
+
+    exit:
+        return;
     }
-}
 
-void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
-{
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
-    VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
-
-    // At this point we can assume that value points to a bool value.
-    mEndpointOnOffState[endpointId - 1] = *value;
-    endpointId == 1 ? statusLED1.Set(*value) : statusLED2.Set(*value);
-
-exit:
-    return;
-}
-
-void DeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
-{
-    bool onOffState    = mEndpointOnOffState[endpointId - 1];
-    uint8_t brightness = onOffState ? *value : 0;
-
-    VerifyOrExit(attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
-    VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
-
-    // At this point we can assume that value points to a bool value.
-    endpointId == 1 ? statusLED1.SetBrightness(brightness) : statusLED2.SetBrightness(brightness);
-
-exit:
-    return;
-}
-
-void IdentifyTimerHandler(Layer * systemLayer, void * appState, Error error)
-{
-    statusLED1.Animate();
-
-    if (identifyTimerCount)
+    void IdentifyTimerHandler(Layer * systemLayer, void * appState, Error error)
     {
-        SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
-        // Decrement the timer count.
-        identifyTimerCount--;
+        statusLED1.Animate();
+
+        if (identifyTimerCount)
+        {
+            SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
+            // Decrement the timer count.
+            identifyTimerCount--;
+        }
     }
-}
 
-void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
-{
-    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
-    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+    {
+        VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+        VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
-    statusLED1.Blink(kIdentifyTimerDelayMS * 2);
+        statusLED1.Blink(kIdentifyTimerDelayMS * 2);
 
-    // timerCount represents the number of callback executions before we stop the timer.
-    // value is expressed in seconds and the timer is fired every 250ms, so just multiply value by 4.
-    // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
-    identifyTimerCount = (*value) * 4;
+        // timerCount represents the number of callback executions before we stop the timer.
+        // value is expressed in seconds and the timer is fired every 250ms, so just multiply value by 4.
+        // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
+        identifyTimerCount = (*value) * 4;
 
-    SystemLayer.CancelTimer(IdentifyTimerHandler, this);
-    SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
+        SystemLayer.CancelTimer(IdentifyTimerHandler, this);
+        SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
 
-exit:
-    return;
-}
+    exit:
+        return;
+    }
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
-{
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
+    bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
+    {
+        emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+        return true;
+    }
