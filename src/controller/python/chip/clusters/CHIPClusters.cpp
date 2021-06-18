@@ -21,6 +21,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/Span.h>
 
 #include <controller/CHIPDevice.h>
@@ -57,6 +58,29 @@ void OnDefaultFailureResponse(void * /* context */, uint8_t status)
 template <class AttributeType>
 void OnAttributeResponse(void * /* context */, AttributeType)
 {
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <class AttributeType>
+void OnSignedIntAttributeResponse(void * /* context */, int64_t value)
+{
+    if (!chip::CanCastTo<AttributeType>(value))
+    {
+        ChipLogError(chipTool, "WARN: value %" PRId64 " does not fits into %zu bytes signed integer", value, sizeof(AttributeType));
+    }
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <class AttributeType>
+void OnUnsignedIntAttributeResponse(void * /* context */, uint64_t value)
+{
+    if (!chip::CanCastTo<AttributeType>(value))
+    {
+        ChipLogError(chipTool, "WARN: value %" PRIu64 " does not fits into %zu bytes unsigned integer", value,
+                     sizeof(AttributeType));
+    }
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -262,14 +286,14 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttr
 chip::Callback::Callback<DefaultSuccessCallback> gDefaultSuccessCallback{ OnDefaultSuccessResponse, nullptr };
 chip::Callback::Callback<DefaultFailureCallback> gDefaultFailureCallback{ OnDefaultFailureResponse, nullptr };
 chip::Callback::Callback<BooleanAttributeCallback> gBooleanAttributeCallback{ OnAttributeResponse<bool>, nullptr };
-chip::Callback::Callback<Int8uAttributeCallback> gInt8uAttributeCallback{ OnAttributeResponse<uint8_t>, nullptr };
-chip::Callback::Callback<Int8sAttributeCallback> gInt8sAttributeCallback{ OnAttributeResponse<int8_t>, nullptr };
-chip::Callback::Callback<Int16uAttributeCallback> gInt16uAttributeCallback{ OnAttributeResponse<uint16_t>, nullptr };
-chip::Callback::Callback<Int16sAttributeCallback> gInt16sAttributeCallback{ OnAttributeResponse<int16_t>, nullptr };
-chip::Callback::Callback<Int32uAttributeCallback> gInt32uAttributeCallback{ OnAttributeResponse<uint32_t>, nullptr };
-chip::Callback::Callback<Int32sAttributeCallback> gInt32sAttributeCallback{ OnAttributeResponse<int32_t>, nullptr };
-chip::Callback::Callback<Int64uAttributeCallback> gInt64uAttributeCallback{ OnAttributeResponse<uint64_t>, nullptr };
-chip::Callback::Callback<Int64sAttributeCallback> gInt64sAttributeCallback{ OnAttributeResponse<int64_t>, nullptr };
+chip::Callback::Callback<Int8uAttributeCallback> gInt8uAttributeCallback{ OnUnsignedIntAttributeResponse<uint8_t>, nullptr };
+chip::Callback::Callback<Int8sAttributeCallback> gInt8sAttributeCallback{ OnSignedIntAttributeResponse<int8_t>, nullptr };
+chip::Callback::Callback<Int16uAttributeCallback> gInt16uAttributeCallback{ OnUnsignedIntAttributeResponse<uint16_t>, nullptr };
+chip::Callback::Callback<Int16sAttributeCallback> gInt16sAttributeCallback{ OnSignedIntAttributeResponse<int16_t>, nullptr };
+chip::Callback::Callback<Int32uAttributeCallback> gInt32uAttributeCallback{ OnUnsignedIntAttributeResponse<uint32_t>, nullptr };
+chip::Callback::Callback<Int32sAttributeCallback> gInt32sAttributeCallback{ OnSignedIntAttributeResponse<int32_t>, nullptr };
+chip::Callback::Callback<Int64uAttributeCallback> gInt64uAttributeCallback{ OnUnsignedIntAttributeResponse<uint64_t>, nullptr };
+chip::Callback::Callback<Int64sAttributeCallback> gInt64sAttributeCallback{ OnSignedIntAttributeResponse<int64_t>, nullptr };
 chip::Callback::Callback<StringAttributeCallback> gStringAttributeCallback{ OnAttributeResponse<ByteSpan>, nullptr };
 
 } // namespace

@@ -110,19 +110,31 @@ public:
         ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
     }
 
-    static void OnInt8uAttributeResponse(void * context, uint8_t value)
+    static void OnInt8uAttributeResponse(void * context, uint64_t value)
     {
-        ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
+        if (!chip::CanCastTo<uint8_t>(value))
+        {
+            ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into uint8", value);
+        }
+        ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, static_cast<uint8_t>(value));
     }
 
-    static void OnInt16uAttributeResponse(void * context, uint16_t value)
+    static void OnInt16uAttributeResponse(void * context, uint64_t value)
     {
-        ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
+        if (!chip::CanCastTo<uint16_t>(value))
+        {
+            ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into uint16", value);
+        }
+        ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, static_cast<uint16_t>(value));
     }
 
-    static void OnInt16sAttributeResponse(void * context, int16_t value)
+    static void OnInt16sAttributeResponse(void * context, int64_t value)
     {
-        ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
+        if (!chip::CanCastTo<int16_t>(value))
+        {
+            ChipLogError(chipTool, "WARN: value read (%" PRIx64 ") does not fits into int16", value);
+        }
+        ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, static_cast<int16_t>(value));
     }
 
 private:

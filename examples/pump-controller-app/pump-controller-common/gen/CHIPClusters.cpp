@@ -399,9 +399,28 @@ CHIP_ERROR LevelControlCluster::DiscoverAttributes(Callback::Cancelable * onSucc
 CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeLevelControlClusterReadCurrentLevelAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0000;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
@@ -422,9 +441,28 @@ CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Cancelable
 CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeLevelControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0xFFFD;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 // OnOff Cluster Commands
@@ -551,17 +589,55 @@ CHIP_ERROR OnOffCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCall
 }
 CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeOnOffClusterReadOnOffAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0000;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeOnOffClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0xFFFD;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 // PumpConfigurationAndControl Cluster Commands
@@ -576,51 +652,163 @@ CHIP_ERROR PumpConfigurationAndControlCluster::DiscoverAttributes(Callback::Canc
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxPressure(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadMaxPressureAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0000;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxSpeed(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadMaxSpeedAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0001;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxFlow(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadMaxFlowAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0002;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
                                                                                    Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterReadEffectiveOperationModeAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0011;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterReadEffectiveControlModeAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0012;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeCapacity(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadCapacityAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0013;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ConfigureAttributeCapacity(Callback::Cancelable * onSuccessCallback,
@@ -643,9 +831,27 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callba
                                                                           Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterReadOperationModeAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0020;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
@@ -661,9 +867,27 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Call
                                                                             Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0xFFFD;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 // TemperatureMeasurement Cluster Commands
@@ -678,9 +902,28 @@ CHIP_ERROR TemperatureMeasurementCluster::DiscoverAttributes(Callback::Cancelabl
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0000;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
@@ -702,25 +945,82 @@ CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback:
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0001;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0002;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0xFFFD;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        mDevice->GetDeviceId(), 0, nullptr /*event path params list*/, 0, &attributePath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDevice->CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 } // namespace Controller
