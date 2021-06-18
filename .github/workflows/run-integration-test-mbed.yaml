@@ -62,13 +62,15 @@ jobs:
         run: |
           lavacli identities add --uri "$LAVA_SERVER_URL" --username artur --token "$LAVA_SERVER_TOKEN" default
           LAVA_JOB_ID=`lavacli jobs submit $GITHUB_WORKSPACE/scripts/tests/mbed/lava_integration_tests.yml`
-          lavacli jobs logs $LAVA_JOB_ID | tee integration-test.log
+          lavacli jobs logs $LAVA_JOB_ID | tee integration-test-${{ steps.outsuffix.outputs.value }}.log
           lavacli jobs wait $LAVA_JOB_ID
+          lavacli results $LAVA_JOB_ID >lava_results.txt
+          bash $GITHUB_WORKSPACE/scripts/tests/mbed/check_lava_results.sh lava_results.txt
       - name: Upload unit test logs
         uses: actions/upload-artifact@v2.2.3
         with:
-          name: integration-test-log
-          path: integration-test.log
+          name: integration-test-${{ steps.outsuffix.outputs.value }}
+          path: integration-test-${{ steps.outsuffix.outputs.value }}.log
   faillure-report:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
