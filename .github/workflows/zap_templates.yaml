@@ -39,7 +39,12 @@ jobs:
               uses: actions/setup-node@v1
               with:
                 node-version: '12.x'
-
+            - name: Use Java 
+              uses: actions/setup-java@v2
+              with:
+                distribution: 'zulu'
+                java-version: '11'
+                java-package: jre
             - run: sudo apt-get update
             - run: sudo apt-get install --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev
             - name: Setup ZAP

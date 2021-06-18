@@ -147,17 +147,17 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-    mChipEventQueue.push(*event); // Thread safe due to ChipStackLock taken by App thread
-    SysOnEventSignal(this);       // Trigger wake select on CHIP thread
+    mChipEventQueue.Push(*event);
+    SysOnEventSignal(this); // Trigger wake select on CHIP thread
 }
 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
 {
-    while (!mChipEventQueue.empty())
+    while (!mChipEventQueue.Empty())
     {
-        Impl()->DispatchEvent(&mChipEventQueue.front());
-        mChipEventQueue.pop();
+        const ChipDeviceEvent event = mChipEventQueue.PopFront();
+        Impl()->DispatchEvent(&event);
     }
 }
 

@@ -476,7 +476,7 @@
 #define ZCL_SEND_KEY_COMMAND_ID (0x00)
 #define ZCL_SEND_KEY_RESPONSE_COMMAND_ID (0x00)
 
-// Commands for cluster: Content Launch
+// Commands for cluster: Content Launcher
 #define ZCL_LAUNCH_CONTENT_COMMAND_ID (0x00)
 #define ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID (0x00)
 #define ZCL_LAUNCH_URL_COMMAND_ID (0x01)
@@ -489,6 +489,9 @@
 // Commands for cluster: Application Launcher
 #define ZCL_LAUNCH_APP_COMMAND_ID (0x00)
 #define ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID (0x00)
+
+// Commands for cluster: Application Basic
+#define ZCL_CHANGE_STATUS_COMMAND_ID (0x00)
 
 // Commands for cluster: Account Login
 #define ZCL_GET_SETUP_PIN_COMMAND_ID (0x00)

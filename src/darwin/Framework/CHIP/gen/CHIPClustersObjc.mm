@@ -483,22 +483,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPContentLaunchClusterLaunchContentResponseCallbackBridge
-    : public Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback> {
+class CHIPContentLauncherClusterLaunchContentResponseCallbackBridge
+    : public Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback> {
 public:
-    CHIPContentLaunchClusterLaunchContentResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>(CallbackFn, this)
+    CHIPContentLauncherClusterLaunchContentResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPContentLaunchClusterLaunchContentResponseCallbackBridge() {};
+    ~CHIPContentLauncherClusterLaunchContentResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
     {
-        CHIPContentLaunchClusterLaunchContentResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPContentLaunchClusterLaunchContentResponseCallbackBridge *>(context);
+        CHIPContentLauncherClusterLaunchContentResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPContentLauncherClusterLaunchContentResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -516,22 +516,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPContentLaunchClusterLaunchURLResponseCallbackBridge
-    : public Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback> {
+class CHIPContentLauncherClusterLaunchURLResponseCallbackBridge
+    : public Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback> {
 public:
-    CHIPContentLaunchClusterLaunchURLResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>(CallbackFn, this)
+    CHIPContentLauncherClusterLaunchURLResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPContentLaunchClusterLaunchURLResponseCallbackBridge() {};
+    ~CHIPContentLauncherClusterLaunchURLResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
     {
-        CHIPContentLaunchClusterLaunchURLResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPContentLaunchClusterLaunchURLResponseCallbackBridge *>(context);
+        CHIPContentLauncherClusterLaunchURLResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPContentLauncherClusterLaunchURLResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -2733,22 +2733,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge
-    : public Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback> {
+class CHIPContentLauncherAcceptsHeaderListAttributeCallbackBridge
+    : public Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback> {
 public:
-    CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback>(CallbackFn, this)
+    CHIPContentLauncherAcceptsHeaderListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge() {};
+    ~CHIPContentLauncherAcceptsHeaderListAttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, chip::ByteSpan * entries)
     {
-        CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge * callback
-            = reinterpret_cast<CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge *>(context);
+        CHIPContentLauncherAcceptsHeaderListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPContentLauncherAcceptsHeaderListAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
@@ -2769,22 +2769,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge
-    : public Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback> {
+class CHIPContentLauncherSupportedStreamingTypesAttributeCallbackBridge
+    : public Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback> {
 public:
-    CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback>(CallbackFn, this)
+    CHIPContentLauncherSupportedStreamingTypesAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge() {};
+    ~CHIPContentLauncherSupportedStreamingTypesAttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, uint8_t * entries)
     {
-        CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge * callback
-            = reinterpret_cast<CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge *>(context);
+        CHIPContentLauncherSupportedStreamingTypesAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPContentLauncherSupportedStreamingTypesAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
@@ -3740,6 +3740,33 @@ private:
 - (Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
+}
+
+- (void)changeStatus:(uint8_t)status responseHandler:(ResponseHandler)responseHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ChangeStatus(onSuccess->Cancel(), onFailure->Cancel(), status);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
 }
 
 - (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler
@@ -8274,11 +8301,11 @@ private:
 
 @end
 
-@interface CHIPContentLaunch ()
-@property (readonly) Controller::ContentLaunchCluster cppCluster;
+@interface CHIPContentLauncher ()
+@property (readonly) Controller::ContentLauncherCluster cppCluster;
 @end
 
-@implementation CHIPContentLaunch
+@implementation CHIPContentLauncher
 
 - (Controller::ClusterBase *)getCluster
 {
@@ -8287,8 +8314,8 @@ private:
 
 - (void)launchContent:(uint8_t)autoPlay data:(NSString *)data responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPContentLaunchClusterLaunchContentResponseCallbackBridge * onSuccess
-        = new CHIPContentLaunchClusterLaunchContentResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPContentLauncherClusterLaunchContentResponseCallbackBridge * onSuccess
+        = new CHIPContentLauncherClusterLaunchContentResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -8316,8 +8343,8 @@ private:
 }
 - (void)launchURL:(NSString *)contentURL displayString:(NSString *)displayString responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPContentLaunchClusterLaunchURLResponseCallbackBridge * onSuccess
-        = new CHIPContentLaunchClusterLaunchURLResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPContentLauncherClusterLaunchURLResponseCallbackBridge * onSuccess
+        = new CHIPContentLauncherClusterLaunchURLResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -8348,8 +8375,8 @@ private:
 
 - (void)readAttributeAcceptsHeaderListWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge * onSuccess
-        = new CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPContentLauncherAcceptsHeaderListAttributeCallbackBridge * onSuccess
+        = new CHIPContentLauncherAcceptsHeaderListAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -8376,8 +8403,8 @@ private:
 
 - (void)readAttributeSupportedStreamingTypesWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge * onSuccess
-        = new CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPContentLauncherSupportedStreamingTypesAttributeCallbackBridge * onSuccess
+        = new CHIPContentLauncherSupportedStreamingTypesAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
