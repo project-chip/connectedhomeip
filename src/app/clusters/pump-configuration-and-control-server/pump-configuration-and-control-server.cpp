@@ -29,10 +29,12 @@ using namespace chip;
 
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
+    emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
     // TODO
 }
 
 void emberAfPumpConfigurationAndControlClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
 {
+    emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", endpoint, attributeId);
     // TODO
 }
