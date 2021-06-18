@@ -372,8 +372,6 @@ void SetupInitialLevelControlValues(chip::EndpointId endpointId)
 
     emberAfWriteAttribute(endpointId, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
                           ZCL_DATA8_ATTRIBUTE_TYPE);
-    emberAfWriteAttribute(endpointId, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_ON_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
-                          ZCL_DATA8_ATTRIBUTE_TYPE);
 }
 
 void SetupPretendDevices()
