@@ -370,7 +370,7 @@ function enhancedAttributes(attributes, types)
   });
 
   attributes.forEach(attribute => {
-    const argument      = { name : attribute.name, chipType : attribute.chipType };
+    const argument      = { name : attribute.name, chipType : attribute.chipType, type : attribute.type };
     attribute.arguments = [ argument ];
     attribute.response  = { arguments : [ argument ] };
   });

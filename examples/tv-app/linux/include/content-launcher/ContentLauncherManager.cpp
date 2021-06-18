@@ -98,11 +98,11 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        emberAfContentLauncherClusterPrintln("Failed to send %s: 0x%X", responseName, status);
+        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
     }
 }
 
-bool emberAfContentLaunchClusterLaunchContentCallback(chip::app::Command * command, unsigned char autoplay, unsigned char * data)
+bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::Command * command, unsigned char autoplay, unsigned char * data)
 {
 
     string dataString(reinterpret_cast<char *>(data));
@@ -112,8 +112,8 @@ bool emberAfContentLaunchClusterLaunchContentCallback(chip::app::Command * comma
     return true;
 }
 
-bool emberAfContentLaunchClusterLaunchURLCallback(chip::app::Command * command, unsigned char * contentUrl,
-                                                  unsigned char * displayString)
+bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::Command * command, unsigned char * contentUrl,
+                                                    unsigned char * displayString)
 {
     string contentUrlString(reinterpret_cast<char *>(contentUrl));
     string displayStringString(reinterpret_cast<char *>(displayString));

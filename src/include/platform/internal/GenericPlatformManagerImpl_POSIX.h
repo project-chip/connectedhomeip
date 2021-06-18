@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <platform/DeviceSafeQueue.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <fcntl.h>
@@ -61,7 +62,6 @@ protected:
 
     // OS-specific members (pthread)
     pthread_mutex_t mChipStackLock;
-    std::queue<ChipDeviceEvent> mChipEventQueue;
 
     enum TaskType
     {
@@ -121,6 +121,7 @@ private:
 
     void ProcessDeviceEvents();
 
+    DeviceSafeQueue mChipEventQueue;
     std::atomic<bool> mShouldRunEventLoop;
     static void * EventLoopTaskMain(void * arg);
 };

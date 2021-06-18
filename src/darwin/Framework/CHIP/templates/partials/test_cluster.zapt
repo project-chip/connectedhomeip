@@ -1,6 +1,6 @@
 {{#chip_tests tests}}
 {{#chip_tests_items}}
-- (void)testSendCluster{{parent.filename}}_{{index}}_{{asCamelCased command false}}
+- (void)testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asCamelCased command false}}
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"{{label}}"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -13,13 +13,36 @@
     {{else if isReadAttribute}}
     [cluster readAttribute{{asCamelCased attribute false}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
     {{else if isWriteAttribute}}
-    [cluster writeAttribute{{asCamelCased attribute false}}WithValue:{{#chip_tests_item_parameters}}{{definedValue}}{{/chip_tests_item_parameters}} responseHandler:^(NSError * err, NSDictionary * values) {
+    {{#chip_tests_item_parameters}}
+    {{#if (isString type)}}
+    {{#if (isOctetString type)}}
+    NSString * {{asCamelCased name true}}ArgumentString= @"{{definedValue}}";
+    NSData * {{asCamelCased name true}}Argument = [{{asCamelCased name true}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    {{else}}
+    NSString * {{asCamelCased name true}}Argument= @"{{definedValue}}";
+    {{/if}}
+    {{else}}
+    {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}};
+    {{/if}}
+    {{/chip_tests_item_parameters}}
+    [cluster writeAttribute{{asCamelCased attribute false}}WithValue:{{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}} responseHandler:^(NSError * err, NSDictionary * values) {
     {{/if}}
         NSLog(@"{{label}} Error: %@", err);
         XCTAssertEqual(err.code, {{response.error}});
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
-        XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] intValue], {{expectedValue}});
+        {{#if (isString type)}}
+        {{#if (isOctetString type)}}
+        NSString * {{asCamelCased name true}}ArgumentString= @"{{expectedValue}}";
+        NSData * {{asCamelCased name true}}Argument = [{{asCamelCased name true}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+        XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToData:{{asCamelCased name true}}Argument]);
+        {{else}}
+        NSString * {{asCamelCased name true}}Argument= @"{{expectedValue}}";
+        XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asCamelCased name true}}Argument]);
+        {{/if}}
+        {{else}}
+        XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}});
+        {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
         [expectation fulfill];

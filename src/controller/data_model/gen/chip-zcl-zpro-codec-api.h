@@ -38,7 +38,7 @@
 | Binding                                                             | 0xF000 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
-| ContentLaunch                                                       | 0x050A |
+| ContentLauncher                                                     | 0x050A |
 | Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
@@ -100,6 +100,7 @@ chip::System::PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAtt
 | Cluster ApplicationBasic                                            | 0x050D |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ChangeStatus                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * VendorName                                                        | 0x0000 |
@@ -1298,7 +1299,7 @@ chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAtt
                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster ContentLaunch                                               | 0x050A |
+| Cluster ContentLauncher                                             | 0x050A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * LaunchContent                                                     |   0x00 |
@@ -1312,30 +1313,31 @@ chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAtt
 
 /**
  * @brief
- *    Encode a Content Launch server discover command into buffer including the APS frame
+ *    Encode a Content Launcher server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeContentLauncherClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Content Launch server read command for the accepts header list attribute into buffer including the APS frame
+ *    Encode a Content Launcher server read command for the accepts header list attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint8_t seqNum,
-                                                                                          chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeContentLauncherClusterReadAcceptsHeaderListAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Content Launch server read command for the supported streaming types attribute into buffer including the APS frame
+ *    Encode a Content Launcher server read command for the supported streaming types attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
-encodeContentLaunchClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+encodeContentLauncherClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Content Launch server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a Content Launcher server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                        chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeContentLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Descriptor                                                  | 0x001D |

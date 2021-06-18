@@ -37,7 +37,7 @@ EmberAfStatus emberAfBinaryInputBasicClusterClientCommandParse(EmberAfClusterCom
 EmberAfStatus emberAfBindingClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfBridgedDeviceBasicClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfColorControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
-EmberAfStatus emberAfContentLaunchClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfContentLauncherClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfDescriptorClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfEthernetNetworkDiagnosticsClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -137,7 +137,7 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
-            result = emberAfContentLaunchClusterClientCommandParse(cmd);
+            result = emberAfContentLauncherClusterClientCommandParse(cmd);
             break;
         case ZCL_DESCRIPTOR_CLUSTER_ID:
             // No commands are enabled for cluster Descriptor
@@ -331,7 +331,7 @@ EmberAfStatus emberAfApplicationLauncherClusterClientCommandParse(EmberAfCluster
     }
     return status(wasHandled, true, cmd->mfgSpecific);
 }
-EmberAfStatus emberAfContentLaunchClusterClientCommandParse(EmberAfClusterCommand * cmd)
+EmberAfStatus emberAfContentLauncherClusterClientCommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;
 
@@ -356,7 +356,7 @@ EmberAfStatus emberAfContentLaunchClusterClientCommandParse(EmberAfClusterComman
             }
             contentLaunchStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfContentLaunchClusterLaunchContentResponseCallback(nullptr, data, contentLaunchStatus);
+            wasHandled = emberAfContentLauncherClusterLaunchContentResponseCallback(nullptr, data, contentLaunchStatus);
             break;
         }
         case ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID: {
@@ -376,7 +376,7 @@ EmberAfStatus emberAfContentLaunchClusterClientCommandParse(EmberAfClusterComman
             }
             contentLaunchStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfContentLaunchClusterLaunchURLResponseCallback(nullptr, data, contentLaunchStatus);
+            wasHandled = emberAfContentLauncherClusterLaunchURLResponseCallback(nullptr, data, contentLaunchStatus);
             break;
         }
         default: {

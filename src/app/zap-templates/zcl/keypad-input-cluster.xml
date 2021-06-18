@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>Keypad Input</name>
     <code>0x0509</code>
     <define>KEYPAD_INPUT_CLUSTER</define>

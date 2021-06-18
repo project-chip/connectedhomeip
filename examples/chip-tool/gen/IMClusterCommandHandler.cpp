@@ -336,8 +336,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfContentLaunchClusterLaunchContentResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
-                                                                                      contentLaunchStatus);
+                wasHandled = emberAfContentLauncherClusterLaunchContentResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
+                                                                                        contentLaunchStatus);
             }
             break;
         }
@@ -401,8 +401,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfContentLaunchClusterLaunchURLResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
-                                                                                  contentLaunchStatus);
+                wasHandled = emberAfContentLauncherClusterLaunchURLResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
+                                                                                    contentLaunchStatus);
             }
             break;
         }

@@ -75,7 +75,7 @@ for j in "${iter_array[@]}"; do
         rm -rf /tmp/all-clusters-log
         rm -rf /tmp/pid
         (
-            stdbuf -o0 out/debug/chip-all-clusters-app &
+            stdbuf -o0 out/debug/standalone/chip-all-clusters-app &
             echo $! >&3
         ) 3>/tmp/pid | tee /tmp/all-clusters-log &
         while ! grep -q "Server Listening" /tmp/all-clusters-log; do
