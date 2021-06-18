@@ -21,12 +21,19 @@
 
 #include <support/CodeUtils.h>
 
-void SetJavaVm(JavaVM * jvm)
+pthread_mutex_t JniReferences::sStackLock  = PTHREAD_MUTEX_INITIALIZER;
+JavaVM * JniReferences::sJvm               = nullptr;
+
+void JniReferences::SetJavaVm(JavaVM * jvm)
 {
-    sJvm = jvm;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    sJvm           = jvm;
+    JNIEnv * env   = GetEnvForCurrentThread();
+
+    VerifyOrReturn(env != NULL, ChipLogError(Controller, "Could not get JNI env for current thread"));
 }
 
-JNIEnv * GetEnvForCurrentThread()
+JNIEnv * JniReferences::GetEnvForCurrentThread()
 {
     JNIEnv * env;
     if (sJvm == NULL)
@@ -75,14 +82,12 @@ CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, con
     VerifyOrExit(env != nullptr && object != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
     javaClass = env->GetObjectClass(object);
-    ChipLogProgress(Controller, "FindMethod:: javaClass exists? %d", javaClass != NULL);
     VerifyOrExit(javaClass != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
     *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
     VerifyOrExit(*methodId != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
 exit:
-    ChipLogProgress(Controller, "FindMethod Returning %d", err);
     return err;
 }
 

@@ -15,28 +15,29 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <core/CHIPError.h>
-#include <jni.h>
 #include <pthread.h>
-#include <support/CodeUtils.h>
 
-class JniReferences
+/** A scoped lock/unlock around a mutex. */
+struct StackLockGuard
 {
 public:
-    static pthread_mutex_t * GetStackLock() { return &sStackLock; }
-
-    static void SetJavaVm(JavaVM * jvm);
-
-    static JNIEnv * GetEnvForCurrentThread();
-
+    StackLockGuard(pthread_mutex_t * mutex) : mMutex(mutex) { pthread_mutex_lock(mMutex); }
+    ~StackLockGuard() { pthread_mutex_unlock(mMutex); }
 
 private:
-    static pthread_mutex_t sStackLock;
-    static JavaVM * sJvm;
+    pthread_mutex_t * mMutex;
 };
 
-CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
-CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId);
-void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);
+/**
+ * Use StackUnlockGuard to temporarily unlock the CHIP BLE stack, e.g. when calling application
+ * or Android BLE code as a result of a BLE event.
+ */
+struct StackUnlockGuard
+{
+public:
+    StackUnlockGuard(pthread_mutex_t * mutex) : mMutex(mutex) { pthread_mutex_unlock(mMutex); }
+    ~StackUnlockGuard() { pthread_mutex_lock(mMutex); }
+
+private:
+    pthread_mutex_t * mMutex;
+};
