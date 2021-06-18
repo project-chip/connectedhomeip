@@ -10,7 +10,8 @@ secrets:
 environment:
   GITHUB_REPOSITORY: _
   GITHUB_REPOSITORY_URL: _
-  GITHUB_ACTION_ID: _
+  GITHUB_APP_BUILD_ACTION_ID: _
+  GITHUB_CHIP_TOOLS_BUILD_ACTION_ID: _
   GITHUB_SHA: _
 
 timeouts:
@@ -56,7 +57,7 @@ actions:
           - . $PWD/CHIP/scripts/tests/mbed/integration_test_env_config.sh
           - /bin/bash CHIP/scripts/tests/mbed/integration_test_env.sh start CHIP
           - echo "Integration tests execution..."
-          - /bin/bash CHIP/scripts/tests/mbed/run_integration_tests.sh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN CHIP
+          - /bin/bash CHIP/scripts/tests/mbed/run_integration_tests.sh $GITHUB_REPOSITORY $GITHUB_APP_BUILD_ACTION_ID $GITHUB_CHIP_TOOLS_BUILD_ACTION_ID $GITHUB_TOKEN CHIP
           - echo "Integration tests completed"
           - echo "Cleanup"
           - /bin/bash CHIP/scripts/tests/mbed/integration_test_env.sh stop

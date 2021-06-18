@@ -51,7 +51,8 @@ jobs:
           GITHUB_REPOSITORY_URL="$GITHUB_SERVER_URL"/"$GITHUB_REPOSITORY".git
           yq e -i ".environment.GITHUB_REPOSITORY = \"$GITHUB_REPOSITORY\"" $JOB_FILE
           yq e -i ".environment.GITHUB_REPOSITORY_URL = \"$GITHUB_REPOSITORY_URL\"" $JOB_FILE
-          yq e -i ".environment.GITHUB_ACTION_ID = ${{ github.event.workflow_run.id }}" $JOB_FILE
+          yq e -i ".environment.GITHUB_APP_BUILD_ACTION_ID = ${{ github.event.workflow_run.id }}" $JOB_FILE
+          yq e -i ".environment.GITHUB_CHIP_TOOLS_BUILD_ACTION_ID = ${{ github.event.workflow_run.id }}" $JOB_FILE
           yq e -i ".environment.GITHUB_SHA = \"$GITHUB_SHA\"" $JOB_FILE
           yq e -i ".secrets.GITHUB_TOKEN = \"$GITHUB_TOKEN\"" $JOB_FILE  
           cat $JOB_FILE

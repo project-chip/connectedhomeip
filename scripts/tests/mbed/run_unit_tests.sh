@@ -8,21 +8,21 @@ if [ $# -lt 4 ]; then
 fi
 
 GITHUB_REPOSITORY=$1
-GITHUB_ACTION_ID=$2
+GITHUB_APP_BUILD_ACTION_ID=$2
 GITHUB_TOKEN=$3
 CHIP_DIR=$4
 
 source $CHIP_DIR/scripts/tests/mbed/common.sh
 
-echo "Downloading artifact from $GITHUB_ACTION_ID action in $GITHUB_REPOSITORY"
-download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_ACTION_ID $GITHUB_TOKEN binaries
+echo "Downloading unit test application from $GITHUB_APP_BUILD_ACTION_ID action in $GITHUB_REPOSITORY"
+download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_APP_BUILD_ACTION_ID $GITHUB_TOKEN app_images
 
 target_number=$(cat devices.json | jq length)
 
 for index in $(eval echo "{0..$(($target_number - 1))}"); do
     platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
     echo "Flash unit-tests application image to $platform_name device"
-    flash_image_to_device unit-tests "$platform_name" binaries
+    flash_image_to_device unit-tests "$platform_name" app_images
     echo "Run unit tests on $platform_name device"
     pytest -rAV --platforms="$platform_name" $CHIP_DIR/src/test_driver/mbed/unit_tests/pytest/test_unittests.py
 done

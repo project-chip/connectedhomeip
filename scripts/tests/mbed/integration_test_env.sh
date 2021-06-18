@@ -8,10 +8,6 @@ if [ $# -lt 1 ]; then
 fi
 
 #####################################################################
-### Default parameters
-true ${CHIP_DIR:=CHIP}
-
-#####################################################################
 ### Check if using supported commands [start/stop]
 
 SUPPORTED_COMMAND=(start stop)
@@ -27,23 +23,16 @@ fi
 
 if [[ "$COMMAND" == *"start"* ]]; then
 
-    if [ $# -ge 2 ]; then
-        CHIP_DIR=$2
+    if [ $# -lt 2 ]; then
+        echo "Illegal number of parameters for start command. Please define CHIP source directory"
+        exit 1
     fi
+
+    CHIP_DIR=$2
 
     bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh start --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
     bash $CHIP_DIR/scripts/tests/mbed/echo_server.sh
 
-    # Disable for now, it takes too long to build CHIP tools
-    # Build CHIP main
-    #pwd=$PWD
-    #cd $CHIP_DIR
-    #bash scripts/build/default.sh
-    #cd $pwd
-
-    # Install Python Chip Device Controller
-    #pip install $CHIP_DIR/out/default/controller/python/chip*.whl
-    #pip install -r $CHIP_DIR/src/test_driver/mbed/integration_test/requirements.txt
     pip install mbed-flasher pytest
 
     source $CHIP_DIR/scripts/tests/mbed/common.sh
@@ -55,5 +44,10 @@ fi
 ### Handle stop command
 
 if [[ "$COMMAND" == *"stop"* ]]; then
-    bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh stop
+    if [ $# -lt 2 ]; then
+        echo "Illegal number of parameters for stop command. Please define CHIP source directory"
+        exit 1
+    fi
+
+    bash $2/scripts/tests/mbed/wlan_ap.sh stop
 fi
