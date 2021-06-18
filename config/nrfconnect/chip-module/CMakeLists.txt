@@ -54,7 +54,7 @@ string(APPEND CHIP_GN_ARGS)
 # ==============================================================================
 
 macro(chip_gn_arg_import FILE)
-    string(APPEND CHIP_GN_ARGS "--module\n\"${FILE}\"\n")
+    string(APPEND CHIP_GN_ARGS "--module\n${FILE}\n")
 endmacro()
 
 macro(chip_gn_arg_string ARG STRING)
@@ -226,19 +226,19 @@ ExternalProject_Add(
     PREFIX                  ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_gn_args.py
-                                @${CMAKE_CURRENT_BINARY_DIR}/args.tmp > ${CMAKE_CURRENT_BINARY_DIR}/args.gn &&
+    CONFIGURE_COMMAND       ""
+    BUILD_COMMAND           ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_gn_args.py
+                                @args.tmp > args.gn &&
                             ${GN_EXECUTABLE}
                                 --root=${CHIP_ROOT}
                                 --root-target=${GN_ROOT_TARGET}
                                 --dotfile=${GN_ROOT_TARGET}/.gn
                                 --script-executable=${Python3_EXECUTABLE}
                                 --export-compile-commands
-                                gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
-    BUILD_COMMAND           ninja
+                                gen --check --fail-on-unused-args . &&
+                            ninja
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
-    CONFIGURE_ALWAYS        TRUE
     BUILD_ALWAYS            TRUE
     USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD     TRUE
