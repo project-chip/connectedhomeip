@@ -37,7 +37,7 @@ constexpr ClusterId kBinaryInputBasicClusterId            = 0x000F;
 constexpr ClusterId kBindingClusterId                     = 0xF000;
 constexpr ClusterId kBridgedDeviceBasicClusterId          = 0x0039;
 constexpr ClusterId kColorControlClusterId                = 0x0300;
-constexpr ClusterId kContentLaunchClusterId               = 0x050A;
+constexpr ClusterId kContentLauncherClusterId             = 0x050A;
 constexpr ClusterId kDescriptorClusterId                  = 0x001D;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
@@ -97,6 +97,9 @@ public:
     ApplicationBasicCluster() : ClusterBase(kApplicationBasicClusterId) {}
     ~ApplicationBasicCluster() {}
 
+    // Cluster Commands
+    CHIP_ERROR ChangeStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t status);
+
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -107,6 +110,9 @@ public:
     CHIP_ERROR ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeApplicationSatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kChangeStatusCommandId = 0x00;
 };
 
 class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
@@ -452,11 +458,11 @@ private:
     static constexpr CommandId kStopMoveStepCommandId           = 0x47;
 };
 
-class DLL_EXPORT ContentLaunchCluster : public ClusterBase
+class DLL_EXPORT ContentLauncherCluster : public ClusterBase
 {
 public:
-    ContentLaunchCluster() : ClusterBase(kContentLaunchClusterId) {}
-    ~ContentLaunchCluster() {}
+    ContentLauncherCluster() : ClusterBase(kContentLauncherClusterId) {}
+    ~ContentLauncherCluster() {}
 
     // Cluster Commands
     CHIP_ERROR LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t autoPlay,

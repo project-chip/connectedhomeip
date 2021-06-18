@@ -503,7 +503,7 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Content Launch (server), big-endian */                                                        \
+            /* Endpoint: 1, Cluster: Content Launcher (server), big-endian */                                                      \
                                                                                                                                    \
             /* 4544 - accepts header list, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -596,7 +596,7 @@
             /* 5608 - seek range start, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 3, Cluster: Content Launch (server), big-endian */                                                        \
+            /* Endpoint: 3, Cluster: Content Launcher (server), big-endian */                                                      \
                                                                                                                                    \
             /* 5616 - accepts header list, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -644,7 +644,7 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* Endpoint: 4, Cluster: Content Launch (server), big-endian */                                                        \
+            /* Endpoint: 4, Cluster: Content Launcher (server), big-endian */                                                      \
                                                                                                                                    \
             /* 6220 - accepts header list, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1187,7 +1187,7 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Content Launch (server), little-endian */                                                     \
+            /* Endpoint: 1, Cluster: Content Launcher (server), little-endian */                                                   \
                                                                                                                                    \
             /* 4544 - accepts header list, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1280,7 +1280,7 @@
             /* 5608 - seek range start, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 3, Cluster: Content Launch (server), little-endian */                                                     \
+            /* Endpoint: 3, Cluster: Content Launcher (server), little-endian */                                                   \
                                                                                                                                    \
             /* 5616 - accepts header list, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1328,7 +1328,7 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* Endpoint: 4, Cluster: Content Launch (server), little-endian */                                                     \
+            /* Endpoint: 4, Cluster: Content Launcher (server), little-endian */                                                   \
                                                                                                                                    \
             /* 6220 - accepts header list, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1605,7 +1605,7 @@
             /* Endpoint: 1, Cluster: Keypad Input (server) */                                                                      \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Content Launch (server) */                                                                    \
+            /* Endpoint: 1, Cluster: Content Launcher (server) */                                                                  \
             { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(4544) }, /* accepts header list */                          \
             { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(4798) }, /* supported streaming types */                    \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* cluster revision */                             \
@@ -1638,7 +1638,7 @@
             { 0x0007, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(5608) }, /* seek range start */                              \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* cluster revision */                              \
                                                                                                                                    \
-            /* Endpoint: 3, Cluster: Content Launch (server) */                                                                    \
+            /* Endpoint: 3, Cluster: Content Launcher (server) */                                                                  \
             { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(5616) }, /* accepts header list */                          \
             { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(5870) }, /* supported streaming types */                    \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* cluster revision */                             \
@@ -1656,7 +1656,7 @@
             /* Endpoint: 3, Cluster: Account Login (server) */                                                                     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
                                                                                                                                    \
-            /* Endpoint: 4, Cluster: Content Launch (server) */                                                                    \
+            /* Endpoint: 4, Cluster: Content Launcher (server) */                                                                  \
             { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(6220) }, /* accepts header list */                          \
             { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(6474) }, /* supported streaming types */                    \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* cluster revision */                             \
@@ -1772,7 +1772,7 @@
             }, /* Endpoint: 1, Cluster: Keypad Input (server) */                                                                   \
             {                                                                                                                      \
                 0x050A, ZAP_ATTRIBUTE_INDEX(130), 3, 510, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
-            }, /* Endpoint: 1, Cluster: Content Launch (server) */                                                                 \
+            }, /* Endpoint: 1, Cluster: Content Launcher (server) */                                                               \
             {                                                                                                                      \
                 0x050C, ZAP_ATTRIBUTE_INDEX(133), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 1, Cluster: Application Launcher (server) */                                                           \
@@ -1796,7 +1796,7 @@
             }, /* Endpoint: 3, Cluster: Media Playback (server) */                                                                 \
             {                                                                                                                      \
                 0x050A, ZAP_ATTRIBUTE_INDEX(151), 3, 510, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
-            }, /* Endpoint: 3, Cluster: Content Launch (server) */                                                                 \
+            }, /* Endpoint: 3, Cluster: Content Launcher (server) */                                                               \
             {                                                                                                                      \
                 0x050D, ZAP_ATTRIBUTE_INDEX(154), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 3, Cluster: Application Basic (server) */                                                              \
@@ -1805,7 +1805,7 @@
             }, /* Endpoint: 3, Cluster: Account Login (server) */                                                                  \
             {                                                                                                                      \
                 0x050A, ZAP_ATTRIBUTE_INDEX(163), 3, 510, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
-            }, /* Endpoint: 4, Cluster: Content Launch (server) */                                                                 \
+            }, /* Endpoint: 4, Cluster: Content Launcher (server) */                                                               \
             {                                                                                                                      \
                 0x050D, ZAP_ATTRIBUTE_INDEX(166), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 4, Cluster: Application Basic (server) */                                                              \
@@ -1874,7 +1874,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (115)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (116)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -1970,7 +1970,7 @@
             { 0x0509, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SendKey */                                                     \
             { 0x0509, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* SendKeyResponse */                                             \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Content Launch (server) */                                                                    \
+            /* Endpoint: 1, Cluster: Content Launcher (server) */                                                                  \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* LaunchContent */                                               \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* LaunchContentResponse */                                       \
             { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* LaunchURL */                                                   \
@@ -2023,18 +2023,21 @@
             { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MediaSkipSeek */                                               \
             { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* MediaSkipSeekResponse */                                       \
                                                                                                                                    \
-            /* Endpoint: 3, Cluster: Content Launch (server) */                                                                    \
+            /* Endpoint: 3, Cluster: Content Launcher (server) */                                                                  \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* LaunchContent */                                               \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* LaunchContentResponse */                                       \
             { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* LaunchURL */                                                   \
             { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* LaunchURLResponse */                                           \
+                                                                                                                                   \
+            /* Endpoint: 3, Cluster: Application Basic (server) */                                                                 \
+            { 0x050D, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ChangeStatus */                                                \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Account Login (server) */                                                                     \
             { 0x050E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* GetSetupPIN */                                                 \
             { 0x050E, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* GetSetupPINResponse */                                         \
             { 0x050E, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Login */                                                       \
                                                                                                                                    \
-            /* Endpoint: 4, Cluster: Content Launch (server) */                                                                    \
+            /* Endpoint: 4, Cluster: Content Launcher (server) */                                                                  \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* LaunchContent */                                               \
             { 0x050A, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* LaunchContentResponse */                                       \
             { 0x050A, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* LaunchURL */                                                   \
