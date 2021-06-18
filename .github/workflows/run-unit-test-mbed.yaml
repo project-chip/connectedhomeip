@@ -66,7 +66,8 @@ jobs:
           lavacli jobs logs $LAVA_JOB_ID | tee unit-test.log
           lavacli jobs wait $LAVA_JOB_ID
           LAVA_JOB_RESULTS=`lavacli results $LAVA_JOB_ID`
-          bash $GITHUB_WORKSPACE/scripts/tests/mbed/check_lava_results.sh $LAVA_JOB_RESULTS
+          chmod +x "$GITHUB_WORKSPACE/scripts/tests/mbed/check_lava_results.sh"
+          "$GITHUB_WORKSPACE/scripts/tests/mbed/check_lava_results.sh" $LAVA_JOB_RESULTS
       - name: Upload unit test logs
         uses: actions/upload-artifact@v2.2.3
         with:
