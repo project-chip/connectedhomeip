@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #pragma once
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelDelegate.h>

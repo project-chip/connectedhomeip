@@ -172,8 +172,10 @@ CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClient ** const apWriteCl
 {
     *apWriteClient = nullptr;
 
-    for (auto & writeClient : mWriteClients) {
-        if (!writeClient.IsFree()) {
+    for (auto & writeClient : mWriteClients)
+    {
+        if (!writeClient.IsFree())
+        {
             continue;
         }
 

@@ -40,10 +40,10 @@ namespace {
 chip::System::Layer gSystemLayer;
 chip::SecureSessionMgr gSessionManager;
 chip::Messaging::ExchangeManager gExchangeManager;
-chip::TransportMgr <chip::Transport::UDP> gTransportManager;
+chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 chip::Transport::AdminId gAdminId = 0;
-}
+} // namespace
 namespace chip {
 namespace app {
 class TestWriteInteraction
@@ -261,8 +261,7 @@ void InitializeChip(nlTestSuite * apSuite)
 
     gSystemLayer.Init(nullptr);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins,
-                                     &gMessageCounterManager);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gExchangeManager.Init(&gSessionManager);
