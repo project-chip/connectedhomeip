@@ -276,21 +276,21 @@ void NetworkChangeEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event,
 {
     switch (event->Type)
     {
-        case chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange:
-            if ((event->InternetConnectivityChange.IPv4 == chip::DeviceLayer::kConnectivity_Established) ||
-                (event->InternetConnectivityChange.IPv6 == chip::DeviceLayer::kConnectivity_Established))
-            {
-                chip::app::Mdns::StartServer();
-            }
-            break;
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        case chip::DeviceLayer::DeviceEventType::kThreadStateChange:
-            VerifyOrReturn(event->ThreadStateChange.AddressChanged);
+    case chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange:
+        if ((event->InternetConnectivityChange.IPv4 == chip::DeviceLayer::kConnectivity_Established) ||
+            (event->InternetConnectivityChange.IPv6 == chip::DeviceLayer::kConnectivity_Established))
+        {
             chip::app::Mdns::StartServer();
-            break;
+        }
+        break;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    case chip::DeviceLayer::DeviceEventType::kThreadStateChange:
+        VerifyOrReturn(event->ThreadStateChange.AddressChanged);
+        chip::app::Mdns::StartServer();
+        break;
 #endif
-        default:
-            break;
+    default:
+        break;
     }
 }
 
