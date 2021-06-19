@@ -272,6 +272,33 @@ void StartServer()
     }
 }
 
+void NetworkChangeEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t)
+{
+    switch (event->Type)
+    {
+    case chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange:
+        if ((event->InternetConnectivityChange.IPv4 == chip::DeviceLayer::kConnectivity_Established) ||
+            (event->InternetConnectivityChange.IPv6 == chip::DeviceLayer::kConnectivity_Established))
+        {
+            chip::app::Mdns::StartServer();
+        }
+        break;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    case chip::DeviceLayer::DeviceEventType::kThreadStateChange:
+        VerifyOrReturn(event->ThreadStateChange.AddressChanged);
+        chip::app::Mdns::StartServer();
+        break;
+#endif
+    default:
+        break;
+    }
+}
+
+void StartServerOnNetworkChange()
+{
+    chip::DeviceLayer::PlatformMgr().AddEventHandler(NetworkChangeEventHandler, {});
+}
+
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {

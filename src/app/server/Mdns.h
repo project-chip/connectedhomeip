@@ -40,6 +40,9 @@ CHIP_ERROR Advertise(bool commissionableNode);
 /// (Re-)starts the minmdns server
 void StartServer();
 
+/// (Re-)starts the minmdns server on network change
+void StartServerOnNetworkChange();
+
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
 } // namespace Mdns
