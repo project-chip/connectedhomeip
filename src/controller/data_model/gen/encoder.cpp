@@ -3757,6 +3757,8 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * ListInt8u                                                         | 0x001A |
 | * ListOctetString                                                   | 0x001B |
 | * ListStructOctetString                                             | 0x001C |
+| * LongOctetString                                                   | 0x001D |
+| * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -4155,6 +4157,60 @@ PacketBufferHandle encodeTestClusterClusterReadListStructOctetStringAttribute(ui
 {
     COMMAND_HEADER("ReadTestClusterListStructOctetString", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001C);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute LongOctetString
+ */
+PacketBufferHandle encodeTestClusterClusterReadLongOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterLongOctetString", TEST_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001D);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTestClusterClusterWriteLongOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                         chip::ByteSpan longOctetString)
+{
+    COMMAND_HEADER("WriteTestClusterLongOctetString", TEST_CLUSTER_ID);
+    size_t longOctetStringStrLen = longOctetString.size();
+    if (!CanCastTo<uint16_t>(longOctetStringStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, longOctetStringStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x001D)
+        .Put8(67)
+        .Put16(static_cast<uint16_t>(longOctetStringStrLen))
+        .Put(longOctetString.data(), longOctetStringStrLen);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Unsupported
+ */
+PacketBufferHandle encodeTestClusterClusterReadUnsupportedAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterUnsupported", TEST_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x00FF);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTestClusterClusterWriteUnsupportedAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                     uint8_t unsupported)
+{
+    COMMAND_HEADER("WriteTestClusterUnsupported", TEST_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x00FF)
+        .Put8(16)
+        .Put8(static_cast<uint8_t>(unsupported));
     COMMAND_FOOTER();
 }
 

@@ -53,6 +53,10 @@ limitations under the License.
     <attribute side="server" code="0x001B" define="LIST_OCTET_STRING" type="ARRAY" entryType="OCTET_STRING" length="254" writable="false" optional="false">list_octet_string</attribute>
     <attribute side="server" code="0x001C" define="LIST_STRUCT_OCTET_STRING" type="ARRAY" entryType="TestListStructOctet" length="254" writable="false" optional="false">list_struct_octet_string</attribute>
     <!--<attribute side="server" code="0x001B" define="STRUCT" type="ARRAY" writable="true" optional="false">struct</attribute>-->
+    <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="LONG_OCTET_STRING" length="1000" writable="true" optional="false">long_octet_string</attribute>
+
+    <!-- This attribute should not be enabled on the server side -->
+    <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="false">unsupported</attribute>
 
     <!-- Test Commands -->
     <command source="client" code="0x00" name="Test" optional="false">
