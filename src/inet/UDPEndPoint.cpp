@@ -42,9 +42,9 @@
 #include <lwip/tcpip.h>
 #include <lwip/udp.h>
 #if CHIP_HAVE_CONFIG_H
-#include <lwip/lwip_buildconfig.h>  // nogncheck
-#endif // CHIP_HAVE_CONFIG_H
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/lwip_buildconfig.h> // nogncheck
+#endif                             // CHIP_HAVE_CONFIG_H
+#endif                             // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if HAVE_SYS_SOCKET_H
