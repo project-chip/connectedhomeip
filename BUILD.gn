@@ -95,7 +95,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     if (chip_with_lwip) {
-      deps += [ "${chip_root}/src/lwip:all" ]
+      deps += [ "${chip_root}/src/lwip" ]
     }
 
     if (chip_build_tools) {
