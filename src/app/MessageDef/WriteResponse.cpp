@@ -130,12 +130,16 @@ CHIP_ERROR WriteResponse::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 AttributeStatusList::Builder & WriteResponse::Builder::CreateAttributeStatusListBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeStatusListBuilder.ResetError(mError));
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mAttributeStatusListBuilder.Init(mpWriter, kCsTag_AttributeStatusList);
+        ChipLogFunctError(mError);
+    }
+    else
+    {
+        mAttributeStatusListBuilder.ResetError(mError);
+    }
 
-    mError = mAttributeStatusListBuilder.Init(mpWriter, kCsTag_AttributeStatusList);
-    ChipLogFunctError(mError);
-
-exit:
     return mAttributeStatusListBuilder;
 }
 

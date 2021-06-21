@@ -34,8 +34,7 @@ PersistedCounter::~PersistedCounter() {}
 CHIP_ERROR
 PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(aEpoch > 0, err = CHIP_ERROR_INVALID_INTEGER_VALUE);
+    VerifyOrReturnError(aEpoch > 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     // Store the ID.
     mId    = aId;
@@ -44,47 +43,36 @@ PersistedCounter::Init(const chip::Platform::PersistedStorage::Key aId, uint32_t
     uint32_t startValue;
 
     // Read our previously-stored starting value.
-    err = ReadStartValue(startValue);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(ReadStartValue(startValue));
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
     ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%x startValue 0x%x", aEpoch, startValue);
 #endif
 
-    err = PersistNextEpochStart(startValue + aEpoch);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(PersistNextEpochStart(startValue + aEpoch));
 
     // This will set the starting value, after which we're ready.
-    err = MonotonicallyIncreasingCounter::Init(startValue);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return MonotonicallyIncreasingCounter::Init(startValue);
 }
 
 CHIP_ERROR
 PersistedCounter::Advance()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(mId != chip::Platform::PersistedStorage::kEmptyKey, CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(mId != chip::Platform::PersistedStorage::kEmptyKey, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = MonotonicallyIncreasingCounter::Advance();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(MonotonicallyIncreasingCounter::Advance());
 
     if (GetValue() >= mNextEpoch)
     {
         // Value advanced past the previously persisted "start point".
         // Ensure that a new starting point is persisted.
-        err = PersistNextEpochStart(mNextEpoch + mEpoch);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(PersistNextEpochStart(mNextEpoch + mEpoch));
 
         // Advancing the epoch should have ensured that the current value
         // is valid
-        VerifyOrExit(GetValue() < mNextEpoch, err = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(GetValue() < mNextEpoch, CHIP_ERROR_INTERNAL);
     }
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
@@ -101,11 +89,9 @@ PersistedCounter::PersistNextEpochStart(uint32_t aStartValue)
 CHIP_ERROR
 PersistedCounter::ReadStartValue(uint32_t & aStartValue)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     aStartValue = 0;
 
-    err = chip::Platform::PersistedStorage::Read(mId, aStartValue);
+    CHIP_ERROR err = chip::Platform::PersistedStorage::Read(mId, aStartValue);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // No previously-stored value, no worries, the counter is initialized to zero.
@@ -114,15 +100,14 @@ PersistedCounter::ReadStartValue(uint32_t & aStartValue)
     }
     else
     {
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(err);
     }
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
     ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x%x", aStartValue);
 #endif
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

@@ -674,14 +674,12 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleWriteConfirmation)
 
     chip::Ble::ChipBleUUID svcUUID;
     chip::Ble::ChipBleUUID charUUID;
-    VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
-                 ChipLogError(Controller, "handleWriteConfirmation() called with invalid service ID"));
-    VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
-                 ChipLogError(Controller, "handleWriteConfirmation() called with invalid characteristic ID"));
+    VerifyOrReturn(JavaBytesToUUID(env, svcId, svcUUID),
+                   ChipLogError(Controller, "handleWriteConfirmation() called with invalid service ID"));
+    VerifyOrReturn(JavaBytesToUUID(env, charId, charUUID),
+                   ChipLogError(Controller, "handleWriteConfirmation() called with invalid characteristic ID"));
 
     sBleLayer.HandleWriteConfirmation(connObj, &svcUUID, &charUUID);
-exit:
-    return;
 }
 
 JNI_ANDROID_CHIP_STACK_METHOD(void, handleSubscribeComplete)
@@ -692,14 +690,12 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleSubscribeComplete)
 
     chip::Ble::ChipBleUUID svcUUID;
     chip::Ble::ChipBleUUID charUUID;
-    VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
-                 ChipLogError(Controller, "handleSubscribeComplete() called with invalid service ID"));
-    VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
-                 ChipLogError(Controller, "handleSubscribeComplete() called with invalid characteristic ID"));
+    VerifyOrReturn(JavaBytesToUUID(env, svcId, svcUUID),
+                   ChipLogError(Controller, "handleSubscribeComplete() called with invalid service ID"));
+    VerifyOrReturn(JavaBytesToUUID(env, charId, charUUID),
+                   ChipLogError(Controller, "handleSubscribeComplete() called with invalid characteristic ID"));
 
     sBleLayer.HandleSubscribeComplete(connObj, &svcUUID, &charUUID);
-exit:
-    return;
 }
 
 JNI_ANDROID_CHIP_STACK_METHOD(void, handleUnsubscribeComplete)
@@ -710,14 +706,12 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleUnsubscribeComplete)
 
     chip::Ble::ChipBleUUID svcUUID;
     chip::Ble::ChipBleUUID charUUID;
-    VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
-                 ChipLogError(Controller, "handleUnsubscribeComplete() called with invalid service ID"));
-    VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
-                 ChipLogError(Controller, "handleUnsubscribeComplete() called with invalid characteristic ID"));
+    VerifyOrReturn(JavaBytesToUUID(env, svcId, svcUUID),
+                   ChipLogError(Controller, "handleUnsubscribeComplete() called with invalid service ID"));
+    VerifyOrReturn(JavaBytesToUUID(env, charId, charUUID),
+                   ChipLogError(Controller, "handleUnsubscribeComplete() called with invalid characteristic ID"));
 
     sBleLayer.HandleUnsubscribeComplete(connObj, &svcUUID, &charUUID);
-exit:
-    return;
 }
 
 JNI_ANDROID_CHIP_STACK_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
@@ -1109,17 +1103,14 @@ void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)
 
 CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     outArray = env->NewByteArray((int) inArrayLen);
-    VerifyOrExit(outArray != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(outArray != NULL, CHIP_ERROR_NO_MEMORY);
 
     env->ExceptionClear();
     env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)

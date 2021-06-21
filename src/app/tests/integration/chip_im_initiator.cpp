@@ -128,6 +128,7 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);
     SuccessOrExit(err);
 
+exit:
     if (err == CHIP_NO_ERROR)
     {
         gCommandCount++;
@@ -136,7 +137,6 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
     {
         printf("Send invoke command request failed, err: %s\n", chip::ErrorStr(err));
     }
-exit:
     return err;
 }
 
@@ -165,6 +165,7 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);
     SuccessOrExit(err);
 
+exit:
     if (err == CHIP_NO_ERROR)
     {
         gCommandCount++;
@@ -173,7 +174,6 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
     {
         printf("Send invoke command request failed, err: %s\n", chip::ErrorStr(err));
     }
-exit:
     return err;
 }
 
@@ -192,6 +192,7 @@ CHIP_ERROR SendReadRequest()
     err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, &eventPathParams, 1, &attributePathParams, 1, number);
     SuccessOrExit(err);
 
+exit:
     if (err == CHIP_NO_ERROR)
     {
         gReadCount++;
@@ -200,7 +201,6 @@ CHIP_ERROR SendReadRequest()
     {
         printf("Send read request failed, err: %s\n", chip::ErrorStr(err));
     }
-exit:
     return err;
 }
 
