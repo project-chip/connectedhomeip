@@ -95,9 +95,10 @@ source "$CHIP_ROOT/scripts/activate.sh"
 
 # Generates ninja files
 [[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging chip_use_clusters_for_ip_commissioning=$clusters $chip_mdns_arg"
+gn --root="$CHIP_ROOT" --dotfile="$CHIP_ROOT/src/pybindings/pycontroller/.gn" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging chip_use_clusters_for_ip_commissioning=$clusters $chip_mdns_arg"
 
 # Compiles python files
+ninja -v -C "$OUTPUT_ROOT" pycontroller
 ninja -C "$OUTPUT_ROOT" python
 
 # Create a virtual environment that has access to the built python tools
@@ -106,7 +107,7 @@ virtualenv --clear "$ENVIRONMENT_ROOT"
 # Activate the new enviroment to register the python WHL
 source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "$OUTPUT_ROOT"/controller/python/chip-*.whl
+"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "$OUTPUT_ROOT"/controller/python/chip-*.whl "$OUTPUT_ROOT"/pybindings/pycontroller/pybindings-*.whl
 
 echo ""
 echo_green "Compilation completed and WHL package installed in: "

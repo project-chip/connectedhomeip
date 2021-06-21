@@ -95,3 +95,7 @@
 	path = third_party/mbed-os-posix-socket/repo
 	url = https://github.com/ARMmbed/mbed-os-posix-socket.git
 	branch = main
+[submodule "third_party/pybind11"]
+	path = third_party/pybind11
+	url = ../../pybind/pybind11
+	branch = stable
