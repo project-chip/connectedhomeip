@@ -183,7 +183,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int32_t v)
     return Put(tag, static_cast<int64_t>(v));
 }
 
-#if  defined(__riscv) && defined(ESP_PLATFORM)
+#if defined(__riscv) && defined(ESP_PLATFORM)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, int v)
 {
     return Put(tag, static_cast<int64_t>(v));
