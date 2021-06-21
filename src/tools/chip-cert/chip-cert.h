@@ -90,16 +90,10 @@ enum KeyFormat
 
 enum
 {
-    kMaxChipCertBufSize = 450,  // Maximum size of a buffer needed to hold CHIP TLV encoded certificates.
-                                // CHIP certificate in TLV format shouldn't exceed 400 bytes.
-                                // chip-cert tool allows support for larger size certificates,
-                                // which might be generated for negative testing purposes.
-    kMaxX509CertBufSize = 1200, // Maximum size of a buffer needed to hold/encode X.509 certificates in DER form.
-                                // CHIP certificate in X.509 DER form shouldn't exceed 600 bytes.
-                                // chip-cert tool allows support for larger size certificates,
-                                // which might be generated for negative testing purposes.
-                                // Also, CHIP to X.509 certificate convertor (ASN1 encoder) requires additional
-                                // space in the buffer to store the deffered length list.
+    kMaxChipCertBufSize = 400, // Maximum size of a buffer needed to hold CHIP TLV encoded certificates.
+    kMaxX509CertBufSize = 650, // Maximum size of a buffer needed to hold/encode X.509 certificates in DER form.
+                               // CHIP certificate in X.509 DER form shouldn't exceed 600 bytes.
+                               // chip-cert tool allows support for larger size certificates.
 };
 
 struct FutureExtension
