@@ -4,7 +4,7 @@
 
 #include "TestCommand.h"
 
-{{>test_cluster tests="TestCluster, Test_3_1_1, Test_3_2_1, Test_3_2_2"}}
+{{>test_cluster tests="TestCluster, Test_3_1_1, Test_3_2_1, Test_3_2_2, Test_10_1_1"}}
 
 void registerCommandsTests(Commands & commands)
 {
@@ -15,6 +15,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_3_1_1>(),
         make_unique<Test_3_2_1>(),
         make_unique<Test_3_2_2>(),
+        make_unique<Test_10_1_1>(),
     };
 
     commands.Register(clusterName, clusterCommands);

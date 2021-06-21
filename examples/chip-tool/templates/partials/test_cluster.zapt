@@ -105,6 +105,13 @@ class {{filename}}: public TestCommand
         delete runner->mOnFailureCallback_{{index}};
         delete runner->mOnSuccessCallback_{{index}};
 
+        {{#if optional}}
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
+            runner->NextTest();
+            return;
+        }
+        {{/if}}
+
         if (runner->mIsFailureExpected_{{index}} == false) {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -151,6 +158,33 @@ class {{filename}}: public TestCommand
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
+        {{/if}}
+        {{/if}}
+        {{#if hasExpectedConstraints}}
+        {{#if expectedConstraints.type}}
+        ChipLogError(chipTool, "Warning: {{asCamelCased name true}} type checking is not implemented yet. Expected type: '%s'", "{{expectedConstraints.type}}");
+        {{/if}}
+
+        {{#if expectedConstraints.format}}
+        ChipLogError(chipTool, "Warning: {{asCamelCased name true}} format checking is not implemented yet. Expected format: '%s'", "{{expectedConstraints.format}}");
+        {{/if}}
+
+        {{#if expectedConstraints.minLength}}
+          if ({{asCamelCased name true}}.size() < {{expectedConstraints.minLength}})
+          {
+            ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too short. Min size is {{expectedConstraints.minLength}} but got '%zu'", {{asCamelCased name true}}.size());
+            runner->SetCommandExitStatus(false);
+            return;
+          }
+        {{/if}}
+
+        {{#if expectedConstraints.maxLength}}
+          if ({{asCamelCased name true}}.size() > {{expectedConstraints.maxLength}})
+          {
+            ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too long. Max size is {{expectedConstraints.maxLength}} but got '%zu'", {{asCamelCased name true}}.size());
+            runner->SetCommandExitStatus(false);
+            return;
+          }
         {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
