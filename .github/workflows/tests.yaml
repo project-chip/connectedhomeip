@@ -44,8 +44,6 @@ jobs:
                   submodules: true
             - name: Try to ensure the directories for core dumping exist and we can write them.
               run: |
-                  apt-get update
-                  apt-get -y install --fix-missing rsync
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
@@ -63,7 +61,7 @@ jobs:
             - name: Build all clusters app
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
@@ -136,7 +134,7 @@ jobs:
             - name: Run Build Test Server
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false
             - name: Build chip-tool
               timeout-minutes: 5
               run: |

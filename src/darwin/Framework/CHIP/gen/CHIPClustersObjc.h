@@ -61,6 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPApplicationBasic : CHIPCluster
 
+- (void)changeStatus:(uint8_t)status responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeApplicationNameWithResponseHandler:(ResponseHandler)responseHandler;
@@ -397,10 +399,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Content Launch
+ * Cluster Content Launcher
  *
  */
-@interface CHIPContentLaunch : CHIPCluster
+@interface CHIPContentLauncher : CHIPCluster
 
 - (void)launchContent:(uint8_t)autoPlay data:(NSString *)data responseHandler:(ResponseHandler)responseHandler;
 - (void)launchURL:(NSString *)contentURL displayString:(NSString *)displayString responseHandler:(ResponseHandler)responseHandler;
@@ -1028,6 +1030,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeLongOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeUnsupportedWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

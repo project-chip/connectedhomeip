@@ -56,6 +56,8 @@ public:
 
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
 
+    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
     static DiscoveryImplPlatform & GetInstance();
 
 private:

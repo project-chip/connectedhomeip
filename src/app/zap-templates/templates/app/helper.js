@@ -195,9 +195,11 @@ function asChipUnderlyingType(label, type)
 // These helpers only works within the endpoint_config iterator
 
 // List of all cluster with generated functions
-var endpointClusterWithInit =
-    [ 'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control', 'Color Control', 'IAS Zone' ];
-var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock' ];
+var endpointClusterWithInit = [
+  'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control', 'Color Control', 'IAS Zone',
+  'Pump Configuration and Control'
+];
+var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
@@ -359,6 +361,24 @@ function isStrEndsWith(str, substr)
   return str.endsWith(substr);
 }
 
+function asTypeLiteralSuffix(type)
+{
+  switch (type) {
+  case 'int32_t':
+    return 'L';
+  case 'int64_t':
+    return 'LL';
+  case 'uint16_t':
+    return 'U';
+  case 'uint32_t':
+    return 'UL';
+  case 'uint64_t':
+    return 'ULL';
+  default:
+    return '';
+  }
+}
+
 //
 // Module exports
 //
@@ -373,3 +393,4 @@ exports.chip_endpoint_generated_functions             = chip_endpoint_generated_
 exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_list
 exports.isSigned                                      = ChipTypesHelper.isSigned;
 exports.isStrEndsWith                                 = isStrEndsWith;
+exports.asTypeLiteralSuffix                           = asTypeLiteralSuffix;

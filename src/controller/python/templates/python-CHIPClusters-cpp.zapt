@@ -125,6 +125,16 @@ CHIP_ERROR chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCa
 {{/if}}
 }
 {{/if}}
+
+{{#if (isWritableAttribute)}}
+CHIP_ERROR chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, {{#if (isString type)}} uint8_t * value, size_t len{{else}}{{chipType}} value{{/if}})
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttribute{{asCamelCased name false}}(g{{asCallbackAttributeType atomicTypeId}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isString type)}} chip::ByteSpan(value, len){{else}}value{{/if}});
+}
+{{/if}}
 {{/chip_server_cluster_attributes}}
 
 // End of Cluster {{asCamelCased name false}}

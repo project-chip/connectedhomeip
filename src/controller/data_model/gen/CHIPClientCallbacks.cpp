@@ -480,8 +480,8 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             message += entryLength;
                         }
 
-                        Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback> * cb =
-                            Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback>::FromCancelable(
+                        Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback> * cb =
+                            Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(
                                 onSuccessCallback);
                         cb->mCall(cb->mContext, count, data);
                         break;
@@ -496,8 +496,8 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             message += 1;
                         }
 
-                        Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback> * cb =
-                            Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback>::FromCancelable(
+                        Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback> * cb =
+                            Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(
                                 onSuccessCallback);
                         cb->mCall(cb->mContext, count, data);
                         break;
@@ -1441,34 +1441,34 @@ bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::app::Comma
     return true;
 }
 
-bool emberAfContentLaunchClusterLaunchContentResponseCallback(chip::app::Command * commandObj, uint8_t * data,
-                                                              uint8_t contentLaunchStatus)
+bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+                                                                uint8_t contentLaunchStatus)
 {
     ChipLogProgress(Zcl, "LaunchContentResponse:");
     // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
     // ChipLogProgress(Zcl, "  data: %.*s", data.size(), data.data());
     ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchContentResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchContentResponseCallback");
 
-    Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback> * cb =
-        Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback> * cb =
+        Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, data, contentLaunchStatus);
     return true;
 }
 
-bool emberAfContentLaunchClusterLaunchURLResponseCallback(chip::app::Command * commandObj, uint8_t * data,
-                                                          uint8_t contentLaunchStatus)
+bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+                                                            uint8_t contentLaunchStatus)
 {
     ChipLogProgress(Zcl, "LaunchURLResponse:");
     // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
     // ChipLogProgress(Zcl, "  data: %.*s", data.size(), data.data());
     ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchURLResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchURLResponseCallback");
 
-    Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback> * cb =
-        Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback> * cb =
+        Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, data, contentLaunchStatus);
     return true;
 }

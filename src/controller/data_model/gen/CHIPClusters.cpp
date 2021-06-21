@@ -132,6 +132,47 @@ CHIP_ERROR AccountLoginCluster::ReadAttributeClusterRevision(Callback::Cancelabl
 }
 
 // ApplicationBasic Cluster Commands
+CHIP_ERROR ApplicationBasicCluster::ChangeStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t status)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kChangeStatusCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // status: applicationBasicStatus
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
 // ApplicationBasic Cluster Attributes
 CHIP_ERROR ApplicationBasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
@@ -2349,9 +2390,9 @@ CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelabl
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-// ContentLaunch Cluster Commands
-CHIP_ERROR ContentLaunchCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t autoPlay, chip::ByteSpan data)
+// ContentLauncher Cluster Commands
+CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t autoPlay, chip::ByteSpan data)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -2393,8 +2434,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ContentLaunchCluster::LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           chip::ByteSpan contentURL, chip::ByteSpan displayString)
+CHIP_ERROR ContentLauncherCluster::LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             chip::ByteSpan contentURL, chip::ByteSpan displayString)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -2436,35 +2477,35 @@ exit:
     return err;
 }
 
-// ContentLaunch Cluster Attributes
-CHIP_ERROR ContentLaunchCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
+// ContentLauncher Cluster Attributes
+CHIP_ERROR ContentLauncherCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterDiscoverAttributes(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodeContentLauncherClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR ContentLaunchCluster::ReadAttributeAcceptsHeaderList(Callback::Cancelable * onSuccessCallback,
+CHIP_ERROR ContentLauncherCluster::ReadAttributeAcceptsHeaderList(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLauncherClusterReadAcceptsHeaderListAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ContentLauncherCluster::ReadAttributeSupportedStreamingTypes(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeContentLauncherClusterReadSupportedStreamingTypesAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ContentLauncherCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterReadAcceptsHeaderListAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ContentLaunchCluster::ReadAttributeSupportedStreamingTypes(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterReadSupportedStreamingTypesAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ContentLaunchCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeContentLaunchClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodeContentLauncherClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -7990,6 +8031,38 @@ CHIP_ERROR TestClusterCluster::ReadAttributeListStructOctetString(Callback::Canc
 {
     uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeTestClusterClusterReadListStructOctetStringAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::ReadAttributeLongOctetString(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTestClusterClusterReadLongOctetStringAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::WriteAttributeLongOctetString(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTestClusterClusterWriteLongOctetStringAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTestClusterClusterReadUnsupportedAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTestClusterClusterWriteUnsupportedAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 

@@ -145,7 +145,7 @@ EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddThreadNetwork: %" PRIu32, err);
+    ChipLogDetail(Zcl, "AddThreadNetwork: %" PRIu8, err);
     return err;
 #else
     // The target does not supports ThreadNetwork. We should not add AddThreadNetwork command in that case then the upper layer will
@@ -203,7 +203,7 @@ EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Co
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddWiFiNetwork: %" PRIu32, err);
+    ChipLogDetail(Zcl, "AddWiFiNetwork: %" PRIu8, err);
     return err;
 #else
     // The target does not supports WiFiNetwork.

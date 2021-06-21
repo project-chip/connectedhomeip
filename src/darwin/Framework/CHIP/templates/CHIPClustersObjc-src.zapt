@@ -446,7 +446,7 @@ public:
                   {{else if (isCharString type)}}
                   @"{{asSymbol label}}": [NSString stringWithFormat:@"%s", {{asSymbol label}}],
                   {{else}}
-                  @"{{asSymbol label}}": [NSNumber numberWith{{asObjectiveCNumberType label type}}:{{asSymbol label}}],
+                  @"{{asSymbol label}}": [NSNumber numberWith{{asObjectiveCNumberType label type false}}:{{asSymbol label}}],
                   {{/if}}
                   {{/unless}}
                   {{/zcl_command_arguments}}
@@ -497,7 +497,7 @@ public:
                     [[NSString alloc] initWithBytes:entries[i].{{name}}+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i].{{name}}) encoding:NSUTF8StringEncoding],
                     {{/if}}
                     {{else}}
-                    [NSNumber numberWith{{asObjectiveCNumberType label type}}:entries[i].{{name}}],
+                    [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i].{{name}}],
                     {{/if}}
                     @"{{name}}",
                 {{/chip_attribute_list_entryTypes}}
@@ -510,7 +510,7 @@ public:
                 values[i] = [[NSString alloc] initWithBytes:entries[i]+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i]) encoding:NSUTF8StringEncoding];
                 {{/if}}
                 {{else}}
-                values[i] = [NSNumber numberWith{{asObjectiveCNumberType label type}}:entries[i]];
+                values[i] = [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i]];
                 {{/if}}
                 {{/if}}
             }

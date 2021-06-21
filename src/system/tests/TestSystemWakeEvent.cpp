@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This is a unit test suite for <tt>chip::System::SystemWakeEvent</tt>
+ *      This is a unit test suite for <tt>chip::System::WakeEvent</tt>
  *
  */
 
@@ -33,7 +33,7 @@
 #include <support/UnitTestRegistration.h>
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
-#include <system/SystemWakeEvent.h>
+#include <system/SystemSockets.h>
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
@@ -46,12 +46,18 @@ namespace {
 
 struct TestContext
 {
-    SystemWakeEvent mWakeEvent;
+    ::chip::System::Layer mSystemLayer;
+    WatchableEventManager mWatchableEvents;
+    WakeEvent mWakeEvent;
     fd_set mReadSet;
     fd_set mWriteSet;
     fd_set mErrorSet;
 
-    TestContext() { mWakeEvent.Open(); }
+    TestContext()
+    {
+        mWatchableEvents.Init(mSystemLayer);
+        mWakeEvent.Open(mWatchableEvents);
+    }
     ~TestContext() { mWakeEvent.Close(); }
 
     int SelectWakeEvent(timeval timeout = {})
@@ -133,7 +139,7 @@ void TestClose(nlTestSuite * inSuite, void * aContext)
     const auto notifFD = lContext.mWakeEvent.GetNotifFD();
 
     // Check that Close() has cleaned up itself and reopen is possible
-    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open() == CHIP_SYSTEM_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open(lContext.mWatchableEvents) == CHIP_SYSTEM_NO_ERROR);
     NL_TEST_ASSERT(inSuite, notifFD < 0);
 }
 } // namespace

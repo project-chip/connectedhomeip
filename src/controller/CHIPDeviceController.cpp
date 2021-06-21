@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -93,10 +93,6 @@ namespace chip {
 namespace Controller {
 
 using namespace chip::Encoding;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-constexpr uint16_t kMdnsPort = 5353;
-#endif
 
 constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
@@ -505,11 +501,11 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-#if CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
-    DeviceLayer::SystemLayer.WakeSelect();
+#if CONFIG_DEVICE_LAYER && CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    DeviceLayer::SystemLayer.WakeIOThread();
 #else
     ReturnErrorOnFailure(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-#endif // CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
+#endif // CONFIG_DEVICE_LAYER && CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 
     return CHIP_NO_ERROR;
 }
@@ -746,32 +742,6 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
     }
 };
-
-void DeviceController::OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData)
-{
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
-    {
-        if (!mCommissionableNodes[i].IsValid())
-        {
-            continue;
-        }
-        if (strcmp(mCommissionableNodes[i].hostName, nodeData.hostName) == 0)
-        {
-            mCommissionableNodes[i] = nodeData;
-            return;
-        }
-    }
-    // Didn't find the host name already in our list, return an invalid
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
-    {
-        if (!mCommissionableNodes[i].IsValid())
-        {
-            mCommissionableNodes[i] = nodeData;
-            return;
-        }
-    }
-    ChipLogError(Discovery, "Failed to add discovered commissionable node with hostname %s- Insufficient space", nodeData.hostName);
-}
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
@@ -1435,32 +1405,27 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
 {
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if ((err = SetUpNodeDiscovery()) == CHIP_NO_ERROR)
     {
-        mCommissionableNodes[i].Reset();
+        return chip::Mdns::Resolver::Instance().FindCommissionableNodes();
     }
-    return Mdns::Resolver::Instance().FindCommissionableNodes();
+    return err;
 }
 
 CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
 {
-    // TODO(cecille): Add assertion about main loop.
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if ((err = SetUpNodeDiscoveryLongDiscriminator(long_discriminator)) == CHIP_NO_ERROR)
     {
-        mCommissionableNodes[i].Reset();
+        return chip::Mdns::Resolver::Instance().FindCommissionableNodes(filter);
     }
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
-    return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+    return err;
 }
 
-const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
+const Mdns::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
 {
-    // TODO(cecille): Add assertion about main loop.
-    if (mCommissionableNodes[idx].IsValid())
-    {
-        return &mCommissionableNodes[idx];
-    }
-    return nullptr;
+    return GetDiscoveredNode(idx);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 

@@ -254,7 +254,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR GetCertChipId(uint64_t & chipId) const;
+    CHIP_ERROR GetCertChipId(uint64_t & certId) const;
 
     bool IsEqual(const ChipDN & other) const;
 
@@ -646,7 +646,7 @@ CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509Cert
  * @param x509ICAC             Intermediate CA certificate in X.509 DER encoding.
  * @param chipCertArrayBuf     Buffer to store converted certificates in CHIP format.
  * @param chipCertArrayBufSize The size of the buffer to store converted certificates.
- * @param chipCertBufLen[out]  The length of the converted certificates.
+ * @param chipCertBufLen       The length of the converted certificates.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/

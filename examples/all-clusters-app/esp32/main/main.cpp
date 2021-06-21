@@ -35,6 +35,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include "shell_extension/launch.h"
 
 #include <cmath>
 #include <cstdio>
@@ -372,8 +373,6 @@ void SetupInitialLevelControlValues(chip::EndpointId endpointId)
 
     emberAfWriteAttribute(endpointId, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
                           ZCL_DATA8_ATTRIBUTE_TYPE);
-    emberAfWriteAttribute(endpointId, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_ON_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
-                          ZCL_DATA8_ATTRIBUTE_TYPE);
 }
 
 void SetupPretendDevices()
@@ -565,13 +564,6 @@ public:
     void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
 };
 
-#if CONFIG_ENABLE_CHIP_SHELL
-void ChipShellTask(void * args)
-{
-    chip::Shell::Engine::Root().RunMainLoop();
-}
-#endif // CONFIG_ENABLE_CHIP_SHELL
-
 } // namespace
 
 extern "C" void app_main()
@@ -605,6 +597,10 @@ extern "C" void app_main()
         return;
     }
 
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+#endif // CONFIG_ENABLE_CHIP_SHELL
+
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
@@ -625,10 +621,6 @@ extern "C" void app_main()
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
     InitServer(&callbacks);
-
-#if CONFIG_ENABLE_CHIP_SHELL
-    xTaskCreate(&ChipShellTask, "chip_shell", 2048, NULL, 5, NULL);
-#endif
 
     SetupPretendDevices();
     SetupInitialLevelControlValues(/* endpointId = */ 1);

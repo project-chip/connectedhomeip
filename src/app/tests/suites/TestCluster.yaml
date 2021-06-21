@@ -34,14 +34,641 @@ tests:
               - name: "returnValue"
                 value: 7
 
-    - label: "Write attribute BOOLEAN"
+    # Tests for Boolean attribute
+
+    - label: "Read attribute BOOLEAN Default Value"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: 0
+
+    - label: "Write attribute BOOLEAN True"
       command: "writeAttribute"
       attribute: "boolean"
       arguments:
           value: 1
 
-    - label: "Read attribute BOOLEAN"
+    - label: "Read attribute BOOLEAN True"
       command: "readAttribute"
       attribute: "boolean"
       response:
           value: 1
+
+    - label: "Write attribute BOOLEAN False"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: 0
+
+    - label: "Read attribute BOOLEAN False"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: 0
+
+    # Tests for Bitmap8 attribute
+
+    - label: "Read attribute BITMAP8 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap8"
+      response:
+          value: 0
+
+    - label: "Write attribute BITMAP8 Max Value"
+      command: "writeAttribute"
+      attribute: "bitmap8"
+      arguments:
+          value: 255
+
+    - label: "Read attribute BITMAP8 Max Value"
+      command: "readAttribute"
+      attribute: "bitmap8"
+      response:
+          value: 255
+
+    - label: "Write attribute BITMAP8 Min Value"
+      command: "writeAttribute"
+      attribute: "bitmap8"
+      arguments:
+          value: 0
+
+    - label: "Read attribute BITMAP8 Min Value"
+      command: "readAttribute"
+      attribute: "bitmap8"
+      response:
+          value: 0
+
+    # Tests for Bitmap16 attribute
+
+    - label: "Read attribute BITMAP16 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap16"
+      response:
+          value: 0
+
+    - label: "Write attribute BITMAP16 Max Value"
+      command: "writeAttribute"
+      attribute: "bitmap16"
+      arguments:
+          value: 65535
+
+    - label: "Read attribute BITMAP16 Max Value"
+      command: "readAttribute"
+      attribute: "bitmap16"
+      response:
+          value: 65535
+
+    - label: "Write attribute BITMAP16 Min Value"
+      command: "writeAttribute"
+      attribute: "bitmap16"
+      arguments:
+          value: 0
+
+    - label: "Read attribute BITMAP16 Min Value"
+      command: "readAttribute"
+      attribute: "bitmap16"
+      response:
+          value: 0
+
+    # Tests for Bitmap32 attribute
+
+    - label: "Read attribute BITMAP32 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 0
+
+    - label: "Write attribute BITMAP32 Max Value"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 4294967295
+
+    - label: "Read attribute BITMAP32 Max Value"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 4294967295
+
+    - label: "Write attribute BITMAP32 Min Value"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 0
+
+    - label: "Read attribute BITMAP32 Min Value"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 0
+
+    # Tests for Bitmap64 attribute
+
+    - label: "Read attribute BITMAP64 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap64"
+      response:
+          value: 0
+
+    - label: "Write attribute BITMAP64 Max Value"
+      command: "writeAttribute"
+      attribute: "bitmap64"
+      arguments:
+          value: "18446744073709551615"
+
+    - label: "Read attribute BITMAP64 Max Value"
+      command: "readAttribute"
+      attribute: "bitmap64"
+      response:
+          value: "18446744073709551615"
+
+    - label: "Write attribute BITMAP64 Min Value"
+      command: "writeAttribute"
+      attribute: "bitmap64"
+      arguments:
+          value: 0
+
+    - label: "Read attribute BITMAP64 Min Value"
+      command: "readAttribute"
+      attribute: "bitmap64"
+      response:
+          value: 0
+
+    # Tests for UInt8 attribute
+
+    - label: "Read attribute INT8U Default Value"
+      command: "readAttribute"
+      attribute: "int8u"
+      response:
+          value: 0
+
+    - label: "Write attribute INT8U Max Value"
+      command: "writeAttribute"
+      attribute: "int8u"
+      arguments:
+          value: 255
+
+    - label: "Read attribute INT8U Max Value"
+      command: "readAttribute"
+      attribute: "int8u"
+      response:
+          value: 255
+
+    - label: "Write attribute INT8U Min Value"
+      command: "writeAttribute"
+      attribute: "int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute INT8U Min Value"
+      command: "readAttribute"
+      attribute: "int8u"
+      response:
+          value: 0
+
+    # Tests for UInt16 attribute
+
+    - label: "Read attribute INT16U Default Value"
+      command: "readAttribute"
+      attribute: "int16u"
+      response:
+          value: 0
+
+    - label: "Write attribute INT16U Max Value"
+      command: "writeAttribute"
+      attribute: "int16u"
+      arguments:
+          value: 65535
+
+    - label: "Read attribute INT16U Max Value"
+      command: "readAttribute"
+      attribute: "int16u"
+      response:
+          value: 65535
+
+    - label: "Write attribute INT16U Min Value"
+      command: "writeAttribute"
+      attribute: "int16u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute INT16U Min Value"
+      command: "readAttribute"
+      attribute: "int16u"
+      response:
+          value: 0
+
+    # Tests for UInt32 attribute
+
+    - label: "Read attribute INT32U Default Value"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          value: 0
+
+    - label: "Write attribute INT32U Max Value"
+      command: "writeAttribute"
+      attribute: "int32u"
+      arguments:
+          value: 4294967295
+
+    - label: "Read attribute INT32U Max Value"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          value: 4294967295
+
+    - label: "Write attribute INT32U Min Value"
+      command: "writeAttribute"
+      attribute: "int32u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute INT32U Min Value"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          value: 0
+
+    # Tests for UInt64 attribute
+
+    - label: "Read attribute INT64U Default Value"
+      command: "readAttribute"
+      attribute: "int64u"
+      response:
+          value: 0
+
+    - label: "Write attribute INT64U Max Value"
+      command: "writeAttribute"
+      attribute: "int64u"
+      arguments:
+          value: "18446744073709551615"
+
+    - label: "Read attribute INT64U Max Value"
+      command: "readAttribute"
+      attribute: "int64u"
+      response:
+          value: "18446744073709551615"
+
+    - label: "Write attribute INT64U Min Value"
+      command: "writeAttribute"
+      attribute: "int64u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute INT64U Min Value"
+      command: "readAttribute"
+      attribute: "int64u"
+      response:
+          value: 0
+
+    # Tests for Int8 attribute
+
+    - label: "Read attribute INT8S Default Value"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          value: 0
+
+    - label: "Write attribute INT8S Max Value"
+      command: "writeAttribute"
+      attribute: "int8s"
+      arguments:
+          value: 127
+
+    - label: "Read attribute INT8S Max Value"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          value: 127
+
+    - label: "Write attribute INT8S Min Value"
+      command: "writeAttribute"
+      attribute: "int8s"
+      arguments:
+          value: -128
+
+    - label: "Read attribute INT8S Min Value"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          value: -128
+
+    - label: "Write attribute INT8S Default Value"
+      command: "writeAttribute"
+      attribute: "int8s"
+      arguments:
+          value: 0
+
+    - label: "Read attribute INT8S Default Value"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          value: 0
+
+    # Tests for Int16 attribute
+
+    - label: "Read attribute INT16S Default Value"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          value: 0
+
+    - label: "Write attribute INT16S Max Value"
+      command: "writeAttribute"
+      attribute: "int16s"
+      arguments:
+          value: 32767
+
+    - label: "Read attribute INT16S Max Value"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          value: 32767
+
+    - label: "Write attribute INT16S Min Value"
+      command: "writeAttribute"
+      attribute: "int16s"
+      arguments:
+          value: -32768
+
+    - label: "Read attribute INT16S Min Value"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          value: -32768
+
+    - label: "Write attribute INT16S Default Value"
+      command: "writeAttribute"
+      attribute: "int16s"
+      arguments:
+          value: 0
+
+    - label: "Read attribute INT16S Default Value"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          value: 0
+
+    # Tests for Int32 attribute
+
+    - label: "Read attribute INT32S Default Value"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          value: 0
+
+    - label: "Write attribute INT32S Max Value"
+      command: "writeAttribute"
+      attribute: "int32s"
+      arguments:
+          value: 2147483647
+
+    - label: "Read attribute INT32S Max Value"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          value: 2147483647
+
+    - label: "Write attribute INT32S Min Value"
+      command: "writeAttribute"
+      attribute: "int32s"
+      arguments:
+          value: -2147483648
+
+    - label: "Read attribute INT32S Min Value"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          value: -2147483648
+
+    - label: "Write attribute INT32S Default Value"
+      command: "writeAttribute"
+      attribute: "int32s"
+      arguments:
+          value: 0
+
+    - label: "Read attribute INT32S Default Value"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          value: 0
+
+    # Tests for Int64 attribute
+
+    - label: "Read attribute INT64S Default Value"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          value: 0
+
+    - label: "Write attribute INT64S Max Value"
+      command: "writeAttribute"
+      attribute: "int64s"
+      arguments:
+          value: "9223372036854775807"
+
+    - label: "Read attribute INT64S Max Value"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          value: "9223372036854775807"
+
+    - label: "Write attribute INT64S Min Value"
+      command: "writeAttribute"
+      attribute: "int64s"
+      arguments:
+          value: "-9223372036854775807"
+
+    - label: "Read attribute INT64S Min Value"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          value: "-9223372036854775807"
+
+    - label: "Write attribute INT64S Default Value"
+      command: "writeAttribute"
+      attribute: "int64s"
+      arguments:
+          value: 0
+
+    - label: "Read attribute INT64S Default Value"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          value: 0
+
+    # Tests for Enum8 attribute
+
+    - label: "Read attribute ENUM8 Default Value"
+      command: "readAttribute"
+      attribute: "enum8"
+      response:
+          value: 0
+
+    - label: "Write attribute ENUM8 Max Value"
+      command: "writeAttribute"
+      attribute: "enum8"
+      arguments:
+          value: 255
+
+    - label: "Read attribute ENUM8 Max Value"
+      command: "readAttribute"
+      attribute: "enum8"
+      response:
+          value: 255
+
+    - label: "Write attribute ENUM8 Min Value"
+      command: "writeAttribute"
+      attribute: "enum8"
+      arguments:
+          value: 0
+
+    - label: "Read attribute ENUM8 Min Value"
+      command: "readAttribute"
+      attribute: "enum8"
+      response:
+          value: 0
+
+    # Tests for Enum16 attribute
+
+    - label: "Read attribute ENUM16 Default Value"
+      command: "readAttribute"
+      attribute: "enum16"
+      response:
+          value: 0
+
+    - label: "Write attribute ENUM16 Max Value"
+      command: "writeAttribute"
+      attribute: "enum16"
+      arguments:
+          value: 65535
+
+    - label: "Read attribute ENUM16 Max Value"
+      command: "readAttribute"
+      attribute: "enum16"
+      response:
+          value: 65535
+
+    - label: "Write attribute ENUM16 Min Value"
+      command: "writeAttribute"
+      attribute: "enum16"
+      arguments:
+          value: 0
+
+    - label: "Read attribute ENUM16 Min Value"
+      command: "readAttribute"
+      attribute: "enum16"
+      response:
+          value: 0
+
+    # Tests for Octet String attribute
+
+    - label: "Read attribute OCTET_STRING Default Value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: ""
+
+    - label: "Write attribute OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "TestValue"
+
+    - label: "Read attribute OCTET_STRING"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "TestValue"
+
+    - label: "Write attribute OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "TestValueLongerThan10"
+
+    - label: "Read attribute OCTET_STRING"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "TestValue"
+
+    - label: "Write attribute OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: ""
+
+    # Tests for Long Octet String attribute
+
+    - label: "Read attribute LONG_OCTET_STRING Default Value"
+      command: "readAttribute"
+      attribute: "long_octet_string"
+      response:
+          value: ""
+
+    - label: "Write attribute LONG_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "long_octet_string"
+      arguments:
+          value: "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+
+    - label: "Read attribute LONG_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "long_octet_string"
+      response:
+          value: "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+
+    - label: "Write attribute LONG_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "long_octet_string"
+      arguments:
+          value: ""
+
+    # Tests for List attribute
+
+    - label: "Read attribute LIST"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          value: [1, 2, 3, 4]
+
+    # Tests for List Octet String attribute
+
+    - label: "Read attribute LIST_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "list_octet_string"
+      response:
+          value: ["Test0", "Test1", "Test2", "Test3"]
+
+    # Tests for List Struct Octet String attribute
+
+    - label: "Read attribute LIST_STRUCT_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "list_struct_octet_string"
+      response:
+          value:
+              [
+                  { fabricIndex: 0, operationalCert: "Test0" },
+                  { fabricIndex: 1, operationalCert: "Test1" },
+                  { fabricIndex: 2, operationalCert: "Test2" },
+                  { fabricIndex: 3, operationalCert: "Test3" },
+              ]
+
+    # Tests for Unsupported attribute
+
+    - label: "Read attribute UNSUPPORTED"
+      command: "readAttribute"
+      attribute: "unsupported"
+      response:
+          value: 0
+          error: 1
+
+    - label: "Writeattribute UNSUPPORTED"
+      command: "writeAttribute"
+      attribute: "unsupported"
+      arguments:
+          value: 0
+      response:
+          error: 1

@@ -113,6 +113,12 @@ const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
     }
 }
 
+void ShutdownEndpoint(mdns::Minimal::ServerBase::EndpointInfo & aEndpoint)
+{
+    aEndpoint.udp->Free();
+    aEndpoint.udp = nullptr;
+}
+
 } // namespace
 
 ServerBase::~ServerBase()
@@ -126,8 +132,7 @@ void ServerBase::Shutdown()
     {
         if (mEndpoints[i].udp != nullptr)
         {
-            mEndpoints[i].udp->Free();
-            mEndpoints[i].udp = nullptr;
+            ShutdownEndpoint(mEndpoints[i]);
         }
     }
 }
@@ -177,9 +182,12 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
             // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
             ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,
                          AddressTypeStr(addressType), chip::ErrorStr(err));
+            ShutdownEndpoint(mEndpoints[endpointIndex]);
         }
-
-        endpointIndex++;
+        else
+        {
+            endpointIndex++;
+        }
     }
 
     return autoShutdown.ReturnSuccess();

@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>TV Channel</name>
     <code>0x0504</code>
     <define>TV_CHANNEL_CLUSTER</define>

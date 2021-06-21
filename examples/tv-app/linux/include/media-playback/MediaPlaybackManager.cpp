@@ -49,7 +49,7 @@ static void writePlaybackState(chip::EndpointId endpoint, uint8_t playbackState)
                                     (uint8_t *) &playbackState, ZCL_INT8U_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to store media playback attribute.");
+        ChipLogError(Zcl, "Failed to store media playback attribute.");
     }
 }
 
@@ -61,7 +61,7 @@ static uint8_t readPlaybackStatus(chip::EndpointId endpoint)
                                    (uint8_t *) &playbackState, sizeof(uint8_t));
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to read media playback attribute.");
+        ChipLogError(Zcl, "Failed to read media playback attribute.");
     }
 
     return playbackState;
@@ -92,7 +92,7 @@ static void sendResponse(const char * responseName, chip::CommandId commandId, E
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to send %s: 0x%X", responseName, status);
+        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
     }
 }
 

@@ -7302,7 +7302,7 @@
           ]
         },
         {
-          "name": "Content Launch",
+          "name": "Content Launcher",
           "code": 1290,
           "mfgCode": null,
           "define": "CONTENT_LAUNCH_CLUSTER",
@@ -7345,7 +7345,7 @@
           ]
         },
         {
-          "name": "Content Launch",
+          "name": "Content Launcher",
           "code": 1290,
           "mfgCode": null,
           "define": "CONTENT_LAUNCH_CLUSTER",
@@ -7593,7 +7593,16 @@
           "define": "APPLICATION_BASIC_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "commands": [],
+          "commands": [
+            {
+              "name": "ChangeStatus",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -8171,6 +8180,36 @@
             {
               "name": "list_struct_octet_string",
               "code": 28,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "long_octet_string",
+              "code": 29,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "unsupported",
+              "code": 255,
               "mfgCode": null,
               "side": "server",
               "included": 1,
