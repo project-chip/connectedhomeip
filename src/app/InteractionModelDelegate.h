@@ -65,7 +65,7 @@ public:
 
     /**
      * Notification that the interaction model has received a list of attribute data in response to a Read request. apData might be
-     * nullptr if status is not success.
+     * nullptr if status is not ProtocolCode::Success.
      *
      * @param[in]  apReadClient   The read client object, the application can use GetAppIdentifier() for the read client to
      *                            distinguish different read requests.

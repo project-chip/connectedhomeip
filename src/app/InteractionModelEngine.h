@@ -219,16 +219,16 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
 /**
  *  Fetch attribute value and version info and write to the TLVWriter provided.
  *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
- * error code will be put into the writer, and CHIP_NO_ERROR will returnm and apDataExists will be set to false.
+ * error code will be put into the writer, and CHIP_NO_ERROR will be returned and apDataExists will be set to false.
  *  If the data exists on the server, the data (with tag kCsTag_Data) and the data version (with tag kCsTag_DataVersion) will be put
- * into the TLVWriter and apDataExists will be set to true. TLVWriter error will be returned if any error occurred during
- * encoding these values.
+ * into the TLVWriter and apDataExists will be set to true. TLVWriter error will be returned if any error occurred during encoding
+ * these values.
  *  This function is implemented by CHIP as a part of cluster data storage & management.
- *  The apWriter and apDataExists can be nullptr if the caller does not care the detailed value of if it exists.
+ * The apWriter and apDataExists can be nullptr.
  *
  *  @param[in]    aClusterInfo      The cluster info object, for the path of cluster data.
- *  @param[in]    apWriter          The TLVWriter for holding cluster data.
- *  @param[out]   apDataExists      Tell whether the cluster data exist on server.
+ *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr.
+ *  @param[out]   apDataExists      Tell whether the cluster data exist on server. Can be a nullptr.
  *
  *  @retval  CHIP_NO_ERROR on success
  */

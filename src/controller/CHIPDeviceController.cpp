@@ -1515,14 +1515,14 @@ void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClien
                                                             TLV::TLVReader * apData,
                                                             Protocols::InteractionModel::ProtocolCode status)
 {
-    IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, Protocols::InteractionModel::ToUint16(status));
+    IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
 }
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::ReportError(const app::ReadClient * apReadClient, CHIP_ERROR aError)
 {
     app::ClusterInfo path;
     path.mNodeId = apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId();
-    IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, EMBER_ZCL_STATUS_FAILURE);
+    IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, Protocols::InteractionModel::ProtocolCode::Failure);
     return CHIP_NO_ERROR;
 }
 
