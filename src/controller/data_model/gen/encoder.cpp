@@ -69,6 +69,7 @@ using namespace chip::Encoding::LittleEndian;
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
+| FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -204,6 +205,8 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
 #define FIXED_LABEL_CLUSTER_ID 0x0040
+
+#define FLOW_MEASUREMENT_CLUSTER_ID 0x0404
 
 #define GENERAL_COMMISSIONING_CLUSTER_ID 0x0030
 #define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x00)
@@ -2431,6 +2434,65 @@ PacketBufferHandle encodeFixedLabelClusterReadLabelListAttribute(uint8_t seqNum,
 PacketBufferHandle encodeFixedLabelClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadFixedLabelClusterRevision", FIXED_LABEL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster FlowMeasurement                                             | 0x0404 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeFlowMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverFlowMeasurementAttributes", FLOW_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MeasuredValue
+ */
+PacketBufferHandle encodeFlowMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadFlowMeasurementMeasuredValue", FLOW_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MinMeasuredValue
+ */
+PacketBufferHandle encodeFlowMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadFlowMeasurementMinMeasuredValue", FLOW_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MaxMeasuredValue
+ */
+PacketBufferHandle encodeFlowMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadFlowMeasurementMaxMeasuredValue", FLOW_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeFlowMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadFlowMeasurementClusterRevision", FLOW_MEASUREMENT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

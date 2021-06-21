@@ -42,6 +42,7 @@ constexpr ClusterId kDescriptorClusterId                  = 0x001D;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
 constexpr ClusterId kFixedLabelClusterId                  = 0x0040;
+constexpr ClusterId kFlowMeasurementClusterId             = 0x0404;
 constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
 constexpr ClusterId kGeneralDiagnosticsClusterId          = 0x0033;
 constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
@@ -610,6 +611,20 @@ public:
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeLabelList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
+class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
+{
+public:
+    FlowMeasurementCluster() : ClusterBase(kFlowMeasurementClusterId) {}
+    ~FlowMeasurementCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 

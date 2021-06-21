@@ -520,6 +520,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Flow Measurement
+ *
+ */
+@interface CHIPFlowMeasurement : CHIPCluster
+
+- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster General Commissioning
  *
  */

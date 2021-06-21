@@ -74,6 +74,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_FIXED_LABEL_CLUSTER_ID:
         emberAfFixedLabelClusterInitCallback(endpoint);
         break;
+    case ZCL_FLOW_MEASUREMENT_CLUSTER_ID:
+        emberAfFlowMeasurementClusterInitCallback(endpoint);
+        break;
     case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
         break;
@@ -232,6 +235,11 @@ void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfFixedLabelClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfFlowMeasurementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
