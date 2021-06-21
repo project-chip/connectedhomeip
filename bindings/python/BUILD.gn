@@ -20,6 +20,7 @@ shared_library("chip") {
   output_dir = "${target_out_dir}"
   include_dirs = [
     ".",
+
     # TODO: from `python3-config --includes`
     "/usr/include/python3.9",
   ]
@@ -27,9 +28,7 @@ shared_library("chip") {
     # TODO: from `python3-config --ldflags`
     "-L/usr/lib/python3.9/config-3.9-x86_64-linux-gnu",
   ]
-  libs = [
-    "python3.9",
-  ]
+  libs = [ "python3.9" ]
 
   sources = [
     "CommissionerInitParams.cpp",
@@ -60,6 +59,7 @@ shared_library("chip") {
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
+
     #"${chip_root}/third_party/pybind11",
   ]
 }
