@@ -356,6 +356,11 @@ config("sanitize_default") {
 config("fuzzing_default") {
 }
 
+declare_args() {
+  # Enable Runtime Type Information (RTTI)
+  enable_rtti = false
+}
+
 config("no_rtti") {
   cflags_cc = [ "-fno-rtti" ]
 }
@@ -365,7 +370,11 @@ config("rtti") {
 }
 
 config("rtti_default") {
-  configs = [ ":no_rtti" ]
+  if (enable_rtti) {
+    configs = [ ":rtti" ]
+  } else {
+    configs = [ ":no_rtti" ]
+  }
 }
 
 config("no_exceptions") {
