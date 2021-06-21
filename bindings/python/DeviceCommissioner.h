@@ -21,9 +21,9 @@
 
 #include <controller/CHIPDeviceController.h>
 
-struct PythonDeviceCommissioner {
-    PyObject_HEAD
-    chip::Controller::DeviceCommissioner mCommissioner;
+struct PythonDeviceCommissioner
+{
+    PyObject_HEAD chip::Controller::DeviceCommissioner mCommissioner;
 };
 
 extern PyTypeObject PythonDeviceCommissionerType;

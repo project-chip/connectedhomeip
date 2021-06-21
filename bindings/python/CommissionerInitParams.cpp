@@ -24,42 +24,42 @@
 
 #include <PersistentStorage.h>
 
-static PyObject * PythonCommissionerInitParamsNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
+static PyObject * PythonCommissionerInitParamsNew(PyTypeObject * type, PyObject * args, PyObject * kwds)
 {
-    PythonCommissionerInitParams *pyo = reinterpret_cast<PythonCommissionerInitParams *>(type->tp_alloc(type, 0));
+    PythonCommissionerInitParams * pyo = reinterpret_cast<PythonCommissionerInitParams *>(type->tp_alloc(type, 0));
     new (&pyo->mOpCredsIssuer) chip::Controller::ExampleOperationalCredentialsIssuer();
     new (&pyo->mPrarms) chip::Controller::CommissionerInitParams();
-    return (PyObject *)pyo;
+    return (PyObject *) pyo;
 }
 
-static void PythonCommissionerInitParamsDealloc(PyObject *self)
+static void PythonCommissionerInitParamsDealloc(PyObject * self)
 {
-    PythonCommissionerInitParams *pyo = reinterpret_cast<PythonCommissionerInitParams*>(self);
+    PythonCommissionerInitParams * pyo = reinterpret_cast<PythonCommissionerInitParams *>(self);
     pyo->mPrarms.~CommissionerInitParams();
     pyo->mOpCredsIssuer.~ExampleOperationalCredentialsIssuer();
 
-    PyTypeObject *tp = Py_TYPE(self);
+    PyTypeObject * tp = Py_TYPE(self);
     tp->tp_free(self);
 }
 
-
 PyDoc_STRVAR(SetPersistentStorageDocument, "SetPersistentStorage()");
-static PyObject * PythonCommissionerInitParamsSetPersistentStorage(PyObject *self, PyObject *args)
+static PyObject * PythonCommissionerInitParamsSetPersistentStorage(PyObject * self, PyObject * args)
 {
-    PythonCommissionerInitParams *pyo = reinterpret_cast<PythonCommissionerInitParams*>(self);
+    PythonCommissionerInitParams * pyo = reinterpret_cast<PythonCommissionerInitParams *>(self);
     PyObject * pyStorage;
 
     // 1nd arg (O!: PyObject *): storage
-    if (!PyArg_ParseTuple(args, "O!", &PythonPersistentStorageType, &pyStorage)) {
+    if (!PyArg_ParseTuple(args, "O!", &PythonPersistentStorageType, &pyStorage))
+    {
         return nullptr;
     }
 
-
-    chip::PersistentStorageDelegate * storage = &reinterpret_cast<PythonPersistentStorage*>(pyStorage)->mDelegate;
+    chip::PersistentStorageDelegate * storage = &reinterpret_cast<PythonPersistentStorage *>(pyStorage)->mDelegate;
 
     // TODO: wrap a real OpCredsIssuer in python.
     CHIP_ERROR err = pyo->mOpCredsIssuer.Initialize(*storage);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         PyErr_Format(PyExc_RuntimeError, "OpCredsIssuer.Initialize failed: %s.", chip::ErrorStr(err));
         return nullptr;
     }
@@ -71,47 +71,46 @@ static PyObject * PythonCommissionerInitParamsSetPersistentStorage(PyObject *sel
 }
 
 static PyMethodDef PythonCommissionerInitParamsMethods[] = {
-    {"SetPersistentStorage", PythonCommissionerInitParamsSetPersistentStorage, METH_VARARGS, SetPersistentStorageDocument},
-    {NULL, NULL, 0, NULL}
+    { "SetPersistentStorage", PythonCommissionerInitParamsSetPersistentStorage, METH_VARARGS, SetPersistentStorageDocument },
+    { NULL, NULL, 0, NULL }
 };
 
 PyTypeObject PythonCommissionerInitParamsType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "chip.CommissionerInitParams",        /* tp_name */
-    sizeof(PythonCommissionerInitParams), /* tp_basicsize */
-    0,                                /* tp_itemsize */
-    PythonCommissionerInitParamsDealloc,  /* tp_dealloc */
-    0,                                /* tp_vectorcall_offset */
-    0,                                /* tp_getattr */
-    0,                                /* tp_setattr */
-    0,                                /* tp_as_async */
-    0,                                /* tp_repr */
-    0,                                /* tp_as_number */
-    0,                                /* tp_as_sequence */
-    0,                                /* tp_as_mapping */
-    0,                                /* tp_hash */
-    0,                                /* tp_call */
-    0,                                /* tp_str */
-    0,                                /* tp_getattro */
-    0,                                /* tp_setattro */
-    0,                                /* tp_as_buffer */
-    0,                                /* tp_flags */
-    0,                                /* tp_doc */
-    0,                                /* tp_traverse */
-    0,                                /* tp_clear */
-    0,                                /* tp_richcompare */
-    0,                                /* tp_weaklistoffset */
-    0,                                /* tp_iter */
-    0,                                /* tp_iternext */
-    PythonCommissionerInitParamsMethods,  /* tp_methods */
-    0,                                /* tp_members */
-    0,                                /* tp_getset */
-    0,                                /* tp_base */
-    0,                                /* tp_dict */
-    0,                                /* tp_descr_get */
-    0,                                /* tp_descr_set */
-    0,                                /* tp_dictoffset */
-    0,                                /* tp_init */
-    0,                                /* tp_alloc */
-    PythonCommissionerInitParamsNew,      /* tp_new */
+    PyVarObject_HEAD_INIT(NULL, 0) "chip.CommissionerInitParams", /* tp_name */
+    sizeof(PythonCommissionerInitParams),                         /* tp_basicsize */
+    0,                                                            /* tp_itemsize */
+    PythonCommissionerInitParamsDealloc,                          /* tp_dealloc */
+    0,                                                            /* tp_vectorcall_offset */
+    0,                                                            /* tp_getattr */
+    0,                                                            /* tp_setattr */
+    0,                                                            /* tp_as_async */
+    0,                                                            /* tp_repr */
+    0,                                                            /* tp_as_number */
+    0,                                                            /* tp_as_sequence */
+    0,                                                            /* tp_as_mapping */
+    0,                                                            /* tp_hash */
+    0,                                                            /* tp_call */
+    0,                                                            /* tp_str */
+    0,                                                            /* tp_getattro */
+    0,                                                            /* tp_setattro */
+    0,                                                            /* tp_as_buffer */
+    0,                                                            /* tp_flags */
+    0,                                                            /* tp_doc */
+    0,                                                            /* tp_traverse */
+    0,                                                            /* tp_clear */
+    0,                                                            /* tp_richcompare */
+    0,                                                            /* tp_weaklistoffset */
+    0,                                                            /* tp_iter */
+    0,                                                            /* tp_iternext */
+    PythonCommissionerInitParamsMethods,                          /* tp_methods */
+    0,                                                            /* tp_members */
+    0,                                                            /* tp_getset */
+    0,                                                            /* tp_base */
+    0,                                                            /* tp_dict */
+    0,                                                            /* tp_descr_get */
+    0,                                                            /* tp_descr_set */
+    0,                                                            /* tp_dictoffset */
+    0,                                                            /* tp_init */
+    0,                                                            /* tp_alloc */
+    PythonCommissionerInitParamsNew,                              /* tp_new */
 };

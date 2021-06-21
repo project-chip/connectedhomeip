@@ -24,10 +24,7 @@ class PythonGil
 public:
     PythonGil() : mState(PyGILState_Ensure()) {}
 
-    ~PythonGil()
-    {
-        PyGILState_Release(mState);
-    }
+    ~PythonGil() { PyGILState_Release(mState); }
 
 private:
     PyGILState_STATE mState;

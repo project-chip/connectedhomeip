@@ -22,9 +22,9 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 
-struct PythonCommissionerInitParams {
-    PyObject_HEAD
-    chip::Controller::CommissionerInitParams mPrarms;
+struct PythonCommissionerInitParams
+{
+    PyObject_HEAD chip::Controller::CommissionerInitParams mPrarms;
 
     // TODO: wrap a real OpCredsIssuer in python.
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;

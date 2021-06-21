@@ -21,9 +21,9 @@
 
 #include <transport/raw/PeerAddress.h>
 
-struct PythonTransportType {
-    PyObject_HEAD
-    chip::Transport::Type mType;
+struct PythonTransportType
+{
+    PyObject_HEAD chip::Transport::Type mType;
 };
 
 extern PyTypeObject PythonTransportTypeType;

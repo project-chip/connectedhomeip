@@ -22,9 +22,9 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <support/ErrorStr.h>
 
-struct PythonRendezvousParameters {
-    PyObject_HEAD
-    chip::RendezvousParameters mParameters;
+struct PythonRendezvousParameters
+{
+    PyObject_HEAD chip::RendezvousParameters mParameters;
 };
 
 extern PyTypeObject PythonRendezvousParametersType;

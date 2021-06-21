@@ -28,10 +28,11 @@
 #include <TransportType.h>
 
 PyDoc_STRVAR(ChipInitDocument, "");
-static PyObject * ChipInit(PyObject *self, PyObject *args)
+static PyObject * ChipInit(PyObject * self, PyObject * args)
 {
     CHIP_ERROR err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         PyErr_Format(PyExc_RuntimeError, "Init Memory failure: %s", chip::ErrorStr(err));
         return nullptr;
     }
@@ -39,75 +40,77 @@ static PyObject * ChipInit(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyMethodDef ChipMethods[] = {
-    {"Init", ChipInit, METH_NOARGS, ChipInitDocument},
-    {NULL, NULL, 0, NULL}
-};
+static PyMethodDef ChipMethods[] = { { "Init", ChipInit, METH_NOARGS, ChipInitDocument }, { NULL, NULL, 0, NULL } };
 
 PyDoc_STRVAR(ChipDocument, "");
 static struct PyModuleDef PythonChipModule = {
     PyModuleDef_HEAD_INIT,
-    "ChipBindings",         /* m_name */
-    ChipDocument,           /* m_doc */
-    -1,                     /* m_size */
-    ChipMethods,            /* m_methods */
-    NULL,                   /* m_reload */
-    NULL,                   /* m_traverse */
-    NULL,                   /* m_clear */
-    NULL                    /* m_free */
+    "ChipBindings", /* m_name */
+    ChipDocument,   /* m_doc */
+    -1,             /* m_size */
+    ChipMethods,    /* m_methods */
+    NULL,           /* m_reload */
+    NULL,           /* m_traverse */
+    NULL,           /* m_clear */
+    NULL            /* m_free */
 };
 
-PyMODINIT_FUNC
-PyInit_chip(void)
+PyMODINIT_FUNC PyInit_chip(void)
 {
-    PyObject *module = PyModule_Create(&PythonChipModule);
-    if (!module) {
+    PyObject * module = PyModule_Create(&PythonChipModule);
+    if (!module)
+    {
         return NULL;
     }
 
     // CommissionerInitParams
-    if (PyType_Ready(&PythonCommissionerInitParamsType) < 0) {
+    if (PyType_Ready(&PythonCommissionerInitParamsType) < 0)
+    {
         return NULL;
     }
     Py_INCREF(&PythonCommissionerInitParamsType);
-    PyModule_AddObject(module, "CommissionerInitParams", (PyObject *)&PythonCommissionerInitParamsType);
+    PyModule_AddObject(module, "CommissionerInitParams", (PyObject *) &PythonCommissionerInitParamsType);
 
     // DeviceCommissioner
-    if (PyType_Ready(&PythonDeviceCommissionerType) < 0) {
+    if (PyType_Ready(&PythonDeviceCommissionerType) < 0)
+    {
         return NULL;
     }
     Py_INCREF(&PythonDeviceCommissionerType);
-    PyModule_AddObject(module, "DeviceCommissioner", (PyObject *)&PythonDeviceCommissionerType);
+    PyModule_AddObject(module, "DeviceCommissioner", (PyObject *) &PythonDeviceCommissionerType);
 
     // PersistentStorage
-    if (PyType_Ready(&PythonPersistentStorageType) < 0) {
+    if (PyType_Ready(&PythonPersistentStorageType) < 0)
+    {
         return NULL;
     }
     Py_INCREF(&PythonPersistentStorageType);
-    PyModule_AddObject(module, "PersistentStorageInterface", (PyObject *)&PythonPersistentStorageType);
+    PyModule_AddObject(module, "PersistentStorageInterface", (PyObject *) &PythonPersistentStorageType);
 
     // TransportType
-    if (PyType_Ready(&PythonTransportTypeType) < 0) {
+    if (PyType_Ready(&PythonTransportTypeType) < 0)
+    {
         return NULL;
     }
     Py_INCREF(&PythonTransportTypeType);
-    PyObject * pyPythonTransportTypeType = reinterpret_cast<PyObject*>(&PythonTransportTypeType);
+    PyObject * pyPythonTransportTypeType = reinterpret_cast<PyObject *>(&PythonTransportTypeType);
     PyModule_AddObject(module, "TransportType", pyPythonTransportTypeType);
 
     // TransportType enums
     PythonTransportType * udp = PyObject_New(PythonTransportType, &PythonTransportTypeType);
-    udp->mType = chip::Transport::Type::kUdp;
+    udp->mType                = chip::Transport::Type::kUdp;
     PythonTransportType * tcp = PyObject_New(PythonTransportType, &PythonTransportTypeType);
-    tcp->mType = chip::Transport::Type::kTcp;
-    PyObject * transport = Py_BuildValue("{s:N,s:N}", "UDP", udp, "TCP", tcp);
+    tcp->mType                = chip::Transport::Type::kTcp;
+    PyObject * transport      = Py_BuildValue("{s:N,s:N}", "UDP", udp, "TCP", tcp);
     PyModule_AddObject(module, "Transport", transport);
 
     // RendezvousParameters
-    if (PyType_Ready(&PythonRendezvousParametersType) < 0) {
+    if (PyType_Ready(&PythonRendezvousParametersType) < 0)
+    {
         return NULL;
     }
     Py_INCREF(&PythonRendezvousParametersType);
-    PyModule_AddObject(module, "RendezvousParameters", (PyObject *)&PythonRendezvousParametersType);
+    PyModule_AddObject(module, "RendezvousParameters", (PyObject *) &PythonRendezvousParametersType);
 
     return module;
 }

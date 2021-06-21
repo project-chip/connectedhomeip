@@ -24,31 +24,32 @@
 #include <Converter.h>
 #include <TransportType.h>
 
-static PyObject * PythonRendezvousParametersNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
+static PyObject * PythonRendezvousParametersNew(PyTypeObject * type, PyObject * args, PyObject * kwds)
 {
-    PythonRendezvousParameters *pyo = reinterpret_cast<PythonRendezvousParameters*>(type->tp_alloc(type, 0));
+    PythonRendezvousParameters * pyo = reinterpret_cast<PythonRendezvousParameters *>(type->tp_alloc(type, 0));
     new (&pyo->mParameters) chip::RendezvousParameters();
-    return (PyObject *)pyo;
+    return (PyObject *) pyo;
 }
 
-static void PythonRendezvousParametersDealloc(PyObject *self)
+static void PythonRendezvousParametersDealloc(PyObject * self)
 {
-    PythonRendezvousParameters *pyo = reinterpret_cast<PythonRendezvousParameters*>(self);
+    PythonRendezvousParameters * pyo = reinterpret_cast<PythonRendezvousParameters *>(self);
     pyo->mParameters.~RendezvousParameters();
 
-    PyTypeObject *tp = Py_TYPE(self);
+    PyTypeObject * tp = Py_TYPE(self);
     tp->tp_free(self);
 }
 
 PyDoc_STRVAR(SetSetupPINCodeDocument, "SetSetupPINCode(pin: unsigned long long)");
-static PyObject * PythonRendezvousParametersSetSetupPINCode(PyObject *self, PyObject *args)
+static PyObject * PythonRendezvousParametersSetSetupPINCode(PyObject * self, PyObject * args)
 {
-    PythonRendezvousParameters *pyo = reinterpret_cast<PythonRendezvousParameters*>(self);
+    PythonRendezvousParameters * pyo = reinterpret_cast<PythonRendezvousParameters *>(self);
 
     unsigned long long pin;
 
     // 1nd arg (I: (int) [unsigned int])
-    if (!PyArg_ParseTuple(args, "K", &pin)) {
+    if (!PyArg_ParseTuple(args, "K", &pin))
+    {
         return nullptr;
     }
 
@@ -58,9 +59,9 @@ static PyObject * PythonRendezvousParametersSetSetupPINCode(PyObject *self, PyOb
 }
 
 PyDoc_STRVAR(SetPeerAddressDocument, "SetPeerAddress(type: int, address: IPv4Address or IPv6Address, port: unsigned short)");
-static PyObject * PythonRendezvousParametersSetPeerAddress(PyObject *self, PyObject *args)
+static PyObject * PythonRendezvousParametersSetPeerAddress(PyObject * self, PyObject * args)
 {
-    PythonRendezvousParameters *pyo = reinterpret_cast<PythonRendezvousParameters*>(self);
+    PythonRendezvousParameters * pyo = reinterpret_cast<PythonRendezvousParameters *>(self);
 
     chip::Transport::Type type;
     chip::Inet::IPAddress address;
@@ -68,7 +69,8 @@ static PyObject * PythonRendezvousParametersSetPeerAddress(PyObject *self, PyObj
 
     // O& (object) [converter, anything]
     // H (int) [unsigned short int]
-    if (!PyArg_ParseTuple(args, "O&O&H", &PyObjectToTransportType, &type, &PyObjectToAddress, &address, &port)) {
+    if (!PyArg_ParseTuple(args, "O&O&H", &PyObjectToTransportType, &type, &PyObjectToAddress, &address, &port))
+    {
         return nullptr;
     }
 
@@ -82,48 +84,47 @@ static PyObject * PythonRendezvousParametersSetPeerAddress(PyObject *self, PyObj
 }
 
 static PyMethodDef PythonRendezvousParametersMethods[] = {
-    {"SetSetupPINCode", PythonRendezvousParametersSetSetupPINCode, METH_VARARGS, SetSetupPINCodeDocument},
-    {"SetPeerAddress", PythonRendezvousParametersSetPeerAddress, METH_VARARGS, SetPeerAddressDocument},
-    {NULL, NULL, 0, NULL}
+    { "SetSetupPINCode", PythonRendezvousParametersSetSetupPINCode, METH_VARARGS, SetSetupPINCodeDocument },
+    { "SetPeerAddress", PythonRendezvousParametersSetPeerAddress, METH_VARARGS, SetPeerAddressDocument },
+    { NULL, NULL, 0, NULL }
 };
 
 PyTypeObject PythonRendezvousParametersType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "chip.RendezvousParameters",        /* tp_name */
-    sizeof(PythonRendezvousParameters), /* tp_basicsize */
-    0,                                /* tp_itemsize */
-    PythonRendezvousParametersDealloc,  /* tp_dealloc */
-    0,                                /* tp_vectorcall_offset */
-    0,                                /* tp_getattr */
-    0,                                /* tp_setattr */
-    0,                                /* tp_as_async */
-    0,                                /* tp_repr */
-    0,                                /* tp_as_number */
-    0,                                /* tp_as_sequence */
-    0,                                /* tp_as_mapping */
-    0,                                /* tp_hash */
-    0,                                /* tp_call */
-    0,                                /* tp_str */
-    0,                                /* tp_getattro */
-    0,                                /* tp_setattro */
-    0,                                /* tp_as_buffer */
-    0,                                /* tp_flags */
-    0,                                /* tp_doc */
-    0,                                /* tp_traverse */
-    0,                                /* tp_clear */
-    0,                                /* tp_richcompare */
-    0,                                /* tp_weaklistoffset */
-    0,                                /* tp_iter */
-    0,                                /* tp_iternext */
-    PythonRendezvousParametersMethods,  /* tp_methods */
-    0,                                /* tp_members */
-    0,                                /* tp_getset */
-    0,                                /* tp_base */
-    0,                                /* tp_dict */
-    0,                                /* tp_descr_get */
-    0,                                /* tp_descr_set */
-    0,                                /* tp_dictoffset */
-    0,                                /* tp_init */
-    0,                                /* tp_alloc */
-    PythonRendezvousParametersNew,      /* tp_new */
+    PyVarObject_HEAD_INIT(NULL, 0) "chip.RendezvousParameters", /* tp_name */
+    sizeof(PythonRendezvousParameters),                         /* tp_basicsize */
+    0,                                                          /* tp_itemsize */
+    PythonRendezvousParametersDealloc,                          /* tp_dealloc */
+    0,                                                          /* tp_vectorcall_offset */
+    0,                                                          /* tp_getattr */
+    0,                                                          /* tp_setattr */
+    0,                                                          /* tp_as_async */
+    0,                                                          /* tp_repr */
+    0,                                                          /* tp_as_number */
+    0,                                                          /* tp_as_sequence */
+    0,                                                          /* tp_as_mapping */
+    0,                                                          /* tp_hash */
+    0,                                                          /* tp_call */
+    0,                                                          /* tp_str */
+    0,                                                          /* tp_getattro */
+    0,                                                          /* tp_setattro */
+    0,                                                          /* tp_as_buffer */
+    0,                                                          /* tp_flags */
+    0,                                                          /* tp_doc */
+    0,                                                          /* tp_traverse */
+    0,                                                          /* tp_clear */
+    0,                                                          /* tp_richcompare */
+    0,                                                          /* tp_weaklistoffset */
+    0,                                                          /* tp_iter */
+    0,                                                          /* tp_iternext */
+    PythonRendezvousParametersMethods,                          /* tp_methods */
+    0,                                                          /* tp_members */
+    0,                                                          /* tp_getset */
+    0,                                                          /* tp_base */
+    0,                                                          /* tp_dict */
+    0,                                                          /* tp_descr_get */
+    0,                                                          /* tp_descr_set */
+    0,                                                          /* tp_dictoffset */
+    0,                                                          /* tp_init */
+    0,                                                          /* tp_alloc */
+    PythonRendezvousParametersNew,                              /* tp_new */
 };
