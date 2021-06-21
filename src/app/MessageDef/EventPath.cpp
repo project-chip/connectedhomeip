@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -200,48 +202,44 @@ CHIP_ERROR EventPath::Builder::Init(chip::TLV::TLVWriter * const apWriter, const
 EventPath::Builder & EventPath::Builder::NodeId(const uint64_t aNodeId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_NodeId), aNodeId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_NodeId), aNodeId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 EventPath::Builder & EventPath::Builder::EndpointId(const chip::EndpointId aEndpointId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 EventPath::Builder & EventPath::Builder::ClusterId(const chip::ClusterId aClusterId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 EventPath::Builder & EventPath::Builder::EventId(const chip::EventId aEventId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventId), aEventId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventId), aEventId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 

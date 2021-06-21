@@ -361,12 +361,12 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPContentLaunchClusterLaunchContentResponseCallback
-    : public Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>
+class CHIPContentLauncherClusterLaunchContentResponseCallback
+    : public Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback>
 {
 public:
-    CHIPContentLaunchClusterLaunchContentResponseCallback(jobject javaCallback) :
-        Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>(CallbackFn, this)
+    CHIPContentLauncherClusterLaunchContentResponseCallback(jobject javaCallback) :
+        Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback>(CallbackFn, this)
     {
         JNIEnv * env = JniReferences::GetEnvForCurrentThread();
         if (env == nullptr)
@@ -381,7 +381,7 @@ public:
             ChipLogError(Zcl, "Could not create global reference for Java callback");
         }
     }
-    ~CHIPContentLaunchClusterLaunchContentResponseCallback()
+    ~CHIPContentLauncherClusterLaunchContentResponseCallback()
     {
         JNIEnv * env = JniReferences::GetEnvForCurrentThread();
         if (env == nullptr)
@@ -399,13 +399,13 @@ public:
         JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
-        CHIPContentLaunchClusterLaunchContentResponseCallback * cppCallback = nullptr;
+        CHIPContentLauncherClusterLaunchContentResponseCallback * cppCallback = nullptr;
         // ByteSpan is not properly returned yet, temporarily use empty string
         UtfString dataStr(env, "");
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
-        cppCallback = reinterpret_cast<CHIPContentLaunchClusterLaunchContentResponseCallback *>(context);
+        cppCallback = reinterpret_cast<CHIPContentLauncherClusterLaunchContentResponseCallback *>(context);
         VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
         javaCallbackRef = cppCallback->javaCallbackRef;
@@ -432,11 +432,12 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPContentLaunchClusterLaunchURLResponseCallback : public Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>
+class CHIPContentLauncherClusterLaunchURLResponseCallback
+    : public Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback>
 {
 public:
-    CHIPContentLaunchClusterLaunchURLResponseCallback(jobject javaCallback) :
-        Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>(CallbackFn, this)
+    CHIPContentLauncherClusterLaunchURLResponseCallback(jobject javaCallback) :
+        Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback>(CallbackFn, this)
     {
         JNIEnv * env = JniReferences::GetEnvForCurrentThread();
         if (env == nullptr)
@@ -451,7 +452,7 @@ public:
             ChipLogError(Zcl, "Could not create global reference for Java callback");
         }
     }
-    ~CHIPContentLaunchClusterLaunchURLResponseCallback()
+    ~CHIPContentLauncherClusterLaunchURLResponseCallback()
     {
         JNIEnv * env = JniReferences::GetEnvForCurrentThread();
         if (env == nullptr)
@@ -469,13 +470,13 @@ public:
         JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
-        CHIPContentLaunchClusterLaunchURLResponseCallback * cppCallback = nullptr;
+        CHIPContentLauncherClusterLaunchURLResponseCallback * cppCallback = nullptr;
         // ByteSpan is not properly returned yet, temporarily use empty string
         UtfString dataStr(env, "");
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
-        cppCallback = reinterpret_cast<CHIPContentLaunchClusterLaunchURLResponseCallback *>(context);
+        cppCallback = reinterpret_cast<CHIPContentLauncherClusterLaunchURLResponseCallback *>(context);
         VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
         javaCallbackRef = cppCallback->javaCallbackRef;
@@ -5230,6 +5231,51 @@ JNI_METHOD(jlong, ApplicationBasicCluster, initWithDevice)(JNIEnv * env, jobject
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, ApplicationBasicCluster, changeStatus)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint status)
+{
+    StackLockGuard lock(JniReferences::GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ApplicationBasicCluster * cppCluster;
+
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<ApplicationBasicCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->ChangeStatus(onSuccess->Cancel(), onFailure->Cancel(), status);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
 JNI_METHOD(jlong, ApplicationLauncherCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     StackLockGuard lock(JniReferences::GetStackLock());
@@ -6337,30 +6383,30 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(jlong, ContentLaunchCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     StackLockGuard lock(JniReferences::GetStackLock());
-    ContentLaunchCluster * cppCluster = new ContentLaunchCluster();
+    ContentLauncherCluster * cppCluster = new ContentLauncherCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, ContentLaunchCluster, launchContent)
+JNI_METHOD(void, ContentLauncherCluster, launchContent)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint autoPlay, jstring data)
 {
     StackLockGuard lock(JniReferences::GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ContentLaunchCluster * cppCluster;
+    ContentLauncherCluster * cppCluster;
 
     JniUtfString dataStr(env, data);
-    CHIPContentLaunchClusterLaunchContentResponseCallback * onSuccess;
+    CHIPContentLauncherClusterLaunchContentResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
-    cppCluster = reinterpret_cast<ContentLaunchCluster *>(clusterPtr);
+    cppCluster = reinterpret_cast<ContentLauncherCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    onSuccess = new CHIPContentLaunchClusterLaunchContentResponseCallback(callback);
+    onSuccess = new CHIPContentLauncherClusterLaunchContentResponseCallback(callback);
     VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -6394,22 +6440,22 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, ContentLaunchCluster, launchURL)
+JNI_METHOD(void, ContentLauncherCluster, launchURL)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring contentURL, jstring displayString)
 {
     StackLockGuard lock(JniReferences::GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ContentLaunchCluster * cppCluster;
+    ContentLauncherCluster * cppCluster;
 
     JniUtfString contentURLStr(env, contentURL);
     JniUtfString displayStringStr(env, displayString);
-    CHIPContentLaunchClusterLaunchURLResponseCallback * onSuccess;
+    CHIPContentLauncherClusterLaunchURLResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
-    cppCluster = reinterpret_cast<ContentLaunchCluster *>(clusterPtr);
+    cppCluster = reinterpret_cast<ContentLauncherCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    onSuccess = new CHIPContentLaunchClusterLaunchURLResponseCallback(callback);
+    onSuccess = new CHIPContentLauncherClusterLaunchURLResponseCallback(callback);
     VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

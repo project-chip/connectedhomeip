@@ -134,11 +134,8 @@ CHIP_ERROR pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
                                                        chip::NodeId localDeviceId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    CommissionerInitParams initParams;
-
     *outDevCtrl = new chip::Controller::DeviceCommissioner();
-    VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(*outDevCtrl != NULL, CHIP_ERROR_NO_MEMORY);
 
     if (localDeviceId == chip::kUndefinedNodeId)
     {
@@ -147,17 +144,17 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
 
     ReturnErrorOnFailure(sOperationalCredentialsIssuer.Initialize(sStorageDelegate));
 
+    CommissionerInitParams initParams;
     initParams.storageDelegate                = &sStorageDelegate;
     initParams.mDeviceAddressUpdateDelegate   = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;
     initParams.imDelegate                     = &PythonInteractionModelDelegate::Instance();
 
-    SuccessOrExit(err = (*outDevCtrl)->Init(localDeviceId, initParams));
-    SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
+    ReturnErrorOnFailure((*outDevCtrl)->Init(localDeviceId, initParams));
+    ReturnErrorOnFailure((*outDevCtrl)->ServiceEvents());
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl)

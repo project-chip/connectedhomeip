@@ -35,8 +35,7 @@ using HKDF_sha_crypto = HKDF_sha;
 
 CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    uint64_t u64_len = in_len;
+    const uint64_t u64_len = in_len;
 
     uint8_t lb[8];
     lb[0] = static_cast<uint8_t>((u64_len >> 0) & 0xff);
@@ -48,17 +47,15 @@ CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
     lb[6] = static_cast<uint8_t>((u64_len >> 48) & 0xff);
     lb[7] = static_cast<uint8_t>((u64_len >> 56) & 0xff);
 
-    error = Hash(lb, sizeof(lb));
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    CHIP_ERROR error = Hash(lb, sizeof(lb));
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     if (in != nullptr)
     {
         error = Hash(in, in_len);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     }
 
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 Spake2p::Spake2p(size_t _fe_size, size_t _point_size, size_t _hash_size)
@@ -90,39 +87,32 @@ Spake2p::Spake2p(size_t _fe_size, size_t _point_size, size_t _hash_size)
 
 CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    state            = CHIP_SPAKE2P_STATE::PREINIT;
+    state = CHIP_SPAKE2P_STATE::PREINIT;
 
-    error = InitImpl();
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    CHIP_ERROR error = InitImpl();
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = PointLoad(spake2p_M_p256, sizeof(spake2p_M_p256), M);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = PointLoad(spake2p_N_p256, sizeof(spake2p_N_p256), N);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = InternalHash(context, context_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     state = CHIP_SPAKE2P_STATE::INIT;
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p::WriteMN()
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-
-    error = InternalHash(spake2p_M_p256, sizeof(spake2p_M_p256));
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    CHIP_ERROR error = InternalHash(spake2p_M_p256, sizeof(spake2p_M_p256));
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     error = InternalHash(spake2p_N_p256, sizeof(spake2p_N_p256));
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
@@ -130,27 +120,25 @@ CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identit
                                   size_t Lin_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::INIT, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::INIT, CHIP_ERROR_INTERNAL);
 
     error = InternalHash(peer_identity, peer_identity_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = InternalHash(my_identity, my_identity_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = WriteMN();
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = FELoad(w0in, w0in_len, w0);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = PointLoad(Lin, Lin_len, L);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     state = CHIP_SPAKE2P_STATE::STARTED;
     role  = CHIP_SPAKE2P_ROLE::VERIFIER;
-    error = CHIP_NO_ERROR;
-exit:
     return error;
 }
 
@@ -158,31 +146,26 @@ CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_
                                 size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
                                 size_t w1in_len)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::INIT, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::INIT, CHIP_ERROR_INTERNAL);
 
-    error = InternalHash(my_identity, my_identity_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    CHIP_ERROR error = InternalHash(my_identity, my_identity_len);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = InternalHash(peer_identity, peer_identity_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = WriteMN();
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = FELoad(w0in, w0in_len, w0);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = FELoad(w1in, w1in_len, w1);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     state = CHIP_SPAKE2P_STATE::STARTED;
     role  = CHIP_SPAKE2P_ROLE::PROVER;
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p::ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len)
@@ -331,28 +314,24 @@ exit:
 
 CHIP_ERROR Spake2p::GenerateKeys()
 {
-    CHIP_ERROR error                         = CHIP_ERROR_INTERNAL;
     static const uint8_t info_keyconfirm[16] = { 'C', 'o', 'n', 'f', 'i', 'r', 'm', 'a', 't', 'i', 'o', 'n', 'K', 'e', 'y', 's' };
 
-    error = HashFinalize(Kae);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    CHIP_ERROR error = HashFinalize(Kae);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = KDF(Ka, hash_size / 2, nullptr, 0, info_keyconfirm, sizeof(info_keyconfirm), Kcab, hash_size);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     uint8_t point_buffer[kP256_Point_Length];
     void * XY        = nullptr; // Choose X if a prover, Y if a verifier
     uint8_t * Kcaorb = nullptr; // Choose Kcb if a prover, Kca if a verifier
 
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::R2, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::R2, CHIP_ERROR_INTERNAL);
 
     if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
@@ -364,19 +343,17 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
         XY     = Y;
         Kcaorb = Kca;
     }
-    VerifyOrExit(XY != nullptr, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(Kcaorb != nullptr, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(XY != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(Kcaorb != nullptr, CHIP_ERROR_INTERNAL);
 
-    error = PointWrite(XY, point_buffer, point_size);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    CHIP_ERROR error = PointWrite(XY, point_buffer, point_size);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = MacVerify(Kcaorb, hash_size / 2, in, in_len, point_buffer, point_size);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     state = CHIP_SPAKE2P_STATE::KC;
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p::GetKeys(uint8_t * out, size_t * out_len)
@@ -395,56 +372,41 @@ exit:
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl()
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-
-    error = sha256_hash_ctx.Begin();
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    CHIP_ERROR error = sha256_hash_ctx.Begin();
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     error = InitInternal();
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Hash(const uint8_t * in, size_t in_len)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR error = sha256_hash_ctx.AddData(in, in_len);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-    error = sha256_hash_ctx.AddData(in, in_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::HashFinalize(uint8_t * out)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR error = sha256_hash_ctx.Finish(out);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-    error = sha256_hash_ctx.Finish(out);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t ikm_len, const uint8_t * salt,
                                               const size_t salt_len, const uint8_t * info, const size_t info_len, uint8_t * out,
                                               size_t out_len)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     HKDF_sha_crypto mHKDF;
 
-    error = mHKDF.HKDF_SHA256(ikm, ikm_len, salt, salt_len, info, info_len, out, out_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    CHIP_ERROR error = mHKDF.HKDF_SHA256(ikm, ikm_len, salt, salt_len, info, info_len, out, out_len);
+    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Crypto

@@ -14,6 +14,8 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("common_flags.gni")
 
 declare_args() {
@@ -22,12 +24,11 @@ declare_args() {
       is_debug && (current_os == "linux" || current_os == "mac")
 }
 
-config("app_config") {
-  if (chip_enable_schema_check) {
-    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=1" ]
-  } else {
-    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=0" ]
-  }
+buildconfig_header("app_buildconfig") {
+  header = "AppBuildConfig.h"
+  header_dir = "app"
+
+  defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}" ]
 }
 
 static_library("app") {
@@ -108,6 +109,7 @@ static_library("app") {
   }
 
   public_deps = [
+    ":app_buildconfig",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/system",
@@ -116,8 +118,5 @@ static_library("app") {
 
   cflags = [ "-Wconversion" ]
 
-  public_configs = [
-    ":app_config",
-    "${chip_root}/src:includes",
-  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }

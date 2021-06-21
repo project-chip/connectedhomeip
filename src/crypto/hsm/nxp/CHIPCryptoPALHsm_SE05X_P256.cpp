@@ -51,37 +51,35 @@ P256KeypairHSM::~P256KeypairHSM()
 
 CHIP_ERROR P256KeypairHSM::Initialize()
 {
-    CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
-    sss_status_t status    = kStatus_SSS_Success;
     sss_object_t keyObject = { 0 };
     uint8_t pubkey[128]    = {
         0,
     };
-    size_t pubKeyLen   = sizeof(pubkey);
-    size_t pbKeyBitLen = sizeof(pubkey) * 8;
+    constexpr size_t pubKeyLen   = sizeof(pubkey);
+    constexpr size_t pbKeyBitLen = sizeof(pubkey) * 8;
 
     if (keyid == 0)
     {
         ChipLogDetail(Crypto, "Keyid not set !. Set key id using 'SetKeyId' member class !");
-        ExitNow();
+        return CHIP_ERROR_INTERNAL;
     }
 
     se05x_sessionOpen();
 
-    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    sss_status_t status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     if (provisioned_key == false)
     {
 
         status = sss_key_object_allocate_handle(&keyObject, keyid, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P, 256,
                                                 kKeyObject_Mode_Transient);
-        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
         ChipLogDetail(Crypto, "Creating Nist256 key on SE05X !");
 
         status = sss_key_store_generate_key(&gex_sss_chip_ctx.ks, &keyObject, 256, 0);
-        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
     }
     else
     {
@@ -91,24 +89,22 @@ CHIP_ERROR P256KeypairHSM::Initialize()
         ChipLogDetail(Crypto, "Provisioned key ! Not creating key in HSM");
 
         status = sss_key_object_get_handle(&keyObject, keyid);
-        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
     }
 
     status = sss_key_store_get_key(&gex_sss_chip_ctx.ks, &keyObject, pubkey, &pubKeyLen, &pbKeyBitLen);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     {
         /* Set the public key */
         P256PublicKeyHSM & public_key = const_cast<P256PublicKeyHSM &>(Pubkey());
-        VerifyOrExit(pubKeyLen > NIST256_HEADER_OFFSET, error = CHIP_ERROR_INTERNAL);
-        VerifyOrExit((pubKeyLen - NIST256_HEADER_OFFSET) <= kP256_PublicKey_Length, error = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(pubKeyLen > NIST256_HEADER_OFFSET, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError((pubKeyLen - NIST256_HEADER_OFFSET) <= kP256_PublicKey_Length, CHIP_ERROR_INTERNAL);
         memcpy((void *) Uint8::to_const_uchar(public_key), pubkey + NIST256_HEADER_OFFSET, pubKeyLen - NIST256_HEADER_OFFSET);
         public_key.SetPublicKeyId(keyid);
     }
 
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature)
@@ -233,8 +229,7 @@ exit:
 
 CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    size_t len       = output.Length() == 0 ? output.Capacity() : output.Length();
+    const size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output, len);
     uint8_t privkey[kP256_PrivateKey_Length] = {
         0,
@@ -246,8 +241,8 @@ CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output)
         bbuf.Put(Uint8::to_uchar(public_key), public_key.Length());
     }
 
-    VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(sizeof(privkey) >= 4, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(bbuf.Available() == sizeof(privkey), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(sizeof(privkey) >= 4, CHIP_ERROR_INTERNAL);
 
     {
         /* When HSM is used for ECC key generation, store key info in private key buffer */
@@ -256,28 +251,24 @@ CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output)
     }
 
     bbuf.Put(privkey, sizeof(privkey));
-    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     output.SetLength(bbuf.Needed());
 
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR P256KeypairHSM::Deserialize(P256SerializedKeypair & input)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-
     /* Set the public key */
     P256PublicKeyHSM & public_key = const_cast<P256PublicKeyHSM &>(Pubkey());
     Encoding::BufferWriter bbuf((uint8_t *) Uint8::to_const_uchar(public_key), public_key.Length());
 
-    VerifyOrExit(input.Length() == public_key.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input.Length() == public_key.Length() + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
     bbuf.Put(static_cast<uint8_t *>(input), public_key.Length());
 
     /* Set private key info */
-    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
     {
         /* When HSM is used for ECC key generation, key info in stored in private key buffer */
         const uint8_t * privkey = Uint8::to_const_uchar(input) + public_key.Length();
@@ -285,77 +276,62 @@ CHIP_ERROR P256KeypairHSM::Deserialize(P256SerializedKeypair & input)
         public_key.SetPublicKeyId(keyid);
     }
 
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR P256KeypairHSM::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
-    const uint8_t * rem_pubKey = nullptr;
-    size_t rem_pubKeyLen       = 0;
-    size_t secret_length       = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
-    smStatus_t smstatus        = SM_NOT_OK;
+    size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
 
-    VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
+    VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
 
     ChipLogDetail(Crypto, "ECDH_derive_secret: Using SE05X for ECDH !");
 
     se05x_sessionOpen();
 
-    rem_pubKey    = Uint8::to_const_uchar(remote_public_key);
-    rem_pubKeyLen = remote_public_key.Length();
+    const uint8_t * const rem_pubKey = Uint8::to_const_uchar(remote_public_key);
+    const size_t rem_pubKeyLen       = remote_public_key.Length();
 
-    VerifyOrExit(gex_sss_chip_ctx.ks.session != nullptr, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != nullptr, CHIP_ERROR_INTERNAL);
 
-    smstatus = Se05x_API_ECGenSharedSecret(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, rem_pubKey,
-                                           rem_pubKeyLen, Uint8::to_uchar(out_secret), &secret_length);
-    VerifyOrExit(smstatus == SM_OK, error = CHIP_ERROR_INTERNAL);
+    const smStatus_t smstatus = Se05x_API_ECGenSharedSecret(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid,
+                                                            rem_pubKey, rem_pubKeyLen, Uint8::to_uchar(out_secret), &secret_length);
+    VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR_INTERNAL);
 
-    SuccessOrExit(out_secret.SetLength(secret_length));
-
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return out_secret.SetLength(secret_length);
 }
 
 /* EC Public key HSM implementation */
 
 CHIP_ERROR SE05X_Set_ECDSA_Public_Key(sss_object_t * keyObject, const uint8_t * key, size_t keylen)
 {
-    sss_status_t status     = kStatus_SSS_Fail;
     uint8_t public_key[128] = {
         0,
     };
-    size_t public_key_len = 0;
-    CHIP_ERROR error      = CHIP_ERROR_INTERNAL;
 
     /* ECC NIST-256 Public Key header */
     const uint8_t nist256_header[] = { 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,
                                        0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00 };
 
     /* Set public key */
-    status = sss_key_object_init(keyObject, &gex_sss_chip_ctx.ks);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    sss_status_t status = sss_key_object_init(keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_allocate_handle(keyObject, kKeyId_sha256_ecc_pub_keyid, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P,
                                             256, kKeyObject_Mode_Transient);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit((sizeof(nist256_header) + keylen) <= sizeof(public_key), error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError((sizeof(nist256_header) + keylen) <= sizeof(public_key), CHIP_ERROR_INTERNAL);
 
     memcpy(public_key, nist256_header, sizeof(nist256_header));
-    public_key_len = public_key_len + sizeof(nist256_header);
+    size_t public_key_len = public_key_len + sizeof(nist256_header);
     memcpy(public_key + public_key_len, key, keylen);
     public_key_len = public_key_len + keylen;
 
     status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, keyObject, public_key, public_key_len, 256, NULL, 0);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    error = CHIP_NO_ERROR;
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR P256PublicKeyHSM::ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
