@@ -26,6 +26,8 @@
 #include "CommandHandler.h"
 #include "CommandSender.h"
 #include "InteractionModelEngine.h"
+
+#include <app/AppBuildConfig.h>
 #include <core/CHIPTLVDebug.hpp>
 
 namespace chip {
