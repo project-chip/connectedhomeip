@@ -1217,6 +1217,8 @@ public:
     CHIP_ERROR ReadAttributeListOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeListStructOctetString(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLongOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                      uint8_t value);
@@ -1250,6 +1252,10 @@ public:
                                     uint16_t value);
     CHIP_ERROR WriteAttributeOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan value);
+    CHIP_ERROR WriteAttributeLongOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             chip::ByteSpan value);
+    CHIP_ERROR WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         uint8_t value);
 
 private:
     static constexpr CommandId kTestCommandId               = 0x00;

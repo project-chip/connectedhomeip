@@ -22,15 +22,21 @@
     NSString * {{asCamelCased name true}}Argument= @"{{definedValue}}";
     {{/if}}
     {{else}}
-    {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}};
+    {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
     {{/if}}
     {{/chip_tests_item_parameters}}
     [cluster writeAttribute{{asCamelCased attribute false}}WithValue:{{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}} responseHandler:^(NSError * err, NSDictionary * values) {
     {{/if}}
         NSLog(@"{{label}} Error: %@", err);
         XCTAssertEqual(err.code, {{response.error}});
+        {{#unless (isStrEqual "0" response.error)}}
+        [expectation fulfill];
+        {{else}}
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
+        {{#if isList}}
+        XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
+        {{else}}
         {{#if (isString type)}}
         {{#if (isOctetString type)}}
         NSString * {{asCamelCased name true}}ArgumentString= @"{{expectedValue}}";
@@ -41,11 +47,14 @@
         XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asCamelCased name true}}Argument]);
         {{/if}}
         {{else}}
-        XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}});
+        XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix}});
+        {{/if}}
         {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
         [expectation fulfill];
+
+        {{/unless}}
     }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];

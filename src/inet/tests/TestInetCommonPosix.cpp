@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,13 +71,12 @@
 #endif // CHIP_TARGET_STYLE_UNIX
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <arpa/inet.h>
-#include <sys/select.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 using namespace chip;
 using namespace chip::Inet;
+
+System::Layer gSystemLayer;
+
+Inet::InetLayer gInet;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static sys_mbox_t * sLwIPEventQueue   = NULL;
@@ -100,25 +99,16 @@ static void ReleaseLwIP(void)
     }
 #endif
 }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-System::Layer gSystemLayer;
-
-Inet::InetLayer gInet;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if CHIP_TARGET_STYLE_UNIX
 // TapAddrAutoconf and TapInterface are only needed for LwIP on
 // sockets simulation in which a host tap/tun interface is used to
 // proxy the LwIP stack onto a host native network interface.
 // CollectTapAddresses() is only available on such targets.
-
 static std::vector<TapInterface> sTapIFs;
-#endif                                    // CHIP_TARGET_STYLE_UNIX
-static std::vector<struct netif> sNetIFs; // interface to filter
-#endif                                    // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_TARGET_STYLE_UNIX
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+static std::vector<struct netif> sNetIFs; // interface to filter
 
 static bool NetworkIsReady();
 static void OnLwIPInitComplete(void * arg);
@@ -230,11 +220,6 @@ void InitNetwork()
     void * lContext = nullptr;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    tcpip_init(NULL, NULL);
-
-#else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // If an tap device name hasn't been specified, derive one from the IPv6 interface id.
 
@@ -447,8 +432,6 @@ void InitNetwork()
 
     PrintNetworkState();
 
-#endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
     AcquireLwIP();
     lContext = sLwIPEventQueue;
 
@@ -463,7 +446,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
 
     if (!printed)
     {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         if (NetworkIsReady())
 #endif
         {
@@ -472,45 +455,18 @@ void ServiceEvents(struct ::timeval & aSleepTime)
             printed = true;
         }
     }
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
-
-    FD_ZERO(&readFDs);
-    FD_ZERO(&writeFDs);
-    FD_ZERO(&exceptFDs);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    if (gSystemLayer.State() == System::kLayerState_Initialized)
-        gSystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
+    gSystemLayer.WatchableEvents().PrepareEventsWithTimeout(aSleepTime);
+    gSystemLayer.WatchableEvents().WaitForEvents();
+    gSystemLayer.WatchableEvents().HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    if (gInet.State == InetLayer::kState_Initialized)
-        gInet.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
-    if (selectRes < 0)
-    {
-        printf("select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
-        return;
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    if (gSystemLayer.State() == System::kLayerState_Initialized)
-    {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (gSystemLayer.State() == System::kLayerState_Initialized)
+    {
         static uint32_t sRemainingSystemLayerEventDelay = 0;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-        gSystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
         if (gSystemLayer.State() == System::kLayerState_Initialized)
         {
             if (sRemainingSystemLayerEventDelay == 0)
@@ -526,10 +482,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
 
             gSystemLayer.HandlePlatformTimer();
         }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     }
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if CHIP_TARGET_STYLE_UNIX
     // TapAddrAutoconf and TapInterface are only needed for LwIP on
     // sockets simulation in which a host tap/tun interface is used to
@@ -538,19 +491,10 @@ void ServiceEvents(struct ::timeval & aSleepTime)
 
     TapInterface_Select(&(sTapIFs[0]), &(sNetIFs[0]), aSleepTime, gNetworkOptions.TapDeviceName.size());
 #endif // CHIP_TARGET_STYLE_UNIX
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    if (gInet.State == InetLayer::kState_Initialized)
-    {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-        gInet.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 static bool NetworkIsReady()
 {
     bool ready = true;
@@ -574,7 +518,7 @@ static void OnLwIPInitComplete(void * arg)
     printf("Waiting for addresses assignment...\n");
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 void ShutdownNetwork()
 {

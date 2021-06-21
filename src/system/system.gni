@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ declare_args() {
 
   # Use BSD/POSIX socket API.
   chip_system_config_use_sockets = current_os != "freertos"
+
+  # Socket event loop type.
+  chip_system_config_sockets_event_loop = "Select"
 
   # Mutex implementation: posix, freertos, none.
   chip_system_config_locking = ""

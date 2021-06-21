@@ -1030,6 +1030,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeLongOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeUnsupportedWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

@@ -219,7 +219,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     if (sIOThread != PTHREAD_NULL)
     {
         sShutdown = true;
-        sSystemLayer.WakeSelect();
+        sSystemLayer.WakeIOThread();
 
         AndroidDeviceControllerWrapper::StackUnlockGuard unlockGuard(&sStackLock);
         pthread_join(sIOThread, NULL);
@@ -1013,9 +1013,6 @@ void * IOThreadMain(void * arg)
 {
     JNIEnv * env;
     JavaVMAttachArgs attachArgs;
-    struct timeval sleepTime;
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
 
     // Attach the IO thread to the JVM as a daemon thread.
     // This allows the JVM to shutdown without waiting for this thread to exit.
@@ -1036,26 +1033,19 @@ void * IOThreadMain(void * arg)
     // Lock the stack to prevent collisions with Java threads.
     pthread_mutex_lock(&sStackLock);
 
+    System::WatchableEventManager & watchState = sSystemLayer.WatchableEvents();
+    watchState.EventLoopBegins();
+
     // Loop until we are told to exit.
     while (!quit.load(std::memory_order_relaxed))
     {
-        numFDs = 0;
-        FD_ZERO(&readFDs);
-        FD_ZERO(&writeFDs);
-        FD_ZERO(&exceptFDs);
-
-        sleepTime.tv_sec  = 10;
-        sleepTime.tv_usec = 0;
-
-        // Collect the currently active file descriptors.
-        sSystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
-        sInetLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
+        // TODO(#5556): add a timer for `sleepTime.tv_sec  = 10; sleepTime.tv_usec = 0;`
+        watchState.PrepareEvents();
 
         // Unlock the stack so that Java threads can make API calls.
         pthread_mutex_unlock(&sStackLock);
 
-        // Wait for for I/O or for the next timer to expire.
-        int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &sleepTime);
+        watchState.WaitForEvents();
 
         // Break the loop if requested to shutdown.
         // if (sShutdown)
@@ -1064,10 +1054,9 @@ void * IOThreadMain(void * arg)
         // Re-lock the stack.
         pthread_mutex_lock(&sStackLock);
 
-        // Perform I/O and/or dispatch timers.
-        sSystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
-        sInetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
+        watchState.HandleEvents();
     }
+    watchState.EventLoopEnds();
 
     // Detach the thread from the JVM.
     sJVM->DetachCurrentThread();
