@@ -40,6 +40,7 @@ def getSpecificTemplatesTargets():
     targets.append(['src/controller/data_model/controller-clusters.zap', '-t', 'examples/chip-tool/templates/templates.json'])
     targets.append(['src/controller/data_model/controller-clusters.zap', '-t', 'src/controller/python/templates/templates.json'])
     targets.append(['src/controller/data_model/controller-clusters.zap', '-t', 'src/darwin/Framework/CHIP/templates/templates.json'])
+    targets.append(['src/controller/data_model/controller-clusters.zap', '-t', 'src/controller/java/templates/templates.json'])
     return targets
 
 def getTargets():
