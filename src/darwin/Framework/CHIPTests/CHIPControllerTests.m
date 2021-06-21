@@ -40,4 +40,33 @@
     XCTAssertTrue([controller shutdown]);
 }
 
+- (void)testControllerMultipleStartup
+{
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    for (int i = 0; i < 5; i++) {
+        XCTAssertTrue([controller startup:nil]);
+    }
+    XCTAssertTrue([controller shutdown]);
+}
+
+- (void)testControllerMultipleShutdown
+{
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    XCTAssertTrue([controller startup:nil]);
+    for (int i = 0; i < 5; i++) {
+        XCTAssertTrue([controller shutdown]);
+    }
+}
+
+- (void)testControllerInvalidAccess
+{
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    NSError * error;
+    XCTAssertFalse([controller isRunning]);
+    XCTAssertNil([controller getPairedDevice:1234 error:&error]);
+    XCTAssertEqual(error.code, CHIPErrorCodeInvalidState);
+    XCTAssertFalse([controller unpairDevice:1 error:&error]);
+    XCTAssertEqual(error.code, CHIPErrorCodeInvalidState);
+}
+
 @end
