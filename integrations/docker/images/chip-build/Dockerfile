@@ -50,13 +50,13 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv \
+    python3.9 \
+    python3.9-dev \
+    python3.9-venv \
     rsync \
     shellcheck \
     strace \
+    sudo \
     systemd \
     udev \
     unzip \
@@ -74,14 +74,17 @@ RUN set -x \
     && exec bash \
     && : # last line
 
-# Python 2 and PIP
+RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
+# Python 3.9 and PIP
 RUN set -x \
-    && apt-get update \
+    && sudo apt-get update \
+    && sudo apt-get install -y libgirepository1.0-dev \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
     && add-apt-repository universe \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y python python2 \
-    && curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py \
-    && python2 get-pip.py \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y python3.9 python3.9-venv python3.9-dev\
+    && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
+    && python3.9 get-pip.py \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
