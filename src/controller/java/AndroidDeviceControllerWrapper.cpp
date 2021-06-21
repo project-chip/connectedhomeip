@@ -156,7 +156,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
 {
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = FindMethod(GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method);
+    err = FindMethod(JniReferences::GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
    {
       ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %d", err);
@@ -178,9 +178,9 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
     CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, certBuf, certBufSize,
                                          outCertLen);
     jbyteArray argument;
-    GetEnvForCurrentThread()->ExceptionClear();
-    N2J_ByteArray(GetEnvForCurrentThread(), csr.data(),csr.size(),argument);
-    GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, argument);
+    JniReferences::GetEnvForCurrentThread()->ExceptionClear();
+    N2J_ByteArray(JniReferences::GetEnvForCurrentThread(), csr.data(),csr.size(),argument);
+    JniReferences::GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, argument);
     return generateCert;
 }
 
