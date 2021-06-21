@@ -91,6 +91,13 @@ public class ChipClusters {
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void changeStatus(DefaultClusterCallback callback, int status) {
+      changeStatus(chipClusterPtr, callback, status);
+    }
+
+    private native void changeStatus(
+        long chipClusterPtr, DefaultClusterCallback callback, int status);
   }
 
   public static class ApplicationLauncherCluster extends BaseChipCluster {
@@ -533,8 +540,8 @@ public class ChipClusters {
         long chipClusterPtr, DefaultClusterCallback callback, int optionsMask, int optionsOverride);
   }
 
-  public static class ContentLaunchCluster extends BaseChipCluster {
-    public ContentLaunchCluster(long devicePtr, int endpointId) {
+  public static class ContentLauncherCluster extends BaseChipCluster {
+    public ContentLauncherCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
