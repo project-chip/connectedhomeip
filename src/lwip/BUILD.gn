@@ -125,7 +125,4 @@ if (current_os == "zephyr") {
       "${chip_root}/src:includes",
     ]
   }
-  group("all") {
-    deps = [ ":lwip_all" ]
-  }
 }
