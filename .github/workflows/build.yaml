@@ -145,10 +145,10 @@ jobs:
               run: |
                   scripts/build/gn_gen.sh --args='is_clang=true target_os="all"'
             - name: Run Build
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: scripts/build/gn_build.sh
             - name: Run Tests
-              timeout-minutes: 2
+              timeout-minutes: 10
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
