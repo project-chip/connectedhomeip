@@ -150,8 +150,10 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+    // NOTE: Disable CRMP temporary, should be enabled later.
+    err = mpExchangeCtx->SendMessage(
+        Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
+        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
     SuccessOrExit(err);
     MoveToState(ClientState::AwaitingResponse);
 
