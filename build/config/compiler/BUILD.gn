@@ -343,7 +343,7 @@ config("rtti") {
 }
 
 config("rtti_default") {
-  configs = [ ":no_rtti" ]
+  configs = [ ":rtti" ]
 }
 
 config("no_exceptions") {
