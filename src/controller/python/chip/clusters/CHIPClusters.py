@@ -1640,6 +1640,16 @@ class ChipClusters:
                     "attributeId": 0x001C,
                     "type": "",
                 },
+                "LongOctetString": {
+                    "attributeId": 0x001D,
+                    "type": "bytes",
+                    "writable": True,
+                },
+                "Unsupported": {
+                    "attributeId": 0x00FF,
+                    "type": "int",
+                    "writable": True,
+                },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
                     "type": "int",
@@ -3128,6 +3138,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_ListOctetString(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_ReadAttributeListStructOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_ListStructOctetString(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_ReadAttributeLongOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_LongOctetString(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeLongOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_LongOctetString(device, ZCLendpoint, ZCLgroupid, value, len(value))
+    def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ReadAttributeLocalTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4529,6 +4547,18 @@ class ChipClusters:
         # Cluster TestCluster ReadAttribute ListStructOctetString
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ListStructOctetString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ListStructOctetString.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute LongOctetString
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_LongOctetString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_LongOctetString.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute LongOctetString
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_LongOctetString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_LongOctetString.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute Unsupported
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute Unsupported
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Unsupported.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_Unsupported.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ClusterRevision.restype = ctypes.c_uint32
