@@ -103,7 +103,7 @@ static_library("inet") {
     "${nlio_root}:nlio",
   ]
 
-  if (chip_with_lwip) {
+  if (chip_system_config_use_lwip) {
     public_deps += [ "${chip_root}/src/lwip" ]
   }
 

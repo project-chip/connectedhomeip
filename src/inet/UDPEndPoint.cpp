@@ -42,7 +42,7 @@
 #include <lwip/tcpip.h>
 #include <lwip/udp.h>
 #if CHIP_HAVE_CONFIG_H
-#include <lwip/lwip_buildconfig.h>
+#include <lwip/lwip_buildconfig.h>  // nogncheck
 #endif // CHIP_HAVE_CONFIG_H
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
