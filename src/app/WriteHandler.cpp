@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPath.h>
 #include <app/WriteHandler.h>
