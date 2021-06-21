@@ -42,6 +42,18 @@ RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
 RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
 RUN chmod 0440 /etc/sudoers.d/$USERNAME
 
+# Python 3.9 and PIP
+RUN set -x \
+    && sudo apt-get install -y libgirepository1.0-dev \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
+    && sudo add-apt-repository universe \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y python3.9 python3.9-venv python3.9-dev\
+    && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
+    && python3.9 get-pip.py \
+    && sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
+    && rm -rf /var/lib/apt/lists/ \
+    && : # last line
+
 RUN mkdir -p /var/downloads
 RUN cd /var/downloads
 RUN curl -JL https://github.com/microsoft/vscode-cpptools/releases/download/0.27.0/cpptools-linux.vsix > extension.zip
