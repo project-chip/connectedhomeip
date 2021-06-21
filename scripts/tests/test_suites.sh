@@ -45,6 +45,8 @@ done
 echo ""
 echo ""
 
+ulimit -c unlimited || true
+
 declare -a iter_array="($(seq "$iterations"))"
 for j in "${iter_array[@]}"; do
     echo " ===== Iteration $j starting"
@@ -52,8 +54,38 @@ for j in "${iter_array[@]}"; do
         echo "  ===== Running test: $i"
         echo "          * Starting cluster server"
         rm -rf /tmp/chip_tool_config.ini
-        out/debug/chip-all-clusters-app &
-        background_pid=$!
+        # This part is a little complicated.  We want to
+        # 1) Start chip-all-clusters-app in the background
+        # 2) Pipe its output through tee so we can wait until it's ready for a
+        #    PASE handshake.
+        # 3) Save its pid off so we can kill it.
+        #
+        # The subshell with echoing of $! to a file descriptor and
+        # then reading things out of there accomplishes item 3;
+        # otherwise $! would be the last-started command which would
+        # be the tee.  This part comes from https://stackoverflow.com/a/3786955
+        # and better ideas are welcome.
+        #
+        # The stdbuf -o0 is to make sure our output is flushed through
+        # tee expeditiously; otherwise it will buffer things up and we
+        # will never see the string we want.
+
+        # Clear out our temp files so we don't accidentally do a stale
+        # read from them before we write to them.
+        rm -rf /tmp/all-clusters-log
+        rm -rf /tmp/pid
+        (
+            stdbuf -o0 out/debug/standalone/chip-all-clusters-app &
+            echo $! >&3
+        ) 3>/tmp/pid | tee /tmp/all-clusters-log &
+        while ! grep -q "Server Listening" /tmp/all-clusters-log; do
+            :
+        done
+        # Now read $background_pid from /tmp/pid; presumably it's
+        # landed there by now.  If we try to read it immediately after
+        # kicking off the subshell, sometimes we try to do it before
+        # the data is there yet.
+        background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
         out/debug/standalone/chip-tool pairing onnetwork 1 20202021 3840 ::1 11097
         echo "          * Starting test run: $i"

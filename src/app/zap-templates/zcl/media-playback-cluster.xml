@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>Media Playback</name>
     <code>0x0506</code>
     <define>MEDIA_PLAYBACK_CLUSTER</define>

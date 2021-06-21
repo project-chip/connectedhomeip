@@ -1,8 +1,8 @@
 {{#chip_tests tests}}
-class {{asCamelCased filename false}}: public TestCommand
+class {{filename}}: public TestCommand
 {
   public:
-    {{asCamelCased filename false}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
+    {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     CHIP_ERROR NextTest() override
@@ -48,7 +48,7 @@ class {{asCamelCased filename false}}: public TestCommand
 
     {{#chip_tests_items}}
     // Test {{label}}
-    typedef void (*SuccessCallback_{{index}})(void * context{{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
+    typedef void (*SuccessCallback_{{index}})(void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
     chip::Callback::Callback<SuccessCallback_{{index}}> * mOnSuccessCallback_{{index}} = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_{{index}} = nullptr;
     bool mIsFailureExpected_{{index}} = {{response.error}};
@@ -66,11 +66,25 @@ class {{asCamelCased filename false}}: public TestCommand
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         {{#if isCommand}}
-        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel());
+        {{#chip_tests_item_parameters}}
+        {{#if (isString type)}}
+        {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"));
+        {{else}}
+        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
+        {{/if}}
+        {{/chip_tests_item_parameters}}
+        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(){{#chip_tests_item_parameters}}, {{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else if isReadAttribute}}
         err = cluster.ReadAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel());
         {{else if isWriteAttribute}}
-        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(), {{#chip_tests_item_parameters}}{{definedValue}}{{/chip_tests_item_parameters}});
+        {{#chip_tests_item_parameters}}
+        {{#if (isString type)}}
+        {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"));
+        {{else}}
+        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
+        {{/if}}
+        {{/chip_tests_item_parameters}}
+        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(), {{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else}}
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         {{/if}}
@@ -88,7 +102,7 @@ class {{asCamelCased filename false}}: public TestCommand
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Failure Response");
 
-        {{asCamelCased parent.filename false}} * runner = reinterpret_cast<{{asCamelCased parent.filename false}} *>(context);
+        {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
 
         delete runner->mOnFailureCallback_{{index}};
         delete runner->mOnSuccessCallback_{{index}};
@@ -102,11 +116,11 @@ class {{asCamelCased filename false}}: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}})
+    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}})
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Success Response");
 
-        {{asCamelCased parent.filename false}} * runner = reinterpret_cast<{{asCamelCased parent.filename false}} *>(context);
+        {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
 
         delete runner->mOnFailureCallback_{{index}};
         delete runner->mOnSuccessCallback_{{index}};
@@ -120,12 +134,26 @@ class {{asCamelCased filename false}}: public TestCommand
 
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
-        if ({{asCamelCased name true}} != {{expectedValue}})
+        {{#if isList}}
+        if (count != {{expectedValue.length}})
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
             runner->SetCommandExitStatus(false);
             return;
         }
+        {{else}}
+        {{#if (isString type)}}
+        {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{expectedValue}}"), strlen("{{expectedValue}}"));
+        if (!{{asCamelCased name true}}.data_equal({{asCamelCased name true}}Argument))
+        {{else}}
+        if ({{asCamelCased name true}} != {{expectedValue}}{{asTypeLiteralSuffix chipType}})
+        {{/if}}
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+        {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
 

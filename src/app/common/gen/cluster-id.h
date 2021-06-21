@@ -301,7 +301,7 @@ static constexpr chip::ClusterId ZCL_LOW_POWER_CLUSTER_ID = 0x0508;
 // Definitions for cluster: Keypad Input
 static constexpr chip::ClusterId ZCL_KEYPAD_INPUT_CLUSTER_ID = 0x0509;
 
-// Definitions for cluster: Content Launch
+// Definitions for cluster: Content Launcher
 static constexpr chip::ClusterId ZCL_CONTENT_LAUNCH_CLUSTER_ID = 0x050A;
 
 // Definitions for cluster: Audio Output

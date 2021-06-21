@@ -117,36 +117,24 @@ public:
 class MockSessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
 {
 public:
-    CHIP_ERROR SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
-                               EncryptedPacketBufferHandle * retainedMessage) override
+    CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
+                              EncryptedPacketBufferHandle & preparedMessage) override
     {
         PacketHeader packetHeader;
 
         ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
         ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
 
-        if (retainedMessage != nullptr && mRetainMessageOnSend)
-        {
-            *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(message.Retain());
-        }
-        return gTransportMgr.SendMessage(Transport::PeerAddress(), std::move(message));
+        preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
+        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
-                             EncryptedPacketBufferHandle * retainedMessage) const override
+    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override
     {
-        // Our send path needs a (writable) PacketBuffer, so get that from the
-        // EncryptedPacketBufferHandle.  Note that we have to do this before we
-        // set *retainedMessage, because 'message' and '*retainedMessage' might
-        // be the same memory location and we have to guarantee that we move out
-        // of 'message' before we write to *retainedMessage.
-        System::PacketBufferHandle writableBuf(std::move(message).CastToWritable());
-        if (retainedMessage != nullptr && mRetainMessageOnSend)
-        {
-            *retainedMessage = EncryptedPacketBufferHandle::MarkEncrypted(writableBuf.Retain());
-        }
-        return gTransportMgr.SendMessage(Transport::PeerAddress(), std::move(writableBuf));
+        return gTransportMgr.SendMessage(Transport::PeerAddress(), preparedMessage.CastToWritable());
     }
+
+    bool IsReliableTransmissionAllowed() const override { return mRetainMessageOnSend; }
 
     bool MessagePermitted(uint16_t protocol, uint8_t type) override { return true; }
 

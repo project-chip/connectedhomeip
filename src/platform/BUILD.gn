@@ -61,7 +61,7 @@ if (chip_device_platform != "none") {
   }
 
   if (chip_stack_lock_tracking == "auto") {
-    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+    if (chip_device_platform == "linux") {
       # TODO: should be fatal for development. Change once bugs are fixed
       chip_stack_lock_tracking = "log"
     } else {
@@ -350,6 +350,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/PosixConfig.cpp",
         "Darwin/PosixConfig.h",
         "Darwin/SystemPlatformConfig.h",
+        "DeviceSafeQueue.cpp",
+        "DeviceSafeQueue.h",
       ]
 
       if (chip_enable_ble) {
@@ -487,6 +489,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       public_deps += [ "${chip_root}/src/crypto" ]
     } else if (chip_device_platform == "linux") {
       sources += [
+        "DeviceSafeQueue.cpp",
+        "DeviceSafeQueue.h",
         "Linux/BLEManagerImpl.cpp",
         "Linux/BLEManagerImpl.h",
         "Linux/BlePlatformConfig.h",

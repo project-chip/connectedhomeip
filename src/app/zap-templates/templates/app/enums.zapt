@@ -12,7 +12,7 @@
 {{#unless (isStrEqual label "ReportingDirection")}}
 
 // Enum for {{label}}
-enum EmberAf{{asType label}} : uint32_t{
+enum EmberAf{{asType label}} : {{asUnderlyingZclType type}} {
 {{#zcl_enum_items}}
 {{ident}}EMBER_ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{value}},
 {{/zcl_enum_items}}

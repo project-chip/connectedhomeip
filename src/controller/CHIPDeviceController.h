@@ -29,6 +29,7 @@
 #pragma once
 
 #include <app/InteractionModelDelegate.h>
+#include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/data_model/gen/CHIPClientCallbacks.h>
@@ -180,7 +181,7 @@ public:
 class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
                                     public Messaging::ExchangeMgrDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-                                    public Mdns::ResolverDelegate,
+                                    public AbstractMdnsDiscoveryController,
 #endif
                                     public app::InteractionModelDelegate
 {
@@ -266,6 +267,15 @@ public:
      */
     CHIP_ERROR ServiceEventSignal();
 
+    /**
+     * @brief Get the Fabric ID assigned to the device.
+     *
+     * @param[out] fabricId   Fabric ID of the device.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    CHIP_ERROR GetFabricId(uint64_t & fabricId);
+
 protected:
     enum class State
     {
@@ -295,7 +305,7 @@ protected:
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
-    Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
+    Mdns::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
     Inet::InetLayer * mInetLayer = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -330,7 +340,7 @@ protected:
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
+    Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mCommissionableNodes; }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 private:
@@ -469,9 +479,9 @@ public:
      * @brief
      *   Returns information about discovered devices.
      *   Should be called on main loop thread.
-     * @return const CommissionableNodeData* info about the selected device. May be nullptr if no information has been returned yet.
+     * @return const DiscoveredNodeData* info about the selected device. May be nullptr if no information has been returned yet.
      */
-    const Mdns::CommissionableNodeData * GetDiscoveredDevice(int idx);
+    const Mdns::DiscoveredNodeData * GetDiscoveredDevice(int idx);
 
     /**
      * @brief

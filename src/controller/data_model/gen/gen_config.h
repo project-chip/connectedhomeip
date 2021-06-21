@@ -55,6 +55,7 @@
 #define EMBER_AF_MEDIA_INPUT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_MEDIA_PLAYBACK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_OTA_SERVER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -113,9 +114,9 @@
 #define ZCL_USING_COLOR_CONTROL_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_COLOR_CONTROL_CLIENT
 
-// Use this macro to check if the client side of the Content Launch cluster is included
+// Use this macro to check if the client side of the Content Launcher cluster is included
 #define ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_CONTENT_LAUNCH_CLIENT
+#define EMBER_AF_PLUGIN_CONTENT_LAUNCHER_CLIENT
 
 // Use this macro to check if the client side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_CLIENT
@@ -176,6 +177,10 @@
 // Use this macro to check if the client side of the Network Commissioning cluster is included
 #define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_CLIENT
+
+// Use this macro to check if the client side of the OTA Software Update Server cluster is included
+#define ZCL_USING_OTA_SERVER_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_SERVER_CLIENT
 
 // Use this macro to check if the client side of the On/off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_CLIENT

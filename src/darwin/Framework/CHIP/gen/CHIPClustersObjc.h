@@ -61,6 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPApplicationBasic : CHIPCluster
 
+- (void)changeStatus:(uint8_t)status responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeApplicationNameWithResponseHandler:(ResponseHandler)responseHandler;
@@ -397,10 +399,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Content Launch
+ * Cluster Content Launcher
  *
  */
-@interface CHIPContentLaunch : CHIPCluster
+@interface CHIPContentLauncher : CHIPCluster
 
 - (void)launchContent:(uint8_t)autoPlay data:(NSString *)data responseHandler:(ResponseHandler)responseHandler;
 - (void)launchURL:(NSString *)contentURL displayString:(NSString *)displayString responseHandler:(ResponseHandler)responseHandler;
@@ -750,6 +752,31 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster OTA Software Update Server
+ *
+ */
+@interface CHIPOtaSoftwareUpdateServer : CHIPCluster
+
+- (void)applyUpdateRequest:(NSData *)updateToken newVersion:(uint32_t)newVersion responseHandler:(ResponseHandler)responseHandler;
+- (void)notifyUpdateApplied:(NSData *)updateToken
+             currentVersion:(uint32_t)currentVersion
+            responseHandler:(ResponseHandler)responseHandler;
+- (void)queryImage:(uint16_t)vendorId
+             productId:(uint16_t)productId
+             imageType:(uint16_t)imageType
+       hardwareVersion:(uint16_t)hardwareVersion
+        currentVersion:(uint32_t)currentVersion
+    protocolsSupported:(uint8_t)protocolsSupported
+              location:(NSString *)location
+      clientCanConsent:(uint8_t)clientCanConsent
+     metadataForServer:(NSData *)metadataForServer
+       responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster On/off
  *
  */
@@ -764,6 +791,14 @@ NS_ASSUME_NONNULL_BEGIN
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeGlobalSceneControlWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOnTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOnTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOffWaitTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOffWaitTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStartUpOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeStartUpOnOffWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -995,6 +1030,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeLongOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeUnsupportedWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1038,6 +1077,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface CHIPThreadNetworkDiagnostics : CHIPCluster
+
+- (void)resetCounts:(ResponseHandler)responseHandler;
 
 - (void)readAttributeChannelWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeRoutingRoleWithResponseHandler:(ResponseHandler)responseHandler;

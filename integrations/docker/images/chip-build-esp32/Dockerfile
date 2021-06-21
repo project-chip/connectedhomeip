@@ -9,7 +9,7 @@ RUN set -x \
     && cd /opt/espressif \
     && git clone --progress -b release/v4.2 https://github.com/espressif/esp-idf.git \
     && cd esp-idf \
-    && git reset --hard d9ec7df3931bea46292f015a99d19a28670bd561
+    && git reset --hard d9ec7df3931bea46292f015a99d19a28670bd561 \
     && git submodule update --init --progress \
     && IDF_TOOLS_PATH=/opt/espressif/tools ./install.sh \
     && : # last line

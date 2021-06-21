@@ -26,7 +26,7 @@ def get_repository_commit_sha(repository_location):
     process = subprocess.run(command, check=True, stdout=subprocess.PIPE)
     return process.stdout.decode('ascii').strip()
 
-def update_ncs(repository_location, revision):
+def update_ncs(repository_location, revision, fetch_shallow):
     # Fetch sdk-nrf to the desired revision.
     command = ['git', '-C', repository_location, 'fetch']
     subprocess.run(command, check=True)
@@ -36,7 +36,8 @@ def update_ncs(repository_location, revision):
     subprocess.run(command, check=True)
 
     # Call west update command to update all projects and submodules used by sdk-nrf.
-    command = ['west', 'update', '-r']
+    command = ['west', 'update']
+    command += ['--fetch', 'smart', '--narrow', '-o=--depth=1'] if fetch_shallow else []
     subprocess.run(command, check=True)
 
 def get_ncs_recommended_revision():
@@ -49,7 +50,7 @@ def get_ncs_recommended_revision():
     except:
         raise RuntimeError("Encountered problem when trying to read .nrfconnect-recommended-revision file.")
 
-def print_messages(messages : list, yellow_text :  bool):
+def print_messages(messages : list, yellow_text : bool):
     # Add colour formatting if yellow text was set
     if yellow_text:
         messages = [f"\33[33m{message}\x1b[0m" for message in messages]
@@ -83,6 +84,7 @@ def main():
         parser = argparse.ArgumentParser(description='Script helping to update nRF Connect SDK to currently recommended revision.')
         parser.add_argument("-c", "--check", help="Check if your current nRF Connect SDK revision is the same as recommended one.", action="store_true")
         parser.add_argument("-u", "--update", help="Update your nRF Connect SDK to currently recommended revision.", action="store_true")
+        parser.add_argument("-s", "--shallow", help="Fetch only specific commits (without the history) when updating nRF Connect SDK.", action="store_true")
         parser.add_argument("-q", "--quiet", help="Don't print any message if the check succeeds.", action="store_true")
         args = parser.parse_args()
 
@@ -104,7 +106,7 @@ def main():
 
         if args.update:
             print("Updating nRF Connect SDK to recommended revision...")
-            update_ncs(ncs_base, recommended_revision)
+            update_ncs(ncs_base, recommended_revision, args.shallow)
 
     except (RuntimeError, subprocess.CalledProcessError) as e:
         print(e)

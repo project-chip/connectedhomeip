@@ -137,9 +137,10 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-{{>test_cluster tests="TestCluster, OnOffCluster"}}
+{{>test_cluster tests="TestCluster, Test_3_1_1, Test_3_2_1, Test_3_2_2"}}
 
 {{#chip_client_clusters}}
+{{#unless (isStrEqual "Test Cluster" name)}}
 {{#chip_server_cluster_attributes}}
 - (void)testSendCluster{{asCamelCased parent.name false}}ReadAttribute{{asCamelCased name false}}WithResponseHandler
 {
@@ -180,6 +181,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}
+{{/unless}}
 {{/chip_client_clusters}}
 
 @end

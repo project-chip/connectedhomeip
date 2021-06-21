@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -168,6 +168,7 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
         this->mNextTimer   = lTimer->mNextTimer;
         lTimer->mNextTimer = this;
     }
+    return CHIP_SYSTEM_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -190,14 +191,13 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
             this->HandleComplete();
         });
         dispatch_resume(timerSource);
-    }
-    else
-    {
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-        lLayer.WakeSelect();
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        return CHIP_SYSTEM_NO_ERROR;
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    lLayer.WakeIOThread();
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     return CHIP_SYSTEM_NO_ERROR;
@@ -218,6 +218,7 @@ Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     err = lLayer.PostEvent(*this, chip::System::kEvent_ScheduleWork, 0);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_queue_t dispatchQueue = lLayer.GetDispatchQueue();
@@ -230,7 +231,7 @@ Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
     else
     {
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-        lLayer.WakeSelect();
+        lLayer.WakeIOThread();
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,9 +37,7 @@
 
 // Include dependent headers
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <system/SystemWakeEvent.h>
-
-#include <sys/select.h>
+#include <system/SystemSockets.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -121,8 +119,7 @@ private:
  *  @brief
  *      This provides access to timers according to the configured event handling model.
  *
- *      For \c CHIP_SYSTEM_CONFIG_USE_SOCKETS, event readiness notification is handled via traditional poll/select implementation on
- *      the platform adaptation.
+ *      For \c CHIP_SYSTEM_CONFIG_USE_SOCKETS, event readiness notification is handled via WatchableEventManager.
  *
  *      For \c CHIP_SYSTEM_CONFIG_USE_LWIP, event readiness notification is handle via events / messages and platform- and
  *      system-specific hooks for the event/message system.
@@ -133,6 +130,9 @@ public:
     Layer();
 
     Error Init(void * aContext);
+
+    // Some other layers hold pointers to System::Layer, so care must be taken
+    // to ensure that they are not used after calling Shutdown().
     Error Shutdown();
 
     void * GetPlatformData() const;
@@ -151,11 +151,14 @@ public:
 
     Error ScheduleWork(TimerCompleteFunct aComplete, void * aAppState);
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    void PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet, struct timeval & aSleepTime);
-    void HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet);
-    void WakeSelect();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    WatchableEventManager & WatchableEvents() { return mWatchableEvents; }
+    bool GetTimeout(struct timeval & aSleepTime); // TODO(#5556): Integrate timer platform details with WatchableEventManager.
+    void HandleTimeout();                         // TODO(#5556): Integrate timer platform details with WatchableEventManager.
+#endif                                            // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    void WakeIOThread();
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     typedef Error (*EventHandler)(Object & aTarget, EventType aEventType, uintptr_t aArgument);
@@ -198,7 +201,8 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    SystemWakeEvent mWakeEvent;
+    WatchableEventManager mWatchableEvents;
+    WakeEvent mWakeEvent;
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_t mHandleSelectThread;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING

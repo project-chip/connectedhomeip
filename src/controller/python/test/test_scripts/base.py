@@ -141,3 +141,24 @@ class BaseTestHelper:
             self.logger.exception(f"Following attributes failed: {failed_zcl}")
             return False
         return True
+
+    def TestWriteBasicAttributes(self, nodeid: int, endpoint: int, group: int):
+        basic_cluster_attrs = [
+            ("UserLabel", "Test"),
+        ]
+        failed_zcl = []
+        for basic_attr in basic_cluster_attrs:
+            try:
+                self.devCtrl.ZCLWriteAttribute(cluster="Basic",
+                                               attribute=basic_attr[0],
+                                               nodeid=nodeid,
+                                               endpoint=endpoint,
+                                               groupid=group,
+                                               value=basic_attr[1])
+                time.sleep(2)
+            except Exception:
+                failed_zcl.append(basic_attr)
+        if failed_zcl:
+            self.logger.exception(f"Following attributes failed: {failed_zcl}")
+            return False
+        return True

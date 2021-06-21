@@ -26,17 +26,17 @@
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ApplicationExchangeDispatch::SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
-                                                        System::PacketBufferHandle && message,
-                                                        EncryptedPacketBufferHandle * retainedMessage)
+CHIP_ERROR ApplicationExchangeDispatch::PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                                       System::PacketBufferHandle && message,
+                                                       EncryptedPacketBufferHandle & preparedMessage)
 {
-    return mSessionMgr->SendMessage(session, payloadHeader, std::move(message), retainedMessage);
+    return mSessionMgr->BuildEncryptedMessagePayload(session, payloadHeader, std::move(message), preparedMessage);
 }
 
-CHIP_ERROR ApplicationExchangeDispatch::ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
-                                                      EncryptedPacketBufferHandle * retainedMessage) const
+CHIP_ERROR ApplicationExchangeDispatch::SendPreparedMessage(SecureSessionHandle session,
+                                                            const EncryptedPacketBufferHandle & preparedMessage) const
 {
-    return mSessionMgr->SendEncryptedMessage(session, std::move(message), retainedMessage);
+    return mSessionMgr->SendPreparedMessage(session, preparedMessage);
 }
 
 bool ApplicationExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,29 +15,32 @@
  *    limitations under the License.
  */
 
-/**
- * This is a sample unit test.
- */
+#include "launch.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <unistd.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "heap_trace.h"
+#include "sdkconfig.h"
 
-//#include "standalone/TapInterface.c"
+#include <lib/shell/Engine.h>
 
-void TapInterface_Init_test1()
+namespace {
+
+void MatterShellTask(void * args)
 {
-    printf("---Running Test--- %s\n", __FUNCTION__);
-    // assert(TapInterface_Init(NULL, NULL, NULL) == ERR_ARG);
+    chip::Shell::Engine::Root().RunMainLoop();
 }
 
-int main()
+} // namespace
+
+namespace chip {
+
+void LaunchShell()
 {
-    printf("---Running Test--- tests from %s\n", __FILE__);
-    TapInterface_Init_test1();
-    return 0;
+#if CONFIG_HEAP_TRACING_STANDALONE || CONFIG_HEAP_TASK_TRACKING
+    RegisterHeapTraceCommands();
+#endif // CONFIG_HEAP_TRACING_STANDALONE || CONFIG_HEAP_TASK_TRACKING
+    xTaskCreate(&MatterShellTask, "chip_cli", 2048, NULL, 5, NULL);
 }
+
+} // namespace chip
