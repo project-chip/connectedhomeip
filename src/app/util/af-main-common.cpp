@@ -284,7 +284,7 @@ static EmberStatus send(const MessageSendDestination & destination, EmberApsFram
 
     if (messageLength <= EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH)
     {
-        status = emAfSend(destination, apsFrame, (uint8_t) messageLength, message, &messageTag, alias, sequence);
+        status = emAfSend(destination, apsFrame, messageLength, message, &messageTag, alias, sequence);
     }
     else
     {
@@ -612,8 +612,8 @@ void emAfFragmentationMessageSentHandler(const MessageSendDestination & destinat
 }
 #endif // EMBER_AF_PLUGIN_FRAGMENTATION
 
-EmberStatus emAfSend(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint8_t messageLength, uint8_t * message,
-                     uint8_t * messageTag, EmberNodeId alias, uint8_t sequence)
+EmberStatus emAfSend(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+                     uint8_t * message, uint8_t * messageTag, EmberNodeId alias, uint8_t sequence)
 {
     // TODO: There's an impedance mismatch here in a few ways:
     // 1) The caller expects to get a messageTag out that will identify this

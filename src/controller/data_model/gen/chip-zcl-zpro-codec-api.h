@@ -2588,6 +2588,8 @@ encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, 
 | * ListInt8u                                                         | 0x001A |
 | * ListOctetString                                                   | 0x001B |
 | * ListStructOctetString                                             | 0x001C |
+| * LongOctetString                                                   | 0x001D |
+| * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -2829,6 +2831,35 @@ chip::System::PacketBufferHandle encodeTestClusterClusterReadListOctetStringAttr
  */
 chip::System::PacketBufferHandle encodeTestClusterClusterReadListStructOctetStringAttribute(uint8_t seqNum,
                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the long_octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadLongOctetStringAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the long_octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteLongOctetStringAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint,
+                                                                                       chip::ByteSpan longOctetString);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the unsupported attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadUnsupportedAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the unsupported attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTestClusterClusterWriteUnsupportedAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t unsupported);
 
 /**
  * @brief

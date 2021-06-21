@@ -15358,6 +15358,8 @@ private:
 | * ListInt8u                                                         | 0x001A |
 | * ListOctetString                                                   | 0x001B |
 | * ListStructOctetString                                             | 0x001C |
+| * LongOctetString                                                   | 0x001D |
+| * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -16682,6 +16684,140 @@ private:
             OnTestClusterListStructOctetStringListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute LongOctetString
+ */
+class ReadTestClusterLongOctetString : public ModelCommand
+{
+public:
+    ReadTestClusterLongOctetString() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "long-octet-string");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterLongOctetString()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeLongOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<StringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<StringAttributeCallback>(OnStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterLongOctetString : public ModelCommand
+{
+public:
+    WriteTestClusterLongOctetString() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "long-octet-string");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterLongOctetString()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeLongOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::ByteSpan mValue;
+};
+
+/*
+ * Attribute Unsupported
+ */
+class ReadTestClusterUnsupported : public ModelCommand
+{
+public:
+    ReadTestClusterUnsupported() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "unsupported");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterUnsupported()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeUnsupported(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterUnsupported : public ModelCommand
+{
+public:
+    WriteTestClusterUnsupported() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "unsupported");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterUnsupported()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeUnsupported(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
 };
 
 /*
@@ -21178,6 +21314,10 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterListInt8u>(),
         make_unique<ReadTestClusterListOctetString>(),
         make_unique<ReadTestClusterListStructOctetString>(),
+        make_unique<ReadTestClusterLongOctetString>(),
+        make_unique<WriteTestClusterLongOctetString>(),
+        make_unique<ReadTestClusterUnsupported>(),
+        make_unique<WriteTestClusterUnsupported>(),
         make_unique<ReadTestClusterClusterRevision>(),
     };
 

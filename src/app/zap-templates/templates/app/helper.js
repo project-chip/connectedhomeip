@@ -361,6 +361,24 @@ function isStrEndsWith(str, substr)
   return str.endsWith(substr);
 }
 
+function asTypeLiteralSuffix(type)
+{
+  switch (type) {
+  case 'int32_t':
+    return 'L';
+  case 'int64_t':
+    return 'LL';
+  case 'uint16_t':
+    return 'U';
+  case 'uint32_t':
+    return 'UL';
+  case 'uint64_t':
+    return 'ULL';
+  default:
+    return '';
+  }
+}
+
 //
 // Module exports
 //
@@ -375,3 +393,4 @@ exports.chip_endpoint_generated_functions             = chip_endpoint_generated_
 exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_list
 exports.isSigned                                      = ChipTypesHelper.isSigned;
 exports.isStrEndsWith                                 = isStrEndsWith;
+exports.asTypeLiteralSuffix                           = asTypeLiteralSuffix;

@@ -1431,62 +1431,6 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 } // namespace OperationalCredentials
 
-namespace ThreadNetworkDiagnostics {
-
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
-{
-    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-    // Any error value TLVUnpackError means we have received an illegal value.
-    // The following variables are used for all commands to save code size.
-    CHIP_ERROR TLVError          = CHIP_NO_ERROR;
-    CHIP_ERROR TLVUnpackError    = CHIP_NO_ERROR;
-    uint32_t validArgumentCount  = 0;
-    uint32_t expectArgumentCount = 0;
-    uint32_t currentDecodeTagId  = 0;
-    bool wasHandled              = false;
-    {
-        switch (aCommandId)
-        {
-        case ZCL_RESET_COUNTS_COMMAND_ID: {
-
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            wasHandled = emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(apCommandObj);
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                               0, // GroupId
-                                                               ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID, aCommandId,
-                                                               (chip::app::CommandPathFlags::kEndpointIdValid) };
-            apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                        Protocols::SecureChannel::Id,
-                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId,
-                         ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
-    {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
-        ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
-                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
-    }
-}
-
-} // namespace ThreadNetworkDiagnostics
-
 namespace WindowCovering {
 
 void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
@@ -1812,9 +1756,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
-        break;
-    case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
-        clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case ZCL_WINDOW_COVERING_CLUSTER_ID:
         clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);

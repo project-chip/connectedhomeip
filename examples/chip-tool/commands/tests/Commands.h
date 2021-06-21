@@ -319,6 +319,33 @@ public:
         case 91:
             err = TestSendClusterTestClusterCommandWriteAttribute_91();
             break;
+        case 92:
+            err = TestSendClusterTestClusterCommandReadAttribute_92();
+            break;
+        case 93:
+            err = TestSendClusterTestClusterCommandWriteAttribute_93();
+            break;
+        case 94:
+            err = TestSendClusterTestClusterCommandReadAttribute_94();
+            break;
+        case 95:
+            err = TestSendClusterTestClusterCommandWriteAttribute_95();
+            break;
+        case 96:
+            err = TestSendClusterTestClusterCommandReadAttribute_96();
+            break;
+        case 97:
+            err = TestSendClusterTestClusterCommandReadAttribute_97();
+            break;
+        case 98:
+            err = TestSendClusterTestClusterCommandReadAttribute_98();
+            break;
+        case 99:
+            err = TestSendClusterTestClusterCommandReadAttribute_99();
+            break;
+        case 100:
+            err = TestSendClusterTestClusterCommandWriteAttribute_100();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -332,7 +359,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 92;
+    const uint16_t mTestCount = 101;
 
     //
     // Tests methods
@@ -1354,7 +1381,7 @@ private:
             return;
         }
 
-        if (bitmap16 != 0)
+        if (bitmap16 != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -1384,7 +1411,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t bitmap16Argument = 65535;
+        uint16_t bitmap16Argument = 65535U;
         err = cluster.WriteAttributeBitmap16(mOnSuccessCallback_14->Cancel(), mOnFailureCallback_14->Cancel(), bitmap16Argument);
 
         if (CHIP_NO_ERROR != err)
@@ -1500,7 +1527,7 @@ private:
             return;
         }
 
-        if (bitmap16 != 65535)
+        if (bitmap16 != 65535U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "65535");
             runner->SetCommandExitStatus(false);
@@ -1530,7 +1557,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t bitmap16Argument = 0;
+        uint16_t bitmap16Argument = 0U;
         err = cluster.WriteAttributeBitmap16(mOnSuccessCallback_16->Cancel(), mOnFailureCallback_16->Cancel(), bitmap16Argument);
 
         if (CHIP_NO_ERROR != err)
@@ -1646,7 +1673,7 @@ private:
             return;
         }
 
-        if (bitmap16 != 0)
+        if (bitmap16 != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -1722,7 +1749,7 @@ private:
             return;
         }
 
-        if (bitmap32 != 0)
+        if (bitmap32 != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -1752,7 +1779,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint32_t bitmap32Argument = 4294967295;
+        uint32_t bitmap32Argument = 4294967295UL;
         err = cluster.WriteAttributeBitmap32(mOnSuccessCallback_19->Cancel(), mOnFailureCallback_19->Cancel(), bitmap32Argument);
 
         if (CHIP_NO_ERROR != err)
@@ -1868,7 +1895,7 @@ private:
             return;
         }
 
-        if (bitmap32 != 4294967295)
+        if (bitmap32 != 4294967295UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "4294967295");
             runner->SetCommandExitStatus(false);
@@ -1898,7 +1925,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint32_t bitmap32Argument = 0;
+        uint32_t bitmap32Argument = 0UL;
         err = cluster.WriteAttributeBitmap32(mOnSuccessCallback_21->Cancel(), mOnFailureCallback_21->Cancel(), bitmap32Argument);
 
         if (CHIP_NO_ERROR != err)
@@ -2014,7 +2041,7 @@ private:
             return;
         }
 
-        if (bitmap32 != 0)
+        if (bitmap32 != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -2826,7 +2853,7 @@ private:
             return;
         }
 
-        if (int16u != 0)
+        if (int16u != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -2856,7 +2883,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t int16uArgument = 65535;
+        uint16_t int16uArgument = 65535U;
         err = cluster.WriteAttributeInt16u(mOnSuccessCallback_34->Cancel(), mOnFailureCallback_34->Cancel(), int16uArgument);
 
         if (CHIP_NO_ERROR != err)
@@ -2972,7 +2999,7 @@ private:
             return;
         }
 
-        if (int16u != 65535)
+        if (int16u != 65535U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "65535");
             runner->SetCommandExitStatus(false);
@@ -3002,7 +3029,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t int16uArgument = 0;
+        uint16_t int16uArgument = 0U;
         err = cluster.WriteAttributeInt16u(mOnSuccessCallback_36->Cancel(), mOnFailureCallback_36->Cancel(), int16uArgument);
 
         if (CHIP_NO_ERROR != err)
@@ -3118,7 +3145,7 @@ private:
             return;
         }
 
-        if (int16u != 0)
+        if (int16u != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -3194,7 +3221,7 @@ private:
             return;
         }
 
-        if (int32u != 0)
+        if (int32u != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -3224,7 +3251,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint32_t int32uArgument = 4294967295;
+        uint32_t int32uArgument = 4294967295UL;
         err = cluster.WriteAttributeInt32u(mOnSuccessCallback_39->Cancel(), mOnFailureCallback_39->Cancel(), int32uArgument);
 
         if (CHIP_NO_ERROR != err)
@@ -3340,7 +3367,7 @@ private:
             return;
         }
 
-        if (int32u != 4294967295)
+        if (int32u != 4294967295UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "4294967295");
             runner->SetCommandExitStatus(false);
@@ -3370,7 +3397,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint32_t int32uArgument = 0;
+        uint32_t int32uArgument = 0UL;
         err = cluster.WriteAttributeInt32u(mOnSuccessCallback_41->Cancel(), mOnFailureCallback_41->Cancel(), int32uArgument);
 
         if (CHIP_NO_ERROR != err)
@@ -3486,7 +3513,7 @@ private:
             return;
         }
 
-        if (int32u != 0)
+        if (int32u != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -4958,7 +4985,7 @@ private:
             return;
         }
 
-        if (int32s != 0)
+        if (int32s != 0L)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -4988,7 +5015,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        int32_t int32sArgument = 2147483647;
+        int32_t int32sArgument = 2147483647L;
         err = cluster.WriteAttributeInt32s(mOnSuccessCallback_63->Cancel(), mOnFailureCallback_63->Cancel(), int32sArgument);
 
         if (CHIP_NO_ERROR != err)
@@ -5104,7 +5131,7 @@ private:
             return;
         }
 
-        if (int32s != 2147483647)
+        if (int32s != 2147483647L)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "2147483647");
             runner->SetCommandExitStatus(false);
@@ -5134,7 +5161,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        int32_t int32sArgument = -2147483648;
+        int32_t int32sArgument = -2147483648L;
         err = cluster.WriteAttributeInt32s(mOnSuccessCallback_65->Cancel(), mOnFailureCallback_65->Cancel(), int32sArgument);
 
         if (CHIP_NO_ERROR != err)
@@ -5250,7 +5277,7 @@ private:
             return;
         }
 
-        if (int32s != -2147483648)
+        if (int32s != -2147483648L)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "-2147483648");
             runner->SetCommandExitStatus(false);
@@ -5280,7 +5307,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        int32_t int32sArgument = 0;
+        int32_t int32sArgument = 0L;
         err = cluster.WriteAttributeInt32s(mOnSuccessCallback_67->Cancel(), mOnFailureCallback_67->Cancel(), int32sArgument);
 
         if (CHIP_NO_ERROR != err)
@@ -5396,7 +5423,7 @@ private:
             return;
         }
 
-        if (int32s != 0)
+        if (int32s != 0L)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -6354,7 +6381,7 @@ private:
             return;
         }
 
-        if (enum16 != 0)
+        if (enum16 != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -6384,7 +6411,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t enum16Argument = 65535;
+        uint16_t enum16Argument = 65535U;
         err = cluster.WriteAttributeEnum16(mOnSuccessCallback_82->Cancel(), mOnFailureCallback_82->Cancel(), enum16Argument);
 
         if (CHIP_NO_ERROR != err)
@@ -6500,7 +6527,7 @@ private:
             return;
         }
 
-        if (enum16 != 65535)
+        if (enum16 != 65535U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "65535");
             runner->SetCommandExitStatus(false);
@@ -6530,7 +6557,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t enum16Argument = 0;
+        uint16_t enum16Argument = 0U;
         err = cluster.WriteAttributeEnum16(mOnSuccessCallback_84->Cancel(), mOnFailureCallback_84->Cancel(), enum16Argument);
 
         if (CHIP_NO_ERROR != err)
@@ -6646,7 +6673,7 @@ private:
             return;
         }
 
-        if (enum16 != 0)
+        if (enum16 != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -7100,6 +7127,698 @@ private:
 
         runner->NextTest();
     }
+
+    // Test Read attribute LONG_OCTET_STRING Default Value
+    typedef void (*SuccessCallback_92)(void * context, chip::ByteSpan longOctetString);
+    chip::Callback::Callback<SuccessCallback_92> * mOnSuccessCallback_92     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_92 = nullptr;
+    bool mIsFailureExpected_92                                               = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_92()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_OCTET_STRING Default Value: Sending command...");
+
+        mOnFailureCallback_92 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandReadAttribute_92_FailureResponse, this);
+        mOnSuccessCallback_92 = new chip::Callback::Callback<SuccessCallback_92>(
+            OnTestSendClusterTestClusterCommandReadAttribute_92_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeLongOctetString(mOnSuccessCallback_92->Cancel(), mOnFailureCallback_92->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_92;
+            delete mOnSuccessCallback_92;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_92_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_OCTET_STRING Default Value: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_92;
+        delete runner->mOnSuccessCallback_92;
+
+        if (runner->mIsFailureExpected_92 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_92_SuccessResponse(void * context, chip::ByteSpan longOctetString)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_OCTET_STRING Default Value: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_92;
+        delete runner->mOnSuccessCallback_92;
+
+        if (runner->mIsFailureExpected_92 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        chip::ByteSpan longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        if (!longOctetString.data_equal(longOctetStringArgument))
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Write attribute LONG_OCTET_STRING
+    typedef void (*SuccessCallback_93)(void * context, chip::ByteSpan longOctetString);
+    chip::Callback::Callback<SuccessCallback_93> * mOnSuccessCallback_93     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_93 = nullptr;
+    bool mIsFailureExpected_93                                               = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_93()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_OCTET_STRING: Sending command...");
+
+        mOnFailureCallback_93 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandWriteAttribute_93_FailureResponse, this);
+        mOnSuccessCallback_93 = new chip::Callback::Callback<SuccessCallback_93>(
+            OnTestSendClusterTestClusterCommandWriteAttribute_93_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        chip::ByteSpan longOctetStringArgument = chip::ByteSpan(
+            chip::Uint8::from_const_char(
+                "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                "111111111111111111111111111111111111111111111111111111111111111111111111"),
+            strlen("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                   "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                   "111111111111111111111111111111111111111111111111111111111111111111111111111111"));
+        err = cluster.WriteAttributeLongOctetString(mOnSuccessCallback_93->Cancel(), mOnFailureCallback_93->Cancel(),
+                                                    longOctetStringArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_93;
+            delete mOnSuccessCallback_93;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandWriteAttribute_93_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_OCTET_STRING: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_93;
+        delete runner->mOnSuccessCallback_93;
+
+        if (runner->mIsFailureExpected_93 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandWriteAttribute_93_SuccessResponse(void * context, chip::ByteSpan longOctetString)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_OCTET_STRING: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_93;
+        delete runner->mOnSuccessCallback_93;
+
+        if (runner->mIsFailureExpected_93 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute LONG_OCTET_STRING
+    typedef void (*SuccessCallback_94)(void * context, chip::ByteSpan longOctetString);
+    chip::Callback::Callback<SuccessCallback_94> * mOnSuccessCallback_94     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_94 = nullptr;
+    bool mIsFailureExpected_94                                               = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_94()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_OCTET_STRING: Sending command...");
+
+        mOnFailureCallback_94 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandReadAttribute_94_FailureResponse, this);
+        mOnSuccessCallback_94 = new chip::Callback::Callback<SuccessCallback_94>(
+            OnTestSendClusterTestClusterCommandReadAttribute_94_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeLongOctetString(mOnSuccessCallback_94->Cancel(), mOnFailureCallback_94->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_94;
+            delete mOnSuccessCallback_94;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_94_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_OCTET_STRING: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_94;
+        delete runner->mOnSuccessCallback_94;
+
+        if (runner->mIsFailureExpected_94 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_94_SuccessResponse(void * context, chip::ByteSpan longOctetString)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_OCTET_STRING: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_94;
+        delete runner->mOnSuccessCallback_94;
+
+        if (runner->mIsFailureExpected_94 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        chip::ByteSpan longOctetStringArgument = chip::ByteSpan(
+            chip::Uint8::from_const_char(
+                "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                "111111111111111111111111111111111111111111111111111111111111111111111111"),
+            strlen("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                   "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                   "111111111111111111111111111111111111111111111111111111111111111111111111111111"));
+        if (!longOctetString.data_equal(longOctetStringArgument))
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'",
+                         "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                         "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                         "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Write attribute LONG_OCTET_STRING
+    typedef void (*SuccessCallback_95)(void * context, chip::ByteSpan longOctetString);
+    chip::Callback::Callback<SuccessCallback_95> * mOnSuccessCallback_95     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_95 = nullptr;
+    bool mIsFailureExpected_95                                               = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_95()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_OCTET_STRING: Sending command...");
+
+        mOnFailureCallback_95 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandWriteAttribute_95_FailureResponse, this);
+        mOnSuccessCallback_95 = new chip::Callback::Callback<SuccessCallback_95>(
+            OnTestSendClusterTestClusterCommandWriteAttribute_95_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        chip::ByteSpan longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char(""), strlen(""));
+        err = cluster.WriteAttributeLongOctetString(mOnSuccessCallback_95->Cancel(), mOnFailureCallback_95->Cancel(),
+                                                    longOctetStringArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_95;
+            delete mOnSuccessCallback_95;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandWriteAttribute_95_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_OCTET_STRING: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_95;
+        delete runner->mOnSuccessCallback_95;
+
+        if (runner->mIsFailureExpected_95 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandWriteAttribute_95_SuccessResponse(void * context, chip::ByteSpan longOctetString)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_OCTET_STRING: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_95;
+        delete runner->mOnSuccessCallback_95;
+
+        if (runner->mIsFailureExpected_95 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute LIST
+    typedef void (*SuccessCallback_96)(void * context, uint16_t count, uint8_t * listInt8u);
+    chip::Callback::Callback<SuccessCallback_96> * mOnSuccessCallback_96     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_96 = nullptr;
+    bool mIsFailureExpected_96                                               = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_96()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST: Sending command...");
+
+        mOnFailureCallback_96 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandReadAttribute_96_FailureResponse, this);
+        mOnSuccessCallback_96 = new chip::Callback::Callback<SuccessCallback_96>(
+            OnTestSendClusterTestClusterCommandReadAttribute_96_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeListInt8u(mOnSuccessCallback_96->Cancel(), mOnFailureCallback_96->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_96;
+            delete mOnSuccessCallback_96;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_96_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_96;
+        delete runner->mOnSuccessCallback_96;
+
+        if (runner->mIsFailureExpected_96 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_96_SuccessResponse(void * context, uint16_t count,
+                                                                                    uint8_t * listInt8u)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_96;
+        delete runner->mOnSuccessCallback_96;
+
+        if (runner->mIsFailureExpected_96 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        if (count != 4)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1,2,3,4");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute LIST_OCTET_STRING
+    typedef void (*SuccessCallback_97)(void * context, uint16_t count, chip::ByteSpan * listOctetString);
+    chip::Callback::Callback<SuccessCallback_97> * mOnSuccessCallback_97     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_97 = nullptr;
+    bool mIsFailureExpected_97                                               = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_97()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST_OCTET_STRING: Sending command...");
+
+        mOnFailureCallback_97 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandReadAttribute_97_FailureResponse, this);
+        mOnSuccessCallback_97 = new chip::Callback::Callback<SuccessCallback_97>(
+            OnTestSendClusterTestClusterCommandReadAttribute_97_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeListOctetString(mOnSuccessCallback_97->Cancel(), mOnFailureCallback_97->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_97;
+            delete mOnSuccessCallback_97;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_97_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST_OCTET_STRING: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_97;
+        delete runner->mOnSuccessCallback_97;
+
+        if (runner->mIsFailureExpected_97 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_97_SuccessResponse(void * context, uint16_t count,
+                                                                                    chip::ByteSpan * listOctetString)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST_OCTET_STRING: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_97;
+        delete runner->mOnSuccessCallback_97;
+
+        if (runner->mIsFailureExpected_97 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        if (count != 4)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "Test0,Test1,Test2,Test3");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute LIST_STRUCT_OCTET_STRING
+    typedef void (*SuccessCallback_98)(void * context, uint16_t count, _TestListStructOctet * listStructOctetString);
+    chip::Callback::Callback<SuccessCallback_98> * mOnSuccessCallback_98     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_98 = nullptr;
+    bool mIsFailureExpected_98                                               = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_98()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST_STRUCT_OCTET_STRING: Sending command...");
+
+        mOnFailureCallback_98 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandReadAttribute_98_FailureResponse, this);
+        mOnSuccessCallback_98 = new chip::Callback::Callback<SuccessCallback_98>(
+            OnTestSendClusterTestClusterCommandReadAttribute_98_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeListStructOctetString(mOnSuccessCallback_98->Cancel(), mOnFailureCallback_98->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_98;
+            delete mOnSuccessCallback_98;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_98_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST_STRUCT_OCTET_STRING: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_98;
+        delete runner->mOnSuccessCallback_98;
+
+        if (runner->mIsFailureExpected_98 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_98_SuccessResponse(void * context, uint16_t count,
+                                                                                    _TestListStructOctet * listStructOctetString)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST_STRUCT_OCTET_STRING: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_98;
+        delete runner->mOnSuccessCallback_98;
+
+        if (runner->mIsFailureExpected_98 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        if (count != 4)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'",
+                         "[object Object],[object Object],[object Object],[object Object]");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute UNSUPPORTED
+    typedef void (*SuccessCallback_99)(void * context, uint8_t unsupported);
+    chip::Callback::Callback<SuccessCallback_99> * mOnSuccessCallback_99     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_99 = nullptr;
+    bool mIsFailureExpected_99                                               = 1;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_99()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute UNSUPPORTED: Sending command...");
+
+        mOnFailureCallback_99 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandReadAttribute_99_FailureResponse, this);
+        mOnSuccessCallback_99 = new chip::Callback::Callback<SuccessCallback_99>(
+            OnTestSendClusterTestClusterCommandReadAttribute_99_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeUnsupported(mOnSuccessCallback_99->Cancel(), mOnFailureCallback_99->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_99;
+            delete mOnSuccessCallback_99;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_99_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute UNSUPPORTED: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_99;
+        delete runner->mOnSuccessCallback_99;
+
+        if (runner->mIsFailureExpected_99 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_99_SuccessResponse(void * context, uint8_t unsupported)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute UNSUPPORTED: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_99;
+        delete runner->mOnSuccessCallback_99;
+
+        if (runner->mIsFailureExpected_99 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        if (unsupported != 0)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Writeattribute UNSUPPORTED
+    typedef void (*SuccessCallback_100)(void * context, uint8_t unsupported);
+    chip::Callback::Callback<SuccessCallback_100> * mOnSuccessCallback_100    = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_100 = nullptr;
+    bool mIsFailureExpected_100                                               = 1;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_100()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Writeattribute UNSUPPORTED: Sending command...");
+
+        mOnFailureCallback_100 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTestClusterCommandWriteAttribute_100_FailureResponse, this);
+        mOnSuccessCallback_100 = new chip::Callback::Callback<SuccessCallback_100>(
+            OnTestSendClusterTestClusterCommandWriteAttribute_100_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t unsupportedArgument = 0;
+        err = cluster.WriteAttributeUnsupported(mOnSuccessCallback_100->Cancel(), mOnFailureCallback_100->Cancel(),
+                                                unsupportedArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_100;
+            delete mOnSuccessCallback_100;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandWriteAttribute_100_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Writeattribute UNSUPPORTED: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_100;
+        delete runner->mOnSuccessCallback_100;
+
+        if (runner->mIsFailureExpected_100 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandWriteAttribute_100_SuccessResponse(void * context, uint8_t unsupported)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Writeattribute UNSUPPORTED: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_100;
+        delete runner->mOnSuccessCallback_100;
+
+        if (runner->mIsFailureExpected_100 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
 };
 
 class Test_3_1_1 : public TestCommand
@@ -7221,7 +7940,7 @@ private:
             return;
         }
 
-        if (clusterRevision != 2)
+        if (clusterRevision != 2U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "2");
             runner->SetCommandExitStatus(false);
@@ -7297,7 +8016,7 @@ private:
             return;
         }
 
-        if (clusterRevision != 2)
+        if (clusterRevision != 2U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "2");
             runner->SetCommandExitStatus(false);
@@ -7373,7 +8092,7 @@ private:
             return;
         }
 
-        if (featureMap != 0)
+        if (featureMap != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -7449,7 +8168,7 @@ private:
             return;
         }
 
-        if (featureMap != 0)
+        if (featureMap != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -7831,7 +8550,7 @@ private:
             return;
         }
 
-        if (onTime != 0)
+        if (onTime != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -7907,7 +8626,7 @@ private:
             return;
         }
 
-        if (offWaitTime != 0)
+        if (offWaitTime != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -8013,7 +8732,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t onTimeArgument = 0;
+        uint16_t onTimeArgument = 0U;
         err = cluster.WriteAttributeOnTime(mOnSuccessCallback_6->Cancel(), mOnFailureCallback_6->Cancel(), onTimeArgument);
 
         if (CHIP_NO_ERROR != err)
@@ -8083,7 +8802,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t offWaitTimeArgument = 0;
+        uint16_t offWaitTimeArgument = 0U;
         err =
             cluster.WriteAttributeOffWaitTime(mOnSuccessCallback_7->Cancel(), mOnFailureCallback_7->Cancel(), offWaitTimeArgument);
 
@@ -8271,7 +8990,7 @@ private:
             return;
         }
 
-        if (onTime != 0)
+        if (onTime != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
@@ -8347,7 +9066,7 @@ private:
             return;
         }
 
-        if (offWaitTime != 0)
+        if (offWaitTime != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(false);
