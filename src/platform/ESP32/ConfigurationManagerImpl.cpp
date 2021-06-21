@@ -102,7 +102,12 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    return esp_wifi_get_mac(WIFI_IF_STA, buf);
+    wifi_mode_t mode;
+    esp_wifi_get_mode(&mode);
+    if((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
+        return esp_wifi_get_mac(WIFI_IF_AP, buf);
+    else
+        return esp_wifi_get_mac(WIFI_IF_STA, buf);
 }
 
 bool ConfigurationManagerImpl::_CanFactoryReset()
