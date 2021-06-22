@@ -187,7 +187,12 @@ public:
     }
 
     void UpdateWaitForResponse(bool value);
+
+#if CONFIG_USE_SEPARATE_EVENTLOOP
     void WaitForResponse(uint16_t duration);
+#else  // CONFIG_USE_SEPARATE_EVENTLOOP
+    CHIP_ERROR ScheduleWaitForResponse(uint16_t duration);
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
 protected:
     ExecutionContext * GetExecContext() { return mExecContext; }
@@ -202,7 +207,9 @@ private:
     const char * mName            = nullptr;
     std::vector<Argument> mArgs;
 
+#if CONFIG_USE_SEPARATE_EVENTLOOP
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ false };
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 };
