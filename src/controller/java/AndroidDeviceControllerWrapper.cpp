@@ -150,6 +150,7 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
 }
 
+ // TODO Refactor this API to match latest spec, so that GenerateNodeOperationalCertificate receives the full CSR Elements data payload.
 CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr,
                                                                                 int64_t serialNumber, uint8_t * certBuf,
                                                                                 uint32_t certBufSize, uint32_t & outCertLen)

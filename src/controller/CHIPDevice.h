@@ -309,8 +309,6 @@ public:
 
     void SetActive(bool active) { mActive = active; }
 
-    bool IsCSRNonceProvided() const {return mCSRNonceProvided; }
-
     bool IsSecureConnected() const { return IsActive() && mState == ConnectionState::SecureConnected; }
 
     void Reset();
@@ -353,9 +351,15 @@ public:
 
     CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
     {
-       memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
-       mCSRNonceProvided = true;
-       return CHIP_NO_ERROR;
+       if(csrNonce.size() == sizeof(mCSRNonce))
+       {
+        memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
+        mCSRNonceProvided = true;
+        return CHIP_NO_ERROR;
+       }
+       else {
+         return CHIP_ERROR_INCORRECT_STATE;
+       }
     }
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
