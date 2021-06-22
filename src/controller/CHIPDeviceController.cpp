@@ -479,7 +479,6 @@ CHIP_ERROR DeviceController::GetConnectedDevice(NodeId deviceId, Callback::Callb
 
     if (device->IsSecureConnected())
     {
-        // Call onConnectedDevice
         onConnection->mCall(onConnection->mContext, device);
         return CHIP_NO_ERROR;
     }
@@ -1554,12 +1553,20 @@ void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHI
 void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
 {
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+    VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
+                   ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
     commissioner->mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);
 }
 
 void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
 {
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
+    VerifyOrReturn(commissioner != nullptr,
+                   ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
+    VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
+                   ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
     commissioner->mPairingDelegate->OnCommissioningComplete(deviceId, error);
 }
 
