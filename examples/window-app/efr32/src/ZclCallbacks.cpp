@@ -28,6 +28,8 @@
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
+#include <app/clusters/window-covering-server/window-covering-common.h>
+
 using namespace ::chip;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
@@ -45,94 +47,118 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
  *
  * @param endpoint    Endpoint that is being initialized
  */
+
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
-    EFR32_LOG("Window Covering Cluster init");
+    EFR32_LOG("Window Covering Cluster Init");
 }
 
 /**
- * @brief Window Covering Cluster Up/Open Command callback
+ * @brief Window Covering Cluster UpOrOpen Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(chip::app::Command *)
+bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::app::Command * commandObj)
 {
-    EFR32_LOG("Window Up/Open command received");
+    EFR32_LOG("Window UpOrOpen command received");
     AppTask::Instance().Cover().Open();
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
+
 /**
- * @brief Window Covering Cluster Down/Close Command callback
+ * @brief Window Covering Cluster DownOrClose Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(chip::app::Command *)
+bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::app::Command *commandObj)
 {
-    EFR32_LOG("Window Down/Close command received");
+    EFR32_LOG("Window DownOrClose command received");
     AppTask::Instance().Cover().Close();
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
 /**
- * @brief Window Covering Cluster Go To Lift Percentage Command callback
+ * @brief Window Covering Cluster GoToLiftPercentage Command callback
  * @param percentageLiftValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(chip::app::Command *, uint8_t percentageLiftValue)
+bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::Command *, uint8_t percentageLiftValue)
 {
-    EFR32_LOG("Window Go To Lift Percentage command received");
+    EFR32_LOG("Window GoToLiftPercentage command received");
     AppTask::Instance().Cover().LiftGotoPercent(percentageLiftValue);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
 /**
- * @brief Window Covering Cluster Go To Lift Value Command callback
+ * @brief Window Covering Cluster GoToLiftPercentage Command callback
+ * @param liftPercentageValue
+ * @param liftPercent100thsValue
+ */
+
+bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::Command * cmd, uint8_t liftPercentageValue, uint16_t liftPercent100thsValue)
+{
+    return emberAfWindowCoveringClusterGoToLiftPercentageCallback(cmd, liftPercent100thsValue / WC_PERCENTAGE_COEF);
+}
+
+/**
+ * @brief Window Covering Cluster GoToLift Value Command callback
  * @param liftValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(chip::app::Command *, uint16_t liftValue)
+bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::app::Command *, uint16_t liftValue)
 {
-    EFR32_LOG("Window Go To Lift Value command received");
+    EFR32_LOG("Window GoToLiftValue command received");
     AppTask::Instance().Cover().LiftGotoValue(liftValue);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
 /**
- * @brief Window Covering Cluster Go To Tilt Percentage Command callback
+ * @brief Window Covering Cluster GoToTiltPercentage Command callback
  * @param percentageTiltValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(chip::app::Command *, uint8_t percentageTiltValue)
+bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::Command *, uint8_t percentageTiltValue)
 {
-    EFR32_LOG("Window Go To Tilt Percentage command received");
+    EFR32_LOG("Window GoToTiltPercentage command received");
     AppTask::Instance().Cover().TiltGotoPercent(percentageTiltValue);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
 /**
- * @brief Window Covering Cluster Go To Tilt Value Command callback
+ * @brief Window Covering Cluster GoToTiltPercentage Command callback
+ * @param tiltPercentageValue
+ * @param tiltPercent100thsValue
+ */
+
+bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::Command * cmd, uint8_t tiltPercentageValue, uint16_t tiltPercent100thsValue)
+{
+    return emberAfWindowCoveringClusterGoToTiltPercentageCallback(cmd, tiltPercent100thsValue / WC_PERCENTAGE_COEF);
+}
+
+/**
+ * @brief Window Covering Cluster GoToTiltValue Command callback
  * @param tiltValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(chip::app::Command *, uint16_t tiltValue)
+bool emberAfWindowCoveringClusterGoToTiltValueCallback(chip::app::Command *, uint16_t tiltValue)
 {
-    EFR32_LOG("Window Go To Tilt Value command received");
+    EFR32_LOG("Window GoToTiltValue command received");
     AppTask::Instance().Cover().TiltGotoValue(tiltValue);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
 /**
- * @brief Window Covering Cluster Stop Command callback
+ * @brief Window Covering Cluster StopMotion Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringStopCallback(chip::app::Command *)
+bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::Command *)
 {
-    EFR32_LOG("Window Stop command received");
+    EFR32_LOG("Window StopMotion command received");
     AppTask::Instance().Cover().Stop();
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
