@@ -40,7 +40,7 @@ chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}Cluster
  * @brief
  *    Encode a {{parent.name}} server configure report command for the {{name}} attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}});
+chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}});
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
