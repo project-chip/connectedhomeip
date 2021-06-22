@@ -170,11 +170,11 @@ CHIP_ERROR PairingCommand::SetupNetwork()
     switch (mNetworkType)
     {
     case PairingNetworkType::None:
+    case PairingNetworkType::Ethernet:
         // Nothing to do
         SetCommandExitStatus(err == CHIP_NO_ERROR);
         break;
     case PairingNetworkType::WiFi:
-    case PairingNetworkType::Ethernet:
     case PairingNetworkType::Thread:
         err = GetExecContext()->commissioner->GetDevice(mRemoteId, &mDevice);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Setup failure! No pairing for device: %" PRIu64, mRemoteId));

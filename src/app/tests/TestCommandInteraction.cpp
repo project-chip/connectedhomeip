@@ -24,6 +24,7 @@
 
 #include <cinttypes>
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>

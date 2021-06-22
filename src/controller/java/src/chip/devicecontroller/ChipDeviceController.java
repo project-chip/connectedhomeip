@@ -78,6 +78,10 @@ public class ChipDeviceController {
     pairDevice(deviceControllerPtr, deviceId, connectionId, pinCode);
   }
 
+  public long getDevicePointer(long deviceId) {
+    return getDevicePointer(deviceControllerPtr, deviceId);
+  }
+
   public boolean disconnectDevice(long deviceId) {
     return disconnectDevice(deviceControllerPtr, deviceId);
   }
@@ -192,6 +196,8 @@ public class ChipDeviceController {
       long deviceControllerPtr, long deviceId, int connectionId, long pinCode);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
+
+  private native long getDevicePointer(long deviceControllerPtr, long deviceId);
 
   private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 

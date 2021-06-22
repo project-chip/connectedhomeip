@@ -67,7 +67,7 @@ efr32_sdk("sdk") {
   defines = [
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "SL_HEAP_SIZE=(13 * 1024)",
+    "SL_HEAP_SIZE=(16 * 1024)",
   ]
 
   if (chip_enable_pw_rpc) {

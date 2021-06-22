@@ -40,18 +40,6 @@ class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDel
 public:
     ~AndroidDeviceControllerWrapper();
 
-    // Use StackUnlockGuard to temporarily unlock the CHIP BLE stack, e.g. when calling application
-    // or Android BLE code as a result of a BLE event.
-    struct StackUnlockGuard
-    {
-    public:
-        StackUnlockGuard(pthread_mutex_t * mutex) : mMutex(mutex) { pthread_mutex_unlock(mMutex); }
-        ~StackUnlockGuard() { pthread_mutex_lock(mMutex); }
-
-    private:
-        pthread_mutex_t * mMutex;
-    };
-
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
     chip::Controller::ExampleOperationalCredentialsIssuer & OpCredsIssuer() { return mOpCredsIssuer; }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);

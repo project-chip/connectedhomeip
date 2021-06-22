@@ -151,10 +151,6 @@ CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
 {
-    CHIP_ERROR error             = CHIP_NO_ERROR;
-    uint16_t serializedLen       = 0;
-    uint32_t localMessageCounter = 0;
-    uint32_t peerMessageCounter  = 0;
     SerializableDevice serializable;
 
     static_assert(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
@@ -169,9 +165,9 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
-    VerifyOrExit(connectionState != nullptr, error = CHIP_ERROR_INCORRECT_STATE);
-    localMessageCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter().Value();
-    peerMessageCounter  = connectionState->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
+    VerifyOrReturnError(connectionState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    const uint32_t localMessageCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter().Value();
+    const uint32_t peerMessageCounter  = connectionState->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
 
     serializable.mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(localMessageCounter);
     serializable.mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(peerMessageCounter);
@@ -183,53 +179,47 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
                   "The underlying type of Transport::Type is not uint8_t.");
     serializable.mDeviceTransport = static_cast<uint8_t>(mDeviceAddress.GetTransportType());
 
-    SuccessOrExit(error = Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
-                                                 sizeof(serializable.mInterfaceName)));
+    ReturnErrorOnFailure(Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
+                                                sizeof(serializable.mInterfaceName)));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
-    serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
-                                       static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
-    VerifyOrExit(serializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(serializedLen < sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
+    const uint16_t serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
+                                                      static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
+    VerifyOrReturnError(serializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(serializedLen < sizeof(output.inner), CHIP_ERROR_INVALID_ARGUMENT);
     output.inner[serializedLen] = '\0';
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
     SerializableDevice serializable;
-    size_t maxlen             = BASE64_ENCODED_LEN(sizeof(serializable));
-    size_t len                = strnlen(Uint8::to_const_char(&input.inner[0]), maxlen);
-    uint16_t deserializedLen  = 0;
-    Inet::IPAddress ipAddress = {};
+    constexpr size_t maxlen = BASE64_ENCODED_LEN(sizeof(serializable));
+    const size_t len        = strnlen(Uint8::to_const_char(&input.inner[0]), maxlen);
 
-    VerifyOrExit(len < sizeof(SerializedDevice), error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(CanCastTo<uint16_t>(len), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(len < sizeof(SerializedDevice), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ZERO_AT(serializable);
-    deserializedLen = Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len),
-                                   Uint8::to_uchar(reinterpret_cast<uint8_t *>(&serializable)));
+    const uint16_t deserializedLen = Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len),
+                                                  Uint8::to_uchar(reinterpret_cast<uint8_t *>(&serializable)));
 
-    VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    uint16_t port;
-    Inet::InterfaceId interfaceId;
+    VerifyOrReturnError(deserializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(deserializedLen <= sizeof(serializable), CHIP_ERROR_INVALID_ARGUMENT);
 
     // The second parameter to FromString takes the strlen value. We are subtracting 1
     // from the sizeof(serializable.mDeviceAddr) to account for null termination, since
     // strlen doesn't include null character in the size.
-    VerifyOrExit(
+    Inet::IPAddress ipAddress = {};
+    VerifyOrReturnError(
         IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, ipAddress),
-        error = CHIP_ERROR_INVALID_ADDRESS);
+        CHIP_ERROR_INVALID_ADDRESS);
 
     mPairing             = serializable.mOpsCreds;
     mDeviceId            = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
-    port                 = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    const uint16_t port  = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
     mAdminId             = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
     mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(serializable.mLocalMessageCounter);
     mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(serializable.mPeerMessageCounter);
@@ -247,7 +237,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
-    interfaceId = INET_NULL_INTERFACEID;
+    Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
     if (serializable.mInterfaceName[0] != '\0')
     {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -257,7 +247,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif
-        VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(CHIP_NO_ERROR == inetErr, CHIP_ERROR_INTERNAL);
     }
 
     static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
@@ -273,11 +263,10 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     case Transport::Type::kTcp:
     case Transport::Type::kUndefined:
     default:
-        ExitNow(error = CHIP_ERROR_INTERNAL);
+        return CHIP_ERROR_INTERNAL;
     }
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::Persist()
@@ -286,7 +275,7 @@ CHIP_ERROR Device::Persist()
     if (mStorageDelegate != nullptr)
     {
         SerializedDevice serialized;
-        SuccessOrExit(error = Serialize(serialized));
+        ReturnErrorOnFailure(Serialize(serialized));
 
         // TODO: no need to base-64 the serialized values AGAIN
         PERSISTENT_KEY_OP(GetDeviceId(), kPairedDeviceKeyPrefix, key,
@@ -296,7 +285,6 @@ CHIP_ERROR Device::Persist()
             ChipLogError(Controller, "Failed to persist device %" PRId32, error);
         }
     }
-exit:
     return error;
 }
 

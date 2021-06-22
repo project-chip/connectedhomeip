@@ -26,7 +26,7 @@
 		1E85732C26551A490050A4D9 /* DataModelHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731C26551A490050A4D9 /* DataModelHandler.cpp */; };
 		1E85732D26551A490050A4D9 /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731D26551A490050A4D9 /* util.cpp */; };
 		1E85732E26551A490050A4D9 /* ember-print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731E26551A490050A4D9 /* ember-print.cpp */; };
-		1E85732F26551A490050A4D9 /* attribute-size.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731F26551A490050A4D9 /* attribute-size.cpp */; };
+		1E85732F26551A490050A4D9 /* attribute-size-util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731F26551A490050A4D9 /* attribute-size-util.cpp */; };
 		1E85733026551A490050A4D9 /* process-cluster-message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85732026551A490050A4D9 /* process-cluster-message.cpp */; };
 		1E85733126551A490050A4D9 /* chip-message-send.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85732126551A490050A4D9 /* chip-message-send.cpp */; };
 		1E85733426551A700050A4D9 /* reporting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85733226551A700050A4D9 /* reporting.cpp */; };
@@ -98,7 +98,7 @@
 		1E85731C26551A490050A4D9 /* DataModelHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DataModelHandler.cpp; path = ../../../app/util/DataModelHandler.cpp; sourceTree = "<group>"; };
 		1E85731D26551A490050A4D9 /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = ../../../app/util/util.cpp; sourceTree = "<group>"; };
 		1E85731E26551A490050A4D9 /* ember-print.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-print.cpp"; path = "../../../app/util/ember-print.cpp"; sourceTree = "<group>"; };
-		1E85731F26551A490050A4D9 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size-util.cpp"; path = "../../../app/util/attribute-size-util.cpp"; sourceTree = "<group>"; };
+		1E85731F26551A490050A4D9 /* attribute-size-util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size-util.cpp"; path = "../../../app/util/attribute-size-util.cpp"; sourceTree = "<group>"; };
 		1E85732026551A490050A4D9 /* process-cluster-message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "process-cluster-message.cpp"; path = "../../../app/util/process-cluster-message.cpp"; sourceTree = "<group>"; };
 		1E85732126551A490050A4D9 /* chip-message-send.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "chip-message-send.cpp"; path = "../../../app/util/chip-message-send.cpp"; sourceTree = "<group>"; };
 		1E85733226551A700050A4D9 /* reporting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = reporting.cpp; path = ../../../app/reporting/reporting.cpp; sourceTree = "<group>"; };
@@ -173,7 +173,7 @@
 				1E85731926551A490050A4D9 /* af-event.cpp */,
 				1E85731B26551A490050A4D9 /* af-main-common.cpp */,
 				1E85731426551A490050A4D9 /* attribute-list-byte-span.cpp */,
-				1E85731F26551A490050A4D9 /* attribute-size.cpp */,
+				1E85731F26551A490050A4D9 /* attribute-size-util.cpp */,
 				1E85731626551A490050A4D9 /* attribute-storage.cpp */,
 				1E85731826551A490050A4D9 /* attribute-table.cpp */,
 				1E85731226551A490050A4D9 /* binding-table.cpp */,
@@ -453,7 +453,7 @@
 				1E85732B26551A490050A4D9 /* af-main-common.cpp in Sources */,
 				1E85732A26551A490050A4D9 /* ember-compatibility-functions.cpp in Sources */,
 				B289D4222639C0D300D4E314 /* CHIPOnboardingPayloadParser.m in Sources */,
-				1E85732F26551A490050A4D9 /* attribute-size.cpp in Sources */,
+				1E85732F26551A490050A4D9 /* attribute-size-util.cpp in Sources */,
 				2C1B027A2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.mm in Sources */,
 				1E85733526551A700050A4D9 /* reporting-default-configuration.cpp in Sources */,
 				1E85732926551A490050A4D9 /* af-event.cpp in Sources */,

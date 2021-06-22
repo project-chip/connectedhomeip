@@ -1,0 +1,39 @@
+{
+    "name": "CHIP Android templates",
+    "version": "chip-v1",
+    "helpers": [
+        "../../../app/zap-templates/common/ListHelper.js",
+        "../../../app/zap-templates/common/StringHelper.js",
+        "../../../app/zap-templates/partials/helper.js",
+        "../../../app/zap-templates/templates/app/helper.js",
+        "../../../app/zap-templates/templates/chip/helper.js",
+        "helper.js"
+    ],
+    "override": "../../../app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "clusters_header",
+            "path": "../../../app/zap-templates/partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "../../../app/zap-templates/partials/cluster_header.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "CHIPClusters-JNI.zapt",
+            "name": "CHIP ZCL API for Java (native code)",
+            "output": "src/controller/java/gen/CHIPClusters-JNI.cpp"
+        },
+        {
+            "path": "ChipClusters-java.zapt",
+            "name": "CHIP ZCL API for Java",
+            "output": "src/controller/java/gen/ChipClusters.java"
+        }
+    ]
+}

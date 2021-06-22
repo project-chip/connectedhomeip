@@ -19,9 +19,6 @@ import("//build_overrides/openthread.gni")
 chip_device_platform = "k32w"
 
 lwip_platform = "k32w"
-lwip_ipv6 = true
-lwip_ipv4 = false
-lwip_api = true
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false

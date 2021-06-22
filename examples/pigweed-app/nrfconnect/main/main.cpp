@@ -30,25 +30,13 @@
 
 LOG_MODULE_REGISTER(app);
 
-static LEDWidget sStatusLED;
-
 namespace {
-#define RPC_STACK_SIZE (8 * 1024)
-#define RPC_PRIORITY 7
-
-K_THREAD_STACK_DEFINE(rpc_stack_area, RPC_STACK_SIZE);
-struct k_thread rpc_thread_data;
-
-pw::rpc::EchoService echo_service;
+LEDWidget sStatusLED;
+pw::rpc::EchoService sEchoService;
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(echo_service);
-}
-
-void RunRpcService(void *, void *, void *)
-{
-    Start(RegisterServices, &::chip::rpc::logger_mutex);
+    server.RegisterService(sEchoService);
 }
 
 } // namespace
@@ -72,8 +60,6 @@ int main()
     sStatusLED.Init(SYSTEM_STATE_LED);
     sStatusLED.Set(true);
 
-    k_thread_create(&rpc_thread_data, rpc_stack_area, K_THREAD_STACK_SIZEOF(rpc_stack_area), RunRpcService, NULL, NULL, NULL,
-                    RPC_PRIORITY, 0, K_NO_WAIT);
-    k_thread_join(&rpc_thread_data, K_FOREVER);
+    Start(RegisterServices, &::chip::rpc::logger_mutex);
     return 0;
 }
