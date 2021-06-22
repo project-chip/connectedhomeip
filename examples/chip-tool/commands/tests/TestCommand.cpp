@@ -31,18 +31,12 @@ CHIP_ERROR TestCommand::Run(NodeId localId, NodeId remoteId)
     //
     UpdateWaitForResponse(true);
 
-    {
-        chip::DeviceLayer::StackLock lock;
+    err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
+    ReturnErrorOnFailure(err);
 
-        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
-        ReturnErrorOnFailure(err);
+    err = NextTest();
+    ReturnErrorOnFailure(err);
 
-        err = NextTest();
-        ReturnErrorOnFailure(err);
-    }
-
-    WaitForResponse(kWaitDurationInSeconds);
-
-    VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
+    ScheduleWaitForResponse(kWaitDurationInSeconds, [] {});
     return CHIP_NO_ERROR;
 }

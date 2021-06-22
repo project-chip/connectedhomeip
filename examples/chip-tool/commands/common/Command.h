@@ -174,6 +174,9 @@ public:
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(uint16_t duration);
 
+    static void OnResponseTimer(chip::System::Layer *aLayer, void *aAppState, chip::System::Error aError);
+    void ScheduleWaitForResponse(uint16_t duration, std::function<void()> f);
+        
 protected:
     ExecutionContext * GetExecContext() { return mExecContext; }
     ExecutionContext * mExecContext;
@@ -186,6 +189,8 @@ private:
     bool mCommandExitStatus = false;
     const char * mName      = nullptr;
     std::vector<Argument> mArgs;
+
+    std::function<void()> mCleanupFunc = nullptr;
 
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;

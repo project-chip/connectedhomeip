@@ -44,6 +44,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
 
+    mRunLoopSem = dispatch_semaphore_create(0);
+    
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
@@ -68,16 +70,21 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 
 CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 {
+    if (dispatch_get_current_queue() != mWorkQueue) {
+        if (mIsWorkQueueRunning == true)
+        {
+            mIsWorkQueueRunning = false;
 
-    if (mIsWorkQueueRunning == true)
-    {
-        mIsWorkQueueRunning = false;
-
-        // dispatch_sync is used in order to guarantee serialization of the caller with
-        // respect to any tasks that might already be on the queue, or running.
-        dispatch_sync(mWorkQueue, ^{
-            dispatch_suspend(mWorkQueue);
-        });
+            // dispatch_sync is used in order to guarantee serialization of the caller with
+            // respect to any tasks that might already be on the queue, or running.
+            dispatch_sync(mWorkQueue, ^{
+                dispatch_suspend(mWorkQueue);
+            });
+        }
+    }
+    else {
+        dispatch_suspend(mWorkQueue);
+        dispatch_semaphore_signal(mRunLoopSem);
     }
 
     return CHIP_NO_ERROR;
@@ -86,8 +93,12 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 void PlatformManagerImpl::_RunEventLoop()
 {
     _StartEventLoopTask();
-    CFRunLoopRun();
-};
+
+    //
+    // Block on the sem till we're signalled to stop by _StopEventLoopTask()
+    //
+    dispatch_semaphore_wait(mRunLoopSem, DISPATCH_TIME_FOREVER);
+}
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {

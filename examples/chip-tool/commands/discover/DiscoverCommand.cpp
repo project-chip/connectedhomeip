@@ -31,22 +31,13 @@ CHIP_ERROR DiscoverCommand::Run(NodeId localId, NodeId remoteId)
     //
     UpdateWaitForResponse(true);
 
-    {
-        chip::DeviceLayer::StackLock lock;
+    GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
 
-        GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
-        err = RunCommand(mNodeId, mFabricId);
-        SuccessOrExit(err);
-    }
+    err = RunCommand(mNodeId, mFabricId);
+    SuccessOrExit(err);
 
-    WaitForResponse(kWaitDurationInSeconds);
+    ScheduleWaitForResponse(kWaitDurationInSeconds, [] {});
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
-    VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
-    return CHIP_NO_ERROR;
+    return err;
 }

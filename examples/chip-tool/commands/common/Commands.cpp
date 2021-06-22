@@ -69,17 +69,12 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
     err = mController.Init(localId, initParams);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
 
-    err = mController.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
-
     err = RunCommand(localId, remoteId, argc, argv);
     SuccessOrExit(err);
 
-exit:
-#if CONFIG_DEVICE_LAYER
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-#endif
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
+exit:
     //
     // We can call DeviceController::Shutdown() safely without grabbing the stack lock
     // since the CHIP thread and event queue have been stopped, preventing any thread

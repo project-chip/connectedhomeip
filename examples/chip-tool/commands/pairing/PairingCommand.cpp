@@ -31,23 +31,13 @@ CHIP_ERROR PairingCommand::Run(NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    {
-        chip::DeviceLayer::StackLock lock;
-
-        GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
-        GetExecContext()->commissioner->RegisterPairingDelegate(this);
-    }
+    GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
+    GetExecContext()->commissioner->RegisterPairingDelegate(this);
 
     err = RunInternal(remoteId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", ErrorStr(err)));
 
 exit:
-
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
-    }
-
     return err;
 }
 
@@ -71,11 +61,8 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     // appropriately. None of the following calls below before the unlock are, nor should be,
     // blocking.
     //
+    switch (mPairingMode)
     {
-        chip::DeviceLayer::StackLock lock;
-
-        switch (mPairingMode)
-        {
         case PairingMode::None:
             err = Unpair(remoteId);
             break;
@@ -92,11 +79,11 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         case PairingMode::Ethernet:
             err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
             break;
-        }
     }
 
-    WaitForResponse(kWaitDurationInSeconds);
-    ReleaseCallbacks();
+    ScheduleWaitForResponse(kWaitDurationInSeconds, [this] { 
+        ReleaseCallbacks(); 
+    });
 
     return err;
 }

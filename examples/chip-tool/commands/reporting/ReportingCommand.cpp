@@ -40,20 +40,16 @@ CHIP_ERROR ReportingCommand::Run(NodeId localId, NodeId remoteId)
     //
     UpdateWaitForResponse(true);
 
-    {
-        chip::DeviceLayer::StackLock lock;
+    err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
 
-        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
+    AddReportCallbacks(mEndPointId);
+    cluster.Associate(mDevice, mEndPointId);
 
-        AddReportCallbacks(mEndPointId);
-        cluster.Associate(mDevice, mEndPointId);
+    err = cluster.MfgSpecificPing(nullptr, nullptr);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
 
-        err = cluster.MfgSpecificPing(nullptr, nullptr);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
-    }
-
-    WaitForResponse(kWaitDurationInSeconds);
+    ScheduleWaitForResponse(kWaitDurationInSeconds, [] {});
 
 exit:
     return err;

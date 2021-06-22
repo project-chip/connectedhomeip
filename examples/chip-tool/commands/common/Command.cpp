@@ -17,6 +17,7 @@
  */
 
 #include "Command.h"
+#include "platform/PlatformManager.h"
 
 #include <netdb.h>
 #include <sstream>
@@ -378,11 +379,13 @@ const char * Command::GetAttribute(void) const
 
 void Command::UpdateWaitForResponse(bool value)
 {
-    {
-        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-        mWaitingForResponse = value;
+    if (value == false) {
+        if (mCommandExitStatus == false) {
+            ChipLogError(chipTool, "Run command failure");
+        }
+
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
-    cvWaitingForResponse.notify_all();
 }
 
 void Command::WaitForResponse(uint16_t duration)
@@ -393,5 +396,36 @@ void Command::WaitForResponse(uint16_t duration)
     if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
     {
         ChipLogError(chipTool, "No response from device");
+    }
+}
+
+void Command::OnResponseTimer(chip::System::Layer *aLayer, void *aAppState, chip::System::Error aError)
+{
+    Command *_this = static_cast<Command *>(aAppState);
+
+    ChipLogError(chipTool, "No response from device");
+
+    if (_this->mCleanupFunc) {
+        _this->mCleanupFunc();
+    }
+
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+}
+
+void Command::ScheduleWaitForResponse(uint16_t duration, std::function<void()> cleanupFunc)
+{
+    chip::System::Timer *timer = nullptr;
+    
+    mCleanupFunc = cleanupFunc;
+
+    if (chip::DeviceLayer::SystemLayer.NewTimer(timer) == CHIP_NO_ERROR) {
+        timer->Start(
+            duration * 1000,
+            OnResponseTimer,
+            this);
+    }
+    else {
+        ChipLogError(chipTool, "Failed to allocate timer");
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 }
