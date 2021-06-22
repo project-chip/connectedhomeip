@@ -151,6 +151,7 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;
     initParams.imDelegate                     = &PythonInteractionModelDelegate::Instance();
 
+    (*outDevCtrl)->SetUdpListenPort(CHIP_PORT + 1);
     ReturnErrorOnFailure((*outDevCtrl)->Init(localDeviceId, initParams));
     ReturnErrorOnFailure((*outDevCtrl)->ServiceEvents());
 
