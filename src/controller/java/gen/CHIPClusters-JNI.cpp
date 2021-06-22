@@ -60,7 +60,7 @@ CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], jint 
     jclass exceptionClass;
     jstring errStr;
 
-    err = GetClassRef(env, "java/lang/IllegalStateException", exceptionClass);
+    err = JniReferences::GetClassRef(env, "java/lang/IllegalStateException", exceptionClass);
     SuccessOrExit(err);
 
     exceptionConstructor = env->GetMethodID(exceptionClass, "<init>", "(Ljava/lang/String;)V");
@@ -124,7 +124,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->ExceptionClear();
@@ -194,7 +194,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onError", "(Ljava/lang/Exception;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onError", "(Ljava/lang/Exception;)V", &javaMethod);
         SuccessOrExit(err);
 
         err = CreateChipClusterException(env, status, exception);
@@ -269,7 +269,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, setupPINStr.jniValue());
@@ -340,7 +340,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue());
@@ -411,7 +411,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue(), static_cast<jint>(contentLaunchStatus));
@@ -482,7 +482,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue(), static_cast<jint>(contentLaunchStatus));
@@ -550,7 +550,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -618,7 +618,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -687,7 +687,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -755,7 +755,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -823,7 +823,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -892,7 +892,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -961,7 +961,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1031,7 +1031,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IJJI)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(IJJI)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jlong>(localStartTime),
@@ -1103,7 +1103,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IJIIIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(IJIIIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(logEntryId), static_cast<jlong>(timestamp),
@@ -1175,7 +1175,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userStatus),
@@ -1246,7 +1246,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userStatus),
@@ -1315,7 +1315,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userType));
@@ -1385,7 +1385,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIIIIII)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(IIIIIII)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jint>(userId),
@@ -1456,7 +1456,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIJJ)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(IIJJ)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jint>(userId),
@@ -1525,7 +1525,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1594,7 +1594,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1662,7 +1662,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1730,7 +1730,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1798,7 +1798,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1867,7 +1867,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1936,7 +1936,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -2004,7 +2004,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -2073,7 +2073,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -2144,7 +2144,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -2215,7 +2215,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -2286,7 +2286,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -2354,7 +2354,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId));
@@ -2424,7 +2424,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(capacity), static_cast<jint>(groupCount)
@@ -2495,7 +2495,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId));
@@ -2565,7 +2565,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), groupNameStr.jniValue());
@@ -2633,7 +2633,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(timeout));
@@ -2701,7 +2701,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -2770,7 +2770,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -2838,7 +2838,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -2906,7 +2906,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -2974,7 +2974,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3043,7 +3043,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3112,7 +3112,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3181,7 +3181,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3250,7 +3250,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3319,7 +3319,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3388,7 +3388,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3456,7 +3456,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3527,7 +3527,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3598,7 +3598,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3669,7 +3669,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3740,7 +3740,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3811,7 +3811,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3884,7 +3884,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue()
@@ -3960,7 +3960,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -4031,7 +4031,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -4100,7 +4100,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IJ)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(IJ)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(action), static_cast<jlong>(delayedActionTime));
@@ -4174,7 +4174,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(JLjava/lang/String;J[BI[B)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(JLjava/lang/String;J[BI[B)V", &javaMethod);
         SuccessOrExit(err);
 
         updateTokenArr = env->NewByteArray(updateToken.size());
@@ -4267,7 +4267,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "([B[B[B[B[B[B)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "([B[B[B[B[B[B)V", &javaMethod);
         SuccessOrExit(err);
 
         CSRArr = env->NewByteArray(CSR.size());
@@ -4380,7 +4380,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IJLjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(IJLjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(StatusCode), static_cast<jlong>(FabricIndex),
@@ -4450,7 +4450,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(FabricId));
@@ -4518,7 +4518,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId));
@@ -4588,7 +4588,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(III)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(III)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(capacity), static_cast<jint>(groupId),
@@ -4660,7 +4660,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId));
@@ -4728,7 +4728,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId));
@@ -4796,7 +4796,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId));
@@ -4867,7 +4867,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId),
@@ -4939,7 +4939,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef,
@@ -5015,7 +5015,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue());
@@ -5083,7 +5083,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(returnValue));
@@ -5156,7 +5156,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5206,7 +5206,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5260,7 +5260,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5319,7 +5319,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5376,7 +5376,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5421,7 +5421,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5476,7 +5476,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5521,7 +5521,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5575,7 +5575,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5639,7 +5639,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5685,7 +5685,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5749,7 +5749,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5797,7 +5797,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5843,7 +5843,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5889,7 +5889,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5937,7 +5937,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5985,7 +5985,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6033,7 +6033,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6081,7 +6081,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6129,7 +6129,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6177,7 +6177,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6225,7 +6225,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6273,7 +6273,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6321,7 +6321,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6367,7 +6367,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6424,7 +6424,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6474,7 +6474,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6537,7 +6537,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6582,7 +6582,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6628,7 +6628,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6673,7 +6673,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6718,7 +6718,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6764,7 +6764,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6810,7 +6810,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6856,7 +6856,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6901,7 +6901,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6946,7 +6946,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6991,7 +6991,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7036,7 +7036,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7082,7 +7082,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7128,7 +7128,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7175,7 +7175,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7223,7 +7223,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7271,7 +7271,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7319,7 +7319,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7365,7 +7365,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7413,7 +7413,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7461,7 +7461,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7508,7 +7508,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7556,7 +7556,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7610,7 +7610,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7674,7 +7674,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7719,7 +7719,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7769,7 +7769,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7844,7 +7844,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7892,7 +7892,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7938,7 +7938,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7983,7 +7983,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8028,7 +8028,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8073,7 +8073,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8127,7 +8127,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8172,7 +8172,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8226,7 +8226,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8281,7 +8281,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8328,7 +8328,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8374,7 +8374,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8420,7 +8420,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8468,7 +8468,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8514,7 +8514,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8560,7 +8560,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8605,7 +8605,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8659,7 +8659,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8713,7 +8713,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8761,7 +8761,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8806,7 +8806,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8851,7 +8851,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8905,7 +8905,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8950,7 +8950,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8995,7 +8995,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9040,7 +9040,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9085,7 +9085,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9130,7 +9130,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9176,7 +9176,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9222,7 +9222,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9268,7 +9268,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9313,7 +9313,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9358,7 +9358,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9416,7 +9416,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9467,7 +9467,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9516,7 +9516,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9565,7 +9565,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9611,7 +9611,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9660,7 +9660,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9708,7 +9708,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9757,7 +9757,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9808,7 +9808,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9866,7 +9866,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9915,7 +9915,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9968,7 +9968,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10022,7 +10022,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10067,7 +10067,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10112,7 +10112,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10173,7 +10173,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10222,7 +10222,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10270,7 +10270,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10315,7 +10315,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10361,7 +10361,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10410,7 +10410,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10456,7 +10456,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10504,7 +10504,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10580,7 +10580,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10625,7 +10625,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10671,7 +10671,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10716,7 +10716,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10762,7 +10762,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10808,7 +10808,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10854,7 +10854,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10908,7 +10908,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10973,7 +10973,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11019,7 +11019,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11064,7 +11064,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11121,7 +11121,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11184,7 +11184,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11229,7 +11229,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11274,7 +11274,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11319,7 +11319,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11373,7 +11373,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11418,7 +11418,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11464,7 +11464,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11512,7 +11512,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11558,7 +11558,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11612,7 +11612,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11675,7 +11675,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11721,7 +11721,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11767,7 +11767,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11813,7 +11813,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11859,7 +11859,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11904,7 +11904,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11949,7 +11949,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
