@@ -65,12 +65,11 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::app::Command * commandOb
     return true;
 }
 
-
 /**
  * @brief Window Covering Cluster DownOrClose Command callback
  */
 
-bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::app::Command *commandObj)
+bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::app::Command * commandObj)
 {
     EFR32_LOG("Window DownOrClose command received");
     AppTask::Instance().Cover().Close();
@@ -97,7 +96,8 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::Command *
  * @param liftPercent100thsValue
  */
 
-bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::Command * cmd, uint8_t liftPercentageValue, uint16_t liftPercent100thsValue)
+bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::Command * cmd, uint8_t liftPercentageValue,
+                                                            uint16_t liftPercent100thsValue)
 {
     return emberAfWindowCoveringClusterGoToLiftPercentageCallback(cmd, liftPercent100thsValue / WC_PERCENTAGE_COEF);
 }
@@ -134,7 +134,8 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::Command *
  * @param tiltPercent100thsValue
  */
 
-bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::Command * cmd, uint8_t tiltPercentageValue, uint16_t tiltPercent100thsValue)
+bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::Command * cmd, uint8_t tiltPercentageValue,
+                                                            uint16_t tiltPercent100thsValue)
 {
     return emberAfWindowCoveringClusterGoToTiltPercentageCallback(cmd, tiltPercent100thsValue / WC_PERCENTAGE_COEF);
 }

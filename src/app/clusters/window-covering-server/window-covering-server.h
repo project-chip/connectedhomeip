@@ -25,7 +25,8 @@
 
 #include "window-covering-common.h"
 
-EmberAfStatus wcWriteAttribute(chip::EndpointId ep, chip::AttributeId attributeID, uint8_t * dataPtr, EmberAfAttributeType dataType);
+EmberAfStatus wcWriteAttribute(chip::EndpointId ep, chip::AttributeId attributeID, uint8_t * dataPtr,
+                               EmberAfAttributeType dataType);
 EmberAfStatus wcReadAttribute(chip::EndpointId ep, chip::AttributeId attributeID, uint8_t * dataPtr, uint16_t readLength);
 
 EmberAfStatus wcSetTargetPositionLift(chip::EndpointId ep, posPercent100ths_t liftPercent100ths);
