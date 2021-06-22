@@ -122,7 +122,7 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamel
 
 {{/if}}
 {{#if (isReportableAttribute)}}
-PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
+PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#if (hasConfigurableChange)}}, {{chipType}} change{{/if}})
 {
     COMMAND_HEADER("Report{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
     buf.Put8(kFrameControlGlobalCommand)
@@ -133,9 +133,9 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asC
        .Put8({{atomicTypeId}})
        .Put16(minInterval)
        .Put16(maxInterval);
-    {{#unless (isDiscreteType)}}
+    {{#if (hasConfigurableChange)}}
     buf.Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>(change));
-    {{/unless}}
+    {{/if}}
     COMMAND_FOOTER();
 }
 
