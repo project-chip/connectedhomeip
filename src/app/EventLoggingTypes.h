@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/ClusterInfo.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -81,6 +82,9 @@ enum class PriorityLevel : uint8_t
     Invalid  = Last + 1,
 
 };
+
+static_assert(sizeof(std::underlying_type_t<PriorityLevel>) <= sizeof(unsigned),
+              "Logging that converts PriorityLevel to unsigned will be lossy");
 
 /**
  * @brief
@@ -168,10 +172,12 @@ struct EventLoadOutContext
     TLV::TLVWriter & mWriter;
     PriorityLevel mPriority          = PriorityLevel::Invalid;
     EventNumber mStartingEventNumber = 0;
+    Timestamp mPreviousSystemTime;
     Timestamp mCurrentSystemTime;
     EventNumber mCurrentEventNumber = 0;
     Timestamp mCurrentUTCTime;
-    bool mFirst = true;
+    ClusterInfo * mpInterestedEventPaths = nullptr;
+    bool mFirst                          = true;
 };
 } // namespace app
 } // namespace chip

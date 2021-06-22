@@ -26,6 +26,8 @@
 #include "CommandHandler.h"
 #include "CommandSender.h"
 #include "InteractionModelEngine.h"
+
+#include <app/AppBuildConfig.h>
 #include <core/CHIPTLVDebug.hpp>
 
 namespace chip {
@@ -54,14 +56,12 @@ CHIP_ERROR Command::Reset()
     CommandList::Builder commandListBuilder;
     AbortExistingExchangeContext();
 
-    if (mCommandMessageBuf.IsNull())
-    {
-        // TODO: Calculate the packet buffer size
-        mCommandMessageBuf = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-        VerifyOrExit(!mCommandMessageBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    }
+    mCommandMessageWriter.Reset();
 
-    mCommandMessageWriter.Init(std::move(mCommandMessageBuf));
+    System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    VerifyOrExit(!commandPacket.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    mCommandMessageWriter.Init(std::move(commandPacket));
     err = mInvokeCommandBuilder.Init(&mCommandMessageWriter);
     SuccessOrExit(err);
 
@@ -128,9 +128,8 @@ exit:
 
 void Command::Shutdown()
 {
-    VerifyOrExit(mState != CommandState::Uninitialized, );
+    VerifyOrReturn(mState != CommandState::Uninitialized);
     mCommandMessageWriter.Reset();
-    mCommandMessageBuf = nullptr;
 
     AbortExistingExchangeContext();
 
@@ -139,24 +138,19 @@ void Command::Shutdown()
     ClearState();
 
     mCommandIndex = 0;
-exit:
-    return;
 }
 
-CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus)
+CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    CommandDataElement::Builder commandDataElement =
-        mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
-    err = commandDataElement.GetError();
+    CommandDataElement::Builder commandDataElement;
+    VerifyOrExit(mState == CommandState::Initialized || mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+    commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+    err                = commandDataElement.GetError();
     SuccessOrExit(err);
 
-    if (apCommandPathParams != nullptr)
-    {
-        err = ConstructCommandPath(*apCommandPathParams, commandDataElement);
-        SuccessOrExit(err);
-    }
+    err = ConstructCommandPath(aCommandPathParams, commandDataElement);
+    SuccessOrExit(err);
 
     if (!aIsStatus)
     {
@@ -225,7 +219,7 @@ CHIP_ERROR Command::AbortExistingExchangeContext()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Command::FinalizeCommandsMessage()
+CHIP_ERROR Command::FinalizeCommandsMessage(System::PacketBufferHandle & commandPacket)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandList::Builder commandListBuilder;
@@ -238,7 +232,7 @@ CHIP_ERROR Command::FinalizeCommandsMessage()
     err = mInvokeCommandBuilder.GetError();
     SuccessOrExit(err);
 
-    err = mCommandMessageWriter.Finalize(&mCommandMessageBuf);
+    err = mCommandMessageWriter.Finalize(&commandPacket);
     SuccessOrExit(err);
 exit:
     ChipLogFunctError(err);

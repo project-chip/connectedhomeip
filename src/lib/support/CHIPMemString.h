@@ -23,10 +23,12 @@
 
 #pragma once
 
+#include <algorithm>
 #include <stdlib.h>
 #include <string.h>
 
 #include <support/ScopedBuffer.h>
+#include <support/Span.h>
 
 namespace chip {
 namespace Platform {
@@ -64,6 +66,28 @@ template <size_t N>
 inline void CopyString(char (&dest)[N], const char * source)
 {
     CopyString(dest, N, source);
+}
+
+/**
+ * Creates a null-terminated string from a ByteSpan.
+ * If dest is nullptr, no copy happens. Non-nullptr result is always null-terminated.
+ *
+ * @param[in]  dest             Destination string buffer or nullptr.
+ *
+ * @param[in]  destLength       Maximum length to be copied. Will need space for null terminator as
+ *                              well (string will be truncated if it does not fit). If 0 this method
+ *                              is a noop.
+ *
+ * @param[in]  source           Data to be copied.
+ */
+inline void CopyString(char * dest, size_t destLength, ByteSpan source)
+{
+    if (dest && destLength)
+    {
+        size_t maxChars = std::min(destLength - 1, source.size());
+        memcpy(dest, source.data(), maxChars);
+        dest[maxChars] = '\0';
+    }
 }
 
 /**

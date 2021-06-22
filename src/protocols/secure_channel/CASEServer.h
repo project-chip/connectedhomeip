@@ -23,7 +23,7 @@
 
 namespace chip {
 
-class CASEServer : public SessionEstablishmentDelegate, public Messaging::ExchangeDelegateBase
+class CASEServer : public SessionEstablishmentDelegate, public Messaging::ExchangeDelegate
 {
 public:
     CASEServer() {}
@@ -46,7 +46,7 @@ public:
 
     //// ExchangeDelegate Implementation ////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
                                                             SecureSessionMgr * sessionMgr) override

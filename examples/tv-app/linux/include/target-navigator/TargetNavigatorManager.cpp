@@ -17,13 +17,14 @@
 
 #include "TargetNavigatorManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <support/CodeUtils.h>
 
 #include <map>
 #include <string>
@@ -34,20 +35,26 @@ CHIP_ERROR TargetNavigatorManager::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Update once storing a list attribute is supported
-    // std::list<EmberAfNavigateTargetTargetInfo> list = TargetNavigatorManager().proxyGetTargetInfoList();
-    // emberAfWriteServerAttribute(endpoint, ZCL_TARGET_NAVIGATOR_CLUSTER_ID, ZCL_TARGET_NAVIGATOR_LIST_ATTRIBUTE_ID,
-    //                             (uint8_t *) &list, ZCL_STRUCT_ATTRIBUTE_TYPE);
-
     SuccessOrExit(err);
 exit:
     return err;
 }
 
-std::list<EmberAfNavigateTargetTargetInfo> TargetNavigatorManager::proxyGetTargetInfoList()
+std::vector<EmberAfNavigateTargetTargetInfo> TargetNavigatorManager::proxyGetTargetInfoList()
 {
     // TODO: Insert code here
-    std::list<EmberAfNavigateTargetTargetInfo> targets;
+    std::vector<EmberAfNavigateTargetTargetInfo> targets;
+    int maximumVectorSize = 2;
+    char name[]           = "exampleName";
+
+    for (int i = 0; i < maximumVectorSize; ++i)
+    {
+        EmberAfNavigateTargetTargetInfo targetInfo;
+        targetInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
+        targetInfo.identifier = static_cast<uint8_t>(1 + i);
+        targets.push_back(targetInfo);
+    }
+
     return targets;
 }
 
@@ -68,7 +75,7 @@ static void sendResponse(const char * responseName, TargetNavigatorLaunchRespons
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        emberAfTargetNavigatorClusterPrintln("Failed to send %s: 0x%X", responseName, status);
+        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
     }
 }
 

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/InteractionModelDelegate.h>
+#include <controller/CHIPDeviceController.h>
 
 namespace chip {
 namespace Controller {
@@ -48,7 +49,7 @@ void pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(
 void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f);
 }
 
-class PythonInteractionModelDelegate : public chip::app::InteractionModelDelegate
+class PythonInteractionModelDelegate : public chip::Controller::DeviceControllerInteractionModelDelegate
 {
 public:
     CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,

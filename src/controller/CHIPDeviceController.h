@@ -29,9 +29,10 @@
 #pragma once
 
 #include <app/InteractionModelDelegate.h>
+#include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
-#include <controller/CHIPOperationalCredentialsProvisioner.h>
 #include <controller/OperationalCredentialsDelegate.h>
+#include <controller/data_model/gen/CHIPClientCallbacks.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
@@ -67,6 +68,12 @@ namespace Controller {
 constexpr uint16_t kNumMaxActiveDevices = 64;
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
+// Raw functions for cluster callbacks
+typedef void (*BasicSuccessCallback)(void * context, uint16_t val);
+typedef void (*BasicFailureCallback)(void * context, uint8_t status);
+void BasicSuccess(void * context, uint16_t val);
+void BasicFailure(void * context, uint8_t status);
+
 struct ControllerInitParams
 {
     PersistentStorageDelegate * storageDelegate = nullptr;
@@ -81,6 +88,25 @@ struct ControllerInitParams
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
+};
+
+enum CommissioningStage : uint8_t
+{
+    kError,
+    kSecurePairing,
+    kArmFailsafe,
+    // kConfigTime,  // NOT YET IMPLEMENTED
+    // kConfigTimeZone,  // NOT YET IMPLEMENTED
+    // kConfigDST,  // NOT YET IMPLEMENTED
+    kConfigRegulatory,
+    kCheckCertificates,
+    kConfigACL,
+    kNetworkSetup,
+    kScanNetworks, // optional stage if network setup fails (not yet implemented)
+    kNetworkEnable,
+    kFindOperational,
+    kSendComplete,
+    kCleanup,
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -155,7 +181,7 @@ public:
 class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
                                     public Messaging::ExchangeMgrDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-                                    public Mdns::ResolverDelegate,
+                                    public AbstractMdnsDiscoveryController,
 #endif
                                     public app::InteractionModelDelegate
 {
@@ -165,6 +191,15 @@ public:
 
     CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
 
+    /**
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This expects to be called with external thread synchronization, and will not internally
+     *  grab the CHIP stack lock.
+     *
+     *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
+     *  ensure this happend before calling this method.
+     */
     virtual CHIP_ERROR Shutdown();
 
     /**
@@ -212,6 +247,10 @@ public:
 
     virtual void ReleaseDevice(Device * device);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
+#endif
+
     // ----- IO -----
     /**
      * @brief
@@ -227,6 +266,15 @@ public:
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR ServiceEventSignal();
+
+    /**
+     * @brief Get the Fabric ID assigned to the device.
+     *
+     * @param[out] fabricId   Fabric ID of the device.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    CHIP_ERROR GetFabricId(uint64_t & fabricId);
 
 protected:
     enum class State
@@ -247,23 +295,23 @@ protected:
     bool mPairedDevicesInitialized;
 
     NodeId mLocalDeviceId;
-    DeviceTransportMgr * mTransportMgr;
-    SecureSessionMgr * mSessionMgr;
-    Messaging::ExchangeManager * mExchangeMgr;
-    secure_channel::MessageCounterManager * mMessageCounterManager;
-    PersistentStorageDelegate * mStorageDelegate;
-    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
+    DeviceTransportMgr * mTransportMgr                             = nullptr;
+    SecureSessionMgr * mSessionMgr                                 = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
+    secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
+    PersistentStorageDelegate * mStorageDelegate                   = nullptr;
+    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate  = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
-    Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
+    Mdns::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
-    Inet::InetLayer * mInetLayer;
+    Inet::InetLayer * mInetLayer = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
-    System::Layer * mSystemLayer;
+    System::Layer * mSystemLayer = nullptr;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
@@ -288,22 +336,22 @@ protected:
 
     uint16_t mNextKeyId = 0;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    //////////// ResolverDelegate Implementation ///////////////
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mCommissionableNodes; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+
 private:
     //////////// ExchangeDelegate Implementation ///////////////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle msgBuf) override;
+                           System::PacketBufferHandle && msgBuf) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
     void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    //////////// ResolverDelegate Implementation ///////////////
-    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
 
@@ -338,6 +386,7 @@ public:
  *   will be stored.
  */
 class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEstablishmentDelegate
+
 {
 public:
     DeviceCommissioner();
@@ -348,6 +397,13 @@ public:
      */
     CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
 
+    /**
+     * @brief
+     *  Tears down the entirety of the stack, including destructing key objects in the system.
+     *  This is not a thread-safe API, and should be called with external synchronization.
+     *
+     *  Please see implementation for more details.
+     */
     CHIP_ERROR Shutdown() override;
 
     // ----- Connection Management -----
@@ -397,6 +453,8 @@ public:
 
     void ReleaseDevice(Device * device) override;
 
+    void AdvanceCommissioningStage(CHIP_ERROR err);
+
 #if CONFIG_NETWORK_LAYER_BLE
     /**
      * @brief
@@ -427,9 +485,9 @@ public:
      * @brief
      *   Returns information about discovered devices.
      *   Should be called on main loop thread.
-     * @return const CommissionableNodeData* info about the selected device. May be nullptr if no information has been returned yet.
+     * @return const DiscoveredNodeData* info about the selected device. May be nullptr if no information has been returned yet.
      */
-    const Mdns::CommissionableNodeData * GetDiscoveredDevice(int idx);
+    const Mdns::DiscoveredNodeData * GetDiscoveredDevice(int idx);
 
     /**
      * @brief
@@ -438,7 +496,12 @@ public:
      */
     int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
 
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+
 #endif
+
+    void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
 private:
     DevicePairingDelegate * mPairingDelegate;
@@ -459,6 +522,8 @@ private:
        persist the device list */
     bool mPairedDevicesUpdated;
 
+    CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
+
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     void PersistDeviceList();
@@ -478,7 +543,7 @@ private:
     /* This function sends the operational credentials to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf);
+    CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a refernce to the device object.
      */
@@ -533,6 +598,12 @@ private:
      */
     CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
                             const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
+
+    // Cluster callbacks for advancing commissioning flows
+    Callback::Callback<BasicSuccessCallback> mSuccess;
+    Callback::Callback<BasicFailureCallback> mFailure;
+
+    CommissioningStage GetNextCommissioningStage();
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;

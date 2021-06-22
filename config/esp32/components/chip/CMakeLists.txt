@@ -60,11 +60,13 @@ chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                is_debug)
 
 if(CONFIG_ENABLE_PW_RPC)
+    string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
     chip_gn_arg_append("pw_log_BACKEND"                     "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"")
     chip_gn_arg_append("pw_assert_BACKEND"                  "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"")
     chip_gn_arg_append("pw_sys_io_BACKEND"                  "\"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"")
     chip_gn_arg_append("dir_pw_third_party_nanopb"          "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
+    chip_gn_arg_append("pw_build_LINK_DEPS"                 "[\"\$dir_pw_assert:impl\", \"\$dir_pw_log:impl\"]")
 endif()
 
 if (NOT CONFIG_USE_MINIMAL_MDNS)
@@ -72,7 +74,7 @@ if (NOT CONFIG_USE_MINIMAL_MDNS)
 endif()
 
 if (CONFIG_ENABLE_CHIP_SHELL)
-    chip_gn_arg_append("chip_build_shell_lib"                   "true")
+    chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
 
@@ -177,6 +179,9 @@ if(NOT CONFIG_USE_MINIMAL_MDNS)
     idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
+
+idf_component_get_property(main_lib main COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group 
                                                 ${chip_libraries}

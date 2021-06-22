@@ -43,7 +43,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 
     ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
 
-    ExchangeDelegateBase * delegate = this;
+    ExchangeDelegate * delegate = this;
     ReturnErrorOnFailure(
         mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, delegate));
     return CHIP_NO_ERROR;
@@ -77,7 +77,7 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 }
 
 void CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
+                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
     ReturnOnFailure(InitCASEHandshake(ec));

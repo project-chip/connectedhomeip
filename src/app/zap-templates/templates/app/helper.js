@@ -16,12 +16,12 @@
  */
 
 // Import helpers from zap core
-const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
-const queryImpexp  = require(zapPath + 'db/query-impexp.js')
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery     = require(zapPath + 'db/query-zcl.js')
-const cHelper      = require(zapPath + 'generator/helper-c.js')
+const zapPath       = '../../../../../third_party/zap/repo/src-electron/';
+const templateUtil  = require(zapPath + 'generator/template-util.js')
+const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
+const zclHelper     = require(zapPath + 'generator/helper-zcl.js')
+const zclQuery      = require(zapPath + 'db/query-zcl.js')
+const cHelper       = require(zapPath + 'generator/helper-c.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
@@ -37,7 +37,7 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
  */
 function user_cluster_has_enabled_manufacturer_command(name, side, options)
 {
-  return queryImpexp.exportEndPointTypeIds(this.global.db, this.global.sessionId)
+  return queryEndpoint.selectEndPointTypeIds(this.global.db, this.global.sessionId)
       .then((endpointTypes) => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(this.global.db, endpointTypes))
       .then((endpointsAndClusters) => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(
                 this.global.db, endpointsAndClusters))
@@ -195,20 +195,13 @@ function asChipUnderlyingType(label, type)
 // These helpers only works within the endpoint_config iterator
 
 // List of all cluster with generated functions
-var endpointClusterWithInit = [ 'Basic', 'Identify', 'Groups', 'Scenes', 'On/off', 'Level Control', 'Color Control', 'IAS Zone' ];
-var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock' ];
+var endpointClusterWithInit = [
+  'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control', 'Color Control', 'IAS Zone',
+  'Pump Configuration and Control'
+];
+var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
-
-/**
- * extract the cluster name from the enpoint cluster comment
- * @param {*} comments
- */
-function extract_cluster_name(comments)
-{
-  let secondPart = comments.split(": ").pop();
-  return secondPart.split(" (")[0];
-}
 
 /**
  * Populate the GENERATED_FUNCTIONS field
@@ -218,7 +211,7 @@ function chip_endpoint_generated_functions()
   let alreadySetCluster = [];
   let ret               = '\\\n';
   this.clusterList.forEach((c) => {
-    let clusterName  = extract_cluster_name(c.comment);
+    let clusterName  = c.clusterName;
     let functionList = '';
     if (alreadySetCluster.includes(clusterName)) {
       // Only one array of Generated functions per cluster across all endpoints
@@ -274,7 +267,7 @@ function chip_endpoint_cluster_list()
   this.clusterList.forEach((c) => {
     let mask          = '';
     let functionArray = c.functions;
-    let clusterName   = extract_cluster_name(c.comment);
+    let clusterName   = c.clusterName;
 
     if (c.comment.includes('server')) {
       let hasFunctionArray = false;
@@ -368,6 +361,24 @@ function isStrEndsWith(str, substr)
   return str.endsWith(substr);
 }
 
+function asTypeLiteralSuffix(type)
+{
+  switch (type) {
+  case 'int32_t':
+    return 'L';
+  case 'int64_t':
+    return 'LL';
+  case 'uint16_t':
+    return 'U';
+  case 'uint32_t':
+    return 'UL';
+  case 'uint64_t':
+    return 'ULL';
+  default:
+    return '';
+  }
+}
+
 //
 // Module exports
 //
@@ -382,3 +393,4 @@ exports.chip_endpoint_generated_functions             = chip_endpoint_generated_
 exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_list
 exports.isSigned                                      = ChipTypesHelper.isSigned;
 exports.isStrEndsWith                                 = isStrEndsWith;
+exports.asTypeLiteralSuffix                           = asTypeLiteralSuffix;

@@ -332,7 +332,12 @@ int main(int argc, char ** args)
     if (DeviceLayer::SystemLayer.NewTimer(timer) == CHIP_NO_ERROR)
     {
         timer->Start(
-            gOptions.runtimeMs, [](System::Layer *, void *, System::Error err) { DeviceLayer::PlatformMgr().Shutdown(); }, nullptr);
+            gOptions.runtimeMs,
+            [](System::Layer *, void *, System::Error err) {
+                DeviceLayer::PlatformMgr().StopEventLoopTask();
+                DeviceLayer::PlatformMgr().Shutdown();
+            },
+            nullptr);
     }
     else
     {

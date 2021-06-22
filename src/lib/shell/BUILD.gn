@@ -17,25 +17,49 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
+source_set("shell_core") {
+  sources = [
+    "Commands.h",
+    "Engine.cpp",
+    "Engine.h",
+    "streamer.cpp",
+    "streamer.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+}
+
 static_library("shell") {
   output_name = "libCHIPShell"
   output_dir = "${root_out_dir}/lib"
 
-  sources = [
-    "commands.cpp",
-    "commands.h",
-    "shell_core.cpp",
-    "shell_core.h",
-    "streamer.cpp",
-    "streamer.h",
-  ]
+  sources = []
 
   if (chip_target_style == "unix") {
     sources += [ "streamer_stdio.cpp" ]
   }
 
   if (chip_device_platform == "esp32") {
-    sources += [ "streamer_esp32.cpp" ]
+    sources += [
+      "MainLoopESP32.cpp",
+      "streamer_esp32.cpp",
+    ]
+  } else if (chip_device_platform == "efr32") {
+    sources += [
+      "MainLoopDefault.cpp",
+      "streamer_efr32.cpp",
+    ]
+  } else if (chip_device_platform == "k32w") {
+    sources += [
+      "MainLoopDefault.cpp",
+      "streamer_k32w.cpp",
+    ]
+  } else {
+    sources += [ "MainLoopDefault.cpp" ]
   }
 
   if (current_os == "zephyr") {
@@ -45,7 +69,7 @@ static_library("shell") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
+    ":shell_core",
+    "${chip_root}/src/lib/shell/commands",
   ]
 }

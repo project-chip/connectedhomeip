@@ -1,8 +1,8 @@
-# Contributing to Project Connected Home over IP
+# Contributing to Matter (formerly Project CHIP)
 
 Want to contribute? Great! First, read this page (including the small print at
 the end). By submitting a pull request, you represent that you have the right to
-license your contribution to the Zigbee Alliance and the community, and agree by
+license your contribution to the Connectivity Standards Alliance and the community, and agree by
 submitting the patch that your contributions are licensed under the
 [Apache 2.0 license](./LICENSE). Before submitting the pull request, please make
 sure you have tested your changes and that they follow the project guidelines
@@ -12,11 +12,11 @@ for contributing code.
 
 As an open source contributor you can report bugs and request features in the
 [Issue Tracker](https://github.com/project-chip/connectedhomeip/issues), as well
-as contribute bug fixes and features that do not impact the Project CHIP
-specification as a pull request. For example: ports of Project CHIP to add APIs
+as contribute bug fixes and features that do not impact Matter
+specification as a pull request. For example: ports of Matter to add APIs
 to alternative programming languages (e.g. Java, JS), hardware ports, or an
 optimized implementation of existing functionality. For features that impact the
-specification, please join Project CHIP work group within the Zigbee Alliance.
+specification, please join Matter work group within the Connectivity Standards Alliance.
 The requirements to become an open source contributor of the
 [Project CHIP Repository](https://github.com/project-chip/connectedhomeip) are:
 
@@ -25,18 +25,18 @@ The requirements to become an open source contributor of the
 -   Have signed the
     [Zigbee Project CHIP Working Group CLA](https://gist.github.com/clapre/65aa9fc63981da765039e0bb7e8701be)
 
-# Contributing as a Zigbee Alliance Project CHIP Working Group Member
+# Contributing as a Connectivity Standards Alliance Project CHIP Working Group Member
 
-As a participant of the Zigbee Alliance Project CHIP working group, you can
-attend working group meetings, propose changes to the Project CHIP
+As a participant of the Connectivity Standards Alliance Project CHIP Working Group, you can
+attend Working Group meetings, propose changes to the Matter
 specification, and contribute code for approved updates to the specification.
 The requirements to become a member of the
 [Project CHIP Repository](https://github.com/project-chip/connectedhomeip) are:
 
 -   Must be a [Participant member](http://www.zigbeealliance.org/join) or higher
-    of the Zigbee Alliance
+    of the Connectivity Standards Alliance
 -   Must be a Project CHIP Working Group member
--   Have signed the Zigbee Project CHIP Work Group CLA
+-   Have signed the Alliance Project CHIP Working Group CLA
 -   Have approval from your company's official approver
 
 # Bugs
@@ -141,7 +141,7 @@ interactive rebase:
 
 ```bash
 # Rebase all commits on your development branch
-git checkout
+git checkout <branch-name>
 git rebase -i master
 ```
 

@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  chip_build_shell_lib = false
+  chip_build_libshell = false
 }
 
 config("includes") {
@@ -40,7 +40,7 @@ static_library("lib") {
     "${chip_root}/src/transport",
   ]
 
-  if (chip_build_shell_lib) {
+  if (chip_build_libshell) {
     public_deps += [ "${chip_root}/src/lib/shell" ]
   }
 

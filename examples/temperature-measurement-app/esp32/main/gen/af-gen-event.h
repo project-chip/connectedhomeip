@@ -22,15 +22,4 @@
 #ifndef __AF_GEN_EVENT__
 #define __AF_GEN_EVENT__
 
-// Code used to configure the cluster event mechanism
-#define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
-    extern EmberEventControl emberAfPluginTemperatureMeasurementServerReadEventControl;                                            \
-    extern void emberAfPluginTemperatureMeasurementServerReadEventHandler(void);
-
-// EmberEventData structs used to populate the EmberEventData table
-#define EMBER_AF_GENERATED_EVENTS                                                                                                  \
-    { &emberAfPluginTemperatureMeasurementServerReadEventControl, emberAfPluginTemperatureMeasurementServerReadEventHandler },
-
-#define EMBER_AF_GENERATED_EVENT_STRINGS "Temperature Measurement Server Cluster Plugin Read",
-
 #endif // __AF_GEN_EVENT__

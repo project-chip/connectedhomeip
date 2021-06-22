@@ -21,21 +21,22 @@
  ***************************************************************************/
 
 #include <app/Command.h>
+#include <app/common/gen/af-structs.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <string.h>
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-
-#include "gen/af-structs.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -78,7 +79,7 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
                                     index + 1);
 }
 
-EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, int32_t index)
+EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, int32_t index)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -86,11 +87,16 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, i
     fabricDescriptor.FabricId = fabricId;
     fabricDescriptor.NodeId   = nodeId;
     fabricDescriptor.VendorId = vendorId;
+    if (fabricLabel != nullptr)
+    {
+        size_t lengthToStore   = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
+        fabricDescriptor.Label = ByteSpan(fabricLabel, lengthToStore);
+    }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                   "OpCreds: Writing admin into attribute store at index %d: fabricId %" PRIX64 ", nodeId %" PRIX64
-                   " vendorId %" PRIX16,
-                   index, fabricId, nodeId, vendorId);
+                   "OpCreds: Writing admin into attribute store at index %d: fabricId 0x" ChipLogFormatX64
+                   ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
+                   index, ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
     status = writeFabricAttribute((uint8_t *) &fabricDescriptor, index);
     return status;
 }
@@ -101,26 +107,28 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Loop through admins
-    int32_t fabricIndex = 0;
+    uint32_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
     {
-        NodeId nodeId     = pairing.GetNodeId();
-        uint64_t fabricId = pairing.GetFabricId();
-        uint16_t vendorId = pairing.GetVendorId();
+        NodeId nodeId               = pairing.GetNodeId();
+        uint64_t fabricId           = pairing.GetFabricId();
+        uint16_t vendorId           = pairing.GetVendorId();
+        const uint8_t * fabricLabel = pairing.GetFabricLabel();
 
         // Skip over uninitialized admins
         if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                           "OpCreds: Skipping over unitialized admin with fabricId %" PRIX64 ", nodeId %" PRIX64
-                           " vendorId %" PRIX16,
-                           fabricId, nodeId, vendorId);
+                           "OpCreds: Skipping over unitialized admin with fabricId 0x" ChipLogFormatX64
+                           ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
+                           ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
         }
-        else if (writeFabric(fabricId, nodeId, vendorId, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+        else if (writeFabric(fabricId, nodeId, vendorId, fabricLabel, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
         {
-            emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin with fabricId %" PRIX64 " in fabrics list",
-                           fabricId);
+            emberAfPrintln(EMBER_AF_PRINT_DEBUG,
+                           "OpCreds: Failed to write admin with fabricId 0x" ChipLogFormatX64 " in fabrics list",
+                           ChipLogValueX64(fabricId));
             err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
             break;
         }
@@ -128,10 +136,10 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     }
 
     // Store the count of fabrics we just stored
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIX32 " admins in fabrics list attribute.", fabricIndex);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu32 " admins in fabrics list attribute.", fabricIndex);
     if (writeFabricAttribute((uint8_t *) &fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin count %" PRIX32 " in fabrics list", fabricIndex);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin count %" PRIu32 " in fabrics list", fabricIndex);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
@@ -150,7 +158,7 @@ static AdminPairingInfo * retrieveCurrentAdmin()
 {
     uint64_t fabricId = emberAfCurrentCommand()->SourceNodeId();
     // TODO: Figure out how to get device node id so we can do FindAdminForNode(fabricId, nodeId)...
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding admin with fabricId  %" PRIX64 ".", fabricId);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding admin with fabricId 0x" ChipLogFormatX64 ".", ChipLogValueX64(fabricId));
     return GetGlobalAdminPairingTable().FindAdminForNode(fabricId);
 }
 
@@ -166,7 +174,7 @@ class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
     // Gets called when a fabric is deleted from KVS store
     void OnAdminDeletedFromStorage(AdminId adminId) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Admin %" PRIX16 " was deleted from admin storage.", adminId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Admin 0x%" PRIX16 " was deleted from admin storage.", adminId);
         writeAdminsIntoFabricsListAttribute();
     }
 
@@ -174,9 +182,10 @@ class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
     void OnAdminRetrievedFromStorage(AdminPairingInfo * admin) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Admin %" PRIX16 " was retrieved from storage. FabricId %" PRIX64 ", NodeId %" PRIX64
-                       ", VendorId %" PRIX64,
-                       admin->GetAdminId(), admin->GetFabricId(), admin->GetNodeId());
+                       "OpCreds: Admin 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       admin->GetAdminId(), ChipLogValueX64(admin->GetFabricId()), ChipLogValueX64(admin->GetNodeId()),
+                       admin->GetVendorId());
         writeAdminsIntoFabricsListAttribute();
     }
 
@@ -184,9 +193,10 @@ class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
     void OnAdminPersistedToStorage(AdminPairingInfo * admin) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Admin %" PRIX16 " was persisted to storage. FabricId %" PRIX64 ", NodeId %" PRIX64
-                       ", VendorId %" PRIX64,
-                       admin->GetAdminId(), admin->GetFabricId(), admin->GetNodeId());
+                       "OpCreds: Admin %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
+                       ", NodeId %0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       admin->GetAdminId(), ChipLogValueX64(admin->GetFabricId()), ChipLogValueX64(admin->GetNodeId()),
+                       admin->GetVendorId());
         writeAdminsIntoFabricsListAttribute();
     }
 };
@@ -229,7 +239,7 @@ exit:
 // TODO: remove SetFabric once AddOptCert + FabricIndex are implemented
 bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * commandObj, uint16_t VendorId)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: SetFabric with vendorId %d", VendorId);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: SetFabric with vendorId %" PRIX16, VendorId);
 
     EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
     EmberStatus sendStatus = EMBER_SUCCESS;
@@ -241,7 +251,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
     // Store vendorId
     admin->SetVendorId(VendorId);
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: vendorId is now set %d", admin->GetVendorId());
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: vendorId is now set %" PRIX16, admin->GetVendorId());
     err = GetGlobalAdminPairingTable().Store(admin->GetAdminId());
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
@@ -262,7 +272,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
         VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         writer = commandObj->GetCommandDataElementTLVWriter();
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), commandObj->GetExchangeContext()->GetSecureSession().GetPeerNodeId()));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -276,7 +286,7 @@ exit:
     }
     if (sendStatus != EMBER_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to send %s response: 0x%x", "set_fabric", sendStatus);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to send SetFabric response: 0x%x", sendStatus);
     }
     if (err != CHIP_NO_ERROR)
     {
@@ -290,7 +300,23 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Co
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err;
+
+    // Fetch current fabric
+    AdminPairingInfo * admin = retrieveCurrentAdmin();
+    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+
+    // Set Label on fabric
+    err = admin->SetFabricLabel(Label);
+    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+    // Persist updated fabric
+    err = GetGlobalAdminPairingTable().Store(admin->GetAdminId());
+    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+exit:
+    writeAdminsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -311,31 +337,18 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Com
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOC,
-                                                           chip::ByteSpan ICACertificate, chip::ByteSpan IPKValue,
-                                                           chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan OperationalCert,
+                                                           chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
+                                                           uint16_t AdminVendorId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> cert;
-
-    uint8_t * certBuf = nullptr;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
 
     AdminPairingInfo * admin = retrieveCurrentAdmin();
     VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
-    // TODO - Update ZAP to use 16 bit length for OCTET_STRING. This is a temporary hack, as OCTET_STRING only supports 8 bit
-    // strings. We are currently spilling over NOC into ICACertificate argument.
-    VerifyOrExit(cert.Alloc(NOC.size() + ICACertificate.size()), status = EMBER_ZCL_STATUS_FAILURE);
-    certBuf = cert.Get();
-    memcpy(certBuf, NOC.data(), NOC.size());
-    memcpy(&certBuf[NOC.size()], ICACertificate.data(), ICACertificate.size());
-
-    VerifyOrExit(admin->SetOperationalCert(ByteSpan(certBuf, NOC.size() + ICACertificate.size())) == CHIP_NO_ERROR,
-                 status = EMBER_ZCL_STATUS_FAILURE);
-
+    VerifyOrExit(admin->SetOperationalCert(OperationalCert) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
@@ -384,7 +397,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
     writer = commandObj->GetCommandDataElementTLVWriter();
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(csr.Get(), csrLength)));
     SuccessOrExit(err = writer->Put(TLV::ContextTag(1), CSRNonce));
@@ -414,6 +427,38 @@ exit:
 
 bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOC,
                                                               chip::ByteSpan ICACertificate)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(chip::app::Command * commandObj,
+                                                                           chip::ByteSpan RootCertificate)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
+
+    // Fetch current admin
+    AdminPairingInfo * admin = retrieveCurrentAdmin();
+    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(admin->SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+    VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+exit:
+    emberAfSendImmediateDefaultResponse(status);
+    if (status == EMBER_ZCL_STATUS_FAILURE)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");
+    }
+
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(chip::app::Command * commandObj,
+                                                                              chip::ByteSpan TrustedRootIdentifier)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

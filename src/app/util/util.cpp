@@ -41,17 +41,17 @@
  ******************************************************************************/
 
 #include "app/util/common.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
+#include <app/common/gen/print-cluster.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af-main.h>
 #include <app/util/af.h>
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
 #include "gen/callback.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-#include "gen/print-cluster.h"
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -133,9 +133,6 @@ uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0,
 };
 
-#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
-void emberAfPluginTemperatureMeasurementServerInitCallback(void);
-#endif
 #ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
 void emberAfPluginBarrierControlServerInitCallback(void);
 #endif
@@ -303,9 +300,6 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
     // Initialize the reporting plugin
     emberAfPluginReportingInitCallback();
 
-#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
-    emberAfPluginTemperatureMeasurementServerInitCallback();
-#endif
 #ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
     emberAfPluginBarrierControlServerInitCallback();
 #endif
@@ -755,7 +749,7 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
     else if (!isBroadcastDestination(emberAfResponseDestination))
     {
         label  = 'U';
-        status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_VIA_EXCHANGE, MessageSendDestination(emberAfResponseDestination),
+        status = emberAfSendUnicastWithCallback(MessageSendDestination::ViaExchange(emberAfResponseDestination),
                                                 &emberAfResponseApsFrame, appResponseLength, appResponseData, callback);
     }
     else

@@ -17,12 +17,12 @@
  */
 
 #include "AccountLoginManager.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-#include "gen/enums.h"
 #include <app/Command.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
+#include <app/common/gen/enums.h>
 #include <app/util/af.h>
 
 using namespace std;
@@ -40,15 +40,15 @@ bool AccountLoginManager::isUserLoggedIn(string requestTempAccountIdentifier, st
         bool found = accounts[requestTempAccountIdentifier] == requestSetupPin;
         if (!found)
         {
-            emberAfAccountLoginClusterPrintln("User is not logged in, failed to match request setup pin",
-                                              EMBER_ZCL_STATUS_NOT_AUTHORIZED);
+            ChipLogError(Zcl, "User is not logged in, failed to match request setup pin. Error:%s",
+                         chip::ErrorStr(EMBER_ZCL_STATUS_NOT_AUTHORIZED));
         }
         return found;
     }
     else
     {
-        emberAfAccountLoginClusterPrintln("User is not logged in, failed to find temp account identifier",
-                                          EMBER_ZCL_STATUS_NOT_AUTHORIZED);
+        ChipLogError(Zcl, "User is not logged in, failed to find temp account identifier. Error:%s",
+                     chip::ErrorStr(EMBER_ZCL_STATUS_NOT_AUTHORIZED));
         return false;
     }
 }
@@ -75,7 +75,7 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::Command * command,
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        emberAfAccountLoginClusterPrintln("Failed to send %s: 0x%X", "GetSetupPIN", status);
+        ChipLogError(Zcl, "Failed to send %s. Error:%s", "GetSetupPIN", chip::ErrorStr(EMBER_ZCL_STATUS_NOT_AUTHORIZED));
     }
     AccountLoginManager().GetInstance().setTempAccountIdentifierForPin(tempAccountIdentifierString, responseSetupPin);
     return true;
@@ -88,7 +88,10 @@ bool emberAfAccountLoginClusterLoginCallback(chip::app::Command * command, unsig
     string tempSetupPinString(reinterpret_cast<char *>(tempSetupPin));
     bool isUserLoggedIn  = AccountLoginManager().GetInstance().isUserLoggedIn(tempAccountIdentifierString, tempSetupPinString);
     EmberAfStatus status = isUserLoggedIn ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
-    emberAfAccountLoginClusterPrintln("User is not authorized.", EMBER_ZCL_STATUS_NOT_AUTHORIZED);
+    if (!isUserLoggedIn)
+    {
+        ChipLogError(Zcl, "User is not authorized. Error:%s", chip::ErrorStr(EMBER_ZCL_STATUS_NOT_AUTHORIZED));
+    }
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }

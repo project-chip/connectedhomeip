@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "shell_core.h"
-#include "streamer.h"
+#include <lib/shell/Engine.h>
+#include <lib/shell/streamer.h>
 
 #include "driver/uart.h"
 #include "esp_console.h"
@@ -34,7 +34,7 @@ static int chip_command_handler(int argc, char ** argv)
 {
     if (argc > 0)
     {
-        return chip::Shell::Shell::Root().ExecCommand(argc - 1, argv + 1);
+        return Engine::Root().ExecCommand(argc - 1, argv + 1);
     }
     else
     {
@@ -64,7 +64,7 @@ int streamer_esp32_init(streamer_t * streamer)
     esp_vfs_dev_uart_use_driver(0);
     esp_console_config_t console_config = {
         .max_cmdline_length = 256,
-        .max_cmdline_args   = 8,
+        .max_cmdline_args   = 32,
     };
     ESP_ERROR_CHECK(esp_console_init(&console_config));
     linenoiseSetMultiLine(1);
@@ -72,7 +72,6 @@ int streamer_esp32_init(streamer_t * streamer)
 
     esp_console_cmd_t command = { .command = "chip", .help = "CHIP utilities", .func = chip_command_handler };
     ESP_ERROR_CHECK(esp_console_cmd_register(&command));
-    chip::Shell::Shell::Root().RegisterDefaultCommands();
     return 0;
 }
 

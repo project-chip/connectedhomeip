@@ -3,6 +3,8 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <stdint.h>
+
 // ZCL enums
 
 {{#zcl_enums}}
@@ -10,11 +12,11 @@
 {{#unless (isStrEqual label "ReportingDirection")}}
 
 // Enum for {{label}}
-typedef enum {
+enum EmberAf{{asType label}} : {{asUnderlyingZclType type}} {
 {{#zcl_enum_items}}
 {{ident}}EMBER_ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{value}},
 {{/zcl_enum_items}}
-} EmberAf{{asType label}};
+};
 {{/unless}}
 {{/unless}}
 {{/zcl_enums}}

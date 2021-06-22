@@ -1,0 +1,7 @@
+[
+    {
+        "path": "infra/3pp/tools/cpython3/${platform}",
+        "platforms": ["mac-amd64", "windows-amd64"],
+        "tags": ["version:3.8.2.chromium.10"]
+    }
+]

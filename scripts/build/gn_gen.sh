@@ -28,4 +28,4 @@ set -x
 
 env
 
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/$BUILD_TYPE" "$@"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/$BUILD_TYPE" "$@"

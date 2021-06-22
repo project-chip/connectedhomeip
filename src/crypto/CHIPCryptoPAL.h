@@ -29,6 +29,7 @@
 
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
+#include <support/Span.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -36,30 +37,36 @@
 namespace chip {
 namespace Crypto {
 
-const size_t kP256_FE_Length     = 32;
-const size_t kP256_Point_Length  = (2 * kP256_FE_Length + 1);
-const size_t kSHA256_Hash_Length = 32;
+constexpr size_t kMax_x509_Certificate_Length = 600;
 
-const size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
-const size_t kMax_ECDSA_Signature_Length = 72;
-const size_t kMAX_FE_Length              = kP256_FE_Length;
-const size_t kMAX_Point_Length           = kP256_Point_Length;
-const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
-const size_t kMAX_CSR_Length             = 512;
+// TODO: Consider renaming these values to be closer to definisions in the spec:
+// CHIP_CRYPTO_GROUP_SIZE_BYTES
+// CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES
+constexpr size_t kP256_FE_Length                  = 32;
+constexpr size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
+constexpr size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
+constexpr size_t kSHA256_Hash_Length              = 32;
 
-const size_t kMin_Salt_Length = 8;
-const size_t kMax_Salt_Length = 16;
+constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
+constexpr size_t kMax_ECDSA_Signature_Length = 72;
+constexpr size_t kMAX_FE_Length              = kP256_FE_Length;
+constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
+constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
+constexpr size_t kMAX_CSR_Length             = 512;
 
-const size_t kP256_PrivateKey_Length = 32;
-const size_t kP256_PublicKey_Length  = 65;
+constexpr size_t kMin_Salt_Length = 8;
+constexpr size_t kMax_Salt_Length = 16;
+
+constexpr size_t kP256_PrivateKey_Length = 32;
+constexpr size_t kP256_PublicKey_Length  = 65;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.
  */
-const size_t kMAX_Spake2p_Context_Size     = 1024;
-const size_t kMAX_Hash_SHA256_Context_Size = 296;
-const size_t kMAX_P256Keypair_Context_Size = 512;
+constexpr size_t kMAX_Spake2p_Context_Size     = 1024;
+constexpr size_t kMAX_Hash_SHA256_Context_Size = 296;
+constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 
 /**
  * Spake2+ parameters for P256
@@ -134,11 +141,9 @@ public:
      **/
     CHIP_ERROR SetLength(size_t len)
     {
-        CHIP_ERROR error = CHIP_NO_ERROR;
-        VerifyOrExit(len <= sizeof(bytes), error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(len <= sizeof(bytes), CHIP_ERROR_INVALID_ARGUMENT);
         length = len;
-    exit:
-        return error;
+        return CHIP_NO_ERROR;
     }
 
     /** @brief Returns current length of the buffer that's being used
@@ -897,6 +902,19 @@ private:
  * @param len Specifies secret data size in bytes.
  **/
 void ClearSecretData(uint8_t * buf, uint32_t len);
+
+typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
+
+CHIP_ERROR LoadCertsFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs);
+
+CHIP_ERROR LoadCertFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t n_cert);
+
+CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs);
+
+CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
+
+CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
 
 } // namespace Crypto
 } // namespace chip

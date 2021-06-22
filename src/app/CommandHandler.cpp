@@ -34,7 +34,7 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
+                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
@@ -47,7 +47,7 @@ void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const Pa
     err = ProcessCommandMessage(std::move(payload), CommandRoleId::HandlerId);
     SuccessOrExit(err);
 
-    SendCommandResponse();
+    err = SendCommandResponse();
 
 exit:
     ChipLogFunctError(err);
@@ -56,13 +56,15 @@ exit:
 CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle commandPacket;
 
-    err = FinalizeCommandsMessage();
+    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = FinalizeCommandsMessage(commandPacket);
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(mCommandMessageBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket));
     SuccessOrExit(err);
 
     MoveToState(CommandState::Sending);
@@ -91,17 +93,15 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     err = commandPath.GetEndpointId(&endpointId);
     SuccessOrExit(err);
 
+    VerifyOrExit(ServerClusterCommandExists(clusterId, commandId, endpointId), err = CHIP_ERROR_INVALID_PROFILE_ID);
+
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
         err = CHIP_NO_ERROR;
-        ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-        // The Path is not present when the CommandDataElement is used with an empty response, ResponseCommandElement would only
-        // have status code,
-        AddStatusCode(nullptr, GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-                      Protocols::SecureChannel::kProtocolCodeSuccess);
+        ChipLogDetail(DataManagement, "Received command without data for cluster %d", clusterId);
     }
-    else if (CHIP_NO_ERROR == err)
+    if (CHIP_NO_ERROR == err)
     {
         DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
@@ -109,28 +109,44 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        // The Path is not present when there is an error to be conveyed back. ResponseCommandElement would only have status code,
-        // set the error with CHIP_NO_ERROR, then continue to process rest of commands
-        AddStatusCode(nullptr, GeneralStatusCode::kInvalidArgument, Protocols::SecureChannel::Id,
-                      Protocols::SecureChannel::kProtocolCodeGeneralFailure);
-        err = CHIP_NO_ERROR;
+        chip::app::CommandPathParams returnStatusParam = { endpointId,
+                                                           0, // GroupId
+                                                           clusterId, commandId, (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+        // The Path is the path in the request if there are any error occurred before we dispatch the command to clusters.
+        // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
+        // TODO: The behavior when receiving a malformed message is not clear in the Spec. (Spec#3259)
+        // TODO: The error code should be updated after #7072 added error codes required by IM.
+        if (err == CHIP_ERROR_INVALID_PROFILE_ID)
+        {
+            ChipLogDetail(DataManagement, "No Cluster 0x%" PRIx16 " on Endpoint 0x%" PRIx8, clusterId, endpointId);
+        }
+
+        AddStatusCode(returnStatusParam,
+                      err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
+                      Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
     }
-    return err;
+    // We have handled the error status above and put the error status in response, now return success status so we can process
+    // other commands in the invoke request.
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPathParams,
+CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathParams,
                                          const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                         const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+                                         const Protocols::Id aProtocolId,
+                                         const Protocols::InteractionModel::ProtocolCode aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
 
-    err = PrepareCommand(apCommandPathParams, true /* isStatus */);
+    err = PrepareCommand(aCommandPathParams, true /* isStatus */);
     SuccessOrExit(err);
 
     statusElementBuilder =
         mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
+    statusElementBuilder
+        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(),
+                             Protocols::InteractionModel::ToUint16(aProtocolCode))
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);

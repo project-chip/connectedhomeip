@@ -39,13 +39,13 @@
  ******************************************************************************/
 
 #include "door-lock-server.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <assert.h>
 
-#include "gen/attribute-id.h"
 #include "gen/callback.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 #include <app/Command.h>
 #include <support/CodeUtils.h>
@@ -151,7 +151,7 @@ bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj,
                                                  ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID,
                                                  (chip::app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), entry.logEntryId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), entry.timestamp));

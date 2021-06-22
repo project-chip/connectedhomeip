@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -33,6 +33,10 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#include <dispatch/dispatch.h>
+#endif
+
 namespace chip {
 namespace Inet {
 
@@ -60,7 +64,7 @@ public:
     INET_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     INET_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
                       uint16_t sendFlags = 0);
-    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
+    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     void Close();
     void Free();
 
@@ -88,6 +92,11 @@ private:
 
     INET_ERROR GetSocket(IPAddressType addrType);
     void HandlePendingIO();
+    static void HandlePendingIO(System::WatchableSocket & socket);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_source_t mReadableSource = nullptr;
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 

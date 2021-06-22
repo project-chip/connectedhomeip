@@ -21,10 +21,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
 #include <app/Command.h>
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -50,6 +50,10 @@
 using namespace chip;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
+
+void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+{}
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {

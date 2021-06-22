@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "RecordResponder.h"
 #include "ReplyFilter.h"
 #include "Responder.h"
 
@@ -245,7 +246,7 @@ public:
     /// Add a new responder to be processed
     ///
     /// Return valid QueryResponderSettings on add success.
-    QueryResponderSettings AddResponder(Responder * responder);
+    QueryResponderSettings AddResponder(RecordResponder * responder);
 
     /// Implementation of the responder delegate.
     ///

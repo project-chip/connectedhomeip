@@ -135,5 +135,5 @@ extern "C" void * pychip_ble_start_scanning(
                                                                   completeCallback:completeCallback
                                                                          timeoutMs:timeout];
 
-    return static_cast<void *>(scanner);
+    return (__bridge_retained void *) (scanner);
 }

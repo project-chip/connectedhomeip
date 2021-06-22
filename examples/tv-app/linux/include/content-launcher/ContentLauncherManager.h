@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include "gen/af-structs.h"
+#include <app/common/gen/af-structs.h>
 
 #include <core/CHIPError.h>
 #include <list>
 #include <string>
-
+#include <vector>
 struct ContentLaunchResponse
 {
     EmberAfContentLaunchStatus status;
@@ -34,8 +34,8 @@ class ContentLauncherManager
 {
 public:
     CHIP_ERROR Init();
-    std::list<std::string> proxyGetAcceptsHeader();
-    std::list<EmberAfContentLaunchStreamingType> proxyGetSupportedStreamingTypes();
+    std::vector<chip::ByteSpan> proxyGetAcceptsHeader();
+    std::vector<EmberAfContentLaunchStreamingType> proxyGetSupportedStreamingTypes();
     ContentLaunchResponse proxyLaunchContentRequest(std::list<EmberAfContentLaunchParamater> parameterList, bool autoplay,
                                                     std::string data);
     ContentLaunchResponse proxyLaunchUrlRequest(std::string contentUrl, std::string displayString,

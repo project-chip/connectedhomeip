@@ -23,8 +23,8 @@
 
 #pragma once
 
+#include <cstdint>
 #include <map>
-#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -33,13 +33,18 @@
 
 namespace chip {
 
-// TODO this should point to the spec
-const int kVersionFieldLengthInBits                   = 3;
-const int kVendorIDFieldLengthInBits                  = 16;
-const int kProductIDFieldLengthInBits                 = 16;
-const int kCustomFlowRequiredFieldLengthInBits        = 1;
-const int kRendezvousInfoFieldLengthInBits            = 8;
-const int kPayloadDiscriminatorFieldLengthInBits      = 12;
+// See section 5.1.2. QR Code in the Matter specification
+const int kVersionFieldLengthInBits              = 3;
+const int kVendorIDFieldLengthInBits             = 16;
+const int kProductIDFieldLengthInBits            = 16;
+const int kCommissioningFlowFieldLengthInBits    = 2;
+const int kRendezvousInfoFieldLengthInBits       = 8;
+const int kPayloadDiscriminatorFieldLengthInBits = 12;
+const int kSetupPINCodeFieldLengthInBits         = 27;
+const int kPaddingFieldLengthInBits              = 4;
+const int kRawVendorTagLengthInBits              = 7;
+
+// See section 5.1.3. Manual Pairing Code in the Matter specification
 const int kManualSetupDiscriminatorFieldLengthInBits  = 4;
 const int kManualSetupChunk1DiscriminatorMsbitsPos    = 0;
 const int kManualSetupChunk1DiscriminatorMsbitsLength = 2;
@@ -51,10 +56,6 @@ const int kManualSetupChunk2DiscriminatorLsbitsPos = (kManualSetupChunk2PINCodeL
 const int kManualSetupChunk2DiscriminatorLsbitsLength = 2;
 const int kManualSetupChunk3PINCodeMsbitsPos          = 0;
 const int kManualSetupChunk3PINCodeMsbitsLength       = 13;
-const int kSetupPINCodeFieldLengthInBits              = 27;
-const int kPaddingFieldLengthInBits                   = 5;
-
-const int kRawVendorTagLengthInBits = 7;
 
 const int kManualSetupShortCodeCharLength  = 10;
 const int kManualSetupLongCodeCharLength   = 20;
@@ -74,7 +75,7 @@ const int kTotalPayloadDataSizeInBits =
     kVersionFieldLengthInBits +
     kVendorIDFieldLengthInBits +
     kProductIDFieldLengthInBits +
-    kCustomFlowRequiredFieldLengthInBits +
+    kCommissioningFlowFieldLengthInBits +
     kRendezvousInfoFieldLengthInBits +
     kPayloadDiscriminatorFieldLengthInBits +
     kSetupPINCodeFieldLengthInBits +
@@ -83,17 +84,24 @@ const int kTotalPayloadDataSizeInBits =
 
 const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 
-const char * const kQRCodePrefix = "CH:";
+const char * const kQRCodePrefix = "MT:";
 
 /// The rendezvous type this device supports.
-enum class RendezvousInformationFlag : uint16_t
+enum class RendezvousInformationFlag : uint8_t
 {
     kNone      = 0,      ///< Device does not support any method for rendezvous
     kSoftAP    = 1 << 0, ///< Device supports Wi-Fi softAP
     kBLE       = 1 << 1, ///< Device supports BLE
     kOnNetwork = 1 << 2, ///< Device supports Setup on network
 };
-using RendezvousInformationFlags = chip::BitFlags<RendezvousInformationFlag, uint16_t>;
+using RendezvousInformationFlags = chip::BitFlags<RendezvousInformationFlag, uint8_t>;
+
+enum class CommissioningFlow : uint8_t
+{
+    kStandard = 0,       ///< Device automatically enters pairing mode upon power-up
+    kUserActionRequired, ///< Device requires a user interaction to enter pairing mode
+    kCustom,             ///< Commissioning steps should be retrieved from the distributed compliance ledger
+};
 
 enum optionalQRCodeInfoType
 {
@@ -145,13 +153,13 @@ class SetupPayload
     friend class QRCodeSetupPayloadParser;
 
 public:
-    uint8_t version;
-    uint16_t vendorID;
-    uint16_t productID;
-    bool requiresCustomFlow;
-    RendezvousInformationFlags rendezvousInformation;
-    uint16_t discriminator;
-    uint32_t setUpPINCode;
+    uint8_t version                                  = 0;
+    uint16_t vendorID                                = 0;
+    uint16_t productID                               = 0;
+    CommissioningFlow commissioningFlow              = CommissioningFlow::kStandard;
+    RendezvousInformationFlags rendezvousInformation = RendezvousInformationFlag::kNone;
+    uint16_t discriminator                           = 0;
+    uint32_t setUpPINCode                            = 0;
 
     /** @brief A function to add an optional vendor data
      * @param tag 7 bit [0-127] tag number
@@ -200,12 +208,6 @@ public:
      * @return Returns a CHIP_ERROR_KEY_NOT_FOUND on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR removeSerialNumber();
-
-    // Test that the Setup Payload is within expected value ranges
-    SetupPayload() :
-        version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(RendezvousInformationFlag::kNone),
-        discriminator(0), setUpPINCode(0)
-    {}
 
     bool isValidQRCodePayload();
     bool isValidManualCode();

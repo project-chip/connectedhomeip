@@ -18,15 +18,15 @@
 #pragma once
 
 #include <mdns/minimal/records/Ptr.h>
-#include <mdns/minimal/responders/Responder.h>
+#include <mdns/minimal/responders/RecordResponder.h>
 
 namespace mdns {
 namespace Minimal {
 
-class PtrResponder : public Responder
+class PtrResponder : public RecordResponder
 {
 public:
-    PtrResponder(const FullQName & qname, const FullQName & target) : Responder(QType::PTR, qname), mTarget(target) {}
+    PtrResponder(const FullQName & qname, const FullQName & target) : RecordResponder(QType::PTR, qname), mTarget(target) {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
     {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,9 +39,7 @@ void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    mSocket = INET_INVALID_SOCKET_FD;
-    mPendingIO.Clear();
-    mRequestIO.Clear();
+    mSocket.Init(aInetLayer.SystemLayer()->WatchableEvents());
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 

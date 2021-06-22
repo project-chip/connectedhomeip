@@ -26,12 +26,17 @@
 
 #include <app/util/basic-types.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 
 #define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
 #define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
 
 extern chip::Messaging::ExchangeManager gExchangeManager;
+extern chip::SecureSessionMgr gSessionManager;
+extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
 
+constexpr chip::NodeId kTestNodeId           = 0x1ULL;
+constexpr chip::NodeId kTestNodeId1          = 0x2ULL;
 constexpr chip::ClusterId kTestClusterId     = 6;
 constexpr chip::CommandId kTestCommandId     = 40;
 constexpr chip::EndpointId kTestEndpointId   = 1;

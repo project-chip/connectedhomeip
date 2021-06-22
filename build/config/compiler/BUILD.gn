@@ -248,6 +248,9 @@ config("runtime_default") {
 #
 
 declare_args() {
+  # Enable Thread sanitizer
+  is_tsan = false
+
   # Enable address sanitizer
   is_asan = false
 
@@ -270,6 +273,12 @@ config("sanitize_address") {
   ldflags = cflags
 }
 
+config("sanitize_thread") {
+  cflags = [ "-fsanitize=thread" ]
+
+  ldflags = cflags
+}
+
 config("sanitize_memory") {
   cflags = [
     "-fsanitize=memory",
@@ -287,6 +296,7 @@ config("sanitize_undefined_behavior") {
     "-fsanitize=unsigned-integer-overflow",
     "-fsanitize=implicit-conversion",
     "-fsanitize=nullability",
+    "-fno-sanitize=vptr,function",
   ]
   ldflags = cflags
 }
@@ -298,6 +308,10 @@ config("sanitize_recover_all") {
 
 config("sanitize_default") {
   configs = []
+
+  if (is_tsan) {
+    configs += [ ":sanitize_thread" ]
+  }
 
   if (is_asan) {
     configs += [ ":sanitize_address" ]

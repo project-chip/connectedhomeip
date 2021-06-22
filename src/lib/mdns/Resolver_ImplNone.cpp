@@ -35,10 +35,8 @@ public:
         ChipLogError(Discovery, "Failed to resolve node ID: mDNS resolving not available");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR FindCommissionableNodes(CommissionableNodeFilter filter = CommissionableNodeFilter()) override
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 NoneResolver gResolver;

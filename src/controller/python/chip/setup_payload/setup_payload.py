@@ -68,8 +68,8 @@ class SetupPayload:
             decorated_value = f" [{decorated_value}]" if decorated_value else ""
             print(f"{name}: {value}{decorated_value}")
 
-        for tag, value in self.vendor_attributes:
-            print(f"Vendor attribute '{tag:>3}': {value}")
+        for tag in self.vendor_attributes:
+            print(f"Vendor attribute '{tag:>3}': {self.vendor_attributes[tag]}")
 
     def Clear(self):
         self.attributes.clear()

@@ -57,7 +57,8 @@ if (chip_device_platform != "none") {
       # test_sources += [ "TestThreadStackMgr.cpp" ]
     }
 
-    if (chip_enable_ble) {
+    if (chip_enable_ble &&
+        (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
       # FIXME: TestCHIPoBLEStackMgr requires bluetoothd daemon to be running
       #
       # TODO: Driver code has a check for only running the test

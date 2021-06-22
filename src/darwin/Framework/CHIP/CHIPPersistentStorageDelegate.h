@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Get the value for the given key
  *
  */
-- (NSString *)CHIPGetKeyValue:(NSString *)key;
+- (nullable NSString *)CHIPGetKeyValue:(NSString *)key;
 
 /**
  * Set the value of the key to the given value

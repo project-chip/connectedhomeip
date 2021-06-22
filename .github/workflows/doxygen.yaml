@@ -17,10 +17,17 @@ name: Doxygen
 on:
     push:
     pull_request:
+    workflow_dispatch:
 
+concurrency:
+    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+  
 jobs:
     doxygen:
         name: Build Doxygen
+        timeout-minutes: 5
+
         runs-on: ubuntu-20.04
         if: github.actor != 'restyled-io[bot]'
 
@@ -41,5 +48,8 @@ jobs:
               if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               uses: peaceiris/actions-gh-pages@v3
               with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  deploy_key: ${{ secrets.DOXYGEN_DEPLOY_KEY }}
+                  external_repository: project-chip/connectedhomeip-doc
                   publish_dir: ./docs/html
+                  # Keep only the latest version of the documentation
+                  force_orphan: true

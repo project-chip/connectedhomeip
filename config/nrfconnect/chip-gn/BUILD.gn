@@ -20,7 +20,6 @@ import("${chip_root}/build/chip/tests.gni")
 assert(current_os == "zephyr")
 
 declare_args() {
-  chip_build_libshell = false
   chip_build_pw_rpc_lib = false
   chip_build_zephyr_shell = false
 }
@@ -30,10 +29,6 @@ group("nrfconnect") {
 
   if (chip_build_tests) {
     deps += [ "${chip_root}/src:tests" ]
-  }
-
-  if (chip_build_libshell) {
-    deps += [ "${chip_root}/src/lib/shell" ]
   }
 
   if (chip_build_zephyr_shell) {

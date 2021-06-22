@@ -17,7 +17,7 @@
  */
 
 #include "PairingCommand.h"
-#include "gen/enums.h"
+#include "platform/PlatformManager.h"
 #include <lib/core/CHIPSafeCasts.h>
 
 using namespace ::chip;
@@ -27,35 +27,27 @@ constexpr uint64_t kBreadcrumb                = 0;
 constexpr uint32_t kTimeoutMs                 = 6000;
 constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
 
-CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR PairingCommand::Run(NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Controller::CommissionerInitParams params;
-    params.storageDelegate              = &storage;
-    params.mDeviceAddressUpdateDelegate = this;
-    params.pairingDelegate              = this;
+    {
+        chip::DeviceLayer::StackLock lock;
 
-    err = mOpCredsIssuer.Initialize(storage);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", ErrorStr(err)));
-
-    params.operationalCredentialsDelegate = &mOpCredsIssuer;
-
-    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
-
-    err = mCommissioner.Init(localId, params);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
-
-    err = mCommissioner.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", ErrorStr(err)));
+        GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
+        GetExecContext()->commissioner->RegisterPairingDelegate(this);
+    }
 
     err = RunInternal(remoteId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", ErrorStr(err)));
 
 exit:
-    mCommissioner.ServiceEventSignal();
-    mCommissioner.Shutdown();
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
+    }
+
     return err;
 }
 
@@ -66,26 +58,43 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     mRemoteId = remoteId;
 
     InitCallbacks();
+
+    //
+    // Set this to true first BEFORE we send commands to ensure we don't
+    // end up in a situation where the response comes back faster than we can
+    // set the variable to true, which will cause it to block indefinitely.
+    //
     UpdateWaitForResponse(true);
-    switch (mPairingMode)
+
+    //
+    // We're about to call methods into the stack, so lock
+    // appropriately. None of the following calls below before the unlock are, nor should be,
+    // blocking.
+    //
     {
-    case PairingMode::None:
-        err = Unpair(remoteId);
-        break;
-    case PairingMode::Bypass:
-        err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-        break;
-    case PairingMode::Ble:
-        err = Pair(remoteId, PeerAddress::BLE());
-        break;
-    case PairingMode::OnNetwork:
-    case PairingMode::SoftAP:
-        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-        break;
-    case PairingMode::Ethernet:
-        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-        break;
+        chip::DeviceLayer::StackLock lock;
+
+        switch (mPairingMode)
+        {
+        case PairingMode::None:
+            err = Unpair(remoteId);
+            break;
+        case PairingMode::Bypass:
+            err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+            break;
+        case PairingMode::Ble:
+            err = Pair(remoteId, PeerAddress::BLE());
+            break;
+        case PairingMode::OnNetwork:
+        case PairingMode::SoftAP:
+            err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+            break;
+        case PairingMode::Ethernet:
+            err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+            break;
+        }
     }
+
     WaitForResponse(kWaitDurationInSeconds);
     ReleaseCallbacks();
 
@@ -97,19 +106,19 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
     RendezvousParameters params =
         RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
 
-    return mCommissioner.PairDevice(remoteId, params);
+    return GetExecContext()->commissioner->PairDevice(remoteId, params);
 }
 
 CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress address)
 {
     ChipSerializedDevice serializedTestDevice;
-    return mCommissioner.PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
+    return GetExecContext()->commissioner->PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
 }
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
     SetCommandExitStatus(true);
-    return mCommissioner.UnpairDevice(remoteId);
+    return GetExecContext()->commissioner->UnpairDevice(remoteId);
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -161,13 +170,13 @@ CHIP_ERROR PairingCommand::SetupNetwork()
     switch (mNetworkType)
     {
     case PairingNetworkType::None:
+    case PairingNetworkType::Ethernet:
         // Nothing to do
         SetCommandExitStatus(err == CHIP_NO_ERROR);
         break;
     case PairingNetworkType::WiFi:
-    case PairingNetworkType::Ethernet:
     case PairingNetworkType::Thread:
-        err = mCommissioner.GetDevice(mRemoteId, &mDevice);
+        err = GetExecContext()->commissioner->GetDevice(mRemoteId, &mDevice);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Setup failure! No pairing for device: %" PRIu64, mRemoteId));
 
         mCluster.Associate(mDevice, mEndpointId);
@@ -210,19 +219,16 @@ CHIP_ERROR PairingCommand::AddThreadNetwork()
 {
     Callback::Cancelable * successCallback = mOnAddThreadNetworkCallback->Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
-    ByteSpan operationalDataset            = ByteSpan(Uint8::from_char(mOperationalDataset), strlen(mOperationalDataset));
 
-    return mCluster.AddThreadNetwork(successCallback, failureCallback, operationalDataset, kBreadcrumb, kTimeoutMs);
+    return mCluster.AddThreadNetwork(successCallback, failureCallback, mOperationalDataset, kBreadcrumb, kTimeoutMs);
 }
 
 CHIP_ERROR PairingCommand::AddWiFiNetwork()
 {
     Callback::Cancelable * successCallback = mOnAddWiFiNetworkCallback->Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
-    ByteSpan ssid                          = ByteSpan(Uint8::from_char(mSSID), strlen(mSSID));
-    ByteSpan credentials                   = ByteSpan(Uint8::from_char(mPassword), strlen(mPassword));
 
-    return mCluster.AddWiFiNetwork(successCallback, failureCallback, ssid, credentials, kBreadcrumb, kTimeoutMs);
+    return mCluster.AddWiFiNetwork(successCallback, failureCallback, mSSID, mPassword, kBreadcrumb, kTimeoutMs);
 }
 
 CHIP_ERROR PairingCommand::EnableNetwork()
@@ -233,7 +239,7 @@ CHIP_ERROR PairingCommand::EnableNetwork()
     ByteSpan networkId;
     if (mNetworkType == PairingNetworkType::WiFi)
     {
-        networkId = ByteSpan(Uint8::from_char(mSSID), strlen(mSSID));
+        networkId = mSSID;
     }
     else
     {
@@ -310,9 +316,9 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
 
 CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
-    ReturnErrorOnFailure(mCommissioner.GetDevice(mRemoteId, &mDevice));
+    ReturnErrorOnFailure(GetExecContext()->commissioner->GetDevice(mRemoteId, &mDevice));
     ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", mRemoteId, mFabricId);
-    return mCommissioner.UpdateDevice(mDevice, mFabricId);
+    return GetExecContext()->commissioner->UpdateDevice(mDevice, mFabricId);
 }
 
 void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)

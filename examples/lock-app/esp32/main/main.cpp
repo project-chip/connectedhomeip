@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "AppTask.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "esp_heap_caps_init.h"
@@ -26,6 +27,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include "shell_extension/launch.h"
 #include <app/server/Server.h>
 
 #include <cmath>
@@ -57,6 +59,10 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "chip-esp32-lock-example starting");
     ESP_LOGI(TAG, "==================================================");
 
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+#endif
+
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
@@ -67,6 +73,13 @@ extern "C" void app_main()
     }
 
     InitServer();
+
+    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
+    err = GetAppTask().StartAppTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetAppTask().Init() failed");
+    }
 
     while (true)
     {

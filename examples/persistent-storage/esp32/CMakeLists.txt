@@ -18,7 +18,6 @@
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
-# The list of extra component dirs must be in sync with that in persistent-storage/esp32/Makefile
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
 )

@@ -50,9 +50,8 @@ NodeId GetCurrentNodeId()
     auto pairing = GetGlobalAdminPairingTable().cbegin();
     if (pairing != GetGlobalAdminPairingTable().cend())
     {
-        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX16 ", node 0x%08" PRIx32 "%08" PRIx32,
-                        pairing->GetAdminId(), static_cast<uint32_t>(pairing->GetNodeId() >> 32),
-                        static_cast<uint32_t>(pairing->GetNodeId()));
+        ChipLogProgress(Discovery, "Found admin pairing for admin %" PRIX16 ", node 0x" ChipLogFormatX64, pairing->GetAdminId(),
+                        ChipLogValueX64(pairing->GetNodeId()));
         return pairing->GetNodeId();
     }
 
@@ -102,16 +101,14 @@ CHIP_ERROR AdvertiseOperational()
             .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
             .SetMac(FillMAC(mac))
             .SetPort(CHIP_PORT)
-            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
+            .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL, CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .EnableIpV4(true);
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise operational node %08" PRIx32 "%08" PRIx32 "-%08" PRIx32 "%08" PRIx32,
-                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetFabricId() >> 32),
-                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetFabricId()),
-                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetNodeId() >> 32),
-                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetNodeId()));
+    ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
+                    ChipLogValueX64(advertiseParameters.GetPeerId().GetFabricId()),
+                    ChipLogValueX64(advertiseParameters.GetPeerId().GetNodeId()));
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
@@ -235,7 +232,7 @@ CHIP_ERROR Advertise(bool commissionableNode)
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
     ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
-                    advertiseParameters.GetVendorId(), advertiseParameters.GetProductId(),
+                    advertiseParameters.GetVendorId().ValueOr(0), advertiseParameters.GetProductId().ValueOr(0),
                     advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
@@ -278,20 +275,17 @@ void StartServer()
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize                = 0;
     uint16_t lifetimeCounter               = 0;
     size_t rotatingDeviceIdValueOutputSize = 0;
 
-    SuccessOrExit(error =
-                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
-    SuccessOrExit(error = AdditionalDataPayloadGenerator().generateRotatingDeviceId(
-                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
-                      rotatingDeviceIdValueOutputSize));
-exit:
-    return error;
+    ReturnErrorOnFailure(
+        chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
+    return AdditionalDataPayloadGenerator().generateRotatingDeviceId(lifetimeCounter, serialNumber, serialNumberSize,
+                                                                     rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+                                                                     rotatingDeviceIdValueOutputSize);
 }
 #endif
 

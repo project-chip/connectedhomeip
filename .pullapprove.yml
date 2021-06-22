@@ -138,6 +138,10 @@ groups:
             - len(groups.approved.include('shared-reviewers-*')) >= 3
         reviews:
             required: 0
+        labels:
+            approved: "review - approved"
+            pending: "review - pending"
+            rejected: "review - changed requested"
 
     ############################################################
     #  Label Based Reviewers

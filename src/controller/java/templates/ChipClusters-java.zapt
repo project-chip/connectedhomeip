@@ -1,0 +1,103 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+
+package chip.devicecontroller;
+
+public class ChipClusters {
+
+  public interface DefaultClusterCallback {
+    void onSuccess();
+    void onError(Exception error);
+  }
+
+  // TODO(#7376): add attribute callbacks.
+
+  public static abstract class BaseChipCluster {
+    protected long chipClusterPtr;
+
+    public BaseChipCluster(long devicePtr, int endpointId) {
+      chipClusterPtr = initWithDevice(devicePtr, endpointId);
+    }
+
+    public abstract long initWithDevice(long devicePtr, int endpointId);
+
+    public native void deleteCluster(long chipClusterPtr);
+    
+    @SuppressWarnings("deprecation")
+    protected void finalize() throws Throwable {
+      super.finalize();
+
+      if (chipClusterPtr != 0) {
+        deleteCluster(chipClusterPtr);
+        chipClusterPtr = 0;
+      }
+    }
+  }
+
+  {{#chip_client_clusters}}
+  public static class {{asCamelCased name false}}Cluster extends BaseChipCluster {
+    public {{asCamelCased name false}}Cluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  {{#chip_server_cluster_commands}}
+
+  {{#if (zcl_command_arguments_count this.id)}}
+    public void {{asCamelCased name}}({{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback, {{#chip_server_cluster_command_arguments}}{{asJavaBasicType type}} {{asCamelCased label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/chip_server_cluster_command_arguments}}) {
+  {{else}}
+    public void {{asCamelCased name}}({{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback) {
+  {{/if}}
+  {{#if (zcl_command_arguments_count this.id)}}
+      {{asCamelCased name}}(chipClusterPtr, callback, {{#chip_server_cluster_command_arguments}}{{asCamelCased label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/chip_server_cluster_command_arguments}});
+  {{else}}
+      {{asCamelCased name}}(chipClusterPtr, callback);
+  {{/if}}    
+    }
+
+  {{/chip_server_cluster_commands}}
+  {{#chip_server_cluster_commands}}
+  {{#if (zcl_command_arguments_count this.id)}}
+    private native void {{asCamelCased name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback, {{#chip_server_cluster_command_arguments}}{{asJavaBasicType type}} {{asCamelCased label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/chip_server_cluster_command_arguments}});
+  {{else}}
+    private native void {{asCamelCased name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback);
+  {{/if}}
+
+  {{/chip_server_cluster_commands}}
+  {{#if (user_cluster_has_enabled_command name side)}}
+  {{#all_user_cluster_commands}}
+  {{#if (isStrEqual clusterName parent.name)}}
+  {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+    public interface {{asCamelCased name false}}Callback {
+      void onSuccess(
+{{#zcl_command_arguments}}
+{{#unless (isStrEqual label "status")}}
+{{#if isArray}}
+      // {{asSymbol label}}: {{asUnderlyingZclType type}}
+      // Conversion from this type to Java is not properly implemented yet
+{{else if (isOctetString type)}}
+      {{omitCommaForFirstNonStatusCommand parent.id index}}byte[] {{asSymbol label}}
+{{else if (isShortString type)}}
+      {{omitCommaForFirstNonStatusCommand parent.id index}}String {{asSymbol label}}
+{{else}}
+      {{omitCommaForFirstNonStatusCommand parent.id index}}{{asJavaBasicTypeForZclType type}} {{asSymbol label}}
+{{/if}}
+{{/unless}}
+{{/zcl_command_arguments}}
+      );
+      
+      void onError(Exception error);
+    }
+
+  {{/if}}
+  {{/if}}
+  {{/all_user_cluster_commands}}
+  {{/if}}
+  }
+  {{#unless (isLastElement index count)}}
+
+  {{/unless}}
+  {{/chip_client_clusters}}
+}
+{{/if}}

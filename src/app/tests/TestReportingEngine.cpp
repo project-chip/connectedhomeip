@@ -64,12 +64,12 @@ CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV
     VerifyOrExit(aAttributePathParams.mClusterId == kTestClusterId && aAttributePathParams.mEndpointId == kTestEndpointId,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (aAttributePathParams.mFieldId == kRootFieldId || aAttributePathParams.mFieldId == kTestFieldId1)
+    if (aAttributePathParams.mFieldId == kTestFieldId1)
     {
         err = aWriter.Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
         SuccessOrExit(err);
     }
-    if (aAttributePathParams.mFieldId == kRootFieldId || aAttributePathParams.mFieldId == kTestFieldId2)
+    if (aAttributePathParams.mFieldId == kTestFieldId2)
     {
         err = aWriter.Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
         SuccessOrExit(err);
@@ -90,7 +90,7 @@ public:
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override
+                           System::PacketBufferHandle && payload) override
     {}
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}

@@ -21,15 +21,6 @@
 #include <cstring>
 #include <type_traits>
 
-#include <app/util/af.h>
-#include <gen/att-storage.h>
-#include <gen/attribute-id.h>
-#include <gen/attribute-type.h>
-#include <gen/callback.h>
-#include <gen/cluster-id.h>
-#include <gen/command-id.h>
-#include <gen/enums.h>
-
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/Span.h>
@@ -37,6 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/internal/DeviceControlServer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -153,7 +145,7 @@ EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddThreadNetwork: %d", err);
+    ChipLogDetail(Zcl, "AddThreadNetwork: %" PRIu8, err);
     return err;
 #else
     // The target does not supports ThreadNetwork. We should not add AddThreadNetwork command in that case then the upper layer will
@@ -207,11 +199,11 @@ EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Co
 
     VerifyOrExit(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS, );
 
-    ChipLogDetail(Zcl, "WiFi provisioning data: SSID: %s", ssid);
+    ChipLogDetail(Zcl, "WiFi provisioning data: SSID: %.*s", static_cast<int>(ssid.size()), ssid.data());
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddWiFiNetwork: %d", err);
+    ChipLogDetail(Zcl, "AddWiFiNetwork: %" PRIu8, err);
     return err;
 #else
     // The target does not supports WiFiNetwork.
@@ -267,6 +259,14 @@ EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Com
 {
     size_t networkSeq;
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_NETWORK_ID_NOT_FOUND;
+    // TODO(cecille): This is very dangerous - need to check against real netif name, ensure no password.
+    constexpr char ethernetNetifMagicCode[] = "ETH0";
+    if (networkID.size() == sizeof(ethernetNetifMagicCode) &&
+        memcmp(networkID.data(), ethernetNetifMagicCode, networkID.size()) == 0)
+    {
+        ChipLogProgress(Zcl, "Wired network enabling requested. Assuming success.");
+        ExitNow(err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS);
+    }
 
     for (networkSeq = 0; networkSeq < kMaxNetworks; networkSeq++)
     {
@@ -283,6 +283,10 @@ EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Com
     }
     // TODO: We should encode response command here.
 exit:
+    if (err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS)
+    {
+        DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().EnableNetworkForOperational(networkID);
+    }
     return err;
 }
 

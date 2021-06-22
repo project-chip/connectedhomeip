@@ -37,8 +37,11 @@ namespace app {
 CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle commandPacket;
 
-    err = FinalizeCommandsMessage();
+    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = FinalizeCommandsMessage(commandPacket);
     SuccessOrExit(err);
 
     // Discard any existing exchange context. Effectively we can only have one exchange per CommandSender
@@ -59,9 +62,8 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    err = mpExchangeCtx->SendMessage(
-        Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
-        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(commandPacket),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(CommandState::Sending);
 
@@ -76,7 +78,7 @@ exit:
 }
 
 void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
+                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -94,7 +96,6 @@ exit:
     // This needs to be done before the Reset() call, because Reset() aborts mpExchangeCtx if its not null.
     mpExchangeCtx->Close();
     mpExchangeCtx = nullptr;
-    Reset();
 
     if (mpDelegate != nullptr)
     {
@@ -107,18 +108,21 @@ exit:
             mpDelegate->CommandResponseProcessed(this);
         }
     }
+
+    Shutdown();
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
-    Reset();
 
     if (mpDelegate != nullptr)
     {
         mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
     }
+
+    Shutdown();
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
@@ -159,6 +163,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     }
     else if (CHIP_END_OF_TLV == err)
     {
+        // TODO(Spec#3258): The endpoint id in response command is not clear, so we cannot do "ClientClusterCommandExists" check.
         err = aCommandElement.GetData(&commandDataReader);
         SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.
