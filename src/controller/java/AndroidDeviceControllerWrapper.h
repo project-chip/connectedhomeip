@@ -25,8 +25,8 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <support/TimeUtils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <support/TimeUtils.h>
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
@@ -58,9 +58,10 @@ public:
 
     // OperationalCredentialsDelegate implementation
     CHIP_ERROR GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr, int64_t serialNumber,
-                                                    uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+                                                  uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
 
-    CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,uint32_t & outCertLen) override;
+    CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
+                                    uint32_t & outCertLen) override;
 
     // DeviceStatusDelegate implementation
     void OnMessage(chip::System::PacketBufferHandle && msg) override;

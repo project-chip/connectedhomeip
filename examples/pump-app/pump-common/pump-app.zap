@@ -1,5 +1,5 @@
 {
-  "featureLevel": 35,
+  "featureLevel": 39,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -4633,7 +4633,7 @@
           "mfgCode": null,
           "define": "PRESSURE_MEASUREMENT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -4659,7 +4659,7 @@
           "mfgCode": null,
           "define": "PRESSURE_MEASUREMENT_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -4775,7 +4775,7 @@
           "mfgCode": null,
           "define": "FLOW_MEASUREMENT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -4801,7 +4801,7 @@
           "mfgCode": null,
           "define": "FLOW_MEASUREMENT_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {

@@ -832,8 +832,9 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     }
     else
     {
-       // TODO Abstract the CSRNonce generation from the CHIPDevice and let the controller always provide it.
-       // This will entail, making the CSRNonce a mandatory init param and also fixing the flow which currently depends on the auto generation of the CSRNonce.
+        // TODO Abstract the CSRNonce generation from the CHIPDevice and let the controller always provide it.
+        // This will entail, making the CSRNonce a mandatory init param and also fixing the flow which currently depends on the auto
+        // generation of the CSRNonce.
         device->GenerateCSRNonce();
     }
 

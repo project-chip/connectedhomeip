@@ -54,7 +54,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
-                                                                     uint32_t & outCertLen)
+                                                                uint32_t & outCertLen)
 {
     Initialize();
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -102,12 +102,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
     chip::Controller::CommissionerInitParams initParams;
 
-    initParams.storageDelegate = wrapper.get();
-    initParams.pairingDelegate = wrapper.get();
+    initParams.storageDelegate                = wrapper.get();
+    initParams.pairingDelegate                = wrapper.get();
     initParams.operationalCredentialsDelegate = wrapper.get();
-    initParams.systemLayer     = systemLayer;
-    initParams.inetLayer       = inetLayer;
-    initParams.bleLayer        = GetJNIBleLayer();
+    initParams.systemLayer                    = systemLayer;
+    initParams.inetLayer                      = inetLayer;
+    initParams.bleLayer                       = GetJNIBleLayer();
 
     *errInfoOnFailure = wrapper->OpCredsIssuer().Initialize(*initParams.storageDelegate);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
@@ -150,37 +150,38 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
 }
 
- // TODO Refactor this API to match latest spec, so that GenerateNodeOperationalCertificate receives the full CSR Elements data payload.
-CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr,
-                                                                                int64_t serialNumber, uint8_t * certBuf,
-                                                                                uint32_t certBufSize, uint32_t & outCertLen)
+// TODO Refactor this API to match latest spec, so that GenerateNodeOperationalCertificate receives the full CSR Elements data
+// payload.
+CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const chip::PeerId & peerId,
+                                                                              const chip::ByteSpan & csr, int64_t serialNumber,
+                                                                              uint8_t * certBuf, uint32_t certBufSize,
+                                                                              uint32_t & outCertLen)
 {
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err = FindMethod(JniReferences::GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
-   {
-      ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %d", err);
-      return err;
-   }
+    {
+        ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %d", err);
+        return err;
+    }
 
     // Initializing the KeyPair.
-     Initialize();
+    Initialize();
 
     chip::X509CertRequestParams request = { serialNumber, mIssuerId,         mNow, mNow + mValidity, true, peerId.GetFabricId(),
-                                          true,         peerId.GetNodeId() };
+                                            true,         peerId.GetNodeId() };
 
     chip::P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
 
     ChipLogProgress(chipTool, "VerifyCertificateSigningRequest");
 
-
-    CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, certBuf, certBufSize,
-                                         outCertLen);
+    CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer,
+                                                         certBuf, certBufSize, outCertLen);
     jbyteArray argument;
     JniReferences::GetEnvForCurrentThread()->ExceptionClear();
-    N2J_ByteArray(JniReferences::GetEnvForCurrentThread(), csr.data(),csr.size(),argument);
+    N2J_ByteArray(JniReferences::GetEnvForCurrentThread(), csr.data(), csr.size(), argument);
     JniReferences::GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, argument);
     return generateCert;
 }
@@ -190,19 +191,20 @@ CHIP_ERROR AndroidDeviceControllerWrapper::Initialize()
     chip::Crypto::P256SerializedKeypair serializedKey;
     uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));
 
-    // TODO: Use Android keystore system instead of direct storage of private key and add specific errors to check if a specified item is not found in the keystore.
+    // TODO: Use Android keystore system instead of direct storage of private key and add specific errors to check if a specified
+    // item is not found in the keystore.
     if (SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
-        {
-         // If storage doesn't have an existing keypair, create one and add it to the storage.
-         ReturnErrorOnFailure(mIssuer.Initialize());
-         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
-         keySize = static_cast<uint16_t>(sizeof(serializedKey));
-         SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize);
-        }
+    {
+        // If storage doesn't have an existing keypair, create one and add it to the storage.
+        ReturnErrorOnFailure(mIssuer.Initialize());
+        ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
+        keySize = static_cast<uint16_t>(sizeof(serializedKey));
+        SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize);
+    }
     else
     {
-     // Use the keypair from the storage
-     ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
+        // Use the keypair from the storage
+        ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
 
     mInitialized = true;

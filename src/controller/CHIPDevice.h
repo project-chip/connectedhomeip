@@ -351,9 +351,9 @@ public:
 
     CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
     {
-       VerifyOrReturnError(csrNonce.size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
-       memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
-       return CHIP_NO_ERROR;
+        VerifyOrReturnError(csrNonce.size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
+        return CHIP_NO_ERROR;
     }
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
@@ -380,8 +380,8 @@ private:
 
     Inet::InetLayer * mInetLayer = nullptr;
 
-    bool mActive           = false;
-    //Should be set to true only if the commissioner provides a CSRNonce during commissioning flow.
+    bool mActive = false;
+    // Should be set to true only if the commissioner provides a CSRNonce during commissioning flow.
     ConnectionState mState = ConnectionState::NotConnected;
 
 #if CONFIG_NETWORK_LAYER_BLE
