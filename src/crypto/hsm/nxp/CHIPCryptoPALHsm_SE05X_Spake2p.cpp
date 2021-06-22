@@ -514,8 +514,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
     {
         return Spake2p::KeyConfirm(in, in_len);
     }
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    error            = Spake2p_KeyConfirm_HSM(&hsm_pake_context, role, in, in_len);
+    CHIP_ERROR error = Spake2p_KeyConfirm_HSM(&hsm_pake_context, role, in, in_len);
     if (CHIP_NO_ERROR == error)
     {
         state = CHIP_SPAKE2P_STATE::KC;
