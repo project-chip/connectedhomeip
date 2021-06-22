@@ -28,6 +28,10 @@ jobs:
         name: Test Suites - Linux
         timeout-minutes: 60
 
+        strategy:
+          matrix:
+            type: [no_tsan, with_tsan]
+
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
@@ -61,11 +65,23 @@ jobs:
             - name: Build all clusters app
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false
+                  case ${{ matrix.type }} in
+                    "no_tsan") GN_ARGS='is_tsan=false';;
+                    "with_tsan") GN_ARGS='is_tsan=true';;
+                    *) ;;
+                  esac
+              
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false "$GN_ARGS"
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+                  case ${{ matrix.type }} in
+                    "no_tsan") GN_ARGS='is_tsan=false';;
+                    "with_tsan") GN_ARGS='is_tsan=true';;
+                    *) ;;
+                  esac
+                
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ "$GN_ARGS"
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have
@@ -95,7 +111,6 @@ jobs:
     test_suites_darwin:
         name: Test Suites - Darwin
         timeout-minutes: 60
-
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
 
