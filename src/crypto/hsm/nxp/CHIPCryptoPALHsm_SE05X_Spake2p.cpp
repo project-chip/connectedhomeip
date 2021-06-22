@@ -496,7 +496,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
 
 CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size_t in_len)
 {
-    CHIP_ERROR error     = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::R2, CHIP_ERROR_INTERNAL);
 
 #if !ENABLE_HSM_SPAKE_VERIFIER
