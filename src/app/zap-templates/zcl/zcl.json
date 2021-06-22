@@ -30,6 +30,7 @@
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
         "group-key-mgmt-cluster.xml",
+        "window-covering.xml",
         "ha.xml",
         "ha-devices.xml",
         "pump-configuration-and-control-cluster.xml",

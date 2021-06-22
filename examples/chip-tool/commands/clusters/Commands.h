@@ -19778,35 +19778,44 @@ private:
 | Cluster WindowCovering                                              | 0x0102 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * WindowCoveringDownClose                                           |   0x01 |
-| * WindowCoveringGoToLiftPercentage                                  |   0x05 |
-| * WindowCoveringGoToLiftValue                                       |   0x04 |
-| * WindowCoveringGoToTiltPercentage                                  |   0x08 |
-| * WindowCoveringGoToTiltValue                                       |   0x07 |
-| * WindowCoveringStop                                                |   0x02 |
-| * WindowCoveringUpOpen                                              |   0x00 |
+| * DownOrClose                                                       |   0x01 |
+| * GoToLiftPercentage                                                |   0x05 |
+| * GoToLiftValue                                                     |   0x04 |
+| * GoToTiltPercentage                                                |   0x08 |
+| * GoToTiltValue                                                     |   0x07 |
+| * StopMotion                                                        |   0x02 |
+| * UpOrOpen                                                          |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * WindowCoveringType                                                | 0x0000 |
+| * Type                                                              | 0x0000 |
 | * CurrentPositionLift                                               | 0x0003 |
 | * CurrentPositionTilt                                               | 0x0004 |
 | * ConfigStatus                                                      | 0x0007 |
+| * CurrentPositionLiftPercentage                                     | 0x0008 |
+| * CurrentPositionTiltPercentage                                     | 0x0009 |
+| * OperationalStatus                                                 | 0x000A |
+| * TargetPositionLiftPercent100ths                                   | 0x000B |
+| * TargetPositionTiltPercent100ths                                   | 0x000C |
+| * EndProductType                                                    | 0x000D |
+| * CurrentPositionLiftPercent100ths                                  | 0x000E |
+| * CurrentPositionTiltPercent100ths                                  | 0x000F |
 | * InstalledOpenLimitLift                                            | 0x0010 |
 | * InstalledClosedLimitLift                                          | 0x0011 |
 | * InstalledOpenLimitTilt                                            | 0x0012 |
 | * InstalledClosedLimitTilt                                          | 0x0013 |
 | * Mode                                                              | 0x0017 |
+| * SafetyStatus                                                      | 0x001A |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command WindowCoveringDownClose
+ * Command DownOrClose
  */
-class WindowCoveringWindowCoveringDownClose : public ModelCommand
+class WindowCoveringDownOrClose : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringDownClose() : ModelCommand("window-covering-down-close") { ModelCommand::AddArguments(); }
-    ~WindowCoveringWindowCoveringDownClose()
+    WindowCoveringDownOrClose() : ModelCommand("down-or-close") { ModelCommand::AddArguments(); }
+    ~WindowCoveringDownOrClose()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -19818,7 +19827,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringDownClose(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.DownOrClose(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -19829,17 +19838,18 @@ private:
 };
 
 /*
- * Command WindowCoveringGoToLiftPercentage
+ * Command GoToLiftPercentage
  */
-class WindowCoveringWindowCoveringGoToLiftPercentage : public ModelCommand
+class WindowCoveringGoToLiftPercentage : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringGoToLiftPercentage() : ModelCommand("window-covering-go-to-lift-percentage")
+    WindowCoveringGoToLiftPercentage() : ModelCommand("go-to-lift-percentage")
     {
-        AddArgument("percentageLiftValue", 0, UINT8_MAX, &mPercentageLiftValue);
+        AddArgument("liftPercentageValue", 0, UINT8_MAX, &mLiftPercentageValue);
+        AddArgument("liftPercent100thsValue", 0, UINT16_MAX, &mLiftPercent100thsValue);
         ModelCommand::AddArguments();
     }
-    ~WindowCoveringWindowCoveringGoToLiftPercentage()
+    ~WindowCoveringGoToLiftPercentage()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -19851,8 +19861,8 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringGoToLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                        mPercentageLiftValue);
+        return cluster.GoToLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLiftPercentageValue,
+                                          mLiftPercent100thsValue);
     }
 
 private:
@@ -19860,21 +19870,22 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mPercentageLiftValue;
+    uint8_t mLiftPercentageValue;
+    uint16_t mLiftPercent100thsValue;
 };
 
 /*
- * Command WindowCoveringGoToLiftValue
+ * Command GoToLiftValue
  */
-class WindowCoveringWindowCoveringGoToLiftValue : public ModelCommand
+class WindowCoveringGoToLiftValue : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringGoToLiftValue() : ModelCommand("window-covering-go-to-lift-value")
+    WindowCoveringGoToLiftValue() : ModelCommand("go-to-lift-value")
     {
         AddArgument("liftValue", 0, UINT16_MAX, &mLiftValue);
         ModelCommand::AddArguments();
     }
-    ~WindowCoveringWindowCoveringGoToLiftValue()
+    ~WindowCoveringGoToLiftValue()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -19886,7 +19897,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringGoToLiftValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLiftValue);
+        return cluster.GoToLiftValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLiftValue);
     }
 
 private:
@@ -19898,17 +19909,18 @@ private:
 };
 
 /*
- * Command WindowCoveringGoToTiltPercentage
+ * Command GoToTiltPercentage
  */
-class WindowCoveringWindowCoveringGoToTiltPercentage : public ModelCommand
+class WindowCoveringGoToTiltPercentage : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringGoToTiltPercentage() : ModelCommand("window-covering-go-to-tilt-percentage")
+    WindowCoveringGoToTiltPercentage() : ModelCommand("go-to-tilt-percentage")
     {
-        AddArgument("percentageTiltValue", 0, UINT8_MAX, &mPercentageTiltValue);
+        AddArgument("tiltPercentageValue", 0, UINT8_MAX, &mTiltPercentageValue);
+        AddArgument("tiltPercent100thsValue", 0, UINT16_MAX, &mTiltPercent100thsValue);
         ModelCommand::AddArguments();
     }
-    ~WindowCoveringWindowCoveringGoToTiltPercentage()
+    ~WindowCoveringGoToTiltPercentage()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -19920,8 +19932,8 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringGoToTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                        mPercentageTiltValue);
+        return cluster.GoToTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTiltPercentageValue,
+                                          mTiltPercent100thsValue);
     }
 
 private:
@@ -19929,21 +19941,22 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mPercentageTiltValue;
+    uint8_t mTiltPercentageValue;
+    uint16_t mTiltPercent100thsValue;
 };
 
 /*
- * Command WindowCoveringGoToTiltValue
+ * Command GoToTiltValue
  */
-class WindowCoveringWindowCoveringGoToTiltValue : public ModelCommand
+class WindowCoveringGoToTiltValue : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringGoToTiltValue() : ModelCommand("window-covering-go-to-tilt-value")
+    WindowCoveringGoToTiltValue() : ModelCommand("go-to-tilt-value")
     {
         AddArgument("tiltValue", 0, UINT16_MAX, &mTiltValue);
         ModelCommand::AddArguments();
     }
-    ~WindowCoveringWindowCoveringGoToTiltValue()
+    ~WindowCoveringGoToTiltValue()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -19955,7 +19968,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringGoToTiltValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTiltValue);
+        return cluster.GoToTiltValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTiltValue);
     }
 
 private:
@@ -19967,13 +19980,13 @@ private:
 };
 
 /*
- * Command WindowCoveringStop
+ * Command StopMotion
  */
-class WindowCoveringWindowCoveringStop : public ModelCommand
+class WindowCoveringStopMotion : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringStop() : ModelCommand("window-covering-stop") { ModelCommand::AddArguments(); }
-    ~WindowCoveringWindowCoveringStop()
+    WindowCoveringStopMotion() : ModelCommand("stop-motion") { ModelCommand::AddArguments(); }
+    ~WindowCoveringStopMotion()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -19985,7 +19998,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringStop(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.StopMotion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -19996,13 +20009,13 @@ private:
 };
 
 /*
- * Command WindowCoveringUpOpen
+ * Command UpOrOpen
  */
-class WindowCoveringWindowCoveringUpOpen : public ModelCommand
+class WindowCoveringUpOrOpen : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringUpOpen() : ModelCommand("window-covering-up-open") { ModelCommand::AddArguments(); }
-    ~WindowCoveringWindowCoveringUpOpen()
+    WindowCoveringUpOrOpen() : ModelCommand("up-or-open") { ModelCommand::AddArguments(); }
+    ~WindowCoveringUpOrOpen()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20014,7 +20027,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringUpOpen(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.UpOrOpen(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -20055,18 +20068,18 @@ private:
 };
 
 /*
- * Attribute WindowCoveringType
+ * Attribute Type
  */
-class ReadWindowCoveringWindowCoveringType : public ModelCommand
+class ReadWindowCoveringType : public ModelCommand
 {
 public:
-    ReadWindowCoveringWindowCoveringType() : ModelCommand("read")
+    ReadWindowCoveringType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "window-covering-type");
+        AddArgument("attr-name", "type");
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringWindowCoveringType()
+    ~ReadWindowCoveringType()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20078,7 +20091,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeWindowCoveringType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttributeType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -20086,52 +20099,6 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-class ReportWindowCoveringWindowCoveringType : public ModelCommand
-{
-public:
-    ReportWindowCoveringWindowCoveringType() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "window-covering-type");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportWindowCoveringWindowCoveringType()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        CHIP_ERROR err = cluster.ReportAttributeWindowCoveringType(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
-        return cluster.ConfigureAttributeWindowCoveringType(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                            mMaxInterval);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
 };
 
 /*
@@ -20168,54 +20135,6 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
-class ReportWindowCoveringCurrentPositionLift : public ModelCommand
-{
-public:
-    ReportWindowCoveringCurrentPositionLift() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "current-position-lift");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportWindowCoveringCurrentPositionLift()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionLift(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
-        return cluster.ConfigureAttributeCurrentPositionLift(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                             mMaxInterval, mChange);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    uint16_t mChange;
-};
-
 /*
  * Attribute CurrentPositionTilt
  */
@@ -20248,54 +20167,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-class ReportWindowCoveringCurrentPositionTilt : public ModelCommand
-{
-public:
-    ReportWindowCoveringCurrentPositionTilt() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "current-position-tilt");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportWindowCoveringCurrentPositionTilt()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
-
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionTilt(onReportCallback->Cancel());
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
-        return cluster.ConfigureAttributeCurrentPositionTilt(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                             mMaxInterval, mChange);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    uint16_t mChange;
 };
 
 /*
@@ -20332,18 +20203,53 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
-class ReportWindowCoveringConfigStatus : public ModelCommand
+/*
+ * Attribute CurrentPositionLiftPercentage
+ */
+class ReadWindowCoveringCurrentPositionLiftPercentage : public ModelCommand
 {
 public:
-    ReportWindowCoveringConfigStatus() : ModelCommand("report")
+    ReadWindowCoveringCurrentPositionLiftPercentage() : ModelCommand("read")
     {
-        AddArgument("attr-name", "config-status");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("attr-name", "current-position-lift-percentage");
         ModelCommand::AddArguments();
     }
 
-    ~ReportWindowCoveringConfigStatus()
+    ~ReadWindowCoveringCurrentPositionLiftPercentage()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentPositionLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportWindowCoveringCurrentPositionLiftPercentage : public ModelCommand
+{
+public:
+    ReportWindowCoveringCurrentPositionLiftPercentage() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "current-position-lift-percentage");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT8_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWindowCoveringCurrentPositionLiftPercentage()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20357,14 +20263,14 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeConfigStatus(onReportCallback->Cancel());
+        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionLiftPercentage(onReportCallback->Cancel());
         if (err != CHIP_NO_ERROR)
         {
             return err;
         }
 
-        return cluster.ConfigureAttributeConfigStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                      mMaxInterval);
+        return cluster.ConfigureAttributeCurrentPositionLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                       mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -20376,6 +20282,531 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    uint8_t mChange;
+};
+
+/*
+ * Attribute CurrentPositionTiltPercentage
+ */
+class ReadWindowCoveringCurrentPositionTiltPercentage : public ModelCommand
+{
+public:
+    ReadWindowCoveringCurrentPositionTiltPercentage() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-position-tilt-percentage");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWindowCoveringCurrentPositionTiltPercentage()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentPositionTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportWindowCoveringCurrentPositionTiltPercentage : public ModelCommand
+{
+public:
+    ReportWindowCoveringCurrentPositionTiltPercentage() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "current-position-tilt-percentage");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT8_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWindowCoveringCurrentPositionTiltPercentage()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionTiltPercentage(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeCurrentPositionTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                       mMinInterval, mMaxInterval, mChange);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint8_t mChange;
+};
+
+/*
+ * Attribute OperationalStatus
+ */
+class ReadWindowCoveringOperationalStatus : public ModelCommand
+{
+public:
+    ReadWindowCoveringOperationalStatus() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "operational-status");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWindowCoveringOperationalStatus()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeOperationalStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportWindowCoveringOperationalStatus : public ModelCommand
+{
+public:
+    ReportWindowCoveringOperationalStatus() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "operational-status");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWindowCoveringOperationalStatus()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeOperationalStatus(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeOperationalStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                           mMaxInterval);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+};
+
+/*
+ * Attribute TargetPositionLiftPercent100ths
+ */
+class ReadWindowCoveringTargetPositionLiftPercent100ths : public ModelCommand
+{
+public:
+    ReadWindowCoveringTargetPositionLiftPercent100ths() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "target-position-lift-percent100ths");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWindowCoveringTargetPositionLiftPercent100ths()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeTargetPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportWindowCoveringTargetPositionLiftPercent100ths : public ModelCommand
+{
+public:
+    ReportWindowCoveringTargetPositionLiftPercent100ths() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "target-position-lift-percent100ths");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWindowCoveringTargetPositionLiftPercent100ths()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeTargetPositionLiftPercent100ths(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeTargetPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                         mMinInterval, mMaxInterval, mChange);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint16_t mChange;
+};
+
+/*
+ * Attribute TargetPositionTiltPercent100ths
+ */
+class ReadWindowCoveringTargetPositionTiltPercent100ths : public ModelCommand
+{
+public:
+    ReadWindowCoveringTargetPositionTiltPercent100ths() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "target-position-tilt-percent100ths");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWindowCoveringTargetPositionTiltPercent100ths()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeTargetPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportWindowCoveringTargetPositionTiltPercent100ths : public ModelCommand
+{
+public:
+    ReportWindowCoveringTargetPositionTiltPercent100ths() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "target-position-tilt-percent100ths");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWindowCoveringTargetPositionTiltPercent100ths()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeTargetPositionTiltPercent100ths(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeTargetPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                         mMinInterval, mMaxInterval, mChange);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint16_t mChange;
+};
+
+/*
+ * Attribute EndProductType
+ */
+class ReadWindowCoveringEndProductType : public ModelCommand
+{
+public:
+    ReadWindowCoveringEndProductType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "end-product-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWindowCoveringEndProductType()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeEndProductType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CurrentPositionLiftPercent100ths
+ */
+class ReadWindowCoveringCurrentPositionLiftPercent100ths : public ModelCommand
+{
+public:
+    ReadWindowCoveringCurrentPositionLiftPercent100ths() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-position-lift-percent100ths");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWindowCoveringCurrentPositionLiftPercent100ths()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportWindowCoveringCurrentPositionLiftPercent100ths : public ModelCommand
+{
+public:
+    ReportWindowCoveringCurrentPositionLiftPercent100ths() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "current-position-lift-percent100ths");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWindowCoveringCurrentPositionLiftPercent100ths()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionLiftPercent100ths(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeCurrentPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                          mMinInterval, mMaxInterval, mChange);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint16_t mChange;
+};
+
+/*
+ * Attribute CurrentPositionTiltPercent100ths
+ */
+class ReadWindowCoveringCurrentPositionTiltPercent100ths : public ModelCommand
+{
+public:
+    ReadWindowCoveringCurrentPositionTiltPercent100ths() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-position-tilt-percent100ths");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWindowCoveringCurrentPositionTiltPercent100ths()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportWindowCoveringCurrentPositionTiltPercent100ths : public ModelCommand
+{
+public:
+    ReportWindowCoveringCurrentPositionTiltPercent100ths() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "current-position-tilt-percent100ths");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWindowCoveringCurrentPositionTiltPercent100ths()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeCurrentPositionTiltPercent100ths(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeCurrentPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                          mMinInterval, mMaxInterval, mChange);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint16_t mChange;
 };
 
 /*
@@ -20579,6 +21010,86 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mValue;
+};
+
+/*
+ * Attribute SafetyStatus
+ */
+class ReadWindowCoveringSafetyStatus : public ModelCommand
+{
+public:
+    ReadWindowCoveringSafetyStatus() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "safety-status");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWindowCoveringSafetyStatus()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSafetyStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportWindowCoveringSafetyStatus : public ModelCommand
+{
+public:
+    ReportWindowCoveringSafetyStatus() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "safety-status");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWindowCoveringSafetyStatus()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeSafetyStatus(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeSafetyStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                      mMaxInterval);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
 };
 
 /*
@@ -21438,28 +21949,41 @@ void registerClusterWindowCovering(Commands & commands)
     const char * clusterName = "WindowCovering";
 
     commands_list clusterCommands = {
-        make_unique<WindowCoveringWindowCoveringDownClose>(),
-        make_unique<WindowCoveringWindowCoveringGoToLiftPercentage>(),
-        make_unique<WindowCoveringWindowCoveringGoToLiftValue>(),
-        make_unique<WindowCoveringWindowCoveringGoToTiltPercentage>(),
-        make_unique<WindowCoveringWindowCoveringGoToTiltValue>(),
-        make_unique<WindowCoveringWindowCoveringStop>(),
-        make_unique<WindowCoveringWindowCoveringUpOpen>(),
+        make_unique<WindowCoveringDownOrClose>(),
+        make_unique<WindowCoveringGoToLiftPercentage>(),
+        make_unique<WindowCoveringGoToLiftValue>(),
+        make_unique<WindowCoveringGoToTiltPercentage>(),
+        make_unique<WindowCoveringGoToTiltValue>(),
+        make_unique<WindowCoveringStopMotion>(),
+        make_unique<WindowCoveringUpOrOpen>(),
         make_unique<DiscoverWindowCoveringAttributes>(),
-        make_unique<ReadWindowCoveringWindowCoveringType>(),
-        make_unique<ReportWindowCoveringWindowCoveringType>(),
+        make_unique<ReadWindowCoveringType>(),
         make_unique<ReadWindowCoveringCurrentPositionLift>(),
-        make_unique<ReportWindowCoveringCurrentPositionLift>(),
         make_unique<ReadWindowCoveringCurrentPositionTilt>(),
-        make_unique<ReportWindowCoveringCurrentPositionTilt>(),
         make_unique<ReadWindowCoveringConfigStatus>(),
-        make_unique<ReportWindowCoveringConfigStatus>(),
+        make_unique<ReadWindowCoveringCurrentPositionLiftPercentage>(),
+        make_unique<ReportWindowCoveringCurrentPositionLiftPercentage>(),
+        make_unique<ReadWindowCoveringCurrentPositionTiltPercentage>(),
+        make_unique<ReportWindowCoveringCurrentPositionTiltPercentage>(),
+        make_unique<ReadWindowCoveringOperationalStatus>(),
+        make_unique<ReportWindowCoveringOperationalStatus>(),
+        make_unique<ReadWindowCoveringTargetPositionLiftPercent100ths>(),
+        make_unique<ReportWindowCoveringTargetPositionLiftPercent100ths>(),
+        make_unique<ReadWindowCoveringTargetPositionTiltPercent100ths>(),
+        make_unique<ReportWindowCoveringTargetPositionTiltPercent100ths>(),
+        make_unique<ReadWindowCoveringEndProductType>(),
+        make_unique<ReadWindowCoveringCurrentPositionLiftPercent100ths>(),
+        make_unique<ReportWindowCoveringCurrentPositionLiftPercent100ths>(),
+        make_unique<ReadWindowCoveringCurrentPositionTiltPercent100ths>(),
+        make_unique<ReportWindowCoveringCurrentPositionTiltPercent100ths>(),
         make_unique<ReadWindowCoveringInstalledOpenLimitLift>(),
         make_unique<ReadWindowCoveringInstalledClosedLimitLift>(),
         make_unique<ReadWindowCoveringInstalledOpenLimitTilt>(),
         make_unique<ReadWindowCoveringInstalledClosedLimitTilt>(),
         make_unique<ReadWindowCoveringMode>(),
         make_unique<WriteWindowCoveringMode>(),
+        make_unique<ReadWindowCoveringSafetyStatus>(),
+        make_unique<ReportWindowCoveringSafetyStatus>(),
         make_unique<ReadWindowCoveringClusterRevision>(),
     };
 

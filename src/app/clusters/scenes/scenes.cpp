@@ -206,7 +206,8 @@ void emAfPluginScenesServerPrintInfo(void)
             emberAfCorePrint(" door %x", entry.lockStateValue);
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-            emberAfCorePrint(" window %x %x", entry.currentPositionLiftPercentageValue, entry.currentPositionTiltPercentageValue);
+            emberAfCorePrint(" Window percentage Lift %3u, Tilt %3u", entry.currentPositionLiftPercentageValue, entry.currentPositionTiltPercentageValue);
+            emberAfCorePrint(" Window percent100ths Lift %5u, Tilt %5u", entry.targetPositionLiftPercent100thsValue, entry.targetPositionTiltPercent100thsValue);
 #endif
         }
         emberAfCorePrintln("");
@@ -600,11 +601,17 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(EndpointId endpoint,
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
     entry.hasCurrentPositionLiftPercentageValue = readServerAttribute(
-        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_LIFT_PERCENTAGE_ATTRIBUTE_ID, "current position lift percentage",
+        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID, "current position lift percentage",
         (uint8_t *) &entry.currentPositionLiftPercentageValue, sizeof(entry.currentPositionLiftPercentageValue));
     entry.hasCurrentPositionTiltPercentageValue = readServerAttribute(
-        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_TILT_PERCENTAGE_ATTRIBUTE_ID, "current position tilt percentage",
+        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID, "current position tilt percentage",
         (uint8_t *) &entry.currentPositionTiltPercentageValue, sizeof(entry.currentPositionTiltPercentageValue));
+    entry.hasTargetPositionLiftPercent100thsValue = readServerAttribute(
+        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, "target position lift percent100ths",
+        (uint8_t *) &entry.targetPositionLiftPercent100thsValue, sizeof(entry.targetPositionLiftPercent100thsValue));
+    entry.hasTargetPositionTiltPercent100thsValue = readServerAttribute(
+        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, "target position tilt percent100ths",
+        (uint8_t *) &entry.targetPositionTiltPercent100thsValue, sizeof(entry.targetPositionTiltPercent100thsValue));
 #endif
 
     // When creating a new entry, the name is set to the null string (i.e., the
@@ -736,15 +743,27 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
                 if (entry.hasCurrentPositionLiftPercentageValue)
                 {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_LIFT_PERCENTAGE_ATTRIBUTE_ID,
+                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
                                          "current position lift percentage", (uint8_t *) &entry.currentPositionLiftPercentageValue,
                                          ZCL_INT8U_ATTRIBUTE_TYPE);
                 }
                 if (entry.hasCurrentPositionTiltPercentageValue)
                 {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_TILT_PERCENTAGE_ATTRIBUTE_ID,
+                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
                                          "current position tilt percentage", (uint8_t *) &entry.currentPositionTiltPercentageValue,
                                          ZCL_INT8U_ATTRIBUTE_TYPE);
+                }
+                if (entry.hasTargetPositionLiftPercent100thsValue)
+                {
+                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
+                                         "current position lift percentage", (uint8_t *) &entry.targetPositionLiftPercent100thsValue,
+                                         ZCL_INT16U_ATTRIBUTE_TYPE);
+                }
+                if (entry.hasTargetPositionTiltPercent100thsValue)
+                {
+                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
+                                         "current position tilt percentage", (uint8_t *) &entry.targetPositionTiltPercent100thsValue,
+                                         ZCL_INT16U_ATTRIBUTE_TYPE);
                 }
 #endif
                 emberAfScenesMakeValid(endpoint, sceneId, groupId);
@@ -857,6 +876,8 @@ bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, con
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
         entry.hasCurrentPositionLiftPercentageValue = false;
         entry.hasCurrentPositionTiltPercentageValue = false;
+        entry.hasTargetPositionLiftPercent100thsValue = false;
+        entry.hasTargetPositionTiltPercent100thsValue = false;
 #endif
     }
 
@@ -1029,8 +1050,7 @@ bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, con
             // If we're here, we know we have at least one byte, so we can skip the
             // length check for the first field.
             entry.hasCurrentPositionLiftPercentageValue = true;
-            entry.currentPositionLiftPercentageValue =
-                emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            entry.currentPositionLiftPercentageValue = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
             extensionFieldSetsIndex++;
             length--;
             if (length < 1)
@@ -1038,8 +1058,23 @@ bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, con
                 break;
             }
             entry.hasCurrentPositionTiltPercentageValue = true;
-            entry.currentPositionTiltPercentageValue =
-                emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            entry.currentPositionTiltPercentageValue = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            extensionFieldSetsIndex++;
+            length--;
+            if (length < 2)
+            {
+                break;
+            }
+            entry.hasTargetPositionLiftPercent100thsValue = true;
+            entry.targetPositionLiftPercent100thsValue = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            extensionFieldSetsIndex     = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+            length                      = static_cast<uint8_t>(length - 2);
+            if (length < 2)
+            {
+                break;
+            }
+            entry.hasTargetPositionTiltPercent100thsValue = true;
+            entry.targetPositionTiltPercent100thsValue = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
             // If additional Window Covering extensions are added, adjust the index
             // and length variables here.
             break;

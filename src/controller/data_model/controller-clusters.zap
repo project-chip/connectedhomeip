@@ -4514,7 +4514,7 @@
           "enabled": 1,
           "commands": [
             {
-              "name": "WindowCoveringUpOpen",
+              "name": "UpOrOpen",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -4522,7 +4522,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringDownClose",
+              "name": "DownOrClose",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -4530,7 +4530,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringStop",
+              "name": "Stop",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -4538,7 +4538,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringGoToLiftValue",
+              "name": "GoToLiftValue",
               "code": 4,
               "mfgCode": null,
               "source": "client",
@@ -4546,7 +4546,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringGoToLiftPercentage",
+              "name": "GoToLiftPercentage",
               "code": 5,
               "mfgCode": null,
               "source": "client",
@@ -4554,7 +4554,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringGoToTiltValue",
+              "name": "GoToTiltValue",
               "code": 7,
               "mfgCode": null,
               "source": "client",
@@ -4562,7 +4562,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringGoToTiltPercentage",
+              "name": "GoToTiltPercentage",
               "code": 8,
               "mfgCode": null,
               "source": "client",
@@ -4598,8 +4598,98 @@
           "commands": [],
           "attributes": [
             {
-              "name": "window covering type",
+              "name": "Type",
               "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x00",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPositionLift",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPositionTilt",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "ConfigStatus",
+              "code": 7,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x03",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPositionLiftPercentage",
+              "code": 8,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 100,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPositionTiltPercentage",
+              "code": 9,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 100,
+              "reportableChange": 0
+            },
+            {
+              "name": "OperationalStatus",
+              "code": 10,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -4609,56 +4699,86 @@
               "defaultValue": "0x00",
               "reportable": 1,
               "minInterval": 0,
-              "maxInterval": 65344,
+              "maxInterval": 127,
               "reportableChange": 0
             },
             {
-              "name": "current position - lift",
-              "code": 3,
+              "name": "TargetPositionLiftPercent100ths",
+              "code": 11,
               "mfgCode": null,
               "side": "server",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0000",
+              "defaultValue": "0xFF",
               "reportable": 1,
               "minInterval": 0,
-              "maxInterval": 65344,
+              "maxInterval": 10000,
               "reportableChange": 0
             },
             {
-              "name": "current position - tilt",
-              "code": 4,
+              "name": "TargetPositionTiltPercent100ths",
+              "code": 12,
               "mfgCode": null,
               "side": "server",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0000",
+              "defaultValue": "0xFFFF",
               "reportable": 1,
               "minInterval": 0,
-              "maxInterval": 65344,
+              "maxInterval": 10000,
               "reportableChange": 0
             },
             {
-              "name": "config status",
-              "code": 7,
+              "name": "EndProductType",
+              "code": 13,
               "mfgCode": null,
               "side": "server",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x03",
-              "reportable": 1,
+              "defaultValue": "0x00",
+              "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
             },
             {
-              "name": "installed open limit - lift",
+              "name": "CurrentPositionLiftPercent100ths",
+              "code": 14,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 10000,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPositionTiltPercent100ths",
+              "code": 15,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 10000,
+              "reportableChange": 0
+            },
+            {
+              "name": "InstalledOpenLimitLift",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -4673,7 +4793,7 @@
               "reportableChange": 0
             },
             {
-              "name": "installed closed limit - lift",
+              "name": "InstalledClosedLimitLift",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -4688,7 +4808,7 @@
               "reportableChange": 0
             },
             {
-              "name": "installed open limit - tilt",
+              "name": "InstalledOpenLimitTilt",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -4703,7 +4823,7 @@
               "reportableChange": 0
             },
             {
-              "name": "installed closed limit - tilt",
+              "name": "InstalledClosedLimitTilt",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -4718,7 +4838,7 @@
               "reportableChange": 0
             },
             {
-              "name": "mode",
+              "name": "Mode",
               "code": 23,
               "mfgCode": null,
               "side": "server",
@@ -4726,8 +4846,23 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x14",
+              "defaultValue": "0x00",
               "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 15,
+              "reportableChange": 0
+            },
+            {
+              "name": "SafetyStatus",
+              "code": 26,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x00",
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0

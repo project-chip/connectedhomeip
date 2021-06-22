@@ -562,13 +562,13 @@
             { 0x0101, 0x19, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* ClearAllRfidsResponse */   \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Window Covering (client) */                                                                   \
-            { 0x0102, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringUpOpen */                                        \
-            { 0x0102, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringDownClose */                                     \
-            { 0x0102, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringStop */                                          \
-            { 0x0102, 0x04, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* WindowCoveringGoToLiftValue */                                 \
-            { 0x0102, 0x05, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* WindowCoveringGoToLiftPercentage */                            \
-            { 0x0102, 0x07, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* WindowCoveringGoToTiltValue */                                 \
-            { 0x0102, 0x08, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* WindowCoveringGoToTiltPercentage */                            \
+            { 0x0102, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpOrOpen */                                                    \
+            { 0x0102, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* DownOrClose */                                                 \
+            { 0x0102, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* StopMotion */                                                  \
+            { 0x0102, 0x04, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* GoToLiftValue */                                               \
+            { 0x0102, 0x05, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* GoToLiftPercentage */                                          \
+            { 0x0102, 0x07, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* GoToTiltValue */                                               \
+            { 0x0102, 0x08, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* GoToTiltPercentage */                                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Barrier Control (client) */                                                                   \
             { 0x0103, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* BarrierControlGoToPercent */                                   \
