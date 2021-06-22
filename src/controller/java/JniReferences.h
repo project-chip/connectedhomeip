@@ -60,7 +60,7 @@ public:
 
     /**
      * @brief
-     *   Gets a jclass reference to the given class type.
+     *   Creates a jclass reference to the given class type.
      *
      *   This must be called after SetJavaVm().
      *
@@ -72,13 +72,14 @@ public:
     CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature,
                           jmethodID * methodId);
     void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);
-    jclass GetClusterExceptionCls();
 
 private:
     JniReferences() {}
-    pthread_mutex_t mStackLock  = PTHREAD_MUTEX_INITIALIZER;
-    JavaVM * mJvm               = nullptr;
-    jclass mClusterExceptionCls = nullptr;
+
+    pthread_mutex_t mStackLock = PTHREAD_MUTEX_INITIALIZER;
+    JavaVM * mJvm              = nullptr;
+    jobject mClassLoader       = nullptr;
+    jmethodID mFindClassMethod = nullptr;
 };
 
 } // namespace Controller

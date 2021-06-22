@@ -25,14 +25,17 @@ static CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[]
 CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable & outEx) {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID exceptionConstructor;
-    
-    exceptionConstructor = env->GetMethodID(JniReferences::GetInstance().GetClusterExceptionCls(), "<init>", "(I)V");
-    VerifyOrExit(exceptionConstructor != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-    
-    outEx = (jthrowable) env->NewObject(JniReferences::GetInstance().GetClusterExceptionCls(), exceptionConstructor, errorCode);
-    VerifyOrExit(outEx != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    jclass clusterExceptionCls;
 
-exit:
+    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipClusterException", clusterExceptionCls);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    
+    exceptionConstructor = env->GetMethodID(clusterExceptionCls, "<init>", "(I)V");
+    VerifyOrReturnError(exceptionConstructor != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    
+    outEx = (jthrowable) env->NewObject(clusterExceptionCls, exceptionConstructor, errorCode);
+    VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
     return err;
 }
 
