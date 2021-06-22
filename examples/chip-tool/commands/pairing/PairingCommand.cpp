@@ -63,27 +63,25 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     //
     switch (mPairingMode)
     {
-        case PairingMode::None:
-            err = Unpair(remoteId);
-            break;
-        case PairingMode::Bypass:
-            err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-            break;
-        case PairingMode::Ble:
-            err = Pair(remoteId, PeerAddress::BLE());
-            break;
-        case PairingMode::OnNetwork:
-        case PairingMode::SoftAP:
-            err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-            break;
-        case PairingMode::Ethernet:
-            err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
-            break;
+    case PairingMode::None:
+        err = Unpair(remoteId);
+        break;
+    case PairingMode::Bypass:
+        err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        break;
+    case PairingMode::Ble:
+        err = Pair(remoteId, PeerAddress::BLE());
+        break;
+    case PairingMode::OnNetwork:
+    case PairingMode::SoftAP:
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        break;
+    case PairingMode::Ethernet:
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        break;
     }
 
-    ScheduleWaitForResponse(kWaitDurationInSeconds, [this] {
-        ReleaseCallbacks();
-    });
+    ScheduleWaitForResponse(kWaitDurationInSeconds, [this] { ReleaseCallbacks(); });
 
     return err;
 }

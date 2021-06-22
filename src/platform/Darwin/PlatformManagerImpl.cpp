@@ -70,7 +70,8 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 
 CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 {
-    if (dispatch_get_current_queue() != mWorkQueue) {
+    if (dispatch_get_current_queue() != mWorkQueue)
+    {
         if (mIsWorkQueueRunning == true)
         {
             mIsWorkQueueRunning = false;
@@ -82,7 +83,8 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
             });
         }
     }
-    else {
+    else
+    {
         dispatch_suspend(mWorkQueue);
         dispatch_semaphore_signal(mRunLoopSem);
     }

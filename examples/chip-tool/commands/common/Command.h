@@ -174,7 +174,7 @@ public:
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(uint16_t duration);
 
-    static void OnResponseTimer(chip::System::Layer *aLayer, void *aAppState, chip::System::Error aError);
+    static void OnResponseTimer(chip::System::Layer * aLayer, void * aAppState, chip::System::Error aError);
     void ScheduleWaitForResponse(uint16_t duration, std::function<void()> f);
 
 protected:
