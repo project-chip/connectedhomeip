@@ -27,7 +27,43 @@
 namespace chip {
 namespace Controller {
 
+constexpr ClusterId kFlowMeasurementClusterId        = 0x0404;
+constexpr ClusterId kPressureMeasurementClusterId    = 0x0403;
 constexpr ClusterId kTemperatureMeasurementClusterId = 0x0402;
+
+class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
+{
+public:
+    FlowMeasurementCluster() : ClusterBase(kFlowMeasurementClusterId) {}
+    ~FlowMeasurementCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t minInterval, uint16_t maxInterval, int16_t change);
+    CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+};
+
+class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
+{
+public:
+    PressureMeasurementCluster() : ClusterBase(kPressureMeasurementClusterId) {}
+    ~PressureMeasurementCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t minInterval, uint16_t maxInterval, int16_t change);
+    CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+};
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 {
