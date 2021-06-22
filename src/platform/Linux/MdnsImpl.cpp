@@ -162,18 +162,18 @@ AvahiWatch * Poller::WatchNew(int fd, AvahiWatchEvent event, AvahiWatchCallback 
 {
     VerifyOrDie(callback != nullptr && fd >= 0);
 
-    AvahiWatch * const watch = new AvahiWatch;
+    auto watch = std::make_unique<AvahiWatch>();
     watch->mSocket.Init(*mWatchableEvents)
         .Attach(fd)
-        .SetCallback(AvahiWatchCallbackTrampoline, reinterpret_cast<intptr_t>(watch))
+        .SetCallback(AvahiWatchCallbackTrampoline, reinterpret_cast<intptr_t>(watch.get()))
         .RequestCallbackOnPendingRead(event & AVAHI_WATCH_IN)
         .RequestCallbackOnPendingWrite(event & AVAHI_WATCH_OUT);
     watch->mCallback = callback;
     watch->mContext  = context;
     watch->mPoller   = this;
-    mWatches.emplace_back(watch);
+    mWatches.emplace_back(std::move(watch));
 
-    return watch;
+    return mWatches.back().get();
 }
 
 void Poller::WatchUpdate(AvahiWatch * watch, AvahiWatchEvent event)

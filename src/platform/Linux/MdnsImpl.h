@@ -38,13 +38,7 @@
 
 struct AvahiWatch
 {
-#if 1
     chip::System::WatchableSocket mSocket;
-#else
-    int mFd;                      ///< The file descriptor to watch.
-    AvahiWatchEvent mWatchEvents; ///< The interested events.
-    int mHappenedEvents;          ///< The events happened.
-#endif
     AvahiWatchCallback mCallback; ///< The function to be called when interested events happened on mFd.
     void * mContext;              ///< A pointer to application-specific context.
     void * mPoller;               ///< The poller created this watch.
