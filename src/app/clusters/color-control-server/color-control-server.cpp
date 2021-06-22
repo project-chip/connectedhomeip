@@ -1412,6 +1412,45 @@ bool emberAfColorControlClusterStopMoveStepCallback(chip::app::Command * command
     return true;
 }
 
+bool emberAfColorControlClusterColorLoopSetCallback(chip::app::Command * commandObj, uint8_t updateFlags, uint8_t action,
+                                                    uint8_t direction, uint16_t time, uint16_t startHue)
+{
+    // TODO IMPLEMENT LOGIC
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate)
+{
+    // TODO IMPLEMENT LOGIC
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfColorControlClusterEnhancedMoveToHueCallback(chip::app::Command * commandObj, uint16_t enhancedHue, uint8_t direction,
+                                                         uint16_t transitionTime)
+{
+    // TODO IMPLEMENT LOGIC
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint16_t enhancedHue,
+                                                                      uint8_t saturation, uint16_t transitionTime)
+{
+    // TODO IMPLEMENT LOGIC
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfColorControlClusterEnhancedStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
+                                                       uint16_t transitionTime)
+{
+    // TODO IMPLEMENT LOGIC
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
 // **************** transition state machines ***********
 
 static void stopAllColorTransitions(void)
