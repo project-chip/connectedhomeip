@@ -113,15 +113,15 @@ CHIP_ERROR ConfigurationManagerImpl::MapConfigError(esp_err_t error)
 {
     switch (error)
     {
-        case ESP_OK:
-            return CHIP_NO_ERROR;
-        case ESP_ERR_WIFI_NOT_INIT:
-            return CHIP_ERROR_WELL_UNINITIALIZED;
-        case ESP_ERR_INVALID_ARG:
-        case ESP_ERR_WIFI_IF:
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        default:
-            return CHIP_ERROR_NOT_IMPLEMENTED;
+    case ESP_OK:
+        return CHIP_NO_ERROR;
+    case ESP_ERR_WIFI_NOT_INIT:
+        return CHIP_ERROR_WELL_UNINITIALIZED;
+    case ESP_ERR_INVALID_ARG:
+    case ESP_ERR_WIFI_IF:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    default:
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 }
 bool ConfigurationManagerImpl::_CanFactoryReset()
