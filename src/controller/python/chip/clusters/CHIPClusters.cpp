@@ -4861,85 +4861,82 @@ CHIP_ERROR chip_ime_ReadAttribute_WakeOnLan_ClusterRevision(chip::Controller::De
 // End of Cluster WakeOnLan
 // Cluster WindowCovering
 
-CHIP_ERROR chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose(chip::Controller::Device * device,
-                                                                         chip::EndpointId ZCLendpointId, chip::GroupId)
+CHIP_ERROR chip_ime_AppendCommand_WindowCovering_DownOrClose(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WindowCoveringDownClose(nullptr, nullptr);
+    return cluster.DownOrClose(nullptr, nullptr);
 }
-CHIP_ERROR chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage(chip::Controller::Device * device,
-                                                                                  chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                                  uint8_t percentageLiftValue)
+CHIP_ERROR chip_ime_AppendCommand_WindowCovering_GoToLiftPercentage(chip::Controller::Device * device,
+                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                    uint8_t liftPercentageValue, uint16_t liftPercent100thsValue)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WindowCoveringGoToLiftPercentage(nullptr, nullptr, percentageLiftValue);
+    return cluster.GoToLiftPercentage(nullptr, nullptr, liftPercentageValue, liftPercent100thsValue);
 }
-CHIP_ERROR chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue(chip::Controller::Device * device,
-                                                                             chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                             uint16_t liftValue)
+CHIP_ERROR chip_ime_AppendCommand_WindowCovering_GoToLiftValue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                               chip::GroupId, uint16_t liftValue)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WindowCoveringGoToLiftValue(nullptr, nullptr, liftValue);
+    return cluster.GoToLiftValue(nullptr, nullptr, liftValue);
 }
-CHIP_ERROR chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage(chip::Controller::Device * device,
-                                                                                  chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                                  uint8_t percentageTiltValue)
+CHIP_ERROR chip_ime_AppendCommand_WindowCovering_GoToTiltPercentage(chip::Controller::Device * device,
+                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                    uint8_t tiltPercentageValue, uint16_t tiltPercent100thsValue)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WindowCoveringGoToTiltPercentage(nullptr, nullptr, percentageTiltValue);
+    return cluster.GoToTiltPercentage(nullptr, nullptr, tiltPercentageValue, tiltPercent100thsValue);
 }
-CHIP_ERROR chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue(chip::Controller::Device * device,
-                                                                             chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                             uint16_t tiltValue)
+CHIP_ERROR chip_ime_AppendCommand_WindowCovering_GoToTiltValue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                               chip::GroupId, uint16_t tiltValue)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WindowCoveringGoToTiltValue(nullptr, nullptr, tiltValue);
+    return cluster.GoToTiltValue(nullptr, nullptr, tiltValue);
 }
-CHIP_ERROR chip_ime_AppendCommand_WindowCovering_WindowCoveringStop(chip::Controller::Device * device,
-                                                                    chip::EndpointId ZCLendpointId, chip::GroupId)
+CHIP_ERROR chip_ime_AppendCommand_WindowCovering_StopMotion(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                            chip::GroupId)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WindowCoveringStop(nullptr, nullptr);
+    return cluster.StopMotion(nullptr, nullptr);
 }
-CHIP_ERROR chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen(chip::Controller::Device * device,
-                                                                      chip::EndpointId ZCLendpointId, chip::GroupId)
+CHIP_ERROR chip_ime_AppendCommand_WindowCovering_UpOrOpen(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                          chip::GroupId)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WindowCoveringUpOpen(nullptr, nullptr);
+    return cluster.UpOrOpen(nullptr, nullptr);
 }
 
-CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_WindowCoveringType(chip::Controller::Device * device,
-                                                                    chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_Type(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                      chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeWindowCoveringType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+    return cluster.ReadAttributeType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
 }
 
-CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType(chip::Controller::Device * device,
-                                                                         chip::EndpointId ZCLendpointId, uint16_t minInterval,
-                                                                         uint16_t maxInterval)
+CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_Type(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                           uint16_t minInterval, uint16_t maxInterval)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ConfigureAttributeWindowCoveringType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                        minInterval, maxInterval);
+    return cluster.ConfigureAttributeType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                          maxInterval);
 }
 
 CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift(chip::Controller::Device * device,

@@ -20041,16 +20041,16 @@ private:
 | Cluster WindowCovering                                              | 0x0102 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * WindowCoveringDownClose                                           |   0x01 |
-| * WindowCoveringGoToLiftPercentage                                  |   0x05 |
-| * WindowCoveringGoToLiftValue                                       |   0x04 |
-| * WindowCoveringGoToTiltPercentage                                  |   0x08 |
-| * WindowCoveringGoToTiltValue                                       |   0x07 |
-| * WindowCoveringStop                                                |   0x02 |
-| * WindowCoveringUpOpen                                              |   0x00 |
+| * DownOrClose                                                       |   0x01 |
+| * GoToLiftPercentage                                                |   0x05 |
+| * GoToLiftValue                                                     |   0x04 |
+| * GoToTiltPercentage                                                |   0x08 |
+| * GoToTiltValue                                                     |   0x07 |
+| * StopMotion                                                        |   0x02 |
+| * UpOrOpen                                                          |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * WindowCoveringType                                                | 0x0000 |
+| * Type                                                              | 0x0000 |
 | * CurrentPositionLift                                               | 0x0003 |
 | * CurrentPositionTilt                                               | 0x0004 |
 | * ConfigStatus                                                      | 0x0007 |
@@ -20063,13 +20063,13 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command WindowCoveringDownClose
+ * Command DownOrClose
  */
-class WindowCoveringWindowCoveringDownClose : public ModelCommand
+class WindowCoveringDownOrClose : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringDownClose() : ModelCommand("window-covering-down-close") { ModelCommand::AddArguments(); }
-    ~WindowCoveringWindowCoveringDownClose()
+    WindowCoveringDownOrClose() : ModelCommand("down-or-close") { ModelCommand::AddArguments(); }
+    ~WindowCoveringDownOrClose()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20081,7 +20081,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringDownClose(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.DownOrClose(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -20092,17 +20092,18 @@ private:
 };
 
 /*
- * Command WindowCoveringGoToLiftPercentage
+ * Command GoToLiftPercentage
  */
-class WindowCoveringWindowCoveringGoToLiftPercentage : public ModelCommand
+class WindowCoveringGoToLiftPercentage : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringGoToLiftPercentage() : ModelCommand("window-covering-go-to-lift-percentage")
+    WindowCoveringGoToLiftPercentage() : ModelCommand("go-to-lift-percentage")
     {
-        AddArgument("percentageLiftValue", 0, UINT8_MAX, &mPercentageLiftValue);
+        AddArgument("liftPercentageValue", 0, UINT8_MAX, &mLiftPercentageValue);
+        AddArgument("liftPercent100thsValue", 0, UINT16_MAX, &mLiftPercent100thsValue);
         ModelCommand::AddArguments();
     }
-    ~WindowCoveringWindowCoveringGoToLiftPercentage()
+    ~WindowCoveringGoToLiftPercentage()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20114,8 +20115,8 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringGoToLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                        mPercentageLiftValue);
+        return cluster.GoToLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLiftPercentageValue,
+                                          mLiftPercent100thsValue);
     }
 
 private:
@@ -20123,21 +20124,22 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mPercentageLiftValue;
+    uint8_t mLiftPercentageValue;
+    uint16_t mLiftPercent100thsValue;
 };
 
 /*
- * Command WindowCoveringGoToLiftValue
+ * Command GoToLiftValue
  */
-class WindowCoveringWindowCoveringGoToLiftValue : public ModelCommand
+class WindowCoveringGoToLiftValue : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringGoToLiftValue() : ModelCommand("window-covering-go-to-lift-value")
+    WindowCoveringGoToLiftValue() : ModelCommand("go-to-lift-value")
     {
         AddArgument("liftValue", 0, UINT16_MAX, &mLiftValue);
         ModelCommand::AddArguments();
     }
-    ~WindowCoveringWindowCoveringGoToLiftValue()
+    ~WindowCoveringGoToLiftValue()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20149,7 +20151,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringGoToLiftValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLiftValue);
+        return cluster.GoToLiftValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLiftValue);
     }
 
 private:
@@ -20161,17 +20163,18 @@ private:
 };
 
 /*
- * Command WindowCoveringGoToTiltPercentage
+ * Command GoToTiltPercentage
  */
-class WindowCoveringWindowCoveringGoToTiltPercentage : public ModelCommand
+class WindowCoveringGoToTiltPercentage : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringGoToTiltPercentage() : ModelCommand("window-covering-go-to-tilt-percentage")
+    WindowCoveringGoToTiltPercentage() : ModelCommand("go-to-tilt-percentage")
     {
-        AddArgument("percentageTiltValue", 0, UINT8_MAX, &mPercentageTiltValue);
+        AddArgument("tiltPercentageValue", 0, UINT8_MAX, &mTiltPercentageValue);
+        AddArgument("tiltPercent100thsValue", 0, UINT16_MAX, &mTiltPercent100thsValue);
         ModelCommand::AddArguments();
     }
-    ~WindowCoveringWindowCoveringGoToTiltPercentage()
+    ~WindowCoveringGoToTiltPercentage()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20183,8 +20186,8 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringGoToTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                        mPercentageTiltValue);
+        return cluster.GoToTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTiltPercentageValue,
+                                          mTiltPercent100thsValue);
     }
 
 private:
@@ -20192,21 +20195,22 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mPercentageTiltValue;
+    uint8_t mTiltPercentageValue;
+    uint16_t mTiltPercent100thsValue;
 };
 
 /*
- * Command WindowCoveringGoToTiltValue
+ * Command GoToTiltValue
  */
-class WindowCoveringWindowCoveringGoToTiltValue : public ModelCommand
+class WindowCoveringGoToTiltValue : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringGoToTiltValue() : ModelCommand("window-covering-go-to-tilt-value")
+    WindowCoveringGoToTiltValue() : ModelCommand("go-to-tilt-value")
     {
         AddArgument("tiltValue", 0, UINT16_MAX, &mTiltValue);
         ModelCommand::AddArguments();
     }
-    ~WindowCoveringWindowCoveringGoToTiltValue()
+    ~WindowCoveringGoToTiltValue()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20218,7 +20222,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringGoToTiltValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTiltValue);
+        return cluster.GoToTiltValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mTiltValue);
     }
 
 private:
@@ -20230,13 +20234,13 @@ private:
 };
 
 /*
- * Command WindowCoveringStop
+ * Command StopMotion
  */
-class WindowCoveringWindowCoveringStop : public ModelCommand
+class WindowCoveringStopMotion : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringStop() : ModelCommand("window-covering-stop") { ModelCommand::AddArguments(); }
-    ~WindowCoveringWindowCoveringStop()
+    WindowCoveringStopMotion() : ModelCommand("stop-motion") { ModelCommand::AddArguments(); }
+    ~WindowCoveringStopMotion()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20248,7 +20252,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringStop(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.StopMotion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -20259,13 +20263,13 @@ private:
 };
 
 /*
- * Command WindowCoveringUpOpen
+ * Command UpOrOpen
  */
-class WindowCoveringWindowCoveringUpOpen : public ModelCommand
+class WindowCoveringUpOrOpen : public ModelCommand
 {
 public:
-    WindowCoveringWindowCoveringUpOpen() : ModelCommand("window-covering-up-open") { ModelCommand::AddArguments(); }
-    ~WindowCoveringWindowCoveringUpOpen()
+    WindowCoveringUpOrOpen() : ModelCommand("up-or-open") { ModelCommand::AddArguments(); }
+    ~WindowCoveringUpOrOpen()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20277,7 +20281,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WindowCoveringUpOpen(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.UpOrOpen(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -20318,18 +20322,18 @@ private:
 };
 
 /*
- * Attribute WindowCoveringType
+ * Attribute Type
  */
-class ReadWindowCoveringWindowCoveringType : public ModelCommand
+class ReadWindowCoveringType : public ModelCommand
 {
 public:
-    ReadWindowCoveringWindowCoveringType() : ModelCommand("read")
+    ReadWindowCoveringType() : ModelCommand("read")
     {
-        AddArgument("attr-name", "window-covering-type");
+        AddArgument("attr-name", "type");
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringWindowCoveringType()
+    ~ReadWindowCoveringType()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20341,7 +20345,7 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeWindowCoveringType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttributeType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -20351,18 +20355,18 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
-class ReportWindowCoveringWindowCoveringType : public ModelCommand
+class ReportWindowCoveringType : public ModelCommand
 {
 public:
-    ReportWindowCoveringWindowCoveringType() : ModelCommand("report")
+    ReportWindowCoveringType() : ModelCommand("report")
     {
-        AddArgument("attr-name", "window-covering-type");
+        AddArgument("attr-name", "type");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         ModelCommand::AddArguments();
     }
 
-    ~ReportWindowCoveringWindowCoveringType()
+    ~ReportWindowCoveringType()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -20376,14 +20380,13 @@ public:
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
 
-        CHIP_ERROR err = cluster.ReportAttributeWindowCoveringType(onReportCallback->Cancel());
+        CHIP_ERROR err = cluster.ReportAttributeType(onReportCallback->Cancel());
         if (err != CHIP_NO_ERROR)
         {
             return err;
         }
 
-        return cluster.ConfigureAttributeWindowCoveringType(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                            mMaxInterval);
+        return cluster.ConfigureAttributeType(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
     }
 
 private:
@@ -21714,16 +21717,16 @@ void registerClusterWindowCovering(Commands & commands)
     const char * clusterName = "WindowCovering";
 
     commands_list clusterCommands = {
-        make_unique<WindowCoveringWindowCoveringDownClose>(),
-        make_unique<WindowCoveringWindowCoveringGoToLiftPercentage>(),
-        make_unique<WindowCoveringWindowCoveringGoToLiftValue>(),
-        make_unique<WindowCoveringWindowCoveringGoToTiltPercentage>(),
-        make_unique<WindowCoveringWindowCoveringGoToTiltValue>(),
-        make_unique<WindowCoveringWindowCoveringStop>(),
-        make_unique<WindowCoveringWindowCoveringUpOpen>(),
+        make_unique<WindowCoveringDownOrClose>(),
+        make_unique<WindowCoveringGoToLiftPercentage>(),
+        make_unique<WindowCoveringGoToLiftValue>(),
+        make_unique<WindowCoveringGoToTiltPercentage>(),
+        make_unique<WindowCoveringGoToTiltValue>(),
+        make_unique<WindowCoveringStopMotion>(),
+        make_unique<WindowCoveringUpOrOpen>(),
         make_unique<DiscoverWindowCoveringAttributes>(),
-        make_unique<ReadWindowCoveringWindowCoveringType>(),
-        make_unique<ReportWindowCoveringWindowCoveringType>(),
+        make_unique<ReadWindowCoveringType>(),
+        make_unique<ReportWindowCoveringType>(),
         make_unique<ReadWindowCoveringCurrentPositionLift>(),
         make_unique<ReportWindowCoveringCurrentPositionLift>(),
         make_unique<ReadWindowCoveringCurrentPositionTilt>(),

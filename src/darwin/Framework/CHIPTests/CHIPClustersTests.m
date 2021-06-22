@@ -8085,18 +8085,17 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterWindowCoveringReadAttributeWindowCoveringTypeWithResponseHandler
+- (void)testSendClusterWindowCoveringReadAttributeTypeWithResponseHandler
 {
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"WindowCoveringReadAttributeWindowCoveringTypeWithResponseHandler"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"WindowCoveringReadAttributeTypeWithResponseHandler"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeWindowCoveringTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"WindowCovering WindowCoveringType Error: %@", err);
+    [cluster readAttributeTypeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"WindowCovering Type Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

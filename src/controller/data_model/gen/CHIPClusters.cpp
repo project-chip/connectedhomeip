@@ -9047,8 +9047,7 @@ CHIP_ERROR WakeOnLanCluster::ReadAttributeClusterRevision(Callback::Cancelable *
 }
 
 // WindowCovering Cluster Commands
-CHIP_ERROR WindowCoveringCluster::WindowCoveringDownClose(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::DownOrClose(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -9061,7 +9060,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringDownClose(Callback::Cancelable *
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringDownCloseCommandId,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kDownOrCloseCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -9086,9 +9085,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback,
-                                                                   uint8_t percentageLiftValue)
+CHIP_ERROR WindowCoveringCluster::GoToLiftPercentage(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint8_t liftPercentageValue,
+                                                     uint16_t liftPercent100thsValue)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -9101,7 +9100,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Can
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftPercentageCommandId,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGoToLiftPercentageCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -9109,8 +9108,10 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Can
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // percentageLiftValue: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), percentageLiftValue));
+    // liftPercentageValue: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), liftPercentageValue));
+    // liftPercent100thsValue: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), liftPercent100thsValue));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -9128,8 +9129,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftValue(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t liftValue)
+CHIP_ERROR WindowCoveringCluster::GoToLiftValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint16_t liftValue)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -9142,7 +9143,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftValue(Callback::Cancelab
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftValueCommandId,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGoToLiftValueCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -9169,9 +9170,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback,
-                                                                   uint8_t percentageTiltValue)
+CHIP_ERROR WindowCoveringCluster::GoToTiltPercentage(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint8_t tiltPercentageValue,
+                                                     uint16_t tiltPercent100thsValue)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -9184,7 +9185,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Can
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltPercentageCommandId,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGoToTiltPercentageCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -9192,8 +9193,10 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Can
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // percentageTiltValue: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), percentageTiltValue));
+    // tiltPercentageValue: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), tiltPercentageValue));
+    // tiltPercent100thsValue: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), tiltPercent100thsValue));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -9211,8 +9214,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltValue(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t tiltValue)
+CHIP_ERROR WindowCoveringCluster::GoToTiltValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint16_t tiltValue)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -9225,7 +9228,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltValue(Callback::Cancelab
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltValueCommandId,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGoToTiltValueCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -9252,8 +9255,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringStop(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::StopMotion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -9266,7 +9268,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringStop(Callback::Cancelable * onSu
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringStopCommandId,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopMotionCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -9291,8 +9293,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringUpOpen(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::UpOrOpen(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -9305,7 +9306,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringUpOpen(Callback::Cancelable * on
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringUpOpenCommandId,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpOrOpenCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -9338,25 +9339,25 @@ CHIP_ERROR WindowCoveringCluster::DiscoverAttributes(Callback::Cancelable * onSu
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR WindowCoveringCluster::ReadAttributeWindowCoveringType(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeType(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadWindowCoveringTypeAttribute(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadTypeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeWindowCoveringType(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeType(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                         uint16_t maxInterval)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+        encodeWindowCoveringClusterConfigureTypeAttribute(seqNum, mEndpoint, minInterval, maxInterval);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReportAttributeWindowCoveringType(Callback::Cancelable * onReportCallback)
+CHIP_ERROR WindowCoveringCluster::ReportAttributeType(Callback::Cancelable * onReportCallback)
 {
     return RequestAttributeReporting(0x0000, onReportCallback);
 }

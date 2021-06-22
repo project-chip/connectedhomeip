@@ -11660,7 +11660,7 @@ JNI_METHOD(jlong, WindowCoveringCluster, initWithDevice)(JNIEnv * env, jobject s
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringDownClose)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WindowCoveringCluster, downOrClose)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11677,7 +11677,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringDownClose)(JNIEnv * env, j
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringDownClose(onSuccess->Cancel(), onFailure->Cancel());
+    err = cppCluster->DownOrClose(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
 exit:
@@ -11705,8 +11705,8 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToLiftPercentage)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint percentageLiftValue)
+JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint liftPercentageValue, jint liftPercent100thsValue)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11723,7 +11723,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToLiftPercentage)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringGoToLiftPercentage(onSuccess->Cancel(), onFailure->Cancel(), percentageLiftValue);
+    err = cppCluster->GoToLiftPercentage(onSuccess->Cancel(), onFailure->Cancel(), liftPercentageValue, liftPercent100thsValue);
     SuccessOrExit(err);
 
 exit:
@@ -11751,7 +11751,7 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToLiftValue)
+JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint liftValue)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -11769,7 +11769,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToLiftValue)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringGoToLiftValue(onSuccess->Cancel(), onFailure->Cancel(), liftValue);
+    err = cppCluster->GoToLiftValue(onSuccess->Cancel(), onFailure->Cancel(), liftValue);
     SuccessOrExit(err);
 
 exit:
@@ -11797,8 +11797,8 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToTiltPercentage)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint percentageTiltValue)
+JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint tiltPercentageValue, jint tiltPercent100thsValue)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11815,7 +11815,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToTiltPercentage)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringGoToTiltPercentage(onSuccess->Cancel(), onFailure->Cancel(), percentageTiltValue);
+    err = cppCluster->GoToTiltPercentage(onSuccess->Cancel(), onFailure->Cancel(), tiltPercentageValue, tiltPercent100thsValue);
     SuccessOrExit(err);
 
 exit:
@@ -11843,7 +11843,7 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToTiltValue)
+JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint tiltValue)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -11861,7 +11861,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToTiltValue)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringGoToTiltValue(onSuccess->Cancel(), onFailure->Cancel(), tiltValue);
+    err = cppCluster->GoToTiltValue(onSuccess->Cancel(), onFailure->Cancel(), tiltValue);
     SuccessOrExit(err);
 
 exit:
@@ -11889,7 +11889,7 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringStop)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WindowCoveringCluster, stopMotion)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11906,7 +11906,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringStop)(JNIEnv * env, jobjec
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringStop(onSuccess->Cancel(), onFailure->Cancel());
+    err = cppCluster->StopMotion(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
 exit:
@@ -11934,7 +11934,7 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringUpOpen)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WindowCoveringCluster, upOrOpen)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11951,7 +11951,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringUpOpen)(JNIEnv * env, jobj
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringUpOpen(onSuccess->Cancel(), onFailure->Cancel());
+    err = cppCluster->UpOrOpen(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
 exit:

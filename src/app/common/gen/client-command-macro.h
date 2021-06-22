@@ -4543,76 +4543,76 @@
                                   ZCL_PROGRAMMING_EVENT_NOTIFICATION_COMMAND_ID, "uuuuuuuu", source, eventCode, userId, pin,       \
                                   userType, userStatus, timeStamp, data);
 
-/** @brief Command description for WindowCoveringUpOpen
+/** @brief Command description for UpOrOpen
  *
- * Command: WindowCoveringUpOpen
+ * Command: UpOrOpen
  */
 #define emberAfFillCommandWindow                                                                                                   \
-    CoveringClusterWindowCoveringUpOpen() emberAfFillExternalBuffer(mask,                                                          \
+    CoveringClusterUpOrOpen() emberAfFillExternalBuffer(mask,                                                                      \
                                                                                                                                    \
-                                                                    ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID, "", );
+                                                        ZCL_UP_OR_OPEN_COMMAND_ID, "", );
 
-/** @brief Command description for WindowCoveringDownClose
+/** @brief Command description for DownOrClose
  *
- * Command: WindowCoveringDownClose
+ * Command: DownOrClose
  */
 #define emberAfFillCommandWindow                                                                                                   \
-    CoveringClusterWindowCoveringDownClose() emberAfFillExternalBuffer(mask,                                                       \
+    CoveringClusterDownOrClose() emberAfFillExternalBuffer(mask,                                                                   \
                                                                                                                                    \
-                                                                       ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID, "", );
+                                                           ZCL_DOWN_OR_CLOSE_COMMAND_ID, "", );
 
-/** @brief Command description for WindowCoveringStop
+/** @brief Command description for StopMotion
  *
- * Command: WindowCoveringStop
+ * Command: StopMotion
  */
 #define emberAfFillCommandWindow                                                                                                   \
-    CoveringClusterWindowCoveringStop() emberAfFillExternalBuffer(mask,                                                            \
+    CoveringClusterStopMotion() emberAfFillExternalBuffer(mask,                                                                    \
                                                                                                                                    \
-                                                                  ZCL_WINDOW_COVERING_STOP_COMMAND_ID, "", );
+                                                          ZCL_STOP_MOTION_COMMAND_ID, "", );
 
-/** @brief Command description for WindowCoveringGoToLiftValue
+/** @brief Command description for GoToLiftValue
  *
- * Command: WindowCoveringGoToLiftValue
+ * Command: GoToLiftValue
  * @param liftValue INT16U
  */
 #define emberAfFillCommandWindow                                                                                                   \
-    CoveringClusterWindowCoveringGoToLiftValue(liftValue)                                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    CoveringClusterGoToLiftValue(liftValue) emberAfFillExternalBuffer(mask,                                                        \
                                                                                                                                    \
-                                  ZCL_WINDOW_COVERING_GO_TO_LIFT_VALUE_COMMAND_ID, "u", liftValue);
+                                                                      ZCL_GO_TO_LIFT_VALUE_COMMAND_ID, "u", liftValue);
 
-/** @brief Command description for WindowCoveringGoToLiftPercentage
+/** @brief Command description for GoToLiftPercentage
  *
- * Command: WindowCoveringGoToLiftPercentage
- * @param percentageLiftValue INT8U
+ * Command: GoToLiftPercentage
+ * @param liftPercentageValue INT8U
+ * @param liftPercent100thsValue INT16U
  */
 #define emberAfFillCommandWindow                                                                                                   \
-    CoveringClusterWindowCoveringGoToLiftPercentage(percentageLiftValue)                                                           \
+    CoveringClusterGoToLiftPercentage(liftPercentageValue, liftPercent100thsValue)                                                 \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_WINDOW_COVERING_GO_TO_LIFT_PERCENTAGE_COMMAND_ID, "u", percentageLiftValue);
+                                  ZCL_GO_TO_LIFT_PERCENTAGE_COMMAND_ID, "uu", liftPercentageValue, liftPercent100thsValue);
 
-/** @brief Command description for WindowCoveringGoToTiltValue
+/** @brief Command description for GoToTiltValue
  *
- * Command: WindowCoveringGoToTiltValue
+ * Command: GoToTiltValue
  * @param tiltValue INT16U
  */
 #define emberAfFillCommandWindow                                                                                                   \
-    CoveringClusterWindowCoveringGoToTiltValue(tiltValue)                                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    CoveringClusterGoToTiltValue(tiltValue) emberAfFillExternalBuffer(mask,                                                        \
                                                                                                                                    \
-                                  ZCL_WINDOW_COVERING_GO_TO_TILT_VALUE_COMMAND_ID, "u", tiltValue);
+                                                                      ZCL_GO_TO_TILT_VALUE_COMMAND_ID, "u", tiltValue);
 
-/** @brief Command description for WindowCoveringGoToTiltPercentage
+/** @brief Command description for GoToTiltPercentage
  *
- * Command: WindowCoveringGoToTiltPercentage
- * @param percentageTiltValue INT8U
+ * Command: GoToTiltPercentage
+ * @param tiltPercentageValue INT8U
+ * @param tiltPercent100thsValue INT16U
  */
 #define emberAfFillCommandWindow                                                                                                   \
-    CoveringClusterWindowCoveringGoToTiltPercentage(percentageTiltValue)                                                           \
+    CoveringClusterGoToTiltPercentage(tiltPercentageValue, tiltPercent100thsValue)                                                 \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_WINDOW_COVERING_GO_TO_TILT_PERCENTAGE_COMMAND_ID, "u", percentageTiltValue);
+                                  ZCL_GO_TO_TILT_PERCENTAGE_COMMAND_ID, "uu", tiltPercentageValue, tiltPercent100thsValue);
 
 /** @brief Command description for BarrierControlGoToPercent
  *

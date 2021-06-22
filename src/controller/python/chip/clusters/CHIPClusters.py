@@ -649,23 +649,25 @@ class ChipClusters:
             "WakeOnLan": {
             },
             "WindowCovering": {
-                "WindowCoveringDownClose": {
+                "DownOrClose": {
                 },
-                "WindowCoveringGoToLiftPercentage": {
-                    "percentageLiftValue": "int",
+                "GoToLiftPercentage": {
+                    "liftPercentageValue": "int",
+                    "liftPercent100thsValue": "int",
                 },
-                "WindowCoveringGoToLiftValue": {
+                "GoToLiftValue": {
                     "liftValue": "int",
                 },
-                "WindowCoveringGoToTiltPercentage": {
-                    "percentageTiltValue": "int",
+                "GoToTiltPercentage": {
+                    "tiltPercentageValue": "int",
+                    "tiltPercent100thsValue": "int",
                 },
-                "WindowCoveringGoToTiltValue": {
+                "GoToTiltValue": {
                     "tiltValue": "int",
                 },
-                "WindowCoveringStop": {
+                "StopMotion": {
                 },
-                "WindowCoveringUpOpen": {
+                "UpOrOpen": {
                 },
             },
         }
@@ -1968,7 +1970,7 @@ class ChipClusters:
                 },
             },
             "WindowCovering": {
-                "WindowCoveringType": {
+                "Type": {
                     "attributeId": 0x0000,
                     "type": "int",
                     "reportable": True,
@@ -2599,32 +2601,32 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_ThreadNetworkDiagnostics_ResetCounts(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterWindowCovering_CommandWindowCoveringDownClose(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose(
+    def ClusterWindowCovering_CommandDownOrClose(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_DownOrClose(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterWindowCovering_CommandWindowCoveringGoToLiftPercentage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentageLiftValue: int):
-        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage(
-                device, ZCLendpoint, ZCLgroupid, percentageLiftValue
+    def ClusterWindowCovering_CommandGoToLiftPercentage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, liftPercentageValue: int, liftPercent100thsValue: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToLiftPercentage(
+                device, ZCLendpoint, ZCLgroupid, liftPercentageValue, liftPercent100thsValue
         )
-    def ClusterWindowCovering_CommandWindowCoveringGoToLiftValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, liftValue: int):
-        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue(
+    def ClusterWindowCovering_CommandGoToLiftValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, liftValue: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToLiftValue(
                 device, ZCLendpoint, ZCLgroupid, liftValue
         )
-    def ClusterWindowCovering_CommandWindowCoveringGoToTiltPercentage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentageTiltValue: int):
-        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage(
-                device, ZCLendpoint, ZCLgroupid, percentageTiltValue
+    def ClusterWindowCovering_CommandGoToTiltPercentage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tiltPercentageValue: int, tiltPercent100thsValue: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToTiltPercentage(
+                device, ZCLendpoint, ZCLgroupid, tiltPercentageValue, tiltPercent100thsValue
         )
-    def ClusterWindowCovering_CommandWindowCoveringGoToTiltValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tiltValue: int):
-        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue(
+    def ClusterWindowCovering_CommandGoToTiltValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tiltValue: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToTiltValue(
                 device, ZCLendpoint, ZCLgroupid, tiltValue
         )
-    def ClusterWindowCovering_CommandWindowCoveringStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop(
+    def ClusterWindowCovering_CommandStopMotion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_StopMotion(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterWindowCovering_CommandWindowCoveringUpOpen(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen(
+    def ClusterWindowCovering_CommandUpOrOpen(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_UpOrOpen(
                 device, ZCLendpoint, ZCLgroupid
         )
 
@@ -3333,10 +3335,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_WakeOnLan_WakeOnLanMacAddress(device, ZCLendpoint, ZCLgroupid)
     def ClusterWakeOnLan_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WakeOnLan_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterWindowCovering_ReadAttributeWindowCoveringType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType(device, ZCLendpoint, ZCLgroupid)
-    def ClusterWindowCovering_ConfigureAttributeWindowCoveringType(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
-        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterWindowCovering_ReadAttributeType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_Type(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ConfigureAttributeType(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_Type(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterWindowCovering_ReadAttributeCurrentPositionLift(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift(device, ZCLendpoint, ZCLgroupid)
     def ClusterWindowCovering_ConfigureAttributeCurrentPositionLift(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
@@ -4862,33 +4864,33 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_WakeOnLan_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WakeOnLan_ClusterRevision.restype = ctypes.c_uint32
         # Cluster WindowCovering
-        # Cluster WindowCovering Command WindowCoveringDownClose
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose.restype = ctypes.c_uint32
-        # Cluster WindowCovering Command WindowCoveringGoToLiftPercentage
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage.restype = ctypes.c_uint32
-        # Cluster WindowCovering Command WindowCoveringGoToLiftValue
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue.restype = ctypes.c_uint32
-        # Cluster WindowCovering Command WindowCoveringGoToTiltPercentage
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage.restype = ctypes.c_uint32
-        # Cluster WindowCovering Command WindowCoveringGoToTiltValue
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue.restype = ctypes.c_uint32
-        # Cluster WindowCovering Command WindowCoveringStop
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop.restype = ctypes.c_uint32
-        # Cluster WindowCovering Command WindowCoveringUpOpen
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen.restype = ctypes.c_uint32
-        # Cluster WindowCovering ReadAttribute WindowCoveringType
-        self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType.restype = ctypes.c_uint32
-        # Cluster WindowCovering ConfigureAttribute WindowCoveringType
-        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
-        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command DownOrClose
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_DownOrClose.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_DownOrClose.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command GoToLiftPercentage
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToLiftPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToLiftPercentage.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command GoToLiftValue
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToLiftValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToLiftValue.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command GoToTiltPercentage
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToTiltPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToTiltPercentage.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command GoToTiltValue
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToTiltValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_GoToTiltValue.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command StopMotion
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_StopMotion.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_StopMotion.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command UpOrOpen
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_UpOrOpen.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_UpOrOpen.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute Type
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_Type.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_Type.restype = ctypes.c_uint32
+        # Cluster WindowCovering ConfigureAttribute Type
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_Type.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_Type.restype = ctypes.c_uint32
         # Cluster WindowCovering ReadAttribute CurrentPositionLift
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift.restype = ctypes.c_uint32
