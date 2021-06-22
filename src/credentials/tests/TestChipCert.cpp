@@ -636,6 +636,7 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, certType == testCase.ExpectedCertType);
+        certSet.Release();
     }
 }
 
@@ -682,6 +683,7 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, chipId == testCase.ExpectedCertId);
+        certSet.Release();
     }
 }
 
