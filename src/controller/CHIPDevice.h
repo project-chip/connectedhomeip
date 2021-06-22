@@ -309,8 +309,6 @@ public:
 
     void SetActive(bool active) { mActive = active; }
 
-    bool IsCSRNonceProvided() const {return mCSRNonceProvided; }
-
     bool IsSecureConnected() const { return IsActive() && mState == ConnectionState::SecureConnected; }
 
     void Reset();
@@ -353,8 +351,8 @@ public:
 
     CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
     {
+       VerifyOrReturnError(csrNonce.size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
        memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
-       mCSRNonceProvided = true;
        return CHIP_NO_ERROR;
     }
 
@@ -384,7 +382,6 @@ private:
 
     bool mActive           = false;
     //Should be set to true only if the commissioner provides a CSRNonce during commissioning flow.
-    bool mCSRNonceProvided = false;
     ConnectionState mState = ConnectionState::NotConnected;
 
 #if CONFIG_NETWORK_LAYER_BLE

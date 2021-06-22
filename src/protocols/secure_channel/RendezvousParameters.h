@@ -73,6 +73,7 @@ public:
     RendezvousParameters & SetCSRNonce(ByteSpan csrNonce)
     {
        mCSRNonce = csrNonce;
+       mHasCSRNonce = true;
        return *this;
     }
 
@@ -97,7 +98,6 @@ public:
     RendezvousParameters & SetRemoteNodeId(NodeId nodeId)
     {
         mRemoteNodeId.SetValue(nodeId);
-        mHasCSRNonce = true;
         return *this;
     }
 
