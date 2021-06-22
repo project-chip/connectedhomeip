@@ -73,7 +73,6 @@ jobs:
               timeout-minutes: 5
               run: scripts/examples/k32w_example.sh
                    examples/shell/k32w out/shell_app_debug
-                   examples/lighting-app/k32w out/lighting_app_release
             - name: Build example K32W Lock App with Secure Element
               timeout-minutes: 5
               run: scripts/examples/k32w_se_example.sh
