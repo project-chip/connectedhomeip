@@ -47,7 +47,7 @@ enum class MsgType : uint8_t
     EchoResponse = 0x02
 };
 
-using EchoFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload);
+using EchoFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload);
 
 class DLL_EXPORT EchoClient : public Messaging::ExchangeDelegate
 {
@@ -104,7 +104,7 @@ private:
     SecureSessionHandle mSecureSession;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 };
 
@@ -146,7 +146,7 @@ private:
     EchoFunct OnEchoRequestReceived           = nullptr;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 

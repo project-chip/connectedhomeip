@@ -20,7 +20,9 @@
  */
 #pragma once
 
-typedef enum
+#include <stdint.h>
+
+enum EmberAfStatus : uint32_t
 {
     EMBER_ZCL_STATUS_SUCCESS                     = 0x00,
     EMBER_ZCL_STATUS_FAILURE                     = 0x01,
@@ -55,7 +57,8 @@ typedef enum
     EMBER_ZCL_STATUS_SOFTWARE_FAILURE            = 0xC1,
     EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER         = 0xC3,
     EMBER_ZCL_STATUS_LIMIT_REACHED               = 0xC4,
-} EmberAfStatus;
+    EMBER_ZCL_STATUS_INVALID_ARGUMENT            = 0xC6,
+};
 
 typedef enum
 {

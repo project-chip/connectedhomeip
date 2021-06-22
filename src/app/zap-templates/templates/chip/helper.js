@@ -20,21 +20,9 @@ const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 
-const { Clusters }    = require('../../common/ClustersHelper.js');
-const StringHelper    = require('../../common/StringHelper.js');
-const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
-
-function asBlocks(promise, options)
-{
-  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise.then(data => templateUtil.collectBlocks(data, options, this)));
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
-}
-
-function asPromise(promise)
-{
-  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise);
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
-}
+const { Clusters, asBlocks, asPromise } = require('../../common/ClustersHelper.js');
+const StringHelper                      = require('../../common/StringHelper.js');
+const ChipTypesHelper                   = require('../../common/ChipTypesHelper.js');
 
 function throwErrorIfUndefined(item, errorMsg, conditions)
 {
@@ -319,13 +307,6 @@ function isManufacturerSpecificCommand()
   return !!this.mfgCode;
 }
 
-function hasSpecificResponse(commandName)
-{
-  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'has_specific_response');
-  const filter = response => response.name == (commandName + 'Response');
-  return asPromise.call(this, Clusters.getServerResponses(clusterName).then(responses => responses.find(filter)));
-}
-
 function asCallbackAttributeType(attributeType)
 {
   switch (parseInt(attributeType)) {
@@ -432,4 +413,3 @@ exports.isWritableAttribute                   = isWritableAttribute;
 exports.isReportableAttribute                 = isReportableAttribute;
 exports.isManufacturerSpecificCommand         = isManufacturerSpecificCommand;
 exports.asCallbackAttributeType               = asCallbackAttributeType;
-exports.hasSpecificResponse                   = hasSpecificResponse;

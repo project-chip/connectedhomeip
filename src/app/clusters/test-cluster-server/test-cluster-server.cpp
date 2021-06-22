@@ -21,17 +21,16 @@
  ***************************************************************************/
 
 #include <app/Command.h>
+#include <app/common/gen/af-structs.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <core/CHIPSafeCasts.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-
-#include "gen/af-structs.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 using namespace chip;
 
@@ -56,6 +55,23 @@ EmberAfStatus writeAttribute(uint8_t endpoint, AttributeId attributeId, uint8_t 
     // at 1. In order to hide this to the rest of the code of this file, the element index is incremented by 1 here.
     // This also allows calling writeAttribute() with no index arg to mean "write the length".
     return emAfReadOrWriteAttribute(&record, NULL, buffer, 0, true, index + 1);
+}
+
+EmberAfStatus writeTestListInt8uAttribute(uint8_t endpoint)
+{
+    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    AttributeId attributeId = ZCL_LIST_ATTRIBUTE_ID;
+
+    uint16_t attributeCount = 4;
+    for (uint8_t index = 0; index < attributeCount; index++)
+    {
+        status = writeAttribute(endpoint, attributeId, (uint8_t *) &index, index);
+        VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+    }
+
+    status = writeAttribute(endpoint, attributeId, (uint8_t *) &attributeCount);
+    VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+    return status;
 }
 
 EmberAfStatus writeTestListOctetAttribute(uint8_t endpoint)
@@ -119,6 +135,9 @@ void emberAfPluginTestClusterServerInitCallback(void)
             continue;
         }
 
+        status = writeTestListInt8uAttribute(endpoint);
+        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list int8u", status));
+
         status = writeTestListOctetAttribute(endpoint);
         VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list octet", status));
 
@@ -144,7 +163,7 @@ bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * apComman
 
     VerifyOrExit(apCommandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(err = apCommandObj->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = apCommandObj->PrepareCommand(cmdParams));
     writer = apCommandObj->GetCommandDataElementTLVWriter();
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), returnValue));
     SuccessOrExit(err = apCommandObj->FinishCommand());

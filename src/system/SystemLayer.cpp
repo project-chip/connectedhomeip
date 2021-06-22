@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -124,13 +124,16 @@ Error Layer::Init(void * aContext)
     lReturn = Platform::Layer::WillInit(*this, aContext);
     SuccessOrExit(lReturn);
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    mWatchableEvents.Init(*this);
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     this->AddEventHandlerDelegate(sSystemEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
-    lReturn = this->mWakeEvent.Open();
+    lReturn = this->mWakeEvent.Open(mWatchableEvents);
     SuccessOrExit(lReturn);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
@@ -168,6 +171,10 @@ Error Layer::Shutdown()
             lTimer->Cancel();
         }
     }
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    mWatchableEvents.Shutdown();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     this->mContext    = nullptr;
     this->mLayerState = kLayerState_NotInitialized;
@@ -247,6 +254,14 @@ static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
  */
 void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback)
 {
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    if (mDispatchQueue != nullptr)
+    {
+        ChipLogError(chipSystemLayer, "%s is not supported with libdispatch", __PRETTY_FUNCTION__);
+        chipDie();
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
     assertChipStackLockedByCurrentThread();
 
     Cancelable * ca = aCallback->Cancel();
@@ -579,53 +594,30 @@ void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
         // one-shot
         chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromCancelable(ready.mNext);
         cb->Cancel();
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-        if (mDispatchQueue != nullptr)
-        {
-            dispatch_sync(mDispatchQueue, ^{
-                cb->mCall(cb->mContext);
-            });
-        }
-        else
-#endif
-            cb->mCall(cb->mContext);
+        cb->mCall(cb->mContext);
     }
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-/**
- *  Prepare the sets of file descriptors for @p select() to work with.
- *
- *  @param[out] aSetSize        The range of file descriptors in the file descriptor set.
- *  @param[in]  aReadSet        A pointer to the set of readable file descriptors.
- *  @param[in]  aWriteSet       A pointer to the set of writable file descriptors.
- *  @param[in]  aExceptionSet   A pointer to the set of file descriptors with errors.
- *  @param[in]  aSleepTime      A reference to the maximum sleep time.
- */
-void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet,
-                          struct timeval & aSleepTime)
+bool Layer::GetTimeout(struct timeval & aSleepTime)
 {
     if (this->State() != kLayerState_Initialized)
-        return;
-
-    const int wakeEventFd = this->mWakeEvent.GetNotifFD();
-    FD_SET(wakeEventFd, aReadSet);
-
-    if (wakeEventFd + 1 > aSetSize)
-        aSetSize = wakeEventFd + 1;
+        return false;
 
     const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
     Timer::Epoch lAwakenEpoch =
         kCurrentEpoch + static_cast<Timer::Epoch>(aSleepTime.tv_sec) * 1000 + static_cast<uint32_t>(aSleepTime.tv_usec) / 1000;
 
+    bool anyTimer = false;
     for (size_t i = 0; i < Timer::sPool.Size(); i++)
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
         if (lTimer != nullptr)
         {
+            anyTimer = true;
+
             if (!Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
             {
                 lAwakenEpoch = kCurrentEpoch;
@@ -643,6 +635,7 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
         Cancelable * ca = mTimerCallbacks.First();
         if (ca != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, ca->mInfoScalar))
         {
+            anyTimer     = true;
             lAwakenEpoch = ca->mInfoScalar;
         }
     }
@@ -650,61 +643,19 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
     const Timer::Epoch kSleepTime = lAwakenEpoch - kCurrentEpoch;
     aSleepTime.tv_sec             = static_cast<time_t>(kSleepTime / 1000);
     aSleepTime.tv_usec            = static_cast<suseconds_t>((kSleepTime % 1000) * 1000);
+
+    return anyTimer;
 }
 
-/**
- * Handle I/O from a select call. This method registers the pending I/O event in each active endpoint and then invokes the
- * respective I/O handling functions for those endpoints.
- *
- * @note
- *  It is important to set the pending I/O fields for all endpoints *before* making any callbacks. This avoids the case where an
- *  endpoint is closed and then re-opened within the callback for another endpoint. When this happens the new endpoint is likely
- * to be assigned the same file descriptor as the old endpoint. However, any pending I/O for that file descriptor number
- * represents I/O related to the old incarnation of the endpoint, not the current one. Saving the pending I/O state in each
- * endpoint before acting on it allows the endpoint code to clear the I/O flags in the event of a close, thus avoiding any
- * confusion.
- *
- *  @param[in]    aSetSize          The return value of the select call.
- *  @param[in]    aReadSet          A pointer to the set of read file descriptors.
- *  @param[in]    aWriteSet         A pointer to the set of write file descriptors.
- *  @param[in]    aExceptionSet     A pointer to the set of file descriptors with errors.
- *
- */
-void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet)
+void Layer::HandleTimeout()
 {
     assertChipStackLockedByCurrentThread();
 
-    pthread_t lThreadSelf;
-    Error lReturn;
-
-    if (this->State() != kLayerState_Initialized)
-        return;
-
-    if (aSetSize < 0)
-        return;
-
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-    lThreadSelf = pthread_self();
+    this->mHandleSelectThread = pthread_self();
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-
-    if (aSetSize > 0)
-    {
-        // If we woke because of someone writing to the wake event, clear the event before returning.
-        if (FD_ISSET(this->mWakeEvent.GetNotifFD(), aReadSet))
-        {
-            lReturn = this->mWakeEvent.Confirm();
-            if (lReturn != CHIP_SYSTEM_NO_ERROR)
-            {
-                ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(lReturn));
-            }
-        }
-    }
 
     const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
-
-#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-    this->mHandleSelectThread = lThreadSelf;
-#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     for (size_t i = 0; i < Timer::sPool.Size(); i++)
     {
@@ -712,16 +663,7 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
 
         if (lTimer != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
         {
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-            if (mDispatchQueue != nullptr)
-            {
-                dispatch_sync(mDispatchQueue, ^{
-                    lTimer->HandleComplete();
-                });
-            }
-            else
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-                lTimer->HandleComplete();
+            lTimer->HandleComplete();
         }
     }
 
@@ -732,17 +674,21 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 }
 
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+
 /**
- * Wake up the I/O thread that monitors the file descriptors using select() by writing a single byte to the wake pipe.
+ * Wake up the I/O thread by writing a single byte to the wake pipe.
  *
  *  @note
- *      If @p WakeSelect() is being called from within @p HandleSelectResult(), then writing to the wake pipe can be skipped,
+ *      If @p WakeIOThread() is being called from within an I/O event callback, then writing to the wake pipe can be skipped,
  * since the I/O thread is already awake.
  *
  *      Furthermore, we don't care if this write fails as the only reasonably likely failure is that the pipe is full, in which
  *      case the select calling thread is going to wake up anyway.
  */
-void Layer::WakeSelect()
+void Layer::WakeIOThread()
 {
     Error lReturn;
 
@@ -764,7 +710,7 @@ void Layer::WakeSelect()
     }
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 LwIPEventHandlerDelegate Layer::sSystemEventHandlerDelegate;

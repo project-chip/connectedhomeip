@@ -91,12 +91,13 @@ public:
     void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
     void RunEventLoop();
     CHIP_ERROR StartEventLoopTask();
+    CHIP_ERROR StopEventLoopTask();
     void LockChipStack();
     bool TryLockChipStack();
     void UnlockChipStack();
     CHIP_ERROR Shutdown();
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
 #endif
 
@@ -171,6 +172,19 @@ extern PlatformManager & PlatformMgr();
  */
 extern PlatformManagerImpl & PlatformMgrImpl();
 
+/**
+ * @brief
+ * RAII locking for PlatformManager to simplify management of
+ * LockChipStack()/UnlockChipStack calls.
+ */
+class StackLock
+{
+public:
+    StackLock() { PlatformMgr().LockChipStack(); }
+
+    ~StackLock() { PlatformMgr().UnlockChipStack(); }
+};
+
 } // namespace DeviceLayer
 } // namespace chip
 
@@ -187,7 +201,7 @@ extern PlatformManagerImpl & PlatformMgrImpl();
 namespace chip {
 namespace DeviceLayer {
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
 inline bool PlatformManager::IsChipStackLockedByCurrentThread() const
 {
     return static_cast<const ImplClass *>(this)->_IsChipStackLockedByCurrentThread();
@@ -233,9 +247,47 @@ inline void PlatformManager::RunEventLoop()
     static_cast<ImplClass *>(this)->_RunEventLoop();
 }
 
+/**
+ * @brief
+ *  Starts the stack on its own task with an associated event queue
+ *  to dispatch and handle events posted to that task.
+ *
+ *  This is thread-safe.
+ *  This is *NOT SAFE* to call from within the CHIP event loop since it can grab the stack lock.
+ */
 inline CHIP_ERROR PlatformManager::StartEventLoopTask()
 {
     return static_cast<ImplClass *>(this)->_StartEventLoopTask();
+}
+
+/**
+ * @brief
+ *  This will trigger the event loop to exit and block till it has exited the loop.
+ *  This prevents the processing of any further events in the queue.
+ *
+ *  Additionally, this stops the CHIP task if the following criteria are met:
+ *      1. One was created earlier through a call to StartEventLoopTask
+ *      2. This call isn't being made from that task.
+ *
+ *  This is safe to call from any task.
+ *  This is safe to call from within the CHIP event loop.
+ *
+ */
+inline CHIP_ERROR PlatformManager::StopEventLoopTask()
+{
+    return static_cast<ImplClass *>(this)->_StopEventLoopTask();
+}
+
+/**
+ * @brief
+ *   Shuts down and cleans up the main objects in the CHIP stack.
+ *   This DOES NOT stop the chip thread or event queue from running.
+ *
+ */
+inline CHIP_ERROR PlatformManager::Shutdown()
+{
+    mInitialized = false;
+    return static_cast<ImplClass *>(this)->_Shutdown();
 }
 
 inline void PlatformManager::LockChipStack()
@@ -266,11 +318,6 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(uint32_t durationMS)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(durationMS);
-}
-
-inline CHIP_ERROR PlatformManager::Shutdown()
-{
-    return static_cast<ImplClass *>(this)->_Shutdown();
 }
 
 } // namespace DeviceLayer

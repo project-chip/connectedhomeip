@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include <app/chip-zcl-zpro-codec-api.h>
+#include "chip-zcl-zpro-codec-api.h"
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -19,31 +19,48 @@ namespace Controller {
 {{#chip_server_cluster_commands}}
 CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
 {{#chip_server_cluster_command_arguments}}
 {{#first}}
-    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
-    uint8_t argSeqNumber = 0;
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
     // {{asCamelCased label}}: {{asCamelCased type}}
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
 {{else}}
     // Command takes no arguments.
 {{/chip_server_cluster_command_arguments}}
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
 }
 
 {{/chip_server_cluster_commands}}

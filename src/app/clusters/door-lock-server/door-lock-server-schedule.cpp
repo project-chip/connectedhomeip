@@ -38,11 +38,10 @@
  ******************************************************************************/
 
 #include "door-lock-server.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
-
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 #include <app/Command.h>
 #include <support/CodeUtils.h>
@@ -169,7 +168,7 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(chip::app::Command * comma
                                              ZCL_SET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -221,7 +220,7 @@ bool emberAfDoorLockClusterGetWeekdayScheduleCallback(chip::app::Command * comma
                                              ZCL_GET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), scheduleId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), userId));
@@ -266,7 +265,7 @@ bool emberAfDoorLockClusterClearWeekdayScheduleCallback(chip::app::Command * com
                                              ZCL_CLEAR_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), zclStatus));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -309,7 +308,7 @@ bool emberAfDoorLockClusterSetYeardayScheduleCallback(chip::app::Command * comma
                                              ZCL_SET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -359,7 +358,7 @@ bool emberAfDoorLockClusterGetYeardayScheduleCallback(chip::app::Command * comma
                                              ZCL_GET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), scheduleId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), userId));
@@ -403,7 +402,7 @@ bool emberAfDoorLockClusterClearYeardayScheduleCallback(chip::app::Command * com
                                              ZCL_CLEAR_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -449,7 +448,7 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(chip::app::Command * comma
                                              ZCL_SET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -498,7 +497,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(chip::app::Command * comma
                                              ZCL_GET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), holidayScheduleId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), zclStatus));
@@ -541,7 +540,7 @@ bool emberAfDoorLockClusterClearHolidayScheduleCallback(chip::app::Command * com
                                              ZCL_CLEAR_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());

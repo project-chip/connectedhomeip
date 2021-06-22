@@ -50,6 +50,15 @@ inline size_t RequiredStorageSize(QNamePart name, Args &&... rest)
     return sizeof(QNamePart) + strlen(name) + 1 + RequiredStorageSize(std::forward<Args>(rest)...);
 }
 
+inline size_t RequiredStorageSizeFromArray(char const * const * names, size_t num)
+{
+    size_t ret = 0;
+    for (size_t i = 0; i < num; ++i)
+    {
+        ret += sizeof(QNamePart) + strlen(names[i]) + 1;
+    }
+    return ret;
+}
 namespace Internal {
 
 // nothing left to initialize
@@ -84,6 +93,23 @@ inline FullQName Build(void * storage, Args &&... args)
     FullQName result;
     result.names     = names;
     result.nameCount = sizeof...(args);
+    return result;
+}
+
+inline FullQName BuildFromArray(void * storage, char const * const * parts, size_t num)
+{
+    // Storage memory holds pointers to each name, then copies of the names after
+    QNamePart * names = reinterpret_cast<QNamePart *>(storage);
+    char * nameOut    = reinterpret_cast<char *>(names + num);
+    for (size_t i = 0; i < num; ++i)
+    {
+        QNamePart * ptrLocation = names + i;
+        Internal::Initialize(ptrLocation, nameOut, parts[i]);
+        nameOut += strlen(parts[i]) + 1;
+    }
+    FullQName result;
+    result.names     = names;
+    result.nameCount = num;
     return result;
 }
 

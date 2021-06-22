@@ -18,11 +18,10 @@
 
 #include "WakeOnLanManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 
@@ -44,23 +43,28 @@ exit:
     return err;
 }
 
-void WakeOnLanManager::store(chip::EndpointId endpoint, char macAddress[17])
+void WakeOnLanManager::store(chip::EndpointId endpoint, char macAddress[18])
 {
+    char addressBuffer[19];
+    snprintf(addressBuffer, 19, "%c%s", 18, macAddress);
     EmberAfStatus macAddressStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_WAKE_ON_LAN_CLUSTER_ID, ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID,
-                                    (uint8_t *) &macAddress, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-    assert(macAddressStatus == EMBER_ZCL_STATUS_SUCCESS);
+                                    (uint8_t *) &addressBuffer, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    if (macAddressStatus != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to store mac address attribute.");
+    }
 }
 
 void WakeOnLanManager::setMacAddress(chip::EndpointId endpoint, char * macAddress)
 {
-    char address[17];
+    char address[18];
     uint16_t size = static_cast<uint16_t>(sizeof(address));
 
     string section = "endpoint" + std::to_string(endpoint);
     CHIP_ERROR err = es->get(section, "macAddress", macAddress, size);
     if (err != CHIP_NO_ERROR)
     {
-        emberAfWakeOnLanClusterPrintln("Failed to get app catalog mac address. ERR:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to get mac address. Error:%s", chip::ErrorStr(err));
     }
 }

@@ -21,11 +21,13 @@
 
 #include "ServiceNaming.h"
 #include "lib/core/CHIPSafeCasts.h"
+#include "lib/mdns/TxtFields.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
 #include "setup_payload/AdditionalDataPayloadGenerator.h"
+#include "support/CHIPMemString.h"
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
 #include "support/RandUtils.h"
@@ -102,24 +104,6 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
     }
 }
 
-CHIP_ERROR DiscoveryImplPlatform::SetupHostname(chip::ByteSpan macOrEui64)
-{
-    char nameBuffer[17];
-    CHIP_ERROR error = MakeHostName(nameBuffer, sizeof(nameBuffer), macOrEui64);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to create mdns hostname: %s", ErrorStr(error));
-        return error;
-    }
-    error = ChipMdnsSetHostname(nameBuffer);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
-        return error;
-    }
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -153,17 +137,22 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
+    error = MakeHostName(service.mHostName, sizeof(service.mHostName), params.GetMac());
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to create mdns hostname: %s", ErrorStr(error));
+        return error;
+    }
 
     snprintf(service.mName, sizeof(service.mName), "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
              static_cast<uint32_t>(mCommissionInstanceName));
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
-        strncpy(service.mType, "_chipc", sizeof(service.mType));
+        strncpy(service.mType, kCommissionableServiceName, sizeof(service.mType));
     }
     else
     {
-        strncpy(service.mType, "_chipd", sizeof(service.mType));
+        strncpy(service.mType, kCommissionerServiceName, sizeof(service.mType));
     }
     service.mProtocol = MdnsServiceProtocol::kMdnsProtocolUdp;
 
@@ -235,28 +224,47 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
                                              strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
         }
 
-        snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
-        subTypes[subTypeSize++] = shortDiscriminatorSubtype;
-        snprintf(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype), "_L%04u", params.GetLongDiscriminator());
-        subTypes[subTypeSize++] = longDiscriminatorSubtype;
-        snprintf(commissioningModeSubType, sizeof(commissioningModeSubType), "_C%u", params.GetCommissioningMode() ? 1 : 0);
-        subTypes[subTypeSize++] = commissioningModeSubType;
+        if (MakeServiceSubtype(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype),
+                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator())) == CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = shortDiscriminatorSubtype;
+        }
+        if (MakeServiceSubtype(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype),
+                               DiscoveryFilter(DiscoveryFilterType::kLong, params.GetLongDiscriminator())) == CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = longDiscriminatorSubtype;
+        }
+        if (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kCommissioningMode, params.GetCommissioningMode() ? 1 : 0)) ==
+            CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = commissioningModeSubType;
+        }
         if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
-            snprintf(openWindowSubType, sizeof(openWindowSubType), "_A1");
-            subTypes[subTypeSize++] = openWindowSubType;
+            if (MakeServiceSubtype(openWindowSubType, sizeof(openWindowSubType),
+                                   DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1)) == CHIP_NO_ERROR)
+            {
+                subTypes[subTypeSize++] = openWindowSubType;
+            }
         }
     }
 
     if (params.GetVendorId().HasValue())
     {
-        snprintf(vendorSubType, sizeof(vendorSubType), "_V%u", params.GetVendorId().Value());
-        subTypes[subTypeSize++] = vendorSubType;
+        if (MakeServiceSubtype(vendorSubType, sizeof(vendorSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kVendor, params.GetVendorId().Value())) == CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = vendorSubType;
+        }
     }
     if (params.GetDeviceType().HasValue())
     {
-        snprintf(deviceTypeSubType, sizeof(deviceTypeSubType), "_T%u", params.GetDeviceType().Value());
-        subTypes[subTypeSize++] = deviceTypeSubType;
+        if (MakeServiceSubtype(deviceTypeSubType, sizeof(deviceTypeSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDeviceType().Value())) == CHIP_NO_ERROR)
+        {
+            subTypes[subTypeSize++] = deviceTypeSubType;
+        }
     }
 
     service.mTextEntries   = textEntries;
@@ -317,19 +325,19 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     // TODO: That value should be defined in the ReliableMessageProtocolConfig.h,
     // but for now it is not possible to access it from src/lib/mdns. It should be
     // refactored after creating common DNS-SD layer.
-    constexpr uint32_t kMaxCRMPRetryInterval = 3600000;
-    // kMaxCRMPRetryInterval max value is 3600000, what gives 7 characters and newline
+    constexpr uint32_t kMaxMRPRetryInterval = 3600000;
+    // kMaxMRPRetryInterval max value is 3600000, what gives 7 characters and newline
     // necessary to represent it in the text form.
-    constexpr uint8_t kMaxCRMPRetryBufferSize = 7 + 1;
-    char crmpRetryIntervalIdleBuf[kMaxCRMPRetryBufferSize];
-    char crmpRetryIntervalActiveBuf[kMaxCRMPRetryBufferSize];
-    TextEntry crmpRetryIntervalEntries[OperationalAdvertisingParameters::kNumAdvertisingTxtEntries];
+    constexpr uint8_t kMaxMRPRetryBufferSize = 7 + 1;
+    char mrpRetryIntervalIdleBuf[kMaxMRPRetryBufferSize];
+    char mrpRetryIntervalActiveBuf[kMaxMRPRetryBufferSize];
+    TextEntry mrpRetryIntervalEntries[OperationalAdvertisingParameters::kNumAdvertisingTxtEntries];
     size_t textEntrySize = 0;
-    uint32_t crmpRetryIntervalIdle, crmpRetryIntervalActive;
+    uint32_t mrpRetryIntervalIdle, mrpRetryIntervalActive;
     int writtenCharactersNumber;
-    params.GetCRMPRetryIntervals(crmpRetryIntervalIdle, crmpRetryIntervalActive);
+    params.GetMRPRetryIntervals(mrpRetryIntervalIdle, mrpRetryIntervalActive);
 
-    // TODO: Issue #5833 - CRMP retry intervals should be updated on the poll period value
+    // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value
     // change or device type change.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (chip::DeviceLayer::ConnectivityMgr().GetThreadDeviceType() ==
@@ -337,45 +345,47 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     {
         uint32_t sedPollPeriod;
         ReturnErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().GetPollPeriod(sedPollPeriod));
-        // Increment default CRMP retry intervals by SED poll period to be on the safe side
+        // Increment default MRP retry intervals by SED poll period to be on the safe side
         // and avoid unnecessary retransmissions.
-        crmpRetryIntervalIdle += sedPollPeriod;
-        crmpRetryIntervalActive += sedPollPeriod;
+        mrpRetryIntervalIdle += sedPollPeriod;
+        mrpRetryIntervalActive += sedPollPeriod;
     }
 #endif
 
-    if (crmpRetryIntervalIdle > kMaxCRMPRetryInterval)
+    if (mrpRetryIntervalIdle > kMaxMRPRetryInterval)
     {
-        ChipLogProgress(Discovery, "CRMP retry interval idle value exceeds allowed range of 1 hour, using maximum available",
-                        chip::ErrorStr(error));
-        crmpRetryIntervalIdle = kMaxCRMPRetryInterval;
+        ChipLogProgress(Discovery, "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
+        mrpRetryIntervalIdle = kMaxMRPRetryInterval;
+    }
+    writtenCharactersNumber = snprintf(mrpRetryIntervalIdleBuf, sizeof(mrpRetryIntervalIdleBuf), "%" PRIu32, mrpRetryIntervalIdle);
+    VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxMRPRetryBufferSize),
+                        CHIP_ERROR_INVALID_STRING_LENGTH);
+    mrpRetryIntervalEntries[textEntrySize++] = { "CRI", reinterpret_cast<const uint8_t *>(mrpRetryIntervalIdleBuf),
+                                                 strlen(mrpRetryIntervalIdleBuf) };
+
+    if (mrpRetryIntervalActive > kMaxMRPRetryInterval)
+    {
+        ChipLogProgress(Discovery, "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
+        mrpRetryIntervalActive = kMaxMRPRetryInterval;
     }
     writtenCharactersNumber =
-        snprintf(crmpRetryIntervalIdleBuf, sizeof(crmpRetryIntervalIdleBuf), "%" PRIu32, crmpRetryIntervalIdle);
-    VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxCRMPRetryBufferSize),
+        snprintf(mrpRetryIntervalActiveBuf, sizeof(mrpRetryIntervalActiveBuf), "%" PRIu32, mrpRetryIntervalActive);
+    VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxMRPRetryBufferSize),
                         CHIP_ERROR_INVALID_STRING_LENGTH);
-    crmpRetryIntervalEntries[textEntrySize++] = { "CRI", reinterpret_cast<const uint8_t *>(crmpRetryIntervalIdleBuf),
-                                                  strlen(crmpRetryIntervalIdleBuf) };
+    mrpRetryIntervalEntries[textEntrySize++] = { "CRA", reinterpret_cast<const uint8_t *>(mrpRetryIntervalActiveBuf),
+                                                 strlen(mrpRetryIntervalActiveBuf) };
 
-    if (crmpRetryIntervalActive > kMaxCRMPRetryInterval)
+    error = MakeHostName(service.mHostName, sizeof(service.mHostName), params.GetMac());
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Discovery, "CRMP retry interval active value exceeds allowed range of 1 hour, using maximum available",
-                        chip::ErrorStr(error));
-        crmpRetryIntervalActive = kMaxCRMPRetryInterval;
+        ChipLogError(Discovery, "Failed to create mdns hostname: %s", ErrorStr(error));
+        return error;
     }
-    writtenCharactersNumber =
-        snprintf(crmpRetryIntervalActiveBuf, sizeof(crmpRetryIntervalActiveBuf), "%" PRIu32, crmpRetryIntervalActive);
-    VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxCRMPRetryBufferSize),
-                        CHIP_ERROR_INVALID_STRING_LENGTH);
-    crmpRetryIntervalEntries[textEntrySize++] = { "CRA", reinterpret_cast<const uint8_t *>(crmpRetryIntervalActiveBuf),
-                                                  strlen(crmpRetryIntervalActiveBuf) };
-
-    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetPeerId()));
-    strncpy(service.mType, "_chip", sizeof(service.mType));
+    strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
-    service.mTextEntries   = crmpRetryIntervalEntries;
+    service.mTextEntries   = mrpRetryIntervalEntries;
     service.mTextEntrySize = textEntrySize;
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mAddressType   = Inet::kIPAddressType_Any;
@@ -417,10 +427,53 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     MdnsService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
-    strncpy(service.mType, "_chip", sizeof(service.mType));
+    strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
     return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
+}
+
+void DiscoveryImplPlatform::HandleCommissionableNodeBrowse(void * context, MdnsService * services, size_t servicesSize,
+                                                           CHIP_ERROR error)
+{
+    for (size_t i = 0; i < servicesSize; ++i)
+    {
+        ChipMdnsResolve(&services[i], INET_NULL_INTERFACEID, HandleCommissionableNodeResolve, context);
+    }
+}
+
+void DiscoveryImplPlatform::HandleCommissionableNodeResolve(void * context, MdnsService * result, CHIP_ERROR error)
+{
+    if (error != CHIP_NO_ERROR)
+    {
+        return;
+    }
+    DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
+    DiscoveredNodeData data;
+    Platform::CopyString(data.hostName, result->mHostName);
+
+    if (result->mAddress.HasValue())
+    {
+        data.ipAddress[data.numIPs++] = result->mAddress.Value();
+    }
+
+    for (size_t i = 0; i < result->mTextEntrySize; ++i)
+    {
+        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
+        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
+        FillNodeDataFromTxt(key, val, &data);
+    }
+    mgr->mResolverDelegate->OnNodeDiscoveryComplete(data);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
+{
+    ReturnErrorOnFailure(Init());
+    char serviceName[kMaxCommisisonableServiceNameSize];
+    ReturnErrorOnFailure(MakeCommissionableNodeServiceTypeName(serviceName, sizeof(serviceName), filter));
+
+    return ChipMdnsBrowse(serviceName, MdnsServiceProtocol::kMdnsProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
+                          HandleCommissionableNodeBrowse, this);
 }
 
 void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error)
@@ -460,8 +513,12 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
 
-    ChipLogProgress(Discovery, "Node ID resolved for 0x08%" PRIX32 "08%" PRIX32,
-                    static_cast<uint32_t>(nodeData.mPeerId.GetNodeId() >> 32), static_cast<uint32_t>(nodeData.mPeerId.GetNodeId()));
+#if CHIP_PROGRESS_LOGGING
+    char addrBuffer[Inet::kMaxIPAddressStringLength + 1];
+    nodeData.mAddress.ToString(addrBuffer);
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64 " to %s", ChipLogValueX64(nodeData.mPeerId.GetNodeId()),
+                    addrBuffer);
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 

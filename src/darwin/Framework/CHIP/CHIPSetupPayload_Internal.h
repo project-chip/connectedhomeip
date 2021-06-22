@@ -17,7 +17,8 @@
 
 #ifdef __cplusplus
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload;
-- (CHIPRendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value;
+- (CHIPRendezvousInformationFlags)convertRendezvousFlags:(chip::RendezvousInformationFlags)value;
+- (CHIPCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value;
 #endif
 
 @end

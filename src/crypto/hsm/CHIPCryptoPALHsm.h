@@ -81,6 +81,28 @@ public:
 #if ENABLE_HSM_GENERATE_EC_KEY
 /* Nist256 Key pair HSM class */
 
+class P256PublicKeyHSM : public P256PublicKey
+{
+public:
+    P256PublicKeyHSM() { PublicKeyid = 0; }
+
+    size_t Length() const override { return kP256_PublicKey_Length; }
+    operator uint8_t *() override { return bytes; }
+    operator const uint8_t *() const override { return bytes; }
+
+    void SetPublicKeyId(uint32_t id) { PublicKeyid = id; }
+
+    CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
+                                            const P256ECDSASignature & signature) const override;
+
+    CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
+                                             const P256ECDSASignature & signature) const override;
+
+private:
+    uint8_t bytes[kP256_PublicKey_Length];
+    uint32_t PublicKeyid;
+};
+
 class P256KeypairHSM : public P256Keypair
 {
 public:
@@ -105,6 +127,8 @@ public:
     virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
                                           P256ECDHDerivedSecret & out_secret) const override;
 
+    const P256PublicKeyHSM & Pubkey() const override { return mPublicKeyHSM; }
+
     bool provisioned_key;
 
     void SetKeyId(uint32_t id) { keyid = id; }
@@ -113,7 +137,9 @@ public:
 
 private:
     uint32_t keyid;
+    P256PublicKeyHSM mPublicKeyHSM;
 };
+
 #endif //#if ENABLE_HSM_GENERATE_EC_KEY
 
 #if ENABLE_HSM_PBKDF2_SHA256

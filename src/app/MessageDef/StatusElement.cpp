@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -42,9 +44,7 @@ CHIP_ERROR StatusElement::Parser::Init(const chip::TLV::TLVReader & aReader)
     mReader.Init(aReader);
     VerifyOrExit(chip::TLV::kTLVType_Array == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    // This is just a dummy, as we're not going to exit this container ever
-    chip::TLV::TLVType OuterContainerType;
-    err = mReader.EnterContainer(OuterContainerType);
+    err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -170,6 +170,8 @@ CHIP_ERROR StatusElement::Parser::CheckSchemaValidity() const
             err = CHIP_ERROR_IM_MALFORMED_STATUS_CODE;
         }
     }
+    SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);

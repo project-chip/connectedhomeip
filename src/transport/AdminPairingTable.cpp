@@ -30,6 +30,16 @@ using namespace Crypto;
 
 namespace Transport {
 
+CHIP_ERROR AdminPairingInfo::SetFabricLabel(const uint8_t * fabricLabel)
+{
+    const char * charFabricLabel = Uint8::to_const_char(fabricLabel);
+    size_t stringLength          = strnlen(charFabricLabel, kFabricLabelMaxLengthInBytes);
+    memcpy(mFabricLabel, charFabricLabel, stringLength);
+    mFabricLabel[stringLength] = '\0'; // Set null terminator
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -44,6 +54,10 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     info->mAdmin    = Encoding::LittleEndian::HostSwap16(mAdmin);
     info->mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
     info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
+
+    size_t stringLength = strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes);
+    memcpy(info->mFabricLabel, mFabricLabel, stringLength);
+    info->mFabricLabel[stringLength] = '\0'; // Set null terminator
 
     if (mOperationalKey != nullptr)
     {
@@ -79,7 +93,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     err = kvs->SyncSetKeyValue(key, info, sizeof(StorableAdminPairingInfo));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue.");
+        ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue: %s", chip::ErrorStr(err));
     }
 
 exit:
@@ -103,6 +117,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 
     AdminId id;
     uint16_t rootCertLen, opCertLen;
+    size_t stringLength;
 
     SuccessOrExit(err = kvs->SyncGetKeyValue(key, info, infoSize));
 
@@ -112,6 +127,10 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
     rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
     opCertLen   = Encoding::LittleEndian::HostSwap16(info->mOpCertLen);
+
+    stringLength = strnlen(info->mFabricLabel, kFabricLabelMaxLengthInBytes);
+    memcpy(mFabricLabel, info->mFabricLabel, stringLength);
+    mFabricLabel[stringLength] = '\0'; // Set null terminator
 
     VerifyOrExit(mAdmin == id, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -232,7 +251,8 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
         return CHIP_NO_ERROR;
     }
 
-    VerifyOrReturnError(cert.size() <= kMaxChipCertSize, CHIP_ERROR_INVALID_ARGUMENT);
+    // There could be two certs in the set -> ICA and NOC
+    VerifyOrReturnError(cert.size() <= kMaxChipCertSize * 2, CHIP_ERROR_INVALID_ARGUMENT);
     if (mOpCertLen != 0 && mOpCertAllocatedLen < cert.size())
     {
         ReleaseOperationalCert();
@@ -260,8 +280,6 @@ CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentia
     ReturnErrorOnFailure(
         certificates.LoadCert(mRootCert, mRootCertLen,
                               BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor).Set(CertDecodeFlags::kGenerateTBSHash)));
-
-    // TODO - Add support of ICA certificates
 
     credentials.Release();
     ReturnErrorOnFailure(credentials.Init(&certificates, certificates.GetCertCount()));
@@ -333,9 +351,11 @@ AdminPairingInfo * AdminPairingTable::FindAdminForNode(FabricId fabricId, NodeId
         if (state.IsInitialized())
         {
             ChipLogProgress(Discovery,
-                            "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu "
-                            "nodeId %llu vendorId %d.",
-                            index, state.GetFabricId(), state.GetNodeId(), state.GetVendorId(), fabricId, nodeId, vendorId);
+                            "Checking ind:%" PRIu32 " [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64
+                            " vendorId %" PRIu16 "] vs"
+                            " [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64 " vendorId %d]",
+                            index, ChipLogValueX64(state.GetFabricId()), ChipLogValueX64(state.GetNodeId()), state.GetVendorId(),
+                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
         }
         if (state.IsInitialized() && state.GetFabricId() == fabricId &&
             (nodeId == kUndefinedNodeId || state.GetNodeId() == nodeId) &&
@@ -372,7 +392,7 @@ CHIP_ERROR AdminPairingTable::Store(AdminId id)
 exit:
     if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
-        ChipLogProgress(Discovery, "Admin (%d) persisted to storage. Calling OnAdminPersistedToStorage.", id);
+        ChipLogProgress(Discovery, "Admin (%d) persisted to storage. Calling OnAdminPersistedToStorage", id);
         mDelegate->OnAdminPersistedToStorage(admin);
     }
     return err;
@@ -401,7 +421,7 @@ exit:
     }
     else if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
-        ChipLogProgress(Discovery, "Admin (%d) loaded from storage. Calling OnAdminRetrievedFromStorage.", id);
+        ChipLogProgress(Discovery, "Admin (%d) loaded from storage. Calling OnAdminRetrievedFromStorage", id);
         mDelegate->OnAdminRetrievedFromStorage(admin);
     }
     return err;
@@ -424,7 +444,7 @@ exit:
         ReleaseAdminId(id);
         if (mDelegate != nullptr && adminIsInitialized)
         {
-            ChipLogProgress(Discovery, "Admin (%d) deleted. Calling OnAdminDeletedFromStorage.", id);
+            ChipLogProgress(Discovery, "Admin (%d) deleted. Calling OnAdminDeletedFromStorage", id);
             mDelegate->OnAdminDeletedFromStorage(id);
         }
     }
@@ -435,7 +455,7 @@ CHIP_ERROR AdminPairingTable::Init(PersistentStorageDelegate * storage)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mStorage = storage;
-    ChipLogProgress(Discovery, "Init admin pairing table with server storage.");
+    ChipLogDetail(Discovery, "Init admin pairing table with server storage");
     return CHIP_NO_ERROR;
 }
 
@@ -443,7 +463,7 @@ CHIP_ERROR AdminPairingTable::SetAdminPairingDelegate(AdminPairingTableDelegate 
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mDelegate = delegate;
-    ChipLogProgress(Discovery, "Set the admin pairing table delegate");
+    ChipLogDetail(Discovery, "Set the admin pairing table delegate");
     return CHIP_NO_ERROR;
 }
 

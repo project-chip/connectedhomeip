@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -43,9 +45,7 @@ CHIP_ERROR ReportData::Parser::Init(const chip::TLV::TLVReader & aReader)
 
     VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    // This is just a dummy, as we're not going to exit this container ever
-    chip::TLV::TLVType OuterContainerType;
-    err = mReader.EnterContainer(OuterContainerType);
+    err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -157,6 +157,8 @@ CHIP_ERROR ReportData::Parser::CheckSchemaValidity() const
     {
         err = CHIP_NO_ERROR;
     }
+    SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -237,48 +239,52 @@ exit:
 ReportData::Builder & ReportData::Builder::SubscriptionId(const uint64_t aSubscriptionId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_SubscriptionId), aSubscriptionId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_SubscriptionId), aSubscriptionId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 AttributeDataList::Builder & ReportData::Builder::CreateAttributeDataListBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataListBuilder.ResetError(mError));
-
-    mError = mAttributeDataListBuilder.Init(mpWriter, kCsTag_AttributeDataList);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mAttributeDataListBuilder.Init(mpWriter, kCsTag_AttributeDataList);
+        ChipLogFunctError(mError);
+    }
+    else
+    {
+        mAttributeDataListBuilder.ResetError(mError);
+    }
     return mAttributeDataListBuilder;
 }
 
 EventList::Builder & ReportData::Builder::CreateEventDataListBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataListBuilder.ResetError(mError));
-
-    mError = mEventDataListBuilder.Init(mpWriter, kCsTag_EventDataList);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mEventDataListBuilder.Init(mpWriter, kCsTag_EventDataList);
+        ChipLogFunctError(mError);
+    }
+    else
+    {
+        mAttributeDataListBuilder.ResetError(mError);
+    }
     return mEventDataListBuilder;
 }
 
 ReportData::Builder & ReportData::Builder::MoreChunkedMessages(const bool aMoreChunkedMessages)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_MoreChunkedMessages), aMoreChunkedMessages);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_MoreChunkedMessages), aMoreChunkedMessages);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 

@@ -29,7 +29,6 @@ import androidx.fragment.app.Fragment
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
-import com.google.chip.chiptool.commissioner.CommissionerActivity
 import com.google.chip.chiptool.echoclient.EchoClientFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
@@ -84,8 +83,12 @@ class CHIPToolActivity :
     }
   }
 
-  override fun onPairingComplete() {
-    showFragment(OnOffClientFragment.newInstance(), false)
+  override fun onCommissioningComplete(code: Int) {
+    if (code == 0) {
+      showFragment(OnOffClientFragment.newInstance(), false)
+    } else {
+      showFragment(SelectActionFragment.newInstance(), false)
+    }
   }
 
   override fun handleScanQrCodeClicked() {
@@ -100,11 +103,6 @@ class CHIPToolActivity :
   override fun onProvisionThreadCredentialsClicked() {
     networkType = ProvisionNetworkType.THREAD
     showFragment(BarcodeFragment.newInstance(), false)
-  }
-
-  override fun handleCommissioningClicked() {
-    var intent = Intent(this, CommissionerActivity::class.java)
-    startActivityForResult(intent, REQUEST_CODE_COMMISSIONING)
   }
 
   override fun handleEchoClientClicked() {
@@ -148,9 +146,9 @@ class CHIPToolActivity :
     val records = (messages[0] as NdefMessage).records
     if (records.size != 1) return
 
-    // Require NDEF URI record starting with "ch:"
+    // Require NDEF URI record starting with "mt:"
     val uri = records[0].toUri()
-    if (!uri?.scheme.equals("ch", true)) return
+    if (!uri?.scheme.equals("mt", true)) return
 
     lateinit var setupPayload: SetupPayload
     try {

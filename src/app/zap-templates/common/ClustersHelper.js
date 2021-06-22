@@ -18,7 +18,6 @@
 // Import helpers from zap core
 const zapPath       = '../../../../third_party/zap/repo/src-electron/';
 const queryConfig   = require(zapPath + 'db/query-config.js')
-const queryImpexp   = require(zapPath + 'db/query-impexp.js')
 const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
 const templateUtil  = require(zapPath + 'generator/template-util.js')
 const zclHelper     = require(zapPath + 'generator/helper-zcl.js')
@@ -78,8 +77,8 @@ function loadStructs(packageId)
 function loadClusters()
 {
   const { db, sessionId } = this.global;
-  return queryImpexp.exportEndPointTypeIds(db, sessionId)
-      .then(endpointTypes => zclQuery.exportAllClustersDetailsFromEndpointTypes(db, endpointTypes))
+  return queryEndpoint.selectEndPointTypeIds(db, sessionId)
+      .then(endpointTypes => zclQuery.selectAllClustersDetailsFromEndpointTypes(db, endpointTypes))
       .then(clusters => clusters.filter(cluster => cluster.enabled == 1));
 }
 
@@ -95,7 +94,7 @@ function loadCommandArguments(command, packageId)
 function loadCommands(packageId)
 {
   const { db, sessionId } = this.global;
-  return queryImpexp.exportEndPointTypeIds(db, sessionId)
+  return queryEndpoint.selectEndPointTypeIds(db, sessionId)
       .then(endpointTypes => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
       .then(endpointTypesAndClusters => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(db, endpointTypesAndClusters))
       .then(commands => Promise.all(commands.map(command => loadCommandArguments.call(this, command, packageId))));
@@ -106,12 +105,12 @@ function loadAttributes(packageId)
   // The 'server' side is enforced here, because the list of attributes is used to generate client global
   // commands to retrieve server side attributes.
   const { db, sessionId } = this.global;
-  return queryImpexp.exportEndPointTypeIds(db, sessionId)
+  return queryEndpoint.selectEndPointTypeIds(db, sessionId)
       .then(endpointTypes => Promise.all(
-                endpointTypes.map(({ endpointTypeId }) => queryEndpoint.queryEndpointClusters(db, endpointTypeId))))
+                endpointTypes.map(({ endpointTypeId }) => queryEndpoint.selectEndpointClusters(db, endpointTypeId))))
       .then(clusters => clusters.flat())
       .then(clusters => Promise.all(
-                clusters.map(({ clusterId, side, endpointTypeId }) => queryEndpoint.queryEndpointClusterAttributes(
+                clusters.map(({ clusterId, side, endpointTypeId }) => queryEndpoint.selectEndpointClusterAttributes(
                                  db, clusterId, 'server', endpointTypeId))))
       .then(attributes => attributes.flat())
       .then(attributes => attributes.filter(attribute => attribute.isIncluded))
@@ -324,6 +323,38 @@ function enhancedCommands(commands, types)
     });
   });
 
+  commands.forEach(command => {
+    // This filter uses the assumption that a response to a command has a well defined name, such as
+    // (response name) == (command name + 'Response') or s/Request/Response. This is very often the case,
+    // but this is not always true since some clusters use the same response to answer different commands, such as the
+    // operational cluster.
+    const automaticFilter = response => (response.name == (command.name + 'Response')
+        || (command.name.includes('Request') && response.name == (command.name.replace('Request', 'Response'))));
+    const manualFilter = response => {
+      switch (command.name) {
+      case 'AddOpCert':
+      case 'UpdateOpCert':
+      case 'UpdateFabricLabel':
+      case 'RemoveFabric':
+        return response.name == 'OpCertResponse';
+      default:
+        return false;
+      }
+    };
+    const filter = response => automaticFilter(response) || manualFilter(response);
+
+    const response = commands.find(filter);
+    if (response) {
+      command.hasSpecificResponse = true;
+      command.responseName        = response.name;
+      command.response            = response;
+    } else {
+      command.hasSpecificResponse = false;
+      command.responseName        = 'DefaultSuccess';
+      command.response            = { arguments : [] };
+    }
+  });
+
   // At this stage, 'command.arguments' may contains 'struct'. But controllers does not know (yet) how
   // to handle them. So those needs to be inlined.
   commands.forEach(command => {
@@ -336,6 +367,12 @@ function enhancedAttributes(attributes, types)
 {
   attributes.forEach(attribute => {
     enhancedItem(attribute, types);
+  });
+
+  attributes.forEach(attribute => {
+    const argument = { isList : attribute.isList, name : attribute.name, chipType : attribute.chipType, type : attribute.type };
+    attribute.arguments = [ argument ];
+    attribute.response  = { arguments : [ argument ] };
   });
 
   // At this stage, the 'attributes' array contains all attributes enabled for all endpoints. It means
@@ -383,6 +420,18 @@ Clusters.init = function(context, packageId) {
 //
 // Helpers: All
 //
+function asBlocks(promise, options)
+{
+  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise.then(data => templateUtil.collectBlocks(data, options, this)));
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
+}
+
+function asPromise(promise)
+{
+  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise);
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
+}
+
 Clusters.getClusters = function()
 {
     return this.ready.then(() => this._clusters);
@@ -390,20 +439,20 @@ Clusters.getClusters = function()
 
 Clusters.getCommands = function(name, side)
 {
-    const filter = command => command.clusterName == name && command.clusterSide == side && command.name.includes('Response') == false;
+    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.name.includes('Response') == false;
     return this.ready.then(() => this._commands.filter(filter));
 }
 
 Clusters.getResponses = function(name, side)
 {
-    const filter = command => command.clusterName == name && command.clusterSide == side && command.name.includes('Response') == true;
+    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.name.includes('Response') == true;
     return this.ready.then(() => this._commands.filter(filter));
 }
 
 Clusters.getAttributes = function(name, side)
 {
     return this.ready.then(() => {
-      const code = this._clusters.find(cluster => cluster.name == name).id;
+      const code = this._clusters.find(cluster => cluster.name.toLowerCase() == name.toLowerCase()).id;
       const filter = attribute => attribute.clusterId == code && attribute.side == side;
       return this._attributes.filter(filter);
     });
@@ -460,4 +509,6 @@ Clusters.getServerAttributes = function(name)
 //
 // Module exports
 //
-exports.Clusters = Clusters;
+exports.Clusters  = Clusters;
+exports.asBlocks  = asBlocks;
+exports.asPromise = asPromise;

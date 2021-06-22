@@ -24,9 +24,6 @@ chip_device_platform = "qpg6100"
 chip_mdns = "platform"
 
 lwip_platform = "qpg6100"
-lwip_ipv6 = true
-lwip_ipv4 = false
-lwip_api = true
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false
@@ -36,6 +33,9 @@ chip_inet_config_enable_raw_endpoint = false
 # Size opt's
 #chip_progress_logging = false
 chip_detail_logging = false
+
+# Use -Os
+is_debug = false
 
 chip_build_tests = false
 

@@ -15,7 +15,6 @@ COPY --from=esp32 /opt/espressif/qemu-src /opt/espressif/qemu-src
 
 COPY --from=nrf /opt/NordicSemiconductor/nRF5_tools /opt/NordicSemiconductor/nRF5_tools
 COPY --from=nrf /opt/NordicSemiconductor/nrfconnect /opt/NordicSemiconductor/nrfconnect
-COPY --from=nrf /opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major /opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major
 
 COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r21b /opt/android/android-ndk-r21b
@@ -31,8 +30,6 @@ ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
-ENV GNUARMEMB_TOOLCHAIN_PATH=/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major
-ENV ARM_GCC_INSTALL_ROOT=/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin
 ENV EFR32_BOARD=BRD4161A
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b

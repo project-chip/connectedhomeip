@@ -299,7 +299,7 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
             break;
 
             default:
-                ChipLogProgress(DeviceLayer, "evt_UNKNOWN id = %08x", SL_BT_MSG_ID(bluetooth_evt->header));
+                ChipLogProgress(DeviceLayer, "evt_UNKNOWN id = %08" PRIx32, SL_BT_MSG_ID(bluetooth_evt->header));
                 break;
             }
         }

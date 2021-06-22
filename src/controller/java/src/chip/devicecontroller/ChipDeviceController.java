@@ -78,6 +78,10 @@ public class ChipDeviceController {
     pairDevice(deviceControllerPtr, deviceId, connectionId, pinCode);
   }
 
+  public long getDevicePointer(long deviceId) {
+    return getDevicePointer(deviceControllerPtr, deviceId);
+  }
+
   public boolean disconnectDevice(long deviceId) {
     return disconnectDevice(deviceControllerPtr, deviceId);
   }
@@ -105,6 +109,12 @@ public class ChipDeviceController {
   public void onPairingDeleted(int errorCode) {
     if (completionListener != null) {
       completionListener.onPairingDeleted(errorCode);
+    }
+  }
+
+  public void onNetworkCommissioningComplete(int errorCode) {
+    if (completionListener != null) {
+      completionListener.onNetworkCommissioningComplete(errorCode);
     }
   }
 
@@ -156,12 +166,20 @@ public class ChipDeviceController {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
+  public void updateAddress(long deviceId, String address, int port) {
+    updateAddress(deviceControllerPtr, deviceId, address, port);
+  }
+
   public void sendMessage(long deviceId, String message) {
     sendMessage(deviceControllerPtr, deviceId, message);
   }
 
   public void sendCommand(long deviceId, ChipCommandType command, int value) {
     sendCommand(deviceControllerPtr, deviceId, command, value);
+  }
+
+  public void enableThreadNetwork(long deviceId, byte[] operationalDataset) {
+    enableThreadNetwork(deviceControllerPtr, deviceId, operationalDataset);
   }
 
   public boolean openPairingWindow(long deviceId, int duration) {
@@ -179,6 +197,8 @@ public class ChipDeviceController {
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
+  private native long getDevicePointer(long deviceControllerPtr, long deviceId);
+
   private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
   private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
@@ -187,10 +207,16 @@ public class ChipDeviceController {
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
 
+  private native void updateAddress(
+      long deviceControllerPtr, long deviceId, String address, int port);
+
   private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
 
   private native void sendCommand(
       long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
+
+  private native void enableThreadNetwork(
+      long deviceControllerPtr, long deviceId, byte[] operationalDataset);
 
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 
@@ -227,6 +253,9 @@ public class ChipDeviceController {
 
     /** Notifies the deletion of pairing session. */
     void onPairingDeleted(int errorCode);
+
+    /** Notifies the completion of network commissioning */
+    void onNetworkCommissioningComplete(int errorCode);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();

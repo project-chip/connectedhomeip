@@ -32,7 +32,7 @@ import("${chip_root}/build/chip/tools.gni")
 
 import("//src/crypto/crypto.gni")
 
-if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
+if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
@@ -95,7 +95,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
 
     if (chip_with_lwip) {
-      deps += [ "${chip_root}/src/lwip:all" ]
+      deps += [ "${chip_root}/src/lwip" ]
     }
 
     if (chip_build_tools) {
@@ -199,6 +199,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     enable_linux_all_clusters_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux tv app example.
+    enable_linux_tv_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # Build the Linux bridge app example.
     enable_linux_bridge_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
@@ -214,7 +218,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     enable_efr32_lock_app_build = enable_efr32_builds
 
     # Build the qpg6100 lock app example.
-    enable_qpg6100_lock_app_build = enable_qpg6100_builds
+    enable_qpg6100_lock_app_build = enable_qpg6100_builds && !is_debug
 
     # Build the efr32 lighting app example.
     enable_efr32_lighting_app_build = enable_efr32_builds
@@ -222,8 +226,14 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Build the efr32 window app example.
     enable_efr32_window_app_build = enable_efr32_builds
 
+    # Build the k32w lighting app example.
+    enable_k32w_lighting_app_build = enable_k32w_builds
+
     # Build the k32w lock app example.
     enable_k32w_lock_app_build = enable_k32w_builds
+
+    # Build the k32w shell app example.
+    enable_k32w_shell_app_build = enable_k32w_builds
   }
 
   if (enable_host_clang_build) {
@@ -299,6 +309,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_linux_tv_app_build) {
+    group("linux_tv_app") {
+      deps = [ "${chip_root}/examples/tv-app/linux(${standalone_toolchain})" ]
+    }
+  }
+
   if (enable_linux_bridge_app_build) {
     group("linux_bridge_app") {
       deps =
@@ -338,9 +354,21 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_k32w_lighting_app_build) {
+    group("k32w_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
+    }
+  }
+
   if (enable_k32w_lock_app_build) {
     group("k32w_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+    }
+  }
+
+  if (enable_k32w_shell_app_build) {
+    group("k32w_shell_app") {
+      deps = [ "${chip_root}/examples/shell/k32w(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
     }
   }
 
@@ -375,6 +403,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (enable_linux_all_clusters_app_build) {
       deps += [ ":linux_all_clusters_app" ]
     }
+    if (enable_linux_tv_app_build) {
+      deps += [ ":linux_tv_app" ]
+    }
     if (enable_linux_bridge_app_build) {
       deps += [ ":linux_bridge_app" ]
     }
@@ -390,8 +421,14 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     if (enable_efr32_window_app_build) {
       deps += [ ":efr32_window_app" ]
     }
+    if (enable_k32w_lighting_app_build) {
+      deps += [ ":k32w_lighting_app" ]
+    }
     if (enable_k32w_lock_app_build) {
       deps += [ ":k32w_lock_app" ]
+    }
+    if (enable_k32w_shell_app_build) {
+      deps += [ ":k32w_shell_app" ]
     }
     if (enable_qpg6100_lock_app_build) {
       deps += [ ":qpg6100_lock_app" ]

@@ -102,7 +102,7 @@ private:
     virtual ~ReadClient() = default;
 
     void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload) override;
+                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
@@ -111,10 +111,12 @@ private:
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; };
 
+    CHIP_ERROR GenerateAttributePathList(ReadRequest::Builder & aRequest, AttributePathParams * apAttributePathParamsList,
+                                         size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
 
     void MoveToState(const ClientState aTargetState);
-    CHIP_ERROR ProcessReportData(System::PacketBufferHandle aPayload);
+    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
 

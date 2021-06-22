@@ -15,62 +15,27 @@
  *    limitations under the License.
  */
 
-#include "esp_console.h"
-#include "esp_event.h"
-#include "esp_log.h"
-#include "esp_netif.h"
-#include "esp_system.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "linenoise/linenoise.h"
 #include "nvs_flash.h"
-#include "support/CHIPMem.h"
 
 #include <ChipShellCollection.h>
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 
+using chip::Shell::Engine;
+
 static void chip_shell_task(void * args)
 {
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
-    int ret = chip::Shell::streamer_init(chip::Shell::streamer_get());
-    assert(ret == 0);
-    cmd_ping_init();
-    while (true)
-    {
-        const char * prompt = LOG_COLOR_I "> " LOG_RESET_COLOR;
-        char * line         = linenoise(prompt);
-        if (line == NULL || strlen(line) == 0)
-        {
-            continue;
-        }
-        linenoiseHistoryAdd(line);
-        int ret;
-        esp_console_run(line, &ret);
-        if (ret)
-        {
-            char errorStr[160];
-            bool errorStrFound = chip::FormatCHIPError(errorStr, sizeof(errorStr), ret);
-            if (!errorStrFound)
-            {
-                errorStr[0] = 0;
-            }
-            printf("Error: %s\n", errorStr);
-        }
-        else
-        {
-            printf("Done\n");
-        }
-
-        linenoiseFree(line);
-    }
+    Engine::Root().RunMainLoop();
 }
 
 extern "C" void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
-    xTaskCreate(&chip_shell_task, "chip_shell", 8192, NULL, 5, NULL);
+    chip::Platform::MemoryInit();
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    cmd_ping_init();
+    xTaskCreate(&chip_shell_task, "chip_shell", 2048, NULL, 5, NULL);
 }

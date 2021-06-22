@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -74,6 +76,8 @@ CHIP_ERROR EventPathList::Parser::CheckSchemaValidity() const
     {
         err = CHIP_NO_ERROR;
     }
+    SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);

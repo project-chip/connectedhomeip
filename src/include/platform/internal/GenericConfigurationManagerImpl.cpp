@@ -1007,7 +1007,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         err = Impl()->_GetManufacturerDeviceId(deviceId);
         SuccessOrExit(err);
 
-        snprintf(inputBuf, sizeof(inputBuf), "0010%016" PRIX64, deviceId);
+        snprintf(inputBuf, sizeof(inputBuf), "0010" ChipLogFormatX64, ChipLogValueX64(deviceId));
 
         hash.AddData((uint8_t *) inputBuf, kLenFieldLen + kDeviceIdLen);
     }
@@ -1118,7 +1118,7 @@ void GenericConfigurationManagerImpl<ImplClass>::_LogDeviceConfig()
     ChipLogProgress(DeviceLayer, "Device Configuration:");
 
 #if CHIP_CONFIG_ENABLE_FABRIC_STATE
-    ChipLogProgress(DeviceLayer, "  Device Id: %016" PRIX64, FabricState.LocalNodeId);
+    ChipLogProgress(DeviceLayer, "  Device Id: 0x" ChipLogFormatX64, ChipLogValueX64(FabricState.LocalNodeId));
 #endif
 
     {
@@ -1190,7 +1190,7 @@ void GenericConfigurationManagerImpl<ImplClass>::_LogDeviceConfig()
 #if CHIP_CONFIG_ENABLE_FABRIC_STATE
     if (FabricState.FabricId != kFabricIdNotSpecified)
     {
-        ChipLogProgress(DeviceLayer, "  Fabric Id: %016" PRIX64, FabricState.FabricId);
+        ChipLogProgress(DeviceLayer, "  Fabric Id: 0x" ChipLogFormatX64, ChipLogValueX64(FabricState.FabricId));
     }
     else
     {

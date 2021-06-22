@@ -257,7 +257,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     {
         ReturnErrorOnFailure(OTBR_TO_CHIP_ERROR(mThreadApi->Attach([](ClientError result) {
             // ThreadDevcieRoleChangedHandler should take care of this, so we don't emit another event.
-            ChipLogProgress(DeviceLayer, "Thread attach result %d", result);
+            ChipLogProgress(DeviceLayer, "Thread attach result %d", static_cast<int>(result));
         })));
     }
     else

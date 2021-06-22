@@ -17,6 +17,9 @@
 
 FROM connectedhomeip/chip-cirque-device-base:latest
 
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y gdb
+
 COPY out/chip-im-responder /usr/bin/
 COPY entrypoint.sh /
 

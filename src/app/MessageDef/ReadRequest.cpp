@@ -26,6 +26,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -40,9 +42,7 @@ CHIP_ERROR ReadRequest::Parser::Init(const chip::TLV::TLVReader & aReader)
 
     VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    // This is just a dummy, as we're not going to exit this container ever
-    chip::TLV::TLVType OuterContainerType;
-    err = mReader.EnterContainer(OuterContainerType);
+    err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -153,6 +153,8 @@ CHIP_ERROR ReadRequest::Parser::CheckSchemaValidity() const
     {
         err = CHIP_NO_ERROR;
     }
+    SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -271,12 +273,11 @@ exit:
 ReadRequest::Builder & ReadRequest::Builder::EventNumber(const uint64_t aEventNumber)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventNumber), aEventNumber);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventNumber), aEventNumber);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 

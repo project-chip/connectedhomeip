@@ -35,7 +35,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -44,10 +43,16 @@
 
 namespace chip {
 namespace app {
+
+bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
+{
+    // The Mock cluster catalog -- only have one command on one cluster on one endpoint.
+    return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestCommandId);
+}
+
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
     static bool statusCodeFlipper = false;
 
     if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndpointId)
@@ -70,8 +75,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     if (statusCodeFlipper)
     {
         printf("responder constructing status code in command");
-        apCommandObj->AddStatusCode(&commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+        apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::Success);
     }
     else
     {
@@ -79,23 +84,16 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 
         chip::TLV::TLVWriter * writer;
 
-        err = apCommandObj->PrepareCommand(&commandPathParams);
-        SuccessOrExit(err);
+        ReturnOnFailure(apCommandObj->PrepareCommand(commandPathParams));
 
         writer = apCommandObj->GetCommandDataElementTLVWriter();
-        err    = writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
-        SuccessOrExit(err);
+        ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));
 
-        err = writer->Put(chip::TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
-        SuccessOrExit(err);
+        ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId2), kTestFieldValue2));
 
-        err = apCommandObj->FinishCommand();
-        SuccessOrExit(err);
+        ReturnOnFailure(apCommandObj->FinishCommand());
     }
     statusCodeFlipper = !statusCodeFlipper;
-
-exit:
-    return;
 }
 
 CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter)
@@ -119,14 +117,29 @@ exit:
     ChipLogFunctError(err);
     return err;
 }
+
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    AttributePathParams attributePathParams;
+    attributePathParams.mNodeId     = 1;
+    attributePathParams.mEndpointId = 2;
+    attributePathParams.mClusterId  = 3;
+    attributePathParams.mFieldId    = 4;
+    attributePathParams.mListIndex  = 5;
+    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+
+    err = apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+    ChipLogFunctError(err);
+    return err;
+}
 } // namespace app
 } // namespace chip
 
 namespace {
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
 LivenessEventGenerator gLivenessGenerator;
 
 uint8_t gDebugEventBuffer[2048];

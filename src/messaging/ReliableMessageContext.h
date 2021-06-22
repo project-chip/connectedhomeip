@@ -191,6 +191,12 @@ public:
      */
     void SetOccupied(bool inOccupied);
 
+    /**
+     * Get the reliable message manager that corresponds to this reliable
+     * message context.
+     */
+    ReliableMessageMgr * GetReliableMessageMgr();
+
 protected:
     enum class Flags : uint16_t
     {
@@ -229,7 +235,6 @@ private:
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
     CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
     ExchangeContext * GetExchangeContext();
-    ReliableMessageMgr * GetReliableMessageMgr();
 
 private:
     friend class ReliableMessageMgr;

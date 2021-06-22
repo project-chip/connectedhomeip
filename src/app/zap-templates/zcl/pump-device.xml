@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <deviceType>
+    <name>Pump</name>
+    <domain>CHIP</domain>
+    <typeName>Pump</typeName>
+    <profileId editable="false">0x0999</profileId>
+    <deviceId editable="false">0x0303</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+      </include>
+      <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>IdentifyQuery</requireCommand>
+        <requireCommand>IdentifyQueryResponse</requireCommand>
+      </include>
+      <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>AddGroupResponse</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>ViewGroupResponse</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>GetGroupMembershipResponse</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveGroupResponse</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>SCENE_COUNT</requireAttribute>
+        <requireAttribute>CURRENT_SCENE</requireAttribute>
+        <requireAttribute>CURRENT_GROUP</requireAttribute>
+        <requireAttribute>SCENE_VALID</requireAttribute>
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>AddSceneResponse</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>ViewSceneResponse</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveSceneResponse</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>RemoveAllScenesResponse</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>StoreSceneResponse</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>GetSceneMembershipResponse</requireCommand>
+      </include>
+      <include cluster="On/off" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+      </include>
+      <include cluster="Pump Configuration and Control" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>MAX_PRESSURE</requireAttribute>
+        <requireAttribute>MAX_SPEED</requireAttribute>
+        <requireAttribute>MAX_FLOW</requireAttribute>
+        <requireAttribute>EffectiveOperationMode</requireAttribute>
+        <requireAttribute>EffectiveControlMode</requireAttribute>
+        <requireAttribute>Capacity</requireAttribute>
+        <requireAttribute>OperationMode</requireAttribute>
+      </include>
+      <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+      </include>
+      <include cluster="Temperature Measurement" client="true" server="true" clientLocked="true" serverLocked="true">
+      </include>
+      <include cluster="Pressure Measurement" client="true" server="true" clientLocked="true" serverLocked="true">
+      </include>
+      <include cluster="Flow Measurement" client="true" server="true" clientLocked="true" serverLocked="true">
+      </include>
+      <!-- TODO add OTA software update -->
+    </clusters>
+  </deviceType>
+
+</configurator>

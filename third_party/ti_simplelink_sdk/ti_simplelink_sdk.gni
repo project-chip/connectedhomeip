@@ -283,7 +283,6 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/radio.c",
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/settings.c",
       "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/system.c",
-      "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/uart.c",
     ]
 
     public_configs = [
@@ -308,6 +307,9 @@ template("ti_simplelink_sdk") {
     include_dirs += [
       # DMM/BLE:
       "${ti_simplelink_sdk_root}/source",
+
+      # Eclipse the SDK config header from DMM
+      "${chip_root}/src/platform/cc13x2_26x2",
 
       # CHIPoBLE Added include dirs
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/",

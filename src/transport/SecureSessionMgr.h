@@ -61,6 +61,11 @@ public:
 
     void operator=(EncryptedPacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 
+    using System::PacketBufferHandle::IsNull;
+    // Pass-through to HasChainedBuffer on our underlying buffer without
+    // exposing operator->
+    bool HasChainedBuffer() const { return (*this)->HasChainedBuffer(); }
+
     uint32_t GetMsgId() const;
 
     /**
@@ -92,13 +97,20 @@ public:
     CHIP_ERROR InsertPacketHeader(const PacketHeader & aPacketHeader) { return aPacketHeader.EncodeBeforeData(*this); }
 #endif // CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
+    static EncryptedPacketBufferHandle MarkEncrypted(PacketBufferHandle && aBuffer)
+    {
+        return EncryptedPacketBufferHandle(std::move(aBuffer));
+    }
+
+    /**
+     * Get a handle to the data that allows mutating the bytes.  This should
+     * only be used if absolutely necessary, because EncryptedPacketBufferHandle
+     * represents a buffer that we want to resend as-is.
+     */
+    PacketBufferHandle CastToWritable() const { return PacketBufferHandle::Retain(); }
+
 private:
-    // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
-    friend class SecureSessionMgr;
-
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
-
-    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 };
 
 /**
@@ -125,7 +137,7 @@ public:
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    SecureSessionHandle session, const Transport::PeerAddress & source,
-                                   System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+                                   System::PacketBufferHandle && msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
@@ -167,17 +179,23 @@ public:
 
     /**
      * @brief
-     *   Send a message to a currently connected peer.
+     *   This function takes the payload and returns an encrypted message which can be sent multiple times.
      *
      * @details
-     *   msgBuf contains the data to be transmitted.  If bufferRetainSlot is not null and this function
-     *   returns success, the encrypted data that was sent, as well as various other information needed
-     *   to retransmit it, will be stored in *bufferRetainSlot.
+     *   It does the following:
+     *    1. Encrypt the msgBuf
+     *    2. construct the packet header
+     *    3. Encode the packet header and prepend it to message.
+     *   Returns a encrypted message in encryptedMessage.
      */
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
-    CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
-                                    EncryptedPacketBufferHandle * bufferRetainSlot);
+    CHIP_ERROR BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                            System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle & encryptedMessage);
+
+    /**
+     * @brief
+     *   Send a prepared message to a currently connected peer.
+     */
+    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
 
     Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
 
@@ -255,7 +273,7 @@ public:
      * @param source    the source address of the package
      * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
      */
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
 private:
     /**
@@ -286,10 +304,6 @@ private:
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
     GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
 
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                           System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
-                           EncryptionState encryptionState);
-
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
 
@@ -307,9 +321,9 @@ private:
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
 
     void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle msg);
+                               System::PacketBufferHandle && msg);
     void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                         System::PacketBufferHandle msg);
+                         System::PacketBufferHandle && msg);
 
     static bool IsControlMessage(PayloadHeader & payloadHeader)
     {

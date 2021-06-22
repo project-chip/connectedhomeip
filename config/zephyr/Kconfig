@@ -1,0 +1,103 @@
+#
+#   Copyright (c) 2021 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+menuconfig CHIP
+	bool "Connected Home over IP protocol stack"
+	default n
+	select CPLUSPLUS
+	imply LIB_CPLUSPLUS
+	imply REQUIRES_FULL_LIBC
+	imply CBPRINTF_LIBC_SUBSTS
+	imply POSIX_API if !ARCH_POSIX
+	imply EVENTFD if !ARCH_POSIX
+	imply REBOOT
+	imply ENTROPY_GENERATOR
+	imply NET_UDP
+	imply NET_IPV6
+	imply NET_CONFIG_NEED_IPV6
+	imply NET_SOCKETS
+	help
+	  This option enables Connected Home over IP libraries.
+
+if CHIP
+
+config CHIP_PROJECT_CONFIG
+	string "Project configuration file for CHIP"
+	help
+	  Project configuration file for CHIP. If specified, CHIP generic
+	  configuration files will include the project configuration file which can
+	  be used to override any CHIP default or platform-specific settings.
+
+config CHIP_OPENTHREAD_CONFIG
+	string "Custom OpenThread configuration file"
+	help
+	  This option can be used to replace Zephyr-supplied OpenThread
+	  configuration file with a custom one.
+
+config CHIP_ZEPHYR_SHELL
+	bool "Enable Zephyr-based CHIP shell"
+	default n
+	imply SHELL
+	help
+	  Add CHIP commands to the Zephyr shell.
+
+config CHIP_STANDALONE_SHELL
+	bool "Enable CHIP shell library"
+	default n
+	depends on !CHIP_ZEPHYR_SHELL
+	help
+	  Link the application with the library containing CHIP shell commands.
+
+config CHIP_PW_RPC
+	bool "Enable Pigweed RPC library"
+	default n
+	help
+	  Link the application with the library containing Pigweed RPC functionalities.
+
+config CHIP_BUILD_TESTS
+	bool "Build CHIP unit tests"
+	default n
+	help
+	  This option enables building CHIP unit tests.
+
+config CHIP_DISABLE_CHIPOBLE_ADVERTISING_WHEN_PROVISIONED
+	bool "Disable CHIPoBLE advertising when device is fully provisioned"
+	default y
+	help
+	  Disable CHIPoBLE advertising when the device achieves a fully provisioned state.
+
+config CHIP_ENABLE_PAIRING_AUTOSTART
+	bool "Enable pairing autostart"
+	default n
+	help
+	  Open pairing window automatically at application boot time.
+
+config CHIP_ENABLE_DNSSD_SRP
+	bool "Enable support for service registration"
+	default y
+	imply OPENTHREAD_ECDSA
+	imply OPENTHREAD_SRP_CLIENT
+	help
+	  Enables DNS-SD SRP client support
+
+config APP_LINK_WITH_CHIP
+	bool "Link 'app' with Connected Home over IP"
+	default y
+	help
+	  Add Connected Home over IP header files to the 'app' include path
+	  and link the 'app' with Connected Home over IP libraries.
+
+endif

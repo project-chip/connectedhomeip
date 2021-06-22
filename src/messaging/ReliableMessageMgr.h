@@ -219,9 +219,11 @@ public:
      */
     void ExpireTicks();
 
+#if CHIP_CONFIG_TEST
     // Functions for testing
     int TestGetCountRetransTable();
     void TestSetIntervalShift(uint16_t value) { mTimerIntervalShift = value; }
+#endif // CHIP_CONFIG_TEST
 
 private:
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;

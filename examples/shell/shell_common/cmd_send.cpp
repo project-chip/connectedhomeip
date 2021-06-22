@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <lib/core/CHIPCore.h>
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeMgr.h>
@@ -54,8 +54,8 @@ public:
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mUsingTCP = false;
 #endif
-        mUsingCRMP = true;
-        mPort      = CHIP_PORT;
+        mUsingMRP = true;
+        mPort     = CHIP_PORT;
     }
 
     uint64_t GetLastSendTime() const { return mLastSendTime; }
@@ -78,8 +78,8 @@ public:
     void SetUsingTCP(bool value) { mUsingTCP = value; }
 #endif
 
-    bool IsUsingCRMP() const { return mUsingCRMP; }
-    void SetUsingCRMP(bool value) { mUsingCRMP = value; }
+    bool IsUsingMRP() const { return mUsingMRP; }
+    void SetUsingMRP(bool value) { mUsingMRP = value; }
 
 private:
     // The last time a CHIP message was attempted to be sent.
@@ -94,14 +94,14 @@ private:
     bool mUsingTCP;
 #endif
 
-    bool mUsingCRMP;
+    bool mUsingMRP;
 } gSendArguments;
 
 class MockAppDelegate : public Messaging::ExchangeDelegate
 {
 public:
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle buffer) override
+                           System::PacketBufferHandle && buffer) override
     {
         uint32_t respTime    = System::Timer::GetCurrentEpoch();
         uint32_t transitTime = respTime - gSendArguments.GetLastSendTime();
@@ -130,8 +130,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
 
     Messaging::SendFlags sendFlags;
     System::PacketBufferHandle payloadBuf;
-    char * requestData = nullptr;
-    uint32_t size      = 0;
+    uint32_t payloadSize = gSendArguments.GetPayloadSize();
 
     // Discard any existing exchange context. Effectively we can only have one exchange with
     // a single node at any one time.
@@ -145,17 +144,13 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
     VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    size = gSendArguments.GetPayloadSize();
-    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    requestData = static_cast<char *>(chip::Platform::MemoryAlloc(size));
-    VerifyOrExit(requestData != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    snprintf(requestData, size, "CHIP Message");
-    payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
+    payloadBuf = MessagePacketBuffer::New(payloadSize);
     VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    if (gSendArguments.IsUsingCRMP())
+    memset(payloadBuf->Start(), 0, payloadSize);
+    payloadBuf->SetDataLength(payloadSize);
+
+    if (gSendArguments.IsUsingMRP())
     {
         sendFlags.Set(Messaging::SendMessageFlags::kNone);
     }
@@ -169,7 +164,8 @@ CHIP_ERROR SendMessage(streamer_t * stream)
 
     gSendArguments.SetLastSendTime(System::Timer::GetCurrentEpoch());
 
-    streamer_printf(stream, "\nSend CHIP message with payload size: %d bytes to Node: %" PRIu64 "\n", size, kTestDeviceNodeId);
+    streamer_printf(stream, "\nSend CHIP message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
+                    kTestDeviceNodeId);
 
     err = gExchangeCtx->SendMessage(Protocols::Id(VendorId::Common, gSendArguments.GetProtocolId()),
                                     gSendArguments.GetMessageType(), std::move(payloadBuf), sendFlags);
@@ -181,11 +177,6 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     }
 
 exit:
-    if (requestData != nullptr)
-    {
-        chip::Platform::MemoryFree(requestData);
-    }
-
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Send CHIP message failed, err: %s\n", ErrorStr(err));
@@ -230,7 +221,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     Transport::PeerAddress peerAddress;
     Transport::AdminPairingInfo * adminInfo = nullptr;
 
-    if (!Inet::IPAddress::FromString(destination, gDestAddr))
+    if (!chip::Inet::IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid CHIP Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -316,8 +307,8 @@ void PrintUsage(streamer_t * stream)
     streamer_printf(stream, "  -P  <protocol>  protocol ID\n");
     streamer_printf(stream, "  -T  <type>      message type\n");
     streamer_printf(stream, "  -p  <port>      server port number\n");
-    streamer_printf(stream, "  -r  <1|0>       enable or disable CRMP\n");
-    streamer_printf(stream, "  -s  <size>      payload size in bytes\n");
+    streamer_printf(stream, "  -r  <1|0>       enable or disable MRP\n");
+    streamer_printf(stream, "  -s  <size>      application payload size in bytes\n");
 }
 
 int cmd_send(int argc, char ** argv)
@@ -399,11 +390,11 @@ int cmd_send(int argc, char ** argv)
 
                 if (arg == 0)
                 {
-                    gSendArguments.SetUsingCRMP(false);
+                    gSendArguments.SetUsingMRP(false);
                 }
                 else if (arg == 1)
                 {
-                    gSendArguments.SetUsingCRMP(true);
+                    gSendArguments.SetUsingMRP(true);
                 }
                 else
                 {
@@ -441,5 +432,5 @@ static shell_command_t cmds_send[] = {
 
 void cmd_send_init()
 {
-    shell_register(cmds_send, ArraySize(cmds_send));
+    Engine::Root().RegisterCommands(cmds_send, ArraySize(cmds_send));
 }

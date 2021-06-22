@@ -31,6 +31,8 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrf52840-pigweed-example)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
+
 target_compile_options(app PRIVATE -Werror)
 
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
@@ -46,7 +48,6 @@ add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 
 target_include_directories(app PRIVATE main/include
-                           ${ZEPHYR_BASE}/subsys // required to get access to `log_output_std.h`
                            ${NRFCONNECT_COMMON}/util/include
                            ${CHIP_ROOT}/src/lib/support
                            ${PIGWEED_ROOT}/pw_sys_io/public
@@ -76,3 +77,5 @@ target_link_libraries(app PUBLIC
   pw_rpc.nanopb.echo_service
   pw_rpc.server
 )
+
+target_link_libraries(pw_build INTERFACE zephyr_interface)

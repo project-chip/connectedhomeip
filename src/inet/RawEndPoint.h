@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -32,6 +32,10 @@
 #include <inet/IPAddress.h>
 
 #include <system/SystemPacketBuffer.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#include <dispatch/dispatch.h>
+#endif
 
 namespace chip {
 namespace Inet {
@@ -78,7 +82,7 @@ public:
                       IPEndPointBasis::OnReceiveErrorFunct onReceiveError, void * appState = nullptr);
     INET_ERROR SendTo(const IPAddress & addr, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     INET_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
-    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
+    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     INET_ERROR SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICMPTypes);
     void Close();
     void Free();
@@ -109,6 +113,11 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR GetSocket(IPAddressType addrType);
     void HandlePendingIO();
+    static void HandlePendingIO(System::WatchableSocket & socket);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_source_t mReadableSource = nullptr;
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 

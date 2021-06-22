@@ -25,9 +25,9 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -490,6 +490,6 @@ void AppTask::UpdateClusterState(void)
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx32, status);
     }
 }

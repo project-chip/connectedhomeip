@@ -18,10 +18,10 @@
 
 #include "ApplicationLauncherManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
@@ -32,20 +32,16 @@ CHIP_ERROR ApplicationLauncherManager::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Update once storing a list attribute is supported
-    // ApplicationLauncherManager().proxyGetApplicationList();
-    // emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_LAUNCH_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID,
-    //                             (uint8_t *) &application, ZCL_STRUCT_ATTRIBUTE_TYPE);
-
     SuccessOrExit(err);
 exit:
     return err;
 }
 
-list<uint16_t> ApplicationLauncherManager::proxyGetApplicationList()
+vector<uint16_t> ApplicationLauncherManager::proxyGetApplicationList()
 {
-    list<uint16_t> applications;
+    vector<uint16_t> applications;
     applications.push_back(123);
+    applications.push_back(456);
     return applications;
 }
 
@@ -72,7 +68,7 @@ static void sendResponse(const char * responseName, ApplicationLaunchResponse re
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        emberAfApplicationLauncherClusterPrintln("Failed to send %s: 0x%X", responseName, status);
+        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
     }
 }
 

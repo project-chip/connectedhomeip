@@ -18,10 +18,12 @@
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/lock-common"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       SRC_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/lock-common/gen"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
@@ -29,6 +31,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/bindings"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/on-off-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
                       PRIV_REQUIRES chip QRCode tft spidriver bt screen-framework)
 

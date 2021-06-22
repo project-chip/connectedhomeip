@@ -661,7 +661,7 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
 
 void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex interface, AvahiProtocol protocol,
                               AvahiResolverEvent event, const char * name, const char * type, const char * /*domain*/,
-                              const char * /*host_name*/, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
+                              const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
                               AvahiLookupResultFlags flags, void * userdata)
 {
     ResolveContext * context = reinterpret_cast<ResolveContext *>(userdata);
@@ -684,6 +684,13 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mProtocol    = GetProtocolInType(type);
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
+        Platform::CopyString(result.mHostName, host_name);
+        // Returned value is full QName, want only host part.
+        char * dot = strchr(result.mHostName, '.');
+        if (dot != nullptr)
+        {
+            *dot = '\0';
+        }
 
         if (address)
         {
@@ -761,13 +768,12 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCal
     return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
 }
 
-CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
-{
-    return MdnsAvahi::GetInstance().SetHostname(hostname);
-}
-
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
+    if (strcmp(service->mHostName, "") != 0)
+    {
+        ReturnErrorOnFailure(MdnsAvahi::GetInstance().SetHostname(service->mHostName));
+    }
     return MdnsAvahi::GetInstance().PublishService(*service);
 }
 

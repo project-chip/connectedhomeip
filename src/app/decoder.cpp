@@ -22,15 +22,14 @@
 //                            EmberNodeId source,
 //                            InterPanHeader *interPanHeader)
 
-#include <app/chip-zcl-zpro-codec.h>
+#include "chip-zcl-zpro-codec.h"
+
 #include <app/message-reader.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <stdio.h>
 #include <string.h>
 #include <support/logging/CHIPLogging.h>
-
-extern "C" {
 
 uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * outApsFrame)
 {
@@ -42,22 +41,18 @@ uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * 
 
     chip::DataModelReader reader(buffer, buf_length);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Skip first byte, because that's the always-0 frame control.
     uint8_t ignored;
-    err = reader.ReadOctet(&ignored)
-              .ReadClusterId(&outApsFrame->clusterId)
-              .ReadEndpointId(&outApsFrame->sourceEndpoint)
-              .ReadEndpointId(&outApsFrame->destinationEndpoint)
-              .Read16(&outApsFrame->options)
-              .ReadGroupId(&outApsFrame->groupId)
-              .ReadOctet(&outApsFrame->sequence)
-              .ReadOctet(&outApsFrame->radius)
-              .StatusCode();
-    SuccessOrExit(err);
+    const CHIP_ERROR err = reader.ReadOctet(&ignored)
+                               .ReadClusterId(&outApsFrame->clusterId)
+                               .ReadEndpointId(&outApsFrame->sourceEndpoint)
+                               .ReadEndpointId(&outApsFrame->destinationEndpoint)
+                               .Read16(&outApsFrame->options)
+                               .ReadGroupId(&outApsFrame->groupId)
+                               .ReadOctet(&outApsFrame->sequence)
+                               .ReadOctet(&outApsFrame->radius)
+                               .StatusCode();
 
-exit:
     return err == CHIP_NO_ERROR ? reader.OctetsRead() : 0;
 }
 
@@ -87,5 +82,3 @@ uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg
     }
     return result;
 }
-
-} // extern C

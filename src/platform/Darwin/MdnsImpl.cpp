@@ -24,6 +24,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
@@ -192,40 +193,9 @@ CHIP_ERROR MdnsContexts::GetRegisterType(const char * type, GenericContext ** co
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-void MdnsContexts::PrepareSelect(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout)
-{
-    std::vector<DNSServiceRef> serviceRefs(mContexts.size());
-    std::transform(mContexts.begin(), mContexts.end(), serviceRefs.begin(),
-                   [](GenericContext * context) { return context->serviceRef; });
+void MdnsContexts::PrepareSelect(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout) {}
 
-    std::vector<DNSServiceRef>::iterator iter;
-    for (iter = serviceRefs.begin(); iter != serviceRefs.end(); iter++)
-    {
-        int fd = DNSServiceRefSockFD(*iter);
-        FD_SET(fd, &readFdSet);
-        if (maxFd < fd)
-        {
-            maxFd = fd;
-        }
-    }
-}
-
-void MdnsContexts::HandleSelectResult(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet)
-{
-    std::vector<DNSServiceRef> serviceRefs(mContexts.size());
-    std::transform(mContexts.begin(), mContexts.end(), serviceRefs.begin(),
-                   [](GenericContext * context) { return context->serviceRef; });
-
-    std::vector<DNSServiceRef>::iterator iter;
-    for (iter = serviceRefs.begin(); iter != serviceRefs.end(); iter++)
-    {
-        int fd = DNSServiceRefSockFD(*iter);
-        if (FD_ISSET(fd, &readFdSet))
-        {
-            DNSServiceProcessResult(*iter);
-        }
-    }
-}
+void MdnsContexts::HandleSelectResult(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet) {}
 
 CHIP_ERROR PopulateTextRecord(TXTRecordRef * record, char * buffer, uint16_t bufferLen, TextEntry * textEntries,
                               size_t textEntrySize)
@@ -322,11 +292,14 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
     }
 
     sdCtx = chip::Platform::New<RegisterContext>(type, nullptr);
-    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, NULL, port, recordLen, recordBytesPtr,
-                             OnRegister, sdCtx);
+    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, NULL, ntohs(port), recordLen,
+                             recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
 
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
+
+    err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
@@ -347,7 +320,7 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
     service.mProtocol   = context->protocol;
 
     strncpy(service.mName, name, sizeof(service.mName));
-    service.mName[kMdnsNameMaxSize] = 0;
+    service.mName[kMdnsInstanceNameMaxSize] = 0;
 
     strncpy(service.mType, regtype, sizeof(service.mType));
     service.mType[kMdnsTypeMaxSize] = 0;
@@ -414,20 +387,23 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     service.mTextEntries   = sdCtx->textEntries.empty() ? nullptr : sdCtx->textEntries.data();
     service.mTextEntrySize = sdCtx->textEntries.empty() ? 0 : sdCtx->textEntries.size();
     service.mAddress.SetValue(chip::Inet::IPAddress::FromSockAddr(*address));
-    strncpy(service.mName, sdCtx->name, sizeof(service.mName));
+    Platform::CopyString(service.mName, sdCtx->name);
+    Platform::CopyString(service.mHostName, hostname);
+    service.mInterface = sdCtx->interfaceId;
 
     sdCtx->callback(sdCtx->context, &service, CHIP_NO_ERROR);
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
-CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint32_t interfaceId, const char * name, const char * hostname,
-                       uint16_t port, uint16_t txtLen, const unsigned char * txtRecord)
+static CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint32_t interfaceId,
+                              chip::Inet::IPAddressType addressType, const char * name, const char * hostname, uint16_t port,
+                              uint16_t txtLen, const unsigned char * txtRecord)
 {
     DNSServiceErrorType err;
     DNSServiceRef sdRef;
     GetAddrInfoContext * sdCtx;
 
-    sdCtx = chip::Platform::New<GetAddrInfoContext>(context, callback, name, port);
+    sdCtx = chip::Platform::New<GetAddrInfoContext>(context, callback, name, interfaceId, port);
 
     char key[kMdnsKeyMaxSize];
     char value[kMdnsTextMaxSize];
@@ -446,7 +422,21 @@ CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint32_t in
         sdCtx->textEntries.push_back(TextEntry{ strdup(key), reinterpret_cast<const uint8_t *>(strdup(value)), valueLen });
     }
 
-    err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, kDNSServiceProtocol_IPv4, hostname, OnGetAddrInfo, sdCtx);
+    DNSServiceProtocol protocol;
+    if (addressType == chip::Inet::kIPAddressType_IPv4)
+    {
+        protocol = kDNSServiceProtocol_IPv4;
+    }
+    else if (addressType == chip::Inet::kIPAddressType_IPv6)
+    {
+        protocol = kDNSServiceProtocol_IPv6;
+    }
+    else
+    {
+        protocol = kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6;
+    }
+
+    err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
     err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
@@ -459,20 +449,24 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
                       const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen, const unsigned char * txtRecord,
                       void * context)
 {
+    ChipLogDetail(DeviceLayer, "Resolved interface id: %u", interfaceId);
+
     ResolveContext * sdCtx = reinterpret_cast<ResolveContext *>(context);
     VerifyOrReturn(CheckForSuccess(sdCtx, __func__, err, true));
 
-    GetAddrInfo(sdCtx->context, sdCtx->callback, interfaceId, sdCtx->name, hostname, ntohs(port), txtLen, txtRecord);
+    GetAddrInfo(sdCtx->context, sdCtx->callback, interfaceId, sdCtx->addressType, sdCtx->name, hostname, ntohs(port), txtLen,
+                txtRecord);
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
-CHIP_ERROR Resolve(void * context, MdnsResolveCallback callback, uint32_t interfaceId, const char * type, const char * name)
+static CHIP_ERROR Resolve(void * context, MdnsResolveCallback callback, uint32_t interfaceId, chip::Inet::IPAddressType addressType,
+                          const char * type, const char * name)
 {
     DNSServiceErrorType err;
     DNSServiceRef sdRef;
     ResolveContext * sdCtx;
 
-    sdCtx = chip::Platform::New<ResolveContext>(context, callback, name);
+    sdCtx = chip::Platform::New<ResolveContext>(context, callback, name, addressType);
     err   = DNSServiceResolve(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, OnResolve, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
 
@@ -491,17 +485,15 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback successCallback, MdnsAsyncReturn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
-{
-    MdnsContexts::GetInstance().SetHostname(hostname);
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
 
+    if (strcmp(service->mHostName, "") != 0)
+    {
+        MdnsContexts::GetInstance().SetHostname(service->mHostName);
+    }
     std::string regtype  = GetFullTypeWithSubTypes(service->mType, service->mProtocol, service->mSubTypes, service->mSubTypeSize);
     uint32_t interfaceId = GetInterfaceId(service->mInterface);
 
@@ -549,18 +541,12 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interf
     std::string regtype  = GetFullType(service->mType, service->mProtocol);
     uint32_t interfaceId = GetInterfaceId(interface);
 
-    return Resolve(context, callback, interfaceId, regtype.c_str(), service->mName);
+    return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
 }
 
-void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout)
-{
-    MdnsContexts::GetInstance().PrepareSelect(readFdSet, writeFdSet, errorFdSet, maxFd, timeout);
-}
+void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout) {}
 
-void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet)
-{
-    MdnsContexts::GetInstance().HandleSelectResult(readFdSet, writeFdSet, errorFdSet);
-}
+void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet) {}
 
 } // namespace Mdns
 } // namespace chip

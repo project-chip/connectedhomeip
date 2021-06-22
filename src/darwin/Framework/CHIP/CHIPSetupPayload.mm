@@ -26,7 +26,7 @@
     chip::SetupPayload _chipSetupPayload;
 }
 
-- (CHIPRendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
+- (CHIPRendezvousInformationFlags)convertRendezvousFlags:(chip::RendezvousInformationFlags)value
 {
     if (value.Has(chip::RendezvousInformationFlag::kBLE)) {
         return kRendezvousInformationBLE;
@@ -39,6 +39,19 @@
     }
 }
 
+- (CHIPCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value
+{
+    if (value == chip::CommissioningFlow::kStandard) {
+        return kCommissioningFlowStandard;
+    } else if (value == chip::CommissioningFlow::kUserActionRequired) {
+        return kCommissioningFlowUserActionRequired;
+    } else if (value == chip::CommissioningFlow::kCustom) {
+        return kCommissioningFlowCustom;
+    } else {
+        return kCommissioningFlowInvalid;
+    }
+}
+
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload
 {
     if (self = [super init]) {
@@ -46,8 +59,8 @@
         _version = [NSNumber numberWithUnsignedChar:setupPayload.version];
         _vendorID = [NSNumber numberWithUnsignedShort:setupPayload.vendorID];
         _productID = [NSNumber numberWithUnsignedShort:setupPayload.productID];
-        _requiresCustomFlow = setupPayload.requiresCustomFlow == 1;
-        _rendezvousInformation = [self valueOf:setupPayload.rendezvousInformation];
+        _commissioningFlow = [self convertCommissioningFlow:setupPayload.commissioningFlow];
+        _rendezvousInformation = [self convertRendezvousFlags:setupPayload.rendezvousInformation];
         _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
         _setUpPINCode = [NSNumber numberWithUnsignedInt:setupPayload.setUpPINCode];
 

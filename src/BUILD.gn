@@ -79,10 +79,6 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/ble/tests" ]
     }
 
-    if (chip_with_lwip && chip_device_platform != "esp32") {
-      deps += [ "${chip_root}/src/lwip/tests" ]
-    }
-
     if (current_os != "zephyr" && chip_device_platform != "esp32") {
       deps += [ "${chip_root}/src/lib/shell/tests" ]
     }
