@@ -437,6 +437,11 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
 
+    if (mState == ConnectionState::Connecting)
+    {
+        ExitNow(err = CHIP_NO_ERROR);
+    }
+
     if (resetNeeded == ResetTransport::kYes)
     {
         err = mTransportMgr->ResetTransport(
@@ -502,8 +507,6 @@ void Device::OperationalCertProvisioned()
         mSessionManager->ExpirePairing(mSecureSession);
         mState = ConnectionState::NotConnected;
     }
-
-    WarmupCASESession();
 }
 
 CHIP_ERROR Device::WarmupCASESession()
@@ -534,6 +537,17 @@ void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 {
     mState = ConnectionState::NotConnected;
     mIDAllocator->Free(mCASESession.GetLocalKeyId());
+
+    Cancelable ready;
+    mConnectionFailure.DequeueAll(ready);
+    while (ready.mNext != &ready)
+    {
+        Callback::Callback<OnDeviceConnectionFailure> * cb =
+            Callback::Callback<OnDeviceConnectionFailure>::FromCancelable(ready.mNext);
+
+        cb->Cancel();
+        cb->mCall(cb->mContext, GetDeviceId(), error);
+    }
 }
 
 void Device::OnSessionEstablished()
@@ -548,6 +562,48 @@ void Device::OnSessionEstablished()
         OnSessionEstablishmentError(err);
         return;
     }
+
+    Cancelable ready;
+    mConnectionSuccess.DequeueAll(ready);
+    while (ready.mNext != &ready)
+    {
+        Callback::Callback<OnDeviceConnected> * cb = Callback::Callback<OnDeviceConnected>::FromCancelable(ready.mNext);
+
+        cb->Cancel();
+        cb->mCall(cb->mContext, this);
+    }
+}
+
+CHIP_ERROR Device::EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
+                                         Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+{
+    bool loadedSecureSession = false;
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    if (loadedSecureSession)
+    {
+        if (IsOperationalCertProvisioned())
+        {
+            if (onConnection != nullptr)
+            {
+                mConnectionSuccess.Enqueue(onConnection->Cancel());
+            }
+
+            if (onFailure != nullptr)
+            {
+                mConnectionFailure.Enqueue(onFailure->Cancel());
+            }
+        }
+        else
+        {
+            if (onConnection != nullptr)
+            {
+                onConnection->mCall(onConnection->mContext, this);
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)

@@ -87,6 +87,11 @@ struct ControllerDeviceInitParams
 #endif
 };
 
+class Device;
+
+typedef void (*OnDeviceConnected)(void * context, Device * device);
+typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
+
 class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
 {
 public:
@@ -352,15 +357,22 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
-    /**
-     * @brief
-     *   This function triggers CASE session setup if the device has been provisioned with
-     *   operational credentials, and there is no currently active session.
+    /*
+     * This function can be called to establish a secure session with the device.
      *
-     * @return CHIP_NO_ERROR if the session setup was triggered or a session is already available.
+     * If the device doesn't have operational credentials, and is under commissioning process,
+     * PASE keys will be used for secure session.
+     *
+     * If the device has been commissioned and has operational credentials, CASE session
+     * setup will be triggered.
+     *
+     * On establishing the session, the callback function `onConnection` will be called. If the
+     * session setup fails, `onFailure` will be called.
+     *
+     * If the session already exists, `onConnection` will be called immediately.
      */
-
-    CHIP_ERROR WarmupCASESession();
+    CHIP_ERROR EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
+                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
 private:
     enum class ConnectionState
@@ -430,6 +442,13 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
+    /**
+     *   This function triggers CASE session setup if the device has been provisioned with
+     *   operational credentials, and there is no currently active session.
+     */
+
+    CHIP_ERROR WarmupCASESession();
+
     uint16_t mListenPort;
 
     Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
@@ -445,6 +464,9 @@ private:
     uint8_t mCSRNonce[kOpCSRNonceLength];
 
     SessionIDAllocator * mIDAllocator = nullptr;
+
+    Callback::CallbackDeque mConnectionSuccess;
+    Callback::CallbackDeque mConnectionFailure;
 };
 
 /**

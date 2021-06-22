@@ -37,25 +37,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
-CHIP_ERROR WaitForSessionSetup(chip::Controller::Device * device)
-{
-    constexpr time_t kWaitPerIterationSec = 1;
-    constexpr uint16_t kIterationCount    = 5;
-
-    struct timespec sleep_time;
-    sleep_time.tv_sec  = kWaitPerIterationSec;
-    sleep_time.tv_nsec = 0;
-
-    for (uint32_t i = 0; i < kIterationCount && device->IsSessionSetupInProgress(); i++)
-    {
-        nanosleep(&sleep_time, nullptr);
-    }
-
-    ReturnErrorCodeIf(!device->IsSecureConnected(), CHIP_ERROR_TIMEOUT);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -70,18 +51,10 @@ CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
     {
         chip::DeviceLayer::StackLock lock;
 
-        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
-
-        // TODO - Implement notification from device object when the secure session is available.
-        // Current code is polling the device object to check for secure session availability. This should
-        // be updated to a notification/callback mechanism.
-        err = WaitForSessionSetup(mDevice);
+        err = GetExecContext()->commissioner->GetConnectedDevice(remoteId, &mOnDeviceConnectedCallback,
+                                                                 &mOnDeviceConnectionFailureCallback);
         VerifyOrExit(err == CHIP_NO_ERROR,
-                     ChipLogError(chipTool, "Timed out while waiting for session setup for device: %" PRIu64, localId));
-
-        err = SendCommand(mDevice, mEndPointId);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
+                     ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %d", remoteId, err));
     }
 
     WaitForResponse(kWaitDurationInSeconds);
@@ -90,4 +63,20 @@ CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
 
 exit:
     return err;
+}
+
+void ModelCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+{
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    VerifyOrReturn(command != nullptr,
+                   ChipLogError(chipTool, "Device connected, but cannot send the command, as the context is null"));
+    command->SendCommand(device, command->mEndPointId);
+}
+
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+{
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ModelCommand context is null"));
+    command->SetCommandExitStatus(false);
 }

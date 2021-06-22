@@ -408,39 +408,6 @@ CHIP_ERROR DeviceController::SetUdpListenPort(uint16_t listenPort)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice & deviceInfo, Device ** out_device)
-{
-    Device * device = nullptr;
-
-    VerifyOrReturnError(out_device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    uint16_t index = FindDeviceIndex(deviceId);
-
-    if (index < kNumMaxActiveDevices)
-    {
-        device = &mActiveDevices[index];
-    }
-    else
-    {
-        VerifyOrReturnError(mPairedDevices.Contains(deviceId), CHIP_ERROR_NOT_CONNECTED);
-
-        index = GetInactiveDeviceIndex();
-        VerifyOrReturnError(index < kNumMaxActiveDevices, CHIP_ERROR_NO_MEMORY);
-        device = &mActiveDevices[index];
-
-        CHIP_ERROR err = device->Deserialize(deviceInfo);
-        if (err != CHIP_NO_ERROR)
-        {
-            ReleaseDevice(device);
-            ReturnErrorOnFailure(err);
-        }
-
-        device->Init(GetControllerDeviceInitParams(), mListenPort, mAdminId);
-    }
-
-    *out_device = device;
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -478,12 +445,6 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
             device->Init(GetControllerDeviceInitParams(), mListenPort, mAdminId);
-
-            if (device->IsOperationalCertProvisioned())
-            {
-                err = device->WarmupCASESession();
-                SuccessOrExit(err);
-            }
         }
     }
 
@@ -497,10 +458,48 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
+bool DeviceController::DoesDevicePairingExist(const PeerId & deviceId)
+{
+    if (InitializePairedDeviceList() == CHIP_NO_ERROR)
+    {
+        return mPairedDevices.Contains(deviceId.GetNodeId());
+    }
+
+    return false;
+}
+
+CHIP_ERROR DeviceController::GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+{
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    Device * device = nullptr;
+
+    err = GetDevice(deviceId, &device);
+    SuccessOrExit(err);
+
+    if (device->IsSecureConnected())
+    {
+        // Call onConnectedDevice
+        onConnection->mCall(onConnection->mContext, device);
+        return CHIP_NO_ERROR;
+    }
+
+    err = device->EstablishConnectivity(onConnection, onFailure);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        onFailure->mCall(onFailure->mContext, deviceId, err);
+    }
+
+    return err;
+}
+
+CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId, uint64_t fabricId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(device->GetDeviceId()).SetFabricId(fabricId),
+    return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(deviceId).SetFabricId(fabricId),
                                                     chip::Inet::kIPAddressType_Any);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -797,7 +796,8 @@ DeviceCommissioner::DeviceCommissioner() :
     mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
     mOpCertResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
     mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddOpCertFailureResponse, this),
-    mOnRootCertFailureCallback(OnRootCertFailureResponse, this)
+    mOnRootCertFailureCallback(OnRootCertFailureResponse, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
 {
     mPairingDelegate      = nullptr;
     mDeviceBeingPaired    = kNumMaxActiveDevices;
@@ -1065,7 +1065,7 @@ CHIP_ERROR DeviceCommissioner::OperationalDiscoveryComplete(NodeId remoteDeviceI
     PersistDevice(device);
     PersistNextKeyId();
 
-    return CHIP_NO_ERROR;
+    return GetConnectedDevice(remoteDeviceId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void DeviceCommissioner::FreeRendezvousSession()
@@ -1550,6 +1550,18 @@ void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHI
 }
 
 #endif
+
+void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
+{
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    commissioner->mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);
+}
+
+void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+{
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    commissioner->mPairingDelegate->OnCommissioningComplete(deviceId, error);
+}
 
 CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
 {
