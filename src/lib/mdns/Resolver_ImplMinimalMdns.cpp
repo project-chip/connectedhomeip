@@ -39,14 +39,6 @@ namespace chip {
 namespace Mdns {
 namespace {
 
-enum class DiscoveryType
-{
-    kUnknown,
-    kOperational,
-    kCommissionableNode,
-    kCommissionerNode
-};
-
 class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
 {
 public:
@@ -386,7 +378,6 @@ CHIP_ERROR MinMdnsResolver::SetResolverDelegate(ResolverDelegate * delegate)
 
 CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type)
 {
-
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
     ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
