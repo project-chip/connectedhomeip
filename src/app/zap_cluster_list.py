@@ -57,7 +57,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TV_CHANNEL_CLUSTER': ['tv-channel-server'],
     'THERMOSTAT_CLUSTER': [],
     'THREAD_NETWORK_DIAGNOSTICS_CLUSTER': [],
-    'WINDOW_COVERING_CLUSTER': [],
+    'WINDOW_COVERING_CLUSTER': ['window-covering-server'],
     'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': [],
     'WAKE_ON_LAN_CLUSTER': [],
     'ZLL_COMMISSIONING_CLUSTER': []
