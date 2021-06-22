@@ -73,6 +73,7 @@ for j in "${iter_array[@]}"; do
         # Clear out our temp files so we don't accidentally do a stale
         # read from them before we write to them.
         rm -rf /tmp/all-clusters-log
+        touch /tmp/all-clusters-log
         rm -rf /tmp/pid
         (
             stdbuf -o0 out/debug/standalone/chip-all-clusters-app &
