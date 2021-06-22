@@ -778,11 +778,11 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConvertChipCertArrayToChipCerts(const ByteSpan & operationalCert, ByteSpan & noc, ByteSpan & icac)
+CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & noc, ByteSpan & icac)
 {
     TLVType outerContainerType;
     TLVReader reader;
-    reader.Init(operationalCert.data(), static_cast<uint32_t>(operationalCert.size()));
+    reader.Init(opCertArray.data(), static_cast<uint32_t>(opCertArray.size()));
 
     if (reader.GetType() == kTLVType_NotSpecified)
     {

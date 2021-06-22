@@ -1227,8 +1227,8 @@ static void TestChipCert_ChipArrayToChipCerts(nlTestSuite * inSuite, void * inCo
 
     ByteSpan noc_chip_cert;
     ByteSpan ica_chip_cert;
-    NL_TEST_ASSERT(
-        inSuite, ConvertChipCertArrayToChipCerts(ByteSpan(outCertBuf, outCertLen), noc_chip_cert, ica_chip_cert) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   ExtractCertsFromCertArray(ByteSpan(outCertBuf, outCertLen), noc_chip_cert, ica_chip_cert) == CHIP_NO_ERROR);
 
     ChipCertificateSet certSet;
     NL_TEST_ASSERT(inSuite, certSet.Init(3, kTestCertBufSize * 3) == CHIP_NO_ERROR);
@@ -1297,8 +1297,8 @@ static void TestChipCert_ChipArrayToChipCertsNoICA(nlTestSuite * inSuite, void *
 
     ByteSpan noc_chip_cert;
     ByteSpan ica_chip_cert;
-    NL_TEST_ASSERT(
-        inSuite, ConvertChipCertArrayToChipCerts(ByteSpan(outCertBuf, outCertLen), noc_chip_cert, ica_chip_cert) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   ExtractCertsFromCertArray(ByteSpan(outCertBuf, outCertLen), noc_chip_cert, ica_chip_cert) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, ica_chip_cert.data() == nullptr && ica_chip_cert.size() == 0);
 
