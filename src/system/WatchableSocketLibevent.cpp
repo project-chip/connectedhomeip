@@ -29,7 +29,6 @@
 
 namespace chip {
 namespace Mdns {
-// TODO(#5556): Convert MDNS to WatchableSocket.
 void GetMdnsTimeout(timeval & timeout);
 void HandleMdnsTimeout();
 } // namespace Mdns

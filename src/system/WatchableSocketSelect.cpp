@@ -34,7 +34,6 @@
 
 namespace chip {
 namespace Mdns {
-// TODO(#5556): Convert MDNS to WatchableSocket.
 void GetMdnsTimeout(timeval & timeout);
 void HandleMdnsTimeout();
 } // namespace Mdns
@@ -164,7 +163,6 @@ void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeou
     mSystemLayer->GetTimeout(nextTimeout);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-    // TODO(#5556): Convert MDNS to WatchableSocket.
     chip::Mdns::GetMdnsTimeout(nextTimeout);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
@@ -203,7 +201,6 @@ void WatchableEventManager::HandleEvents()
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-    // TODO(#5556): Convert MDNS to WatchableSocket.
     chip::Mdns::HandleMdnsTimeout();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 }

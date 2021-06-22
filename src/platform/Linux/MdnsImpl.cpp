@@ -81,16 +81,6 @@ chip::Inet::IPAddressType ToAddressType(AvahiProtocol protocol)
     return type;
 }
 
-#if 0
-SocketEvents ToSocketEvents(AvahiWatchEvent events)
-{
-    return SocketEvents()
-        .Set(chip::System::SocketEventFlags::kRead, events & AVAHI_WATCH_IN)
-        .Set(chip::System::SocketEventFlags::kWrite, events & AVAHI_WATCH_OUT)
-        .Set(chip::System::SocketEventFlags::kError, events & AVAHI_WATCH_ERR);
-}
-#endif
-
 AvahiWatchEvent ToAvahiWatchEvent(SocketEvents events)
 {
     return static_cast<AvahiWatchEvent>((events.Has(chip::System::SocketEventFlags::kRead) ? AVAHI_WATCH_IN : 0) |
