@@ -73,6 +73,15 @@ jobs:
               timeout-minutes: 5
               run: scripts/examples/k32w_example.sh
                    examples/shell/k32w out/shell_app_debug
+                   examples/lighting-app/k32w out/lighting_app_release
+            - name: Build example K32W Lock App with Secure Element
+              timeout-minutes: 5
+              run: scripts/examples/k32w_se_example.sh
+                   examples/lock-app/k32w out/lock_app_se_release
+            - name: Build example K32W Lighting App with Secure Element
+              timeout-minutes: 5
+              run: scripts/examples/k32w_se_example.sh
+                   examples/lighting-app/k32w out/lighting_app_se_release
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

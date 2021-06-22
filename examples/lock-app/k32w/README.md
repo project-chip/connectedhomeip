@@ -181,7 +181,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/De
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/k32w/
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=1"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
