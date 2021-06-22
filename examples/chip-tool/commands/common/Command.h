@@ -176,7 +176,7 @@ public:
 
     static void OnResponseTimer(chip::System::Layer *aLayer, void *aAppState, chip::System::Error aError);
     void ScheduleWaitForResponse(uint16_t duration, std::function<void()> f);
-        
+
 protected:
     ExecutionContext * GetExecContext() { return mExecContext; }
     ExecutionContext * mExecContext;

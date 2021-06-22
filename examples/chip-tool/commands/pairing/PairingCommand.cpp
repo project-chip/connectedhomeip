@@ -81,8 +81,8 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
             break;
     }
 
-    ScheduleWaitForResponse(kWaitDurationInSeconds, [this] { 
-        ReleaseCallbacks(); 
+    ScheduleWaitForResponse(kWaitDurationInSeconds, [this] {
+        ReleaseCallbacks();
     });
 
     return err;

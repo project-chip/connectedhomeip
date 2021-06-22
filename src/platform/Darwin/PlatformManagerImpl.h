@@ -81,7 +81,7 @@ private:
 
     dispatch_queue_t mWorkQueue = nullptr;
     dispatch_semaphore_t mRunLoopSem;
-    
+
     bool mIsWorkQueueRunning    = false;
 
     inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }

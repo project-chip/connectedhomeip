@@ -415,7 +415,7 @@ void Command::OnResponseTimer(chip::System::Layer *aLayer, void *aAppState, chip
 void Command::ScheduleWaitForResponse(uint16_t duration, std::function<void()> cleanupFunc)
 {
     chip::System::Timer *timer = nullptr;
-    
+
     mCleanupFunc = cleanupFunc;
 
     if (chip::DeviceLayer::SystemLayer.NewTimer(timer) == CHIP_NO_ERROR) {

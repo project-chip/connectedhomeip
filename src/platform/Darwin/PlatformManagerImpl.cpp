@@ -45,7 +45,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SuccessOrExit(err);
 
     mRunLoopSem = dispatch_semaphore_create(0);
-    
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
