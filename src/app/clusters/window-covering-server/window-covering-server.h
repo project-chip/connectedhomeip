@@ -39,4 +39,3 @@ EmberAfStatus wcGetCurrentPositionLift(chip::EndpointId ep, posPercent100ths_t *
 
 EmberAfStatus wcSetCurrentPositionTilt(chip::EndpointId ep, posPercent100ths_t tiltPercent100ths, uint16_t tiltValue);
 EmberAfStatus wcGetCurrentPositionTilt(chip::EndpointId ep, posPercent100ths_t * p_tiltPercent100ths);
-

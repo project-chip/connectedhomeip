@@ -159,7 +159,7 @@ EmberAfStatus wcSetCurrentPositionLift(EndpointId ep, posPercent100ths_t liftPer
     /* Since we have multiple attribute for positionning lets use always this helper function to update the current position */
     if (m_wcFeature.PA && m_wcFeature.LF) {
         if (EMBER_ZCL_STATUS_SUCCESS != (status = wcWriteAttribute(ep, ZCL_WC_CURRENT_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, (uint8_t *) &liftPercent100ths, ZCL_INT16U_ATTRIBUTE_TYPE))) return status;
-        if (EMBER_ZCL_STATUS_SUCCESS != (status = wcWriteAttribute(ep, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID    , (uint8_t *) &liftPercentage   , ZCL_INT8U_ATTRIBUTE_TYPE ))) return status;  
+        if (EMBER_ZCL_STATUS_SUCCESS != (status = wcWriteAttribute(ep, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID    , (uint8_t *) &liftPercentage   , ZCL_INT8U_ATTRIBUTE_TYPE ))) return status;
         if (EMBER_ZCL_STATUS_SUCCESS != (status = wcWriteAttribute(ep, ZCL_WC_CURRENT_POSITION_LIFT_ATTRIBUTE_ID               , (uint8_t *) &liftValue        , ZCL_INT16U_ATTRIBUTE_TYPE))) return status;
     } else {
         emberAfWindowCoveringClusterPrint("Err Device is not PA=%u or LF=%u", m_wcFeature.PA, m_wcFeature.LF);
@@ -350,4 +350,3 @@ void __attribute__((weak)) emberAfWindowCoveringClusterInitCallback(chip::Endpoi
 {
     emberAfWindowCoveringClusterPrint("Window Covering Cluster init");
 }
-

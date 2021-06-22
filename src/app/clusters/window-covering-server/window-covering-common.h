@@ -32,7 +32,7 @@
 #define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
 #define CHECK_BOUNDS_VALID(MIN, VAL, MAX)   (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
 
-#define WC_PERCENTAGE_COEF   100         // Percentage Coef  
+#define WC_PERCENTAGE_COEF   100         // Percentage Coef
 #define WC_PERCENT100THS_MAX 10000       // Transfer Coef
 #define WC_DEFAULT_EP        1           // EndPoint default
 
@@ -91,5 +91,3 @@ static_assert (sizeof(SafetyStatus_t) == sizeof(uint16_t), "SafetyStatus_t Size 
 /* Values Abs <-> Rel Converting functions */
 posPercent100ths_t wcAbsPositionToRelPercent100ths(uint16_t openLimit, uint16_t closedLimit, uint16_t position);
 uint16_t           wcRelPercent100thsToAbsPosition(uint16_t openLimit, uint16_t closedLimit, posPercent100ths_t percent100ths);
-
-
