@@ -90,8 +90,9 @@ Done
 
 The nRF Connect SDK examples let you use several CHIP-specific CLI commands.
 
-These commands are not available by default and to enable using them, set the `CONFIG_CHIP_LIB_SHELL=y` Kconfig
-option in the `prj.conf` file of the given example.
+These commands are not available by default and to enable using them, set the
+`CONFIG_CHIP_LIB_SHELL=y` Kconfig option in the `prj.conf` file of the given
+example.
 
 Every invoked command must be preceded by the `matter` prefix.
 
@@ -99,11 +100,13 @@ See the following subsections for the description of each CHIP-specific command.
 
 ### device
 
-Handles a group of commands that are used to manage the device. You must use this command together with one of the additional subcommands listed below.
+Handles a group of commands that are used to manage the device. You must use
+this command together with one of the additional subcommands listed below.
 
 #### factoryreset
 
-Performs device factory reset that is hardware reset preceded by erasing of the whole CHIP settings stored in a non-volatile memory.
+Performs device factory reset that is hardware reset preceded by erasing of the
+whole CHIP settings stored in a non-volatile memory.
 
 ```shell
 uart:~$ matter factoryreset
@@ -112,7 +115,9 @@ Performing factory reset ...
 
 ### onboardingcodes
 
-Handles a group of commands that are used to view information about device onboarding codes. You can use this command without any subcommand to print all available onboarding codes or to add a specific subcommand.
+Handles a group of commands that are used to view information about device
+onboarding codes. You can use this command without any subcommand to print all
+available onboarding codes or to add a specific subcommand.
 
 ```shell
 uart:~$ matter onboardingcodes
@@ -157,16 +162,18 @@ uart:~$ matter onboardingcodes manualpairingcode
 
 ### config
 
-Handles a group of commands that are used to view device configuration information. You can use this command without any subcommand to print all available configuration data or to add a specific subcommand.
+Handles a group of commands that are used to view device configuration
+information. You can use this command without any subcommand to print all
+available configuration data or to add a specific subcommand.
 
 ```shell
 VendorId:        9050 (0x235A)
 ProductId:       20043 (0x4E4B)
 ProductRevision: 1 (0x1)
-FabricId:        
+FabricId:
 PinCode:         020202021
 Discriminator:   f00
-DeviceId:        
+DeviceId:
 ```
 
 The `config` command can also take the subcommands listed below.
@@ -226,7 +233,9 @@ Prints the fabric identifier. Takes no arguments.
 
 ### ble
 
-Handles a group of commands that are used to control the device Bluetooth LE transport state. You must use this command together with one of the additional subcommands listed below.
+Handles a group of commands that are used to control the device Bluetooth LE
+transport state. You must use this command together with one of the additional
+subcommands listed below.
 
 #### help
 
@@ -268,7 +277,9 @@ BLE advertising is disabled
 
 ### nfc
 
-Handles a group of commands that are used to control the device NFC tag emulation state. You must use this command together with one of the additional subcommands listed below.
+Handles a group of commands that are used to control the device NFC tag
+emulation state. You must use this command together with one of the additional
+subcommands listed below.
 
 #### start
 
