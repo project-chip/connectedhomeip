@@ -41,6 +41,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+#include <atomic>
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
@@ -204,7 +205,7 @@ private:
     WatchableEventManager mWatchableEvents;
     WakeEvent mWakeEvent;
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-    pthread_t mHandleSelectThread;
+    std::atomic<pthread_t> mHandleSelectThread;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 

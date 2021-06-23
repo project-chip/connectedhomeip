@@ -40,9 +40,7 @@ public:
     CommissionableNodeController(){};
     virtual ~CommissionableNodeController() {}
 
-    CHIP_ERROR DiscoverCommissionersLongDiscriminator(uint16_t long_discriminator);
-
-    CHIP_ERROR DiscoverCommissioners();
+    CHIP_ERROR DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter = Mdns::DiscoveryFilter());
 
     const Mdns::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
 

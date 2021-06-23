@@ -1,13 +1,13 @@
 {{> header}}
 {{#if (chip_has_client_clusters)}}
 
-#include "CHIPJNIError.h"
 #include "gen/CHIPClusters.h"
 #include "gen/CHIPClientCallbacks.h"
-#include "JniReferences.h"
-#include "JniTypeWrappers.h"
-#include "StackLock.h"
 
+#include <controller/java/CHIPJNIError.h>
+#include <controller/java/JniReferences.h>
+#include <controller/java/JniTypeWrappers.h>
+#include <controller/java/StackLock.h>
 #include <core/CHIPSafeCasts.h>
 #include <lib/support/Span.h>
 #include <jni.h>

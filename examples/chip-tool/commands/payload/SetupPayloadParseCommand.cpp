@@ -23,7 +23,7 @@
 
 using namespace ::chip;
 
-CHIP_ERROR SetupPayloadParseCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR SetupPayloadParseCommand::Run()
 {
     std::string codeString(mCode);
     SetupPayload payload;
@@ -35,6 +35,10 @@ CHIP_ERROR SetupPayloadParseCommand::Run(NodeId localId, NodeId remoteId)
     err = Print(payload);
     SuccessOrExit(err);
 exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
     return err;
 }
 

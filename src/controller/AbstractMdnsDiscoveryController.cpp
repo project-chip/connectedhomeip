@@ -71,12 +71,6 @@ CHIP_ERROR AbstractMdnsDiscoveryController::SetUpNodeDiscovery()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AbstractMdnsDiscoveryController::SetUpNodeDiscoveryLongDiscriminator(uint16_t long_discriminator)
-{
-    filter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
-    return SetUpNodeDiscovery();
-}
-
 const Mdns::DiscoveredNodeData * AbstractMdnsDiscoveryController::GetDiscoveredNode(int idx)
 {
     // TODO(cecille): Add assertion about main loop.

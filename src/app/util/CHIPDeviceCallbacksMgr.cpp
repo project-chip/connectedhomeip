@@ -64,8 +64,9 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseCallback(NodeId nodeId, uint8_t se
     VerifyOrReturnError(onFailureCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ResponseCallbackInfo info = { nodeId, sequenceNumber };
-    memcpy(&onSuccessCallback->mInfoPtr, &info, sizeof(info));
-    memcpy(&onFailureCallback->mInfoPtr, &info, sizeof(info));
+    static_assert(sizeof(onSuccessCallback->mInfo) >= sizeof(info), "Callback info too large");
+    memcpy(&onSuccessCallback->mInfo, &info, sizeof(info));
+    memcpy(&onFailureCallback->mInfo, &info, sizeof(info));
 
     // If some callbacks have already been registered for the same ResponseCallbackInfo, it usually means that the response
     // has not been received for a previous command with the same sequenceNumber. Cancel the previously registered callbacks.
@@ -106,7 +107,8 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::AddReportCallback(NodeId nodeId, EndpointId e
     VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReportCallbackInfo info = { nodeId, endpointId, clusterId, attributeId };
-    memmove(&onReportCallback->mInfoPtr, &info, sizeof(info));
+    static_assert(sizeof(onReportCallback->mInfo) >= sizeof(info), "Callback info too large");
+    memcpy(&onReportCallback->mInfo, &info, sizeof(info));
 
     // If a callback has already been registered for the same ReportCallbackInfo, let's cancel it.
     CancelCallback(info, mReports);

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - K32W
+name: Build example - K32W with SE051
 
 on:
     push:
@@ -65,14 +65,14 @@ jobs:
               timeout-minutes: 5
               run: scripts/examples/k32w_example.sh
                    examples/lock-app/k32w out/lock_app_debug
-            - name: Build example K32W Lighting App
-              timeout-minutes: 5
-              run: scripts/examples/k32w_example.sh
-                   examples/lighting-app/k32w out/lighting_app_debug
             - name: Build example K32W Shell App
               timeout-minutes: 5
               run: scripts/examples/k32w_example.sh
                    examples/shell/k32w out/shell_app_debug
+            - name: Build example K32W Lighting App with Secure Element
+              timeout-minutes: 5
+              run: scripts/examples/k32w_se_example.sh
+                   examples/lighting-app/k32w out/lighting_app_se_release
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

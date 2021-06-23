@@ -303,7 +303,7 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
         res = chip::System::MapErrorPOSIX(errno);
 
     // Wait for ability to read on this endpoint.
-    mSocket.SetCallback(HandlePendingIO, this);
+    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
     mSocket.RequestCallbackOnPendingRead();
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -507,7 +507,7 @@ INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
         return res;
     }
 
-    mSocket.SetCallback(HandlePendingIO, this);
+    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
 
     // Once Connecting or Connected, bump the reference count.  The corresponding Release()
     // [or on LwIP, DeferredRelease()] will happen in DoClose().
@@ -2440,7 +2440,7 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
 // static
 void TCPEndPoint::HandlePendingIO(System::WatchableSocket & socket)
 {
-    static_cast<TCPEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
+    reinterpret_cast<TCPEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
 }
 
 void TCPEndPoint::HandlePendingIO()
@@ -2693,7 +2693,7 @@ void TCPEndPoint::HandleIncomingConnection()
         conEP->Retain();
 
         // Wait for ability to read on this endpoint.
-        conEP->mSocket.SetCallback(HandlePendingIO, conEP);
+        conEP->mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(conEP));
         conEP->mSocket.RequestCallbackOnPendingRead();
 
         // Call the app's callback function.

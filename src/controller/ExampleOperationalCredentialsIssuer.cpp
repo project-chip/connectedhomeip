@@ -18,6 +18,7 @@
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/CHIPCert.h>
+#include <support/CHIPMem.h>
 
 namespace chip {
 namespace Controller {
@@ -29,6 +30,16 @@ using namespace Crypto;
 
 CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage)
 {
+    using namespace ASN1;
+    ASN1UniversalTime effectiveTime;
+
+    // Initializing the default start validity to start of 2021. The default validity duration is 10 years.
+    CHIP_ZERO_AT(effectiveTime);
+    effectiveTime.Year  = 2021;
+    effectiveTime.Month = 1;
+    effectiveTime.Day   = 1;
+    ReturnErrorOnFailure(ASN1ToChipEpochTime(effectiveTime, mNow));
+
     Crypto::P256SerializedKeypair serializedKey;
     uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));
 
