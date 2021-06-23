@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - K32W
+name: Build example - K32W with SE051
 
 on:
     push:
