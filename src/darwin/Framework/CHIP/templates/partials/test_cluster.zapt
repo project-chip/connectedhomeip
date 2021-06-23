@@ -28,6 +28,14 @@
     [cluster writeAttribute{{asCamelCased attribute false}}WithValue:{{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}} responseHandler:^(NSError * err, NSDictionary * values) {
     {{/if}}
         NSLog(@"{{label}} Error: %@", err);
+
+        {{#if optional}}
+        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
+        {{/if}}
+
         XCTAssertEqual(err.code, {{response.error}});
         {{#unless (isStrEqual "0" response.error)}}
         [expectation fulfill];
@@ -49,6 +57,14 @@
         {{else}}
         XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix}});
         {{/if}}
+        {{/if}}
+        {{/if}}
+        {{#if hasExpectedConstraints}}
+        {{#if expectedConstraints.minLength}}
+        XCTAssertGreaterThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] length], {{expectedConstraints.minLength}});
+        {{/if}}
+        {{#if expectedConstraints.maxLength}}
+        XCTAssertLessThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] length], {{expectedConstraints.maxLength}});
         {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}

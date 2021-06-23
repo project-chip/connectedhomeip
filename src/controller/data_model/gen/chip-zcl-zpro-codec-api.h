@@ -322,6 +322,7 @@ chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionA
 | * ProductLabel                                                      | 0x000E |
 | * SerialNumber                                                      | 0x000F |
 | * LocalConfigDisabled                                               | 0x0010 |
+| * Reachable                                                         | 0x0011 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -461,6 +462,12 @@ chip::System::PacketBufferHandle encodeBasicClusterReadLocalConfigDisabledAttrib
 chip::System::PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t seqNum,
                                                                                      chip::EndpointId destinationEndpoint,
                                                                                      uint8_t localConfigDisabled);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the Reachable attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadReachableAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief

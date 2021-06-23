@@ -734,6 +734,15 @@ CHIP_ERROR chip_ime_WriteAttribute_Basic_LocalConfigDisabled(chip::Controller::D
     cluster.Associate(device, ZCLendpointId);
     return cluster.WriteAttributeLocalConfigDisabled(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), value);
 }
+CHIP_ERROR chip_ime_ReadAttribute_Basic_Reachable(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::BasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeReachable(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
 CHIP_ERROR chip_ime_ReadAttribute_Basic_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                         chip::GroupId /* ZCLgroupId */)
 {

@@ -824,6 +824,10 @@ class ChipClusters:
                     "type": "int",
                     "writable": True,
                 },
+                "Reachable": {
+                    "attributeId": 0x0011,
+                    "type": "int",
+                },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
                     "type": "int",
@@ -2683,6 +2687,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Basic_LocalConfigDisabled(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_WriteAttributeLocalConfigDisabled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_Basic_LocalConfigDisabled(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterBasic_ReadAttributeReachable(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_Reachable(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBinaryInputBasic_ReadAttributeOutOfService(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -3483,6 +3489,9 @@ class ChipClusters:
         # Cluster Basic WriteAttribute LocalConfigDisabled
         self._chipLib.chip_ime_WriteAttribute_Basic_LocalConfigDisabled.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_WriteAttribute_Basic_LocalConfigDisabled.restype = ctypes.c_uint32
+        # Cluster Basic ReadAttribute Reachable
+        self._chipLib.chip_ime_ReadAttribute_Basic_Reachable.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Basic_Reachable.restype = ctypes.c_uint32
         # Cluster Basic ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.restype = ctypes.c_uint32
