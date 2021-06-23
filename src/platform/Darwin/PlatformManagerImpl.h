@@ -80,7 +80,10 @@ private:
     static PlatformManagerImpl sInstance;
 
     dispatch_queue_t mWorkQueue = nullptr;
-    bool mIsWorkQueueRunning    = false;
+    // Semaphore used to implement blocking behavior in _RunEventLoop.
+    dispatch_semaphore_t mRunLoopSem;
+
+    bool mIsWorkQueueRunning = false;
 
     inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }
 };

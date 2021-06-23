@@ -211,6 +211,7 @@ public:
     CHIP_ERROR ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                        chip::ByteSpan value);

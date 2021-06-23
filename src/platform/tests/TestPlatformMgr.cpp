@@ -44,15 +44,105 @@ using namespace chip::DeviceLayer;
 //      Unit tests
 // =================================
 
-static void TestPlatformMgr_Init(nlTestSuite * inSuite, void * inContext)
+static void TestPlatformMgr_InitShutdown(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = PlatformMgr().Shutdown();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-static void TestPlatformMgr_StartEventLoopTask(nlTestSuite * inSuite, void * inContext)
+static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR err = PlatformMgr().StartEventLoopTask();
+    CHIP_ERROR err = PlatformMgr().InitChipStack();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = PlatformMgr().StartEventLoopTask();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = PlatformMgr().StopEventLoopTask();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = PlatformMgr().Shutdown();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
+static bool stopRan;
+
+static void StopTheLoop(intptr_t)
+{
+    // Testing the return value here would involve multi-threaded access to the
+    // nlTestSuite, and it's not clear whether that's OK.
+    stopRan = true;
+    PlatformMgr().StopEventLoopTask();
+}
+
+static void TestPlatformMgr_BasicRunEventLoop(nlTestSuite * inSuite, void * inContext)
+{
+    stopRan = false;
+
+    CHIP_ERROR err = PlatformMgr().InitChipStack();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    PlatformMgr().ScheduleWork(StopTheLoop);
+
+    PlatformMgr().RunEventLoop();
+    NL_TEST_ASSERT(inSuite, stopRan);
+
+    err = PlatformMgr().Shutdown();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
+static bool sleepRan;
+
+static void SleepSome(intptr_t)
+{
+    sleep(1);
+    sleepRan = true;
+}
+
+static void TestPlatformMgr_RunEventLoopTwoTasks(nlTestSuite * inSuite, void * inContext)
+{
+    stopRan  = false;
+    sleepRan = false;
+
+    CHIP_ERROR err = PlatformMgr().InitChipStack();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    PlatformMgr().ScheduleWork(SleepSome);
+    PlatformMgr().ScheduleWork(StopTheLoop);
+
+    PlatformMgr().RunEventLoop();
+    NL_TEST_ASSERT(inSuite, stopRan);
+    NL_TEST_ASSERT(inSuite, sleepRan);
+
+    err = PlatformMgr().Shutdown();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
+void StopAndSleep(intptr_t arg)
+{
+    // Ensure that we don't proceed after stopping until the sleep is done too.
+    StopTheLoop(arg);
+    SleepSome(arg);
+}
+
+static void TestPlatformMgr_RunEventLoopStopBeforeSleep(nlTestSuite * inSuite, void * inContext)
+{
+    stopRan  = false;
+    sleepRan = false;
+
+    CHIP_ERROR err = PlatformMgr().InitChipStack();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    PlatformMgr().ScheduleWork(StopAndSleep);
+
+    PlatformMgr().RunEventLoop();
+    NL_TEST_ASSERT(inSuite, stopRan);
+    NL_TEST_ASSERT(inSuite, sleepRan);
+
+    err = PlatformMgr().Shutdown();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -92,8 +182,11 @@ static void TestPlatformMgr_AddEventHandler(nlTestSuite * inSuite, void * inCont
  */
 static const nlTest sTests[] = {
 
-    NL_TEST_DEF("Test PlatformMgr::Init", TestPlatformMgr_Init),
-    NL_TEST_DEF("Test PlatformMgr::StartEventLoopTask", TestPlatformMgr_StartEventLoopTask),
+    NL_TEST_DEF("Test PlatformMgr::Init/Shutdown", TestPlatformMgr_InitShutdown),
+    NL_TEST_DEF("Test basic PlatformMgr::StartEventLoopTask", TestPlatformMgr_BasicEventLoopTask),
+    NL_TEST_DEF("Test basic PlatformMgr::RunEventLoop", TestPlatformMgr_BasicRunEventLoop),
+    NL_TEST_DEF("Test PlatformMgr::RunEventLoop with two tasks", TestPlatformMgr_RunEventLoopTwoTasks),
+    NL_TEST_DEF("Test PlatformMgr::RunEventLoop with stop before sleep", TestPlatformMgr_RunEventLoopStopBeforeSleep),
     NL_TEST_DEF("Test PlatformMgr::TryLockChipStack", TestPlatformMgr_TryLockChipStack),
     NL_TEST_DEF("Test PlatformMgr::AddEventHandler", TestPlatformMgr_AddEventHandler),
 
