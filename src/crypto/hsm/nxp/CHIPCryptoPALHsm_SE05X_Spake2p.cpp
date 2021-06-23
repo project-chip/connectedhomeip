@@ -159,11 +159,8 @@ CHIP_ERROR Spake2p_ComputeRoundOne_HSM(hsm_pake_context_t * phsm_pake_context, c
 
     if (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER)
     {
-        if (pab == NULL)
-        {
-            /* Need X/Y value to verify abort condition */
-            goto exit;
-        }
+        /* Need X/Y value to verify abort condition */
+        VerifyOrReturnError(pab != NULL, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
 #if SSS_HAVE_SE05X_VER_GTE_16_03
@@ -262,7 +259,9 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_
     }
     VerifyOrReturnError(context_len <= sizeof(hsm_pake_context.spake_context), CHIP_ERROR_INTERNAL);
     memset(hsm_pake_context.spake_context, 0, sizeof(hsm_pake_context.spake_context));
-    memcpy(hsm_pake_context.spake_context, context, context_len);
+    if (context_len > 0){
+        memcpy(hsm_pake_context.spake_context, context, context_len);
+    }
     hsm_pake_context.spake_context_len = context_len;
 
     const CHIP_ERROR error = Spake2p::Init(context, context_len);
@@ -487,7 +486,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
     uint8_t pKeyKe[16] = {
         0,
     };
-    constexpr size_t pkeyKeLen = sizeof(pKeyKe);
+    size_t pkeyKeLen = sizeof(pKeyKe);
 
     const CHIP_ERROR error = Spake2p_ComputeRoundTwo_HSM(&hsm_pake_context, role, in, in_len, out, out_len, pKeyKe, &pkeyKeLen);
     if (CHIP_NO_ERROR == error)
@@ -500,7 +499,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
 
 CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size_t in_len)
 {
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::R2, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::R2, CHIP_ERROR_INTERNAL);
 
 #if !ENABLE_HSM_SPAKE_VERIFIER
     const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);

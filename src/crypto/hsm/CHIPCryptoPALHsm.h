@@ -116,7 +116,7 @@ public:
 
     virtual CHIP_ERROR Initialize() override;
 
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) override;
+    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
 
     virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
 
@@ -126,6 +126,8 @@ public:
 
     virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
                                           P256ECDHDerivedSecret & out_secret) const override;
+
+    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) override;
 
     const P256PublicKeyHSM & Pubkey() const override { return mPublicKeyHSM; }
 

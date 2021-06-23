@@ -23,6 +23,9 @@
 #include <support/CHIPMem.h>
 #include <support/SafeInt.h>
 #include <transport/AdminPairingTable.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 namespace chip {
 using namespace Credentials;
