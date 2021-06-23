@@ -383,17 +383,10 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         return;
     }
     dispatch_sync(_chipWorkQueue, ^{
-        chip::Controller::Device * device = nullptr;
-
         if ([self isRunning]) {
-            errorCode = self.cppCommissioner->GetDevice(deviceID, &device);
+            errorCode = self.cppCommissioner->UpdateDevice(deviceID, fabricId);
+            CHIP_LOG_ERROR("Update device address returned: %d", errorCode);
         }
-
-        if (errorCode != CHIP_NO_ERROR) {
-            return;
-        }
-
-        errorCode = self.cppCommissioner->UpdateDevice(device, fabricId);
     });
 }
 

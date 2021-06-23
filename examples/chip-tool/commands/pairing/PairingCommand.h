@@ -97,12 +97,15 @@ public:
     }
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
+    uint16_t GetWaitDurationInSeconds() const override { return 120; }
+    void Shutdown() override;
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
     /////////// DeviceAddressUpdateDelegate Interface /////////
     void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
@@ -119,7 +122,6 @@ private:
     CHIP_ERROR Unpair(NodeId remoteId);
 
     void InitCallbacks();
-    void ReleaseCallbacks();
     CHIP_ERROR SetupNetwork();
     CHIP_ERROR AddNetwork(PairingNetworkType networkType);
     CHIP_ERROR AddThreadNetwork();
@@ -139,10 +141,10 @@ private:
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
 
-    chip::Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> * mOnAddThreadNetworkCallback;
-    chip::Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> * mOnAddWiFiNetworkCallback;
-    chip::Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> * mOnEnableNetworkCallback;
-    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback;
+    chip::Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> * mOnAddThreadNetworkCallback = nullptr;
+    chip::Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> * mOnAddWiFiNetworkCallback     = nullptr;
+    chip::Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> * mOnEnableNetworkCallback       = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback                                               = nullptr;
     ChipDevice * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;

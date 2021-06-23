@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,24 +15,28 @@
  *    limitations under the License.
  */
 
-// module header, comes first
-#include <controller/CHIPCommissionableNodeController.h>
+#pragma once
 
-#include <support/CodeUtils.h>
+#include <core/CHIPError.h>
 
 namespace chip {
-namespace Controller {
 
-CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter)
+class SessionIDAllocator
 {
-    ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return chip::Mdns::Resolver::Instance().FindCommissioners(discoveryFilter);
-}
+public:
+    SessionIDAllocator() {}
+    ~SessionIDAllocator() {}
 
-const Mdns::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
-{
-    return GetDiscoveredNode(idx);
-}
+    CHIP_ERROR Allocate(uint16_t & id);
+    void Free(uint16_t id);
+    CHIP_ERROR Reserve(uint16_t id);
+    CHIP_ERROR ReserveUpTo(uint16_t id);
+    uint16_t Peek();
 
-} // namespace Controller
+private:
+    // Session ID is a 15 bit value (16th bit indicates unicast/group key)
+    static constexpr uint16_t kMaxSessionID = (1 << 15) - 1;
+    uint16_t mNextAvailable                 = 0;
+};
+
 } // namespace chip
