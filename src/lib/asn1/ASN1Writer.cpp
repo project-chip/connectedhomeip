@@ -48,7 +48,7 @@ using namespace chip::Encoding;
 enum
 {
     kLengthFieldReserveSize = 1,
-    kUnknownLength           = -1,
+    kUnknownLength          = -1,
     kUnknownLengthMarker    = 0xFF
 };
 
