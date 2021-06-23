@@ -50,7 +50,7 @@ bool SendStatusIfDelegateNull(chip::EndpointId endpointId)
 {
     if (GetDelegate(endpointId) == nullptr)
     {
-        ChipLogError(Zcl, "No OTAServerDelegate set for ep:%" PRIu8, endpointId);
+        ChipLogError(Zcl, "No OTAServerDelegate set for ep:%" PRIu16, endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
         return true;
     }

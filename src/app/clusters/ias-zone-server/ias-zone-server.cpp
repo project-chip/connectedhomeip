@@ -630,7 +630,7 @@ static void unenrollSecurityDevice(EndpointId endpoint)
     uint16_t zoneType     = EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE;
 
     emberAfWriteServerAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID, (uint8_t *) ieeeAddress,
-                                ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE);
+                                ZCL_NODE_ID_ATTRIBUTE_TYPE);
 
     emberAfWriteServerAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, (uint8_t *) &zoneType,
                                 ZCL_INT16U_ATTRIBUTE_TYPE);
