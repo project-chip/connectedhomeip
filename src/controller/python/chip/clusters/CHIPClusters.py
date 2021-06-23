@@ -3702,10 +3702,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_BinaryInputBasic_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Binding
         # Cluster Binding Command Bind
-        self._chipLib.chip_ime_AppendCommand_Binding_Bind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Binding_Bind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_Binding_Bind.restype = ctypes.c_uint32
         # Cluster Binding Command Unbind
-        self._chipLib.chip_ime_AppendCommand_Binding_Unbind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Binding_Unbind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_Binding_Unbind.restype = ctypes.c_uint32
         # Cluster Binding ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -4542,7 +4542,7 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_RelativeHumidityMeasurement_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Scenes
         # Cluster Scenes Command AddScene
-        self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.restype = ctypes.c_uint32
         # Cluster Scenes Command GetSceneMembership
         self._chipLib.chip_ime_AppendCommand_Scenes_GetSceneMembership.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
