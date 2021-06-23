@@ -551,8 +551,8 @@ CHIP_ERROR DeviceController::GetFabricId(uint64_t & fabricId)
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                               const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     uint16_t index;
     bool needClose = true;
@@ -573,6 +573,7 @@ exit:
     {
         ec->Close();
     }
+    return CHIP_NO_ERROR;
 }
 
 void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
