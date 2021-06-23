@@ -34,7 +34,8 @@ class RequestCommissioningCommand : public Command
 {
 public:
     RequestCommissioningCommand() : Command("request-commissioning") {}
-    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
+    uint16_t GetWaitDurationInSeconds() const override { return 3 * 60; }
 
 private:
     chip::Controller::CommissionableNodeController mCommissionableNodeController;

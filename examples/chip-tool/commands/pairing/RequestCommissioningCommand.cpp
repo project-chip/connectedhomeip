@@ -22,28 +22,8 @@
 
 using namespace ::chip;
 
-constexpr uint16_t kWaitDurationInSeconds = 3 * 60;
-
-CHIP_ERROR RequestCommissioningCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR RequestCommissioningCommand::Run()
 {
-    //
-    // Set this to true first BEFORE we send commands to ensure we don't
-    // end up in a situation where the response comes back faster than we can
-    // set the variable to true, which will cause it to block indefinitely.
-    //
-    UpdateWaitForResponse(true);
-
-    {
-        chip::DeviceLayer::StackLock lock;
-
-        ReturnErrorOnFailure(mCommissionableNodeController.AdvertiseCommissionableNode());
-
-        // TODO: ReturnErrorOnFailure(mCommissionableNodeController.SendUserDirectedCommissioningRequest(args...));
-
-        ChipLogProgress(chipTool, "Waiting for %d sec", kWaitDurationInSeconds);
-    }
-
-    WaitForResponse(kWaitDurationInSeconds);
-
-    return CHIP_NO_ERROR;
+    ChipLogProgress(chipTool, "Announcing commissionable node for %d sec", GetWaitDurationInSeconds());
+    return mCommissionableNodeController.AdvertiseCommissionableNode();
 }
