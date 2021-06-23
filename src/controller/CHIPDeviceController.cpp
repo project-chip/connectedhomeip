@@ -883,13 +883,14 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     if (params.HasCSRNonce())
     {
         device->SetCSRNonce(params.GetCSRNonce());
+        VerifyOrReturnError(device->SetCSRNonce(params.GetCSRNonce()), CHIP_ERROR_INVALID_ARGUMENT);
     }
     else
     {
         uint8_t mCSRNonce[kOpCSRNonceLength];
         Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
         chip::Optional<chip::ByteSpan> opCSROptional(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
-        device->SetCSRNonce(opCSROptional);
+        VerifyOrReturnError(device->SetCSRNonce(opCSROptional), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
