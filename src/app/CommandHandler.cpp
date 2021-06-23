@@ -100,7 +100,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     if (CHIP_END_OF_TLV == err)
     {
         err = CHIP_NO_ERROR;
-        ChipLogDetail(DataManagement, "Received command without data for cluster %d", clusterId);
+        ChipLogDetail(DataManagement, "Received command without data for cluster %" PRIx32, clusterId);
     }
     if (CHIP_NO_ERROR == err)
     {
@@ -120,7 +120,7 @@ exit:
         // TODO: The error code should be updated after #7072 added error codes required by IM.
         if (err == CHIP_ERROR_INVALID_PROFILE_ID)
         {
-            ChipLogDetail(DataManagement, "No Cluster 0x%" PRIx16 " on Endpoint 0x%" PRIx8, clusterId, endpointId);
+            ChipLogDetail(DataManagement, "No Cluster 0x%" PRIx32 " on Endpoint 0x%" PRIx16, clusterId, endpointId);
         }
 
         AddStatusCode(returnStatusParam,

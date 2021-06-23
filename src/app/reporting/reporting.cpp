@@ -301,8 +301,8 @@ void emberAfPluginReportingTickEventHandler(void)
             }
         }
 
-        // Payload is [attribute id:2] [type:1] [data:N].
-        emberAfPutInt16uInResp(entry.attributeId);
+        // Payload is [attribute id:4] [type:1] [data:N].
+        emberAfPutInt32uInResp(entry.attributeId);
         emberAfPutInt8uInResp(dataType);
 
 #if (BIGENDIAN_CPU)
@@ -412,10 +412,10 @@ bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
     emberAfFillExternalManufacturerSpecificBuffer(frameControl, cmd->apsFrame->clusterId, cmd->mfgCode,
                                                   ZCL_CONFIGURE_REPORTING_RESPONSE_COMMAND_ID, "");
 
-    // Each record in the command has at least a one-byte direction and a two-
+    // Each record in the command has at least a one-byte direction and a four-
     // byte attribute id.  Additional fields are present depending on the value
     // of the direction field.
-    while (bufIndex + 3 < cmd->bufLen)
+    while (bufIndex + 5 < cmd->bufLen)
     {
         AttributeId attributeId;
         EmberAfReportingDirection direction;
@@ -423,8 +423,8 @@ bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
 
         direction = (EmberAfReportingDirection) emberAfGetInt8u(cmd->buffer, bufIndex, cmd->bufLen);
         bufIndex++;
-        attributeId = (AttributeId) emberAfGetInt16u(cmd->buffer, bufIndex, cmd->bufLen);
-        bufIndex    = static_cast<uint16_t>(bufIndex + 2);
+        attributeId = (AttributeId) emberAfGetInt32u(cmd->buffer, bufIndex, cmd->bufLen);
+        bufIndex    = static_cast<uint16_t>(bufIndex + 4);
 
         emberAfReportingPrintln(" - direction:%x, attr:%2x", direction, attributeId);
 
@@ -519,7 +519,7 @@ bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
         {
             emberAfPutInt8uInResp(status);
             emberAfPutInt8uInResp(direction);
-            emberAfPutInt16uInResp(attributeId);
+            emberAfPutInt32uInResp(attributeId);
             failures = true;
             if (status == EMBER_ZCL_STATUS_INVALID_FIELD)
             {
@@ -571,9 +571,9 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
     emberAfFillExternalManufacturerSpecificBuffer(frameControl, cmd->apsFrame->clusterId, cmd->mfgCode,
                                                   ZCL_READ_REPORTING_CONFIGURATION_RESPONSE_COMMAND_ID, "");
 
-    // Each record in the command has a one-byte direction and a two-byte
+    // Each record in the command has a one-byte direction and a four-byte
     // attribute id.
-    while (bufIndex + 3 <= cmd->bufLen)
+    while (bufIndex + 5 <= cmd->bufLen)
     {
         AttributeId attributeId;
         EmberAfAttributeMetadata * metadata = NULL;
@@ -584,8 +584,8 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
 
         direction = (EmberAfReportingDirection) emberAfGetInt8u(cmd->buffer, bufIndex, cmd->bufLen);
         bufIndex++;
-        attributeId = (AttributeId) emberAfGetInt16u(cmd->buffer, bufIndex, cmd->bufLen);
-        bufIndex    = static_cast<uint16_t>(bufIndex + 2);
+        attributeId = (AttributeId) emberAfGetInt32u(cmd->buffer, bufIndex, cmd->bufLen);
+        bufIndex    = static_cast<uint16_t>(bufIndex + 4);
 
         switch (direction)
         {
@@ -597,14 +597,14 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
             {
                 emberAfPutInt8uInResp(EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE);
                 emberAfPutInt8uInResp(direction);
-                emberAfPutInt16uInResp(attributeId);
+                emberAfPutInt32uInResp(attributeId);
                 continue;
             }
             break;
         default:
             emberAfPutInt8uInResp(EMBER_ZCL_STATUS_INVALID_FIELD);
             emberAfPutInt8uInResp(direction);
-            emberAfPutInt16uInResp(attributeId);
+            emberAfPutInt32uInResp(attributeId);
             continue;
         }
 
@@ -637,13 +637,13 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
         {
             emberAfPutInt8uInResp(EMBER_ZCL_STATUS_NOT_FOUND);
             emberAfPutInt8uInResp(direction);
-            emberAfPutInt16uInResp(attributeId);
+            emberAfPutInt32uInResp(attributeId);
             continue;
         }
         // Attribute supported, reportable, report configuration was found.
         emberAfPutInt8uInResp(EMBER_ZCL_STATUS_SUCCESS);
         emberAfPutInt8uInResp(direction);
-        emberAfPutInt16uInResp(attributeId);
+        emberAfPutInt32uInResp(attributeId);
         switch (direction)
         {
         case EMBER_ZCL_REPORTING_DIRECTION_REPORTED:
