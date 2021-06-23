@@ -102,6 +102,7 @@ source_set("se05x") {
   else if (host == "host_linux") {
     sources += [
       "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/linux/i2c_a7.c",
+      "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/generic/sm_timer.c",
     ]
   }
 
