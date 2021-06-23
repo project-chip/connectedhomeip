@@ -27,14 +27,14 @@ public:
     TestCluster() : TestCommand("TestCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         if (mTestCount == mTestIndex)
         {
             ChipLogProgress(chipTool, "TestCluster: Test complete");
-            SetCommandExitStatus(true);
+            SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
         // Ensure we increment mTestIndex before we start running the relevant
@@ -351,10 +351,8 @@ public:
         if (CHIP_NO_ERROR != err)
         {
             ChipLogProgress(chipTool, "TestCluster: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(false);
+            SetCommandExitStatus(err);
         }
-
-        return err;
     }
 
 private:
@@ -408,7 +406,7 @@ private:
         if (runner->mIsFailureExpected_0 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -427,7 +425,7 @@ private:
         if (runner->mIsFailureExpected_0 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -477,7 +475,7 @@ private:
         if (runner->mIsFailureExpected_1 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -496,7 +494,7 @@ private:
         if (runner->mIsFailureExpected_1 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -546,7 +544,7 @@ private:
         if (runner->mIsFailureExpected_2 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -565,14 +563,14 @@ private:
         if (runner->mIsFailureExpected_2 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (returnValue != 7)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "7");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -622,7 +620,7 @@ private:
         if (runner->mIsFailureExpected_3 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -641,14 +639,14 @@ private:
         if (runner->mIsFailureExpected_3 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (boolean != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -699,7 +697,7 @@ private:
         if (runner->mIsFailureExpected_4 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -718,7 +716,7 @@ private:
         if (runner->mIsFailureExpected_4 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -768,7 +766,7 @@ private:
         if (runner->mIsFailureExpected_5 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -787,14 +785,14 @@ private:
         if (runner->mIsFailureExpected_5 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (boolean != 1)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -845,7 +843,7 @@ private:
         if (runner->mIsFailureExpected_6 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -864,7 +862,7 @@ private:
         if (runner->mIsFailureExpected_6 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -914,7 +912,7 @@ private:
         if (runner->mIsFailureExpected_7 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -933,14 +931,14 @@ private:
         if (runner->mIsFailureExpected_7 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (boolean != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -990,7 +988,7 @@ private:
         if (runner->mIsFailureExpected_8 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1009,14 +1007,14 @@ private:
         if (runner->mIsFailureExpected_8 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap8 != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1067,7 +1065,7 @@ private:
         if (runner->mIsFailureExpected_9 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1086,7 +1084,7 @@ private:
         if (runner->mIsFailureExpected_9 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1136,7 +1134,7 @@ private:
         if (runner->mIsFailureExpected_10 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1155,14 +1153,14 @@ private:
         if (runner->mIsFailureExpected_10 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap8 != 255)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "255");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1213,7 +1211,7 @@ private:
         if (runner->mIsFailureExpected_11 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1232,7 +1230,7 @@ private:
         if (runner->mIsFailureExpected_11 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1282,7 +1280,7 @@ private:
         if (runner->mIsFailureExpected_12 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1301,14 +1299,14 @@ private:
         if (runner->mIsFailureExpected_12 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap8 != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1358,7 +1356,7 @@ private:
         if (runner->mIsFailureExpected_13 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1377,14 +1375,14 @@ private:
         if (runner->mIsFailureExpected_13 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap16 != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1435,7 +1433,7 @@ private:
         if (runner->mIsFailureExpected_14 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1454,7 +1452,7 @@ private:
         if (runner->mIsFailureExpected_14 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1504,7 +1502,7 @@ private:
         if (runner->mIsFailureExpected_15 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1523,14 +1521,14 @@ private:
         if (runner->mIsFailureExpected_15 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap16 != 65535U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "65535");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1581,7 +1579,7 @@ private:
         if (runner->mIsFailureExpected_16 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1600,7 +1598,7 @@ private:
         if (runner->mIsFailureExpected_16 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1650,7 +1648,7 @@ private:
         if (runner->mIsFailureExpected_17 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1669,14 +1667,14 @@ private:
         if (runner->mIsFailureExpected_17 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap16 != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1726,7 +1724,7 @@ private:
         if (runner->mIsFailureExpected_18 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1745,14 +1743,14 @@ private:
         if (runner->mIsFailureExpected_18 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap32 != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1803,7 +1801,7 @@ private:
         if (runner->mIsFailureExpected_19 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1822,7 +1820,7 @@ private:
         if (runner->mIsFailureExpected_19 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1872,7 +1870,7 @@ private:
         if (runner->mIsFailureExpected_20 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1891,14 +1889,14 @@ private:
         if (runner->mIsFailureExpected_20 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap32 != 4294967295UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "4294967295");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1949,7 +1947,7 @@ private:
         if (runner->mIsFailureExpected_21 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -1968,7 +1966,7 @@ private:
         if (runner->mIsFailureExpected_21 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2018,7 +2016,7 @@ private:
         if (runner->mIsFailureExpected_22 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2037,14 +2035,14 @@ private:
         if (runner->mIsFailureExpected_22 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap32 != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2094,7 +2092,7 @@ private:
         if (runner->mIsFailureExpected_23 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2113,14 +2111,14 @@ private:
         if (runner->mIsFailureExpected_23 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap64 != 0ULL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2171,7 +2169,7 @@ private:
         if (runner->mIsFailureExpected_24 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2190,7 +2188,7 @@ private:
         if (runner->mIsFailureExpected_24 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2240,7 +2238,7 @@ private:
         if (runner->mIsFailureExpected_25 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2259,14 +2257,14 @@ private:
         if (runner->mIsFailureExpected_25 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap64 != 18446744073709551615ULL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "18446744073709551615");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2317,7 +2315,7 @@ private:
         if (runner->mIsFailureExpected_26 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2336,7 +2334,7 @@ private:
         if (runner->mIsFailureExpected_26 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2386,7 +2384,7 @@ private:
         if (runner->mIsFailureExpected_27 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2405,14 +2403,14 @@ private:
         if (runner->mIsFailureExpected_27 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (bitmap64 != 0ULL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2462,7 +2460,7 @@ private:
         if (runner->mIsFailureExpected_28 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2481,14 +2479,14 @@ private:
         if (runner->mIsFailureExpected_28 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int8u != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2539,7 +2537,7 @@ private:
         if (runner->mIsFailureExpected_29 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2558,7 +2556,7 @@ private:
         if (runner->mIsFailureExpected_29 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2608,7 +2606,7 @@ private:
         if (runner->mIsFailureExpected_30 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2627,14 +2625,14 @@ private:
         if (runner->mIsFailureExpected_30 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int8u != 255)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "255");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2685,7 +2683,7 @@ private:
         if (runner->mIsFailureExpected_31 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2704,7 +2702,7 @@ private:
         if (runner->mIsFailureExpected_31 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2754,7 +2752,7 @@ private:
         if (runner->mIsFailureExpected_32 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2773,14 +2771,14 @@ private:
         if (runner->mIsFailureExpected_32 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int8u != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2830,7 +2828,7 @@ private:
         if (runner->mIsFailureExpected_33 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2849,14 +2847,14 @@ private:
         if (runner->mIsFailureExpected_33 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int16u != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2907,7 +2905,7 @@ private:
         if (runner->mIsFailureExpected_34 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2926,7 +2924,7 @@ private:
         if (runner->mIsFailureExpected_34 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2976,7 +2974,7 @@ private:
         if (runner->mIsFailureExpected_35 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -2995,14 +2993,14 @@ private:
         if (runner->mIsFailureExpected_35 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int16u != 65535U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "65535");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3053,7 +3051,7 @@ private:
         if (runner->mIsFailureExpected_36 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3072,7 +3070,7 @@ private:
         if (runner->mIsFailureExpected_36 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3122,7 +3120,7 @@ private:
         if (runner->mIsFailureExpected_37 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3141,14 +3139,14 @@ private:
         if (runner->mIsFailureExpected_37 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int16u != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3198,7 +3196,7 @@ private:
         if (runner->mIsFailureExpected_38 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3217,14 +3215,14 @@ private:
         if (runner->mIsFailureExpected_38 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int32u != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3275,7 +3273,7 @@ private:
         if (runner->mIsFailureExpected_39 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3294,7 +3292,7 @@ private:
         if (runner->mIsFailureExpected_39 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3344,7 +3342,7 @@ private:
         if (runner->mIsFailureExpected_40 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3363,14 +3361,14 @@ private:
         if (runner->mIsFailureExpected_40 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int32u != 4294967295UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "4294967295");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3421,7 +3419,7 @@ private:
         if (runner->mIsFailureExpected_41 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3440,7 +3438,7 @@ private:
         if (runner->mIsFailureExpected_41 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3490,7 +3488,7 @@ private:
         if (runner->mIsFailureExpected_42 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3509,14 +3507,14 @@ private:
         if (runner->mIsFailureExpected_42 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int32u != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3566,7 +3564,7 @@ private:
         if (runner->mIsFailureExpected_43 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3585,14 +3583,14 @@ private:
         if (runner->mIsFailureExpected_43 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int64u != 0ULL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3643,7 +3641,7 @@ private:
         if (runner->mIsFailureExpected_44 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3662,7 +3660,7 @@ private:
         if (runner->mIsFailureExpected_44 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3712,7 +3710,7 @@ private:
         if (runner->mIsFailureExpected_45 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3731,14 +3729,14 @@ private:
         if (runner->mIsFailureExpected_45 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int64u != 18446744073709551615ULL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "18446744073709551615");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3789,7 +3787,7 @@ private:
         if (runner->mIsFailureExpected_46 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3808,7 +3806,7 @@ private:
         if (runner->mIsFailureExpected_46 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3858,7 +3856,7 @@ private:
         if (runner->mIsFailureExpected_47 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3877,14 +3875,14 @@ private:
         if (runner->mIsFailureExpected_47 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int64u != 0ULL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3934,7 +3932,7 @@ private:
         if (runner->mIsFailureExpected_48 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -3953,14 +3951,14 @@ private:
         if (runner->mIsFailureExpected_48 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int8s != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4011,7 +4009,7 @@ private:
         if (runner->mIsFailureExpected_49 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4030,7 +4028,7 @@ private:
         if (runner->mIsFailureExpected_49 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4080,7 +4078,7 @@ private:
         if (runner->mIsFailureExpected_50 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4099,14 +4097,14 @@ private:
         if (runner->mIsFailureExpected_50 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int8s != 127)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "127");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4157,7 +4155,7 @@ private:
         if (runner->mIsFailureExpected_51 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4176,7 +4174,7 @@ private:
         if (runner->mIsFailureExpected_51 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4226,7 +4224,7 @@ private:
         if (runner->mIsFailureExpected_52 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4245,14 +4243,14 @@ private:
         if (runner->mIsFailureExpected_52 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int8s != -128)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "-128");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4303,7 +4301,7 @@ private:
         if (runner->mIsFailureExpected_53 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4322,7 +4320,7 @@ private:
         if (runner->mIsFailureExpected_53 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4372,7 +4370,7 @@ private:
         if (runner->mIsFailureExpected_54 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4391,14 +4389,14 @@ private:
         if (runner->mIsFailureExpected_54 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int8s != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4448,7 +4446,7 @@ private:
         if (runner->mIsFailureExpected_55 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4467,14 +4465,14 @@ private:
         if (runner->mIsFailureExpected_55 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int16s != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4525,7 +4523,7 @@ private:
         if (runner->mIsFailureExpected_56 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4544,7 +4542,7 @@ private:
         if (runner->mIsFailureExpected_56 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4594,7 +4592,7 @@ private:
         if (runner->mIsFailureExpected_57 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4613,14 +4611,14 @@ private:
         if (runner->mIsFailureExpected_57 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int16s != 32767)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "32767");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4671,7 +4669,7 @@ private:
         if (runner->mIsFailureExpected_58 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4690,7 +4688,7 @@ private:
         if (runner->mIsFailureExpected_58 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4740,7 +4738,7 @@ private:
         if (runner->mIsFailureExpected_59 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4759,14 +4757,14 @@ private:
         if (runner->mIsFailureExpected_59 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int16s != -32768)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "-32768");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4817,7 +4815,7 @@ private:
         if (runner->mIsFailureExpected_60 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4836,7 +4834,7 @@ private:
         if (runner->mIsFailureExpected_60 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4886,7 +4884,7 @@ private:
         if (runner->mIsFailureExpected_61 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4905,14 +4903,14 @@ private:
         if (runner->mIsFailureExpected_61 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int16s != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4962,7 +4960,7 @@ private:
         if (runner->mIsFailureExpected_62 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -4981,14 +4979,14 @@ private:
         if (runner->mIsFailureExpected_62 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int32s != 0L)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5039,7 +5037,7 @@ private:
         if (runner->mIsFailureExpected_63 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5058,7 +5056,7 @@ private:
         if (runner->mIsFailureExpected_63 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5108,7 +5106,7 @@ private:
         if (runner->mIsFailureExpected_64 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5127,14 +5125,14 @@ private:
         if (runner->mIsFailureExpected_64 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int32s != 2147483647L)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "2147483647");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5185,7 +5183,7 @@ private:
         if (runner->mIsFailureExpected_65 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5204,7 +5202,7 @@ private:
         if (runner->mIsFailureExpected_65 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5254,7 +5252,7 @@ private:
         if (runner->mIsFailureExpected_66 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5273,14 +5271,14 @@ private:
         if (runner->mIsFailureExpected_66 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int32s != -2147483648L)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "-2147483648");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5331,7 +5329,7 @@ private:
         if (runner->mIsFailureExpected_67 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5350,7 +5348,7 @@ private:
         if (runner->mIsFailureExpected_67 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5400,7 +5398,7 @@ private:
         if (runner->mIsFailureExpected_68 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5419,14 +5417,14 @@ private:
         if (runner->mIsFailureExpected_68 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int32s != 0L)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5476,7 +5474,7 @@ private:
         if (runner->mIsFailureExpected_69 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5495,14 +5493,14 @@ private:
         if (runner->mIsFailureExpected_69 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int64s != 0LL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5553,7 +5551,7 @@ private:
         if (runner->mIsFailureExpected_70 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5572,7 +5570,7 @@ private:
         if (runner->mIsFailureExpected_70 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5622,7 +5620,7 @@ private:
         if (runner->mIsFailureExpected_71 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5641,14 +5639,14 @@ private:
         if (runner->mIsFailureExpected_71 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int64s != 9223372036854775807LL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "9223372036854775807");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5699,7 +5697,7 @@ private:
         if (runner->mIsFailureExpected_72 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5718,7 +5716,7 @@ private:
         if (runner->mIsFailureExpected_72 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5768,7 +5766,7 @@ private:
         if (runner->mIsFailureExpected_73 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5787,14 +5785,14 @@ private:
         if (runner->mIsFailureExpected_73 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int64s != -9223372036854775807LL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "-9223372036854775807");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5845,7 +5843,7 @@ private:
         if (runner->mIsFailureExpected_74 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5864,7 +5862,7 @@ private:
         if (runner->mIsFailureExpected_74 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5914,7 +5912,7 @@ private:
         if (runner->mIsFailureExpected_75 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5933,14 +5931,14 @@ private:
         if (runner->mIsFailureExpected_75 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (int64s != 0LL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -5990,7 +5988,7 @@ private:
         if (runner->mIsFailureExpected_76 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6009,14 +6007,14 @@ private:
         if (runner->mIsFailureExpected_76 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (enum8 != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6067,7 +6065,7 @@ private:
         if (runner->mIsFailureExpected_77 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6086,7 +6084,7 @@ private:
         if (runner->mIsFailureExpected_77 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6136,7 +6134,7 @@ private:
         if (runner->mIsFailureExpected_78 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6155,14 +6153,14 @@ private:
         if (runner->mIsFailureExpected_78 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (enum8 != 255)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "255");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6213,7 +6211,7 @@ private:
         if (runner->mIsFailureExpected_79 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6232,7 +6230,7 @@ private:
         if (runner->mIsFailureExpected_79 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6282,7 +6280,7 @@ private:
         if (runner->mIsFailureExpected_80 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6301,14 +6299,14 @@ private:
         if (runner->mIsFailureExpected_80 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (enum8 != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6358,7 +6356,7 @@ private:
         if (runner->mIsFailureExpected_81 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6377,14 +6375,14 @@ private:
         if (runner->mIsFailureExpected_81 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (enum16 != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6435,7 +6433,7 @@ private:
         if (runner->mIsFailureExpected_82 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6454,7 +6452,7 @@ private:
         if (runner->mIsFailureExpected_82 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6504,7 +6502,7 @@ private:
         if (runner->mIsFailureExpected_83 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6523,14 +6521,14 @@ private:
         if (runner->mIsFailureExpected_83 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (enum16 != 65535U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "65535");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6581,7 +6579,7 @@ private:
         if (runner->mIsFailureExpected_84 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6600,7 +6598,7 @@ private:
         if (runner->mIsFailureExpected_84 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6650,7 +6648,7 @@ private:
         if (runner->mIsFailureExpected_85 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6669,14 +6667,14 @@ private:
         if (runner->mIsFailureExpected_85 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (enum16 != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6726,7 +6724,7 @@ private:
         if (runner->mIsFailureExpected_86 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6745,7 +6743,7 @@ private:
         if (runner->mIsFailureExpected_86 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6753,7 +6751,7 @@ private:
         if (!octetString.data_equal(octetStringArgument))
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6805,7 +6803,7 @@ private:
         if (runner->mIsFailureExpected_87 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6824,7 +6822,7 @@ private:
         if (runner->mIsFailureExpected_87 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6874,7 +6872,7 @@ private:
         if (runner->mIsFailureExpected_88 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6893,7 +6891,7 @@ private:
         if (runner->mIsFailureExpected_88 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6901,7 +6899,7 @@ private:
         if (!octetString.data_equal(octetStringArgument))
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "TestValue");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6954,7 +6952,7 @@ private:
         if (runner->mIsFailureExpected_89 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -6973,7 +6971,7 @@ private:
         if (runner->mIsFailureExpected_89 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7023,7 +7021,7 @@ private:
         if (runner->mIsFailureExpected_90 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7042,7 +7040,7 @@ private:
         if (runner->mIsFailureExpected_90 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7050,7 +7048,7 @@ private:
         if (!octetString.data_equal(octetStringArgument))
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "TestValue");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7102,7 +7100,7 @@ private:
         if (runner->mIsFailureExpected_91 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7121,7 +7119,7 @@ private:
         if (runner->mIsFailureExpected_91 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7171,7 +7169,7 @@ private:
         if (runner->mIsFailureExpected_92 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7190,7 +7188,7 @@ private:
         if (runner->mIsFailureExpected_92 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7198,7 +7196,7 @@ private:
         if (!longOctetString.data_equal(longOctetStringArgument))
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7257,7 +7255,7 @@ private:
         if (runner->mIsFailureExpected_93 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7276,7 +7274,7 @@ private:
         if (runner->mIsFailureExpected_93 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7326,7 +7324,7 @@ private:
         if (runner->mIsFailureExpected_94 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7345,7 +7343,7 @@ private:
         if (runner->mIsFailureExpected_94 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7363,7 +7361,7 @@ private:
                          "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
                          "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
                          "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7415,7 +7413,7 @@ private:
         if (runner->mIsFailureExpected_95 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7434,7 +7432,7 @@ private:
         if (runner->mIsFailureExpected_95 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7484,7 +7482,7 @@ private:
         if (runner->mIsFailureExpected_96 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7504,14 +7502,14 @@ private:
         if (runner->mIsFailureExpected_96 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (count != 4)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1,2,3,4");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7561,7 +7559,7 @@ private:
         if (runner->mIsFailureExpected_97 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7581,14 +7579,14 @@ private:
         if (runner->mIsFailureExpected_97 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (count != 4)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "Test0,Test1,Test2,Test3");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7638,7 +7636,7 @@ private:
         if (runner->mIsFailureExpected_98 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7658,7 +7656,7 @@ private:
         if (runner->mIsFailureExpected_98 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7666,7 +7664,7 @@ private:
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'",
                          "[object Object],[object Object],[object Object],[object Object]");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7716,7 +7714,7 @@ private:
         if (runner->mIsFailureExpected_99 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7735,14 +7733,14 @@ private:
         if (runner->mIsFailureExpected_99 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (unsupported != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7794,7 +7792,7 @@ private:
         if (runner->mIsFailureExpected_100 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7813,7 +7811,7 @@ private:
         if (runner->mIsFailureExpected_100 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7827,14 +7825,14 @@ public:
     Test_3_1_1() : TestCommand("Test_3_1_1"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         if (mTestCount == mTestIndex)
         {
             ChipLogProgress(chipTool, "Test_3_1_1: Test complete");
-            SetCommandExitStatus(true);
+            SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
         // Ensure we increment mTestIndex before we start running the relevant
@@ -7860,10 +7858,8 @@ public:
         if (CHIP_NO_ERROR != err)
         {
             ChipLogProgress(chipTool, "Test_3_1_1: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(false);
+            SetCommandExitStatus(err);
         }
-
-        return err;
     }
 
 private:
@@ -7917,7 +7913,7 @@ private:
         if (runner->mIsFailureExpected_0 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7936,14 +7932,14 @@ private:
         if (runner->mIsFailureExpected_0 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (clusterRevision != 2U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "2");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -7993,7 +7989,7 @@ private:
         if (runner->mIsFailureExpected_1 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8012,14 +8008,14 @@ private:
         if (runner->mIsFailureExpected_1 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (clusterRevision != 2U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "2");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8069,7 +8065,7 @@ private:
         if (runner->mIsFailureExpected_2 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8088,14 +8084,14 @@ private:
         if (runner->mIsFailureExpected_2 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (featureMap != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8145,7 +8141,7 @@ private:
         if (runner->mIsFailureExpected_3 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8164,14 +8160,14 @@ private:
         if (runner->mIsFailureExpected_3 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (featureMap != 0UL)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8185,14 +8181,14 @@ public:
     Test_3_2_1() : TestCommand("Test_3_2_1"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         if (mTestCount == mTestIndex)
         {
             ChipLogProgress(chipTool, "Test_3_2_1: Test complete");
-            SetCommandExitStatus(true);
+            SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
         // Ensure we increment mTestIndex before we start running the relevant
@@ -8242,10 +8238,8 @@ public:
         if (CHIP_NO_ERROR != err)
         {
             ChipLogProgress(chipTool, "Test_3_2_1: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(false);
+            SetCommandExitStatus(err);
         }
-
-        return err;
     }
 
 private:
@@ -8299,7 +8293,7 @@ private:
         if (runner->mIsFailureExpected_0 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8318,14 +8312,14 @@ private:
         if (runner->mIsFailureExpected_0 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onOff != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8375,7 +8369,7 @@ private:
         if (runner->mIsFailureExpected_1 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8394,14 +8388,14 @@ private:
         if (runner->mIsFailureExpected_1 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onOff != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8451,7 +8445,7 @@ private:
         if (runner->mIsFailureExpected_2 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8470,14 +8464,14 @@ private:
         if (runner->mIsFailureExpected_2 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (globalSceneControl != 1)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8527,7 +8521,7 @@ private:
         if (runner->mIsFailureExpected_3 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8546,14 +8540,14 @@ private:
         if (runner->mIsFailureExpected_3 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onTime != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8603,7 +8597,7 @@ private:
         if (runner->mIsFailureExpected_4 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8622,14 +8616,14 @@ private:
         if (runner->mIsFailureExpected_4 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (offWaitTime != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8679,7 +8673,7 @@ private:
         if (runner->mIsFailureExpected_5 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8698,14 +8692,14 @@ private:
         if (runner->mIsFailureExpected_5 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (startUpOnOff != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8756,7 +8750,7 @@ private:
         if (runner->mIsFailureExpected_6 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8775,7 +8769,7 @@ private:
         if (runner->mIsFailureExpected_6 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8827,7 +8821,7 @@ private:
         if (runner->mIsFailureExpected_7 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8846,7 +8840,7 @@ private:
         if (runner->mIsFailureExpected_7 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8898,7 +8892,7 @@ private:
         if (runner->mIsFailureExpected_8 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8917,7 +8911,7 @@ private:
         if (runner->mIsFailureExpected_8 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8967,7 +8961,7 @@ private:
         if (runner->mIsFailureExpected_9 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -8986,14 +8980,14 @@ private:
         if (runner->mIsFailureExpected_9 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onTime != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9043,7 +9037,7 @@ private:
         if (runner->mIsFailureExpected_10 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9062,14 +9056,14 @@ private:
         if (runner->mIsFailureExpected_10 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (offWaitTime != 0U)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9119,7 +9113,7 @@ private:
         if (runner->mIsFailureExpected_11 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9138,14 +9132,14 @@ private:
         if (runner->mIsFailureExpected_11 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (startUpOnOff != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9159,14 +9153,14 @@ public:
     Test_3_2_2() : TestCommand("Test_3_2_2"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         if (mTestCount == mTestIndex)
         {
             ChipLogProgress(chipTool, "Test_3_2_2: Test complete");
-            SetCommandExitStatus(true);
+            SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
         // Ensure we increment mTestIndex before we start running the relevant
@@ -9222,10 +9216,8 @@ public:
         if (CHIP_NO_ERROR != err)
         {
             ChipLogProgress(chipTool, "Test_3_2_2: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(false);
+            SetCommandExitStatus(err);
         }
-
-        return err;
     }
 
 private:
@@ -9279,7 +9271,7 @@ private:
         if (runner->mIsFailureExpected_0 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9298,7 +9290,7 @@ private:
         if (runner->mIsFailureExpected_0 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9348,7 +9340,7 @@ private:
         if (runner->mIsFailureExpected_1 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9367,14 +9359,14 @@ private:
         if (runner->mIsFailureExpected_1 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onOff != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9424,7 +9416,7 @@ private:
         if (runner->mIsFailureExpected_2 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9443,7 +9435,7 @@ private:
         if (runner->mIsFailureExpected_2 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9493,7 +9485,7 @@ private:
         if (runner->mIsFailureExpected_3 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9512,14 +9504,14 @@ private:
         if (runner->mIsFailureExpected_3 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onOff != 1)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9569,7 +9561,7 @@ private:
         if (runner->mIsFailureExpected_4 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9588,7 +9580,7 @@ private:
         if (runner->mIsFailureExpected_4 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9638,7 +9630,7 @@ private:
         if (runner->mIsFailureExpected_5 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9657,14 +9649,14 @@ private:
         if (runner->mIsFailureExpected_5 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onOff != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9714,7 +9706,7 @@ private:
         if (runner->mIsFailureExpected_6 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9733,7 +9725,7 @@ private:
         if (runner->mIsFailureExpected_6 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9783,7 +9775,7 @@ private:
         if (runner->mIsFailureExpected_7 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9802,14 +9794,14 @@ private:
         if (runner->mIsFailureExpected_7 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onOff != 1)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9859,7 +9851,7 @@ private:
         if (runner->mIsFailureExpected_8 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9878,7 +9870,7 @@ private:
         if (runner->mIsFailureExpected_8 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9928,7 +9920,7 @@ private:
         if (runner->mIsFailureExpected_9 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -9947,14 +9939,14 @@ private:
         if (runner->mIsFailureExpected_9 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onOff != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -10004,7 +9996,7 @@ private:
         if (runner->mIsFailureExpected_10 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -10023,7 +10015,7 @@ private:
         if (runner->mIsFailureExpected_10 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -10073,7 +10065,7 @@ private:
         if (runner->mIsFailureExpected_11 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -10092,14 +10084,14 @@ private:
         if (runner->mIsFailureExpected_11 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onOff != 1)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -10149,7 +10141,7 @@ private:
         if (runner->mIsFailureExpected_12 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -10168,7 +10160,7 @@ private:
         if (runner->mIsFailureExpected_12 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -10218,7 +10210,7 @@ private:
         if (runner->mIsFailureExpected_13 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -10237,14 +10229,14 @@ private:
         if (runner->mIsFailureExpected_13 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (onOff != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 

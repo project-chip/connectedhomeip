@@ -23,10 +23,6 @@
 
 using namespace ::chip;
 
-namespace {
-constexpr uint16_t kWaitDurationInSeconds = 10;
-} // namespace
-
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
@@ -37,29 +33,16 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
-CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR ModelCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    //
-    // Set this to true first BEFORE we send commands to ensure we don't
-    // end up in a situation where the response comes back faster than we can
-    // set the variable to true, which will cause it to block indefinitely.
-    //
-    UpdateWaitForResponse(true);
+    auto * ctx = GetExecContext();
 
-    {
-        chip::DeviceLayer::StackLock lock;
-
-        err = GetExecContext()->commissioner->GetConnectedDevice(remoteId, &mOnDeviceConnectedCallback,
-                                                                 &mOnDeviceConnectionFailureCallback);
-        VerifyOrExit(err == CHIP_NO_ERROR,
-                     ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %d", remoteId, err));
-    }
-
-    WaitForResponse(kWaitDurationInSeconds);
-
-    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
+    err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %d", ctx->remoteId, err));
 
 exit:
     return err;
@@ -78,5 +61,5 @@ void ModelCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ModelCommand context is null"));
-    command->SetCommandExitStatus(false);
+    command->SetCommandExitStatus(error);
 }

@@ -544,9 +544,9 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interf
     return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
 }
 
-void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout) {}
+void GetMdnsTimeout(timeval & timeout) {}
 
-void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet) {}
+void HandleMdnsTimeout() {}
 
 } // namespace Mdns
 } // namespace chip

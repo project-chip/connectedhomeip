@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Configuration file
+import("//build_overrides/chip.gni")
 
-declare_args() {
-  # possible values host_k32w, host_linux
-  host = "host_k32w"
+source_set("device_callbacks_manager") {
+  sources = [
+    "CHIPDeviceCallbacksMgr.cpp",
+    "CHIPDeviceCallbacksMgr.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+
+  cflags = [ "-Wconversion" ]
 }

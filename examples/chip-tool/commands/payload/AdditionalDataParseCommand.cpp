@@ -24,7 +24,7 @@
 using namespace ::chip;
 using namespace ::chip::SetupPayloadData;
 
-CHIP_ERROR AdditionalDataParseCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR AdditionalDataParseCommand::Run()
 {
     std::vector<uint8_t> payloadData;
     AdditionalDataPayload resultPayload;
@@ -47,5 +47,9 @@ CHIP_ERROR AdditionalDataParseCommand::Run(NodeId localId, NodeId remoteId)
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
 
 exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
     return err;
 }

@@ -25,6 +25,7 @@
 
 #include <netinet/in.h>
 
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
@@ -32,6 +33,7 @@
 using chip::Mdns::kMdnsTypeMaxSize;
 using chip::Mdns::MdnsServiceProtocol;
 using chip::Mdns::TextEntry;
+using chip::System::SocketEvents;
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 using std::chrono::seconds;
@@ -77,6 +79,19 @@ chip::Inet::IPAddressType ToAddressType(AvahiProtocol protocol)
     }
 
     return type;
+}
+
+AvahiWatchEvent ToAvahiWatchEvent(SocketEvents events)
+{
+    return static_cast<AvahiWatchEvent>((events.Has(chip::System::SocketEventFlags::kRead) ? AVAHI_WATCH_IN : 0) |
+                                        (events.Has(chip::System::SocketEventFlags::kWrite) ? AVAHI_WATCH_OUT : 0) |
+                                        (events.Has(chip::System::SocketEventFlags::kError) ? AVAHI_WATCH_ERR : 0));
+}
+
+void AvahiWatchCallbackTrampoline(chip::System::WatchableSocket & socket)
+{
+    AvahiWatch * const watch = reinterpret_cast<AvahiWatch *>(socket.GetCallbackData());
+    watch->mCallback(watch, socket.GetFD(), ToAvahiWatchEvent(socket.GetPendingEvents()), watch->mContext);
 }
 
 CHIP_ERROR MakeAvahiStringListFromTextEntries(TextEntry * entries, size_t size, AvahiStringList ** strListOut)
@@ -133,6 +148,8 @@ Poller::Poller()
     mAvahiPoller.timeout_new    = TimeoutNew;
     mAvahiPoller.timeout_update = TimeoutUpdate;
     mAvahiPoller.timeout_free   = TimeoutFree;
+
+    mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEvents();
 }
 
 AvahiWatch * Poller::WatchNew(const struct AvahiPoll * poller, int fd, AvahiWatchEvent event, AvahiWatchCallback callback,
@@ -145,19 +162,43 @@ AvahiWatch * Poller::WatchNew(int fd, AvahiWatchEvent event, AvahiWatchCallback 
 {
     VerifyOrDie(callback != nullptr && fd >= 0);
 
-    mWatches.emplace_back(new AvahiWatch{ fd, event, 0, callback, context, this });
+    auto watch = std::make_unique<AvahiWatch>();
+    watch->mSocket.Init(*mWatchableEvents)
+        .Attach(fd)
+        .SetCallback(AvahiWatchCallbackTrampoline, reinterpret_cast<intptr_t>(watch.get()))
+        .RequestCallbackOnPendingRead(event & AVAHI_WATCH_IN)
+        .RequestCallbackOnPendingWrite(event & AVAHI_WATCH_OUT);
+    watch->mCallback = callback;
+    watch->mContext  = context;
+    watch->mPoller   = this;
+    mWatches.emplace_back(std::move(watch));
 
     return mWatches.back().get();
 }
 
 void Poller::WatchUpdate(AvahiWatch * watch, AvahiWatchEvent event)
 {
-    watch->mWatchEvents = event;
+    if (event & AVAHI_WATCH_IN)
+    {
+        watch->mSocket.RequestCallbackOnPendingRead();
+    }
+    else
+    {
+        watch->mSocket.ClearCallbackOnPendingRead();
+    }
+    if (event & AVAHI_WATCH_OUT)
+    {
+        watch->mSocket.RequestCallbackOnPendingWrite();
+    }
+    else
+    {
+        watch->mSocket.ClearCallbackOnPendingWrite();
+    }
 }
 
 AvahiWatchEvent Poller::WatchGetEvents(AvahiWatch * watch)
 {
-    return static_cast<AvahiWatchEvent>(watch->mHappenedEvents);
+    return ToAvahiWatchEvent(watch->mSocket.GetPendingEvents());
 }
 
 void Poller::WatchFree(AvahiWatch * watch)
@@ -167,6 +208,7 @@ void Poller::WatchFree(AvahiWatch * watch)
 
 void Poller::WatchFree(AvahiWatch & watch)
 {
+    (void) watch.mSocket.ReleaseFD();
     mWatches.erase(std::remove_if(mWatches.begin(), mWatches.end(),
                                   [&watch](const std::unique_ptr<AvahiWatch> & aValue) { return aValue.get() == &watch; }),
                    mWatches.end());
@@ -226,37 +268,9 @@ void Poller::TimeoutFree(AvahiTimeout & timer)
                   mTimers.end());
 }
 
-void Poller::UpdateFdSet(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & aMaxFd, timeval & timeout)
+void Poller::GetTimeout(timeval & timeout)
 {
     microseconds timeoutVal = seconds(timeout.tv_sec) + microseconds(timeout.tv_usec);
-
-    for (auto && watch : mWatches)
-    {
-        int fd                 = watch->mFd;
-        AvahiWatchEvent events = watch->mWatchEvents;
-
-        if (AVAHI_WATCH_IN & events)
-        {
-            FD_SET(fd, &readFdSet);
-        }
-
-        if (AVAHI_WATCH_OUT & events)
-        {
-            FD_SET(fd, &writeFdSet);
-        }
-
-        if (AVAHI_WATCH_ERR & events)
-        {
-            FD_SET(fd, &errorFdSet);
-        }
-
-        if (aMaxFd < fd)
-        {
-            aMaxFd = fd;
-        }
-
-        watch->mHappenedEvents = 0;
-    }
 
     for (auto && timer : mTimers)
     {
@@ -282,37 +296,9 @@ void Poller::UpdateFdSet(fd_set & readFdSet, fd_set & writeFdSet, fd_set & error
     timeout.tv_usec = static_cast<uint64_t>(timeoutVal.count()) % kUsPerSec;
 }
 
-void Poller::Process(const fd_set & readFdSet, const fd_set & writeFdSet, const fd_set & errorFdSet)
+void Poller::HandleTimeout()
 {
     steady_clock::time_point now = steady_clock::now();
-
-    for (auto && watch : mWatches)
-    {
-        int fd                 = watch->mFd;
-        AvahiWatchEvent events = watch->mWatchEvents;
-
-        watch->mHappenedEvents = 0;
-
-        if ((AVAHI_WATCH_IN & events) && FD_ISSET(fd, &readFdSet))
-        {
-            watch->mHappenedEvents |= AVAHI_WATCH_IN;
-        }
-
-        if ((AVAHI_WATCH_OUT & events) && FD_ISSET(fd, &writeFdSet))
-        {
-            watch->mHappenedEvents |= AVAHI_WATCH_OUT;
-        }
-
-        if ((AVAHI_WATCH_ERR & events) && FD_ISSET(fd, &errorFdSet))
-        {
-            watch->mHappenedEvents |= AVAHI_WATCH_ERR;
-        }
-
-        if (watch->mHappenedEvents)
-        {
-            watch->mCallback(watch.get(), watch->mFd, static_cast<AvahiWatchEvent>(watch->mHappenedEvents), watch->mContext);
-        }
-    }
 
     for (auto && timer : mTimers)
     {
@@ -753,14 +739,14 @@ MdnsAvahi::~MdnsAvahi()
     }
 }
 
-void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout)
+void GetMdnsTimeout(timeval & timeout)
 {
-    MdnsAvahi::GetInstance().GetPoller().UpdateFdSet(readFdSet, writeFdSet, errorFdSet, maxFd, timeout);
+    MdnsAvahi::GetInstance().GetPoller().GetTimeout(timeout);
 }
 
-void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet)
+void HandleMdnsTimeout()
 {
-    MdnsAvahi::GetInstance().GetPoller().Process(readFdSet, writeFdSet, errorFdSet);
+    MdnsAvahi::GetInstance().GetPoller().HandleTimeout();
 }
 
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
