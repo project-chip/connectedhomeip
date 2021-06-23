@@ -7675,7 +7675,7 @@ private:
     typedef void (*SuccessCallback_99)(void * context, uint8_t unsupported);
     chip::Callback::Callback<SuccessCallback_99> * mOnSuccessCallback_99     = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_99 = nullptr;
-    bool mIsFailureExpected_99                                               = 1;
+    bool mIsFailureExpected_99                                               = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_99()
     {
@@ -7710,6 +7710,12 @@ private:
 
         delete runner->mOnFailureCallback_99;
         delete runner->mOnSuccessCallback_99;
+
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+        {
+            runner->NextTest();
+            return;
+        }
 
         if (runner->mIsFailureExpected_99 == false)
         {
@@ -7751,7 +7757,7 @@ private:
     typedef void (*SuccessCallback_100)(void * context, uint8_t unsupported);
     chip::Callback::Callback<SuccessCallback_100> * mOnSuccessCallback_100    = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_100 = nullptr;
-    bool mIsFailureExpected_100                                               = 1;
+    bool mIsFailureExpected_100                                               = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_100()
     {
@@ -7788,6 +7794,12 @@ private:
 
         delete runner->mOnFailureCallback_100;
         delete runner->mOnSuccessCallback_100;
+
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+        {
+            runner->NextTest();
+            return;
+        }
 
         if (runner->mIsFailureExpected_100 == false)
         {
@@ -10244,15 +10256,1543 @@ private:
     }
 };
 
+class Test_10_1_1 : public TestCommand
+{
+public:
+    Test_10_1_1() : TestCommand("Test_10_1_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "Test_10_1_1: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterBasicCommandReadAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterBasicCommandReadAttribute_1();
+            break;
+        case 2:
+            err = TestSendClusterBasicCommandReadAttribute_2();
+            break;
+        case 3:
+            err = TestSendClusterBasicCommandReadAttribute_3();
+            break;
+        case 4:
+            err = TestSendClusterBasicCommandReadAttribute_4();
+            break;
+        case 5:
+            err = TestSendClusterBasicCommandReadAttribute_5();
+            break;
+        case 6:
+            err = TestSendClusterBasicCommandReadAttribute_6();
+            break;
+        case 7:
+            err = TestSendClusterBasicCommandReadAttribute_7();
+            break;
+        case 8:
+            err = TestSendClusterBasicCommandReadAttribute_8();
+            break;
+        case 9:
+            err = TestSendClusterBasicCommandReadAttribute_9();
+            break;
+        case 10:
+            err = TestSendClusterBasicCommandReadAttribute_10();
+            break;
+        case 11:
+            err = TestSendClusterBasicCommandReadAttribute_11();
+            break;
+        case 12:
+            err = TestSendClusterBasicCommandReadAttribute_12();
+            break;
+        case 13:
+            err = TestSendClusterBasicCommandReadAttribute_13();
+            break;
+        case 14:
+            err = TestSendClusterBasicCommandReadAttribute_14();
+            break;
+        case 15:
+            err = TestSendClusterBasicCommandReadAttribute_15();
+            break;
+        case 16:
+            err = TestSendClusterBasicCommandReadAttribute_16();
+            break;
+        case 17:
+            err = TestSendClusterBasicCommandReadAttribute_17();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "Test_10_1_1: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 18;
+
+    //
+    // Tests methods
+    //
+
+    // Test Query Interaction Model Version
+    typedef void (*SuccessCallback_0)(void * context, uint16_t interactionModelVersion);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Basic - Query Interaction Model Version: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_0_FailureResponse, this);
+        mOnSuccessCallback_0 =
+            new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterBasicCommandReadAttribute_0_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeInteractionModelVersion(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query Interaction Model Version: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_0_SuccessResponse(void * context, uint16_t interactionModelVersion)
+    {
+        ChipLogProgress(chipTool, "Basic - Query Interaction Model Version: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: interactionModelVersion type checking is not implemented yet. Expected type: '%s'",
+                     "uint16");
+
+        runner->NextTest();
+    }
+
+    // Test Query Vendor Name
+    typedef void (*SuccessCallback_1)(void * context, chip::ByteSpan vendorName);
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
+    bool mIsFailureExpected_1                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_1()
+    {
+        ChipLogProgress(chipTool, "Basic - Query Vendor Name: Sending command...");
+
+        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_1_FailureResponse, this);
+        mOnSuccessCallback_1 =
+            new chip::Callback::Callback<SuccessCallback_1>(OnTestSendClusterBasicCommandReadAttribute_1_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeVendorName(mOnSuccessCallback_1->Cancel(), mOnFailureCallback_1->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_1;
+            delete mOnSuccessCallback_1;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query Vendor Name: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_1_SuccessResponse(void * context, chip::ByteSpan vendorName)
+    {
+        ChipLogProgress(chipTool, "Basic - Query Vendor Name: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: vendorName type checking is not implemented yet. Expected type: '%s'", "string");
+
+        if (vendorName.size() > 32)
+        {
+            ChipLogError(chipTool, "Error: vendorName is too long. Max size is 32 but got '%zu'", vendorName.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query VendorID
+    typedef void (*SuccessCallback_2)(void * context, uint16_t vendorID);
+    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_2 = nullptr;
+    bool mIsFailureExpected_2                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_2()
+    {
+        ChipLogProgress(chipTool, "Basic - Query VendorID: Sending command...");
+
+        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_2_FailureResponse, this);
+        mOnSuccessCallback_2 =
+            new chip::Callback::Callback<SuccessCallback_2>(OnTestSendClusterBasicCommandReadAttribute_2_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeVendorID(mOnSuccessCallback_2->Cancel(), mOnFailureCallback_2->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_2;
+            delete mOnSuccessCallback_2;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query VendorID: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_2_SuccessResponse(void * context, uint16_t vendorID)
+    {
+        ChipLogProgress(chipTool, "Basic - Query VendorID: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: vendorID type checking is not implemented yet. Expected type: '%s'", "uint16");
+
+        runner->NextTest();
+    }
+
+    // Test Query Product Name
+    typedef void (*SuccessCallback_3)(void * context, chip::ByteSpan productName);
+    chip::Callback::Callback<SuccessCallback_3> * mOnSuccessCallback_3      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_3 = nullptr;
+    bool mIsFailureExpected_3                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_3()
+    {
+        ChipLogProgress(chipTool, "Basic - Query Product Name: Sending command...");
+
+        mOnFailureCallback_3 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_3_FailureResponse, this);
+        mOnSuccessCallback_3 =
+            new chip::Callback::Callback<SuccessCallback_3>(OnTestSendClusterBasicCommandReadAttribute_3_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeProductName(mOnSuccessCallback_3->Cancel(), mOnFailureCallback_3->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_3;
+            delete mOnSuccessCallback_3;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_3_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query Product Name: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_3;
+        delete runner->mOnSuccessCallback_3;
+
+        if (runner->mIsFailureExpected_3 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_3_SuccessResponse(void * context, chip::ByteSpan productName)
+    {
+        ChipLogProgress(chipTool, "Basic - Query Product Name: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_3;
+        delete runner->mOnSuccessCallback_3;
+
+        if (runner->mIsFailureExpected_3 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: productName type checking is not implemented yet. Expected type: '%s'", "string");
+
+        if (productName.size() > 32)
+        {
+            ChipLogError(chipTool, "Error: productName is too long. Max size is 32 but got '%zu'", productName.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query ProductID
+    typedef void (*SuccessCallback_4)(void * context, uint16_t productID);
+    chip::Callback::Callback<SuccessCallback_4> * mOnSuccessCallback_4      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_4 = nullptr;
+    bool mIsFailureExpected_4                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_4()
+    {
+        ChipLogProgress(chipTool, "Basic - Query ProductID: Sending command...");
+
+        mOnFailureCallback_4 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_4_FailureResponse, this);
+        mOnSuccessCallback_4 =
+            new chip::Callback::Callback<SuccessCallback_4>(OnTestSendClusterBasicCommandReadAttribute_4_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeProductID(mOnSuccessCallback_4->Cancel(), mOnFailureCallback_4->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_4;
+            delete mOnSuccessCallback_4;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_4_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query ProductID: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_4;
+        delete runner->mOnSuccessCallback_4;
+
+        if (runner->mIsFailureExpected_4 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_4_SuccessResponse(void * context, uint16_t productID)
+    {
+        ChipLogProgress(chipTool, "Basic - Query ProductID: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_4;
+        delete runner->mOnSuccessCallback_4;
+
+        if (runner->mIsFailureExpected_4 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: productID type checking is not implemented yet. Expected type: '%s'", "uint16");
+
+        runner->NextTest();
+    }
+
+    // Test Query User Label
+    typedef void (*SuccessCallback_5)(void * context, chip::ByteSpan userLabel);
+    chip::Callback::Callback<SuccessCallback_5> * mOnSuccessCallback_5      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_5 = nullptr;
+    bool mIsFailureExpected_5                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_5()
+    {
+        ChipLogProgress(chipTool, "Basic - Query User Label: Sending command...");
+
+        mOnFailureCallback_5 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_5_FailureResponse, this);
+        mOnSuccessCallback_5 =
+            new chip::Callback::Callback<SuccessCallback_5>(OnTestSendClusterBasicCommandReadAttribute_5_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeUserLabel(mOnSuccessCallback_5->Cancel(), mOnFailureCallback_5->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_5;
+            delete mOnSuccessCallback_5;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_5_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query User Label: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_5;
+        delete runner->mOnSuccessCallback_5;
+
+        if (runner->mIsFailureExpected_5 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_5_SuccessResponse(void * context, chip::ByteSpan userLabel)
+    {
+        ChipLogProgress(chipTool, "Basic - Query User Label: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_5;
+        delete runner->mOnSuccessCallback_5;
+
+        if (runner->mIsFailureExpected_5 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: userLabel type checking is not implemented yet. Expected type: '%s'", "string");
+
+        if (userLabel.size() > 32)
+        {
+            ChipLogError(chipTool, "Error: userLabel is too long. Max size is 32 but got '%zu'", userLabel.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query User Location
+    typedef void (*SuccessCallback_6)(void * context, chip::ByteSpan location);
+    chip::Callback::Callback<SuccessCallback_6> * mOnSuccessCallback_6      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_6 = nullptr;
+    bool mIsFailureExpected_6                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_6()
+    {
+        ChipLogProgress(chipTool, "Basic - Query User Location: Sending command...");
+
+        mOnFailureCallback_6 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_6_FailureResponse, this);
+        mOnSuccessCallback_6 =
+            new chip::Callback::Callback<SuccessCallback_6>(OnTestSendClusterBasicCommandReadAttribute_6_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeLocation(mOnSuccessCallback_6->Cancel(), mOnFailureCallback_6->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_6;
+            delete mOnSuccessCallback_6;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_6_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query User Location: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_6;
+        delete runner->mOnSuccessCallback_6;
+
+        if (runner->mIsFailureExpected_6 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_6_SuccessResponse(void * context, chip::ByteSpan location)
+    {
+        ChipLogProgress(chipTool, "Basic - Query User Location: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_6;
+        delete runner->mOnSuccessCallback_6;
+
+        if (runner->mIsFailureExpected_6 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: location type checking is not implemented yet. Expected type: '%s'", "string");
+
+        ChipLogError(chipTool, "Warning: location format checking is not implemented yet. Expected format: '%s'",
+                     "ISO 3166-1 alpha-2");
+
+        if (location.size() > 2)
+        {
+            ChipLogError(chipTool, "Error: location is too long. Max size is 2 but got '%zu'", location.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query HardwareVersion
+    typedef void (*SuccessCallback_7)(void * context, uint16_t hardwareVersion);
+    chip::Callback::Callback<SuccessCallback_7> * mOnSuccessCallback_7      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_7 = nullptr;
+    bool mIsFailureExpected_7                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_7()
+    {
+        ChipLogProgress(chipTool, "Basic - Query HardwareVersion: Sending command...");
+
+        mOnFailureCallback_7 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_7_FailureResponse, this);
+        mOnSuccessCallback_7 =
+            new chip::Callback::Callback<SuccessCallback_7>(OnTestSendClusterBasicCommandReadAttribute_7_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeHardwareVersion(mOnSuccessCallback_7->Cancel(), mOnFailureCallback_7->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_7;
+            delete mOnSuccessCallback_7;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_7_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query HardwareVersion: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_7;
+        delete runner->mOnSuccessCallback_7;
+
+        if (runner->mIsFailureExpected_7 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_7_SuccessResponse(void * context, uint16_t hardwareVersion)
+    {
+        ChipLogProgress(chipTool, "Basic - Query HardwareVersion: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_7;
+        delete runner->mOnSuccessCallback_7;
+
+        if (runner->mIsFailureExpected_7 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: hardwareVersion type checking is not implemented yet. Expected type: '%s'", "uint16");
+
+        runner->NextTest();
+    }
+
+    // Test Query HardwareVersionString
+    typedef void (*SuccessCallback_8)(void * context, chip::ByteSpan hardwareVersionString);
+    chip::Callback::Callback<SuccessCallback_8> * mOnSuccessCallback_8      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_8 = nullptr;
+    bool mIsFailureExpected_8                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_8()
+    {
+        ChipLogProgress(chipTool, "Basic - Query HardwareVersionString: Sending command...");
+
+        mOnFailureCallback_8 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_8_FailureResponse, this);
+        mOnSuccessCallback_8 =
+            new chip::Callback::Callback<SuccessCallback_8>(OnTestSendClusterBasicCommandReadAttribute_8_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeHardwareVersionString(mOnSuccessCallback_8->Cancel(), mOnFailureCallback_8->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_8;
+            delete mOnSuccessCallback_8;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_8_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query HardwareVersionString: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_8;
+        delete runner->mOnSuccessCallback_8;
+
+        if (runner->mIsFailureExpected_8 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_8_SuccessResponse(void * context, chip::ByteSpan hardwareVersionString)
+    {
+        ChipLogProgress(chipTool, "Basic - Query HardwareVersionString: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_8;
+        delete runner->mOnSuccessCallback_8;
+
+        if (runner->mIsFailureExpected_8 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: hardwareVersionString type checking is not implemented yet. Expected type: '%s'",
+                     "string");
+
+        if (hardwareVersionString.size() < 1)
+        {
+            ChipLogError(chipTool, "Error: hardwareVersionString is too short. Min size is 1 but got '%zu'",
+                         hardwareVersionString.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        if (hardwareVersionString.size() > 64)
+        {
+            ChipLogError(chipTool, "Error: hardwareVersionString is too long. Max size is 64 but got '%zu'",
+                         hardwareVersionString.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query SoftwareVersion
+    typedef void (*SuccessCallback_9)(void * context, uint32_t softwareVersion);
+    chip::Callback::Callback<SuccessCallback_9> * mOnSuccessCallback_9      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_9 = nullptr;
+    bool mIsFailureExpected_9                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_9()
+    {
+        ChipLogProgress(chipTool, "Basic - Query SoftwareVersion: Sending command...");
+
+        mOnFailureCallback_9 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_9_FailureResponse, this);
+        mOnSuccessCallback_9 =
+            new chip::Callback::Callback<SuccessCallback_9>(OnTestSendClusterBasicCommandReadAttribute_9_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeSoftwareVersion(mOnSuccessCallback_9->Cancel(), mOnFailureCallback_9->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_9;
+            delete mOnSuccessCallback_9;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_9_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query SoftwareVersion: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_9;
+        delete runner->mOnSuccessCallback_9;
+
+        if (runner->mIsFailureExpected_9 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_9_SuccessResponse(void * context, uint32_t softwareVersion)
+    {
+        ChipLogProgress(chipTool, "Basic - Query SoftwareVersion: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_9;
+        delete runner->mOnSuccessCallback_9;
+
+        if (runner->mIsFailureExpected_9 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: softwareVersion type checking is not implemented yet. Expected type: '%s'", "uint32");
+
+        runner->NextTest();
+    }
+
+    // Test Query SoftwareVersionString
+    typedef void (*SuccessCallback_10)(void * context, chip::ByteSpan softwareVersionString);
+    chip::Callback::Callback<SuccessCallback_10> * mOnSuccessCallback_10     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_10 = nullptr;
+    bool mIsFailureExpected_10                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_10()
+    {
+        ChipLogProgress(chipTool, "Basic - Query SoftwareVersionString: Sending command...");
+
+        mOnFailureCallback_10 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_10_FailureResponse, this);
+        mOnSuccessCallback_10 =
+            new chip::Callback::Callback<SuccessCallback_10>(OnTestSendClusterBasicCommandReadAttribute_10_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeSoftwareVersionString(mOnSuccessCallback_10->Cancel(), mOnFailureCallback_10->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_10;
+            delete mOnSuccessCallback_10;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_10_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query SoftwareVersionString: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_10;
+        delete runner->mOnSuccessCallback_10;
+
+        if (runner->mIsFailureExpected_10 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_10_SuccessResponse(void * context, chip::ByteSpan softwareVersionString)
+    {
+        ChipLogProgress(chipTool, "Basic - Query SoftwareVersionString: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_10;
+        delete runner->mOnSuccessCallback_10;
+
+        if (runner->mIsFailureExpected_10 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: softwareVersionString type checking is not implemented yet. Expected type: '%s'",
+                     "string");
+
+        ChipLogError(chipTool, "Warning: softwareVersionString format checking is not implemented yet. Expected format: '%s'",
+                     "ASCII");
+
+        if (softwareVersionString.size() < 1)
+        {
+            ChipLogError(chipTool, "Error: softwareVersionString is too short. Min size is 1 but got '%zu'",
+                         softwareVersionString.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        if (softwareVersionString.size() > 64)
+        {
+            ChipLogError(chipTool, "Error: softwareVersionString is too long. Max size is 64 but got '%zu'",
+                         softwareVersionString.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query ManufacturingDate
+    typedef void (*SuccessCallback_11)(void * context, chip::ByteSpan manufacturingDate);
+    chip::Callback::Callback<SuccessCallback_11> * mOnSuccessCallback_11     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_11 = nullptr;
+    bool mIsFailureExpected_11                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_11()
+    {
+        ChipLogProgress(chipTool, "Basic - Query ManufacturingDate: Sending command...");
+
+        mOnFailureCallback_11 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_11_FailureResponse, this);
+        mOnSuccessCallback_11 =
+            new chip::Callback::Callback<SuccessCallback_11>(OnTestSendClusterBasicCommandReadAttribute_11_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeManufacturingDate(mOnSuccessCallback_11->Cancel(), mOnFailureCallback_11->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_11;
+            delete mOnSuccessCallback_11;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_11_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query ManufacturingDate: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_11;
+        delete runner->mOnSuccessCallback_11;
+
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+        {
+            runner->NextTest();
+            return;
+        }
+
+        if (runner->mIsFailureExpected_11 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_11_SuccessResponse(void * context, chip::ByteSpan manufacturingDate)
+    {
+        ChipLogProgress(chipTool, "Basic - Query ManufacturingDate: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_11;
+        delete runner->mOnSuccessCallback_11;
+
+        if (runner->mIsFailureExpected_11 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: manufacturingDate type checking is not implemented yet. Expected type: '%s'", "string");
+
+        ChipLogError(chipTool, "Warning: manufacturingDate format checking is not implemented yet. Expected format: '%s'",
+                     "ISO 8601");
+
+        if (manufacturingDate.size() < 8)
+        {
+            ChipLogError(chipTool, "Error: manufacturingDate is too short. Min size is 8 but got '%zu'", manufacturingDate.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        if (manufacturingDate.size() > 16)
+        {
+            ChipLogError(chipTool, "Error: manufacturingDate is too long. Max size is 16 but got '%zu'", manufacturingDate.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query PartNumber
+    typedef void (*SuccessCallback_12)(void * context, chip::ByteSpan partNumber);
+    chip::Callback::Callback<SuccessCallback_12> * mOnSuccessCallback_12     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_12 = nullptr;
+    bool mIsFailureExpected_12                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_12()
+    {
+        ChipLogProgress(chipTool, "Basic - Query PartNumber: Sending command...");
+
+        mOnFailureCallback_12 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_12_FailureResponse, this);
+        mOnSuccessCallback_12 =
+            new chip::Callback::Callback<SuccessCallback_12>(OnTestSendClusterBasicCommandReadAttribute_12_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributePartNumber(mOnSuccessCallback_12->Cancel(), mOnFailureCallback_12->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_12;
+            delete mOnSuccessCallback_12;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_12_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query PartNumber: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_12;
+        delete runner->mOnSuccessCallback_12;
+
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+        {
+            runner->NextTest();
+            return;
+        }
+
+        if (runner->mIsFailureExpected_12 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_12_SuccessResponse(void * context, chip::ByteSpan partNumber)
+    {
+        ChipLogProgress(chipTool, "Basic - Query PartNumber: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_12;
+        delete runner->mOnSuccessCallback_12;
+
+        if (runner->mIsFailureExpected_12 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: partNumber type checking is not implemented yet. Expected type: '%s'", "string");
+
+        if (partNumber.size() > 32)
+        {
+            ChipLogError(chipTool, "Error: partNumber is too long. Max size is 32 but got '%zu'", partNumber.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query ProductURL
+    typedef void (*SuccessCallback_13)(void * context, chip::ByteSpan productURL);
+    chip::Callback::Callback<SuccessCallback_13> * mOnSuccessCallback_13     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_13 = nullptr;
+    bool mIsFailureExpected_13                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_13()
+    {
+        ChipLogProgress(chipTool, "Basic - Query ProductURL: Sending command...");
+
+        mOnFailureCallback_13 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_13_FailureResponse, this);
+        mOnSuccessCallback_13 =
+            new chip::Callback::Callback<SuccessCallback_13>(OnTestSendClusterBasicCommandReadAttribute_13_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeProductURL(mOnSuccessCallback_13->Cancel(), mOnFailureCallback_13->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_13;
+            delete mOnSuccessCallback_13;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_13_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query ProductURL: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_13;
+        delete runner->mOnSuccessCallback_13;
+
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+        {
+            runner->NextTest();
+            return;
+        }
+
+        if (runner->mIsFailureExpected_13 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_13_SuccessResponse(void * context, chip::ByteSpan productURL)
+    {
+        ChipLogProgress(chipTool, "Basic - Query ProductURL: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_13;
+        delete runner->mOnSuccessCallback_13;
+
+        if (runner->mIsFailureExpected_13 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: productURL type checking is not implemented yet. Expected type: '%s'", "string");
+
+        ChipLogError(chipTool, "Warning: productURL format checking is not implemented yet. Expected format: '%s'", "RFC3986");
+
+        if (productURL.size() > 256)
+        {
+            ChipLogError(chipTool, "Error: productURL is too long. Max size is 256 but got '%zu'", productURL.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query ProductLabel
+    typedef void (*SuccessCallback_14)(void * context, chip::ByteSpan productLabel);
+    chip::Callback::Callback<SuccessCallback_14> * mOnSuccessCallback_14     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_14 = nullptr;
+    bool mIsFailureExpected_14                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_14()
+    {
+        ChipLogProgress(chipTool, "Basic - Query ProductLabel: Sending command...");
+
+        mOnFailureCallback_14 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_14_FailureResponse, this);
+        mOnSuccessCallback_14 =
+            new chip::Callback::Callback<SuccessCallback_14>(OnTestSendClusterBasicCommandReadAttribute_14_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeProductLabel(mOnSuccessCallback_14->Cancel(), mOnFailureCallback_14->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_14;
+            delete mOnSuccessCallback_14;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_14_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query ProductLabel: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_14;
+        delete runner->mOnSuccessCallback_14;
+
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+        {
+            runner->NextTest();
+            return;
+        }
+
+        if (runner->mIsFailureExpected_14 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_14_SuccessResponse(void * context, chip::ByteSpan productLabel)
+    {
+        ChipLogProgress(chipTool, "Basic - Query ProductLabel: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_14;
+        delete runner->mOnSuccessCallback_14;
+
+        if (runner->mIsFailureExpected_14 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: productLabel type checking is not implemented yet. Expected type: '%s'", "string");
+
+        if (productLabel.size() > 64)
+        {
+            ChipLogError(chipTool, "Error: productLabel is too long. Max size is 64 but got '%zu'", productLabel.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query SerialNumber
+    typedef void (*SuccessCallback_15)(void * context, chip::ByteSpan serialNumber);
+    chip::Callback::Callback<SuccessCallback_15> * mOnSuccessCallback_15     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_15 = nullptr;
+    bool mIsFailureExpected_15                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_15()
+    {
+        ChipLogProgress(chipTool, "Basic - Query SerialNumber: Sending command...");
+
+        mOnFailureCallback_15 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_15_FailureResponse, this);
+        mOnSuccessCallback_15 =
+            new chip::Callback::Callback<SuccessCallback_15>(OnTestSendClusterBasicCommandReadAttribute_15_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeSerialNumber(mOnSuccessCallback_15->Cancel(), mOnFailureCallback_15->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_15;
+            delete mOnSuccessCallback_15;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_15_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query SerialNumber: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_15;
+        delete runner->mOnSuccessCallback_15;
+
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+        {
+            runner->NextTest();
+            return;
+        }
+
+        if (runner->mIsFailureExpected_15 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_15_SuccessResponse(void * context, chip::ByteSpan serialNumber)
+    {
+        ChipLogProgress(chipTool, "Basic - Query SerialNumber: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_15;
+        delete runner->mOnSuccessCallback_15;
+
+        if (runner->mIsFailureExpected_15 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: serialNumber type checking is not implemented yet. Expected type: '%s'", "string");
+
+        if (serialNumber.size() > 32)
+        {
+            ChipLogError(chipTool, "Error: serialNumber is too long. Max size is 32 but got '%zu'", serialNumber.size());
+            runner->SetCommandExitStatus(false);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Query LocalConfigDisabled
+    typedef void (*SuccessCallback_16)(void * context, uint8_t localConfigDisabled);
+    chip::Callback::Callback<SuccessCallback_16> * mOnSuccessCallback_16     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_16 = nullptr;
+    bool mIsFailureExpected_16                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_16()
+    {
+        ChipLogProgress(chipTool, "Basic - Query LocalConfigDisabled: Sending command...");
+
+        mOnFailureCallback_16 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_16_FailureResponse, this);
+        mOnSuccessCallback_16 =
+            new chip::Callback::Callback<SuccessCallback_16>(OnTestSendClusterBasicCommandReadAttribute_16_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeLocalConfigDisabled(mOnSuccessCallback_16->Cancel(), mOnFailureCallback_16->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_16;
+            delete mOnSuccessCallback_16;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_16_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query LocalConfigDisabled: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_16;
+        delete runner->mOnSuccessCallback_16;
+
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+        {
+            runner->NextTest();
+            return;
+        }
+
+        if (runner->mIsFailureExpected_16 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_16_SuccessResponse(void * context, uint8_t localConfigDisabled)
+    {
+        ChipLogProgress(chipTool, "Basic - Query LocalConfigDisabled: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_16;
+        delete runner->mOnSuccessCallback_16;
+
+        if (runner->mIsFailureExpected_16 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: localConfigDisabled type checking is not implemented yet. Expected type: '%s'", "boolean");
+
+        runner->NextTest();
+    }
+
+    // Test Query Reachable
+    typedef void (*SuccessCallback_17)(void * context, uint8_t reachable);
+    chip::Callback::Callback<SuccessCallback_17> * mOnSuccessCallback_17     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_17 = nullptr;
+    bool mIsFailureExpected_17                                               = 0;
+
+    CHIP_ERROR TestSendClusterBasicCommandReadAttribute_17()
+    {
+        ChipLogProgress(chipTool, "Basic - Query Reachable: Sending command...");
+
+        mOnFailureCallback_17 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterBasicCommandReadAttribute_17_FailureResponse, this);
+        mOnSuccessCallback_17 =
+            new chip::Callback::Callback<SuccessCallback_17>(OnTestSendClusterBasicCommandReadAttribute_17_SuccessResponse, this);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeReachable(mOnSuccessCallback_17->Cancel(), mOnFailureCallback_17->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_17;
+            delete mOnSuccessCallback_17;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_17_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Basic - Query Reachable: Failure Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_17;
+        delete runner->mOnSuccessCallback_17;
+
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
+        {
+            runner->NextTest();
+            return;
+        }
+
+        if (runner->mIsFailureExpected_17 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBasicCommandReadAttribute_17_SuccessResponse(void * context, uint8_t reachable)
+    {
+        ChipLogProgress(chipTool, "Basic - Query Reachable: Success Response");
+
+        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+
+        delete runner->mOnFailureCallback_17;
+        delete runner->mOnSuccessCallback_17;
+
+        if (runner->mIsFailureExpected_17 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: reachable type checking is not implemented yet. Expected type: '%s'", "boolean");
+
+        runner->NextTest();
+    }
+};
+
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
-        make_unique<TestCluster>(),
-        make_unique<Test_3_1_1>(),
-        make_unique<Test_3_2_1>(),
-        make_unique<Test_3_2_2>(),
+        make_unique<TestCluster>(), make_unique<Test_3_1_1>(),  make_unique<Test_3_2_1>(),
+        make_unique<Test_3_2_2>(),  make_unique<Test_10_1_1>(),
     };
 
     commands.Register(clusterName, clusterCommands);

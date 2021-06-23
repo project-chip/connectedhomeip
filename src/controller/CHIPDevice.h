@@ -353,12 +353,10 @@ public:
 
     CASESession & GetCASESession() { return mCASESession; }
 
-    CHIP_ERROR GenerateCSRNonce() { return Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce)); }
-
-    CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
+    CHIP_ERROR SetCSRNonce(Optional<ByteSpan> csrNonce)
     {
-        VerifyOrReturnError(csrNonce.size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
+        VerifyOrReturnError(csrNonce.Value().size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mCSRNonce, csrNonce.Value().data(), csrNonce.Value().size());
         return CHIP_NO_ERROR;
     }
 

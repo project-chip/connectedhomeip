@@ -57,6 +57,10 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
             errorWithDomain:CHIPErrorDomain
                        code:CHIPErrorCodeDuplicateExists
                    userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A Duplicate entry or setting exists.", nil) }];
+    case EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeUnsupportedAttribute
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Attribute is not supported.", nil) }];
     case CHIP_NO_ERROR:
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPSuccess
@@ -79,6 +83,8 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
     }
 
     switch (error.code) {
+    case CHIPErrorCodeUnsupportedAttribute:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
     case CHIPErrorCodeDuplicateExists:
         return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
     case CHIPErrorCodeInvalidStringLength:
