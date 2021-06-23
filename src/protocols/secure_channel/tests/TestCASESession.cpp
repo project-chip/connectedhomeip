@@ -335,14 +335,15 @@ CASEServer gPairingServer;
 void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
 {
     TestCASESecurePairingDelegate delegateCommissioner;
-    CASESession pairingCommissioner;
+
+    auto * pairingCommissioner = chip::Platform::New<CASESession>();
 
     AdminPairingTable adminTable;
     TestPersistentStorageDelegate storageDelegate;
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     gLoopback.mSentMessageCount = 0;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner->MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gPairingServer.GetSession().MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
 
     SessionIDAllocator idAllocator;
@@ -379,22 +380,25 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                                                                 &ctx.GetSecureSessionManager(), &adminTable,
                                                                 &idAllocator) == CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
+    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(pairingCommissioner);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials, 1, 0,
-                                                        contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials, 1, 0,
+                                                         contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
-    CASESession pairingCommissioner1;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner1.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * contextCommissioner1 = ctx.NewExchangeToLocal(&pairingCommissioner1);
+    auto * pairingCommissioner1 = chip::Platform::New<CASESession>();
+    NL_TEST_ASSERT(inSuite, pairingCommissioner1->MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    ExchangeContext * contextCommissioner1 = ctx.NewExchangeToLocal(pairingCommissioner1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials, 1, 0,
-                                                         contextCommissioner1, &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner1->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials, 1, 0,
+                                                          contextCommissioner1, &delegateCommissioner) == CHIP_NO_ERROR);
+
+    chip::Platform::Delete(pairingCommissioner);
+    chip::Platform::Delete(pairingCommissioner1);
 }
 
 void CASE_SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
