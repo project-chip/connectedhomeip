@@ -29,7 +29,8 @@ source_set("commands") {
     sources += [
       "Config.cpp",
       "Device.cpp",
-      "OnboardingCodes.cpp" ]
+      "OnboardingCodes.cpp",
+    ]
   }
 
   if (chip_enable_wifi) {
@@ -45,7 +46,7 @@ source_set("commands") {
   }
 
   public_deps = [
+    "${chip_root}/src/app/server",
     "${chip_root}/src/lib/shell:shell_core",
-    "${chip_root}/src/app/server"
-    ]
+  ]
 }
