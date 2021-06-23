@@ -706,6 +706,9 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     // OnLevel is not used for Move commands.
     state->useOnLevel = false;
 
+    // storedLevel is not use for Move commands.
+    state->storedLevel = INVALID_STORED_LEVEL;
+
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, state->eventDurationMs);
     status = EMBER_ZCL_STATUS_SUCCESS;
@@ -825,6 +828,9 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
 
     // OnLevel is not used for Step commands.
     state->useOnLevel = false;
+
+    // storedLevel is not used for Step commands
+    state->storedLevel = INVALID_STORED_LEVEL;
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, state->eventDurationMs);
