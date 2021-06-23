@@ -70,7 +70,7 @@ void ASN1Writer::InitNullWriter(void)
 
 ASN1_ERROR ASN1Writer::Finalize()
 {
-    // TODO: This method is not required and can be depricated.
+    // TODO: This method is not required and can be deprecated.
     return ASN1_NO_ERROR;
 }
 
