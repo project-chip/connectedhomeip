@@ -435,7 +435,7 @@ void UDPEndPoint::Free()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     DeferredFree(kReleaseDeferralErrorTactic_Die);
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
-    Release();
+    UDPEndPoint::sPool.Release(this);
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 

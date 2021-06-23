@@ -93,7 +93,7 @@ CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
     CHIP_ERROR res = CHIP_NO_ERROR;
 
 #if !CHIP_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
-    Release();
+    DNSResolver::sPool.Release(this);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
 
@@ -106,7 +106,7 @@ CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
          addrFamilyOption != kDNSOption_AddrFamily_IPv6Preferred) ||
         (optionFlags & ~kDNSOption_ValidFlags) != 0)
     {
-        Release();
+        DNSResolver::sPool.Release(this);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -162,7 +162,7 @@ CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
     if (addrFamilyOption == kDNSOption_AddrFamily_IPv6Only)
 #endif
     {
-        Release();
+        DNSResolver::sPool.Release(this);
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
@@ -200,7 +200,7 @@ CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
     else if (lwipErr != ERR_INPROGRESS)
     {
         res = chip::System::MapErrorLwIP(lwipErr);
-        Release();
+        DNSResolver::sPool.Release(this);
     }
 
     return res;
@@ -227,7 +227,7 @@ CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
     onComplete(appState, res, NumAddrs, addrArray);
 
     // Release DNSResolver object.
-    Release();
+    DNSResolver::sPool.Release(this);
 
     return CHIP_NO_ERROR;
 
@@ -300,7 +300,7 @@ void DNSResolver::HandleResolveComplete()
         OnComplete(AppState, (NumAddrs > 0) ? CHIP_NO_ERROR : INET_ERROR_HOST_NOT_FOUND, NumAddrs, AddrArray);
 
     // Release the resolver object.
-    Release();
+    DNSResolver::sPool.Release(this);
 }
 
 /**
@@ -529,7 +529,7 @@ void DNSResolver::HandleAsyncResolveComplete()
         OnComplete(AppState, asyncDNSResolveResult, NumAddrs, AddrArray);
     }
 
-    Release();
+    DNSResolver::sPool.Release(this);
 }
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

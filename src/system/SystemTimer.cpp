@@ -284,7 +284,7 @@ CHIP_ERROR Timer::Cancel()
     }
 #endif
 
-    this->Release();
+    Timer::sPool.Release(this);
 exit:
     return CHIP_NO_ERROR;
 }
@@ -306,7 +306,7 @@ void Timer::HandleComplete()
 
     // Since this thread changed the state of OnComplete, release the timer.
     AppState = nullptr;
-    this->Release();
+    Timer::sPool.Release(this);
 
     // Invoke the app's callback, if it's still valid.
     if (lOnComplete != nullptr)

@@ -34,9 +34,15 @@
 // Include dependent headers
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include <unistd.h>
 
+#include <memory>
+#include <mutex>
+#include <vector>
+
 #include <support/DLLUtil.h>
+#include <support/logging/CHIPLogging.h>
 
 #include <system/SystemError.h>
 #include <system/SystemStats.h>
@@ -75,12 +81,19 @@ class DLL_EXPORT Object
     friend class ObjectPool;
 
 public:
+    Object() : mSystemLayer(nullptr) {}
+    ~Object() {}
+
     /** Test whether this object is retained by \c aLayer. Concurrency safe. */
     bool IsRetained(const Layer & aLayer) const;
 
     void Retain();
-    void Release();
     Layer & SystemLayer() const;
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+private:
+#endif
+    void Release();
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -96,8 +109,6 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
-    Object();
-    ~Object();
     Object(const Object &) = delete;
     Object & operator=(const Object &) = delete;
 
@@ -144,12 +155,6 @@ inline Layer & Object::SystemLayer() const
     return *this->mSystemLayer;
 }
 
-/** Deleted. */
-inline Object::Object() {}
-
-/** Deleted. */
-inline Object::~Object() {}
-
 /**
  *  @brief
  *      A union template used for representing a well-aligned block of memory.
@@ -175,15 +180,21 @@ template <class T, unsigned int N>
 class ObjectPool
 {
 public:
+    void Reset();
     static size_t Size();
 
     T * Get(const Layer & aLayer, size_t aIndex);
     T * TryCreate(Layer & aLayer);
+    void Release(T * pObj);
     void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
 private:
     friend class TestObject;
 
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    std::mutex mtx;
+    std::vector<std::unique_ptr<T>> mObjects;
+#else
     ObjectArena<void *, N * sizeof(T)> mArena;
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
@@ -191,7 +202,25 @@ private:
     void UpdateHighWatermark(const unsigned int & aCandidate);
     volatile unsigned int mHighWatermark;
 #endif
+#endif
 };
+
+template <class T, unsigned int N>
+inline void ObjectPool<T, N>::Reset()
+{
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    mtx.lock();
+    mObjects.clear();
+    mtx.unlock();
+#else
+    // static_assert(std::is_trivial<T>::value, "Types used in ObjectPool must be trivial");
+    memset(mArena.uMemory, 0, N * sizeof(T));
+
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    mHighWatermark = 0;
+#endif
+#endif
+}
 
 /**
  *  @brief
@@ -212,8 +241,12 @@ inline T * ObjectPool<T, N>::Get(const Layer & aLayer, size_t aIndex)
 {
     T * lReturn = nullptr;
 
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    lReturn = aIndex < mObjects.size() ? mObjects[aIndex].get() : nullptr;
+#else
     if (aIndex < N)
         lReturn = &reinterpret_cast<T *>(mArena.uMemory)[aIndex];
+#endif
 
     (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
 
@@ -228,10 +261,18 @@ template <class T, unsigned int N>
 inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
 {
     T * lReturn = nullptr;
-    unsigned int lIndex;
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    unsigned int lNumInUse = 0;
-#endif
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    mtx.lock();
+    mObjects.push_back(std::unique_ptr<T>(new T()));
+
+    if (mObjects.back()->TryCreate(aLayer, sizeof(T)))
+    {
+        lReturn = mObjects.back().get();
+    }
+    mtx.unlock();
+#else // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    unsigned int lIndex = 0;
 
     for (lIndex = 0; lIndex < N; ++lIndex)
     {
@@ -245,6 +286,8 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
     }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    unsigned int lNumInUse = 0;
+
     if (lReturn != nullptr)
     {
         lIndex++;
@@ -258,11 +301,49 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
 
     UpdateHighWatermark(lNumInUse);
 #endif
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
     return lReturn;
 }
 
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+template <class T, unsigned int N>
+inline void ObjectPool<T, N>::Release(T * pObj)
+{
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    mtx.lock();
+
+    bool found = false;
+    auto iter  = mObjects.begin();
+
+    while (iter != mObjects.end())
+    {
+        if (pObj == iter->get())
+        {
+            pObj->Release();
+            found = true;
+            break;
+        }
+        iter++;
+    }
+
+    if (found && pObj->mSystemLayer == nullptr)
+    {
+        mObjects.erase(iter);
+    }
+
+    mtx.unlock();
+#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    for (unsigned int lIndex = 0; lIndex < N; ++lIndex)
+    {
+        if (pObj == &reinterpret_cast<T *>(mArena.uMemory)[lIndex])
+        {
+            pObj->Release();
+        }
+    }
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+}
+
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 template <class T, unsigned int N>
 inline void ObjectPool<T, N>::UpdateHighWatermark(const unsigned int & aCandidate)
 {
@@ -305,12 +386,12 @@ inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsig
 
     aNumInUse += count;
 }
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 template <class T, unsigned int N>
 inline void ObjectPool<T, N>::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
 {
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     unsigned int lNumInUse;
     unsigned int lHighWatermark;
 
