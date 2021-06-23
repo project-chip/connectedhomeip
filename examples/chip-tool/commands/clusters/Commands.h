@@ -1118,6 +1118,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | OtaSoftwareUpdateServer                                             | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
+| PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
 | Scenes                                                              | 0x0005 |
@@ -1162,6 +1163,7 @@ constexpr chip::ClusterId kNetworkCommissioningClusterId        = 0x0031;
 constexpr chip::ClusterId kOtaSoftwareUpdateServerClusterId     = 0x0029;
 constexpr chip::ClusterId kOnOffClusterId                       = 0x0006;
 constexpr chip::ClusterId kOperationalCredentialsClusterId      = 0x003E;
+constexpr chip::ClusterId kPressureMeasurementClusterId         = 0x0403;
 constexpr chip::ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
 constexpr chip::ClusterId kRelativeHumidityMeasurementClusterId = 0x0405;
 constexpr chip::ClusterId kScenesClusterId                      = 0x0005;
@@ -13197,6 +13199,232 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster PressureMeasurement                                         | 0x0403 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverPressureMeasurementAttributes : public ModelCommand
+{
+public:
+    DiscoverPressureMeasurementAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverPressureMeasurementAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute MeasuredValue
+ */
+class ReadPressureMeasurementMeasuredValue : public ModelCommand
+{
+public:
+    ReadPressureMeasurementMeasuredValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "measured-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPressureMeasurementMeasuredValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0403) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportPressureMeasurementMeasuredValue : public ModelCommand
+{
+public:
+    ReportPressureMeasurementMeasuredValue() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "measured-value");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", INT16_MIN, INT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPressureMeasurementMeasuredValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0403) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeMeasuredValue(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                       mMaxInterval, mChange);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    int16_t mChange;
+};
+
+/*
+ * Attribute MinMeasuredValue
+ */
+class ReadPressureMeasurementMinMeasuredValue : public ModelCommand
+{
+public:
+    ReadPressureMeasurementMinMeasuredValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "min-measured-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPressureMeasurementMinMeasuredValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0403) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMinMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute MaxMeasuredValue
+ */
+class ReadPressureMeasurementMaxMeasuredValue : public ModelCommand
+{
+public:
+    ReadPressureMeasurementMaxMeasuredValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-measured-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPressureMeasurementMaxMeasuredValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0403) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMaxMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadPressureMeasurementClusterRevision : public ModelCommand
+{
+public:
+    ReadPressureMeasurementClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPressureMeasurementClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0403) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::PressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster PumpConfigurationAndControl                                 | 0x0200 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -21157,6 +21385,18 @@ void registerClusterOperationalCredentials(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterPressureMeasurement(Commands & commands)
+{
+    const char * clusterName = "PressureMeasurement";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverPressureMeasurementAttributes>(),   make_unique<ReadPressureMeasurementMeasuredValue>(),
+        make_unique<ReportPressureMeasurementMeasuredValue>(),  make_unique<ReadPressureMeasurementMinMeasuredValue>(),
+        make_unique<ReadPressureMeasurementMaxMeasuredValue>(), make_unique<ReadPressureMeasurementClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterPumpConfigurationAndControl(Commands & commands)
 {
     const char * clusterName = "PumpConfigurationAndControl";
@@ -21497,6 +21737,7 @@ void registerClusters(Commands & commands)
     registerClusterOtaSoftwareUpdateServer(commands);
     registerClusterOnOff(commands);
     registerClusterOperationalCredentials(commands);
+    registerClusterPressureMeasurement(commands);
     registerClusterPumpConfigurationAndControl(commands);
     registerClusterRelativeHumidityMeasurement(commands);
     registerClusterScenes(commands);

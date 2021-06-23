@@ -3122,6 +3122,59 @@ CHIP_ERROR chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(chip::C
 }
 
 // End of Cluster OperationalCredentials
+// Cluster PressureMeasurement
+
+CHIP_ERROR chip_ime_ReadAttribute_PressureMeasurement_MeasuredValue(chip::Controller::Device * device,
+                                                                    chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PressureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_PressureMeasurement_MeasuredValue(chip::Controller::Device * device,
+                                                                         chip::EndpointId ZCLendpointId, uint16_t minInterval,
+                                                                         uint16_t maxInterval, int16_t change)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PressureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                                   maxInterval, change);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_PressureMeasurement_MinMeasuredValue(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId,
+                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PressureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMinMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_PressureMeasurement_MaxMeasuredValue(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId,
+                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PressureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMaxMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_PressureMeasurement_ClusterRevision(chip::Controller::Device * device,
+                                                                      chip::EndpointId ZCLendpointId,
+                                                                      chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PressureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster PressureMeasurement
 // Cluster PumpConfigurationAndControl
 
 CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxPressure(chip::Controller::Device * device,

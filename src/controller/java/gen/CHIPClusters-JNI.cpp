@@ -10520,6 +10520,15 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
+JNI_METHOD(jlong, PressureMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    StackLockGuard lock(JniReferences::GetStackLock());
+    PressureMeasurementCluster * cppCluster = new PressureMeasurementCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, PumpConfigurationAndControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     StackLockGuard lock(JniReferences::GetStackLock());
