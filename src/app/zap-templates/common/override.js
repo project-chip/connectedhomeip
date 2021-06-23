@@ -18,22 +18,33 @@
 function atomicType(arg)
 {
   switch (arg.name) {
-  case 'node_id':
-    return 'chip::NodeId';
-  case 'endpoint_id':
-    return 'chip::EndpointId';
-  case 'group_id':
-    return 'chip::GroupId';
-  case 'attribute_id':
-    return 'chip::AttributeId';
   case 'cluster_id':
-    return 'chip::ClusterId';
-  case 'device_type_id':
-    return 'chip::DeviceTypeId';
+  case 'field_id':
+  case 'event_id':
+  case 'command_id':
+  case 'action_id':
+  case 'transaction_id':
+  case 'node_id':
+  case 'vendor_id':
   case 'fabric_id':
-    return 'chip::FabricId';
-  case 'ieee_address':
-    return 'uint64_t';
+  case 'group_id':
+    const parts = arg.name.split('_');
+    return 'chip::' + parts[0][0].toUpperCase() + parts[0].substring(1) + parts[1][0].toUpperCase() + parts[1].substring(1);
+
+  case 'attrib_id':
+    return 'chip::AttributeId';
+  case 'devtype_id':
+    return 'chip::DeviceTypeId';
+  case 'fabric_idx':
+    return 'chip::FabricIndex';
+  case 'status':
+    return 'chip::StatusCode';
+  case 'data_ver':
+    return 'chip::DataVersion';
+  case 'event_no':
+    return 'chip::EventNumber';
+  case 'endpoint_no':
+    return 'chip::EndpointId';
   default:
     throw 'not overriding';
   }

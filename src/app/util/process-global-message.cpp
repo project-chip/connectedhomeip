@@ -501,7 +501,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
             if (emAfSyncingTime && !cmd->mfgSpecific && msgLen - msgIndex == 8 // attr:2 status:1 type:1 data:4
                 && (emberAfGetInt16u(message, msgIndex, msgLen) == ZCL_TIME_ATTRIBUTE_ID) &&
                 (emberAfGetInt8u(message, msgIndex + 2, msgLen) == EMBER_ZCL_STATUS_SUCCESS) &&
-                (emberAfGetInt8u(message, msgIndex + 3, msgLen) == ZCL_UTC_TIME_ATTRIBUTE_TYPE))
+                (emberAfGetInt8u(message, msgIndex + 3, msgLen) == ZCL_UTC_ATTRIBUTE_TYPE))
             {
                 // emberAfSetTime(emberAfGetInt32u(message, msgIndex + 4, msgLen));
                 // emberAfDebugPrintln("time sync ok, time: %4x", emberAfGetCurrentTime());

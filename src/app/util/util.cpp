@@ -362,7 +362,7 @@ void emberAfStackDown(void)
 
 uint16_t emberAfFindClusterNameIndexWithMfgCode(ClusterId cluster, uint16_t mfgCode)
 {
-    static_assert(sizeof(ClusterId) == 2, "May need to adjust our index type or somehow define it in terms of cluster id type");
+    static_assert(sizeof(ClusterId) == 4, "May need to adjust our index type or somehow define it in terms of cluster id type");
     uint16_t index = 0;
     while (zclClusterNames[index].id != ZCL_NULL_CLUSTER_ID)
     {
@@ -394,8 +394,8 @@ void emberAfDecodeAndPrintClusterWithMfgCode(ClusterId cluster, uint16_t mfgCode
     uint16_t index = emberAfFindClusterNameIndexWithMfgCode(cluster, mfgCode);
     if (index == 0xFFFF)
     {
-        static_assert(sizeof(ClusterId) == 2, "Adjust the print formatting");
-        emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [0x%2x])", cluster);
+        static_assert(sizeof(ClusterId) == 4, "Adjust the print formatting");
+        emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [0x%4x])", cluster);
     }
     else
     {
