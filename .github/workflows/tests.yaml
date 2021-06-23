@@ -30,7 +30,7 @@ jobs:
 
         strategy:
           matrix:
-            type: [no_tsan, with_tsan]
+            type: [debug, tsan]
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -58,7 +58,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }}
               with:
-                  name: bootstrap-logs
+                  name: bootstrap-logs-${{ matrix.type }}
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
@@ -66,8 +66,8 @@ jobs:
               timeout-minutes: 5
               run: |
                   case ${{ matrix.type }} in
-                    "no_tsan") GN_ARGS='is_tsan=false';;
-                    "with_tsan") GN_ARGS='is_tsan=true';;
+                    "debug") GN_ARGS='is_tsan=false';;
+                    "tsan") GN_ARGS='is_tsan=true';;
                     *) ;;
                   esac
               
@@ -76,8 +76,8 @@ jobs:
               timeout-minutes: 5
               run: |
                   case ${{ matrix.type }} in
-                    "no_tsan") GN_ARGS='is_tsan=false';;
-                    "with_tsan") GN_ARGS='is_tsan=true';;
+                    "debug") GN_ARGS='is_tsan=false';;
+                    "tsan") GN_ARGS='is_tsan=true';;
                     *) ;;
                   esac
                 
@@ -96,7 +96,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-core-linux
+                  name: crash-core-linux-${{ matrix.type }}
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -104,13 +104,18 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-objdir-linux
+                  name: crash-objdir-linux-${{ matrix.type }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
         timeout-minutes: 60
+
+        strategy:
+          matrix:
+            type: [debug, tsan]
+
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
 
@@ -142,18 +147,30 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }}
               with:
-                  name: bootstrap-logs
+                  name: bootstrap-logs-${{ matrix.type }}
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Run Build Test Server
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false
+                  case ${{ matrix.type }} in
+                    "debug") GN_ARGS='is_tsan=false';;
+                    "tsan") GN_ARGS='is_tsan=true';;
+                    *) ;;
+                  esac
+
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false "$GN_ARGS"
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+                  case ${{ matrix.type }} in
+                    "debug") GN_ARGS='is_tsan=false';;
+                    "tsan") GN_ARGS='is_tsan=true';;
+                    *) ;;
+                  esac
+
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ "$GN_ARGS"
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have
@@ -167,7 +184,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-core-darwin
+                  name: crash-core-darwin-${{ matrix.type }}
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -175,13 +192,13 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-log-darwin
+                  name: crash-log-darwin-${{ matrix.type }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-objdir-darwin
+                  name: crash-objdir-darwin-${{ matrix.type }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
