@@ -95,7 +95,7 @@ private:
     virtual ~WriteClient() = default;
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**

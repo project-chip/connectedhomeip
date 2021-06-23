@@ -78,7 +78,7 @@ class MockAppDelegate : public ExchangeDelegate
 {
 public:
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && buffer) override
+                                 System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
         ec->Close();
@@ -94,8 +94,10 @@ class WaitForTimeoutDelegate : public ExchangeDelegate
 {
 public:
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && buffer) override
-    { return CHIP_NO_ERROR; }
+                                 System::PacketBufferHandle && buffer) override
+    {
+        return CHIP_NO_ERROR;
+    }
 
     void OnResponseTimeout(ExchangeContext * ec) override
     {

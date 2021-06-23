@@ -59,7 +59,7 @@ private:
     // accidentally call it on us when we're not being treated as an actual
     // ExchangeDelegate.
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;

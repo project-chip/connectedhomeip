@@ -325,7 +325,7 @@ void Device::OnConnectionExpired(SecureSessionHandle session)
 }
 
 CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
-                               const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {

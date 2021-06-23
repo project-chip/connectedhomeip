@@ -54,7 +54,7 @@ void EchoServer::Shutdown()
 }
 
 CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;

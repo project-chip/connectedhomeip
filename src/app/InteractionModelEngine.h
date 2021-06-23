@@ -156,11 +156,11 @@ public:
 private:
     friend class reporting::Engine;
     CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
     /**
@@ -168,14 +168,14 @@ private:
      * the Read Request are handled entirely within this function.
      */
     CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+                             const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
      * the Write Request are handled entirely within this function.
      */
     CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;

@@ -86,7 +86,7 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketH
 }
 
 CHIP_ERROR MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                              const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+                                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq))
     {
@@ -254,8 +254,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                                    System::PacketBufferHandle && msgBuf)
+CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext,
+                                                          const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -282,7 +282,7 @@ exit:
 }
 
 CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
-                                                     const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
+                                                           const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

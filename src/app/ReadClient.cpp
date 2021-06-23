@@ -195,7 +195,7 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(ReadRequest::Builder & aRequest
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                   const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+                                         const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

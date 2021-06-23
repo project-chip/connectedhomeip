@@ -104,13 +104,13 @@ private:
     CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, FixedByteSpan<kChallengeSize> challenge);
 
     CHIP_ERROR HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                 System::PacketBufferHandle && msgBuf);
+                                       System::PacketBufferHandle && msgBuf);
 
     CHIP_ERROR HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                  System::PacketBufferHandle && msgBuf);
+                                        System::PacketBufferHandle && msgBuf);
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                           const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
 
     void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override;
 };

@@ -74,7 +74,7 @@ class MockAppDelegate : public ExchangeDelegate
 {
 public:
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && msgBuf) override
+                                 System::PacketBufferHandle && msgBuf) override
     {
         ++ReceiveHandlerCallCount;
         ec->Close();
