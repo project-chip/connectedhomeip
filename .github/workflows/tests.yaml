@@ -63,7 +63,7 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Build all clusters app
-              timeout-minutes: 10
+              timeout-minutes: 5
               run: |
                   case ${{ matrix.type }} in
                     "debug") GN_ARGS='is_tsan=false';;
@@ -73,7 +73,7 @@ jobs:
               
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false "$GN_ARGS"
             - name: Build chip-tool
-              timeout-minutes: 10
+              timeout-minutes: 5
               run: |
                   case ${{ matrix.type }} in
                     "debug") GN_ARGS='is_tsan=false';;
@@ -88,7 +88,7 @@ jobs:
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Tests
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   ifconfig -a
                   scripts/tests/test_suites.sh
@@ -152,7 +152,7 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Run Build Test Server
-              timeout-minutes: 10
+              timeout-minutes: 5
               run: |
                   case ${{ matrix.type }} in
                     "debug") GN_ARGS='is_tsan=false';;
@@ -162,7 +162,7 @@ jobs:
 
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false "$GN_ARGS"
             - name: Build chip-tool
-              timeout-minutes: 10
+              timeout-minutes: 5
               run: |
                   case ${{ matrix.type }} in
                     "debug") GN_ARGS='is_tsan=false';;
@@ -177,7 +177,7 @@ jobs:
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Test Suites
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   scripts/tests/test_suites.sh
             - name: Uploading core files
