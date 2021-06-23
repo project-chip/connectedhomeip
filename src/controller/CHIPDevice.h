@@ -401,8 +401,7 @@ private:
 
     Inet::InetLayer * mInetLayer = nullptr;
 
-    bool mActive = false;
-    // Should be set to true only if the commissioner provides a CSRNonce during commissioning flow.
+    bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;
 
 #if CONFIG_NETWORK_LAYER_BLE
