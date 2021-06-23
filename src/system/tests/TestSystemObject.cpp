@@ -98,7 +98,6 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     // Not defined
-    TestObject(const TestObject &) = delete;
     TestObject & operator=(const TestObject &) = delete;
 };
 
@@ -137,7 +136,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     unsigned int i, j;
 
     lLayer.Init(lContext.mLayerContext);
-    memset(&sPool, 0, sizeof(sPool));
+    sPool.Reset();
 
     for (i = 0; i < kPoolSize; ++i)
     {
@@ -332,7 +331,7 @@ void TestObject::MultithreadedTest(nlTestSuite * inSuite, void * aContext, void 
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     pthread_t lThread[kNumThreads];
 
-    memset(&sPool, 0, sizeof(sPool));
+    sPool.Reset();
 
     for (unsigned int i = 0; i < kNumThreads; ++i)
     {
@@ -369,7 +368,7 @@ void TestObject::CheckHighWatermarkConcurrency(nlTestSuite * inSuite, void * aCo
 
 void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 {
-    memset(&sPool, 0, sizeof(sPool));
+    sPool.Reset();
 
     const int kNumObjects  = kPoolSize;
     TestObject * lObject   = nullptr;
