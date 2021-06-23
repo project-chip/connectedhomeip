@@ -35,7 +35,6 @@
 // Include local headers
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
 
 namespace chip {
 namespace System {

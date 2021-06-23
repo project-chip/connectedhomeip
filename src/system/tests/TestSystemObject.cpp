@@ -70,6 +70,13 @@ static int Finalize(void * aContext);
 class TestObject : public Object
 {
 public:
+    enum
+    {
+        kPoolSize = 122 // a multiple of kNumThreads, less than CHIP_SYS_STATS_COUNT_MAX
+    };
+
+    static ObjectPool<TestObject, kPoolSize> sPool;
+
     Error Init();
 
     static void CheckRetention(nlTestSuite * inSuite, void * aContext);
@@ -78,12 +85,6 @@ public:
     static void CheckHighWatermarkConcurrency(nlTestSuite * inSuite, void * aContext);
 
 private:
-    enum
-    {
-        kPoolSize = 122 // a multiple of kNumThreads, less than CHIP_SYS_STATS_COUNT_MAX
-    };
-    static ObjectPool<TestObject, kPoolSize> sPool;
-
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     unsigned int mDelay;
 
@@ -137,7 +138,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     unsigned int i, j;
 
     lLayer.Init(lContext.mLayerContext);
-    memset(&sPool, 0, sizeof(sPool));
+    sPool.Reset();
 
     for (i = 0; i < kPoolSize; ++i)
     {
@@ -332,7 +333,7 @@ void TestObject::MultithreadedTest(nlTestSuite * inSuite, void * aContext, void 
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     pthread_t lThread[kNumThreads];
 
-    memset(&sPool, 0, sizeof(sPool));
+    sPool.Reset();
 
     for (unsigned int i = 0; i < kNumThreads; ++i)
     {
@@ -369,7 +370,7 @@ void TestObject::CheckHighWatermarkConcurrency(nlTestSuite * inSuite, void * aCo
 
 void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 {
-    memset(&sPool, 0, sizeof(sPool));
+    sPool.Reset();
 
     const int kNumObjects  = kPoolSize;
     TestObject * lObject   = nullptr;
@@ -488,6 +489,11 @@ static int Initialize(void * aContext)
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
     void * lLayerContext   = nullptr;
 
+    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
+        return FAILURE;
+
+    TestObject::sPool.Init();
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
@@ -514,6 +520,9 @@ static int Finalize(void * aContext)
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
 
     lContext.mTestSuite = nullptr;
+
+    TestObject::sPool.Shutdown();
+    chip::Platform::MemoryShutdown();
 
     return SUCCESS;
 }

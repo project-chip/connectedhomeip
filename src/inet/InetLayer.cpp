@@ -281,14 +281,26 @@ INET_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     State = kState_Initialized;
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
+    RawEndPoint::sPool.Init();
+#endif
 
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
+    UDPEndPoint::sPool.Init();
+#endif
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    TCPEndPoint::sPool.Init();
+#endif
+
+#if INET_CONFIG_ENABLE_DNS_RESOLVER
+    DNSResolver::sPool.Init();
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
     err = mAsyncDNSResolver.Init(this);
     SuccessOrExit(err);
-
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 exit:
     Platform::InetLayer::DidInit(this, mContext, err);
@@ -331,10 +343,10 @@ INET_ERROR InetLayer::Shutdown()
         }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-
         err = mAsyncDNSResolver.Shutdown();
-
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+
+        DNSResolver::sPool.Shutdown();
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
@@ -347,6 +359,8 @@ INET_ERROR InetLayer::Shutdown()
                 lEndPoint->Close();
             }
         }
+
+        RawEndPoint::sPool.Shutdown();
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -359,6 +373,8 @@ INET_ERROR InetLayer::Shutdown()
                 lEndPoint->Abort();
             }
         }
+
+        TCPEndPoint::sPool.Shutdown();
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -371,6 +387,8 @@ INET_ERROR InetLayer::Shutdown()
                 lEndPoint->Close();
             }
         }
+
+        UDPEndPoint::sPool.Shutdown();
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
     }
 

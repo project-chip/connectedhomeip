@@ -34,8 +34,10 @@
 // Include dependent headers
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include <unistd.h>
 
+#include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
 
 #include <system/SystemError.h>
@@ -160,7 +162,11 @@ inline Object::~Object() {}
 template <typename ALIGN, size_t SIZE>
 union ObjectArena
 {
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    uint8_t * uMemory;
+#else
     uint8_t uMemory[SIZE];
+#endif
     ALIGN uAlign;
 };
 
@@ -175,6 +181,9 @@ template <class T, unsigned int N>
 class ObjectPool
 {
 public:
+    void Init();
+    void Reset();
+    void Shutdown();
     static size_t Size();
 
     T * Get(const Layer & aLayer, size_t aIndex);
@@ -185,6 +194,9 @@ private:
     friend class TestObject;
 
     ObjectArena<void *, N * sizeof(T)> mArena;
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    unsigned int mRefCount = 0;
+#endif
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse);
@@ -192,6 +204,59 @@ private:
     volatile unsigned int mHighWatermark;
 #endif
 };
+
+template <class T, unsigned int N>
+inline void ObjectPool<T, N>::Init()
+{
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    unsigned int oldCount = __sync_fetch_and_add(&this->mRefCount, 1);
+
+    if (oldCount == 0)
+    {
+        mArena.uMemory = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(N * sizeof(T)));
+        memset(mArena.uMemory, 0, N * sizeof(T));
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+        mHighWatermark = 0;
+#endif
+    }
+#endif
+}
+
+template <class T, unsigned int N>
+inline void ObjectPool<T, N>::Shutdown()
+{
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    unsigned int oldCount = __sync_fetch_and_sub(&this->mRefCount, 1);
+
+    if (oldCount == 1)
+    {
+        if (mArena.uMemory)
+        {
+            chip::Platform::MemoryFree(mArena.uMemory);
+            mArena.uMemory = nullptr;
+        }
+
+        __sync_synchronize();
+    }
+    else if (oldCount == 0)
+    {
+        abort();
+    }
+#endif
+
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    mHighWatermark = 0;
+#endif
+}
+
+template <class T, unsigned int N>
+inline void ObjectPool<T, N>::Reset()
+{
+    memset(mArena.uMemory, 0, N * sizeof(T));
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    mHighWatermark = 0;
+#endif
+}
 
 /**
  *  @brief

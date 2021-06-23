@@ -129,6 +129,8 @@ Error Layer::Init(void * aContext)
 {
     Error lReturn;
 
+    Timer::sPool.Init();
+
     RegisterLayerErrorFormatter();
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     RegisterPOSIXErrorFormatter();
@@ -198,6 +200,7 @@ Error Layer::Shutdown()
     this->mContext    = nullptr;
     this->mLayerState = kLayerState_NotInitialized;
 
+    Timer::sPool.Shutdown();
 exit:
     Platform::Layer::DidShutdown(*this, lContext, lReturn);
     return lReturn;
