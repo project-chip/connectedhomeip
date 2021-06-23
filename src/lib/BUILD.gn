@@ -13,10 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
-declare_args() {
-  chip_build_libshell = false
-}
+import("lib.gni")
 
 config("includes") {
   include_dirs = [ "." ]

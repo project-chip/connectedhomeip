@@ -41,6 +41,7 @@
 
 // Include system and language headers
 #include <stddef.h>
+#include <string.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #include <errno.h>
@@ -66,6 +67,24 @@
 
 namespace chip {
 namespace System {
+
+namespace {
+
+Timer::Epoch GetTimerEpoch(const Callback::Cancelable * timer)
+{
+    Timer::Epoch timerEpoch;
+    static_assert(sizeof(timerEpoch) <= sizeof(timer->mInfo), "mInfo is too small for timer epoch");
+    memcpy(&timerEpoch, &timer->mInfo, sizeof(timerEpoch));
+    return timerEpoch;
+}
+
+void SetTimerEpoch(Callback::Cancelable * timer, Timer::Epoch timerEpoch)
+{
+    static_assert(sizeof(timerEpoch) <= sizeof(timer->mInfo), "mInfo is too small for timer epoch");
+    memcpy(&timer->mInfo, &timerEpoch, sizeof(timerEpoch));
+}
+
+} // namespace
 
 using namespace ::chip::Callback;
 
@@ -227,13 +246,17 @@ Error Layer::NewTimer(Timer *& aTimerPtr)
 
 static bool TimerReady(const Timer::Epoch epoch, const Cancelable * timer)
 {
-    return !Timer::IsEarlierEpoch(epoch, timer->mInfoScalar);
+    return !Timer::IsEarlierEpoch(epoch, GetTimerEpoch(timer));
 }
 
 static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
 {
     (void) p;
-    return (a->mInfoScalar > b->mInfoScalar) ? 1 : (a->mInfoScalar < b->mInfoScalar) ? -1 : 0;
+
+    Timer::Epoch epochA = GetTimerEpoch(a);
+    Timer::Epoch epochB = GetTimerEpoch(b);
+
+    return (epochA > epochB) ? 1 : (epochA < epochB) ? -1 : 0;
 }
 
 /**
@@ -266,7 +289,7 @@ void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCal
 
     Cancelable * ca = aCallback->Cancel();
 
-    ca->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
+    SetTimerEpoch(ca, Timer::GetCurrentEpoch() + aMilliseconds);
 
     mTimerCallbacks.InsertBy(ca, TimerCompare, nullptr);
 
@@ -633,10 +656,10 @@ bool Layer::GetTimeout(struct timeval & aSleepTime)
     if (lAwakenEpoch != kCurrentEpoch)
     {
         Cancelable * ca = mTimerCallbacks.First();
-        if (ca != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, ca->mInfoScalar))
+        if (ca != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, GetTimerEpoch(ca)))
         {
             anyTimer     = true;
-            lAwakenEpoch = ca->mInfoScalar;
+            lAwakenEpoch = GetTimerEpoch(ca);
         }
     }
 

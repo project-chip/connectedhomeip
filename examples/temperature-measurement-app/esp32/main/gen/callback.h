@@ -774,13 +774,6 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Co
                                                                    uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief Network Commissioning Cluster AddThreadNetwork Command callback
- */
-
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan operationalDataset,
-                                                                uint64_t breadcrumb, uint32_t timeoutMs);
-
-/**
  * @brief Network Commissioning Cluster AddWiFiNetwork Command callback
  */
 
@@ -821,14 +814,6 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command 
 
 bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
                                                             uint64_t breadcrumb, uint32_t timeoutMs);
-
-/**
- * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback
- */
-
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj,
-                                                                   chip::ByteSpan operationalDataset, uint64_t breadcrumb,
-                                                                   uint32_t timeoutMs);
 
 /**
  * @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback

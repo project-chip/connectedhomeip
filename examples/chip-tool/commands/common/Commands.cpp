@@ -42,6 +42,7 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Controller::CommissionerInitParams initParams;
+    Command * command = nullptr;
 
     err = chip::Platform::MemoryInit();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
@@ -72,13 +73,18 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
     err = mController.ServiceEvents();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
 
-    err = RunCommand(localId, remoteId, argc, argv);
+    err = RunCommand(localId, remoteId, argc, argv, &command);
     SuccessOrExit(err);
 
 exit:
 #if CONFIG_DEVICE_LAYER
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 #endif
+
+    if (command)
+    {
+        command->Shutdown();
+    }
 
     //
     // We can call DeviceController::Shutdown() safely without grabbing the stack lock
@@ -90,7 +96,7 @@ exit:
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv)
+CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv, Command ** ranCommand)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::map<std::string, CommandsVector>::iterator cluster;
@@ -158,10 +164,21 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
         execContext.commissioner  = &mController;
         execContext.opCredsIssuer = &mOpCredsIssuer;
         execContext.storage       = &mStorage;
+        execContext.localId       = localId;
+        execContext.remoteId      = remoteId;
 
         command->SetExecutionContext(execContext);
+        *ranCommand = command;
 
-        err = command->Run(localId, remoteId);
+        //
+        // Set this to true first BEFORE we send commands to ensure we don't end
+        // up in a situation where the response comes back faster than we can
+        // set the variable to true, which will cause it to block indefinitely.
+        //
+        command->UpdateWaitForResponse(true);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(command));
+        command->WaitForResponse(command->GetWaitDurationInSeconds());
+        err = command->GetCommandExitStatus();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
@@ -171,6 +188,16 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
 
 exit:
     return err;
+}
+
+void Commands::RunQueuedCommand(intptr_t commandArg)
+{
+    auto * command = reinterpret_cast<Command *>(commandArg);
+    CHIP_ERROR err = command->Run();
+    if (err != CHIP_NO_ERROR)
+    {
+        command->SetCommandExitStatus(err);
+    }
 }
 
 std::map<std::string, Commands::CommandsVector>::iterator Commands::GetCluster(std::string clusterName)

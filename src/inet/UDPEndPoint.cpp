@@ -350,7 +350,7 @@ INET_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnRecei
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wait for ability to read on this endpoint.
-    mSocket.SetCallback(HandlePendingIO, this);
+    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
     mSocket.RequestCallbackOnPendingRead();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -909,7 +909,7 @@ INET_ERROR UDPEndPoint::GetSocket(IPAddressType aAddressType)
 // static
 void UDPEndPoint::HandlePendingIO(System::WatchableSocket & socket)
 {
-    static_cast<UDPEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
+    reinterpret_cast<UDPEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
 }
 
 void UDPEndPoint::HandlePendingIO()

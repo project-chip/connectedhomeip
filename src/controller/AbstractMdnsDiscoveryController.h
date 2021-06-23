@@ -46,11 +46,8 @@ public:
 
 protected:
     CHIP_ERROR SetUpNodeDiscovery();
-    CHIP_ERROR SetUpNodeDiscoveryLongDiscriminator(uint16_t long_discriminator);
     const Mdns::DiscoveredNodeData * GetDiscoveredNode(int idx);
     virtual Mdns::DiscoveredNodeData * GetDiscoveredNodes() = 0;
-
-    Mdns::DiscoveryFilter filter;
 };
 
 } // namespace Controller
