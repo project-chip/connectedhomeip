@@ -214,6 +214,34 @@ exit:
     return err;
 }
 
+void SecureSessionMgr::ExpirePairing(SecureSessionHandle session)
+{
+    PeerConnectionState * state = GetPeerConnectionState(session);
+    if (state != nullptr)
+    {
+        mPeerConnections.MarkConnectionExpired(
+            state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+    }
+}
+
+void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin)
+{
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+    while (state != nullptr)
+    {
+        if (admin == state->GetAdminId())
+        {
+            mPeerConnections.MarkConnectionExpired(
+                state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+            state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+        }
+        else
+        {
+            state = mPeerConnections.FindPeerConnectionState(peerNodeId, state);
+        }
+    }
+}
+
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                                         PairingSession * pairing, SecureSession::SessionRole direction, Transport::AdminId admin,
                                         Transport::Base * transport)

@@ -67,10 +67,10 @@ using HKDF_sha_crypto = HKDF_shaHSM;
 using HKDF_sha_crypto = HKDF_sha;
 #endif
 
-// Wait at most 30 seconds for the response from the peer.
+// Wait at most 10 seconds for the response from the peer.
 // This timeout value assumes the underlying transport is reliable.
 // The session establishment fails if the response is not received within timeout window.
-static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = 30000;
+static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = 10000;
 
 CASESession::CASESession()
 {
@@ -969,6 +969,11 @@ CHIP_ERROR CASESession::FindValidTrustedRoot(const uint8_t ** msgIterator, uint3
 
         if (mOpCredSet->IsTrustedRootIn(trustedRoot[i]))
         {
+            if (mTrustedRootId.mId != nullptr)
+            {
+                chip::Platform::MemoryFree(const_cast<uint8_t *>(mTrustedRootId.mId));
+                mTrustedRootId.mId = nullptr;
+            }
             mTrustedRootId.mId = reinterpret_cast<const uint8_t *>(chip::Platform::MemoryAlloc(kTrustedRootIdSize));
             VerifyOrReturnError(mTrustedRootId.mId != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -1021,30 +1026,34 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen,
 CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIterator, P256PublicKey & responderID,
                                                          const uint8_t ** responderOpCert, uint16_t & responderOpCertLen)
 {
-    ChipCertificateData chipCertData;
     ChipCertificateData * resultCert = nullptr;
+
+    ChipCertificateSet certSet;
+    // Certificate set can contain up to 3 certs (NOC, ICA cert, and Root CA cert)
+    ReturnErrorOnFailure(certSet.Init(3, kMaxCHIPCertLength * 3));
 
     responderOpCertLen = chip::Encoding::LittleEndian::Read16(*msgIterator);
     *responderOpCert   = *msgIterator;
     *msgIterator += responderOpCertLen;
 
     Encoding::LittleEndian::BufferWriter bbuf(responderID, responderID.Length());
-    ReturnErrorOnFailure(DecodeChipCert(*responderOpCert, responderOpCertLen, chipCertData));
+    ReturnErrorOnFailure(
+        certSet.LoadCerts(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
 
-    bbuf.Put(chipCertData.mPublicKey, chipCertData.mPublicKeyLen);
+    bbuf.Put(certSet.GetCertSet()[0].mPublicKey, certSet.GetCertSet()[0].mPublicKeyLen);
 
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
     // Validate responder identity located in msg_r2_encrypted
     ReturnErrorOnFailure(
         mOpCredSet->FindCertSet(mTrustedRootId)
-            ->LoadCert(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+            ->LoadCerts(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
 
     ReturnErrorOnFailure(SetEffectiveTime());
     // Locate the subject DN and key id that will be used as input the FindValidCert() method.
     {
-        const ChipDN & subjectDN              = chipCertData.mSubjectDN;
-        const CertificateKeyId & subjectKeyId = chipCertData.mSubjectKeyId;
+        const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;
+        const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
         ReturnErrorOnFailure(mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert));
     }

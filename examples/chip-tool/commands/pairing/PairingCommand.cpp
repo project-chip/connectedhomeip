@@ -162,6 +162,20 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     SetCommandExitStatus(err == CHIP_NO_ERROR);
 }
 
+void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(chipTool, "Device commissioning completed with success");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "Device commissioning Failure: %s", ErrorStr(err));
+    }
+
+    SetCommandExitStatus(err == CHIP_NO_ERROR);
+}
+
 CHIP_ERROR PairingCommand::SetupNetwork()
 {
 
@@ -316,13 +330,17 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
 
 CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
-    ReturnErrorOnFailure(GetExecContext()->commissioner->GetDevice(mRemoteId, &mDevice));
     ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", mRemoteId, mFabricId);
-    return GetExecContext()->commissioner->UpdateDevice(mDevice, mFabricId);
+    return GetExecContext()->commissioner->UpdateDevice(mRemoteId, mFabricId);
 }
 
 void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
 {
     ChipLogProgress(chipTool, "OnAddressUpdateComplete: %s", ErrorStr(err));
-    SetCommandExitStatus(CHIP_NO_ERROR == err);
+    if (err != CHIP_NO_ERROR)
+    {
+        // Set exit status only if the address update failed.
+        // Otherwise wait for OnCommissioningComplete() callback.
+        SetCommandExitStatus(false);
+    }
 }

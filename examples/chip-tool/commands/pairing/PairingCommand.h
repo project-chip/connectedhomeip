@@ -103,6 +103,7 @@ public:
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
     /////////// DeviceAddressUpdateDelegate Interface /////////
     void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;

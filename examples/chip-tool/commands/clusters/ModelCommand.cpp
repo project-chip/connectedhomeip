@@ -51,11 +51,10 @@ CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
     {
         chip::DeviceLayer::StackLock lock;
 
-        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
-
-        err = SendCommand(mDevice, mEndPointId);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
+        err = GetExecContext()->commissioner->GetConnectedDevice(remoteId, &mOnDeviceConnectedCallback,
+                                                                 &mOnDeviceConnectionFailureCallback);
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %d", remoteId, err));
     }
 
     WaitForResponse(kWaitDurationInSeconds);
@@ -64,4 +63,20 @@ CHIP_ERROR ModelCommand::Run(NodeId localId, NodeId remoteId)
 
 exit:
     return err;
+}
+
+void ModelCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+{
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    VerifyOrReturn(command != nullptr,
+                   ChipLogError(chipTool, "Device connected, but cannot send the command, as the context is null"));
+    command->SendCommand(device, command->mEndPointId);
+}
+
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+{
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ModelCommand context is null"));
+    command->SetCommandExitStatus(false);
 }
