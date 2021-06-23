@@ -120,14 +120,16 @@ public:
      *
      * @param[in] manager       Reference to shared socket-event state (which must already have been initialized).
      */
-    void Init(WatchableEventManager & manager)
+    Impl & Init(WatchableEventManager & manager)
     {
         mFD = kInvalidFd;
         mPendingIO.ClearAll();
-        mCallback     = nullptr;
-        mCallbackData = nullptr;
-        mSharedState  = &manager;
-        static_cast<Impl *>(this)->OnInit();
+        mCallback         = nullptr;
+        mCallbackData     = 0;
+        mSharedState      = &manager;
+        Impl * const impl = static_cast<Impl *>(this);
+        impl->OnInit();
+        return *impl;
     }
 
     /**
@@ -135,24 +137,33 @@ public:
      *
      * @param[in]   fd          An open file descriptor.
      */
-    void Attach(int fd)
+    Impl & Attach(int fd)
     {
-        mFD = fd;
-        static_cast<Impl *>(this)->OnAttach();
+        mFD               = fd;
+        Impl * const impl = static_cast<Impl *>(this);
+        impl->OnAttach();
+        return *impl;
+    }
+
+    /**
+     * Disassociate this WatchableSocket from its file descriptor.
+     *
+     * @returns the file descriptor.
+     */
+    int ReleaseFD()
+    {
+        static_cast<Impl *>(this)->OnClose();
+        const int fd = mFD;
+        mFD          = kInvalidFd;
+        return fd;
     }
 
     /**
      * Close the associated file descriptor.
      *
-     * @returns the return value of `close()`.
+     * @returns the return value of `close(2)`.
      */
-    int Close()
-    {
-        static_cast<Impl *>(this)->OnClose();
-        const int r = close(mFD);
-        mFD         = kInvalidFd;
-        return r;
-    }
+    int Close() { return close(ReleaseFD()); }
 
     /**
      * Test whether there is an associated open file descriptor.
@@ -167,22 +178,48 @@ public:
     /**
      * Indicate that the socket-event system should invoke the registered callback when the file descriptor is ready to read.
      */
-    void RequestCallbackOnPendingRead() { static_cast<Impl *>(this)->OnRequestCallbackOnPendingRead(); }
+    Impl & RequestCallbackOnPendingRead(bool request = true)
+    {
+        Impl * const impl = static_cast<Impl *>(this);
+        if (request)
+        {
+            impl->OnRequestCallbackOnPendingRead();
+        }
+        return *impl;
+    }
 
     /**
      * Indicate that the socket-event system should invoke the registered callback when the file descriptor is ready to write.
      */
-    void RequestCallbackOnPendingWrite() { static_cast<Impl *>(this)->OnRequestCallbackOnPendingWrite(); }
+    Impl & RequestCallbackOnPendingWrite(bool request = true)
+    {
+        Impl * const impl = static_cast<Impl *>(this);
+        if (request)
+        {
+            impl->OnRequestCallbackOnPendingWrite();
+        }
+        return *impl;
+    }
 
     /**
      * Indicate that the socket-event system need not invoke the registered callback when the file descriptor is ready to read.
      */
-    void ClearCallbackOnPendingRead() { static_cast<Impl *>(this)->OnClearCallbackOnPendingRead(); }
+    Impl & ClearCallbackOnPendingRead()
+    {
+        Impl * const impl = static_cast<Impl *>(this);
+        impl->OnClearCallbackOnPendingRead();
+        return *impl;
+    }
 
     /**
      * Indicate that the socket-event system need not invoke the registered callback when the file descriptor is ready to write.
      */
-    void ClearCallbackOnPendingWrite() { static_cast<Impl *>(this)->OnClearCallbackOnPendingWrite(); }
+    Impl & ClearCallbackOnPendingWrite()
+    {
+        Impl * const impl = static_cast<Impl *>(this);
+        impl->OnClearCallbackOnPendingWrite();
+        return *impl;
+    }
 
     /**
      * The callback is passed a reference to the WatchableSocket for which the requested event(s) are ready.
@@ -195,12 +232,13 @@ public:
      * The callback will be invoked (with the CHIP stack lock held) when requested event(s) are ready.
      *
      * @param[in]   callback        Function invoked when event(s) are ready.
-     * @param[in]   data            Arbitrary pointer accessible within a callback function.
+     * @param[in]   data            Arbitrary data accessible within a callback function.
      */
-    void SetCallback(Callback callback, void * data)
+    Impl & SetCallback(Callback callback, intptr_t data)
     {
         mCallback     = callback;
         mCallbackData = data;
+        return *static_cast<Impl *>(this);
     }
 
     /**
@@ -208,7 +246,12 @@ public:
      *
      * @returns the pointer supplied to SetCallback().
      */
-    void * GetCallbackData() const { return mCallbackData; }
+    intptr_t GetCallbackData() const { return mCallbackData; }
+
+    /**
+     * Inside a callback function, get the pending SocketEvents.
+     */
+    SocketEvents GetPendingEvents() const { return mPendingIO; }
 
     /**
      * Inside a callback function, test whether the file descriptor is ready to read.
@@ -248,7 +291,7 @@ protected:
     int mFD;
     SocketEvents mPendingIO;
     Callback mCallback;
-    void * mCallbackData;
+    intptr_t mCallbackData;
     WatchableEventManager * mSharedState;
 };
 
@@ -268,6 +311,12 @@ namespace System {
 
 using ::chip::System::Error;
 
+/**
+ * @class WakeEvent
+ *
+ * An instance of this type is contained in System::Layer. Its purpose is to allow other threads
+ * to wake the event loop thread via System::Layer::WakeIOThread().
+ */
 class WakeEvent
 {
 public:
@@ -278,7 +327,7 @@ public:
 
     Error Notify(); /**< Set the event. */
     void Confirm(); /**< Clear the event. */
-    static void Confirm(WatchableSocket & socket) { static_cast<WakeEvent *>(socket.GetCallbackData())->Confirm(); }
+    static void Confirm(WatchableSocket & socket) { reinterpret_cast<WakeEvent *>(socket.GetCallbackData())->Confirm(); }
 
 private:
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
