@@ -324,8 +324,8 @@ void Device::OnConnectionExpired(SecureSessionHandle session)
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
-                               const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
+                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -339,6 +339,7 @@ void Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const Pack
         }
     }
     exchange->Close();
+    return CHIP_NO_ERROR;
 }
 
 void Device::OnResponseTimeout(Messaging::ExchangeContext * ec)

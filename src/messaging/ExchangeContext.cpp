@@ -397,7 +397,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+        err = mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
     }
     else
     {

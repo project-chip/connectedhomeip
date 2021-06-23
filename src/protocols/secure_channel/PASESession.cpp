@@ -783,8 +783,8 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     return CHIP_NO_ERROR;
 }
 
-void PASESession::OnMessageReceived(ExchangeContext * exchange, const PacketHeader & packetHeader,
-                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
+CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const PacketHeader & packetHeader,
+                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = ValidateReceivedMessage(exchange, packetHeader, payloadHeader, std::move(msg));
     SuccessOrExit(err);
@@ -831,6 +831,7 @@ exit:
         ChipLogError(SecureChannel, "Failed during PASE session setup. %s", ErrorStr(err));
         mDelegate->OnSessionEstablishmentError(err);
     }
+    return err;
 }
 
 } // namespace chip

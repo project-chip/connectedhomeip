@@ -43,9 +43,11 @@ namespace chip {
 //       Delete this class when Device::SendMessage() is obsoleted.
 class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
 {
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override
-    {}
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override
+    {
+        return CHIP_NO_ERROR;
+    }
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
