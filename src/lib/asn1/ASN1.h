@@ -195,7 +195,7 @@ private:
     uint8_t * mBuf;
     uint8_t * mBufEnd;
     uint8_t * mWritePoint;
-    uint8_t * mDeferredLength[kMaxDeferredLengthDepth];
+    uint8_t * mDeferredLengthLocations[kMaxDeferredLengthDepth];
     uint8_t mDeferredLengthCount;
 
     ASN1_ERROR EncodeHead(uint8_t cls, uint32_t tag, bool isConstructed, int32_t len);
