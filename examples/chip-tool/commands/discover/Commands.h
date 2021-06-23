@@ -47,13 +47,13 @@ public:
         nodeData.mAddress.ToString(addrBuffer);
         ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Address: %s, Port: %" PRIu16, nodeData.mPeerId.GetNodeId(),
                         addrBuffer, nodeData.mPort);
-        SetCommandExitStatus(true);
+        SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "NodeId Resolution: failed!");
-        SetCommandExitStatus(false);
+        SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     }
     void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override {}
 };
@@ -82,7 +82,7 @@ public:
             ChipLogError(chipTool, "Failed to update the device address: %s", chip::ErrorStr(error));
         }
 
-        SetCommandExitStatus(CHIP_NO_ERROR == error);
+        SetCommandExitStatus(error);
     }
 };
 

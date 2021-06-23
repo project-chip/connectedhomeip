@@ -33,7 +33,11 @@ public:
     int Run(NodeId localId, NodeId remoteId, int argc, char ** argv);
 
 private:
-    CHIP_ERROR RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv);
+    // *ranCommand will be set to the command we ran if we get as far as running
+    // it.  If it's not null, we need to call Shutdown() on the command after we
+    // shut down the event loop.
+    CHIP_ERROR RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv, Command ** ranCommand);
+    static void RunQueuedCommand(intptr_t commandArg);
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
     Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);

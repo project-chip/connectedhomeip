@@ -21,25 +21,13 @@
 
 using namespace ::chip;
 
-constexpr uint16_t kWaitDurationInSeconds = 3;
-
-CHIP_ERROR DiscoverCommissionersCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR DiscoverCommissionersCommand::Run()
 {
-    //
-    // Set this to true first BEFORE we send commands to ensure we don't
-    // end up in a situation where the response comes back faster than we can
-    // set the variable to true, which will cause it to block indefinitely.
-    //
-    UpdateWaitForResponse(true);
+    return mCommissionableNodeController.DiscoverCommissioners();
+}
 
-    {
-        chip::DeviceLayer::StackLock lock;
-
-        ReturnErrorOnFailure(mCommissionableNodeController.DiscoverCommissioners());
-    }
-
-    WaitForResponse(kWaitDurationInSeconds);
-
+void DiscoverCommissionersCommand::Shutdown()
+{
     int commissionerCount = 0;
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
@@ -86,6 +74,5 @@ CHIP_ERROR DiscoverCommissionersCommand::Run(NodeId localId, NodeId remoteId)
         }
     }
 
-    printf("Total of %d commissioner(s) discovered in %d sec\n", commissionerCount, kWaitDurationInSeconds);
-    return CHIP_NO_ERROR;
+    printf("Total of %d commissioner(s) discovered in %" PRIu16 " sec\n", commissionerCount, GetWaitDurationInSeconds());
 }
