@@ -25,11 +25,18 @@
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 #include <lib/core/CHIPSafeCasts.h>
 #include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
 #include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
+
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+#define CASE_OPS_KEY 0xCA5EECC0
+#endif
 
 namespace chip {
 namespace Transport {
