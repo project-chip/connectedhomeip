@@ -57,7 +57,8 @@
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
-| OtaSoftwareUpdateProvider                                           | 0x0029 |
+| OtaSoftwareUpdateServer                                             | 0x0029 |
+| OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
@@ -733,6 +734,11 @@ chip::System::PacketBufferHandle encodeBridgedDeviceBasicClusterReadClusterRevis
 | Cluster ColorControl                                                | 0x0300 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ColorLoopSet                                                      |   0x44 |
+| * EnhancedMoveHue                                                   |   0x41 |
+| * EnhancedMoveToHue                                                 |   0x40 |
+| * EnhancedMoveToHueAndSaturation                                    |   0x43 |
+| * EnhancedStepHue                                                   |   0x42 |
 | * MoveColor                                                         |   0x08 |
 | * MoveColorTemperature                                              |   0x4B |
 | * MoveHue                                                           |   0x01 |
@@ -2144,7 +2150,7 @@ chip::System::PacketBufferHandle
 encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster OtaSoftwareUpdateProvider                                   | 0x0029 |
+| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ApplyUpdateRequest                                                |   0x01 |
@@ -2157,18 +2163,74 @@ encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, ch
 
 /**
  * @brief
- *    Encode a OTA Software Update Provider server discover command into buffer including the APS frame
+ *    Encode a OTA Software Update Server server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeOtaSoftwareUpdateProviderClusterDiscoverAttributes(uint8_t seqNum,
-                                                                                          chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a OTA Software Update Provider server read command for the cluster revision attribute into buffer including the APS
+ *    Encode a OTA Software Update Server server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster OccupancySensing                                            | 0x0406 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Occupancy                                                         | 0x0000 |
+| * OccupancySensorType                                               | 0x0001 |
+| * OccupancySensorTypeBitmap                                         | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Occupancy Sensing server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOccupancySensingClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Occupancy Sensing server read command for the occupancy attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOccupancySensingClusterReadOccupancyAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Occupancy Sensing server configure report command for the occupancy attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOccupancySensingClusterConfigureOccupancyAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint,
+                                                                                          uint16_t minInterval,
+                                                                                          uint16_t maxInterval);
+
+/**
+ * @brief
+ *    Encode a Occupancy Sensing server read command for the occupancy sensor type attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOccupancySensingClusterReadOccupancySensorTypeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Occupancy Sensing server read command for the occupancy sensor type bitmap attribute into buffer including the APS
  * frame
  */
 chip::System::PacketBufferHandle
-encodeOtaSoftwareUpdateProviderClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+encodeOccupancySensingClusterReadOccupancySensorTypeBitmapAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Occupancy Sensing server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOccupancySensingClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |

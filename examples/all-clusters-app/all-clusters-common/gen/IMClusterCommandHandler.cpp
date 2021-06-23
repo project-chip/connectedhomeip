@@ -21,10 +21,10 @@
 #include <cstdint>
 
 #include "app/common/gen/af-structs.h"
-#include "app/common/gen/callback.h"
-#include "app/common/gen/ids/Clusters.h"
-#include "app/common/gen/ids/Commands.h"
+#include "app/common/gen/cluster-id.h"
+#include "app/common/gen/command-id.h"
 #include "app/util/util.h"
+#include "callback.h"
 
 #include <app/InteractionModelEngine.h>
 
@@ -55,7 +55,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::BarrierControl::Commands::Ids::BarrierControlGoToPercent: {
+        case ZCL_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND_ID: {
             expectArgumentCount = 1;
             uint8_t percentOpen;
             bool argExists[1];
@@ -114,7 +114,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::BarrierControl::Commands::Ids::BarrierControlStop: {
+        case ZCL_BARRIER_CONTROL_STOP_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfBarrierControlClusterBarrierControlStopCallback(apCommandObj);
@@ -124,12 +124,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::BarrierControl::Id, aCommandId,
+                                                               ZCL_BARRIER_CONTROL_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::BarrierControl::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_BARRIER_CONTROL_CLUSTER_ID);
             return;
         }
         }
@@ -139,7 +139,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::BarrierControl::Id, aCommandId,
+                                                           ZCL_BARRIER_CONTROL_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -173,12 +173,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::Basic::Id, aCommandId,
+                                                               ZCL_BASIC_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::Basic::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_BASIC_CLUSTER_ID);
             return;
         }
         }
@@ -188,7 +188,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::Basic::Id, aCommandId,
+                                                           ZCL_BASIC_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -218,7 +218,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::Binding::Commands::Ids::Bind: {
+        case ZCL_BIND_COMMAND_ID: {
             expectArgumentCount = 4;
             chip::NodeId nodeId;
             chip::GroupId groupId;
@@ -289,7 +289,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Binding::Commands::Ids::Unbind: {
+        case ZCL_UNBIND_COMMAND_ID: {
             expectArgumentCount = 4;
             chip::NodeId nodeId;
             chip::GroupId groupId;
@@ -364,12 +364,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::Binding::Id, aCommandId,
+                                                               ZCL_BINDING_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::Binding::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_BINDING_CLUSTER_ID);
             return;
         }
         }
@@ -379,7 +379,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::Binding::Id, aCommandId,
+                                                           ZCL_BINDING_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -409,7 +409,349 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::ColorControl::Commands::Ids::MoveColor: {
+        case ZCL_COLOR_LOOP_SET_COMMAND_ID: {
+            expectArgumentCount = 5;
+            uint8_t updateFlags;
+            uint8_t action;
+            uint8_t direction;
+            uint16_t time;
+            uint16_t startHue;
+            bool argExists[5];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 5)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(updateFlags);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(action);
+                    break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(direction);
+                    break;
+                case 3:
+                    TLVUnpackError = aDataTlv.Get(time);
+                    break;
+                case 4:
+                    TLVUnpackError = aDataTlv.Get(startHue);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                wasHandled =
+                    emberAfColorControlClusterColorLoopSetCallback(apCommandObj, updateFlags, action, direction, time, startHue);
+            }
+            break;
+        }
+        case ZCL_ENHANCED_MOVE_HUE_COMMAND_ID: {
+            expectArgumentCount = 2;
+            uint8_t moveMode;
+            uint16_t rate;
+            bool argExists[2];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 2)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(moveMode);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(rate);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                wasHandled = emberAfColorControlClusterEnhancedMoveHueCallback(apCommandObj, moveMode, rate);
+            }
+            break;
+        }
+        case ZCL_ENHANCED_MOVE_TO_HUE_COMMAND_ID: {
+            expectArgumentCount = 3;
+            uint16_t enhancedHue;
+            uint8_t direction;
+            uint16_t transitionTime;
+            bool argExists[3];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 3)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(enhancedHue);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(direction);
+                    break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(transitionTime);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                wasHandled =
+                    emberAfColorControlClusterEnhancedMoveToHueCallback(apCommandObj, enhancedHue, direction, transitionTime);
+            }
+            break;
+        }
+        case ZCL_ENHANCED_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID: {
+            expectArgumentCount = 3;
+            uint16_t enhancedHue;
+            uint8_t saturation;
+            uint16_t transitionTime;
+            bool argExists[3];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 3)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(enhancedHue);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(saturation);
+                    break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(transitionTime);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                wasHandled = emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(apCommandObj, enhancedHue, saturation,
+                                                                                              transitionTime);
+            }
+            break;
+        }
+        case ZCL_ENHANCED_STEP_HUE_COMMAND_ID: {
+            expectArgumentCount = 3;
+            uint8_t stepMode;
+            uint16_t stepSize;
+            uint16_t transitionTime;
+            bool argExists[3];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 3)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(stepMode);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(stepSize);
+                    break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(transitionTime);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                wasHandled = emberAfColorControlClusterEnhancedStepHueCallback(apCommandObj, stepMode, stepSize, transitionTime);
+            }
+            break;
+        }
+        case ZCL_MOVE_COLOR_COMMAND_ID: {
             expectArgumentCount = 4;
             int16_t rateX;
             int16_t rateY;
@@ -480,7 +822,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveColorTemperature: {
+        case ZCL_MOVE_COLOR_TEMPERATURE_COMMAND_ID: {
             expectArgumentCount = 6;
             uint8_t moveMode;
             uint16_t rate;
@@ -560,7 +902,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveHue: {
+        case ZCL_MOVE_HUE_COMMAND_ID: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -631,7 +973,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveSaturation: {
+        case ZCL_MOVE_SATURATION_COMMAND_ID: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -703,7 +1045,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToColor: {
+        case ZCL_MOVE_TO_COLOR_COMMAND_ID: {
             expectArgumentCount = 5;
             uint16_t colorX;
             uint16_t colorY;
@@ -779,7 +1121,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToColorTemperature: {
+        case ZCL_MOVE_TO_COLOR_TEMPERATURE_COMMAND_ID: {
             expectArgumentCount = 4;
             uint16_t colorTemperature;
             uint16_t transitionTime;
@@ -851,7 +1193,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToHue: {
+        case ZCL_MOVE_TO_HUE_COMMAND_ID: {
             expectArgumentCount = 5;
             uint8_t hue;
             uint8_t direction;
@@ -927,7 +1269,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToHueAndSaturation: {
+        case ZCL_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID: {
             expectArgumentCount = 5;
             uint8_t hue;
             uint8_t saturation;
@@ -1003,7 +1345,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToSaturation: {
+        case ZCL_MOVE_TO_SATURATION_COMMAND_ID: {
             expectArgumentCount = 4;
             uint8_t saturation;
             uint16_t transitionTime;
@@ -1075,7 +1417,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StepColor: {
+        case ZCL_STEP_COLOR_COMMAND_ID: {
             expectArgumentCount = 5;
             int16_t stepX;
             int16_t stepY;
@@ -1151,7 +1493,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StepColorTemperature: {
+        case ZCL_STEP_COLOR_TEMPERATURE_COMMAND_ID: {
             expectArgumentCount = 7;
             uint8_t stepMode;
             uint16_t stepSize;
@@ -1236,7 +1578,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StepHue: {
+        case ZCL_STEP_HUE_COMMAND_ID: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -1312,7 +1654,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StepSaturation: {
+        case ZCL_STEP_SATURATION_COMMAND_ID: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -1388,7 +1730,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StopMoveStep: {
+        case ZCL_STOP_MOVE_STEP_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t optionsMask;
             uint8_t optionsOverride;
@@ -1455,12 +1797,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::ColorControl::Id, aCommandId,
+                                                               ZCL_COLOR_CONTROL_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::ColorControl::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_COLOR_CONTROL_CLUSTER_ID);
             return;
         }
         }
@@ -1470,7 +1812,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::ColorControl::Id, aCommandId,
+                                                           ZCL_COLOR_CONTROL_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -1500,7 +1842,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::DiagnosticLogs::Commands::Ids::RetrieveLogsRequest: {
+        case ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID: {
             expectArgumentCount = 3;
             uint8_t intent;
             uint8_t requestedProtocol;
@@ -1575,12 +1917,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::DiagnosticLogs::Id, aCommandId,
+                                                               ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::DiagnosticLogs::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID);
             return;
         }
         }
@@ -1590,7 +1932,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::DiagnosticLogs::Id, aCommandId,
+                                                           ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -1620,19 +1962,19 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::DoorLock::Commands::Ids::ClearAllPins: {
+        case ZCL_CLEAR_ALL_PINS_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfDoorLockClusterClearAllPinsCallback(apCommandObj);
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearAllRfids: {
+        case ZCL_CLEAR_ALL_RFIDS_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfDoorLockClusterClearAllRfidsCallback(apCommandObj);
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearHolidaySchedule: {
+        case ZCL_CLEAR_HOLIDAY_SCHEDULE_COMMAND_ID: {
             expectArgumentCount = 1;
             uint8_t scheduleId;
             bool argExists[1];
@@ -1691,7 +2033,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearPin: {
+        case ZCL_CLEAR_PIN_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -1750,7 +2092,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearRfid: {
+        case ZCL_CLEAR_RFID_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -1809,7 +2151,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearWeekdaySchedule: {
+        case ZCL_CLEAR_WEEKDAY_SCHEDULE_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t scheduleId;
             uint16_t userId;
@@ -1872,7 +2214,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearYeardaySchedule: {
+        case ZCL_CLEAR_YEARDAY_SCHEDULE_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t scheduleId;
             uint16_t userId;
@@ -1935,7 +2277,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetHolidaySchedule: {
+        case ZCL_GET_HOLIDAY_SCHEDULE_COMMAND_ID: {
             expectArgumentCount = 1;
             uint8_t scheduleId;
             bool argExists[1];
@@ -1994,7 +2336,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetLogRecord: {
+        case ZCL_GET_LOG_RECORD_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t logIndex;
             bool argExists[1];
@@ -2053,7 +2395,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetPin: {
+        case ZCL_GET_PIN_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -2112,7 +2454,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetRfid: {
+        case ZCL_GET_RFID_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -2171,7 +2513,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetUserType: {
+        case ZCL_GET_USER_TYPE_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -2230,7 +2572,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetWeekdaySchedule: {
+        case ZCL_GET_WEEKDAY_SCHEDULE_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t scheduleId;
             uint16_t userId;
@@ -2293,7 +2635,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetYeardaySchedule: {
+        case ZCL_GET_YEARDAY_SCHEDULE_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t scheduleId;
             uint16_t userId;
@@ -2356,7 +2698,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::LockDoor: {
+        case ZCL_LOCK_DOOR_COMMAND_ID: {
             expectArgumentCount = 1;
             const uint8_t * PIN;
             bool argExists[1];
@@ -2416,7 +2758,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetHolidaySchedule: {
+        case ZCL_SET_HOLIDAY_SCHEDULE_COMMAND_ID: {
             expectArgumentCount = 4;
             uint8_t scheduleId;
             uint32_t localStartTime;
@@ -2488,7 +2830,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetPin: {
+        case ZCL_SET_PIN_COMMAND_ID: {
             expectArgumentCount = 4;
             uint16_t userId;
             uint8_t userStatus;
@@ -2561,7 +2903,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetRfid: {
+        case ZCL_SET_RFID_COMMAND_ID: {
             expectArgumentCount = 4;
             uint16_t userId;
             uint8_t userStatus;
@@ -2634,7 +2976,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetUserType: {
+        case ZCL_SET_USER_TYPE_COMMAND_ID: {
             expectArgumentCount = 2;
             uint16_t userId;
             uint8_t userType;
@@ -2697,7 +3039,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetWeekdaySchedule: {
+        case ZCL_SET_WEEKDAY_SCHEDULE_COMMAND_ID: {
             expectArgumentCount = 7;
             uint8_t scheduleId;
             uint16_t userId;
@@ -2781,7 +3123,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetYeardaySchedule: {
+        case ZCL_SET_YEARDAY_SCHEDULE_COMMAND_ID: {
             expectArgumentCount = 4;
             uint8_t scheduleId;
             uint16_t userId;
@@ -2853,7 +3195,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::UnlockDoor: {
+        case ZCL_UNLOCK_DOOR_COMMAND_ID: {
             expectArgumentCount = 1;
             const uint8_t * PIN;
             bool argExists[1];
@@ -2913,7 +3255,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::UnlockWithTimeout: {
+        case ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID: {
             expectArgumentCount = 2;
             uint16_t timeoutInSeconds;
             const uint8_t * pin;
@@ -2982,12 +3324,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::DoorLock::Id, aCommandId,
+                                                               ZCL_DOOR_LOCK_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::DoorLock::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_DOOR_LOCK_CLUSTER_ID);
             return;
         }
         }
@@ -2997,7 +3339,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::DoorLock::Id, aCommandId,
+                                                           ZCL_DOOR_LOCK_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -3027,7 +3369,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::GeneralCommissioning::Commands::Ids::ArmFailSafe: {
+        case ZCL_ARM_FAIL_SAFE_COMMAND_ID: {
             expectArgumentCount = 3;
             uint16_t expiryLengthSeconds;
             uint64_t breadcrumb;
@@ -3095,13 +3437,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::GeneralCommissioning::Commands::Ids::CommissioningComplete: {
+        case ZCL_COMMISSIONING_COMPLETE_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj);
             break;
         }
-        case Clusters::GeneralCommissioning::Commands::Ids::SetRegulatoryConfig: {
+        case ZCL_SET_REGULATORY_CONFIG_COMMAND_ID: {
             expectArgumentCount = 4;
             uint8_t location;
             const uint8_t * countryCode;
@@ -3178,12 +3520,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::GeneralCommissioning::Id, aCommandId,
+                                                               ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::GeneralCommissioning::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_GENERAL_COMMISSIONING_CLUSTER_ID);
             return;
         }
         }
@@ -3193,7 +3535,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::GeneralCommissioning::Id, aCommandId,
+                                                           ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -3223,7 +3565,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::Groups::Commands::Ids::AddGroup: {
+        case ZCL_ADD_GROUP_COMMAND_ID: {
             expectArgumentCount = 2;
             uint16_t groupId;
             const uint8_t * groupName;
@@ -3287,7 +3629,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Groups::Commands::Ids::AddGroupIfIdentifying: {
+        case ZCL_ADD_GROUP_IF_IDENTIFYING_COMMAND_ID: {
             expectArgumentCount = 2;
             uint16_t groupId;
             const uint8_t * groupName;
@@ -3352,7 +3694,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Groups::Commands::Ids::GetGroupMembership: {
+        case ZCL_GET_GROUP_MEMBERSHIP_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t groupCount;
             /* TYPE WARNING: array array defaults to */ uint8_t * groupList;
@@ -3416,13 +3758,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Groups::Commands::Ids::RemoveAllGroups: {
+        case ZCL_REMOVE_ALL_GROUPS_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfGroupsClusterRemoveAllGroupsCallback(apCommandObj);
             break;
         }
-        case Clusters::Groups::Commands::Ids::RemoveGroup: {
+        case ZCL_REMOVE_GROUP_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t groupId;
             bool argExists[1];
@@ -3481,7 +3823,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Groups::Commands::Ids::ViewGroup: {
+        case ZCL_VIEW_GROUP_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t groupId;
             bool argExists[1];
@@ -3544,12 +3886,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::Groups::Id, aCommandId,
+                                                               ZCL_GROUPS_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::Groups::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_GROUPS_CLUSTER_ID);
             return;
         }
         }
@@ -3559,7 +3901,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::Groups::Id, aCommandId,
+                                                           ZCL_GROUPS_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -3589,7 +3931,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::IasZone::Commands::Ids::ZoneEnrollResponse: {
+        case ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t enrollResponseCode;
             uint8_t zoneId;
@@ -3656,12 +3998,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::IasZone::Id, aCommandId,
+                                                               ZCL_IAS_ZONE_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::IasZone::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_IAS_ZONE_CLUSTER_ID);
             return;
         }
         }
@@ -3671,7 +4013,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::IasZone::Id, aCommandId,
+                                                           ZCL_IAS_ZONE_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -3701,7 +4043,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::Identify::Commands::Ids::Identify: {
+        case ZCL_IDENTIFY_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t identifyTime;
             bool argExists[1];
@@ -3760,7 +4102,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Identify::Commands::Ids::IdentifyQuery: {
+        case ZCL_IDENTIFY_QUERY_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfIdentifyClusterIdentifyQueryCallback(apCommandObj);
@@ -3770,12 +4112,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::Identify::Id, aCommandId,
+                                                               ZCL_IDENTIFY_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::Identify::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_IDENTIFY_CLUSTER_ID);
             return;
         }
         }
@@ -3785,7 +4127,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::Identify::Id, aCommandId,
+                                                           ZCL_IDENTIFY_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -3815,7 +4157,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::LevelControl::Commands::Ids::Move: {
+        case ZCL_MOVE_COMMAND_ID: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -3886,7 +4228,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::MoveToLevel: {
+        case ZCL_MOVE_TO_LEVEL_COMMAND_ID: {
             expectArgumentCount = 4;
             uint8_t level;
             uint16_t transitionTime;
@@ -3958,7 +4300,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::MoveToLevelWithOnOff: {
+        case ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t level;
             uint16_t transitionTime;
@@ -4021,7 +4363,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::MoveWithOnOff: {
+        case ZCL_MOVE_WITH_ON_OFF_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t moveMode;
             uint8_t rate;
@@ -4084,7 +4426,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::Step: {
+        case ZCL_STEP_COMMAND_ID: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -4160,7 +4502,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::StepWithOnOff: {
+        case ZCL_STEP_WITH_ON_OFF_COMMAND_ID: {
             expectArgumentCount = 3;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -4227,7 +4569,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::Stop: {
+        case ZCL_STOP_COMMAND_ID: {
             expectArgumentCount = 2;
             uint8_t optionMask;
             uint8_t optionOverride;
@@ -4290,7 +4632,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::StopWithOnOff: {
+        case ZCL_STOP_WITH_ON_OFF_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj);
@@ -4300,12 +4642,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::LevelControl::Id, aCommandId,
+                                                               ZCL_LEVEL_CONTROL_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::LevelControl::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_LEVEL_CONTROL_CLUSTER_ID);
             return;
         }
         }
@@ -4315,7 +4657,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::LevelControl::Id, aCommandId,
+                                                           ZCL_LEVEL_CONTROL_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -4345,7 +4687,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::LowPower::Commands::Ids::Sleep: {
+        case ZCL_SLEEP_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfLowPowerClusterSleepCallback(apCommandObj);
@@ -4355,12 +4697,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::LowPower::Id, aCommandId,
+                                                               ZCL_LOW_POWER_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::LowPower::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_LOW_POWER_CLUSTER_ID);
             return;
         }
         }
@@ -4370,7 +4712,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::LowPower::Id, aCommandId,
+                                                           ZCL_LOW_POWER_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -4400,7 +4742,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::NetworkCommissioning::Commands::Ids::AddThreadNetwork: {
+        case ZCL_ADD_THREAD_NETWORK_COMMAND_ID: {
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -4471,7 +4813,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::AddWiFiNetwork: {
+        case ZCL_ADD_WI_FI_NETWORK_COMMAND_ID: {
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -4549,7 +4891,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::DisableNetwork: {
+        case ZCL_DISABLE_NETWORK_COMMAND_ID: {
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -4620,7 +4962,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::EnableNetwork: {
+        case ZCL_ENABLE_NETWORK_COMMAND_ID: {
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -4691,7 +5033,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::GetLastNetworkCommissioningResult: {
+        case ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID: {
             expectArgumentCount = 1;
             uint32_t timeoutMs;
             bool argExists[1];
@@ -4750,7 +5092,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::RemoveNetwork: {
+        case ZCL_REMOVE_NETWORK_COMMAND_ID: {
             expectArgumentCount = 3;
             chip::ByteSpan NetworkID;
             uint64_t Breadcrumb;
@@ -4821,7 +5163,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::ScanNetworks: {
+        case ZCL_SCAN_NETWORKS_COMMAND_ID: {
             expectArgumentCount = 3;
             chip::ByteSpan ssid;
             uint64_t breadcrumb;
@@ -4891,7 +5233,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::UpdateThreadNetwork: {
+        case ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID: {
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -4962,7 +5304,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::UpdateWiFiNetwork: {
+        case ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID: {
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -5044,12 +5386,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::NetworkCommissioning::Id, aCommandId,
+                                                               ZCL_NETWORK_COMMISSIONING_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::NetworkCommissioning::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID);
             return;
         }
         }
@@ -5059,7 +5401,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::NetworkCommissioning::Id, aCommandId,
+                                                           ZCL_NETWORK_COMMISSIONING_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -5089,7 +5431,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::ApplyUpdateRequest: {
+        case ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID: {
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t newVersion;
@@ -5156,7 +5498,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::NotifyUpdateApplied: {
+        case ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID: {
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t currentVersion;
@@ -5223,7 +5565,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::QueryImage: {
+        case ZCL_QUERY_IMAGE_COMMAND_ID: {
             expectArgumentCount = 9;
             uint16_t vendorId;
             uint16_t productId;
@@ -5325,13 +5667,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::OtaSoftwareUpdateProvider::Id, aCommandId,
+                                                               ZCL_OTA_PROVIDER_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId,
-                         Clusters::OtaSoftwareUpdateProvider::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_OTA_PROVIDER_CLUSTER_ID);
             return;
         }
         }
@@ -5341,7 +5682,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::OtaSoftwareUpdateProvider::Id, aCommandId,
+                                                           ZCL_OTA_PROVIDER_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -5371,19 +5712,19 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::OnOff::Commands::Ids::Off: {
+        case ZCL_OFF_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfOnOffClusterOffCallback(apCommandObj);
             break;
         }
-        case Clusters::OnOff::Commands::Ids::On: {
+        case ZCL_ON_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfOnOffClusterOnCallback(apCommandObj);
             break;
         }
-        case Clusters::OnOff::Commands::Ids::Toggle: {
+        case ZCL_TOGGLE_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfOnOffClusterToggleCallback(apCommandObj);
@@ -5393,12 +5734,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::OnOff::Id, aCommandId,
+                                                               ZCL_ON_OFF_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::OnOff::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_ON_OFF_CLUSTER_ID);
             return;
         }
         }
@@ -5408,7 +5749,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::OnOff::Id, aCommandId,
+                                                           ZCL_ON_OFF_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -5438,7 +5779,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::OperationalCredentials::Commands::Ids::AddOpCert: {
+        case ZCL_ADD_OP_CERT_COMMAND_ID: {
             expectArgumentCount = 4;
             chip::ByteSpan NOCArray;
             chip::ByteSpan IPKValue;
@@ -5516,7 +5857,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::AddTrustedRootCertificate: {
+        case ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID: {
             expectArgumentCount = 1;
             chip::ByteSpan RootCertificate;
             bool argExists[1];
@@ -5578,7 +5919,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::OpCSRRequest: {
+        case ZCL_OP_CSR_REQUEST_COMMAND_ID: {
             expectArgumentCount = 1;
             chip::ByteSpan CSRNonce;
             bool argExists[1];
@@ -5640,13 +5981,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::RemoveAllFabrics: {
+        case ZCL_REMOVE_ALL_FABRICS_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(apCommandObj);
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::RemoveFabric: {
+        case ZCL_REMOVE_FABRIC_COMMAND_ID: {
             expectArgumentCount = 3;
             chip::FabricId FabricId;
             chip::NodeId NodeId;
@@ -5713,7 +6054,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::RemoveTrustedRootCertificate: {
+        case ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID: {
             expectArgumentCount = 1;
             chip::ByteSpan TrustedRootIdentifier;
             bool argExists[1];
@@ -5776,7 +6117,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::SetFabric: {
+        case ZCL_SET_FABRIC_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t VendorId;
             bool argExists[1];
@@ -5835,7 +6176,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::UpdateFabricLabel: {
+        case ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID: {
             expectArgumentCount = 1;
             const uint8_t * Label;
             bool argExists[1];
@@ -5900,12 +6241,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::OperationalCredentials::Id, aCommandId,
+                                                               ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::OperationalCredentials::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId,
+                         ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID);
             return;
         }
         }
@@ -5915,7 +6257,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::OperationalCredentials::Id, aCommandId,
+                                                           ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -5945,7 +6287,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::Scenes::Commands::Ids::AddScene: {
+        case ZCL_ADD_SCENE_COMMAND_ID: {
             expectArgumentCount = 5;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6023,7 +6365,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::GetSceneMembership: {
+        case ZCL_GET_SCENE_MEMBERSHIP_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t groupId;
             bool argExists[1];
@@ -6082,7 +6424,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::RecallScene: {
+        case ZCL_RECALL_SCENE_COMMAND_ID: {
             expectArgumentCount = 3;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6149,7 +6491,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::RemoveAllScenes: {
+        case ZCL_REMOVE_ALL_SCENES_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t groupId;
             bool argExists[1];
@@ -6208,7 +6550,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::RemoveScene: {
+        case ZCL_REMOVE_SCENE_COMMAND_ID: {
             expectArgumentCount = 2;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6271,7 +6613,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::StoreScene: {
+        case ZCL_STORE_SCENE_COMMAND_ID: {
             expectArgumentCount = 2;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6334,7 +6676,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::ViewScene: {
+        case ZCL_VIEW_SCENE_COMMAND_ID: {
             expectArgumentCount = 2;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6401,12 +6743,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::Scenes::Id, aCommandId,
+                                                               ZCL_SCENES_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::Scenes::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_SCENES_CLUSTER_ID);
             return;
         }
         }
@@ -6416,7 +6758,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::Scenes::Id, aCommandId,
+                                                           ZCL_SCENES_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -6446,19 +6788,19 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case Clusters::TestCluster::Commands::Ids::Test: {
+        case ZCL_TEST_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfTestClusterClusterTestCallback(apCommandObj);
             break;
         }
-        case Clusters::TestCluster::Commands::Ids::TestNotHandled: {
+        case ZCL_TEST_NOT_HANDLED_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfTestClusterClusterTestNotHandledCallback(apCommandObj);
             break;
         }
-        case Clusters::TestCluster::Commands::Ids::TestSpecific: {
+        case ZCL_TEST_SPECIFIC_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfTestClusterClusterTestSpecificCallback(apCommandObj);
@@ -6468,12 +6810,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               Clusters::TestCluster::Id, aCommandId,
+                                                               ZCL_TEST_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::TestCluster::Id);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_TEST_CLUSTER_ID);
             return;
         }
         }
@@ -6483,7 +6825,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           Clusters::TestCluster::Id, aCommandId,
+                                                           ZCL_TEST_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -6508,58 +6850,58 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     SuccessOrExit(aReader.EnterContainer(dataTlvType));
     switch (aClusterId)
     {
-    case Clusters::BarrierControl::Id:
+    case ZCL_BARRIER_CONTROL_CLUSTER_ID:
         clusters::BarrierControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::Basic::Id:
+    case ZCL_BASIC_CLUSTER_ID:
         clusters::Basic::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::Binding::Id:
+    case ZCL_BINDING_CLUSTER_ID:
         clusters::Binding::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::ColorControl::Id:
+    case ZCL_COLOR_CONTROL_CLUSTER_ID:
         clusters::ColorControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::DiagnosticLogs::Id:
+    case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
         clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::DoorLock::Id:
+    case ZCL_DOOR_LOCK_CLUSTER_ID:
         clusters::DoorLock::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::GeneralCommissioning::Id:
+    case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
         clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::Groups::Id:
+    case ZCL_GROUPS_CLUSTER_ID:
         clusters::Groups::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::IasZone::Id:
+    case ZCL_IAS_ZONE_CLUSTER_ID:
         clusters::IasZone::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::Identify::Id:
+    case ZCL_IDENTIFY_CLUSTER_ID:
         clusters::Identify::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::LevelControl::Id:
+    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::LowPower::Id:
+    case ZCL_LOW_POWER_CLUSTER_ID:
         clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::NetworkCommissioning::Id:
+    case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::OtaSoftwareUpdateProvider::Id:
+    case ZCL_OTA_PROVIDER_CLUSTER_ID:
         clusters::OtaSoftwareUpdateProvider::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::OnOff::Id:
+    case ZCL_ON_OFF_CLUSTER_ID:
         clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::OperationalCredentials::Id:
+    case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::Scenes::Id:
+    case ZCL_SCENES_CLUSTER_ID:
         clusters::Scenes::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case Clusters::TestCluster::Id:
+    case ZCL_TEST_CLUSTER_ID:
         clusters::TestCluster::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     default:
