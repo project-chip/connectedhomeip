@@ -56,7 +56,7 @@ constexpr uint16_t kIPKSize = 32;
 
 
 #ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
-#define CASE_EPHEMERAL_KEY 0x11223344
+#define CASE_EPHEMERAL_KEY 0xCA5EECD0
 #endif
 
 using namespace Crypto;

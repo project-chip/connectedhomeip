@@ -467,7 +467,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
     // Step 3
     // hardcoded to use a p256keypair
     #ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
-    mEphemeralKey.SetKeyId(0x22334455);
+    mEphemeralKey.SetKeyId(CASE_EPHEMERAL_KEY);
     #endif
     err = mEphemeralKey.Initialize();
     SuccessOrExit(err);
