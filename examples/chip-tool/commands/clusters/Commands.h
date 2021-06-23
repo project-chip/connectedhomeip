@@ -768,7 +768,7 @@ static void OnDescriptorServerListListAttributeResponse(void * context, uint16_t
 
     for (uint16_t i = 0; i < count; i++)
     {
-        ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu16 "", i, entries[i]);
+        ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu32 "", i, entries[i]);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -781,7 +781,7 @@ static void OnDescriptorClientListListAttributeResponse(void * context, uint16_t
 
     for (uint16_t i = 0; i < count; i++)
     {
-        ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu16 "", i, entries[i]);
+        ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu32 "", i, entries[i]);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -794,7 +794,7 @@ static void OnDescriptorPartsListListAttributeResponse(void * context, uint16_t 
 
     for (uint16_t i = 0; i < count; i++)
     {
-        ChipLogProgress(chipTool, "ENDPOINT_ID[%" PRIu16 "]: %" PRIu8 "", i, entries[i]);
+        ChipLogProgress(chipTool, "ENDPOINT_NO[%" PRIu16 "]: %" PRIu16 "", i, entries[i]);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -3482,8 +3482,8 @@ public:
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
-        AddArgument("endpointId", 0, UINT8_MAX, &mEndpointId);
-        AddArgument("clusterId", 0, UINT16_MAX, &mClusterId);
+        AddArgument("endpointId", 0, UINT16_MAX, &mEndpointId);
+        AddArgument("clusterId", 0, UINT32_MAX, &mClusterId);
         ModelCommand::AddArguments();
     }
     ~BindingBind()
@@ -3522,8 +3522,8 @@ public:
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
-        AddArgument("endpointId", 0, UINT8_MAX, &mEndpointId);
-        AddArgument("clusterId", 0, UINT16_MAX, &mClusterId);
+        AddArgument("endpointId", 0, UINT16_MAX, &mEndpointId);
+        AddArgument("clusterId", 0, UINT32_MAX, &mClusterId);
         ModelCommand::AddArguments();
     }
     ~BindingUnbind()
@@ -14117,7 +14117,7 @@ public:
         AddArgument("sceneId", 0, UINT8_MAX, &mSceneId);
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("sceneName", &mSceneName);
-        AddArgument("clusterId", 0, UINT16_MAX, &mClusterId);
+        AddArgument("clusterId", 0, UINT32_MAX, &mClusterId);
         AddArgument("length", 0, UINT8_MAX, &mLength);
         AddArgument("value", 0, UINT8_MAX, &mValue);
         ModelCommand::AddArguments();

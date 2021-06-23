@@ -208,12 +208,12 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void bind(
-        DefaultClusterCallback callback, long nodeId, int groupId, int endpointId, int clusterId) {
+        DefaultClusterCallback callback, long nodeId, int groupId, int endpointId, long clusterId) {
       bind(chipClusterPtr, callback, nodeId, groupId, endpointId, clusterId);
     }
 
     public void unbind(
-        DefaultClusterCallback callback, long nodeId, int groupId, int endpointId, int clusterId) {
+        DefaultClusterCallback callback, long nodeId, int groupId, int endpointId, long clusterId) {
       unbind(chipClusterPtr, callback, nodeId, groupId, endpointId, clusterId);
     }
 
@@ -223,7 +223,7 @@ public class ChipClusters {
         long nodeId,
         int groupId,
         int endpointId,
-        int clusterId);
+        long clusterId);
 
     private native void unbind(
         long chipClusterPtr,
@@ -231,7 +231,7 @@ public class ChipClusters {
         long nodeId,
         int groupId,
         int endpointId,
-        int clusterId);
+        long clusterId);
   }
 
   public static class BridgedDeviceBasicCluster extends BaseChipCluster {
@@ -1979,7 +1979,7 @@ public class ChipClusters {
         int sceneId,
         int transitionTime,
         String sceneName,
-        int clusterId,
+        long clusterId,
         int length,
         int value) {
       addScene(
@@ -2026,7 +2026,7 @@ public class ChipClusters {
         int sceneId,
         int transitionTime,
         String sceneName,
-        int clusterId,
+        long clusterId,
         int length,
         int value);
 

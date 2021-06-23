@@ -882,7 +882,7 @@ CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callba
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nodeId));
     // groupId: groupId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
-    // endpointId: endpointId
+    // endpointId: endpointNo
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), endpointId));
     // clusterId: clusterId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
@@ -930,7 +930,7 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Call
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nodeId));
     // groupId: groupId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
-    // endpointId: endpointId
+    // endpointId: endpointNo
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), endpointId));
     // clusterId: clusterId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
