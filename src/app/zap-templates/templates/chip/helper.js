@@ -355,7 +355,7 @@ function chip_attribute_list_entryTypes(options)
 }
 
 /**
- * Returns if a given command argument chip type has configurable change
+ * Returns whether a given command argument chip type has configurable change (i.e. can support reporting triggered from a "big enough" change in the value).
  *
  * This function is meant to be used inside a {{#chip_*}} block.
  * It will throws otherwise.
