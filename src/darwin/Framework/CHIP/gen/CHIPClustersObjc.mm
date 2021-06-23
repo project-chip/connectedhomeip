@@ -2859,7 +2859,7 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+                values[i] = [NSNumber numberWithUnsignedLong:entries[i]];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -2894,7 +2894,7 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+                values[i] = [NSNumber numberWithUnsignedLong:entries[i]];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -2929,7 +2929,7 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -5352,8 +5352,8 @@ private:
 
 - (void)bind:(uint64_t)nodeId
             groupId:(uint16_t)groupId
-         endpointId:(uint8_t)endpointId
-          clusterId:(uint16_t)clusterId
+         endpointId:(uint16_t)endpointId
+          clusterId:(uint32_t)clusterId
     responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -5382,8 +5382,8 @@ private:
 }
 - (void)unbind:(uint64_t)nodeId
             groupId:(uint16_t)groupId
-         endpointId:(uint8_t)endpointId
-          clusterId:(uint16_t)clusterId
+         endpointId:(uint16_t)endpointId
+          clusterId:(uint32_t)clusterId
     responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -13338,7 +13338,7 @@ private:
             sceneId:(uint8_t)sceneId
      transitionTime:(uint16_t)transitionTime
           sceneName:(NSString *)sceneName
-          clusterId:(uint16_t)clusterId
+          clusterId:(uint32_t)clusterId
              length:(uint8_t)length
               value:(uint8_t)value
     responseHandler:(ResponseHandler)responseHandler

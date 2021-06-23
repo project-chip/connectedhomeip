@@ -530,9 +530,9 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                         chip::ClusterId data[count];
                         for (size_t i = 0; i < count; i++)
                         {
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i] = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i] = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
                         }
 
                         Callback::Callback<DescriptorServerListListAttributeCallback> * cb =
@@ -545,9 +545,9 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                         chip::ClusterId data[count];
                         for (size_t i = 0; i < count; i++)
                         {
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i] = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i] = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
                         }
 
                         Callback::Callback<DescriptorClientListListAttributeCallback> * cb =
@@ -555,14 +555,14 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                         cb->mCall(cb->mContext, count, data);
                         break;
                     }
-                    case 0x0003: // ENDPOINT_ID
+                    case 0x0003: // ENDPOINT_NO
                     {
                         chip::EndpointId data[count];
                         for (size_t i = 0; i < count; i++)
                         {
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i] = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i] = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
                         }
 
                         Callback::Callback<DescriptorPartsListListAttributeCallback> * cb =
