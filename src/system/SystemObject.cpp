@@ -35,7 +35,6 @@
 // Include local headers
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
 
 namespace chip {
 namespace System {
@@ -52,6 +51,13 @@ DLL_EXPORT void Object::Release()
     if (oldCount == 1)
     {
         this->mSystemLayer = nullptr;
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        std::lock_guard<std::mutex> lock(*mMutexRef);
+        this->prev->next = this->next;
+        if (this->next)
+            this->next->prev = this->prev;
+        delete this;
+#endif
         __sync_synchronize();
     }
     else if (oldCount == 0)
