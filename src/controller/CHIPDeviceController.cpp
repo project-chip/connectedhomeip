@@ -1430,24 +1430,10 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
+CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Mdns::DiscoveryFilter filter)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if ((err = SetUpNodeDiscovery()) == CHIP_NO_ERROR)
-    {
-        return chip::Mdns::Resolver::Instance().FindCommissionableNodes();
-    }
-    return err;
-}
-
-CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if ((err = SetUpNodeDiscoveryLongDiscriminator(long_discriminator)) == CHIP_NO_ERROR)
-    {
-        return chip::Mdns::Resolver::Instance().FindCommissionableNodes(filter);
-    }
-    return err;
+    ReturnErrorOnFailure(SetUpNodeDiscovery());
+    return chip::Mdns::Resolver::Instance().FindCommissionableNodes(filter);
 }
 
 const Mdns::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)

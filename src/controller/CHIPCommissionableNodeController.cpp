@@ -24,16 +24,10 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR CommissionableNodeController::DiscoverCommissioners()
+CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return chip::Mdns::Resolver::Instance().FindCommissioners();
-}
-
-CHIP_ERROR CommissionableNodeController::DiscoverCommissionersLongDiscriminator(uint16_t long_discriminator)
-{
-    ReturnErrorOnFailure(SetUpNodeDiscoveryLongDiscriminator(long_discriminator));
-    return chip::Mdns::Resolver::Instance().FindCommissioners(filter);
+    return chip::Mdns::Resolver::Instance().FindCommissioners(discoveryFilter);
 }
 
 const Mdns::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
