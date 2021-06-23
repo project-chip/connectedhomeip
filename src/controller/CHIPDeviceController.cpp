@@ -112,11 +112,7 @@ DeviceController::DeviceController()
 
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams params)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    Transport::AdminPairingInfo * admin = nullptr;
-
-    VerifyOrExit(mState == State::NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::NotInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     if (params.systemLayer != nullptr && params.inetLayer != nullptr)
     {
@@ -126,16 +122,15 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     else
     {
 #if CONFIG_DEVICE_LAYER
-        err = DeviceLayer::PlatformMgr().InitChipStack();
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
         mSystemLayer = &DeviceLayer::SystemLayer;
         mInetLayer   = &DeviceLayer::InetLayer;
 #endif // CONFIG_DEVICE_LAYER
     }
 
-    VerifyOrExit(mSystemLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mInetLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mInetLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mStorageDelegate = params.storageDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -146,7 +141,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     }
 #endif // CONFIG_DEVICE_LAYER
     mBleLayer = params.bleLayer;
-    VerifyOrExit(mBleLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif
 
     mTransportMgr          = chip::Platform::New<DeviceTransportMgr>();
@@ -154,7 +149,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mExchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     mMessageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
-    err = mTransportMgr->Init(
+    ReturnErrorOnFailure(mTransportMgr->Init(
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
 #if INET_CONFIG_ENABLE_IPV4
             ,
@@ -164,46 +159,37 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
             ,
         Transport::BleListenParameters(mBleLayer)
 #endif
-    );
-    SuccessOrExit(err);
+            ));
 
-    err = mAdmins.Init(mStorageDelegate);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mAdmins.Init(mStorageDelegate));
 
-    admin = mAdmins.AssignAdminId(mAdminId, localDeviceId);
-    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    Transport::AdminPairingInfo * const admin = mAdmins.AssignAdminId(mAdminId, localDeviceId);
+    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    err = mAdmins.LoadFromStorage(mAdminId);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mAdmins.LoadFromStorage(mAdminId));
 
-    err = mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins, mMessageCounterManager);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins, mMessageCounterManager));
 
-    err = mExchangeMgr->Init(mSessionMgr);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mExchangeMgr->Init(mSessionMgr));
 
-    err = mMessageCounterManager->Init(mExchangeMgr);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mMessageCounterManager->Init(mExchangeMgr));
 
-    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this));
 
     if (params.imDelegate != nullptr)
     {
-        err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate);
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate));
     }
     else
     {
         mDefaultIMDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
-        err                = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mDefaultIMDelegate);
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mDefaultIMDelegate));
     }
-    SuccessOrExit(err);
 
     mExchangeMgr->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    err = Mdns::Resolver::Instance().SetResolverDelegate(this);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Mdns::Resolver::Instance().SetResolverDelegate(this));
 
     RegisterDeviceAddressUpdateDelegate(params.mDeviceAddressUpdateDelegate);
 
@@ -215,16 +201,14 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
 
-    VerifyOrExit(params.operationalCredentialsDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
-    err = LoadLocalCredentials(admin);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(LoadLocalCredentials(admin));
 
     ReleaseAllDevices();
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * admin)

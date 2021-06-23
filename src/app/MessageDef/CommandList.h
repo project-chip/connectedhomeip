@@ -27,6 +27,7 @@
 #include "ListBuilder.h"
 #include "ListParser.h"
 
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>

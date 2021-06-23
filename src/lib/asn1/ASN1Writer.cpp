@@ -335,16 +335,13 @@ ASN1_ERROR ASN1Writer::PutNull()
 
 ASN1_ERROR ASN1Writer::PutConstructedType(const uint8_t * val, uint16_t valLen)
 {
-    ASN1_ERROR err = ASN1_NO_ERROR;
-
     // Do nothing for a null writer.
-    VerifyOrExit(mBuf != nullptr, err = ASN1_NO_ERROR);
+    VerifyOrReturnError(mBuf != nullptr, ASN1_NO_ERROR);
 
     memcpy(mWritePoint, val, valLen);
     mWritePoint += valLen;
 
-exit:
-    return err;
+    return ASN1_NO_ERROR;
 }
 
 ASN1_ERROR ASN1Writer::StartConstructedType(uint8_t cls, uint32_t tag)

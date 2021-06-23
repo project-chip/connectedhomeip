@@ -47,7 +47,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     ReturnErrorCodeIf(mGetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(offset != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    JNIEnv * env = GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString javaKey(env, key);
@@ -100,7 +100,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     ReturnErrorCodeIf(mKeyValueStoreManagerClass == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mDeleteMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    JNIEnv * env = GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString javaKey(env, key);
@@ -124,7 +124,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     ReturnErrorCodeIf(mSetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(value_size > kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
-    JNIEnv * env = GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value_size) + 1]);

@@ -28,6 +28,8 @@
 #include "InvokeCommand.h"
 #include "MessageDefHelper.h"
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 

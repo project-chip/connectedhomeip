@@ -36,6 +36,12 @@
 #include <vector>
 
 #include <support/ErrorStr.h>
+
+#if CONFIG_ENABLE_PW_RPC
+#include "PigweedLogger.h"
+#include "Rpc.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
@@ -54,6 +60,10 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", ErrorStr(err));
         return;
     }
+
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
 
     ESP_LOGI(TAG, "==================================================");
     ESP_LOGI(TAG, "chip-esp32-lock-example starting");
@@ -79,10 +89,5 @@ extern "C" void app_main()
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "GetAppTask().Init() failed");
-    }
-
-    while (true)
-    {
-        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }

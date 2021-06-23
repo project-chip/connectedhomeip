@@ -37,12 +37,16 @@ shared_library("jni") {
     "JniReferences.cpp",
     "JniReferences.h",
     "JniTypeWrappers.h",
+    "StackLock.h",
+    "gen/CHIPClusters-JNI.cpp",
   ]
 
   deps = [
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
   ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 }
@@ -56,7 +60,9 @@ android_library("java") {
   ]
 
   sources = [
+    "gen/ChipClusters.java",
     "src/chip/devicecontroller/AndroidChipStack.java",
+    "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",

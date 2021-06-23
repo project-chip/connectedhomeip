@@ -101,7 +101,6 @@ def DecodeHexIntOption(option, opt, value):
     except ValueError:
         raise OptionValueError("option %s: invalid value: %r" % (opt, value))
 
-
 def ParseEncodedString(value):
     if value.find(":") < 0:
         raise ParsingError(
@@ -114,6 +113,17 @@ def ParseEncodedString(value):
     raise ParsingError("only str and hex encoding is supported")
 
 
+def ParseValueWithType(value, type):
+    if type == 'int':
+        return int(value)
+    elif type == 'str':
+        return value
+    elif type == 'bytes':
+        return ParseEncodedString(value)
+    else:
+        raise ParsingError('cannot recognize type: {}'.format(type))
+
+
 def FormatZCLArguments(args, command):
     commandArgs = {}
     for kvPair in args:
@@ -121,12 +131,7 @@ def FormatZCLArguments(args, command):
             raise ParsingError("Argument should in key=value format")
         key, value = kvPair.split("=", 1)
         valueType = command.get(key, None)
-        if valueType == 'int':
-            commandArgs[key] = int(value)
-        elif valueType == 'str':
-            commandArgs[key] = value
-        elif valueType == 'bytes':
-            commandArgs[key] = ParseEncodedString(value)
+        commandArgs[key] = ParseValueWithType(int(value), valueType)
     return commandArgs
 
 
@@ -704,8 +709,10 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
+                attribute_type = all_attrs.get(args[0], {}).get(
+                    args[1], {}).get("type", None)
                 self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), args[5])
+                    args[2]), int(args[3]), int(args[4]), ParseValueWithType(args[5], attribute_type))
             else:
                 self.do_help("zclwrite")
         except exceptions.ChipStackException as ex:

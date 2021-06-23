@@ -29,9 +29,6 @@ chip_device_platform = "efr32"
 chip_mdns = "platform"
 
 lwip_platform = "efr32"
-lwip_ipv6 = true
-lwip_ipv4 = false
-lwip_api = true
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false

@@ -61,11 +61,10 @@ void BLEBase::ClearState()
 
 CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
     BleLayer * bleLayer = param.GetBleLayer();
 
-    VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(bleLayer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(bleLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mBleLayer                           = bleLayer;
     mBleLayer->mBleTransport            = this;
@@ -73,25 +72,19 @@ CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
 
     mState = State::kInitialized;
 
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEBase::SetEndPoint(Ble::BLEEndPoint * endPoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(endPoint->mState == BLEEndPoint::kState_Connected, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endPoint->mState == BLEEndPoint::kState_Connected, CHIP_ERROR_INVALID_ARGUMENT);
 
     mBleEndPoint = endPoint;
 
     // Manually trigger the OnConnectComplete callback.
-    OnEndPointConnectComplete(endPoint, err);
+    OnEndPointConnectComplete(endPoint, CHIP_NO_ERROR);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)

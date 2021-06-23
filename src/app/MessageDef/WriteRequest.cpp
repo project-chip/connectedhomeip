@@ -26,6 +26,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -198,48 +200,53 @@ CHIP_ERROR WriteRequest::Builder::Init(chip::TLV::TLVWriter * const apWriter)
 WriteRequest::Builder & WriteRequest::Builder::SuppressResponse(const bool aSuppressResponse)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_SuppressResponse), aSuppressResponse);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_SuppressResponse), aSuppressResponse);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 AttributeDataList::Builder & WriteRequest::Builder::CreateAttributeDataListBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataListBuilder.ResetError(mError));
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mAttributeDataListBuilder.Init(mpWriter, kCsTag_AttributeDataList);
+        ChipLogFunctError(mError);
+    }
+    else
+    {
+        mAttributeDataListBuilder.ResetError(mError);
+    }
 
-    mError = mAttributeDataListBuilder.Init(mpWriter, kCsTag_AttributeDataList);
-    ChipLogFunctError(mError);
-
-exit:
     return mAttributeDataListBuilder;
 }
 
 AttributeDataVersionList::Builder & WriteRequest::Builder::CreateAttributeDataVersionListBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataVersionListBuilder.ResetError(mError));
-
-    mError = mAttributeDataVersionListBuilder.Init(mpWriter, kCsTag_AttributeDataVersionList);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mAttributeDataVersionListBuilder.Init(mpWriter, kCsTag_AttributeDataVersionList);
+        ChipLogFunctError(mError);
+    }
+    else
+    {
+        mAttributeDataVersionListBuilder.ResetError(mError);
+    }
     return mAttributeDataVersionListBuilder;
 }
 
 WriteRequest::Builder & WriteRequest::Builder::MoreChunkedMessages(const bool aMoreChunkedMessages)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_MoreChunkedMessages), aMoreChunkedMessages);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_MoreChunkedMessages), aMoreChunkedMessages);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 

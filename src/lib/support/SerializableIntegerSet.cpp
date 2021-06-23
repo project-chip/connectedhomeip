@@ -65,11 +65,9 @@ uint16_t SerializableU64SetBase::FindIndex(uint64_t value)
 
 CHIP_ERROR SerializableU64SetBase::Insert(uint64_t value)
 {
-    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-    uint16_t index = 0;
-    VerifyOrExit(value != mEmptyValue, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value != mEmptyValue, CHIP_ERROR_INVALID_ARGUMENT);
 
-    index = FirstAvailableForUniqueId(value);
+    const uint16_t index = FirstAvailableForUniqueId(value);
     if (index < mCapacity)
     {
         mData[index] = value;
@@ -77,18 +75,17 @@ CHIP_ERROR SerializableU64SetBase::Insert(uint64_t value)
         {
             mNextAvailable = static_cast<uint16_t>(index + 1);
         }
-        err = CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
 
-exit:
-    return err;
+    return CHIP_ERROR_NO_MEMORY;
 }
 
 void SerializableU64SetBase::Remove(uint64_t value)
 {
     if (value != mEmptyValue)
     {
-        uint16_t index = FindIndex(value);
+        const uint16_t index = FindIndex(value);
         if (index < mCapacity)
         {
             mData[index] = mEmptyValue;
