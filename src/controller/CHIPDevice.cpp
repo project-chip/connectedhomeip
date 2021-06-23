@@ -616,9 +616,10 @@ CHIP_ERROR Device::EstablishConnectivity(Callback::Callback<OnDeviceConnected> *
     return CHIP_NO_ERROR;
 }
 
-void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                app::TLVDataFilter tlvDataFilter)
 {
-    mCallbacksMgr.AddResponseCallback(mDeviceId, seqNum, onSuccessCallback, onFailureCallback);
+    mCallbacksMgr.AddResponseCallback(mDeviceId, seqNum, onSuccessCallback, onFailureCallback, tlvDataFilter);
 }
 
 void Device::CancelResponseHandler(uint8_t seqNum)

@@ -5,6 +5,7 @@
 
 #include "chip-zcl-zpro-codec-api.h"
 #include <lib/support/Span.h>
+#include <gen/CHIPClientCallbacks.h>
 
 namespace chip {
 namespace Controller {
@@ -84,7 +85,11 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCase
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
-        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+{{#if isList}}
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback, {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAttributeFilter);
+{{else}}
+        mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback, BasicAttributeFilter<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>);
+{{/if}}
     }
     // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we use the seqNum.
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
