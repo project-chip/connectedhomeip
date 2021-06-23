@@ -48,13 +48,13 @@ void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clust
  */
 void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Diagnostic Logs Cluster Init
+/** @brief Color Control Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint);
+void emberAfColorControlClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Ethernet Network Diagnostics Cluster Init
  *
@@ -95,6 +95,14 @@ void emberAfLevelControlClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfNetworkCommissioningClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Occupancy Sensing Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOccupancySensingClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief On/off Cluster Init
  *
@@ -207,27 +215,27 @@ EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(chip::Endpoin
 void emberAfBasicClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
-// Diagnostic Logs Cluster server
+// Color Control Cluster server
 //
 
-/** @brief Diagnostic Logs Cluster Server Init
+/** @brief Color Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfDiagnosticLogsClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfColorControlClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Diagnostic Logs Cluster Server Attribute Changed
+/** @brief Color Control Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param endpoint    Endpoint that is being initialized
  * @param attributeId Attribute that changed
  */
-void emberAfDiagnosticLogsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void emberAfColorControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief Diagnostic Logs Cluster Server Manufacturer Specific Attribute Changed
+/** @brief Color Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
  *
@@ -235,11 +243,11 @@ void emberAfDiagnosticLogsClusterServerAttributeChangedCallback(chip::EndpointId
  * @param attributeId       Attribute that changed
  * @param manufacturerCode  Manufacturer Code of the attribute that changed
  */
-void emberAfDiagnosticLogsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    uint16_t manufacturerCode);
+void emberAfColorControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
+                                                                                  uint16_t manufacturerCode);
 
-/** @brief Diagnostic Logs Cluster Server Message Sent
+/** @brief Color Control Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -250,11 +258,10 @@ void emberAfDiagnosticLogsClusterServerManufacturerSpecificAttributeChangedCallb
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfDiagnosticLogsClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfColorControlClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                         uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief Diagnostic Logs Cluster Server Pre Attribute Changed
+/** @brief Color Control Cluster Server Pre Attribute Changed
  *
  * server Pre Attribute Changed
  *
@@ -264,18 +271,17 @@ void emberAfDiagnosticLogsClusterServerMessageSentCallback(const chip::MessageSe
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDiagnosticLogsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint16_t size,
-                                                                            uint8_t * value);
+EmberAfStatus emberAfColorControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+                                                                          EmberAfAttributeType attributeType, uint16_t size,
+                                                                          uint8_t * value);
 
-/** @brief Diagnostic Logs Cluster Server Tick
+/** @brief Color Control Cluster Server Tick
  *
  * server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfDiagnosticLogsClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfColorControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Ethernet Network Diagnostics Cluster server
@@ -632,6 +638,77 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerPreAttributeChangedCallbac
 void emberAfNetworkCommissioningClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Occupancy Sensing Cluster server
+//
+
+/** @brief Occupancy Sensing Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOccupancySensingClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Occupancy Sensing Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfOccupancySensingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief Occupancy Sensing Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfOccupancySensingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
+                                                                                      uint16_t manufacturerCode);
+
+/** @brief Occupancy Sensing Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param type               The type of message sent
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfOccupancySensingClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
+
+/** @brief Occupancy Sensing Cluster Server Pre Attribute Changed
+ *
+ * server Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfOccupancySensingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
+                                                                              EmberAfAttributeType attributeType, uint16_t size,
+                                                                              uint8_t * value);
+
+/** @brief Occupancy Sensing Cluster Server Tick
+ *
+ * server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOccupancySensingClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // On/off Cluster server
 //
 
@@ -986,11 +1063,140 @@ void emberAfWiFiNetworkDiagnosticsClusterServerTickCallback(chip::EndpointId end
 // Cluster Commands Callback
 
 /**
- * @brief Diagnostic Logs Cluster RetrieveLogsRequest Command callback
+ * @brief Color Control Cluster ColorLoopSet Command callback
  */
 
-bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::Command * commandObj, uint8_t intent,
-                                                             uint8_t requestedProtocol, chip::ByteSpan transferFileDesignator);
+bool emberAfColorControlClusterColorLoopSetCallback(chip::app::Command * commandObj, uint8_t updateFlags, uint8_t action,
+                                                    uint8_t direction, uint16_t time, uint16_t startHue);
+
+/**
+ * @brief Color Control Cluster EnhancedMoveHue Command callback
+ */
+
+bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate);
+
+/**
+ * @brief Color Control Cluster EnhancedMoveToHue Command callback
+ */
+
+bool emberAfColorControlClusterEnhancedMoveToHueCallback(chip::app::Command * commandObj, uint16_t enhancedHue, uint8_t direction,
+                                                         uint16_t transitionTime);
+
+/**
+ * @brief Color Control Cluster EnhancedMoveToHueAndSaturation Command callback
+ */
+
+bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint16_t enhancedHue,
+                                                                      uint8_t saturation, uint16_t transitionTime);
+
+/**
+ * @brief Color Control Cluster EnhancedStepHue Command callback
+ */
+
+bool emberAfColorControlClusterEnhancedStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
+                                                       uint16_t transitionTime);
+
+/**
+ * @brief Color Control Cluster MoveColor Command callback
+ */
+
+bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj, int16_t rateX, int16_t rateY, uint8_t optionsMask,
+                                                 uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster MoveColorTemperature Command callback
+ */
+
+bool emberAfColorControlClusterMoveColorTemperatureCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate,
+                                                            uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
+                                                            uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster MoveHue Command callback
+ */
+
+bool emberAfColorControlClusterMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
+                                               uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster MoveSaturation Command callback
+ */
+
+bool emberAfColorControlClusterMoveSaturationCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate,
+                                                      uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster MoveToColor Command callback
+ */
+
+bool emberAfColorControlClusterMoveToColorCallback(chip::app::Command * commandObj, uint16_t colorX, uint16_t colorY,
+                                                   uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster MoveToColorTemperature Command callback
+ */
+
+bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::Command * commandObj, uint16_t colorTemperature,
+                                                              uint16_t transitionTime, uint8_t optionsMask,
+                                                              uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster MoveToHue Command callback
+ */
+
+bool emberAfColorControlClusterMoveToHueCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t direction,
+                                                 uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster MoveToHueAndSaturation Command callback
+ */
+
+bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t saturation,
+                                                              uint16_t transitionTime, uint8_t optionsMask,
+                                                              uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster MoveToSaturation Command callback
+ */
+
+bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::Command * commandObj, uint8_t saturation,
+                                                        uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster StepColor Command callback
+ */
+
+bool emberAfColorControlClusterStepColorCallback(chip::app::Command * commandObj, int16_t stepX, int16_t stepY,
+                                                 uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster StepColorTemperature Command callback
+ */
+
+bool emberAfColorControlClusterStepColorTemperatureCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
+                                                            uint16_t transitionTime, uint16_t colorTemperatureMinimum,
+                                                            uint16_t colorTemperatureMaximum, uint8_t optionsMask,
+                                                            uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster StepHue Command callback
+ */
+
+bool emberAfColorControlClusterStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+                                               uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster StepSaturation Command callback
+ */
+
+bool emberAfColorControlClusterStepSaturationCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+                                                      uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief Color Control Cluster StopMoveStep Command callback
+ */
+
+bool emberAfColorControlClusterStopMoveStepCallback(chip::app::Command * commandObj, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief General Commissioning Cluster ArmFailSafe Command callback

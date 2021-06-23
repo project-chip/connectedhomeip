@@ -3826,6 +3826,40 @@ bool emberAfBindingClusterUnbindCallback(chip::app::Command * commandObj, chip::
                                          chip::EndpointId endpointId, chip::ClusterId clusterId);
 
 /**
+ * @brief Color Control Cluster ColorLoopSet Command callback
+ */
+
+bool emberAfColorControlClusterColorLoopSetCallback(chip::app::Command * commandObj, uint8_t updateFlags, uint8_t action,
+                                                    uint8_t direction, uint16_t time, uint16_t startHue);
+
+/**
+ * @brief Color Control Cluster EnhancedMoveHue Command callback
+ */
+
+bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate);
+
+/**
+ * @brief Color Control Cluster EnhancedMoveToHue Command callback
+ */
+
+bool emberAfColorControlClusterEnhancedMoveToHueCallback(chip::app::Command * commandObj, uint16_t enhancedHue, uint8_t direction,
+                                                         uint16_t transitionTime);
+
+/**
+ * @brief Color Control Cluster EnhancedMoveToHueAndSaturation Command callback
+ */
+
+bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint16_t enhancedHue,
+                                                                      uint8_t saturation, uint16_t transitionTime);
+
+/**
+ * @brief Color Control Cluster EnhancedStepHue Command callback
+ */
+
+bool emberAfColorControlClusterEnhancedStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
+                                                       uint16_t transitionTime);
+
+/**
  * @brief Color Control Cluster MoveColor Command callback
  */
 
