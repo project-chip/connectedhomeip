@@ -100,7 +100,7 @@ private:
 class MockAppDelegate : public Messaging::ExchangeDelegate
 {
 public:
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
     {
         uint32_t respTime    = System::Timer::GetCurrentEpoch();
@@ -112,6 +112,7 @@ public:
 
         gExchangeCtx->Close();
         gExchangeCtx = nullptr;
+        return CHIP_NO_ERROR;
     }
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override

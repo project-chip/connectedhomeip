@@ -33,7 +33,7 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
 namespace chip {
 namespace app {
-void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -51,6 +51,7 @@ void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const Pa
 
 exit:
     ChipLogFunctError(err);
+    return err;
 }
 
 CHIP_ERROR CommandHandler::SendCommandResponse()

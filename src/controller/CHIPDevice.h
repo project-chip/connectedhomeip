@@ -268,7 +268,7 @@ public:
      * @param[in] payloadHeader Reference to payload header in the message
      * @param[in] msgBuf        The message buffer
      */
-    void OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && msgBuf) override;
 
     /**

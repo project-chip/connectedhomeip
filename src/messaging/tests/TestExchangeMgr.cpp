@@ -77,11 +77,12 @@ TransportMgr<LoopbackTransport> gTransportMgr;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
         ec->Close();
+        return CHIP_NO_ERROR;
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
@@ -92,9 +93,9 @@ public:
 class WaitForTimeoutDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
-    {}
+    { return CHIP_NO_ERROR; }
 
     void OnResponseTimeout(ExchangeContext * ec) override
     {

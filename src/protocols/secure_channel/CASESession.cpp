@@ -1189,7 +1189,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
     return CHIP_NO_ERROR;
 }
 
-void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                     System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);
@@ -1229,6 +1229,7 @@ exit:
         Clear();
         mDelegate->OnSessionEstablishmentError(err);
     }
+    return err;
 }
 
 } // namespace chip

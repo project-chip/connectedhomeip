@@ -91,7 +91,7 @@ OutgoingTransport gLoopback;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -105,6 +105,7 @@ public:
             NL_TEST_ASSERT(mTestSuite, buffer->TotalLength() == sizeof(PAYLOAD));
             NL_TEST_ASSERT(mTestSuite, memcmp(buffer->Start(), PAYLOAD, buffer->TotalLength()) == 0);
         }
+        return CHIP_NO_ERROR;
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
@@ -144,7 +145,7 @@ public:
 class MockSessionEstablishmentDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -154,6 +155,7 @@ public:
             NL_TEST_ASSERT(mTestSuite, buffer->TotalLength() == sizeof(PAYLOAD));
             NL_TEST_ASSERT(mTestSuite, memcmp(buffer->Start(), PAYLOAD, buffer->TotalLength()) == 0);
         }
+        return CHIP_NO_ERROR;
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}

@@ -86,14 +86,15 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     return CHIP_NO_ERROR;
 }
 
-void CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
-    ReturnOnFailure(InitCASEHandshake(ec));
+    ReturnErrorOnFailure(InitCASEHandshake(ec));
 
     mPairingSession.OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
 
+    return CHIP_NO_ERROR;
     // TODO - Enable multiple concurrent CASE session establishment
 }
 
