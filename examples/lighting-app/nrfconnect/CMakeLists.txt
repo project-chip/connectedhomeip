@@ -30,7 +30,7 @@ if (EXISTS boards/${BOARD}.conf)
 endif()
 
 # TODO: temporary fix to remove after solving static addressing problem on nrf5340
-if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
+if(BOARD STREQUAL "nrf5340dk_nrf5340_cpuapp")
     list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
 endif()
 
@@ -95,6 +95,10 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                )
+
+if (BOARD STREQUAL "nrf52840dongle_nrf52840")
+  target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)
+endif()
 
 if (CONFIG_CHIP_PW_RPC)
 

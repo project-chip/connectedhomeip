@@ -36,6 +36,8 @@ into an existing CHIP network and can be controlled by this network.
     -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
 -   [Configuring the example](#configuring-the-example)
 -   [Flashing and debugging](#flashing-and-debugging)
+    -   [Flashing on the development kits](#nrfdks_flashing)
+    -   [Flashing on the nRF52840 Dongle](#nrf52840dongle_flashing)
 -   [Testing the example](#testing-the-example)
     -   [Testing using CHIPTool](#testing-using-chiptool)
     -   [Testing Device Firmware Upgrade](#testing-device-firmware-upgrade)
@@ -147,10 +149,11 @@ more information.
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
-| ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| Hardware platform                                                                                 | Build target               | Platform image                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)         | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details>        |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)           | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>           |
+| [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-Dongle) | `nrf52840dongle_nrf52840`  | <details><summary>nRF52840 Dongle</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_Dongle-medium.jpg" alt="nRF52840 Dongle"/></details> |
 
 <hr>
 
@@ -432,6 +435,13 @@ page.
 
 ## Flashing and debugging
 
+The flashing and debugging procedure is different for the development kits and
+the nRF52840 Dongle.
+
+<a name="nrfdks_flashing"></a>
+
+### Flashing on the development kits
+
 To flash the application to the device, use the west tool and run the following
 command from the example directory:
 
@@ -444,6 +454,14 @@ To debug the application on target, run the following command from the example
 directory:
 
         $ west debug
+
+<a name="nrf52840dongle_flashing"></a>
+
+### Flashing on the nRF52840 Dongle
+
+Visit
+[Programming and Flashing nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
+to read more about flashing on the nRF52840 Dongle.
 
 <hr>
 
