@@ -43,6 +43,23 @@ jobs:
             if_true: "${{ github.sha }}"
             if_false: "pull-${{ github.event.pull_request.number }}"
 
+      - name: Try to get last succesfull |run_id| from build_cr.yaml workflow 
+        run: |
+              echo "CHIPTOOL_CR_RUN_ID=$(\
+              curl --silent \
+              --request GET \
+              --url 'https://api.github.com/repos/${{ github.repository }}/actions/workflows/build_cr.yaml/runs?per_page=1&status=success' \
+              --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+              --header 'content-type: application/json' | \
+              jq '.workflow_runs[0].id' \
+              )" \
+              >> $GITHUB_ENV
+      - name: Verify correctness of requested |run_id|
+        run: |
+            if [[ "$CHIPTOOL_CR_RUN_ID" == "null" ]]; then
+            echo "::error::Can't obtain last succesfull run_id from build_cr.yaml workflow"
+            exit 1
+            fi
       - name: Prepare lava job
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,7 +69,7 @@ jobs:
           yq e -i ".environment.GITHUB_REPOSITORY = \"$GITHUB_REPOSITORY\"" $JOB_FILE
           yq e -i ".environment.GITHUB_REPOSITORY_URL = \"$GITHUB_REPOSITORY_URL\"" $JOB_FILE
           yq e -i ".environment.GITHUB_APP_BUILD_ACTION_ID = ${{ github.event.workflow_run.id }}" $JOB_FILE
-          yq e -i ".environment.GITHUB_CHIP_TOOLS_BUILD_ACTION_ID = 0" $JOB_FILE
+          yq e -i ".environment.GITHUB_CHIP_TOOLS_BUILD_ACTION_ID = $CHIPTOOL_CR_RUN_ID" $JOB_FILE
           yq e -i ".environment.GITHUB_SHA = \"$GITHUB_SHA\"" $JOB_FILE
           yq e -i ".secrets.GITHUB_TOKEN = \"$GITHUB_TOKEN\"" $JOB_FILE  
           cat $JOB_FILE
