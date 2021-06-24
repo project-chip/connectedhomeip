@@ -36,6 +36,9 @@ size_t BytesCircularBuffer::Advance(size_t dataLocation, size_t amount) const
 
 void BytesCircularBuffer::Read(uint8_t * dest, size_t length, size_t offset) const
 {
+    // offset is maximized at sizeof(SizeType) for all use cases.
+    static_assert(std::numeric_limits<SizeType>::max() < std::numeric_limits<size_t>::max() - sizeof(SizeType),
+                  "SizeType too large, may cause overflow");
     VerifyOrDie(StorageUsed() >= offset + length);
 
     size_t start = Advance(mDataStart, offset);
@@ -93,15 +96,18 @@ size_t BytesCircularBuffer::StorageUsed() const
 
 CHIP_ERROR BytesCircularBuffer::Push(const ByteSpan & payload)
 {
-    size_t maxStorageAvailable = mCapacity - (sizeof(SizeType) + 1);
-    size_t length              = payload.size();
-    if (length > maxStorageAvailable)
-        return CHIP_ERROR_INVALID_ARGUMENT;
+    size_t length = payload.size();
     if (length > std::numeric_limits<SizeType>::max())
         return CHIP_ERROR_INVALID_ARGUMENT;
 
+    static_assert(std::numeric_limits<SizeType>::max() < std::numeric_limits<size_t>::max() - (sizeof(SizeType) + 1),
+                  "SizeType too large, may cause overflow");
+    size_t storageNeed = length + sizeof(SizeType) + 1;
+    if (storageNeed > mCapacity)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
     // Free up space until there is enough space.
-    while (length > maxStorageAvailable - StorageUsed())
+    while (storageNeed > mCapacity - StorageUsed())
     {
         VerifyOrDie(Pop() == CHIP_NO_ERROR);
     }
