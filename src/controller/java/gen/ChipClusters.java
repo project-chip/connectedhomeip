@@ -588,6 +588,31 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
   }
 
+  public static class DiagnosticLogsCluster extends BaseChipCluster {
+    public DiagnosticLogsCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void retrieveLogsRequest(
+        DefaultClusterCallback callback,
+        int intent,
+        int requestedProtocol,
+        byte[] transferFileDesignator) {
+      retrieveLogsRequest(
+          chipClusterPtr, callback, intent, requestedProtocol, transferFileDesignator);
+    }
+
+    private native void retrieveLogsRequest(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int intent,
+        int requestedProtocol,
+        byte[] transferFileDesignator);
+  }
+
   public static class DoorLockCluster extends BaseChipCluster {
     public DoorLockCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

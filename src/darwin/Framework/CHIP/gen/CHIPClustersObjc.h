@@ -429,6 +429,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Diagnostic Logs
+ *
+ */
+@interface CHIPDiagnosticLogs : CHIPCluster
+
+- (void)retrieveLogsRequest:(uint8_t)intent
+          requestedProtocol:(uint8_t)requestedProtocol
+     transferFileDesignator:(NSData *)transferFileDesignator
+            responseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Door Lock
  *
  */

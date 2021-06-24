@@ -51,6 +51,8 @@ namespace ASN1 {
 #include <asn1/ASN1OID.h>
 #endif
 
+static constexpr size_t kMaxConstructedAndEncapsulatedTypesDepth = 10;
+
 enum ASN1TagClasses
 {
     kASN1TagClass_Universal       = 0x00,
@@ -125,7 +127,7 @@ public:
     ASN1_ERROR GetBitString(uint32_t & outVal);
 
 private:
-    static constexpr size_t kMaxContextDepth = 32;
+    static constexpr size_t kMaxContextDepth = kMaxConstructedAndEncapsulatedTypesDepth;
 
     struct ASN1ParseContext
     {
@@ -188,10 +190,13 @@ public:
     ASN1_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, chip::TLV::TLVReader & val);
 
 private:
+    static constexpr size_t kMaxDeferredLengthDepth = kMaxConstructedAndEncapsulatedTypesDepth;
+
     uint8_t * mBuf;
     uint8_t * mBufEnd;
     uint8_t * mWritePoint;
-    uint8_t ** mDeferredLengthList;
+    uint8_t * mDeferredLengthLocations[kMaxDeferredLengthDepth];
+    uint8_t mDeferredLengthCount;
 
     ASN1_ERROR EncodeHead(uint8_t cls, uint32_t tag, bool isConstructed, int32_t len);
     ASN1_ERROR WriteDeferredLength(void);

@@ -40,6 +40,7 @@
 | ColorControl                                                        | 0x0300 |
 | ContentLauncher                                                     | 0x050A |
 | Descriptor                                                          | 0x001D |
+| DiagnosticLogs                                                      | 0x0032 |
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
@@ -1400,6 +1401,22 @@ chip::System::PacketBufferHandle encodeDescriptorClusterReadPartsListAttribute(u
  */
 chip::System::PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                      chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster DiagnosticLogs                                              | 0x0032 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RetrieveLogsRequest                                               |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Diagnostic Logs server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDiagnosticLogsClusterDiscoverAttributes(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |

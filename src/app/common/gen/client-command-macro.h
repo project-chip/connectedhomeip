@@ -3584,6 +3584,33 @@
                                                                                                                                    \
                                   ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID, "u", timeoutMs);
 
+/** @brief Command description for RetrieveLogsRequest
+ *
+ * Command: RetrieveLogsRequest
+ * @param intent LogsIntent
+ * @param requestedProtocol LogsTransferProtocol
+ * @param transferFileDesignator OCTET_STRING
+ */
+#define emberAfFillCommandDiagnostic                                                                                               \
+    LogsClusterRetrieveLogsRequest(intent, requestedProtocol, transferFileDesignator)                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID, "uuu", intent, requestedProtocol, transferFileDesignator);
+
+/** @brief Command description for RetrieveLogsResponse
+ *
+ * Command: RetrieveLogsResponse
+ * @param status LogsStatus
+ * @param content OCTET_STRING
+ * @param timeStamp UTC_TIME
+ * @param timeSinceBoot INT32U
+ */
+#define emberAfFillCommandDiagnostic                                                                                               \
+    LogsClusterRetrieveLogsResponse(status, content, timeStamp, timeSinceBoot)                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_RETRIEVE_LOGS_RESPONSE_COMMAND_ID, "uuuu", status, content, timeStamp, timeSinceBoot);
+
 /** @brief Command description for ResetWatermarks
  *
  * Command: ResetWatermarks

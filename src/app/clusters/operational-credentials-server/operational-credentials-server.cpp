@@ -26,6 +26,7 @@
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
+#include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -257,14 +258,6 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
     // Return FabricId - we are temporarily using commissioner nodeId (retrieved via emberAfCurrentCommand()->SourceNodeId()) as
     // fabricId until addOptCert + fabricIndex are implemented. Once they are, this method and its response will go away.
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
-                                  ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y",
-                                  emberAfCurrentCommand()->SourceNodeId());
-        sendStatus = emberAfSendResponse();
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
                                              ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -350,6 +343,12 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * 
 
     VerifyOrExit(admin->SetOperationalCert(OperationalCert) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+    // We have a new operational identity and should start advertising it.  We
+    // can't just wait until we get network configuration commands, because we
+    // might be on the operational network already, in which case we are
+    // expected to be live with our new identity at this point.
+    chip::app::Mdns::StartServer();
 
 exit:
     emberAfSendImmediateDefaultResponse(status);

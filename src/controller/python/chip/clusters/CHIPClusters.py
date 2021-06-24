@@ -204,6 +204,13 @@ class ChipClusters:
             },
             "Descriptor": {
             },
+            "DiagnosticLogs": {
+                "RetrieveLogsRequest": {
+                    "intent": "int",
+                    "requestedProtocol": "int",
+                    "transferFileDesignator": "bytes",
+                },
+            },
             "DoorLock": {
                 "ClearAllPins": {
                 },
@@ -1188,6 +1195,8 @@ class ChipClusters:
                     "type": "int",
                 },
             },
+            "DiagnosticLogs": {
+            },
             "DoorLock": {
                 "LockState": {
                     "attributeId": 0x0000,
@@ -2166,6 +2175,10 @@ class ChipClusters:
         displayString = displayString.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_ContentLauncher_LaunchURL(
                 device, ZCLendpoint, ZCLgroupid, contentURL, len(contentURL), displayString, len(displayString)
+        )
+    def ClusterDiagnosticLogs_CommandRetrieveLogsRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, intent: int, requestedProtocol: int, transferFileDesignator: bytes):
+        return self._chipLib.chip_ime_AppendCommand_DiagnosticLogs_RetrieveLogsRequest(
+                device, ZCLendpoint, ZCLgroupid, intent, requestedProtocol, transferFileDesignator, len(transferFileDesignator)
         )
     def ClusterDoorLock_CommandClearAllPins(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins(
@@ -3894,6 +3907,10 @@ class ChipClusters:
         # Cluster Descriptor ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster DiagnosticLogs
+        # Cluster DiagnosticLogs Command RetrieveLogsRequest
+        self._chipLib.chip_ime_AppendCommand_DiagnosticLogs_RetrieveLogsRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_DiagnosticLogs_RetrieveLogsRequest.restype = ctypes.c_uint32
         # Cluster DoorLock
         # Cluster DoorLock Command ClearAllPins
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

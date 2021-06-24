@@ -131,7 +131,7 @@ def FormatZCLArguments(args, command):
             raise ParsingError("Argument should in key=value format")
         key, value = kvPair.split("=", 1)
         valueType = command.get(key, None)
-        commandArgs[key] = ParseValueWithType(int(value), valueType)
+        commandArgs[key] = ParseValueWithType(value, valueType)
     return commandArgs
 
 
