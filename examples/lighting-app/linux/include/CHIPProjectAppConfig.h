@@ -32,7 +32,7 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
 
-// Bulbs do not typically need this - enabled so we can use shell to discover commissioners
+// Bulbs do not typically use this - enabled so we can use shell to discover commissioners
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT 1
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1

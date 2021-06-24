@@ -111,8 +111,8 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHan
     char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
     pktInfo->SrcAddress.ToString(addrBuffer, sizeof(addrBuffer));
 
-    printf("UDP::OnUdpReceive message from %s, DataLength=%d\n", addrBuffer, buffer->DataLength());
-    // buffer->DebugDump("UDP::OnUdpReceive");
+    ChipLogDetail(Inet, "UDP::OnUdpReceive message from %s", addrBuffer);
+    buffer->DebugDump("UDP::OnUdpReceive");
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
