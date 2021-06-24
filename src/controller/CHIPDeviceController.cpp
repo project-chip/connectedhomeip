@@ -112,7 +112,7 @@ DeviceController::DeviceController()
     mLocalDeviceId            = 0;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
-    mListenPort               = CHIP_PORT + 2;
+    mListenPort               = CHIP_PORT + 2; // It should not be a requirement to use the same port
 }
 
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams params)
@@ -224,7 +224,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     VerifyOrExit(params.operationalCredentialsDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // TODO: debug
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // this conflicts with app/Server commissionee code
     err = LoadLocalCredentials(admin);
     SuccessOrExit(err);
 #endif
@@ -803,7 +803,8 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     mPairingDelegate = params.pairingDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().SetUDCHelper(this);
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().SetInstanceNameResolver(this);
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().SetUserConfirmationProvider(this);
 #endif
     return CHIP_NO_ERROR;
 }
@@ -1134,7 +1135,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     uint8_t CSRNonce[kOpCSRNonceLength];
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(CSRNonce, sizeof(CSRNonce)));
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
@@ -1234,7 +1235,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
     Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
@@ -1300,7 +1301,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
     chip::Controller::TrustedRootCertificatesCluster cluster;
     cluster.Associate(device, 0);
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
     Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnRootCertFailureCallback.Cancel();
 
@@ -1647,7 +1648,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
     device = &mActiveDevices[mDeviceBeingPaired];
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
     // TODO(cecille): We probably want something better than this for breadcrumbs.
     uint64_t breadcrumb = static_cast<uint64_t>(nextStage);
 
@@ -1666,7 +1667,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         // TODO: should get the endpoint information from the descriptor cluster.
         genCom.Associate(device, 0);
         // genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
         uint16_t commissioningExpirySeconds = 5;
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
 #endif
@@ -1710,7 +1711,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
         genCom.SetRegulatoryConfig(mSuccess.Cancel(), mFailure.Cancel(), static_cast<uint8_t>(regulatoryLocation), countryCode,
                                    breadcrumb, kCommandTimeoutMs);
 #endif
@@ -1747,7 +1748,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         // TODO: Once network credential sending is implemented, attempting to set wifi credential on an ethernet only device
         // will cause an error to be sent back. At that point, we should scan and we shoud see the proper ethernet network ID
         // returned in the scan results. For now, we use magic.
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
         char magicNetworkEnableCode[] = "ETH0";
         netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(),
                              ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
@@ -1768,7 +1769,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Calling commissioning complete");
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // temporary - until tv-app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
         genCom.CommissioningComplete(mSuccess.Cancel(), mFailure.Cancel());
 #endif
     }
@@ -1803,7 +1804,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 } // namespace Controller
 } // namespace chip
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // not needed with app/server is included
 namespace chip {
 namespace Platform {
 namespace PersistedStorage {
@@ -1827,4 +1828,4 @@ CHIP_ERROR Write(const char * aKey, uint32_t aValue)
 } // namespace PersistedStorage
 } // namespace Platform
 } // namespace chip
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

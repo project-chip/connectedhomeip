@@ -167,10 +167,11 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     SuccessOrExit(err);
 
 #ifdef DEBUG
-    printf("PacketHeader::Decode header=%u\n", (int) header);
-    printf("                     mEncryptionType=%d\n", (int) mEncryptionType);
-    printf("                     mFlags=%d\n", mFlags.Raw());
-    printf("                     mMessageId=%d\n", mMessageId);
+    ChipLogDetail(Inet, "PacketHeader::Decode");
+    ChipLogDetail(Inet, "  header=%u", (int) header);
+    ChipLogDetail(Inet, "  mEncryptionType=%d", (int) mEncryptionType);
+    ChipLogDetail(Inet, "  mFlags=%d", mFlags.Raw());
+    ChipLogDetail(Inet, "  mMessageId=%d", mMessageId);
 #endif
 
     if (mFlags.Has(Header::FlagValues::kSourceNodeIdPresent))
@@ -179,7 +180,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
         err = reader.Read64(&sourceNodeId).StatusCode();
         SuccessOrExit(err);
 #ifdef DEBUG
-        printf("                     sourceNodeId=%lu\n", sourceNodeId);
+        ChipLogDetail(Inet, "  sourceNodeId=%lu", sourceNodeId);
 #endif
         mSourceNodeId.SetValue(sourceNodeId);
     }
@@ -194,7 +195,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
         err = reader.Read64(&destinationNodeId).StatusCode();
         SuccessOrExit(err);
 #ifdef DEBUG
-        printf("                     destinationNodeId=%lu\n", destinationNodeId);
+        ChipLogDetail(Inet, "  destinationNodeId=%lu", destinationNodeId);
 #endif
         mDestinationNodeId.SetValue(destinationNodeId);
     }
@@ -205,7 +206,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
 
     err = reader.Read16(&mEncryptionKeyID).StatusCode();
 #ifdef DEBUG
-    printf("                     mEncryptionKeyID=%d\n", mEncryptionKeyID);
+    ChipLogDetail(Inet, "  mEncryptionKeyID=%d", mEncryptionKeyID);
 #endif
     SuccessOrExit(err);
 
@@ -239,9 +240,10 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
     mExchangeFlags.SetRaw(header);
 
 #ifdef DEBUG
-    printf("PayloadHeader::Decode header=%u\n", header);
-    printf("                      mMessageType=%u\n", mMessageType);
-    printf("                      mExchangeID=%u\n", mExchangeID);
+    ChipLogDetail(Inet, "PayloadHeader::Decode");
+    ChipLogDetail(Inet, "  header=%u", header);
+    ChipLogDetail(Inet, "  mMessageType=%u", mMessageType);
+    ChipLogDetail(Inet, "  mExchangeID=%u", mExchangeID);
 #endif
 
     VendorId vendor_id;
@@ -252,7 +254,7 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
         SuccessOrExit(err);
         vendor_id = static_cast<VendorId>(vendor_id_raw);
 #ifdef DEBUG
-        printf("                      vendor_id_raw=%u\n", vendor_id_raw);
+        ChipLogDetail(Inet, "  vendor_id_raw=%u", vendor_id_raw);
 #endif
     }
     else
@@ -265,7 +267,7 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
     SuccessOrExit(err);
 
 #ifdef DEBUG
-    printf("                      protocol_id=%u\n", protocol_id);
+    ChipLogDetail(Inet, "  protocol_id=%u", protocol_id);
 #endif
 
     mProtocolID = Protocols::Id(vendor_id, protocol_id);
@@ -278,7 +280,7 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
         mAckId.SetValue(ack_id);
 
 #ifdef DEBUG
-        printf("                      exchange ack_id=%u\n", ack_id);
+        ChipLogDetail(Inet, "  exchange ack_id=%u", ack_id);
 #endif
     }
     else
@@ -318,29 +320,30 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     LittleEndian::Write32(p, mMessageId);
 
 #ifdef DEBUG
-    printf("PacketHeader::Encode encodeFlags=%u\n", encodeFlags.Raw());
-    printf("                     header=%u\n", header);
-    printf("                     mMessageId=%u\n", mMessageId);
+    ChipLogDetail(Inet, "PacketHeader::Encode");
+    ChipLogDetail(Inet, "  encodeFlags=%u", encodeFlags.Raw());
+    ChipLogDetail(Inet, "  header=%u", header);
+    ChipLogDetail(Inet, "  mMessageId=%u", mMessageId);
 #endif
 
     if (mSourceNodeId.HasValue())
     {
         LittleEndian::Write64(p, mSourceNodeId.Value());
 #ifdef DEBUG
-        printf("                     mSourceNodeId=%lu\n", mSourceNodeId.Value());
+        ChipLogDetail(Inet, "  mSourceNodeId=%lu", mSourceNodeId.Value());
 #endif
     }
     if (mDestinationNodeId.HasValue())
     {
         LittleEndian::Write64(p, mDestinationNodeId.Value());
 #ifdef DEBUG
-        printf("                     mDestinationNodeId=%lu\n", mDestinationNodeId.Value());
+        ChipLogDetail(Inet, "  mDestinationNodeId=%lu", mDestinationNodeId.Value());
 #endif
     }
 
     LittleEndian::Write16(p, mEncryptionKeyID);
 #ifdef DEBUG
-    printf("                     mEncryptionKeyID=%u\n", mEncryptionKeyID);
+    ChipLogDetail(Inet, "  mEncryptionKeyID=%u", mEncryptionKeyID);
 #endif
 
     // Written data size provided to caller on success
@@ -374,26 +377,27 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
     Write8(p, mMessageType);
     LittleEndian::Write16(p, mExchangeID);
 #ifdef DEBUG
-    printf("PayloadHeader::Encode header=%u\n", header);
-    printf("                      mMessageType=%u\n", mMessageType);
-    printf("                      mExchangeID=%u\n", mExchangeID);
+    ChipLogDetail(Inet, "PayloadHeader::Encode");
+    ChipLogDetail(Inet, "  header=%u", header);
+    ChipLogDetail(Inet, "  mMessageType=%u", mMessageType);
+    ChipLogDetail(Inet, "  mExchangeID=%u", mExchangeID);
 #endif
     if (HaveVendorId())
     {
         LittleEndian::Write16(p, static_cast<std::underlying_type_t<VendorId>>(mProtocolID.GetVendorId()));
 #ifdef DEBUG
-        printf("                      GetVendorId=%u\n", mProtocolID.GetVendorId());
+        ChipLogDetail(Inet, "  GetVendorId=%u", mProtocolID.GetVendorId());
 #endif
     }
     LittleEndian::Write16(p, mProtocolID.GetProtocolId());
 #ifdef DEBUG
-    printf("                      mProtocolID=%u\n", mProtocolID.GetProtocolId());
+    ChipLogDetail(Inet, "  mProtocolID=%u", mProtocolID.GetProtocolId());
 #endif
     if (mAckId.HasValue())
     {
         LittleEndian::Write32(p, mAckId.Value());
 #ifdef DEBUG
-        printf("                      mAckId=%u\n", mAckId.Value());
+        ChipLogDetail(Inet, "  mAckId=%u", mAckId.Value());
 #endif
     }
 

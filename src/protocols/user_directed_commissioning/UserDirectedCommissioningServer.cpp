@@ -36,8 +36,9 @@ CHIP_ERROR UserDirectedCommissioningServer::Init(Messaging::ExchangeManager * ex
     if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    mExchangeMgr = exchangeMgr;
-    mHelper      = nullptr;
+    mExchangeMgr              = exchangeMgr;
+    mInstanceNameResolver     = nullptr;
+    mUserConfirmationProvider = nullptr;
 
     // Register to receive unsolicited Echo Request messages from the exchange manager.
     mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MsgType::IdentificationDeclaration, this);
@@ -88,14 +89,14 @@ void UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeConte
             return;
         }
 
-        // Call the registered UDCHelper, if any.
-        if (mHelper != nullptr)
+        // Call the registered InstanceNameResolver, if any.
+        if (mInstanceNameResolver != nullptr)
         {
-            mHelper->FindCommissionableNode(ec, instanceName);
+            mInstanceNameResolver->FindCommissionableNode(ec, instanceName);
         }
         else
         {
-            ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived no mHelper registered");
+            ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived no mInstanceNameResolver registered");
         }
     }
     // else
@@ -155,10 +156,10 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Mdns::Comm
                       (int) UDCClientProcessingState::kPromptingUser);
         client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
 
-        // Call the registered UDCHelper, if any.
-        if (mHelper != nullptr)
+        // Call the registered mUserConfirmationProvider, if any.
+        if (mUserConfirmationProvider != nullptr)
         {
-            mHelper->OnUserDirectedCommissioningRequest(nodeData);
+            mUserConfirmationProvider->OnUserDirectedCommissioningRequest(nodeData);
         }
     }
 }

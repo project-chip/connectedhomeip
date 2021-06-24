@@ -1083,10 +1083,23 @@
  *
  * Enable or disable whether this device advertises as a commissioner.
  *
+ * Depends upon CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE set to 1
+ *
  * For Video Players, this value will be 1
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+ *
+ * Enable including commissioner code (CHIPDeviceController.cpp) in the commissionee (Server.cpp) code.
+ *
+ * For Video Players, this value will be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 0
 #endif
 
 /**

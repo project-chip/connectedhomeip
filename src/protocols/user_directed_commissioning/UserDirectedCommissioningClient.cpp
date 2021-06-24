@@ -66,29 +66,18 @@ CHIP_ERROR UserDirectedCommissioningClient::SendUDCRequest(System::PacketBufferH
         mExchangeCtx = nullptr;
     }
 
-    printf("UserDirectedCommissioningClient::SendUDCRequest message DataLength=%d\n", payload->DataLength());
-    uint8_t startOfBuf[10];
-    payload->Read(startOfBuf, sizeof(startOfBuf));
-    for (int i = 0; i < (int) sizeof(startOfBuf); i++)
-    {
-        printf("%d ", startOfBuf[i]);
-    }
-    printf("\n");
+    payload->DebugDump("UserDirectedCommissioningClient::SendUDCRequest");
 
     // Create a new exchange context.
     mExchangeCtx = mExchangeMgr->NewContext(mSecureSession, this);
     if (mExchangeCtx == nullptr)
     {
-        printf("UserDirectedCommissioningClient::SendUDCRequest no exchange\n");
+        ChipLogError(Inet, "UserDirectedCommissioningClient::SendUDCRequest no exchange");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    printf("UserDirectedCommissioningClient::SendUDCRequest exchange\n");
-
     // Send an Echo Request message.  Discard the exchange context if the send fails.
     err = mExchangeCtx->SendMessage(MsgType::IdentificationDeclaration, std::move(payload), sendFlags);
-
-    printf("UserDirectedCommissioningClient::SendUDCRequest returned err=%d\n", (int) err);
 
     if (err != CHIP_NO_ERROR)
     {

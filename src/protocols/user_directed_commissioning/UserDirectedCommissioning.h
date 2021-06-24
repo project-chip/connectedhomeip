@@ -48,7 +48,7 @@ enum class MsgType : uint8_t
     IdentificationDeclaration = 0x00,
 };
 
-class DLL_EXPORT UDCHelper
+class DLL_EXPORT InstanceNameResolver
 {
 public:
     /**
@@ -62,18 +62,25 @@ public:
      */
     virtual void FindCommissionableNode(Messaging::ExchangeContext * ec, char * instanceName) {}
 
+    virtual ~InstanceNameResolver() {}
+};
+
+class DLL_EXPORT UserConfirmationProvider
+{
+public:
     /**
      * @brief
      *   Called when a UDC message has been received and corresponding nodeData has been found.
      * It is expected that the implementer will prompt the user to confirm their intention to
-     * commission the given node, and provide the setup code to allow commissioning to proceed.
+     * commission the given node, and obtain the setup code to allow commissioning to proceed,
+     * and then invoke commissioning on the given Node (using CHIP Device Controller, for example)
      *
      * @param nodeData DNS-SD node information for the client requesting commissioning
      *
      */
     virtual void OnUserDirectedCommissioningRequest(const Mdns::CommissionableNodeData & nodeData) {}
 
-    virtual ~UDCHelper() {}
+    virtual ~UserConfirmationProvider() {}
 };
 
 class DLL_EXPORT UserDirectedCommissioningClient : public Messaging::ExchangeDelegate
@@ -159,12 +166,29 @@ public:
     void Shutdown();
 
     /**
-     * Set the listener to be called when a UDC request is received.
+     * Set the listener to be called when a UDC request is received
+     * and the Instance Name provided needs to be resolved.
      *
-     *  @param[in]    listener    The callback function to receive UDC request instance name.
+     * The resolver should call OnCommissionableNodeFound when the instance is found
+     *
+     *  @param[in]    instanceNameResolver    The callback function to receive UDC request instance name.
      *
      */
-    void SetUDCHelper(UDCHelper * helper) { mHelper = helper; }
+    void SetInstanceNameResolver(InstanceNameResolver * instanceNameResolver) { mInstanceNameResolver = instanceNameResolver; }
+
+    /**
+     * Set the listener to be called when a UDC request is received
+     * and the Instance Name has been resolved.
+     *
+     * The provider should prompt the user to allow commissioning of the node and provide the setup code.
+     *
+     *  @param[in]    userConfirmationProvider    The callback function to obtain user confirmation.
+     *
+     */
+    void SetUserConfirmationProvider(UserConfirmationProvider * userConfirmationProvider)
+    {
+        mUserConfirmationProvider = userConfirmationProvider;
+    }
 
     /**
      * Update the processing state for a UDC Client based upon instance name.
@@ -200,8 +224,9 @@ public:
     void OnCommissionableNodeFound(const Mdns::CommissionableNodeData & nodeData);
 
 private:
-    Messaging::ExchangeManager * mExchangeMgr = nullptr;
-    UDCHelper * mHelper                       = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr            = nullptr;
+    InstanceNameResolver * mInstanceNameResolver         = nullptr;
+    UserConfirmationProvider * mUserConfirmationProvider = nullptr;
 
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle && payload) override;

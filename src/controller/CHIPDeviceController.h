@@ -365,7 +365,8 @@ public:
  */
 class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-                                      public Protocols::UserDirectedCommissioning::UDCHelper,
+                                      public Protocols::UserDirectedCommissioning::InstanceNameResolver,
+                                      public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
 #endif
                                       public SessionEstablishmentDelegate
 

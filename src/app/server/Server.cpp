@@ -46,7 +46,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -553,7 +553,8 @@ void InitServer(AppDelegate * delegate)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     err = chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().Init(&gExchangeMgr);
     SuccessOrExit(err);
-
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     err = InitCommissioner();
     SuccessOrExit(err);
 #endif
@@ -682,7 +683,7 @@ AdminPairingTable & GetGlobalAdminPairingTable()
     return gAdminPairings;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
 ChipDeviceCommissioner mCommissioner;
 bool mCommissionerInited = false;

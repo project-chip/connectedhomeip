@@ -389,7 +389,6 @@ CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * serviceName, 
 {
     if (maxLength < 17)
     {
-        // TODO: find correct error code
         return CHIP_ERROR_NO_MEMORY;
     }
     size_t len = snprintf(serviceName, maxLength, ChipLogFormatX64, mCommissionInstanceName1, mCommissionInstanceName2);

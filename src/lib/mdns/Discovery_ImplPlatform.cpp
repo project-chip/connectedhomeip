@@ -124,7 +124,6 @@ CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * serviceNa
 {
     if (max_length < 17)
     {
-        // TODO: find correct error code
         return CHIP_ERROR_NO_MEMORY;
     }
     size_t len = snprintf(serviceName, maxLength, "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),

@@ -144,6 +144,7 @@ private:
 public:
     void DebugDump(const char * title) const
     {
+#ifdef DEBUG
         printf("DebugDump %s message DataLength=%d\n", title, DataLength());
         uint8_t startOfBuf[DataLength()];
         Read(startOfBuf, sizeof(startOfBuf));
@@ -152,6 +153,7 @@ public:
             printf("%d ", startOfBuf[i]);
         }
         printf("\n");
+#endif
     }
 
     /**
