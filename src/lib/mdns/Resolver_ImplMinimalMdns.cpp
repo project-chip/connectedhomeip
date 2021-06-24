@@ -190,7 +190,6 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     {
         strncpy(mCommissionableNodeData.instanceName, name.Value(), sizeof(CommissionableNodeData::instanceName));
     }
-    // printf("PacketDataReporter::OnCommissionableNodeSrvRecord name=%.*s host=%.*s\n", 5, name.Value(), 5, it.Value());
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
@@ -318,7 +317,6 @@ void PacketDataReporter::OnComplete()
 {
     if (mDiscoveryType == DiscoveryType::kCommissionableNode && mCommissionableNodeData.IsValid())
     {
-        // printf("PacketDataReporter::OnComplete - calling OnCommissionableNodeFound\n");
         mDelegate->OnCommissionableNodeFound(mCommissionableNodeData);
     }
 }

@@ -153,8 +153,6 @@ int main(int argc, char * argv[])
         printf("Listening for UDC requests...\n");
     }
 
-    printf("Listening ...\n");
-
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:

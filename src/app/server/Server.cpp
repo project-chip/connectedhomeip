@@ -34,7 +34,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
@@ -580,7 +579,7 @@ constexpr chip::Transport::AdminId gAdminId = 0;
 
 CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port)
 {
-    printf("SendUserDirectedCommissioningRequest\n");
+    ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest");
 
     CHIP_ERROR err;
     chip::Optional<chip::Transport::PeerAddress> peerAddr;
@@ -600,7 +599,7 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
         ChipLogError(AppServer, "Failed to create mdns hostname: %s", ErrorStr(err));
         return err;
     }
-    printf("instanceName=%s\n", nameBuffer);
+    ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
 
     err = gUDCClient.Init(&gExchangeMgr, { chip::kTestDeviceNodeId, 0, gAdminId });
 
@@ -612,7 +611,7 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
 
         if (payloadBuf.IsNull())
         {
-            printf("Unable to allocate packet buffer\n");
+            ChipLogError(AppServer, "Unable to allocate packet buffer\n");
             return CHIP_ERROR_NO_MEMORY;
         }
 
@@ -620,11 +619,11 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
 
         if (err == CHIP_NO_ERROR)
         {
-            printf("Send UDC request success");
+            ChipLogDetail(AppServer, "Send UDC request success");
         }
         else
         {
-            printf("Send UDC request failed, err: %s\n", chip::ErrorStr(err));
+            ChipLogError(AppServer, "Send UDC request failed, err: %s\n", chip::ErrorStr(err));
         }
 
         sleep(1);
@@ -635,7 +634,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));
+        ChipLogError(AppServer, "ChipEchoClient failed: %s\n", chip::ErrorStr(err));
     }
 
     return err;
@@ -717,56 +716,37 @@ CHIP_ERROR InitCommissioner()
 
 CHIP_ERROR DiscoverCommissionableNodes()
 {
-    printf("discover 3\n");
-
     InitCommissioner();
 
-    sleep(2);
-    printf("done sleeping\n");
-
-    printf(" DiscoverCommand\n");
     mCommissioner.DiscoverAllCommissioning();
-    sleep(1);
-    printf(" DiscoverAllCommissioning done\n");
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoverCommissionableNodes(char * instance)
 {
-    printf("discover 3\n");
-
     InitCommissioner();
 
-    sleep(2);
-    printf("done sleeping\n");
-
-    printf(" DiscoverCommand\n");
     mCommissioner.DiscoverCommissioningInstanceName(instance);
-    sleep(1);
-    printf(" DiscoverAllCommissioning done\n");
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DisplayCommissionableNodes()
 {
-    printf("DisplayCommissionableNodes\n");
-
     InitCommissioner();
 
     for (int i = 0; i < 10; i++)
     {
-        printf(" Entry %d", i);
         const chip::Mdns::CommissionableNodeData * next = mCommissioner.GetDiscoveredDevice(i);
         if (next == nullptr)
         {
-            printf(" null\n");
+            ChipLogProgress(AppServer, "  Entry %d null", i);
         }
         else
         {
-            printf(" instanceName=%s host=%s longDiscriminator=%d vendorId=%d productId=%d\n", next->instanceName, next->hostName,
-                   next->longDiscriminator, next->vendorId, next->productId);
+            ChipLogProgress(AppServer, "  Entry %d instanceName=%s host=%s longDiscriminator=%d vendorId=%d productId=%d", i,
+                            next->instanceName, next->hostName, next->longDiscriminator, next->vendorId, next->productId);
         }
     }
 
@@ -775,12 +755,9 @@ CHIP_ERROR DisplayCommissionableNodes()
 
 CHIP_ERROR ResetUDCStates()
 {
-    printf("ResetUDCStates\n");
-
     InitCommissioner();
 
     mCommissioner.ResetUserDirectedCommissioningStates();
-    printf(" ResetUDCStates done\n");
 
     return CHIP_NO_ERROR;
 }

@@ -112,7 +112,7 @@ DeviceController::DeviceController()
     mLocalDeviceId            = 0;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
-    mListenPort               = CHIP_PORT;
+    mListenPort               = CHIP_PORT + 2;
 }
 
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams params)
@@ -224,8 +224,10 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     VerifyOrExit(params.operationalCredentialsDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
-    // err = LoadLocalCredentials(admin);
-    // SuccessOrExit(err);
+#if !CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // TODO: debug
+    err = LoadLocalCredentials(admin);
+    SuccessOrExit(err);
+#endif
 
     ReleaseAllDevices();
 
@@ -754,9 +756,8 @@ void DeviceController::OnCommissionableNodeFound(const chip::Mdns::Commissionabl
         if (!mCommissionableNodes[i].IsValid())
         {
             mCommissionableNodes[i] = nodeData;
-            printf("DeviceController::OnCommissionableNodeFound hostName=%s instanceName=%s ", nodeData.hostName,
-                   nodeData.instanceName);
-            printf(" adding entry at index %d\n", i);
+            ChipLogDetail(Controller, "DeviceController::OnCommissionableNodeFound hostName=%s instanceName=%s ", nodeData.hostName,
+                          nodeData.instanceName);
             return;
         }
     }
@@ -802,7 +803,6 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     mPairingDelegate = params.pairingDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    printf("DeviceCommissioner::Init setting up UDC\n");
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().SetUDCHelper(this);
 #endif
     return CHIP_NO_ERROR;
@@ -1475,13 +1475,12 @@ const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int
 
 void DeviceCommissioner::FindCommissionableNode(Messaging::ExchangeContext * ec, char * instanceName)
 {
-    printf("DeviceCommissioner FindCommissionableNode instance=%s\n", instanceName);
     DiscoverCommissioningInstanceName(instanceName);
 }
 
 void DeviceCommissioner::OnUserDirectedCommissioningRequest(const Mdns::CommissionableNodeData & nodeData)
 {
-    printf("------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s\n", nodeData.instanceName);
+    ChipLogDetail(Controller, "------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s", nodeData.instanceName);
 }
 
 void DeviceCommissioner::ResetUserDirectedCommissioningStates()

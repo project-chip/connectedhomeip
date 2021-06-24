@@ -24,6 +24,7 @@
 #include <core/Optional.h>
 #include <core/PeerId.h>
 #include <inet/InetLayer.h>
+#include <lib/support/ChipMemString.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -179,37 +180,55 @@ public:
     {
         if (deviceName.HasValue())
         {
-            strncpy(mDeviceName, deviceName.Value(), min(strlen(deviceName.Value()) + 1, sizeof(mDeviceName)));
+            chip::Platform::CopyString(mDeviceName, sizeof(mDeviceName), deviceName.Value());
             mDeviceNameHasValue = true;
+        }
+        else
+        {
+            mDeviceNameHasValue = false;
         }
         return *this;
     }
-    bool HasValueDeviceName() const { return mDeviceNameHasValue; }
-    const char * GetDeviceName() const { return mDeviceName; }
+    Optional<const char *> GetDeviceName() const
+    {
+        return mDeviceNameHasValue ? Optional<const char *>::Value(mDeviceName) : Optional<const char *>::Missing();
+    }
 
     CommissionAdvertisingParameters & SetRotatingId(Optional<const char *> rotatingId)
     {
         if (rotatingId.HasValue())
         {
-            strncpy(mRotatingId, rotatingId.Value(), min(strlen(rotatingId.Value()) + 1, sizeof(mRotatingId)));
+            chip::Platform::CopyString(mRotatingId, sizeof(mRotatingId), rotatingId.Value());
             mRotatingIdHasValue = true;
+        }
+        else
+        {
+            mRotatingIdHasValue = false;
         }
         return *this;
     }
-    bool HasValueRotatingId() const { return mRotatingIdHasValue; }
-    const char * GetRotatingId() const { return mRotatingId; }
+    Optional<const char *> GetRotatingId() const
+    {
+        return mRotatingIdHasValue ? Optional<const char *>::Value(mRotatingId) : Optional<const char *>::Missing();
+    }
 
     CommissionAdvertisingParameters & SetPairingInstr(Optional<const char *> pairingInstr)
     {
         if (pairingInstr.HasValue())
         {
-            strncpy(mPairingInstr, pairingInstr.Value(), min(strlen(pairingInstr.Value()) + 1, sizeof(mPairingInstr)));
+            chip::Platform::CopyString(mPairingInstr, sizeof(mPairingInstr), pairingInstr.Value());
             mPairingInstrHasValue = true;
+        }
+        else
+        {
+            mPairingInstrHasValue = false;
         }
         return *this;
     }
-    bool HasValuePairingInstr() const { return mPairingInstrHasValue; }
-    const char * GetPairingInstr() const { return mPairingInstr; }
+    Optional<const char *> GetPairingInstr() const
+    {
+        return mPairingInstrHasValue ? Optional<const char *>::Value(mPairingInstr) : Optional<const char *>::Missing();
+    }
 
     CommissionAdvertisingParameters & SetPairingHint(Optional<uint16_t> pairingHint)
     {

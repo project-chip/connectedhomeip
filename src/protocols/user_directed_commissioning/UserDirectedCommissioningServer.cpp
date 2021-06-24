@@ -31,7 +31,7 @@ namespace UserDirectedCommissioning {
 
 CHIP_ERROR UserDirectedCommissioningServer::Init(Messaging::ExchangeManager * exchangeMgr)
 {
-    printf("UserDirectedCommissioningServer::Init");
+    ChipLogDetail(AppServer, "UserDirectedCommissioningServer::Init");
     // Error if already initialized.
     if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
@@ -42,7 +42,7 @@ CHIP_ERROR UserDirectedCommissioningServer::Init(Messaging::ExchangeManager * ex
     // Register to receive unsolicited Echo Request messages from the exchange manager.
     mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MsgType::IdentificationDeclaration, this);
 
-    printf("UserDirectedCommissioningServer::Init done");
+    ChipLogDetail(AppServer, "UserDirectedCommissioningServer::Init done");
     return CHIP_NO_ERROR;
 }
 
@@ -58,7 +58,7 @@ void UserDirectedCommissioningServer::Shutdown()
 void UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
-    // payload->DebugDump("UserDirectedCommissioningServer::OnMessageReceive");
+    payload->DebugDump("UserDirectedCommissioningServer::OnMessageReceive");
 
     char instanceName[USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME];
     int instanceNameLength = (payload->DataLength() > (USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME - 1))
@@ -73,18 +73,18 @@ void UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeConte
     UDCClientState * client = mUdcClients.FindUDCClientState(instanceName, nullptr);
     if (client == nullptr)
     {
-        printf("UserDirectedCommissioningServer::OnMessageReceived new instance state received\n");
+        ChipLogProgress(AppServer, "UserDirectedCommissioningServer::OnMessageReceived new instance state received");
 
         CHIP_ERROR err;
         err = mUdcClients.CreateNewUDCClientState(instanceName, &client);
         if (err != CHIP_NO_ERROR)
         {
-            printf("UserDirectedCommissioningServer::OnMessageReceived error creating new connection state\n");
+            ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived error creating new connection state");
             return;
         }
         if (client == nullptr)
         {
-            printf("UserDirectedCommissioningServer::OnMessageReceived no memory\n");
+            ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived no memory");
             return;
         }
 
@@ -92,6 +92,10 @@ void UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeConte
         if (mHelper != nullptr)
         {
             mHelper->FindCommissionableNode(ec, instanceName);
+        }
+        else
+        {
+            ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived no mHelper registered");
         }
     }
     // else
@@ -116,12 +120,13 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
         err = mUdcClients.CreateNewUDCClientState(instanceName, &client);
         if (err != CHIP_NO_ERROR)
         {
-            printf("UserDirectedCommissioningServer::SetUDCClientProcessingState error creating new connection state\n");
+            ChipLogError(AppServer,
+                         "UserDirectedCommissioningServer::SetUDCClientProcessingState error creating new connection state");
             return;
         }
         if (client == nullptr)
         {
-            printf("UserDirectedCommissioningServer::SetUDCClientProcessingState no memory\n");
+            ChipLogError(AppServer, "UserDirectedCommissioningServer::SetUDCClientProcessingState no memory");
             return;
         }
     }
@@ -131,7 +136,7 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
     //            client->GetExpirationTimeMs(), (int) client->GetUDCClientProcessingState());
     // }
 
-    printf("SetUDCClientProcessingState instance=%s new state=%d\n", instanceName, (int) state);
+    ChipLogDetail(AppServer, "SetUDCClientProcessingState instance=%s new state=%d", instanceName, (int) state);
 
     client->SetUDCClientProcessingState(state);
 
@@ -145,9 +150,9 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Mdns::Comm
     UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName, nullptr);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)
     {
-        printf("OnCommissionableNodeFound instance: name=%s, expiration=%lu old_state=%d new_state=%d\n", client->GetInstanceName(),
-               client->GetExpirationTimeMs(), (int) client->GetUDCClientProcessingState(),
-               (int) UDCClientProcessingState::kPromptingUser);
+        ChipLogDetail(AppServer, "OnCommissionableNodeFound instance: name=%s, expiration=%lu old_state=%d new_state=%d",
+                      client->GetInstanceName(), client->GetExpirationTimeMs(), (int) client->GetUDCClientProcessingState(),
+                      (int) UDCClientProcessingState::kPromptingUser);
         client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
 
         // Call the registered UDCHelper, if any.

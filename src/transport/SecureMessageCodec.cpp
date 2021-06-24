@@ -81,8 +81,7 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
         packetHeader.SetEncryptionType(Header::EncryptionType::kAESCCMTagLen8);
     }
 
-    // TODO: remove
-    printf("SecureMessageCodec totalLen=%d taglen=%d \n", totalLen, taglen);
+    ChipLogDetail(Inet, "SecureMessageCodec totalLen=%d taglen=%d", totalLen, taglen);
 
     VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
