@@ -25,6 +25,14 @@ jobs:
               )" \
               >> $GITHUB_ENV
 
+      
+      - name: additional verification step
+        run: |
+              if [[ "$CHIP_TOOL_RUN_ID" == "null" ]]; then
+              echo "::error::Can't obtain last succesfull run_id from build_cr.yaml workflow"
+              exit 1
+              fi
+
       - name: Display received result
         run: |
               echo "$CHIP_TOOL_RUN_ID"
