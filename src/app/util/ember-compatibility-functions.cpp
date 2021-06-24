@@ -26,6 +26,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/ember-compatibility-functions.h>
+#include <app/util/error-mapping.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -168,7 +169,8 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
         returnStatusParam,
         status == EMBER_ZCL_STATUS_SUCCESS ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                            : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
-        chip::Protocols::InteractionModel::Id, static_cast<Protocols::InteractionModel::ProtocolCode>(status));
+        chip::Protocols::InteractionModel::Id,
+        static_cast<Protocols::InteractionModel::ProtocolCode>(ToInteractionModelProtocolCode(status)));
     return CHIP_NO_ERROR == err;
 }
 
@@ -202,8 +204,6 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER,
                                   data, sizeof(data), &attributeType);
 
-    // TODO: Currently, all errors are considered as attribute not exists, should be fixed by mapping ember error code to IM error
-    // codes.
     if (apDataExists != nullptr)
     {
         *apDataExists = (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -212,9 +212,8 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        return apWriter->Put(
-            chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-            Protocols::InteractionModel::ToUint16(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
+        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
+                             Protocols::InteractionModel::ToUint16(ToInteractionModelProtocolCode(status)));
     }
 
     // TODO: ZCL_STRUCT_ATTRIBUTE_TYPE is not included in this switch case currently, should add support for structures.
