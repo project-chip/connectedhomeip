@@ -115,7 +115,7 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
     size_t idx = 0;
     for (size_t i = 0; i < macOrEui64.size(); ++i)
     {
-        idx += snprintf(buffer + idx, 3, "%X", macOrEui64.data()[i]);
+        idx += snprintf(buffer + idx, 3, "%02X", macOrEui64.data()[i]);
     }
     return CHIP_NO_ERROR;
 }

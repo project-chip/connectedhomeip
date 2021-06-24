@@ -244,19 +244,19 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionerNode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_matterd") == 0);
 
-    // Test buffer exactly the right size - "_chipc" = 6 + nullptr = 7
+    // Test buffer exactly the right size - "_matterc" = 8 + nullchar = 9
     filter.type = DiscoveryFilterType::kNone;
-    NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 6, filter, DiscoveryType::kCommissionableNode) == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 9, filter, DiscoveryType::kCommissionableNode) == CHIP_ERROR_NO_MEMORY);
 
-    // Test buffer exactly the right size - "_matterc" = 8 + nullptr = 9
+    // Test buffer exactly the right size - "_matterc" = 8 + nullchar = 9
     filter.type = DiscoveryFilterType::kNone;
-    NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 7, filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 9, filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_matterc") == 0);
 
-    // Test buffer exactly the right size for subtype - "_C1._sub._matter" = 17 + nullptr = 18
+    // Test buffer exactly the right size for subtype - "_C1._sub._matterc" = 17 + nullchar = 18
     filter.type = DiscoveryFilterType::kCommissioningMode;
     filter.code = 1;
-    NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 16, filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 18, filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C1._sub._matterc") == 0);
 }
 

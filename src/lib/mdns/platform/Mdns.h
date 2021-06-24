@@ -37,7 +37,7 @@
 namespace chip {
 namespace Mdns {
 
-// None of these sizes include an nullptr at the end.
+// None of these sizes include an null character at the end.
 static constexpr uint8_t kMdnsInstanceNameMaxSize = 33; // [Node]-[Fabric] ID in hex - 16+1+16
 static constexpr uint8_t kMdnsHostNameMaxSize     = 16; // 64-bits in hex.
 static constexpr size_t kMdnsProtocolTextMaxSize  = std::max(sizeof(kOperationalProtocol), sizeof(kCommissionProtocol)) - 1;
