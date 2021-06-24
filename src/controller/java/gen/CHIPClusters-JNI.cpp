@@ -10527,7 +10527,7 @@ exit:
 }
 JNI_METHOD(jlong, PressureMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     PressureMeasurementCluster * cppCluster = new PressureMeasurementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
