@@ -600,10 +600,10 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(EndpointId endpoint,
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
     entry.hasCurrentPositionLiftPercentageValue = readServerAttribute(
-        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_LIFT_PERCENTAGE_ATTRIBUTE_ID, "current position lift percentage",
+        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID, "current position lift percentage",
         (uint8_t *) &entry.currentPositionLiftPercentageValue, sizeof(entry.currentPositionLiftPercentageValue));
     entry.hasCurrentPositionTiltPercentageValue = readServerAttribute(
-        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_TILT_PERCENTAGE_ATTRIBUTE_ID, "current position tilt percentage",
+        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID, "current position tilt percentage",
         (uint8_t *) &entry.currentPositionTiltPercentageValue, sizeof(entry.currentPositionTiltPercentageValue));
 #endif
 
@@ -736,13 +736,13 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
                 if (entry.hasCurrentPositionLiftPercentageValue)
                 {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_LIFT_PERCENTAGE_ATTRIBUTE_ID,
+                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
                                          "current position lift percentage", (uint8_t *) &entry.currentPositionLiftPercentageValue,
                                          ZCL_INT8U_ATTRIBUTE_TYPE);
                 }
                 if (entry.hasCurrentPositionTiltPercentageValue)
                 {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_TILT_PERCENTAGE_ATTRIBUTE_ID,
+                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
                                          "current position tilt percentage", (uint8_t *) &entry.currentPositionTiltPercentageValue,
                                          ZCL_INT8U_ATTRIBUTE_TYPE);
                 }
