@@ -233,15 +233,15 @@ class ChipDeviceController(object):
     def GetFabricId(self):
         fabricid = c_uint64(0)
 
-        error = self._ChipStack.Call(
+        res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetFabricId(
                 self.devCtrl, pointer(fabricid))
         )
 
-        if error == 0:
+        if res == 0:
             return fabricid.value
         else:
-            return 0
+            raise self._ChipStack.ErrorToException(res)
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = c_void_p(None)
