@@ -43,10 +43,10 @@ class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredent
 public:
     virtual ~ExampleOperationalCredentialsIssuer() {}
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr, int64_t serialNumber,
-                                                  uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GenerateNodeOperationalCertificate(const Optional<NodeId> & deviceId, FabricId fabricId, const ByteSpan & csr,
+                                                  int64_t serialNumber, Callback::Callback<NOCGenerated> * onNOCGenerated) override;
 
-    CHIP_ERROR GetRootCACertificate(FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GetRootCACertificate(FabricId fabricId, MutableByteSpan & outCert) override;
 
     /**
      * @brief Initialize the issuer with the keypair in the storage.
@@ -75,6 +75,8 @@ private:
 
     // By default, let's set validity to 10 years
     uint32_t mValidity = 365 * 24 * 60 * 60 * 10;
+
+    NodeId mNextAvailableNodeId = 1;
 };
 
 } // namespace Controller

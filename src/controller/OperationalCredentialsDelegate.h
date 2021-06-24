@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <core/CHIPCallback.h>
 #include <core/PeerId.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/DLLUtil.h>
@@ -28,6 +29,14 @@
 namespace chip {
 namespace Controller {
 
+typedef void (*NOCGenerated)(void * context, const ByteSpan & noc, const PeerId & deviceId);
+
+// TODO - Reduce memory requirement for generating x509 certificates
+// As per specifications (section 6.3.7. Trusted Root CA Certificates), DER certs
+// should require 600 bytes. Currently, due to ASN writer overheads, a larger buffer
+// is needed, even though the generated certificate fits in 600 bytes limit.
+constexpr uint32_t kMaxCHIPDERCertLength = 1024;
+
 /// Callbacks for CHIP operational credentials generation
 class DLL_EXPORT OperationalCredentialsDelegate
 {
@@ -36,24 +45,27 @@ public:
 
     /**
      * @brief
-     *   This function generates an operational certificate for the given node.
+     *   This function generates an operational certificate for the device.
      *   The API generates the certificate in X.509 DER format.
      *
      *   The delegate is expected to use the certificate authority whose certificate
      *   is returned in `GetIntermediateCACertificate()` or `GetRootCACertificate()`
      *   API calls.
      *
-     * @param[in] peerId       Node ID and Fabric ID of the target device.
-     * @param[in] csr          Certificate Signing Request from the node in DER format.
-     * @param[in] serialNumber Serial number to assign to the new certificate.
-     * @param[in] certBuf      The API will fill in the generated cert in this buffer. The buffer is allocated by the caller.
-     * @param[in] certBufSize  The size of certBuf buffer.
-     * @param[out] outCertLen  The size of the actual certificate that was written in the certBuf.
+     *   The delegate will call `onNOCGenerated` when the NOC is ready.
+     *
+     * @param[in] deviceId        Optional device ID. If provided, the generated NOC must use the provided ID.
+     *                            If ID is not provided, the delegate must generate one.
+     * @param[in] fabricId        Fabric ID for which the certificate is being requested.
+     * @param[in] csr             Certificate Signing Request from the node in DER format.
+     * @param[in] serialNumber    Serial number to assign to the new certificate.
+     * @param[in] onNOCGenerated  Callback handler to provide generated NOC to the caller of GenerateNodeOperationalCertificate()
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr, int64_t serialNumber,
-                                                          uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) = 0;
+    virtual CHIP_ERROR GenerateNodeOperationalCertificate(const Optional<NodeId> & deviceId, FabricId fabricId,
+                                                          const ByteSpan & csr, int64_t serialNumber,
+                                                          Callback::Callback<NOCGenerated> * onNOCGenerated) = 0;
 
     /**
      * @brief
@@ -64,15 +76,12 @@ public:
      *   The returned certificate is in X.509 DER format.
      *
      * @param[in] fabricId    Fabric ID for which the certificate is being requested.
-     * @param[in] certBuf     The API will fill in the cert in this buffer. The buffer is allocated by the caller.
-     * @param[in] certBufSize The size of certBuf buffer.
-     * @param[out] outCertLen The size of the actual certificate that was written in the certBuf.
+     * @param[in] outCert     The API will fill in the cert in this buffer. The buffer is allocated by the caller.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      *         CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED is not a critical error. It indicates that ICA is not needed.
      */
-    virtual CHIP_ERROR GetIntermediateCACertificate(FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
-                                                    uint32_t & outCertLen)
+    virtual CHIP_ERROR GetIntermediateCACertificate(FabricId fabricId, MutableByteSpan & outCert)
     {
         // By default, let's return CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED status. It'll allow
         // commissioner applications to not implement GetIntermediateCACertificate() if they don't require an
@@ -88,13 +97,11 @@ public:
      *   The returned certificate is in X.509 DER format.
      *
      * @param[in] fabricId    Fabric ID for which the certificate is being requested.
-     * @param[in] certBuf     The API will fill in the cert in this buffer. The buffer is allocated by the caller.
-     * @param[in] certBufSize The size of certBuf buffer.
-     * @param[out] outCertLen The size of the actual certificate that was written in the certBuf.
+     * @param[in] outCert     The API will fill in the cert in this buffer. The buffer is allocated by the caller.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GetRootCACertificate(FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) = 0;
+    virtual CHIP_ERROR GetRootCACertificate(FabricId fabricId, MutableByteSpan & outCert) = 0;
 };
 
 } // namespace Controller

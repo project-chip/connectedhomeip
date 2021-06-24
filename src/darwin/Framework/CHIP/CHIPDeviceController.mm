@@ -225,6 +225,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
 
         if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = self.cppCommissioner->PairDevice(deviceID, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
@@ -256,6 +257,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
                                                 .SetDiscriminator(discriminator)
                                                 .SetPeerAddress(peerAddress);
         if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = self.cppCommissioner->PairDevice(deviceID, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
@@ -281,6 +283,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
 
         if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = _cppCommissioner->PairTestDeviceWithoutSecurity(
                 deviceID, chip::Transport::PeerAddress::UDP(addr, port), serializedTestDevice);
         }
@@ -302,6 +305,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     if (setupPayload) {
         uint16_t discriminator = setupPayload.discriminator.unsignedShortValue;
         uint32_t setupPINCode = setupPayload.setUpPINCode.unsignedIntValue;
+        _operationalCredentialsDelegate->SetDeviceID(deviceID);
         didSucceed = [self pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:error];
     } else {
         CHIP_LOG_ERROR("Failed to create CHIPSetupPayload for pairing with error %@", *error);
@@ -337,6 +341,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     }
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
+            _operationalCredentialsDelegate->ResetDeviceID();
             errorCode = self.cppCommissioner->StopPairing(deviceID);
         }
         success = ![self checkForError:errorCode logMsg:kErrorStopPairing error:error];

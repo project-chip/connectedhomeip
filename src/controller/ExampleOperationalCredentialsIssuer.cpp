@@ -19,6 +19,7 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/CHIPCert.h>
 #include <support/CHIPMem.h>
+#include <support/ScopedBuffer.h>
 
 namespace chip {
 namespace Controller {
@@ -62,26 +63,51 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr,
-                                                                                   int64_t serialNumber, uint8_t * certBuf,
-                                                                                   uint32_t certBufSize, uint32_t & outCertLen)
+CHIP_ERROR
+ExampleOperationalCredentialsIssuer::GenerateNodeOperationalCertificate(const Optional<NodeId> & deviceId, FabricId fabricId,
+                                                                        const ByteSpan & csr, int64_t serialNumber,
+                                                                        Callback::Callback<NOCGenerated> * onNOCGenerated)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    X509CertRequestParams request = { serialNumber, mIssuerId,         mNow, mNow + mValidity, true, peerId.GetFabricId(),
-                                      true,         peerId.GetNodeId() };
+    NodeId assignedId;
+    if (deviceId.HasValue())
+    {
+        assignedId = deviceId.Value();
+    }
+    else
+    {
+        assignedId = mNextAvailableNodeId++;
+    }
+
+    X509CertRequestParams request = { serialNumber, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
-    return NewNodeOperationalX509Cert(request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, certBuf, certBufSize,
-                                      outCertLen);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+    ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    uint32_t nocLen = 0;
+
+    ReturnErrorOnFailure(NewNodeOperationalX509Cert(request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, noc.Get(),
+                                                    kMaxCHIPDERCertLength, nocLen));
+
+    onNOCGenerated->mCall(onNOCGenerated->mContext, ByteSpan(noc.Get(), nocLen),
+                          PeerId().SetNodeId(assignedId).SetFabricId(fabricId));
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleOperationalCredentialsIssuer::GetRootCACertificate(FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
-                                                                     uint32_t & outCertLen)
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GetRootCACertificate(FabricId fabricId, MutableByteSpan & outCert)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
-    return NewRootX509Cert(request, mIssuer, certBuf, certBufSize, outCertLen);
+
+    size_t outCertSize  = (outCert.size() > UINT32_MAX) ? UINT32_MAX : outCert.size();
+    uint32_t outCertLen = 0;
+    ReturnErrorOnFailure(NewRootX509Cert(request, mIssuer, outCert.data(), static_cast<uint32_t>(outCertSize), outCertLen));
+    outCert.reduce_size(outCertLen);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller

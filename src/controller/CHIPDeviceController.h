@@ -352,7 +352,7 @@ protected:
     // array can contain up to two certificates (node operational certificate, and ICA certificate).
     // If the certificate issuer doesn't require an ICA (i.e. NOC is signed by the root CA), the array
     // will have only one certificate (node operational certificate).
-    CHIP_ERROR GenerateOperationalCertificates(const ByteSpan & CSR, NodeId deviceId, MutableByteSpan & cert);
+    CHIP_ERROR GenerateOperationalCertificates(const ByteSpan & noc, MutableByteSpan & cert);
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
@@ -367,6 +367,9 @@ private:
     void ReleaseAllDevices();
 
     CHIP_ERROR LoadLocalCredentials(Transport::AdminPairingInfo * admin);
+
+    static void OnLocalNOCGenerated(void * context, const ByteSpan & noc, const PeerId & deviceId);
+    Callback::Callback<NOCGenerated> mLocalNOCCallback;
 };
 
 /**
@@ -602,6 +605,8 @@ private:
     static void OnDeviceConnectedFn(void * context, Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
+    static void OnDeviceNOCGenerated(void * context, const ByteSpan & noc, const PeerId & deviceId);
+
     /**
      * @brief
      *   This function processes the CSR sent by the device.
@@ -632,6 +637,8 @@ private:
 
     Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    Callback::Callback<NOCGenerated> mDeviceNOCCallback;
 
     PASESession mPairingSession;
 };
