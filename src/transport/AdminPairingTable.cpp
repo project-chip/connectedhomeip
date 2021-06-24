@@ -139,7 +139,12 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 
     if (mOperationalKey == nullptr)
     {
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        mOperationalKey = chip::Platform::New<P256KeypairHSM>();
+        mOperationalKey->SetKeyId(CASE_OPS_KEY);
+#else
         mOperationalKey = chip::Platform::New<P256Keypair>();
+#endif
     }
     VerifyOrExit(mOperationalKey != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = mOperationalKey->Deserialize(info->mOperationalKey));
