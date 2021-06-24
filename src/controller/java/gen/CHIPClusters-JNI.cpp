@@ -6504,6 +6504,65 @@ JNI_METHOD(jlong, DescriptorCluster, initWithDevice)(JNIEnv * env, jobject self,
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(jlong, DiagnosticLogsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    DiagnosticLogsCluster * cppCluster = new DiagnosticLogsCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
+JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint intent, jint requestedProtocol,
+ jbyteArray transferFileDesignator)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DiagnosticLogsCluster * cppCluster;
+
+    JniByteArray transferFileDesignatorArr(env, transferFileDesignator);
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<DiagnosticLogsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->RetrieveLogsRequest(
+        onSuccess->Cancel(), onFailure->Cancel(), intent, requestedProtocol,
+        chip::ByteSpan((const uint8_t *) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
 JNI_METHOD(jlong, DoorLockCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());

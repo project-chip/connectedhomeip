@@ -180,6 +180,12 @@
 #define CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER
 #endif
 
+#if defined(ZCL_USING_DIAGNOSTIC_LOGS_CLUSTER_SERVER) || defined(ZCL_USING_DIAGNOSTIC_LOGS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DIAGNOSTIC_LOGS_CLUSTER { ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID, 50, "Diagnostic Logs" },
+#else
+#define CHIP_PRINTCLUSTER_DIAGNOSTIC_LOGS_CLUSTER
+#endif
+
 #if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_GENERAL_DIAGNOSTICS_CLUSTER { ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID, 51, "General Diagnostics" },
 #else
@@ -951,6 +957,7 @@
     CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_DIAGNOSTIC_LOGS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_GENERAL_DIAGNOSTICS_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_SOFTWARE_DIAGNOSTICS_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                           \

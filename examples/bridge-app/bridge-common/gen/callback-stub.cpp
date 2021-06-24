@@ -35,6 +35,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_DESCRIPTOR_CLUSTER_ID:
         emberAfDescriptorClusterInitCallback(endpoint);
         break;
+    case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
+        emberAfDiagnosticLogsClusterInitCallback(endpoint);
+        break;
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -80,6 +83,11 @@ void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfDiagnosticLogsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

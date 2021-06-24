@@ -422,6 +422,12 @@
 
 // Server attributes
 
+// Attribute ids for cluster: Diagnostic Logs
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: General Diagnostics
 
 // Client attributes

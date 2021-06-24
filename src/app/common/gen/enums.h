@@ -1805,6 +1805,31 @@ enum EmberAfLocationMethod : uint8_t
     EMBER_ZCL_LOCATION_METHOD_OUT_OF_BAND       = 3,
 };
 
+// Enum for LogsIntent
+enum EmberAfLogsIntent : uint8_t
+{
+    EMBER_ZCL_LOGS_INTENT_END_USER_SUPPORT = 0,
+    EMBER_ZCL_LOGS_INTENT_NETWORK_DIAG     = 1,
+    EMBER_ZCL_LOGS_INTENT_CRASH_LOGS       = 2,
+};
+
+// Enum for LogsStatus
+enum EmberAfLogsStatus : uint8_t
+{
+    EMBER_ZCL_LOGS_STATUS_SUCCESS   = 0,
+    EMBER_ZCL_LOGS_STATUS_EXHAUSTED = 1,
+    EMBER_ZCL_LOGS_STATUS_NO_LOGS   = 2,
+    EMBER_ZCL_LOGS_STATUS_BUSY      = 3,
+    EMBER_ZCL_LOGS_STATUS_DENIED    = 4,
+};
+
+// Enum for LogsTransferProtocol
+enum EmberAfLogsTransferProtocol : uint8_t
+{
+    EMBER_ZCL_LOGS_TRANSFER_PROTOCOL_RESPONSE_PAYLOAD = 0,
+    EMBER_ZCL_LOGS_TRANSFER_PROTOCOL_BDX              = 1,
+};
+
 // Enum for ManufacturerSpecificAlarmGroups
 enum EmberAfManufacturerSpecificAlarmGroups : uint8_t
 {

@@ -39,6 +39,7 @@ constexpr ClusterId kBridgedDeviceBasicClusterId          = 0x0039;
 constexpr ClusterId kColorControlClusterId                = 0x0300;
 constexpr ClusterId kContentLauncherClusterId             = 0x050A;
 constexpr ClusterId kDescriptorClusterId                  = 0x001D;
+constexpr ClusterId kDiagnosticLogsClusterId              = 0x0032;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
 constexpr ClusterId kFixedLabelClusterId                  = 0x0040;
@@ -497,6 +498,23 @@ public:
     CHIP_ERROR ReadAttributeClientList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributePartsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
+class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
+{
+public:
+    DiagnosticLogsCluster() : ClusterBase(kDiagnosticLogsClusterId) {}
+    ~DiagnosticLogsCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR RetrieveLogsRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t intent, uint8_t requestedProtocol, chip::ByteSpan transferFileDesignator);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kRetrieveLogsRequestCommandId = 0x00;
 };
 
 class DLL_EXPORT DoorLockCluster : public ClusterBase

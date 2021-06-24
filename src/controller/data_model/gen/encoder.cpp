@@ -66,6 +66,7 @@ using namespace chip::Encoding::LittleEndian;
 | ColorControl                                                        | 0x0300 |
 | ContentLauncher                                                     | 0x050A |
 | Descriptor                                                          | 0x001D |
+| DiagnosticLogs                                                      | 0x0032 |
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
@@ -175,6 +176,9 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_LAUNCH_URL_COMMAND_ID (0x01)
 
 #define DESCRIPTOR_CLUSTER_ID 0x001D
+
+#define DIAGNOSTIC_LOGS_CLUSTER_ID 0x0032
+#define ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID (0x00)
 
 #define DOOR_LOCK_CLUSTER_ID 0x0101
 #define ZCL_CLEAR_ALL_PINS_COMMAND_ID (0x08)
@@ -2228,6 +2232,22 @@ PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t s
 {
     COMMAND_HEADER("ReadDescriptorClusterRevision", DESCRIPTOR_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster DiagnosticLogs                                              | 0x0032 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RetrieveLogsRequest                                               |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeDiagnosticLogsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverDiagnosticLogsAttributes", DIAGNOSTIC_LOGS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
