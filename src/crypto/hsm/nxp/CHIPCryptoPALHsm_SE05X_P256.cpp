@@ -570,6 +570,7 @@ CHIP_ERROR P256KeypairHSM::NewCertificateSigningRequest(uint8_t * csr, size_t & 
                                    0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03,
                                    0x42, 0x00 };
 
+    ChipLogDetail(Crypto, "NewCertificateSigningRequest: Using SE05X for creating CSR !");
 
     // No extensions are copied
     buffer_index = buffer_index - 2;
