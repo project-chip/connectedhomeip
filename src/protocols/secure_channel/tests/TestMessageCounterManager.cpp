@@ -73,11 +73,12 @@ const char PAYLOAD[] = "Hello!";
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && msgBuf) override
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && msgBuf) override
     {
         ++ReceiveHandlerCallCount;
         ec->Close();
+        return CHIP_NO_ERROR;
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}

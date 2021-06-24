@@ -178,8 +178,9 @@ CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClient ** const apWriteCl
     return CHIP_ERROR_NO_MEMORY;
 }
 
-void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext,
+                                                    const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
+                                                    System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -199,11 +200,12 @@ void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExc
     {
         apExchangeContext->Abort();
     }
+    return err;
 }
 
-void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                    const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
-                                                    System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                          const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
+                                                          System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -213,7 +215,7 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
         {
             err = commandHandler.Init(mpExchangeMgr, mpDelegate);
             SuccessOrExit(err);
-            commandHandler.OnMessageReceived(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+            err = commandHandler.OnInvokeCommandRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
             apExchangeContext = nullptr;
             break;
         }
@@ -226,10 +228,11 @@ exit:
     {
         apExchangeContext->Abort();
     }
+    return err;
 }
 
-void InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -241,8 +244,7 @@ void InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchan
         {
             err = readHandler.Init(mpDelegate);
             SuccessOrExit(err);
-            err = readHandler.OnReadRequest(apExchangeContext, std::move(aPayload));
-            SuccessOrExit(err);
+            err               = readHandler.OnReadRequest(apExchangeContext, std::move(aPayload));
             apExchangeContext = nullptr;
             break;
         }
@@ -255,10 +257,12 @@ exit:
     {
         apExchangeContext->Abort();
     }
+    return err;
 }
 
-void InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                  const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
+                                                  System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -270,8 +274,7 @@ void InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExcha
         {
             err = writeHandler.Init(mpDelegate);
             SuccessOrExit(err);
-            err = writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload));
-            SuccessOrExit(err);
+            err               = writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload));
             apExchangeContext = nullptr;
             break;
         }
@@ -284,28 +287,31 @@ exit:
     {
         apExchangeContext->Abort();
     }
+    return err;
 }
 
-void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                               const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
+                                                     const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
+                                                     System::PacketBufferHandle && aPayload)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
-
-        OnInvokeCommandRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+        err = OnInvokeCommandRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
-        OnReadRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+        err = OnReadRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
-        OnWriteRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+        err = OnWriteRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
     }
     else
     {
-        OnUnknownMsgType(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+        err = OnUnknownMsgType(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
     }
+    return err;
 }
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)

@@ -28,7 +28,7 @@
 #include <platform/KeyValueStoreManager.h>
 #include <support/ThreadOperationalDataset.h>
 
-using chip::Controller::DeviceCommissioner;
+using namespace chip::Controller;
 
 extern chip::Ble::BleLayer * GetJNIBleLayer();
 
@@ -37,7 +37,7 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
     if ((mJavaVM != nullptr) && (mJavaObjectRef != nullptr))
     {
-        JniReferences::GetEnvForCurrentThread()->DeleteGlobalRef(mJavaObjectRef);
+        JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mJavaObjectRef);
     }
     mController->Shutdown();
 }
@@ -45,12 +45,13 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
 {
     mJavaVM        = vm;
-    mJavaObjectRef = JniReferences::GetEnvForCurrentThread()->NewGlobalRef(obj);
+    mJavaObjectRef = JniReferences::GetInstance().GetEnvForCurrentThread()->NewGlobalRef(obj);
 }
 
 void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jint argument)
 {
-    CallVoidInt(JniReferences::GetEnvForCurrentThread(), mJavaObjectRef, methodName, argument);
+    JniReferences::GetInstance().CallVoidInt(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef, methodName,
+                                             argument);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
@@ -159,7 +160,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
 {
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = FindMethod(JniReferences::GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method);
+    err = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef, "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %d", err);
@@ -180,9 +181,9 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
     CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer,
                                                          certBuf, certBufSize, outCertLen);
     jbyteArray argument;
-    JniReferences::GetEnvForCurrentThread()->ExceptionClear();
-    N2J_ByteArray(JniReferences::GetEnvForCurrentThread(), csr.data(), csr.size(), argument);
-    JniReferences::GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, argument);
+    JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csr.data(), csr.size(), argument);
+    JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, argument);
     return generateCert;
 }
 
