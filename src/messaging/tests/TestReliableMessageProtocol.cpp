@@ -99,7 +99,18 @@ public:
         {
             ec->GetReliableMessageContext()->SetAckPending(false);
         }
-        ec->Close();
+        if (!mRetainExchange)
+        {
+            ec->Close();
+            ec = nullptr;
+
+            if (mExchange != nullptr)
+            {
+                mExchange->Close();
+                mExchange = nullptr;
+            }
+        }
+        mExchange = ec;
         if (mTestSuite != nullptr)
         {
             NL_TEST_ASSERT(mTestSuite, buffer->TotalLength() == sizeof(PAYLOAD));
@@ -112,6 +123,8 @@ public:
 
     bool IsOnMessageReceivedCalled = false;
     bool mDropAckResponse          = false;
+    bool mRetainExchange           = false;
+    ExchangeContext * mExchange    = nullptr;
     nlTestSuite * mTestSuite       = nullptr;
 };
 
@@ -654,6 +667,81 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     gTransportMgr.SetSecureSessionMgr(&inctx.GetSecureSessionManager());
 }
 
+void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver;
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    mockReceiver.mTestSuite = inSuite;
+
+    MockAppDelegate mockSender;
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+    NL_TEST_ASSERT(inSuite, rc != nullptr);
+
+    rc->SetConfig({
+        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    });
+
+    // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
+    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 0;
+    gLoopback.mDroppedMessageCount = 0;
+
+    // Drop the ack, and keep the exchange around to receive the duplicate message
+    mockReceiver.mDropAckResponse = true;
+    mockReceiver.mRetainExchange  = true;
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message was sent
+    // The ack was dropped, and message was added to the retransmit table
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    // Let's not drop the duplicate message
+    mockReceiver.mDropAckResponse = false;
+    mockReceiver.mRetainExchange  = false;
+
+    // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
+    test_os_sleep_ms(65);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+
+    // Ensure the retransmit message was sent and the ack was sent
+    // and retransmit table was cleared
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    if (mockReceiver.mExchange != nullptr)
+    {
+        mockReceiver.mExchange->Close();
+    }
+
+    rm->ClearRetransTable(rc);
+    exchange->Close();
+}
+
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -690,6 +778,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange", CheckResendApplicationMessageWithPeerExchange),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessageWithLostAcks", CheckResendApplicationMessageWithLostAcks),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendSessionEstablishmentMessageWithPeerExchange", CheckResendSessionEstablishmentMessageWithPeerExchange),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessage", CheckDuplicateMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
 
     NL_TEST_SENTINEL()

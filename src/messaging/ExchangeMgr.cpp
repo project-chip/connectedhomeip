@@ -140,7 +140,7 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
+void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source)
 {
 #if CHIP_ERROR_LOGGING
     char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
@@ -197,7 +197,7 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         SecureSessionHandle session, const Transport::PeerAddress & source,
-                                        System::PacketBufferHandle && msgBuf, SecureSessionMgr * msgLayer)
+                                        DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
@@ -219,15 +219,20 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                 ec->SetMsgRcvdFromPeer(true);
             }
 
+            MessageFlags msgFlags;
+            if (isDuplicate == DuplicateMessage::kYes)
+            {
+                msgFlags.Set(MessageFlagValues::kDuplicateMessage);
+            }
             // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
+            ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
             found = true;
             return false;
         }
         return true;
     });
 
-    if (found)
+    if (found || isDuplicate == DuplicateMessage::kYes)
     {
         ExitNow(err = CHIP_NO_ERROR);
     }
@@ -288,7 +293,12 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
 
-        ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
+        MessageFlags msgFlags;
+        if (isDuplicate == DuplicateMessage::kYes)
+        {
+            msgFlags.Set(MessageFlagValues::kDuplicateMessage);
+        }
+        ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
 
         // Close exchange if it was created only to send ack for a duplicate message.
         if (sendAckAndCloseExchange)
@@ -302,7 +312,7 @@ exit:
     }
 }
 
-void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnNewConnection(SecureSessionHandle session)
 {
     if (mDelegate != nullptr)
     {
@@ -310,7 +320,7 @@ void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSession
     }
 }
 
-void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnConnectionExpired(SecureSessionHandle session)
 {
     if (mDelegate != nullptr)
     {
@@ -326,23 +336,6 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
         }
         return true;
     });
-}
-
-void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf)
-{
-    PacketHeader header;
-
-    ReturnOnFailure(header.DecodeAndConsume(msgBuf));
-
-    Optional<NodeId> peer = header.GetSourceNodeId();
-    if (!peer.HasValue())
-    {
-        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
-        source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
-                     addrBuffer);
-        return;
-    }
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)
