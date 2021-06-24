@@ -182,7 +182,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-objdir-darwin-${{ matrix.eventloop }}-${{ matrix.eventloop }}
+                  name: crash-objdir-darwin-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
