@@ -2270,6 +2270,18 @@ bool emberAfBindingClusterUnbindCallback(chip::app::Command * commandObj, chip::
                                          chip::EndpointId endpointId, chip::ClusterId clusterId);
 
 /**
+ * @brief Content Launcher Cluster LaunchContent Command callback
+ */
+
+bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::Command * commandObj, uint8_t autoPlay, uint8_t * data);
+
+/**
+ * @brief Content Launcher Cluster LaunchURL Command callback
+ */
+
+bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::Command * commandObj, uint8_t * contentURL, uint8_t * displayString);
+
+/**
  * @brief General Commissioning Cluster ArmFailSafe Command callback
  */
 
