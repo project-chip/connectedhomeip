@@ -1938,15 +1938,6 @@ public class ChipClusters {
     }
   }
 
-  public static class PressureMeasurementCluster extends BaseChipCluster {
-    public PressureMeasurementCluster(long devicePtr, int endpointId) {
-      super(devicePtr, endpointId);
-    }
-
-    @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
-  }
-
   public static class PumpConfigurationAndControlCluster extends BaseChipCluster {
     public PumpConfigurationAndControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

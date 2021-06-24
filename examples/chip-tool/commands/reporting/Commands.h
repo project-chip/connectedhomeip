@@ -40,7 +40,6 @@ public:
         delete onReportDoorLockLockStateCallback;
         delete onReportLevelControlCurrentLevelCallback;
         delete onReportOnOffOnOffCallback;
-        delete onReportPressureMeasurementMeasuredValueCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
         delete onReportRelativeHumidityMeasurementMeasuredValueCallback;
         delete onReportSwitchCurrentPositionCallback;
@@ -74,8 +73,6 @@ public:
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0008, 0x0000,
                                        onReportLevelControlCurrentLevelCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0403, 0x0000,
-                                       onReportPressureMeasurementMeasuredValueCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0200, 0x0013,
                                        onReportPumpConfigurationAndControlCapacityCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0405, 0x0000,
@@ -149,8 +146,6 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlCapacityCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMeasuredValueCallback =
