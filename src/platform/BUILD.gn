@@ -144,6 +144,11 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_ESP32=1",
         "CHIP_DEVICE_LAYER_TARGET=ESP32",
       ]
+    } else if (chip_device_platform == "ambd") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_AMBD=1",
+        "CHIP_DEVICE_LAYER_TARGET=AMBD",
+      ]
     } else if (chip_device_platform == "linux") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
@@ -450,7 +455,37 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
 
       public_deps += [ "${chip_root}/src/crypto" ]
-    } else if (chip_device_platform == "k32w") {
+    } else if (chip_device_platform == "ambd") {
+      sources += [
+        "AMBD/BLEManagerImpl.h",
+        "AMBD/CHIPDevicePlatformConfig.h",
+        "AMBD/CHIPDevicePlatformEvent.h",
+        "AMBD/ConfigurationManagerImpl.cpp",
+        "AMBD/ConfigurationManagerImpl.h",
+        "AMBD/ConnectivityManagerImpl.cpp",
+        "AMBD/ConnectivityManagerImpl.h",
+        "AMBD/DeviceNetworkProvisioningDelegateImpl.cpp",
+        "AMBD/DeviceNetworkProvisioningDelegateImpl.h",
+        "AMBD/AMBDConfig.cpp",
+        "AMBD/AMBDConfig.h",
+        "AMBD/AMBDUtils.cpp",
+        "AMBD/AMBDUtils.h",
+        "AMBD/KeyValueStoreManagerImpl.cpp",
+        "AMBD/KeyValueStoreManagerImpl.h",
+        "AMBD/Logging.cpp",
+        "AMBD/LwIPCoreLock.cpp",
+        "AMBD/NetworkProvisioningServerImpl.h",
+        "AMBD/PlatformManagerImpl.cpp",
+        "AMBD/PlatformManagerImpl.h",
+        "AMBD/ServiceProvisioning.cpp",
+        "AMBD/ServiceProvisioning.h",
+        "AMBD/SoftwareUpdateManagerImpl.h",
+        "AMBD/SystemTimeSupport.cpp",
+        "FreeRTOS/SystemTimeSupport.cpp",
+      ]
+
+      public_deps += [ "${chip_root}/src/crypto" ]
+    }  else if (chip_device_platform == "k32w") {
       sources += [
         "FreeRTOS/SystemTimeSupport.cpp",
         "K32W/BLEManagerImpl.cpp",

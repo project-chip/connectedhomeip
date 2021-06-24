@@ -71,7 +71,7 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/lib/mdns/minimal/tests" ]
     }
 
-    if (chip_device_platform != "esp32") {
+    if (chip_device_platform != "esp32" && chip_device_platform != "ambd") {
       deps += [ "${chip_root}/src/platform/tests" ]
     }
 
@@ -79,7 +79,7 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/ble/tests" ]
     }
 
-    if (current_os != "zephyr" && chip_device_platform != "esp32") {
+    if (current_os != "zephyr" && chip_device_platform != "esp32" && chip_device_platform != "ambd") {
       deps += [ "${chip_root}/src/lib/shell/tests" ]
     }
 
