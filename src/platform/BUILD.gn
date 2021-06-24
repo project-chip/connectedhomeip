@@ -547,7 +547,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "Linux/ThreadStackManagerImpl.cpp",
           "Linux/ThreadStackManagerImpl.h",
         ]
-        public_deps += [ "${ot_br_posix_root}:ot_br_client" ]
+        public_deps += [ "Linux/dbus/openthread" ]
       }
 
       if (chip_enable_wifi) {
