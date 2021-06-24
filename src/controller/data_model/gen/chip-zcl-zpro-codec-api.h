@@ -57,6 +57,7 @@
 | OtaSoftwareUpdateServer                                             | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
+| PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
 | Scenes                                                              | 0x0005 |
@@ -322,6 +323,7 @@ chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionA
 | * ProductLabel                                                      | 0x000E |
 | * SerialNumber                                                      | 0x000F |
 | * LocalConfigDisabled                                               | 0x0010 |
+| * Reachable                                                         | 0x0011 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -461,6 +463,12 @@ chip::System::PacketBufferHandle encodeBasicClusterReadLocalConfigDisabledAttrib
 chip::System::PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t seqNum,
                                                                                      chip::EndpointId destinationEndpoint,
                                                                                      uint8_t localConfigDisabled);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the Reachable attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadReachableAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -2117,6 +2125,62 @@ chip::System::PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsL
  */
 chip::System::PacketBufferHandle
 encodeOperationalCredentialsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster PressureMeasurement                                         | 0x0403 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePressureMeasurementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server read command for the measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePressureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server configure report command for the measured value attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePressureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                uint16_t minInterval, uint16_t maxInterval, int16_t change);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server read command for the min measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePressureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server read command for the max measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePressureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePressureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster PumpConfigurationAndControl                                 | 0x0200 |

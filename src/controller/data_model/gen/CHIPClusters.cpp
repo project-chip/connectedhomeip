@@ -753,6 +753,13 @@ CHIP_ERROR BasicCluster::WriteAttributeLocalConfigDisabled(Callback::Cancelable 
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR BasicCluster::ReadAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBasicClusterReadReachableAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
@@ -6657,6 +6664,62 @@ CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback:
 {
     uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeOperationalCredentialsClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+// PressureMeasurement Cluster Commands
+// PressureMeasurement Cluster Attributes
+CHIP_ERROR PressureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodePressureMeasurementClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR PressureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodePressureMeasurementClusterReadMeasuredValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PressureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback,
+                                                                       uint16_t minInterval, uint16_t maxInterval, int16_t change)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodePressureMeasurementClusterConfigureMeasuredValueAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PressureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
+}
+
+CHIP_ERROR PressureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodePressureMeasurementClusterReadMinMeasuredValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PressureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodePressureMeasurementClusterReadMaxMeasuredValueAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PressureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodePressureMeasurementClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 

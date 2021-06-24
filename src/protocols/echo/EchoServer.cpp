@@ -53,9 +53,10 @@ void EchoServer::Shutdown()
     }
 }
 
-void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
 
     // NOTE: we already know this is an Echo Request message because we explicitly registered with the
@@ -81,10 +82,11 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     }
 
     // Send an Echo Response back to the sender.
-    ec->SendMessage(MsgType::EchoResponse, std::move(response));
+    err = ec->SendMessage(MsgType::EchoResponse, std::move(response));
 
     // Discard the exchange context.
     ec->Close();
+    return err;
 }
 
 } // namespace Echo

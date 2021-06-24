@@ -10,3 +10,6 @@ pygdbmi<=0.9.0.2
 reedsolo>=1.5.3,<=1.5.4
 bitstring>=3.1.6
 ecdsa>=0.16.0
+kconfiglib==13.7.1
+construct==2.10.54
+python-socketio<5

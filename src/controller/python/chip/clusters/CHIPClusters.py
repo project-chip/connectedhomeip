@@ -546,6 +546,8 @@ class ChipClusters:
                     "label": "str",
                 },
             },
+            "PressureMeasurement": {
+            },
             "PumpConfigurationAndControl": {
             },
             "RelativeHumidityMeasurement": {
@@ -823,6 +825,10 @@ class ChipClusters:
                     "attributeId": 0x0010,
                     "type": "int",
                     "writable": True,
+                },
+                "Reachable": {
+                    "attributeId": 0x0011,
+                    "type": "int",
                 },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
@@ -1388,6 +1394,25 @@ class ChipClusters:
                 "FabricsList": {
                     "attributeId": 0x0001,
                     "type": "",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "PressureMeasurement": {
+                "MeasuredValue": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "MinMeasuredValue": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "MaxMeasuredValue": {
+                    "attributeId": 0x0002,
+                    "type": "int",
                 },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
@@ -2683,6 +2708,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Basic_LocalConfigDisabled(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_WriteAttributeLocalConfigDisabled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_Basic_LocalConfigDisabled(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterBasic_ReadAttributeReachable(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_Reachable(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBinaryInputBasic_ReadAttributeOutOfService(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -2992,6 +3019,16 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPressureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPressureMeasurement_ConfigureAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_PressureMeasurement_MeasuredValue(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterPressureMeasurement_ReadAttributeMinMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MinMeasuredValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPressureMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPressureMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterPumpConfigurationAndControl_ReadAttributeMaxPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxPressure(device, ZCLendpoint, ZCLgroupid)
     def ClusterPumpConfigurationAndControl_ReadAttributeMaxSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -3483,6 +3520,9 @@ class ChipClusters:
         # Cluster Basic WriteAttribute LocalConfigDisabled
         self._chipLib.chip_ime_WriteAttribute_Basic_LocalConfigDisabled.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_WriteAttribute_Basic_LocalConfigDisabled.restype = ctypes.c_uint32
+        # Cluster Basic ReadAttribute Reachable
+        self._chipLib.chip_ime_ReadAttribute_Basic_Reachable.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Basic_Reachable.restype = ctypes.c_uint32
         # Cluster Basic ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.restype = ctypes.c_uint32
@@ -4271,6 +4311,22 @@ class ChipClusters:
         # Cluster OperationalCredentials ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster PressureMeasurement
+        # Cluster PressureMeasurement ReadAttribute MeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MeasuredValue.restype = ctypes.c_uint32
+        # Cluster PressureMeasurement ConfigureAttribute MeasuredValue
+        self._chipLib.chip_ime_ConfigureAttribute_PressureMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_ConfigureAttribute_PressureMeasurement_MeasuredValue.restype = ctypes.c_uint32
+        # Cluster PressureMeasurement ReadAttribute MinMeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MinMeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MinMeasuredValue.restype = ctypes.c_uint32
+        # Cluster PressureMeasurement ReadAttribute MaxMeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MaxMeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster PressureMeasurement ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PressureMeasurement_ClusterRevision.restype = ctypes.c_uint32
         # Cluster PumpConfigurationAndControl
         # Cluster PumpConfigurationAndControl ReadAttribute MaxPressure
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxPressure.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

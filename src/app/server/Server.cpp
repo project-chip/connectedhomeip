@@ -323,9 +323,10 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
 class ServerCallback : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                           const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
     {
+        CHIP_ERROR err = CHIP_NO_ERROR;
         // as soon as a client connects, assume it is connected
         VerifyOrExit(!buffer.IsNull(), ChipLogError(AppServer, "Received data but couldn't process it..."));
         VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), ChipLogError(AppServer, "Unknown source for received message"));
@@ -342,7 +343,6 @@ public:
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
         if (payloadHeader.HasProtocol(chip::Protocols::ServiceProvisioning::Id))
         {
-            CHIP_ERROR err = CHIP_NO_ERROR;
             uint32_t timeout;
             uint16_t discriminator;
             PASEVerifier verifier;
@@ -388,6 +388,7 @@ public:
 
     exit:
         exchangeContext->Close();
+        return err;
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override

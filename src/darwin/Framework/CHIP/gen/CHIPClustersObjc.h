@@ -149,6 +149,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeLocalConfigDisabledWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLocalConfigDisabledWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -826,6 +827,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeFabricsListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Pressure Measurement
+ *
+ */
+@interface CHIPPressureMeasurement : CHIPCluster
+
+- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                                change:(int16_t)change
+                                       responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

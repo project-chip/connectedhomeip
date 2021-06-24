@@ -90,7 +90,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         esp_fill_random(ap_mac, sizeof(ap_mac));
         /* Bit 0 of the first octet of MAC Address should always be 0 */
         ap_mac[0] &= (uint8_t) ~0x01;
-        err = esp_wifi_set_mac(ESP_IF_WIFI_AP, ap_mac);
+        err = esp_wifi_set_mac(WIFI_IF_AP, ap_mac);
         SuccessOrExit(err);
     }
 

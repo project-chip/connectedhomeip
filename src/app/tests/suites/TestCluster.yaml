@@ -661,14 +661,13 @@ tests:
     - label: "Read attribute UNSUPPORTED"
       command: "readAttribute"
       attribute: "unsupported"
+      optional: true
       response:
           value: 0
-          error: 1
 
     - label: "Writeattribute UNSUPPORTED"
       command: "writeAttribute"
       attribute: "unsupported"
+      optional: true
       arguments:
           value: 0
-      response:
-          error: 1

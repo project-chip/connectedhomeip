@@ -32,6 +32,7 @@ const kEndpointName      = 'endpoint';
 const kCommandName       = 'command';
 const kIndexName         = 'index';
 const kValuesName        = 'values';
+const kConstraintsName   = 'constraints';
 const kArgumentsName     = 'arguments';
 const kResponseName      = 'response';
 const kDisabledName      = 'disabled';
@@ -101,23 +102,33 @@ function setDefaultResponse(test)
   const defaultResponseValues = [];
   setDefault(test[kResponseName], kValuesName, defaultResponseValues);
 
+  const defaultResponseConstraints = [];
+  setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
+
   if (!test.isReadAttribute) {
     return;
   }
 
-  if (!('value' in test[kResponseName])) {
-    const errorStr = 'Test with label "' + test.label + '" does not have a "value" defined.';
+  if (!('value' in test[kResponseName]) && !('constraints' in test[kResponseName])) {
+    const errorStr = 'Test with label "' + test.label + '" does not have a "value" or a "constraints" defined.';
     throw new Error(errorStr);
   }
 
-  test[kResponseName].values.push({ name : test.attribute, value : test[kResponseName].value });
+  if ('value' in test[kResponseName]) {
+    test[kResponseName].values.push({ name : test.attribute, value : test[kResponseName].value });
+  }
+
+  if ('constraints' in test[kResponseName]) {
+    test[kResponseName].values.push({ name : test.attribute, constraints : test[kResponseName].constraints });
+  }
+
   delete test[kResponseName].value;
 }
 
 function setDefaults(test, defaultConfig)
 {
   const defaultClusterName = defaultConfig[kClusterName] || null;
-  const defaultEndpointId  = defaultConfig[kEndpointName] || null;
+  const defaultEndpointId  = kEndpointName in defaultConfig ? defaultConfig[kEndpointName] : null;
   const defaultDisabled    = false;
 
   setDefaultType(test);
@@ -253,8 +264,15 @@ function chip_tests_item_response_parameters(options)
 
       const expected = responseValues.find(value => value.name.toLowerCase() == responseArg.name.toLowerCase());
       if (expected) {
-        responseArg.hasExpectedValue = true;
-        responseArg.expectedValue    = expected.value;
+        if ('value' in expected) {
+          responseArg.hasExpectedValue = true;
+          responseArg.expectedValue    = expected.value;
+        }
+
+        if ('constraints' in expected) {
+          responseArg.hasExpectedConstraints = true;
+          responseArg.expectedConstraints    = expected.constraints;
+        }
       }
 
       return responseArg;
