@@ -196,7 +196,12 @@ CHIP_ERROR AdminPairingInfo::SetOperationalKey(const P256Keypair & key)
     ReturnErrorOnFailure(key.Serialize(serialized));
     if (mOperationalKey == nullptr)
     {
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        mOperationalKey = chip::Platform::New<P256KeypairHSM>();
+        mOperationalKey->SetKeyId(CASE_OPS_KEY);
+#else
         mOperationalKey = chip::Platform::New<P256Keypair>();
+#endif
     }
     VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
     return mOperationalKey->Deserialize(serialized);
