@@ -63,7 +63,7 @@ public:
 
     bool HasPeerAddress() const { return mPeerAddress.IsInitialized(); }
     Transport::PeerAddress GetPeerAddress() const { return mPeerAddress; }
-    const Optional<ByteSpan> GetCSRNonce() const {return mCSRNonce;}
+    const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     RendezvousParameters & SetPeerAddress(const Transport::PeerAddress & peerAddress)
     {
         mPeerAddress = peerAddress;
@@ -72,8 +72,8 @@ public:
 
     RendezvousParameters & SetCSRNonce(ByteSpan csrNonce)
     {
-       mCSRNonce.SetValue(csrNonce);
-       return *this;
+        mCSRNonce.SetValue(csrNonce);
+        return *this;
     }
 
     bool HasDiscriminator() const { return mDiscriminator <= kMaxRendezvousDiscriminatorValue; }
@@ -101,7 +101,7 @@ public:
     }
 
     bool HasPASEVerifier() const { return mHasPASEVerifier; }
-    bool HasCSRNonce() const {return mCSRNonce.HasValue();}
+    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
     const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
     RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
     {
@@ -146,8 +146,7 @@ private:
     Optional<NodeId> mRemoteNodeId;       ///< the remote node id
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
-    Optional<ByteSpan> mCSRNonce;                   ///< CSR Nonce passed by the commissioner
-
+    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;

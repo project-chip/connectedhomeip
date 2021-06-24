@@ -110,7 +110,6 @@ exit:
     return err;
 }
 
-
 CHIP_ERROR JniReferences::FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature,
                                      jmethodID * methodId)
 {
