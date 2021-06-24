@@ -71,6 +71,8 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
 
 #if CONFIG_USE_SEPARATE_EVENTLOOP
+    // ServiceEvents() calls StartEventLoopTask(), which is paired with the
+    // StopEventLoopTask() below.
     err = mController.ServiceEvents();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP

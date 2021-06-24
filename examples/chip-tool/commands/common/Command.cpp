@@ -400,9 +400,9 @@ void Command::UpdateWaitForResponse(bool value)
 
 #if CONFIG_USE_SEPARATE_EVENTLOOP
 
-void Command::WaitForResponse(uint16_t duration)
+void Command::WaitForResponse(uint16_t seconds)
 {
-    std::chrono::seconds waitingForResponseTimeout(duration);
+    std::chrono::seconds waitingForResponseTimeout(seconds);
     std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
     auto waitingUntil = std::chrono::system_clock::now() + waitingForResponseTimeout;
     if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
@@ -420,14 +420,14 @@ static void OnResponseTimeout(chip::System::Layer *, void *, chip::System::Error
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
-CHIP_ERROR Command::ScheduleWaitForResponse(uint16_t duration)
+CHIP_ERROR Command::ScheduleWaitForResponse(uint16_t seconds)
 {
     chip::System::Timer * timer = nullptr;
 
     CHIP_ERROR err = chip::DeviceLayer::SystemLayer.NewTimer(timer);
     if (err == CHIP_NO_ERROR)
     {
-        timer->Start(duration * 1000, OnResponseTimeout, this);
+        timer->Start(seconds * 1000, OnResponseTimeout, this);
     }
     else
     {
