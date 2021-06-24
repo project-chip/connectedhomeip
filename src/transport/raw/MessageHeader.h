@@ -47,8 +47,8 @@ namespace Header {
 
 enum class EncryptionType
 {
-    kEncryptionTypeNone  = 0,
-    kAESCCMTagLen16 = 1,
+    kEncryptionTypeNone = 0,
+    kAESCCMTagLen16     = 1,
 };
 
 /**
