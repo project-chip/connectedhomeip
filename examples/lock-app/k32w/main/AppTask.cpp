@@ -413,7 +413,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = CHIP_ERROR_MAX;
+        err = CHIP_ERROR_INTERNAL;
     }
 
     if (err == CHIP_NO_ERROR)

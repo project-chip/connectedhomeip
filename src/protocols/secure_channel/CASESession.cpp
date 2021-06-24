@@ -286,7 +286,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session, SecureSessi
     saltlen = kSHA256_Hash_Length;
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
-    VerifyOrReturnError(!msg_salt.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!msg_salt.IsNull(), CHIP_ERROR_NO_MEMORY);
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_salt->Start(), saltlen);
         // TODO: Add IPK to Salt
@@ -311,7 +311,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     uint8_t * msg = nullptr;
 
     msg_R1 = System::PacketBufferHandle::New(data_len);
-    VerifyOrReturnError(!msg_R1.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!msg_R1.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     msg = msg_R1->Start();
 
@@ -445,11 +445,11 @@ CHIP_ERROR CASESession::SendSigmaR2()
     saltlen = kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length;
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
-    VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_salt.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     msg_salt->SetDataLength(saltlen);
 
     msg_rand = System::PacketBufferHandle::New(kSigmaParamRandomNumberSize);
-    VerifyOrExit(!msg_rand.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_rand.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Step 1
     // Fill in the random value
@@ -483,7 +483,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         static_cast<uint16_t>(sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen(mTrustedRootId) + kP256_PublicKey_Length * 2);
 
     msg_R2_Signed = System::PacketBufferHandle::New(msg_r2_signed_len);
-    VerifyOrExit(!msg_R2_Signed.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R2_Signed.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_R2_Signed->Start(), msg_r2_signed_len);
@@ -506,7 +506,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
     msg_r2_signed_enc_len = sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen(mTrustedRootId) + sigmaR2Signature.Length();
 
     msg_R2_Encrypted = System::PacketBufferHandle::New(msg_r2_signed_enc_len);
-    VerifyOrExit(!msg_R2_Encrypted.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R2_Encrypted.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_R2_Encrypted->Start(), msg_r2_signed_enc_len);
@@ -529,7 +529,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
                                      msg_r2_signed_enc_len + sizeof(tag));
 
     msg_R2 = System::PacketBufferHandle::New(data_len);
-    VerifyOrExit(!msg_R2.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R2.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Step 10
     // now construct sigmaR2
@@ -643,7 +643,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(const System::PacketBufferHandle & msg)
     saltlen = kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length;
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
-    VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_salt.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     msg_salt->SetDataLength(saltlen);
 
     err = ComputeIPK(mConnectionState.GetPeerKeyID(), mRemoteIPK, sizeof(mRemoteIPK));
@@ -678,7 +678,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(const System::PacketBufferHandle & msg)
     msg_r2_signed_len = static_cast<uint16_t>(sizeof(uint16_t) + remoteDeviceOpCertLen + kP256_PublicKey_Length * 2);
 
     msg_R2_Signed = System::PacketBufferHandle::New(msg_r2_signed_len);
-    VerifyOrExit(!msg_R2_Signed.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R2_Signed.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     msg_R2_Signed->SetDataLength(msg_r2_signed_len);
 
     sigLen = buflen - kSigmaParamRandomNumberSize - sizeof(encryptionKeyId) - kTrustedRootIdSize - kP256_PublicKey_Length -
@@ -734,7 +734,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     ChipLogDetail(SecureChannel, "Sending SigmaR3");
     msg_salt = System::PacketBufferHandle::New(saltlen);
-    VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_salt.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     msg_salt->SetDataLength(saltlen);
 
     err = ConstructSaltSigmaR3(mIPK, sizeof(mIPK), msg_salt);
@@ -749,7 +749,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
         static_cast<uint16_t>(sizeof(uint16_t) + mOpCredSet->GetDevOpCredLen(mTrustedRootId) + kP256_PublicKey_Length * 2);
 
     msg_R3_Signed = System::PacketBufferHandle::New(msg_r3_signed_len);
-    VerifyOrExit(!msg_R3_Signed.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R3_Signed.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_R3_Signed->Start(), msg_r3_signed_len);
@@ -773,7 +773,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
                                                  static_cast<uint16_t>(sigmaR3Signature.Length()));
 
     msg_R3_Encrypted = System::PacketBufferHandle::New(msg_r3_encrypted_len);
-    VerifyOrExit(!msg_R3_Encrypted.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R3_Encrypted.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_R3_Encrypted->Start(), msg_r3_encrypted_len);
@@ -796,7 +796,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
     data_len = static_cast<uint16_t>(sizeof(tag) + msg_r3_encrypted_len);
 
     msg_R3 = System::PacketBufferHandle::New(data_len);
-    VerifyOrExit(!msg_R3.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R3.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_R3->Start(), data_len);
@@ -872,7 +872,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(const System::PacketBufferHandle & msg)
     saltlen = kIPKSize + kSHA256_Hash_Length;
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
-    VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_salt.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     msg_salt->SetDataLength(saltlen);
 
     err = ComputeIPK(mConnectionState.GetPeerKeyID(), mRemoteIPK, sizeof(mRemoteIPK));
@@ -903,7 +903,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(const System::PacketBufferHandle & msg)
     msg_r3_signed_len = static_cast<uint16_t>(sizeof(uint16_t) + remoteDeviceOpCertLen + kP256_PublicKey_Length * 2);
 
     msg_R3_Signed = System::PacketBufferHandle::New(msg_r3_signed_len);
-    VerifyOrExit(!msg_R3_Signed.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R3_Signed.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     msg_R3_Signed->SetDataLength(msg_r3_signed_len);
 
     sigLen = msg->DataLength() - sizeof(uint16_t) - remoteDeviceOpCertLen - kTAGSize;

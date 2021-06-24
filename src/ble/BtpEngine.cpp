@@ -76,7 +76,7 @@ static void PrintBufDebug(const System::PacketBufferHandle & buf)
 const uint16_t BtpEngine::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
 const uint16_t BtpEngine::sMaxFragmentSize     = 128; // Size of write and indication characteristics
 
-BLE_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
+CHIP_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
 {
     mAppState              = an_app_state;
     mRxState               = kState_Idle;
@@ -111,7 +111,7 @@ BLE_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
         mRxNextSeqNum = 1;
     }
 
-    return BLE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 SequenceNumber_t BtpEngine::GetAndIncrementNextTxSeqNum()
@@ -171,7 +171,7 @@ bool BtpEngine::IsValidAck(SequenceNumber_t ack_num) const
     return (ack_num <= mTxNewestUnackedSeqNum || ack_num >= mTxOldestUnackedSeqNum);
 }
 
-BLE_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
+CHIP_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
 {
     ChipLogDebugBtpEngine(Ble, "entered HandleAckReceived, ack_num = %u", ack_num);
 
@@ -192,18 +192,18 @@ BLE_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
         IncSeqNum(mTxOldestUnackedSeqNum);
     }
 
-    return BLE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 // Calling convention:
 //   EncodeStandAloneAck may only be called if data arg is commited for immediate, synchronous subsequent transmission.
-BLE_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
+CHIP_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
 {
     // Ensure enough headroom exists for the lower BLE layers.
-    VerifyOrReturnError(data->EnsureReservedSize(CHIP_CONFIG_BLE_PKT_RESERVED_SIZE), BLE_ERROR_NO_MEMORY);
+    VerifyOrReturnError(data->EnsureReservedSize(CHIP_CONFIG_BLE_PKT_RESERVED_SIZE), CHIP_ERROR_NO_MEMORY);
 
     // Ensure enough space for standalone ack payload.
-    VerifyOrReturnError(data->MaxDataLength() >= kTransferProtocolStandaloneAckHeaderSize, BLE_ERROR_NO_MEMORY);
+    VerifyOrReturnError(data->MaxDataLength() >= kTransferProtocolStandaloneAckHeaderSize, CHIP_ERROR_NO_MEMORY);
     uint8_t * characteristic = data->Start();
 
     // Since there's no preexisting message payload, we can write BTP header without adjusting data start pointer.
@@ -219,7 +219,7 @@ BLE_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
     // Set ack payload data length.
     data->SetDataLength(kTransferProtocolStandaloneAckHeaderSize);
 
-    return BLE_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 // Calling convention:
@@ -234,21 +234,21 @@ BLE_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
 //   or freed if it holds a stand-alone ack. In all cases, caller must clear its reference to data arg when this
 //   function returns.
 //
-//   Upper layer must immediately clean up and reinitialize protocol engine if returned err != BLE_NO_ERROR.
-BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle && data, SequenceNumber_t & receivedAck,
-                                                  bool & didReceiveAck)
+//   Upper layer must immediately clean up and reinitialize protocol engine if returned err != CHIP_NO_ERROR.
+CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle && data, SequenceNumber_t & receivedAck,
+                                                   bool & didReceiveAck)
 {
-    BLE_ERROR err = BLE_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     BitFlags<HeaderFlags> rx_flags;
     // BLE data uses little-endian byte order.
     Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
 
-    VerifyOrExit(!data.IsNull(), err = BLE_ERROR_BAD_ARGS);
+    VerifyOrExit(!data.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mRxCharCount++;
 
     // Get header flags, always in first byte.
-    VerifyOrExit(reader.Read8(rx_flags.RawStorage()).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(reader.Read8(rx_flags.RawStorage()).StatusCode() == CHIP_NO_ERROR, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 #if CHIP_ENABLE_CHIPOBLE_TEST
     if (rx_flags.Has(HeaderFlags::kCommandMessage))
         SetRxPacketType(kType_Control);
@@ -261,14 +261,14 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle && 
     // Get ack number, if any.
     if (didReceiveAck)
     {
-        VerifyOrExit(reader.Read8(&receivedAck).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
+        VerifyOrExit(reader.Read8(&receivedAck).StatusCode() == CHIP_NO_ERROR, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
         err = HandleAckReceived(receivedAck);
         SuccessOrExit(err);
     }
 
     // Get sequence number.
-    VerifyOrExit(reader.Read8(&mRxNewestUnackedSeqNum).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(reader.Read8(&mRxNewestUnackedSeqNum).StatusCode() == CHIP_NO_ERROR, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
     // Verify that received sequence number is the next one we'd expect.
     VerifyOrExit(mRxNewestUnackedSeqNum == mRxNextSeqNum, err = BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER);
@@ -304,7 +304,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle && 
         // Verify StartMessage header flag set.
         VerifyOrExit(rx_flags.Has(HeaderFlags::kStartMessage), err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 
-        VerifyOrExit(startReader.Read16(&mRxLength).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
+        VerifyOrExit(startReader.Read16(&mRxLength).StatusCode() == CHIP_NO_ERROR, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
         mRxState = kState_InProgress;
 
@@ -313,7 +313,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle && 
         // Create a new buffer for use as the Rx re-assembly area.
         mRxBuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
-        VerifyOrExit(!mRxBuf.IsNull(), err = BLE_ERROR_NO_MEMORY);
+        VerifyOrExit(!mRxBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         mRxBuf->AddToEnd(std::move(data));
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
@@ -333,7 +333,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle && 
 
         // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
         // TODO add support for BtpEngine messages longer than 1 pbuf
-        VerifyOrExit(!mRxBuf->HasChainedBuffer(), err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
+        VerifyOrExit(!mRxBuf->HasChainedBuffer(), err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     }
     else
     {
@@ -360,12 +360,12 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle && 
     }
 
 exit:
-    if (err != BLE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         mRxState = kState_Error;
 
         // Dump protocol engine state, plus header flags and received data length.
-        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %" BleErrorFormat ", rx_flags = %u", err, rx_flags.Raw());
+        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %" CHIP_ERROR_FORMAT ", rx_flags = %u", err, rx_flags.Raw());
         if (didReceiveAck)
         {
             ChipLogError(Ble, "With rx'd ack = %u", receivedAck);

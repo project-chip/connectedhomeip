@@ -41,29 +41,29 @@ namespace System {
  *
  *  @param[in,out]  aThis   A zero-initialized object.
  *
- *  @retval         #CHIP_SYSTEM_NO_ERROR                  The mutual exclusion lock is ready to use.
- *  @retval         #CHIP_SYSTEM_ERROR_NO_MEMORY           Insufficient system memory to allocate the mutual exclusion lock.
- *  @retval         #CHIP_SYSTEM_ERROR_UNEXPECTED_STATE    An unexpected system error encountered during initialization.
+ *  @retval         #CHIP_NO_ERROR                  The mutual exclusion lock is ready to use.
+ *  @retval         #CHIP_ERROR_NO_MEMORY           Insufficient system memory to allocate the mutual exclusion lock.
+ *  @retval         #CHIP_ERROR_INCORRECT_STATE     An unexpected system error encountered during initialization.
  */
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-DLL_EXPORT Error Mutex::Init(Mutex & aThis)
+DLL_EXPORT CHIP_ERROR Mutex::Init(Mutex & aThis)
 {
     int lSysError = pthread_mutex_init(&aThis.mPOSIXMutex, nullptr);
-    Error lError;
+    CHIP_ERROR lError;
 
     switch (lSysError)
     {
     case 0:
-        lError = CHIP_SYSTEM_NO_ERROR;
+        lError = CHIP_NO_ERROR;
         break;
 
     case ENOMEM:
-        lError = CHIP_SYSTEM_ERROR_NO_MEMORY;
+        lError = CHIP_ERROR_NO_MEMORY;
         break;
 
     default:
-        lError = CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
+        lError = CHIP_ERROR_INCORRECT_STATE;
         break;
     }
 
@@ -72,7 +72,7 @@ DLL_EXPORT Error Mutex::Init(Mutex & aThis)
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-DLL_EXPORT Error Mutex::Init(Mutex & aThis)
+DLL_EXPORT CHIP_ERROR Mutex::Init(Mutex & aThis)
 {
 restart:
     if (__sync_bool_compare_and_swap(&aThis.mInitialized, 0, 1))
@@ -86,7 +86,7 @@ restart:
         {
             aThis.mInitialized = 0;
 
-            return CHIP_SYSTEM_ERROR_NO_MEMORY;
+            return CHIP_ERROR_NO_MEMORY;
         }
     }
     else
@@ -102,7 +102,7 @@ restart:
         }
     }
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 DLL_EXPORT void Mutex::Lock(void)

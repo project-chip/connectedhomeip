@@ -279,10 +279,11 @@ static nlTestSuite sSuite =
 
 static TestContext sContext;
 
-/**
+namespace {
+/*
  *  Set up the test suite.
  */
-int CASE_TestSecurePairing_Setup(void * inContext)
+CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -352,6 +353,15 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     ReturnErrorOnFailure(accessoryDevOpCred.SetDevOpCredKeypair(trustedRootId, &accessoryOpKeys));
 
     return CHIP_NO_ERROR;
+}
+} // anonymous namespace
+
+/**
+ *  Set up the test suite.
+ */
+int CASE_TestSecurePairing_Setup(void * inContext)
+{
+    return CASETestSecurePairingSetup(inContext) == CHIP_NO_ERROR ? SUCCESS : FAILURE;
 }
 
 /**

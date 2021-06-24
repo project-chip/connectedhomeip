@@ -70,7 +70,7 @@ static int Finalize(void * aContext);
 class TestObject : public Object
 {
 public:
-    Error Init();
+    CHIP_ERROR Init();
 
     static void CheckRetention(nlTestSuite * inSuite, void * aContext);
     static void CheckConcurrency(nlTestSuite * inSuite, void * aContext);
@@ -104,7 +104,7 @@ private:
 
 ObjectPool<TestObject, TestObject::kPoolSize> TestObject::sPool;
 
-Error TestObject::Init()
+CHIP_ERROR TestObject::Init()
 {
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mDelay = kMaxDelayIterations > 0 ? 1 : 0;
@@ -114,7 +114,7 @@ Error TestObject::Init()
     }
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 namespace {

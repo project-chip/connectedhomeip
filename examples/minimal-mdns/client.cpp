@@ -333,7 +333,7 @@ int main(int argc, char ** args)
     {
         timer->Start(
             gOptions.runtimeMs,
-            [](System::Layer *, void *, System::Error err) {
+            [](System::Layer *, void *, CHIP_ERROR err) {
                 DeviceLayer::PlatformMgr().StopEventLoopTask();
                 DeviceLayer::PlatformMgr().Shutdown();
             },

@@ -65,7 +65,7 @@ bool gDone = false;
 
 void InetFailError(int32_t err, const char * msg)
 {
-    if (err != INET_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("%s: %s", msg, ErrorStr(err));
         exit(-1);

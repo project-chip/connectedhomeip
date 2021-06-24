@@ -70,7 +70,7 @@ public:
     Mutex();
     ~Mutex();
 
-    static Error Init(Mutex & aMutex);
+    static CHIP_ERROR Init(Mutex & aMutex);
 
     void Lock();   /**< Acquire the mutual exclusion lock, blocking the current thread indefinitely if necessary. */
     void Unlock(); /**< Release the mutual exclusion lock (can block on some systems until scheduler completes). */

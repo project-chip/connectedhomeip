@@ -153,11 +153,6 @@
 
 #endif // CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
 
-/* Standard include headers */
-#ifndef CHIP_SYSTEM_CONFIG_ERROR_TYPE
-#include <stdint.h>
-#endif /* CHIP_SYSTEM_CONFIG_ERROR_TYPE */
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/opt.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -225,59 +220,6 @@
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING && CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 #error "FORBIDDEN: CHIP_SYSTEM_CONFIG_POSIX_LOCKING && CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING"
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING && CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
-
-#ifndef CHIP_SYSTEM_CONFIG_ERROR_TYPE
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_ERROR_TYPE
- *
- *  @brief
- *      This defines the data type used to represent errors for the CHIP System Layer subsystem.
- */
-#define CHIP_SYSTEM_CONFIG_ERROR_TYPE int32_t
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_NO_ERROR
- *
- *  @brief
- *      This defines the CHIP System Layer error code for no error or success.
- */
-#ifndef CHIP_SYSTEM_CONFIG_NO_ERROR
-#define CHIP_SYSTEM_CONFIG_NO_ERROR 0
-#endif /* CHIP_SYSTEM_CONFIG_NO_ERROR */
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_ERROR_MIN
- *
- *  @brief
- *      This defines the base or minimum CHIP System Layer error number range.
- */
-#ifndef CHIP_SYSTEM_CONFIG_ERROR_MIN
-#define CHIP_SYSTEM_CONFIG_ERROR_MIN 7000
-#endif /* CHIP_SYSTEM_CONFIG_ERROR_MIN */
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_ERROR_MAX
- *
- *  @brief
- *      This defines the top or maximum CHIP System Layer error number range.
- */
-#ifndef CHIP_SYSTEM_CONFIG_ERROR_MAX
-#define CHIP_SYSTEM_CONFIG_ERROR_MAX 7999
-#endif /* CHIP_SYSTEM_CONFIG_ERROR_MAX */
-
-/**
- *  @def _CHIP_SYSTEM_CONFIG_ERROR
- *
- *  @brief
- *      This defines a mapping function for CHIP System Layer errors that allows mapping such errors into a platform- or
- *      system-specific range.
- */
-#ifndef _CHIP_SYSTEM_CONFIG_ERROR
-#define _CHIP_SYSTEM_CONFIG_ERROR(e) (CHIP_SYSTEM_CONFIG_ERROR_MIN + (e))
-#endif /* _CHIP_SYSTEM_CONFIG_ERROR */
-
-#endif /* CHIP_SYSTEM_CONFIG_ERROR_TYPE */
 
 /**
  *  @def CHIP_SYSTEM_HEADER_RESERVE_SIZE

@@ -60,7 +60,7 @@ using namespace ::chip::DeviceLayer::Internal;
 
 int Application_Init(void)
 {
-    int ret = CHIP_ERROR_MAX;
+    int ret = CHIP_CONFIG_CORE_ERROR_MAX;
 
     /* Launch application task */
     ChipLogProgress(NotSpecified, "============================");
@@ -79,7 +79,7 @@ int Application_Init(void)
 
 int CHIP_Init(void)
 {
-    int ret = CHIP_ERROR_MAX;
+    int ret = CHIP_CONFIG_CORE_ERROR_MAX;
 
     ret = chip::Platform::MemoryInit();
     if (ret != CHIP_NO_ERROR)

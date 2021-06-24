@@ -33,13 +33,13 @@ namespace Shell {
 
 static chip::Shell::Engine sShellDeviceSubcommands;
 
-int BLEHelpHandler(int argc, char ** argv)
+CHIP_ERROR BLEHelpHandler(int argc, char ** argv)
 {
     sShellDeviceSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-int BLEAdvertiseHandler(int argc, char ** argv)
+CHIP_ERROR BLEAdvertiseHandler(int argc, char ** argv)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
@@ -91,7 +91,7 @@ int BLEAdvertiseHandler(int argc, char ** argv)
     return error;
 }
 
-int BLEDispatch(int argc, char ** argv)
+CHIP_ERROR BLEDispatch(int argc, char ** argv)
 {
     if (argc == 0)
     {

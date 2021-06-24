@@ -232,15 +232,15 @@ private:
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct
-    static INET_ERROR OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle && buffer);
+    static CHIP_ERROR OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle && buffer);
 
     // Callback handler for TCPEndPoint. Called when a connection has been completed.
     // @see TCPEndpoint::OnConnectCompleteFunct
-    static void OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR err);
+    static void OnConnectionComplete(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
 
     // Callback handler for TCPEndPoint. Called when a connection has been closed.
     // @see TCPEndpoint::OnConnectionClosedFunct
-    static void OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err);
+    static void OnConnectionClosed(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
 
     // Callback handler for TCPEndPoint. Callend when a peer closes the connection.
     // @see TCPEndpoint::OnPeerCloseFunct
@@ -253,7 +253,7 @@ private:
 
     // Called on accept error
     // @see TCPEndpoint::OnAcceptErrorFunct
-    static void OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err);
+    static void OnAcceptError(Inet::TCPEndPoint * endPoint, CHIP_ERROR err);
 
     Inet::TCPEndPoint * mListenSocket = nullptr;                                     ///< TCP socket used by the transport
     Inet::IPAddressType mEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type

@@ -37,10 +37,10 @@ namespace Shell {
 
 static chip::Shell::Engine sShellWifiSubCommands;
 
-static int WiFiHelpHandler(int argc, char ** argv)
+static CHIP_ERROR WiFiHelpHandler(int argc, char ** argv)
 {
     sShellWifiSubCommands.ForEachCommand(PrintCommandHelp, nullptr);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 static int PrintWifiMode()
@@ -96,7 +96,7 @@ static int SetWifiMode(const char * mode)
     return 0;
 }
 
-static int WiFiModeHandler(int argc, char ** argv)
+static CHIP_ERROR WiFiModeHandler(int argc, char ** argv)
 {
     if (argc == 0)
     {
@@ -109,7 +109,7 @@ static int WiFiModeHandler(int argc, char ** argv)
     return SetWifiMode(argv[0]);
 }
 
-static int WiFiConnectHandler(int argc, char ** argv)
+static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
 {
     if (argc != 2)
     {
@@ -119,7 +119,7 @@ static int WiFiConnectHandler(int argc, char ** argv)
     return deviceDelegate.ProvisionWiFi(argv[0], argv[1]);
 }
 
-static int WiFiDispatch(int argc, char ** argv)
+static CHIP_ERROR WiFiDispatch(int argc, char ** argv)
 {
     if (argc == 0)
     {

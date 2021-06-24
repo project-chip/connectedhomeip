@@ -34,7 +34,7 @@ namespace Layer {
 
 using namespace ::chip::DeviceLayer;
 
-System::Error StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMilliseconds)
+CHIP_ERROR StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMilliseconds)
 {
     return PlatformMgr().StartChipTimer(aMilliseconds);
 }

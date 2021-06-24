@@ -340,7 +340,7 @@ bool HandleTCPDataReceived(const PacketBufferHandle & aBuffer, TransferStats & a
 
 // Timer Callback Handler
 
-void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
+void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
 {
     INET_FAIL_ERROR(aError, "Send timer completed with error");
 
@@ -364,7 +364,7 @@ void HandleRawMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuf
            static_cast<size_t>(aBuffer->DataLength()));
 }
 
-void HandleRawReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR & aError, const IPPacketInfo * aPacketInfo)
+void HandleRawReceiveError(const IPEndPointBasis * aEndPoint, const CHIP_ERROR & aError, const IPPacketInfo * aPacketInfo)
 {
     char lAddressBuffer[INET6_ADDRSTRLEN];
 
@@ -395,7 +395,7 @@ void HandleUDPMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuf
            lDestinationAddressBuffer, aPacketInfo->DestPort, static_cast<size_t>(aBuffer->DataLength()));
 }
 
-void HandleUDPReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR & aError, const IPPacketInfo * aPacketInfo)
+void HandleUDPReceiveError(const IPEndPointBasis * aEndPoint, const CHIP_ERROR & aError, const IPPacketInfo * aPacketInfo)
 {
     char lAddressBuffer[INET6_ADDRSTRLEN];
     uint16_t lSourcePort;
