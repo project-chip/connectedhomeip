@@ -100,6 +100,9 @@ static constexpr chip::ClusterId ZCL_GENERAL_COMMISSIONING_CLUSTER_ID = 0x0030;
 // Definitions for cluster: Network Commissioning
 static constexpr chip::ClusterId ZCL_NETWORK_COMMISSIONING_CLUSTER_ID = 0x0031;
 
+// Definitions for cluster: Diagnostic Logs
+static constexpr chip::ClusterId ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID = 0x0032;
+
 // Definitions for cluster: General Diagnostics
 static constexpr chip::ClusterId ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID = 0x0033;
 

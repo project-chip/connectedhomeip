@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+    <domain name="CHIP" spec="chip-0.7" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
+    <enum name="LogsIntent" type="ENUM8">
+        <item name="EndUserSupport" value="0x0"/>
+        <item name="NetworkDiag" value="0x1"/>
+        <item name="CrashLogs" value="0x2"/>
+    </enum>
+    <enum name="LogsStatus" type="ENUM8">
+        <item name="Success" value="0x0"/>
+        <item name="Exhausted" value="0x1"/>
+        <item name="NoLogs" value="0x2"/>
+        <item name="Busy" value="0x3"/>
+        <item name="Denied" value="0x4"/>
+    </enum>
+    <enum name="LogsTransferProtocol" type="ENUM8">
+        <item name="ResponsePayload" value="0x0"/>
+        <item name="BDX" value="0x1"/>
+    </enum>
+    <cluster>
+        <name>Diagnostic Logs</name>
+        <domain>CHIP</domain>
+        <description>The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics.</description>
+        <code>0x0032</code>
+        <define>DIAGNOSTIC_LOGS_CLUSTER</define>
+        <client tick="false" init="false">true</client>
+        <server tick="false" init="false">true</server>
+        <command source="client" code="0x00" name="RetrieveLogsRequest" optional="false" cli="chip logs retrieve">
+            <description>Retrieving diagnostic logs from a Node</description>
+            <arg name="intent" type="LogsIntent"/>
+            <arg name="requestedProtocol" type="LogsTransferProtocol"/>
+            <arg name="transferFileDesignator" type="OCTET_STRING" length="32"/>
+        </command>
+        <command source="server" code="0x01" name="RetrieveLogsResponse" optional="false" cli="chip logs response">
+            <description>Response to the RetrieveLogsRequest</description>
+            <arg name="status" type="LogsStatus"/>
+            <arg name="content" type="OCTET_STRING"/>
+            <arg name="timeStamp" type="UTC_TIME"/>
+            <arg name="timeSinceBoot" type="INT32U"/>
+        </command>
+    </cluster>
+</configurator>
