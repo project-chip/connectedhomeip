@@ -227,9 +227,8 @@ bool emberAfScenesClusterViewSceneCallback(chip::app::Command * commandObj, Grou
 
 bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId)
 {
-    EmberAfStatus status   = EMBER_ZCL_STATUS_NOT_FOUND;
-    EmberStatus sendStatus = EMBER_SUCCESS;
-    CHIP_ERROR err         = CHIP_NO_ERROR;
+    EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
 
     emberAfScenesClusterPrintln("RX: RemoveScene 0x%2x, 0x%x", groupId, sceneId);
 
@@ -260,13 +259,6 @@ bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, Gr
     // single device.
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
-                                      ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID, "uvu", status, groupId, sceneId);
-            sendStatus = emberAfSendResponse();
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
                                                  ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID,
@@ -279,10 +271,6 @@ bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, Gr
             SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
             SuccessOrExit(err = commandObj->FinishCommand());
         }
-        if (EMBER_SUCCESS != sendStatus)
-        {
-            emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "remove_scene", sendStatus);
-        }
     }
 exit:
     if (err != CHIP_NO_ERROR)
@@ -294,9 +282,8 @@ exit:
 
 bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj, GroupId groupId)
 {
-    EmberAfStatus status   = EMBER_ZCL_STATUS_INVALID_FIELD;
-    EmberStatus sendStatus = EMBER_SUCCESS;
-    CHIP_ERROR err         = CHIP_NO_ERROR;
+    EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
 
     emberAfScenesClusterPrintln("RX: RemoveAllScenes 0x%2x", groupId);
 
@@ -322,15 +309,6 @@ bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj
     // to a single device.
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
-                                      ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID, "uv", status, groupId);
-
-            sendStatus = emberAfSendResponse();
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
                                                  ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID,
@@ -341,10 +319,6 @@ bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
             SuccessOrExit(err = commandObj->FinishCommand());
-        }
-        if (EMBER_SUCCESS != sendStatus)
-        {
-            emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "remove_all_scenes", sendStatus);
         }
     }
 exit:
@@ -358,8 +332,7 @@ exit:
 bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId)
 {
     EmberAfStatus status;
-    EmberStatus sendStatus = EMBER_SUCCESS;
-    CHIP_ERROR err         = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     emberAfScenesClusterPrintln("RX: StoreScene 0x%2x, 0x%x", groupId, sceneId);
     status = emberAfScenesClusterStoreCurrentSceneCallback(emberAfCurrentEndpoint(), groupId, sceneId);
 
@@ -367,14 +340,6 @@ bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, Gro
     // single device.
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
-                                      ZCL_STORE_SCENE_RESPONSE_COMMAND_ID, "uvu", status, groupId, sceneId);
-            sendStatus = emberAfSendResponse();
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
                                                  ZCL_STORE_SCENE_RESPONSE_COMMAND_ID,
@@ -386,10 +351,6 @@ bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, Gro
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
             SuccessOrExit(err = commandObj->FinishCommand());
-        }
-        if (EMBER_SUCCESS != sendStatus)
-        {
-            emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "store_scene", sendStatus);
         }
     }
 exit:
@@ -436,10 +397,9 @@ bool emberAfScenesClusterRecallSceneCallback(chip::app::Command * commandObj, Gr
 
 bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * commandObj, GroupId groupId)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
-    EmberStatus sendStatus = EMBER_SUCCESS;
-    uint8_t sceneCount     = 0;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    uint8_t sceneCount   = 0;
     uint8_t sceneList[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
 
     emberAfScenesClusterPrintln("RX: GetSceneMembership 0x%2x", groupId);
@@ -469,29 +429,6 @@ bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * command
         }
     }
 
-    if (commandObj == nullptr)
-    {
-        // The status, capacity, and group id are always included in the response, but
-        // the scene count and scene list are only included if the group id matched.
-        emberAfFillExternalBuffer(
-            (ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT | EMBER_AF_DEFAULT_RESPONSE_POLICY_RESPONSES),
-            ZCL_SCENES_CLUSTER_ID, ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID, "uuv", status,
-            (EMBER_AF_PLUGIN_SCENES_TABLE_SIZE - emberAfPluginScenesServerNumSceneEntriesInUse()), // capacity
-            groupId);
-
-        // Get Scene Membership commands are only responded to when they are
-        // addressed to a single device or when an entry in the table matches.
-        if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST ||
-            emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY || sceneCount != 0)
-        {
-            sendStatus = emberAfSendResponse();
-            if (EMBER_SUCCESS != sendStatus)
-            {
-                emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "get_scene_membership", sendStatus);
-            }
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
                                              ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID,
@@ -763,7 +700,6 @@ bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, con
     CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfSceneTableEntry entry;
     EmberAfStatus status;
-    EmberStatus sendStatus         = EMBER_SUCCESS;
     bool enhanced                  = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
     uint16_t extensionFieldSetsLen = static_cast<uint16_t>(
         cmd->bufLen -
@@ -1072,15 +1008,6 @@ kickout:
     {
         return true;
     }
-
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
-                                  (enhanced ? ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID : ZCL_ADD_SCENE_RESPONSE_COMMAND_ID),
-                                  "uvu", status, groupId, sceneId);
-        sendStatus = emberAfSendResponse();
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
                                              ZCL_ADD_SCENE_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -1095,10 +1022,6 @@ kickout:
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(2), sceneId));
         SuccessOrExit(err = commandObj->FinishCommand());
-    }
-    if (EMBER_SUCCESS != sendStatus)
-    {
-        emberAfScenesClusterPrintln("Scenes: failed to send %s response: 0x%x", "add_scene", sendStatus);
     }
 
 exit:
