@@ -119,14 +119,6 @@ if (NOT CHIP_LIBRARIES)
     set(CHIP_LIBRARIES -lCHIP)
 endif()
 
-if (CONFIG_CHIP_STANDALONE_SHELL)
-    list(APPEND CHIP_LIBRARIES -lCHIPShell)
-endif()
-
-if (CONFIG_CHIP_ZEPHYR_SHELL)
-    set(CHIP_ZEPHYR_SHELL_LIBRARY -lCHIPZephyrShell)
-endif()
-
 if (CONFIG_CHIP_PW_RPC)
     list(APPEND CHIP_LIBRARIES -lPwRpc)
 endif()
@@ -206,8 +198,7 @@ chip_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_inet_config_enable_raw_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_dns_resolver"   CONFIG_CHIP_BUILD_TESTS)
-chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_STANDALONE_SHELL)
-chip_gn_arg_bool  ("chip_build_zephyr_shell"                CONFIG_CHIP_ZEPHYR_SHELL)
+chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                  CONFIG_CHIP_PW_RPC)
 
 if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
@@ -266,7 +257,12 @@ target_include_directories(chip INTERFACE
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
-target_link_libraries(chip INTERFACE -Wl,--whole-archive ${CHIP_ZEPHYR_SHELL_LIBRARY} -Wl,--no-whole-archive,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
+if (CONFIG_CHIP_LIB_SHELL)
+    target_link_options(chip INTERFACE -Wl,--whole-archive -lCHIPShell -Wl,--no-whole-archive)
+endif()
+
+target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
+
 add_dependencies(chip chip-gn)
 
 endif() # CONFIG_CHIP
