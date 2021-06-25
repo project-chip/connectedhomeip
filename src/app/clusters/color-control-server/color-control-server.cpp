@@ -196,7 +196,7 @@ static uint16_t readColorTemperature(EndpointId endpoint)
 static uint16_t readColorTemperatureMin(EndpointId endpoint)
 {
     uint16_t colorTemperatureMin;
-    EmberStatus status;
+    EmberAfStatus status;
 
     status =
         emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN_ATTRIBUTE_ID,
@@ -213,7 +213,7 @@ static uint16_t readColorTemperatureMin(EndpointId endpoint)
 static uint16_t readColorTemperatureMax(EndpointId endpoint)
 {
     uint16_t colorTemperatureMax;
-    EmberStatus status;
+    EmberAfStatus status;
 
     status =
         emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX_ATTRIBUTE_ID,
@@ -230,7 +230,7 @@ static uint16_t readColorTemperatureMax(EndpointId endpoint)
 static uint16_t readColorTemperatureCoupleToLevelMin(EndpointId endpoint)
 {
     uint16_t colorTemperatureCoupleToLevelMin;
-    EmberStatus status;
+    EmberAfStatus status;
 
     status = emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
                                         ZCL_COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS_ATTRIBUTE_ID,
@@ -248,7 +248,7 @@ static uint16_t readColorTemperatureCoupleToLevelMin(EndpointId endpoint)
 static uint8_t readLevelControlCurrentLevel(EndpointId endpoint)
 {
     uint8_t currentLevel;
-    EmberStatus status;
+    EmberAfStatus status;
 
     status = emberAfReadServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
                                         (uint8_t *) &currentLevel, sizeof(uint8_t));

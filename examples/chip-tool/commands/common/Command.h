@@ -187,7 +187,18 @@ public:
     }
 
     void UpdateWaitForResponse(bool value);
-    void WaitForResponse(uint16_t duration);
+
+    // There is a certain symmetry between the single-event-loop and
+    // separate-event-loop approaches.  With a separate event loop, we schedule
+    // our work on that event loop and synchronously wait (block) waiting for a
+    // response. When using a single event loop, we ask for an async response
+    // notification and then block processing work on the event loop
+    // synchronously until that notification happens.
+#if CONFIG_USE_SEPARATE_EVENTLOOP
+    void WaitForResponse(uint16_t seconds);
+#else  // CONFIG_USE_SEPARATE_EVENTLOOP
+    CHIP_ERROR ScheduleWaitForResponse(uint16_t seconds);
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
 protected:
     ExecutionContext * GetExecContext() { return mExecContext; }
@@ -202,7 +213,9 @@ private:
     const char * mName            = nullptr;
     std::vector<Argument> mArgs;
 
+#if CONFIG_USE_SEPARATE_EVENTLOOP
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ false };
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 };

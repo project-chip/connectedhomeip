@@ -226,17 +226,7 @@ bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::Command * commandObj, 
     if (emAfPluginDoorLockServerCheckForSufficientSpace(userId, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE))
     {
         EmberAfPluginDoorLockServerUser * user = &pinUserTable[userId];
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_GET_USER_TYPE_RESPONSE_COMMAND_ID, "vu", userId, user->type);
-            EmberStatus status = emberAfSendResponse();
-            if (status != EMBER_SUCCESS)
-            {
-                emberAfDoorLockClusterPrintln("Failed to send GetUserTypeResponse: 0x%X", status);
-            }
-        }
-        else
+
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_USER_TYPE_RESPONSE_COMMAND_ID,
@@ -264,18 +254,7 @@ bool emberAfDoorLockClusterSetUserTypeCallback(chip::app::Command * commandObj, 
     uint8_t status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType))
                           ? 0x00   // success (per 7.3.2.17.21)
                           : 0x01); // failure (per 7.3.2.17.21)
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID, "u", status);
 
-        EmberStatus emberStatus = emberAfSendResponse();
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send SetUserTypeResponse: 0x%X", emberStatus);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID,
@@ -317,13 +296,7 @@ bool emberAfDoorLockClusterSetPinCallback(chip::app::Command * commandObj, uint1
     // send response
     uint8_t status = setUser(userId, userStatus, userType, pin, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     uint16_t rfProgrammingEventMask = 0xffff; // send event by default
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_SET_PIN_RESPONSE_COMMAND_ID, "u", status);
-        emberAfSendResponse();
-    }
-    else
+
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_SET_PIN_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -375,15 +348,6 @@ bool emberAfDoorLockClusterGetPinCallback(chip::app::Command * commandObj, uint1
     CHIP_ERROR err     = CHIP_NO_ERROR;
     if (getUser(userId, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE, &user))
     {
-        uint8_t fakePin = 0x00;
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_GET_PIN_RESPONSE_COMMAND_ID, "vuus", userId, user.status, user.type,
-                                      (getSendPinOverTheAir() ? user.code.pin : &fakePin));
-            status = emberAfSendResponse();
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_PIN_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -429,18 +393,6 @@ bool emberAfDoorLockClusterClearPinCallback(chip::app::Command * commandObj, uin
     uint16_t rfProgrammingEventMask = 0xffff; // event sent by default
     uint8_t userPin                 = 0x00;   // Zero length Zigbee string
 
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_CLEAR_PIN_RESPONSE_COMMAND_ID, "u", status);
-
-        EmberStatus emberStatus = emberAfSendResponse();
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send ClearPinResponse: 0x%X", emberStatus);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_CLEAR_PIN_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -485,17 +437,6 @@ bool emberAfDoorLockClusterClearAllPinsCallback(chip::app::Command * commandObj)
     }
 
     // 7.3.2.17.9 says that "0x00" indicates success.
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_CLEAR_ALL_PINS_RESPONSE_COMMAND_ID, "u", 0x00);
-        EmberStatus status = emberAfSendResponse();
-        if (status != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send ClearAllPins: 0x%X", status);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_CLEAR_ALL_PINS_RESPONSE_COMMAND_ID,
@@ -523,18 +464,7 @@ bool emberAfDoorLockClusterSetRfidCallback(chip::app::Command * commandObj, uint
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status =
         setUser(userId, userStatus, userType, rfid, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_SET_RFID_RESPONSE_COMMAND_ID, "u", status);
 
-        EmberStatus emberStatus = emberAfSendResponse();
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send SetRfidResponse: 0x%X", emberStatus);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_SET_RFID_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -559,13 +489,6 @@ bool emberAfDoorLockClusterGetRfidCallback(chip::app::Command * commandObj, uint
     CHIP_ERROR err     = CHIP_NO_ERROR;
     if (getUser(userId, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE, &user))
     {
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_GET_RFID_RESPONSE_COMMAND_ID, "vuus", userId, user.status, user.type, user.code.pin);
-            status = emberAfSendResponse();
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_RFID_RESPONSE_COMMAND_ID,
@@ -602,19 +525,6 @@ bool emberAfDoorLockClusterClearRfidCallback(chip::app::Command * commandObj, ui
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status = clearUserPinOrRfid(userId, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
 
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_CLEAR_RFID_RESPONSE_COMMAND_ID, "u", status);
-
-        EmberStatus emberStatus = emberAfSendResponse();
-
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send ClearRfidResponse: 0x%X", emberStatus);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_CLEAR_RFID_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -641,17 +551,6 @@ bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::Command * commandObj
     }
 
     // 7.3.2.17.26 says that "0x00" indicates success.
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_CLEAR_ALL_RFIDS_RESPONSE_COMMAND_ID, "u", 0x00);
-        EmberStatus status = emberAfSendResponse();
-        if (status != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send ClearAllRfidsResponse: 0x%X", status);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_CLEAR_ALL_RFIDS_RESPONSE_COMMAND_ID,
@@ -696,13 +595,13 @@ static void printSuccessOrFailure(bool success)
 static bool verifyPin(uint8_t * pin, uint8_t * userId)
 {
     bool pinRequired = false;
-    EmberStatus status;
+    EmberAfStatus status;
     uint8_t i;
 
     status =
         emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID,
                                    ZCL_REQUIRE_PIN_FOR_RF_OPERATION_ATTRIBUTE_ID, (uint8_t *) &pinRequired, sizeof(pinRequired));
-    if (EMBER_SUCCESS != status || !pinRequired)
+    if (EMBER_ZCL_STATUS_SUCCESS != status || !pinRequired)
     {
         return true;
     }
@@ -749,14 +648,6 @@ bool emberAfDoorLockClusterLockDoorCallback(chip::app::Command * commandObj, uin
     }
 
     // send response
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID, "u",
-                                  doorLocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-        emberAfSendResponse();
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -819,14 +710,6 @@ bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::Command * commandObj, u
                                     &lockStateUnlocked, ZCL_INT8U_ATTRIBUTE_TYPE);
     }
 
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_UNLOCK_DOOR_RESPONSE_COMMAND_ID, "u",
-                                  doorUnlocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-        emberAfSendResponse();
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_UNLOCK_DOOR_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -1018,17 +901,6 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::Command * comman
         status = 0x01; // failure (per 7.3.2.17.4)
     }
 
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND_ID, "u", status);
-        EmberStatus emberStatus = emberAfSendResponse();
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send UnlockWithTimeoutResponse: 0x%X", status);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND_ID,

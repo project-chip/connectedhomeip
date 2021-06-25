@@ -70,6 +70,7 @@ public:
         return *this;
     }
 
+    // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of RendezvousParameter object.
     RendezvousParameters & SetCSRNonce(ByteSpan csrNonce)
     {
         mCSRNonce.SetValue(csrNonce);
@@ -146,8 +147,7 @@ private:
     Optional<NodeId> mRemoteNodeId;       ///< the remote node id
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
-
-    // The lifetime of provided csrNonce should exceed the lifetime of RendezvousParameter object.
+    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
 
     PASEVerifier mPASEVerifier;

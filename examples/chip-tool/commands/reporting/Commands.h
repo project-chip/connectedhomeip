@@ -46,7 +46,7 @@ public:
         delete onReportSwitchCurrentPositionCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
         delete onReportThermostatLocalTemperatureCallback;
-        delete onReportWindowCoveringWindowCoveringTypeCallback;
+        delete onReportWindowCoveringTypeCallback;
         delete onReportWindowCoveringCurrentPositionLiftCallback;
         delete onReportWindowCoveringCurrentPositionTiltCallback;
         delete onReportWindowCoveringConfigStatusCallback;
@@ -87,7 +87,7 @@ public:
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0201, 0x0000,
                                        onReportThermostatLocalTemperatureCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0000,
-                                       onReportWindowCoveringWindowCoveringTypeCallback->Cancel());
+                                       onReportWindowCoveringTypeCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0003,
                                        onReportWindowCoveringCurrentPositionLiftCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0004,
@@ -161,7 +161,7 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatLocalTemperatureCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringWindowCoveringTypeCallback =
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringTypeCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);

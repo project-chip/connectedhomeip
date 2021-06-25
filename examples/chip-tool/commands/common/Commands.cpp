@@ -70,16 +70,34 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
     err = mController.Init(localId, initParams);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
 
+#if CONFIG_USE_SEPARATE_EVENTLOOP
+    // ServiceEvents() calls StartEventLoopTask(), which is paired with the
+    // StopEventLoopTask() below.
     err = mController.ServiceEvents();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
     err = RunCommand(localId, remoteId, argc, argv, &command);
     SuccessOrExit(err);
 
+#if !CONFIG_USE_SEPARATE_EVENTLOOP
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+#endif // !CONFIG_USE_SEPARATE_EVENTLOOP
+
+    if (command)
+    {
+        err = command->GetCommandExitStatus();
+    }
+
 exit:
-#if CONFIG_DEVICE_LAYER
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
+    }
+
+#if CONFIG_USE_SEPARATE_EVENTLOOP
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-#endif
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
     if (command)
     {
@@ -176,14 +194,14 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
         // set the variable to true, which will cause it to block indefinitely.
         //
         command->UpdateWaitForResponse(true);
+#if CONFIG_USE_SEPARATE_EVENTLOOP
         chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(command));
         command->WaitForResponse(command->GetWaitDurationInSeconds());
-        err = command->GetCommandExitStatus();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
-            ExitNow();
-        }
+#else  // CONFIG_USE_SEPARATE_EVENTLOOP
+        err = command->Run();
+        SuccessOrExit(err);
+        command->ScheduleWaitForResponse(command->GetWaitDurationInSeconds());
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
     }
 
 exit:

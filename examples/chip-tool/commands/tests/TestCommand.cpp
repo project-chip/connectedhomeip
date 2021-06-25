@@ -24,9 +24,24 @@ CHIP_ERROR TestCommand::Run()
 
     auto * ctx = GetExecContext();
 
-    err = ctx->commissioner->GetDevice(ctx->remoteId, &mDevice);
+    err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     ReturnErrorOnFailure(err);
 
-    NextTest();
     return CHIP_NO_ERROR;
+}
+
+void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+{
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
+    command->mDevice = device;
+    command->NextTest();
+}
+
+void TestCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+{
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
+    command->SetCommandExitStatus(error);
 }
