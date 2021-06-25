@@ -148,7 +148,6 @@ private:
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
-    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;

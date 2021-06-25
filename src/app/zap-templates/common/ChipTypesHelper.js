@@ -18,18 +18,26 @@
 function asBasicType(type)
 {
   switch (type) {
+  case 'chip::ActionId':
   case 'chip::CommandId':
   case 'chip::EndpointId':
+  case 'chip::FabricIndex':
+  case 'chip::FieldId':
     return 'uint8_t';
   case 'chip::AttributeId':
   case 'chip::ClusterId':
   case 'chip::EventId':
   case 'chip::GroupId':
+  case 'chip::VendorId':
     return 'uint16_t';
   case 'chip::DeviceTypeId':
+  case 'chip::TransactionId':
+  case 'chip::StatusCode':
     return 'uint32_t';
-  case 'chip::NodeId':
+  case 'chip::DataVersion':
+  case 'chip::EventNumber':
   case 'chip::FabricId':
+  case 'chip::NodeId':
     return 'uint64_t';
   default:
     return type;

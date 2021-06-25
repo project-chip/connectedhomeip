@@ -46,38 +46,6 @@ typedef struct _BasicCommissioningInfoType
     uint32_t FailSafeExpiryLengthMs;
 } EmberAfBasicCommissioningInfoType;
 
-// Struct for BlockThreshold
-typedef struct _BlockThreshold
-{
-    uint8_t blockThreshold;
-    uint8_t priceControl;
-    uint32_t blockPeriodStartTime;
-    uint32_t blockPeriodDurationMinutes;
-    uint8_t fuelType;
-    uint32_t standingCharge;
-} EmberAfBlockThreshold;
-
-// Struct for BlockThresholdSubPayload
-typedef struct _BlockThresholdSubPayload
-{
-    uint8_t tierNumberOfBlockThresholds;
-    uint8_t * blockThreshold;
-} EmberAfBlockThresholdSubPayload;
-
-// Struct for ChatParticipant
-typedef struct _ChatParticipant
-{
-    uint16_t uid;
-    uint8_t * nickname;
-} EmberAfChatParticipant;
-
-// Struct for ChatRoom
-typedef struct _ChatRoom
-{
-    uint16_t cid;
-    uint8_t * name;
-} EmberAfChatRoom;
-
 // Struct for ConfigureReportingRecord
 typedef struct _ConfigureReportingRecord
 {
@@ -140,27 +108,6 @@ typedef struct _ContentLaunchStyleInformation
     uint8_t size;
 } EmberAfContentLaunchStyleInformation;
 
-// Struct for DebtPayload
-typedef struct _DebtPayload
-{
-    uint32_t collectionTime;
-    uint32_t amountCollected;
-    uint8_t debtType;
-    uint32_t outstandingDebt;
-} EmberAfDebtPayload;
-
-// Struct for DeviceInformationRecord
-typedef struct _DeviceInformationRecord
-{
-    uint64_t ieeeAddress;
-    chip::EndpointId endpointId;
-    uint16_t profileId;
-    uint16_t deviceId;
-    uint8_t version;
-    uint8_t groupIdCount;
-    uint8_t sort;
-} EmberAfDeviceInformationRecord;
-
 // Struct for DeviceType
 typedef struct _DeviceType
 {
@@ -174,36 +121,6 @@ typedef struct _DiscoverAttributesInfoRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
 } EmberAfDiscoverAttributesInfoRecord;
-
-// Struct for EndpointInformationRecord
-typedef struct _EndpointInformationRecord
-{
-    uint16_t networkAddress;
-    chip::EndpointId endpointId;
-    uint16_t profileId;
-    uint16_t deviceId;
-    uint8_t version;
-} EmberAfEndpointInformationRecord;
-
-// Void typedef for EmberAfEphemeralData which is empty.
-// this will result in all the references to the data being as uint8_t*
-typedef uint8_t EmberAfEphemeralData;
-
-// Struct for EventConfigurationPayload
-typedef struct _EventConfigurationPayload
-{
-    uint16_t eventId;
-    uint8_t eventConfiguration;
-} EmberAfEventConfigurationPayload;
-
-// Struct for EventLogPayload
-typedef struct _EventLogPayload
-{
-    uint8_t logId;
-    uint16_t eventId;
-    uint32_t eventTime;
-    chip::ByteSpan eventData;
-} EmberAfEventLogPayload;
 
 // Struct for ExtendedDiscoverAttributesInfoRecord
 typedef struct _ExtendedDiscoverAttributesInfoRecord
@@ -221,33 +138,6 @@ typedef struct _FabricDescriptor
     chip::NodeId NodeId;
     chip::ByteSpan Label;
 } EmberAfFabricDescriptor;
-
-// Struct for GpPairingConfigurationGroupList
-typedef struct _GpPairingConfigurationGroupList
-{
-    uint16_t SinkGroup;
-    uint16_t Alias;
-} EmberAfGpPairingConfigurationGroupList;
-
-// Struct for GpTranslationTableUpdateTranslation
-typedef struct _GpTranslationTableUpdateTranslation
-{
-    uint8_t index;
-    uint8_t gpdCommandId;
-    chip::EndpointId endpoint;
-    uint16_t profile;
-    uint16_t cluster;
-    uint8_t zigbeeCommandId;
-    chip::ByteSpan zigbeeCommandPayload;
-    chip::ByteSpan additionalInfoBlock;
-} EmberAfGpTranslationTableUpdateTranslation;
-
-// Struct for GroupInformationRecord
-typedef struct _GroupInformationRecord
-{
-    chip::GroupId groupId;
-    uint8_t groupType;
-} EmberAfGroupInformationRecord;
 
 // Struct for GroupKey
 typedef struct _GroupKey
@@ -273,10 +163,6 @@ typedef struct _IasAceZoneStatusResult
     uint8_t zoneId;
     uint16_t zoneStatus;
 } EmberAfIasAceZoneStatusResult;
-
-// Void typedef for EmberAfIdentity which is empty.
-// this will result in all the references to the data being as uint8_t*
-typedef uint8_t EmberAfIdentity;
 
 // Struct for LabelStruct
 typedef struct _LabelStruct
@@ -308,17 +194,6 @@ typedef struct _NavigateTargetTargetInfo
     chip::ByteSpan name;
 } EmberAfNavigateTargetTargetInfo;
 
-// Struct for NeighborInfo
-typedef struct _NeighborInfo
-{
-    uint64_t neighbor;
-    int16_t x;
-    int16_t y;
-    int16_t z;
-    int8_t rssi;
-    uint8_t numberRssiMeasurements;
-} EmberAfNeighborInfo;
-
 // Struct for NeighborTable
 typedef struct _NeighborTable
 {
@@ -345,18 +220,9 @@ typedef struct _NetworkInterfaceType
     uint8_t FabricConnected;
     uint8_t OffPremiseServicesReachableIPv4;
     uint8_t OffPremiseServicesReachableIPv6;
-    uint64_t HardwareAddress;
+    chip::ByteSpan HardwareAddress;
     uint8_t Type;
 } EmberAfNetworkInterfaceType;
-
-// Struct for NodeInformation
-typedef struct _NodeInformation
-{
-    uint16_t uid;
-    uint16_t address;
-    chip::EndpointId endpoint;
-    uint8_t * nickname;
-} EmberAfNodeInformation;
 
 // Struct for Notification
 typedef struct _Notification
@@ -390,20 +256,6 @@ typedef struct _PowerProfileRecord
     uint8_t powerProfileRemoteControl;
     uint8_t powerProfileState;
 } EmberAfPowerProfileRecord;
-
-// Struct for PriceMatrixSubPayload
-typedef struct _PriceMatrixSubPayload
-{
-    uint8_t tierBlockId;
-    uint32_t price;
-} EmberAfPriceMatrixSubPayload;
-
-// Struct for Protocol
-typedef struct _Protocol
-{
-    uint16_t manufacturerCode;
-    uint8_t protocolId;
-} EmberAfProtocol;
 
 // Struct for ReadAttributeStatusRecord
 typedef struct _ReadAttributeStatusRecord
@@ -480,34 +332,6 @@ typedef struct _SceneExtensionFieldSet
     uint8_t value;
 } EmberAfSceneExtensionFieldSet;
 
-// Struct for ScheduleEntry
-typedef struct _ScheduleEntry
-{
-    uint16_t startTime;
-    uint8_t activePriceTierOrFriendlyCreditEnable;
-} EmberAfScheduleEntry;
-
-// Struct for ScheduleEntryAuxilliaryLoadSwitchTimes
-typedef struct _ScheduleEntryAuxilliaryLoadSwitchTimes
-{
-    uint16_t startTime;
-    uint8_t auxiliaryLoadSwitchState;
-} EmberAfScheduleEntryAuxilliaryLoadSwitchTimes;
-
-// Struct for ScheduleEntryFriendlyCreditSwitchTimes
-typedef struct _ScheduleEntryFriendlyCreditSwitchTimes
-{
-    uint16_t startTime;
-    uint8_t friendlyCreditEnable;
-} EmberAfScheduleEntryFriendlyCreditSwitchTimes;
-
-// Struct for ScheduleEntryRateSwitchTimes
-typedef struct _ScheduleEntryRateSwitchTimes
-{
-    uint16_t startTime;
-    uint8_t priceTier;
-} EmberAfScheduleEntryRateSwitchTimes;
-
 // Struct for ScheduledPhase
 typedef struct _ScheduledPhase
 {
@@ -515,51 +339,12 @@ typedef struct _ScheduledPhase
     uint16_t scheduledTime;
 } EmberAfScheduledPhase;
 
-// Struct for SeasonEntry
-typedef struct _SeasonEntry
-{
-    uint32_t seasonStartDate;
-    uint8_t weekIdRef;
-} EmberAfSeasonEntry;
-
 // Struct for SecurityPolicy
 typedef struct _SecurityPolicy
 {
     uint16_t RotationTime;
     uint8_t Flags;
 } EmberAfSecurityPolicy;
-
-// Void typedef for EmberAfSignature which is empty.
-// this will result in all the references to the data being as uint8_t*
-typedef uint8_t EmberAfSignature;
-
-// Void typedef for EmberAfSmac which is empty.
-// this will result in all the references to the data being as uint8_t*
-typedef uint8_t EmberAfSmac;
-
-// Struct for SnapshotResponsePayload
-typedef struct _SnapshotResponsePayload
-{
-    uint8_t snapshotScheduleId;
-    uint8_t snapshotScheduleConfirmation;
-} EmberAfSnapshotResponsePayload;
-
-// Struct for SnapshotSchedulePayload
-typedef struct _SnapshotSchedulePayload
-{
-    uint8_t snapshotScheduleId;
-    uint32_t snapshotStartTime;
-    uint32_t snapshotSchedule;
-    uint8_t snapshotPayloadType;
-    uint32_t snapshotCause;
-} EmberAfSnapshotSchedulePayload;
-
-// Struct for SpecialDay
-typedef struct _SpecialDay
-{
-    uint32_t specialDayDate;
-    uint8_t dayIdRef;
-} EmberAfSpecialDay;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
@@ -583,21 +368,6 @@ typedef struct _ThreadMetrics
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
 } EmberAfThreadMetrics;
-
-// Struct for TierLabelsPayload
-typedef struct _TierLabelsPayload
-{
-    uint8_t tierId;
-    chip::ByteSpan tierLabel;
-} EmberAfTierLabelsPayload;
-
-// Struct for TopUpPayload
-typedef struct _TopUpPayload
-{
-    chip::ByteSpan topUpCode;
-    int32_t topUpAmount;
-    uint32_t topUpTime;
-} EmberAfTopUpPayload;
 
 // Struct for TransferredPhase
 typedef struct _TransferredPhase
@@ -672,18 +442,3 @@ typedef struct _WriteStructuredAttributeStatusRecord
     uint8_t indicator;
     uint16_t indicies;
 } EmberAfWriteStructuredAttributeStatusRecord;
-
-// Struct for WwahBeaconSurvey
-typedef struct _WwahBeaconSurvey
-{
-    uint16_t deviceShort;
-    uint8_t rssi;
-    uint8_t classificationMask;
-} EmberAfWwahBeaconSurvey;
-
-// Struct for WwahClusterStatusToUseTC
-typedef struct _WwahClusterStatusToUseTC
-{
-    chip::ClusterId clusterId;
-    uint8_t status;
-} EmberAfWwahClusterStatusToUseTC;

@@ -249,6 +249,8 @@ private:
     Hash_SHA256_stream mCommissioningHash;
     P256PublicKey mRemotePubKey;
     P256Keypair mEphemeralKey;
+    // TODO: Remove mFabricSecret later
+    P256ECDHDerivedSecret mFabricSecret;
     P256ECDHDerivedSecret mSharedSecret;
     OperationalCredentialSet * mOpCredSet;
     CertificateKeyId mTrustedRootId;
