@@ -44,4 +44,3 @@ cd ${AMBD_HP_PATH}
 make clean
 make -C asdk lib_all
 make all
-
