@@ -18,14 +18,14 @@
 
 #pragma once
 
-#include "ota-server-delegate.h"
+#include "ota-provider-delegate.h"
 
 namespace chip {
 namespace app {
 namespace clusters {
-namespace OTAServer {
+namespace OTAProvider {
 
-void SetDelegate(chip::EndpointId endpointId, OTAServerDelegate * delegate);
+void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate);
 
 }
 } // namespace clusters

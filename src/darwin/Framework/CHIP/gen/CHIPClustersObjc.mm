@@ -2183,22 +2183,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge
-    : public Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback> {
+class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge
+    : public Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback> {
 public:
-    CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>(CallbackFn, this)
+    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge() {};
+    ~CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t action, uint32_t delayedActionTime)
     {
-        CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge *>(context);
+        CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -2216,23 +2216,23 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge
-    : public Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback> {
+class CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge
+    : public Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> {
 public:
-    CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>(CallbackFn, this)
+    CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge() {};
+    ~CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-        chip::ByteSpan updateToken, uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
+        chip::ByteSpan updateToken, uint8_t userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
-        CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge *>(context);
+        CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -2241,7 +2241,7 @@ public:
                     @"softwareVersion" : [NSNumber numberWithUnsignedLong:softwareVersion],
                     @"updateToken" : [NSData dataWithBytes:updateToken.data() length:updateToken.size()],
                     @"userConsentNeeded" : [NSNumber numberWithUnsignedChar:userConsentNeeded],
-                    @"metadataForClient" : [NSData dataWithBytes:metadataForClient.data() length:metadataForClient.size()],
+                    @"metadataForRequestor" : [NSData dataWithBytes:metadataForRequestor.data() length:metadataForRequestor.size()],
                 });
                 callback->Cancel();
                 delete callback;
@@ -11874,11 +11874,11 @@ private:
 
 @end
 
-@interface CHIPOtaSoftwareUpdateServer ()
-@property (readonly) Controller::OtaSoftwareUpdateServerCluster cppCluster;
+@interface CHIPOtaSoftwareUpdateProvider ()
+@property (readonly) Controller::OtaSoftwareUpdateProviderCluster cppCluster;
 @end
 
-@implementation CHIPOtaSoftwareUpdateServer
+@implementation CHIPOtaSoftwareUpdateProvider
 
 - (Controller::ClusterBase *)getCluster
 {
@@ -11887,8 +11887,8 @@ private:
 
 - (void)applyUpdateRequest:(NSData *)updateToken newVersion:(uint32_t)newVersion responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge * onSuccess
-        = new CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge * onSuccess
+        = new CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -11943,18 +11943,18 @@ private:
     }
 }
 - (void)queryImage:(uint16_t)vendorId
-             productId:(uint16_t)productId
-             imageType:(uint16_t)imageType
-       hardwareVersion:(uint16_t)hardwareVersion
-        currentVersion:(uint32_t)currentVersion
-    protocolsSupported:(uint8_t)protocolsSupported
-              location:(NSString *)location
-      clientCanConsent:(uint8_t)clientCanConsent
-     metadataForServer:(NSData *)metadataForServer
-       responseHandler:(ResponseHandler)responseHandler
+              productId:(uint16_t)productId
+              imageType:(uint16_t)imageType
+        hardwareVersion:(uint16_t)hardwareVersion
+         currentVersion:(uint32_t)currentVersion
+     protocolsSupported:(uint8_t)protocolsSupported
+               location:(NSString *)location
+    requestorCanConsent:(uint8_t)requestorCanConsent
+    metadataForProvider:(NSData *)metadataForProvider
+        responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge * onSuccess
-        = new CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge * onSuccess
+        = new CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -11973,7 +11973,7 @@ private:
             currentVersion, protocolsSupported,
             chip::ByteSpan((const uint8_t *) [location dataUsingEncoding:NSUTF8StringEncoding].bytes,
                 [location lengthOfBytesUsingEncoding:NSUTF8StringEncoding]),
-            clientCanConsent, chip::ByteSpan((const uint8_t *) metadataForServer.bytes, metadataForServer.length));
+            requestorCanConsent, chip::ByteSpan((const uint8_t *) metadataForProvider.bytes, metadataForProvider.length));
     });
 
     if (err != CHIP_NO_ERROR) {

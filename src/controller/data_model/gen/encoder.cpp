@@ -81,7 +81,7 @@ using namespace chip::Encoding::LittleEndian;
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
-| OtaSoftwareUpdateServer                                             | 0x0029 |
+| OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
@@ -277,7 +277,7 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID (0x08)
 #define ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID (0x04)
 
-#define OTA_SERVER_CLUSTER_ID 0x0029
+#define OTA_PROVIDER_CLUSTER_ID 0x0029
 #define ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID (0x01)
 #define ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID (0x02)
 #define ZCL_QUERY_IMAGE_COMMAND_ID (0x00)
@@ -2954,7 +2954,7 @@ PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
+| Cluster OtaSoftwareUpdateProvider                                   | 0x0029 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ApplyUpdateRequest                                                |   0x01 |
@@ -2965,9 +2965,9 @@ PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeOtaSoftwareUpdateProviderClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverOtaSoftwareUpdateServerAttributes", OTA_SERVER_CLUSTER_ID);
+    COMMAND_HEADER("DiscoverOtaSoftwareUpdateProviderAttributes", OTA_PROVIDER_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
@@ -2975,9 +2975,10 @@ PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_
 /*
  * Attribute ClusterRevision
  */
-PacketBufferHandle encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeOtaSoftwareUpdateProviderClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadOtaSoftwareUpdateServerClusterRevision", OTA_SERVER_CLUSTER_ID);
+    COMMAND_HEADER("ReadOtaSoftwareUpdateProviderClusterRevision", OTA_PROVIDER_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

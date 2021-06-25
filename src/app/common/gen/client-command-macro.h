@@ -3211,17 +3211,17 @@
  * @param protocolsSupported OTADownloadProtocol []
  * @param protocolsSupportedLen int
  * @param location CHAR_STRING
- * @param clientCanConsent BOOLEAN
- * @param metadataForServer OCTET_STRING
+ * @param requestorCanConsent BOOLEAN
+ * @param metadataForProvider OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,   \
-                                            protocolsSupportedLen, location, clientCanConsent, metadataForServer)                  \
+    Software Update ProviderClusterQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, \
+                                              protocolsSupportedLen, location, requestorCanConsent, metadataForProvider)           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuubuuu", vendorId, productId, imageType, hardwareVersion,        \
-                                  currentVersion, protocolsSupported, protocolsSupportedLen, location, clientCanConsent,           \
-                                  metadataForServer);
+                                  currentVersion, protocolsSupported, protocolsSupportedLen, location, requestorCanConsent,        \
+                                  metadataForProvider);
 
 /** @brief Command description for ApplyUpdateRequest
  *
@@ -3230,7 +3230,7 @@
  * @param newVersion INT32U
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterApplyUpdateRequest(updateToken, newVersion)                                                       \
+    Software Update ProviderClusterApplyUpdateRequest(updateToken, newVersion)                                                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID, "uu", updateToken, newVersion);
@@ -3242,7 +3242,7 @@
  * @param currentVersion INT32U
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterNotifyUpdateApplied(updateToken, currentVersion)                                                  \
+    Software Update ProviderClusterNotifyUpdateApplied(updateToken, currentVersion)                                                \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID, "uu", updateToken, currentVersion);
@@ -3256,15 +3256,15 @@
  * @param softwareVersion INT32U
  * @param updateToken OCTET_STRING
  * @param userConsentNeeded BOOLEAN
- * @param metadataForClient OCTET_STRING
+ * @param metadataForRequestor OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterQueryImageResponse(status, delayedActionTime, imageURI, softwareVersion, updateToken,             \
-                                                    userConsentNeeded, metadataForClient)                                          \
+    Software Update ProviderClusterQueryImageResponse(status, delayedActionTime, imageURI, softwareVersion, updateToken,           \
+                                                      userConsentNeeded, metadataForRequestor)                                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID, "uuuuuuu", status, delayedActionTime, imageURI,             \
-                                  softwareVersion, updateToken, userConsentNeeded, metadataForClient);
+                                  softwareVersion, updateToken, userConsentNeeded, metadataForRequestor);
 
 /** @brief Command description for ApplyUpdateRequestResponse
  *
@@ -3273,24 +3273,24 @@
  * @param delayedActionTime INT32U
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterApplyUpdateRequestResponse(action, delayedActionTime)                                             \
+    Software Update ProviderClusterApplyUpdateRequestResponse(action, delayedActionTime)                                           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_APPLY_UPDATE_REQUEST_RESPONSE_COMMAND_ID, "uu", action, delayedActionTime);
 
-/** @brief Command description for AnnounceOtaServer
+/** @brief Command description for AnnounceOtaProvider
  *
- * Command: AnnounceOtaServer
+ * Command: AnnounceOtaProvider
  * @param serverLocation OCTET_STRING
  * @param vendorId INT16U
  * @param announcementReason OTAAnnouncementReason
  * @param metadataForNode OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ClientClusterAnnounceOtaServer(serverLocation, vendorId, announcementReason, metadataForNode)                  \
+    Software Update RequestorClusterAnnounceOtaProvider(serverLocation, vendorId, announcementReason, metadataForNode)             \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ANNOUNCE_OTA_SERVER_COMMAND_ID, "uuuu", serverLocation, vendorId, announcementReason,        \
+                                  ZCL_ANNOUNCE_OTA_PROVIDER_COMMAND_ID, "uuuu", serverLocation, vendorId, announcementReason,      \
                                   metadataForNode);
 
 /** @brief Command description for ArmFailSafe

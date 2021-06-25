@@ -1204,10 +1204,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -1255,10 +1255,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [
@@ -7106,10 +7106,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -7157,10 +7157,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [
@@ -7200,16 +7200,16 @@
           ]
         },
         {
-          "name": "OTA Software Update Client",
+          "name": "OTA Software Update Requestor",
           "code": 42,
           "mfgCode": null,
-          "define": "OTA_CLIENT_CLUSTER",
+          "define": "OTA_REQUESTOR_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [],
           "attributes": [
             {
-              "name": "default ota server",
+              "name": "default ota provider",
               "code": 0,
               "mfgCode": null,
               "side": "client",
@@ -7256,10 +7256,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Client",
+          "name": "OTA Software Update Requestor",
           "code": 42,
           "mfgCode": null,
-          "define": "OTA_CLIENT_CLUSTER",
+          "define": "OTA_REQUESTOR_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [],

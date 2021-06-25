@@ -88,11 +88,11 @@ static constexpr chip::ClusterId ZCL_KEEPALIVE_CLUSTER_ID = 0x0025;
 // Definitions for cluster: Basic
 static constexpr chip::ClusterId ZCL_BASIC_CLUSTER_ID = 0x0028;
 
-// Definitions for cluster: OTA Software Update Server
-static constexpr chip::ClusterId ZCL_OTA_SERVER_CLUSTER_ID = 0x0029;
+// Definitions for cluster: OTA Software Update Provider
+static constexpr chip::ClusterId ZCL_OTA_PROVIDER_CLUSTER_ID = 0x0029;
 
-// Definitions for cluster: OTA Software Update Client
-static constexpr chip::ClusterId ZCL_OTA_CLIENT_CLUSTER_ID = 0x002A;
+// Definitions for cluster: OTA Software Update Requestor
+static constexpr chip::ClusterId ZCL_OTA_REQUESTOR_CLUSTER_ID = 0x002A;
 
 // Definitions for cluster: General Commissioning
 static constexpr chip::ClusterId ZCL_GENERAL_COMMISSIONING_CLUSTER_ID = 0x0030;

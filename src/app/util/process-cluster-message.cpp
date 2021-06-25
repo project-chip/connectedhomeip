@@ -83,14 +83,14 @@ bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd)
 
 #ifdef ZCL_USING_OTA_BOOTLOAD_CLUSTER_CLIENT
     if (cmd->apsFrame->clusterId == ZCL_OTA_BOOTLOAD_CLUSTER_ID && cmd->direction == ZCL_DIRECTION_SERVER_TO_CLIENT &&
-        emberAfOtaClientIncomingMessageRawCallback(cmd))
+        emberAfOtaRequestorIncomingMessageRawCallback(cmd))
     {
         return true;
     }
 #endif
 #ifdef ZCL_USING_OTA_BOOTLOAD_CLUSTER_SERVER
     if (cmd->apsFrame->clusterId == ZCL_OTA_BOOTLOAD_CLUSTER_ID && cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER &&
-        emberAfOtaServerIncomingMessageRawCallback(cmd))
+        emberAfOtaProviderIncomingMessageRawCallback(cmd))
     {
         return true;
     }

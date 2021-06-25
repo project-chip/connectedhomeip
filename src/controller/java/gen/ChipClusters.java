@@ -1745,8 +1745,8 @@ public class ChipClusters {
     }
   }
 
-  public static class OtaSoftwareUpdateServerCluster extends BaseChipCluster {
-    public OtaSoftwareUpdateServerCluster(long devicePtr, int endpointId) {
+  public static class OtaSoftwareUpdateProviderCluster extends BaseChipCluster {
+    public OtaSoftwareUpdateProviderCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -1772,8 +1772,8 @@ public class ChipClusters {
         long currentVersion,
         int protocolsSupported,
         String location,
-        int clientCanConsent,
-        byte[] metadataForServer) {
+        int requestorCanConsent,
+        byte[] metadataForProvider) {
       queryImage(
           chipClusterPtr,
           callback,
@@ -1784,8 +1784,8 @@ public class ChipClusters {
           currentVersion,
           protocolsSupported,
           location,
-          clientCanConsent,
-          metadataForServer);
+          requestorCanConsent,
+          metadataForProvider);
     }
 
     private native void applyUpdateRequest(
@@ -1810,8 +1810,8 @@ public class ChipClusters {
         long currentVersion,
         int protocolsSupported,
         String location,
-        int clientCanConsent,
-        byte[] metadataForServer);
+        int requestorCanConsent,
+        byte[] metadataForProvider);
 
     public interface ApplyUpdateRequestResponseCallback {
       void onSuccess(int action, long delayedActionTime);
@@ -1826,7 +1826,7 @@ public class ChipClusters {
           long softwareVersion,
           byte[] updateToken,
           int userConsentNeeded,
-          byte[] metadataForClient);
+          byte[] metadataForRequestor);
 
       void onError(Exception error);
     }
