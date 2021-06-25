@@ -29,11 +29,11 @@ namespace Platform {
 
 void GetMessageString(char * buf, uint8_t bufLen, const char * module, uint8_t category)
 {
-	int writtenLen = 0;
-	const char *categoryString;
+    int writtenLen = 0;
+    const char * categoryString;
 
     writtenLen = snprintf(buf, bufLen, "[%lu]", otPlatAlarmMilliGetNow());
-    assert ((writtenLen > 0) && (writtenLen < bufLen));
+    assert((writtenLen > 0) && (writtenLen < bufLen));
     bufLen -= writtenLen;
 
     if (category != kLogCategory_None)
@@ -54,12 +54,12 @@ void GetMessageString(char * buf, uint8_t bufLen, const char * module, uint8_t c
         }
 
         writtenLen = snprintf(buf + writtenLen, bufLen, "[%s]", categoryString);
-        assert ((writtenLen > 0) && (writtenLen < bufLen));
+        assert((writtenLen > 0) && (writtenLen < bufLen));
         bufLen -= writtenLen;
     }
 
     writtenLen = snprintf(buf + writtenLen, bufLen, "[%s]", module);
-    assert ((writtenLen > 0) && (writtenLen < bufLen));
+    assert((writtenLen > 0) && (writtenLen < bufLen));
 }
 
 } // namespace Platform
@@ -150,7 +150,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 extern "C" void LwIPLog(const char * msg, ...)
 {
     va_list v;
-    const char *module = "LWIP";
+    const char * module = "LWIP";
 
     va_start(v, msg);
     GenericLog(msg, v, module, chip::Logging::kLogCategory_None);
@@ -165,7 +165,7 @@ extern "C" void LwIPLog(const char * msg, ...)
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     va_list v;
-    const char *module = "OT";
+    const char * module = "OT";
 
     (void) aLogLevel;
     (void) aLogRegion;
