@@ -3008,7 +3008,8 @@ public:
                     [NSNumber numberWithUnsignedChar:entries[i].OffPremiseServicesReachableIPv4],
                     @"OffPremiseServicesReachableIPv4",
                     [NSNumber numberWithUnsignedChar:entries[i].OffPremiseServicesReachableIPv6],
-                    @"OffPremiseServicesReachableIPv6", [NSNumber numberWithUnsignedLongLong:entries[i].HardwareAddress],
+                    @"OffPremiseServicesReachableIPv6",
+                    [NSData dataWithBytes:entries[i].HardwareAddress.data() length:entries[i].HardwareAddress.size()],
                     @"HardwareAddress", [NSNumber numberWithUnsignedChar:entries[i].Type], @"Type", nil];
             }
 
