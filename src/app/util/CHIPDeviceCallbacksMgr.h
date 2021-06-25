@@ -30,6 +30,7 @@
 
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
+#include <core/CHIPConfig.h>
 #include <core/CHIPError.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
@@ -37,7 +38,11 @@
 namespace chip {
 namespace app {
 
+#ifndef CHIP_DEVICE_CALLBACK_MANAGER_TLV_FILTER_POOL_SIZE
 constexpr size_t kTLVFilterPoolSize = 32;
+#else
+constexpr size_t kTLVFilterPoolSize = CHIP_DEVICE_CALLBACK_MANAGER_TLV_FILTER_POOL_SIZE;
+#endif
 
 /**
  * The filter interface for processing data from TLV.

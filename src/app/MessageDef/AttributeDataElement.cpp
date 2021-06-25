@@ -328,7 +328,7 @@ CHIP_ERROR AttributeDataElement::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        // Either the data or the status code should exists.
+        // Either the data or the status code should exist.
         const uint16_t RequiredFieldSetSuccess = (1 << kCsTag_AttributePath) | (1 << kCsTag_Data) | (1 << kCsTag_DataVersion);
         const uint16_t RequiredFieldSetFailure = (1 << kCsTag_AttributePath) | (1 << kCsTag_Status);
         if (((TagPresenceMask & RequiredFieldSetSuccess) == RequiredFieldSetSuccess) ||

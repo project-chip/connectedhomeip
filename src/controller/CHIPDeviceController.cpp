@@ -450,7 +450,6 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
             device->Init(GetControllerDeviceInitParams(), mListenPort, mAdminId);
-            ReturnErrorOnFailure(device->LoadSecureSessionParametersIfNeeded());
         }
     }
 

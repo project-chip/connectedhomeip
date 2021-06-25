@@ -140,6 +140,9 @@ public:
                            std::move(message));
     }
 
+    CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
+                                        Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
+
     /**
      * @brief
      *   Send the command in internal command sender.

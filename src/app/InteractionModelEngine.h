@@ -227,8 +227,10 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
  * The apWriter and apDataExists can be nullptr.
  *
  *  @param[in]    aClusterInfo      The cluster info object, for the path of cluster data.
- *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr.
- *  @param[out]   apDataExists      Tell whether the cluster data exist on server. Can be a nullptr.
+ *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr if the caller does not care
+ *                                  the exact value of the attribute.
+ *  @param[out]   apDataExists      Tell whether the cluster data exist on server. Can be a nullptr if the caller does not care
+ *                                  whether the data exists.
  *
  *  @retval  CHIP_NO_ERROR on success
  */

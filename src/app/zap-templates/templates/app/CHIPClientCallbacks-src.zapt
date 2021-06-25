@@ -21,7 +21,7 @@ using namespace ::chip::app::List;
 
 constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
 
-#define CHECK_STATUS(error)                                                                                                        \
+#define CHECK_STATUS_WITH_RETVAL(error, retval) \
     if (CHIP_NO_ERROR != error)                                                                                                    \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_STATUS %s", ErrorStr(error));                                                                     \
@@ -31,23 +31,13 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
             cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
         }                                                                                                                          \
-        return true;                                                                                                               \
+        return retval;                                                                                                             \
     }
 
-#define CHECK_STATUS_VOID(error)                                                                                                        \
-    if (CHIP_NO_ERROR != error)                                                                                                    \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "CHECK_STATUS %s", ErrorStr(error));                                                                     \
-        if (onFailureCallback != nullptr)                                                                                          \
-        {                                                                                                                          \
-            Callback::Callback<DefaultFailureCallback> * cb =                                                                      \
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
-            cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
-        }                                                                                                                          \
-        return;                                                                                                               \
-    }
+#define CHECK_STATUS(error) CHECK_STATUS_WITH_RETVAL(error, true)
+#define CHECK_STATUS_VOID(error) CHECK_STATUS_WITH_RETVAL(error, )
 
-#define CHECK_MESSAGE_LENGTH(value)                                                                                                \
+#define CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, retval)                                                                                                \
     if (!chip::CanCastTo<uint16_t>(value))                                                                                         \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_MESSAGE_LENGTH expects a uint16_t value, got: %d", value);                                        \
@@ -57,7 +47,7 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
             cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
         }                                                                                                                          \
-        return true;                                                                                                               \
+        return retval;                                                                                                             \
     }                                                                                                                              \
                                                                                                                                    \
     if (messageLen < value)                                                                                                        \
@@ -69,37 +59,13 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
             cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
         }                                                                                                                          \
-        return true;                                                                                                               \
+        return retval;                                                                                                             \
     }                                                                                                                              \
                                                                                                                                    \
     messageLen = static_cast<uint16_t>(messageLen - static_cast<uint16_t>(value));
 
-#define CHECK_MESSAGE_LENGTH_VOID(value)                                                                                                \
-    if (!chip::CanCastTo<uint16_t>(value))                                                                                         \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "CHECK_MESSAGE_LENGTH expects a uint16_t value, got: %d", value);                                        \
-        if (onFailureCallback != nullptr)                                                                                          \
-        {                                                                                                                          \
-            Callback::Callback<DefaultFailureCallback> * cb =                                                                      \
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
-            cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
-        }                                                                                                                          \
-        return;                                                                                                               \
-    }                                                                                                                              \
-                                                                                                                                   \
-    if (messageLen < value)                                                                                                        \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "Unexpected response length: %d", messageLen);                                                           \
-        if (onFailureCallback != nullptr)                                                                                          \
-        {                                                                                                                          \
-            Callback::Callback<DefaultFailureCallback> * cb =                                                                      \
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
-            cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
-        }                                                                                                                          \
-        return;                                                                                                               \
-    }                                                                                                                              \
-                                                                                                                                   \
-    messageLen = static_cast<uint16_t>(messageLen - static_cast<uint16_t>(value));
+#define CHECK_MESSAGE_LENGTH(value) CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, true)
+#define CHECK_MESSAGE_LENGTH_VOID(value) CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, )
 
 #define GET_RESPONSE_CALLBACKS(name)                                                                                               \
     Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
@@ -266,7 +232,7 @@ void LogStatus(uint8_t status)
     }
 }
 
-void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
+static void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
 {
     switch (status)
     {
@@ -394,7 +360,7 @@ void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
         ChipLogProgress(Zcl, "  status: InvalidArgument        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
     default:
-        ChipLogError(Zcl, "Unknow status: 0x%04" PRIx16, Protocols::InteractionModel::ToUint16(status));
+        ChipLogError(Zcl, "Unknown status: 0x%04" PRIx16, Protocols::InteractionModel::ToUint16(status));
         break;
     }
 }
@@ -532,7 +498,6 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
         return true;
     }
 
-    // struct readAttributeResponseRecord[]
     uint16_t attributeId = aPath.mFieldId; // attribId
     ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
     LogIMStatus(status);
@@ -540,7 +505,7 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
     if (status == Protocols::InteractionModel::ProtocolCode::Success && apData != nullptr)
     {
         chip::TLV::TLVType attributeType = apData->GetType();
-        ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
+        ChipLogProgress(Zcl, "  attribute TLV Type: 0x%02x", attributeType);
         tlvFilter(apData, onSuccessCallback, onFailureCallback);
     }
     else
@@ -768,14 +733,14 @@ static EmberAfStatus PrepareListFromTLV(TLV::TLVReader * tlvData, const uint8_t 
     reader.Init(*tlvData);
     reader.EnterContainer(type);
     tlvError = reader.Next();
-    if (tlvError != CHIP_NO_ERROR && tlvError != CHIP_END_OF_TLV)
+    if (tlvError != CHIP_NO_ERROR && tlvError != CHIP_END_OF_TLV && chip::CanCastTo<uint16_t>(reader.GetLength()))
     {
         return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
     if (tlvError == CHIP_NO_ERROR)
     {
         tlvError   = reader.GetDataPtr(message);
-        messageLen = reader.GetLength();
+        messageLen = static_cast<uint16_t>(reader.GetLength());
     }
     if (tlvError != CHIP_NO_ERROR)
     {
@@ -811,7 +776,7 @@ void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAtt
         {{#chip_attribute_list_entryTypes}}
         {{#if (isString type)}}
         CHECK_STATUS_VOID(ReadByteSpan(message, {{size}}, &data[i].{{name}}));
-        messageLen -= {{size}};
+        messageLen = static_cast<uint16_t>(messageLen - {{size}});
         {{else}}
         CHECK_MESSAGE_LENGTH_VOID({{size}});
         data[i].{{name}} = emberAfGet{{asReadType type}}(message, 0, {{size}});
@@ -822,7 +787,7 @@ void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAtt
         {{#if (isString type)}}
         CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
         uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
-        messageLen -= entryLength;
+        messageLen = static_cast<uint16_t>(messageLen - entryLength);
         message += entryLength;
         {{else}}
         CHECK_MESSAGE_LENGTH_VOID({{size}});

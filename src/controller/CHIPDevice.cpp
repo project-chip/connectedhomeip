@@ -655,6 +655,30 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeI
     mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
 }
 
+CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
+                                            Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter)
+{
+    bool loadedSecureSession = false;
+    uint8_t seqNum           = GetNextSequenceNumber();
+    aPath.mNodeId            = GetDeviceId();
+
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback, aTlvDataFilter);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        GetDeviceId(), 0, nullptr /*event path params list*/, 0, &aPath, 1, 0 /* event number */, seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        CancelResponseHandler(seqNum);
+    }
+    return err;
+}
+
 Device::~Device()
 {
     if (mExchangeMgr)

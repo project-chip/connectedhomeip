@@ -150,7 +150,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    // NOTE: Disable CRMP temporary, should be enabled later.
+    // TODO (#7909): Disable CRMP temporary for duplicate ACK issues, should be enabled later.
     err = mpExchangeCtx->SendMessage(
         Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
         Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
@@ -345,8 +345,8 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         AttributeDataElement::Parser element;
         AttributePath::Parser attributePathParser;
         ClusterInfo clusterInfo;
-        uint16_t statusU16                               = 0;
-        Protocols::InteractionModel::ProtocolCode status = Protocols::InteractionModel::ProtocolCode::Success;
+        uint16_t statusU16 = 0;
+        auto status        = Protocols::InteractionModel::ProtocolCode::Success;
 
         TLV::TLVReader reader = aAttributeDataListReader;
         err                   = element.Init(reader);
@@ -390,7 +390,7 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         err = element.GetData(&dataReader);
         if (err == CHIP_END_OF_TLV)
         {
-            // The spec requires that one of data or status code must exists, thus failed to read data and status code means we
+            // The spec requires that one of data or status code must exist, thus failure to read data and status code means we
             // received malformed data from server.
             SuccessOrExit(err = element.GetStatus(&statusU16));
             status = static_cast<Protocols::InteractionModel::ProtocolCode>(statusU16);

@@ -67,12 +67,12 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseCallback(NodeId nodeId, uint8_t se
     CancelCallback(info, mResponsesFailure);
     PopResponseFilter(info, nullptr);
 
-    mResponsesSuccess.Enqueue(onSuccessCallback);
-    mResponsesFailure.Enqueue(onFailureCallback);
     if (filter != nullptr)
     {
         ReturnErrorOnFailure(AddResponseFilter(info, filter));
     }
+    mResponsesSuccess.Enqueue(onSuccessCallback);
+    mResponsesFailure.Enqueue(onFailureCallback);
     return CHIP_NO_ERROR;
 }
 
@@ -88,6 +88,7 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::CancelResponseCallback(NodeId nodeId, uint8_t
 CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter filter)
 {
     constexpr ResponseCallbackInfo kEmptyInfo{ kAnyNodeId, 0 };
+
     for (size_t i = 0; i < kTLVFilterPoolSize; i++)
     {
         if (mTLVFilterPool[i].info == kEmptyInfo)
@@ -97,6 +98,7 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseFilter(const ResponseCallbackInfo 
             return CHIP_NO_ERROR;
         }
     }
+
     return CHIP_ERROR_NO_MEMORY;
 }
 
@@ -115,6 +117,7 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::PopResponseFilter(const ResponseCallbackInfo 
             return CHIP_NO_ERROR;
         }
     }
+
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
@@ -130,18 +133,13 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::GetResponseCallback(NodeId nodeId, uint8_t se
     ReturnErrorOnFailure(GetCallback(info, mResponsesFailure, onFailureCallback));
     (*onFailureCallback)->Cancel();
 
-    TLVDataFilter filter;
-    CHIP_ERROR callbackFilterErr = CHIP_NO_ERROR;
-    if (CHIP_NO_ERROR == (callbackFilterErr = PopResponseFilter(info, &filter)))
+    if (outFilter == nullptr)
     {
-        if (outFilter != nullptr)
-        {
-            *outFilter = filter;
-        }
+        PopResponseFilter(info, nullptr);
     }
-    else if (outFilter != nullptr)
+    else
     {
-        return callbackFilterErr;
+        ReturnErrorOnFailure(PopResponseFilter(info, outFilter));
     }
 
     return CHIP_NO_ERROR;

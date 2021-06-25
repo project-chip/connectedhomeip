@@ -45,7 +45,9 @@ namespace chip {
 namespace app {
 namespace Compatibility {
 namespace {
-constexpr uint32_t kTemporatyDataVersion  = 0;
+constexpr uint32_t kTemporaryDataVersion = 0;
+// On some apps, ATTRIBUTE_LARGEST can as small as 3, making compiler unhappy since data[kAttributeReadBufferSize] cannot hold
+// uint64_t. Make kAttributeReadBufferSize at least 8 so it can fit all basic types.
 constexpr size_t kAttributeReadBufferSize = (ATTRIBUTE_LARGEST >= 8 ? ATTRIBUTE_LARGEST : 8);
 EmberAfClusterCommand imCompatibilityEmberAfCluster;
 EmberApsFrame imCompatibilityEmberApsFrame;
@@ -71,7 +73,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_ENUM16_ATTRIBUTE_TYPE:   // 16-bit enumeration
     case ZCL_BITMAP16_ATTRIBUTE_TYPE: // 16-bit bitmap
         static_assert(std::is_same<chip::GroupId, uint16_t>::value,
-                      "chip::GroupId is expected to be uint8_t, change this when necessary");
+                      "chip::GroupId is expected to be uint16_t, change this when necessary");
         return ZCL_INT16U_ATTRIBUTE_TYPE;
 
     case ZCL_BITMAP32_ATTRIBUTE_TYPE:       // 32-bit bitmap
@@ -167,17 +169,11 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
                   " ListIndex=%" PRIx16,
                   aClusterInfo.mClusterId, ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId, aClusterInfo.mFieldId,
                   aClusterInfo.mListIndex);
-    EmberAfAttributeType dataType;
 
-    EmberAfAttributeMetadata * metadata = NULL;
-    EmberAfAttributeSearchRecord record;
+    EmberAfAttributeType attributeType;
     EmberAfStatus status;
-    record.endpoint         = aClusterInfo.mEndpointId;
-    record.clusterId        = aClusterInfo.mClusterId;
-    record.clusterMask      = CLUSTER_MASK_SERVER;
-    record.attributeId      = aClusterInfo.mFieldId;
-    record.manufacturerCode = 0;
-    status                  = emAfReadOrWriteAttribute(&record, &metadata, data, sizeof(data), false); // write?
+    status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER,
+                                  data, sizeof(data), &attributeType);
 
     // TODO: Currently, all errors are considered as attribute not exists, should be fixed by mapping ember error code to IM error
     // codes.
@@ -194,8 +190,8 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
             Protocols::InteractionModel::ToUint16(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
     }
 
-    dataType = metadata->attributeType;
-    switch (BaseType(dataType))
+    // TODO: ZCL_STRUCT_ATTRIBUTE_TYPE is not included in this switch case currently, should add support for structures.
+    switch (BaseType(attributeType))
     {
     case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
         ReturnErrorOnFailure(apWriter->PutNull(TLV::ContextTag(AttributeDataElement::kCsTag_Data)));
@@ -259,6 +255,10 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     {
         uint8_t * actualData = data + 1;
         uint8_t dataLength   = data[0];
+        if (dataLength == 0xFF /* invalid data, put empty value instead */)
+        {
+            dataLength = 0;
+        }
         ReturnErrorOnFailure(
             apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::ByteSpan(actualData, dataLength)));
         break;
@@ -267,30 +267,33 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         uint8_t * actualData = data + 2; // The pascal string contains 2 bytes length
         uint16_t dataLength;
         memcpy(&dataLength, data, sizeof(dataLength));
+        if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
+        {
+            dataLength = 0;
+        }
         ReturnErrorOnFailure(
             apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::ByteSpan(actualData, dataLength)));
         break;
     }
     case ZCL_ARRAY_ATTRIBUTE_TYPE: {
-        // TODO: Add support to structures
         TLV::TLVType containerType;
         ReturnErrorOnFailure(
             apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_List, containerType));
         // TODO: Encode data in TLV, now raw buffers
-        ReturnErrorOnFailure(apWriter->PutBytes(
-            TLV::AnonymousTag, data,
-            emberAfAttributeValueSize(aClusterInfo.mClusterId, aClusterInfo.mFieldId, metadata->attributeType, data)));
+        ReturnErrorOnFailure(
+            apWriter->PutBytes(TLV::AnonymousTag, data,
+                               emberAfAttributeValueSize(aClusterInfo.mClusterId, aClusterInfo.mFieldId, attributeType, data)));
         ReturnErrorOnFailure(apWriter->EndContainer(containerType));
         break;
     }
     default:
-        ChipLogError(DataManagement, "Attribute type %d not handled", static_cast<int>(dataType));
+        ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
         return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
                              Protocols::InteractionModel::ToUint16(Protocols::InteractionModel::ProtocolCode::UnsupportedRead));
     }
 
     // TODO: Add DataVersion support
-    ReturnErrorOnFailure(apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), kTemporatyDataVersion));
+    ReturnErrorOnFailure(apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), kTemporaryDataVersion));
     return CHIP_NO_ERROR;
 }
 
