@@ -413,7 +413,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                                 {{#chip_attribute_list_entryTypes}}
                                 {{#if (isString type)}}
                                 CHECK_STATUS(ReadByteSpan(message, {{size}}, &data[i].{{name}}));
-                                messageLen -= {{size}};
+                                messageLen = static_cast<uint16_t>(messageLen - {{size}});
                                 {{else}}
                                 CHECK_MESSAGE_LENGTH({{size}});
                                 data[i].{{name}} = emberAfGet{{asReadType type}}(message, 0, {{size}});
@@ -424,7 +424,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                                 {{#if (isString type)}}
                                 CHECK_STATUS(ReadByteSpan(message, messageLen, &data[i]));
                                 uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
-                                messageLen -= entryLength;
+                                messageLen = static_cast<uint16_t>(messageLen - entryLength);
                                 message += entryLength;
                                 {{else}}
                                 CHECK_MESSAGE_LENGTH({{size}});

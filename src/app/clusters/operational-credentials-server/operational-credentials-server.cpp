@@ -108,7 +108,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Loop through admins
-    uint32_t fabricIndex = 0;
+    int32_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
     {
         NodeId nodeId               = pairing.GetNodeId();
