@@ -265,7 +265,8 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_
     }
     VerifyOrReturnError(context_len <= sizeof(hsm_pake_context.spake_context), CHIP_ERROR_INTERNAL);
     memset(hsm_pake_context.spake_context, 0, sizeof(hsm_pake_context.spake_context));
-    if (context_len > 0){
+    if (context_len > 0)
+    {
         memcpy(hsm_pake_context.spake_context, context, context_len);
     }
     hsm_pake_context.spake_context_len = context_len;

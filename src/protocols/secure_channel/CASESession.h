@@ -54,7 +54,6 @@ constexpr uint16_t kMaxTrustedRootIds          = 5;
 
 constexpr uint16_t kIPKSize = 32;
 
-
 #ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
 #define CASE_EPHEMERAL_KEY 0xCA5EECD0
 #endif
@@ -253,11 +252,11 @@ private:
 
     Hash_SHA256_stream mCommissioningHash;
     P256PublicKey mRemotePubKey;
-    #ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
     P256KeypairHSM mEphemeralKey;
-    #else
+#else
     P256Keypair mEphemeralKey;
-    #endif
+#endif
     P256ECDHDerivedSecret mSharedSecret;
     OperationalCredentialSet * mOpCredSet;
     CertificateKeyId mTrustedRootId;
