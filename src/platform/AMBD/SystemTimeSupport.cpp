@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,11 +62,9 @@ uint64_t GetClock_MonotonicHiRes(void)
 Error GetClock_RealTime(uint64_t & curTime)
 {
     time_t seconds;
-    //struct tm *timeinfo;
     struct rtkTimeVal tv;
 
     seconds = rtc_read();
-    //timeinfo = localtime(&seconds);
 
     tv.tv_sec = (uint32_t)seconds;
     tv.tv_usec = 0;
@@ -84,11 +81,9 @@ Error GetClock_RealTime(uint64_t & curTime)
 Error GetClock_RealTimeMS(uint64_t & curTime)
 {
     time_t seconds;
-    //struct tm *timeinfo;
     struct rtkTimeVal tv;
 
     seconds = rtc_read();
-    //timeinfo = localtime(&seconds);
 
     tv.tv_sec = (uint32_t)seconds;
     tv.tv_usec = 0;

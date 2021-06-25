@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +27,6 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/util/basic-types.h>
-//#include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -61,36 +61,14 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    // switch (static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE))
-    // {
-    // case RendezvousInformationFlags::kBLE:
-    //     ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-    //     break;
-
-    // case RendezvousInformationFlags::kWiFi:
-    //     ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-    //     ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
-    //     break;
-
-    // case RendezvousInformationFlags::kNone:
-    //     // If rendezvous is bypassed, enable SoftAP so that the device can still
-    //     // be communicated with via its SoftAP as needed.
-    //     ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
-    //     break;
-
-    // default:
-    //     break;
-    // }
-
     err = Platform::MemoryInit();
-
     SuccessOrExit(err);
 
-    // // Register a function to receive events from the CHIP device layer.  Note that calls to
-    // // this function will happen on the CHIP event loop thread, not the app_main thread.
+    // Register a function to receive events from the CHIP device layer.  Note that calls to
+    // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
-    // // Start a task to run the CHIP Device event loop.
+    // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
@@ -100,8 +78,6 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     {
         printf("StartEventLoopTask() - OK\r\n");
     }
-
-    // SuccessOrExit(err);
 
  exit:
      return err;

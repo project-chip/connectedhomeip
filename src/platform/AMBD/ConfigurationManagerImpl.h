@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +26,6 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-
 #include <platform/AMBD/AMBDConfig.h>
 
 namespace chip {

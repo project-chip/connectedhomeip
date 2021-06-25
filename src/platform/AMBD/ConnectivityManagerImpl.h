@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,9 +41,6 @@ class IPAddress;
 namespace chip {
 namespace DeviceLayer {
 
-/**
- * Concrete implementation of the ConnectivityManager singleton object for Qorvo QPG6100 platforms.
- */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

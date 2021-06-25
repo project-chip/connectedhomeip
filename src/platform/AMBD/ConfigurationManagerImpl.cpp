@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -82,73 +81,21 @@ void ConfigurationManagerImpl::_InitiateFactoryReset()
 CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                 uint32_t & value)
 {
-#if 0
-    CHIP_ERROR err;
-    uintmax_t recordKey = persistedStorageKey + kConfigKey_GroupKeyBase;
-
-    VerifyOrExit(recordKey <= kConfigKey_GroupKeyMax, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-
-    err = ReadConfigValue(persistedStorageKey, value);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    }
-    SuccessOrExit(err);
-
-exit:
-    return err;
-#else
+    //TODO
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 
 CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                  uint32_t value)
 {
-#if 0
-    CHIP_ERROR err;
-
-    uintmax_t recordKey = persistedStorageKey + kConfigKey_GroupKeyBase;
-
-    VerifyOrExit(recordKey <= kConfigKey_GroupKeyMax, err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-
-    err = WriteConfigValue(persistedStorageKey, value);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-#else
+    //TODO
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-#if 0
-    CHIP_ERROR err;
-
-    ChipLogProgress(DeviceLayer, "Performing factory reset");
-
-    err = FactoryResetConfig();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
-    }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
-    ThreadStackMgr().ErasePersistentInfo();
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-    // Restart the system.
+    //TODO
     ChipLogProgress(DeviceLayer, "System restarting");
-    // NVIC_SystemReset(); - FIXME
-#else
-	ChipLogProgress(DeviceLayer, "System restarting");
-    //return CHIP_NO_ERROR;
-#endif
 }
 
 } // namespace DeviceLayer

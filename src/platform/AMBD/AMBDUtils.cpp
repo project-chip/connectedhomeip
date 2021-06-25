@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,19 +22,10 @@
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include <platform/AMBD/AMBDUtils.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
-
-//#include "wifi_conf.h"
-//#include "wlan_intf.h"
-//#include "wifi_constants.h"
-//#include "lwip_netconf.h"
-//#include <wifi/wifi_conf.h>
-//#include <wifi/wifi_util.h>
-//#include <device_lock.h>
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
