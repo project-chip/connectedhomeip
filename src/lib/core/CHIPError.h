@@ -32,6 +32,9 @@
 #pragma once
 
 #include <core/CHIPConfig.h>
+
+#include <stdint.h>
+
 // clang-format off
 
 /**
