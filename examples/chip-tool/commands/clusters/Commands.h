@@ -828,7 +828,7 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(void * co
         ChipLogProgress(chipTool, "  FabricConnected: %" PRIu8 "", entries[i].FabricConnected);
         ChipLogProgress(chipTool, "  OffPremiseServicesReachableIPv4: %" PRIu8 "", entries[i].OffPremiseServicesReachableIPv4);
         ChipLogProgress(chipTool, "  OffPremiseServicesReachableIPv6: %" PRIu8 "", entries[i].OffPremiseServicesReachableIPv6);
-        ChipLogProgress(chipTool, "  HardwareAddress: %" PRIu64 "", entries[i].HardwareAddress);
+        ChipLogProgress(Zcl, "  HardwareAddress: %zu", entries[i].HardwareAddress.size());
         ChipLogProgress(chipTool, "  Type: %" PRIu8 "", entries[i].Type);
     }
 
