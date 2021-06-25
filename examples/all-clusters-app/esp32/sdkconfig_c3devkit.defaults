@@ -16,11 +16,11 @@
 #    limitations under the License.
 #
 #    Description:
-#      CI uses this to select the ESP32-DevKitC.
+#      CI uses this to select the ESP32C3-DevKitM.
 #
-CONFIG_IDF_TARGET="esp32"
-CONFIG_IDF_TARGET_ESP32=y
-CONFIG_DEVICE_TYPE_ESP32_DEVKITC=y
+CONFIG_IDF_TARGET="esp32c3"
+CONFIG_IDF_TARGET_ESP32C3=y
+CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM=y
 
 # Default to 921600 baud when flashing and monitoring device
 CONFIG_ESPTOOLPY_BAUD_921600B=y
