@@ -390,7 +390,8 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
-    if (connectionState == nullptr) {
+    if (connectionState == nullptr)
+    {
         // Nothing needs to be done here.  It's not an error to not have a
         // connectionState.  For one thing, we could have gotten an different
         // UpdateAddress already and that caused connections to be torn down and
