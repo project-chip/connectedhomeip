@@ -14,15 +14,15 @@ control.
 
 ---
 
-
 ## Supported Device
 
-The CHIP demo application is supported on [Ameba-D](https://www.amebaiot.com/en/amebad).
-
+The CHIP demo application is supported on
+[Ameba-D](https://www.amebaiot.com/en/amebad).
 
 ## Building the Example Application
 
-Building the example application requires the use of [Ameba-D SDK](https://github.com/hank820/ambd_sdk_with_chip_non_NDA).
+Building the example application requires the use of
+[Ameba-D SDK](https://github.com/hank820/ambd_sdk_with_chip_non_NDA).
 
 -   To download and setup building environment
 
@@ -34,28 +34,33 @@ Building the example application requires the use of [Ameba-D SDK](https://githu
 
           $ cd ${path-to-connectedhomeip}/examples/all-clusters-app/ambd
           $ ./build.sh
-    
-       The output image files are stored in `project_lp/asdk/image` and `project_hp/asdk/image` folders under Ameba-D SDK.
-          
--   After building the application, **Ameba-D Image Tool** is used to flash it to Ameba-D board.
-  1.  Connect your device via USB and open Ameba-D Image Tool.
-  2.  Select correct serial port and set baudrate as **115200**.
-  3.  Browse and add the corresponding image files in the Flash Download list to the correct locations
-  4.  Click **Download** button.
 
+    The output image files are stored in `project_lp/asdk/image` and
+    `project_hp/asdk/image` folders under Ameba-D SDK.
+
+-   After building the application, **Ameba-D Image Tool** is used to flash it
+    to Ameba-D board.
+
+1.  Connect your device via USB and open Ameba-D Image Tool.
+2.  Select correct serial port and set baudrate as **115200**.
+3.  Browse and add the corresponding image files in the Flash Download list to
+    the correct locations
+4.  Click **Download** button.
 
 ## Commissioning and Cluster Control
 
 ### Commissioning
+
 The commissioning is carried out via WiFi.
 
-  1.  After download all-cluster example to Ameba-D board, boot up the board by pressing the reset button.
-  2.  Use ATW commands to setup network.
-  3.  Use ATS$ command to run all-cluster example.
-  4.  Use
+1.  After download all-cluster example to Ameba-D board, boot up the board by
+    pressing the reset button.
+2.  Use ATW commands to setup network.
+3.  Use ATS\$ command to run all-cluster example.
+4.  Use
     [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
     to communicate with the device.
-    
+
           $ ./chip-tool pairing bypass 192.168.xx.xxx 11097
 
 ### Cluster Control
