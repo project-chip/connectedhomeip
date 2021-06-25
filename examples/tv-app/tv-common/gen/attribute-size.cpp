@@ -241,7 +241,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         {
         case 0x0000: // NetworkInterfaces
         {
-            entryLength = 46;
+            entryLength = 48;
             if (((index - 1) * entryLength) > (am->size - entryLength))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -266,8 +266,15 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv6,
                            write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv6 : src, write, &entryOffset,
                            sizeof(entry->OffPremiseServicesReachableIPv6)); // BOOLEAN
-            copyListMember(write ? dest : (uint8_t *) &entry->HardwareAddress, write ? (uint8_t *) &entry->HardwareAddress : src,
-                           write, &entryOffset, sizeof(entry->HardwareAddress)); // IEEE_ADDRESS
+            chip::ByteSpan * HardwareAddressSpan = &entry->HardwareAddress; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 10, HardwareAddressSpan)
+                       : ReadByteSpan(src + entryOffset, 10, HardwareAddressSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 10);
             copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
                            sizeof(entry->Type)); // ENUM8
             break;
@@ -723,7 +730,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         {
         case 0x0000: // NetworkInterfaces
             // Struct _NetworkInterfaceType
-            entryLength = 46;
+            entryLength = 48;
             break;
         }
         break;
