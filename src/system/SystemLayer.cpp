@@ -1120,7 +1120,7 @@ exit:
  *
  *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
  *
- *  @retval   # CHIP_ERROR_INVALID_ARGUMENT     If aLayer or aContext is NULL.
+ *  @retval   #CHIP_ERROR_INVALID_ARGUMENT      If aLayer or aContext is NULL.
  *  @retval   #CHIP_ERROR_INCORRECT_STATE       If the state of the CHIP System Layer object is unexpected.
  *  @retval   #CHIP_ERROR_UNEXPECTED_EVENT      If an event type is unrecognized.
  *  @retval   #CHIP_NO_ERROR                    On success.
@@ -1169,7 +1169,7 @@ exit:
  *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
  *  @param[in]     aEvent    The platform-specific event object to dispatch for handling.
  *
- *  @retval   # CHIP_ERROR_INVALID_ARGUMENT     If aLayer or the event target is NULL.
+ *  @retval   #CHIP_ERROR_INVALID_ARGUMENT      If aLayer or the event target is NULL.
  *  @retval   #CHIP_ERROR_UNEXPECTED_EVENT      If the event type is unrecognized.
  *  @retval   #CHIP_ERROR_INCORRECT_STATE       If the state of the CHIP System Layer object is unexpected.
  *  @retval   #CHIP_NO_ERROR                    On success.

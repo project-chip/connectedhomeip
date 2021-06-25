@@ -43,7 +43,7 @@
  *    This defines a mapping function for InetLayer errors that allows
  *    mapping such errors into a platform- or system-specific
  *    range. This function may be configured via
- *    #_INET_CONFIG_ERROR(e).
+ *    #INET_CONFIG_ERROR(e).
  *
  *  @param[in]  e  The InetLayer error to map.
  *
