@@ -21,7 +21,10 @@
 #
 # This file can also be used as an executable
 
-CURR_PATH=`test -d "${0%/*}" && cd "${0%/*}"; pwd`
+CURR_PATH=$(
+    test -d "${0%/*}" && cd "${0%/*}"
+    pwd
+)
 CHIP_PATH=$CURR_PATH/../../..
 AMBD_PATH=$CHIP_PATH/../..
 AMBD_LP_PATH=$AMBD_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
@@ -29,7 +32,7 @@ AMBD_HP_PATH=$AMBD_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/project_h
 AMBD_CHIP_MAIN=$AMBD_HP_PATH/asdk/make/chip_main
 
 if test -f "$AMBD_CHIP_MAIN/Makefile"; then
-	rm "$AMBD_CHIP_MAIN"/Makefile
+    rm "$AMBD_CHIP_MAIN"/Makefile
 fi
 cp -p "$CURR_PATH"/main/Makefile "$AMBD_CHIP_MAIN"/Makefile
 
