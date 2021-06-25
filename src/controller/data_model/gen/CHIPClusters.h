@@ -992,8 +992,7 @@ public:
 
     // Cluster Commands
     CHIP_ERROR AddOpCert(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                         chip::ByteSpan operationalCert, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
-                         uint16_t adminVendorId);
+                         chip::ByteSpan nOCArray, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
     CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan rootCertificate);
     CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
