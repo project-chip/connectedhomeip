@@ -855,8 +855,8 @@ bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, con
             entry.hasOccupiedCoolingSetpointValue = true;
             entry.occupiedCoolingSetpointValue =
                 (int16_t) emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-            extensionFieldSetsIndex += 2;
-            length -= 2;
+            extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+            length                  = static_cast<uint8_t>(length - 2);
             if (length < 2)
             {
                 break;
@@ -864,8 +864,8 @@ bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, con
             entry.hasOccupiedHeatingSetpointValue = true;
             entry.occupiedHeatingSetpointValue =
                 (int16_t) emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-            extensionFieldSetsIndex += 2;
-            length -= 2;
+            extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+            length                  = static_cast<uint8_t>(length - 2);
             if (length < 1)
             {
                 break;

@@ -457,7 +457,7 @@ void AppTask::UpdateClusterState(void)
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx32, status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx8, status);
     }
 
     newValue = LightingMgr().GetLevel();
@@ -466,6 +466,6 @@ void AppTask::UpdateClusterState(void)
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating level %" PRIx32, status);
+        ChipLogError(NotSpecified, "ERR: updating level %" PRIx8, status);
     }
 }
