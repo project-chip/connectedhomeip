@@ -23,7 +23,6 @@ following features are available:
 
 -   [CHIP ESP32 Pigweed Example Application](#chip-esp32-pigweed-example-application)
     -   [Building the Example Application](#building-the-example-application)
-        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
     -   [Testing the Example Application](#testing-the-example-application)
 
 ---
@@ -36,22 +35,20 @@ Development Framework and the xtensa-esp32-elf toolchain.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
+-   Clone the Espressif ESP-IDF and checkout
+    [v4.3 tag](https://github.com/espressif/esp-idf/releases/v4.3)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.2
+          $ git checkout v4.3
           $ git submodule update --init
-          $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
 
 -   Install ninja-build
 
           $ sudo apt-get install ninja-build
-
-### To build the application, follow these steps:
 
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
@@ -64,22 +61,19 @@ To download and install packages.
         $ ./install.sh
         $ . ./export.sh
         $ cd {path-to-connectedhomeip}
+
+    To download and install packages.
+
         $ source ./scripts/bootstrap.sh
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
 
-If packages are already installed then simply activate it.
+    If packages are already installed then simply activate them.
 
-        $ cd ${HOME}/tools/esp-idf
-        $ ./install.sh
-        $ . ./export.sh
-        $ cd {path-to-connectedhomeip}
         $ source ./scripts/activate.sh
-        $ cd {path-to-connectedhomeip-examples}
 
 -   Configuration Options
 
-        To choose from the different configuration options, run menuconfig
+        To choose from the different configuration options, run menuconfig.
 
           $ idf.py menuconfig
 
@@ -101,7 +95,7 @@ If packages are already installed then simply activate it.
     before flashing. For ESP32-DevKitC devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
-          $ idf.py build flash ESPPORT=/dev/tty.SLAB_USBtoUART
+          $ idf.py -p /dev/tty.SLAB_USBtoUART build flash
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)

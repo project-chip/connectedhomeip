@@ -93,7 +93,7 @@ limitations under the License.
         <server tick="false" init="false">true</server>
         <attribute side="client" code="0" define="DEFAULT_OTA_SERVER" type="OCTET_STRING" length="16" writable="true" optional="false" default="0">default ota server</attribute>
         <attribute side="client" code="1" define="UPDATE_POSSIBLE" type="BOOLEAN" length="32" writable="false" optional="false" default="true">update possible</attribute>
-        <command source="server" code="0" name="AnnounceOtaServer" optional="true" cli="chip ota announceotaserver">
+        <command source="client" code="0" name="AnnounceOtaServer" optional="true" cli="chip ota announceotaserver">
             <description>Notify OTA Server that an update was applied</description>
             <arg name="serverLocation" type="OCTET_STRING" length="16"/>
             <arg name="vendorId" type="INT16U"/>

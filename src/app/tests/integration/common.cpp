@@ -30,8 +30,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 
-// The ExchangeManager global object.
 chip::Messaging::ExchangeManager gExchangeManager;
+chip::SecureSessionMgr gSessionManager;
+chip::secure_channel::MessageCounterManager gMessageCounterManager;
 
 void InitializeChip(void)
 {
@@ -57,8 +58,11 @@ exit:
 
 void ShutdownChip(void)
 {
-    gExchangeManager.Shutdown();
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     chip::DeviceLayer::PlatformMgr().Shutdown();
+    gMessageCounterManager.Shutdown();
+    gExchangeManager.Shutdown();
+    gSessionManager.Shutdown();
 }
 
 void TLVPrettyPrinter(const char * aFormat, ...)

@@ -38,21 +38,25 @@ public:
     ExchangeMessageDispatch() {}
     virtual ~ExchangeMessageDispatch() {}
 
-    CHIP_ERROR Init(ReliableMessageMgr * reliableMessageMgr)
-    {
-        mReliableMessageMgr = reliableMessageMgr;
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle && message);
 
-    virtual CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
-                                     EncryptedPacketBufferHandle * retainedMessage) const
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    /**
+     * @brief
+     *   This interface takes the payload and returns the prepared message which can be send multiple times.
+     *
+     * @param session         Peer node to which the payload to be sent
+     * @param payloadHeader   The payloadHeader to be encoded into the packet
+     * @param message         The payload to be sent
+     * @param preparedMessage The handle to hold the prepared message
+     */
+    virtual CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                      System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage) = 0;
+    virtual CHIP_ERROR SendPreparedMessage(SecureSessionHandle session,
+                                           const EncryptedPacketBufferHandle & preparedMessage) const                       = 0;
 
     virtual CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                          const Transport::PeerAddress & peerAddress,
@@ -60,14 +64,7 @@ public:
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;
-
-    virtual CHIP_ERROR SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
-                                       System::PacketBufferHandle && message, EncryptedPacketBufferHandle * retainedMessage) = 0;
-
-    virtual bool IsReliableTransmissionAllowed() { return true; }
-
-private:
-    ReliableMessageMgr * mReliableMessageMgr = nullptr;
+    virtual bool IsReliableTransmissionAllowed() const { return true; }
 };
 
 } // namespace Messaging

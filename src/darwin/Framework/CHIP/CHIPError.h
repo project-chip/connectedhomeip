@@ -33,6 +33,7 @@ typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode) {
     CHIPErrorCodeWrongAddressType = 7,
     CHIPErrorCodeIntegrityCheckFailed = 8,
     CHIPErrorCodeDuplicateExists = 9,
+    CHIPErrorCodeUnsupportedAttribute = 10,
 };
 
 @interface CHIPError : NSObject

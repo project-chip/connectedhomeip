@@ -28,21 +28,23 @@ namespace chip {
 
 using namespace Messaging;
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
-                                                                 System::PacketBufferHandle && message,
-                                                                 EncryptedPacketBufferHandle * retainedMessage)
+CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                                                System::PacketBufferHandle && message,
+                                                                EncryptedPacketBufferHandle & preparedMessage)
 {
     PacketHeader packetHeader;
-
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
 
-    if (mTransportMgr != nullptr)
-    {
-        return mTransportMgr->SendMessage(mPeerAddress, std::move(message));
-    }
+    preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
+    return CHIP_NO_ERROR;
+}
 
-    return CHIP_ERROR_INCORRECT_STATE;
+CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SecureSessionHandle session,
+                                                                     const EncryptedPacketBufferHandle & preparedMessage) const
+{
+    ReturnErrorCodeIf(mTransportMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mTransportMgr->SendMessage(mPeerAddress, preparedMessage.CastToWritable());
 }
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
@@ -60,6 +62,7 @@ bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, u
     case Protocols::SecureChannel::Id.GetProtocolId():
         switch (type)
         {
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PBKDFParamRequest):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PBKDFParamResponse):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Spake2p1):

@@ -25,6 +25,7 @@
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
 #include <support/Span.h>
@@ -34,14 +35,13 @@ namespace chip {
 namespace Transport {
 
 typedef uint16_t AdminId;
-static constexpr AdminId kUndefinedAdminId = UINT16_MAX;
+static constexpr AdminId kUndefinedAdminId            = UINT16_MAX;
+static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying
 // platform. Keeping them short.
 constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
 constexpr char kAdminTableCountKey[]  = "CHIPAdminNextId";
-
-constexpr uint16_t kMaxChipCertSize = 600;
 
 struct AccessControlList
 {
@@ -65,6 +65,12 @@ class DLL_EXPORT AdminPairingInfo
 {
 public:
     AdminPairingInfo() { Reset(); }
+
+    // Returns a pointer to a null terminated char array
+    const uint8_t * GetFabricLabel() const { return Uint8::from_const_char(mFabricLabel); };
+
+    // Expects a pointer to a null terminated char array
+    CHIP_ERROR SetFabricLabel(const uint8_t * fabricLabel);
 
     ~AdminPairingInfo()
     {
@@ -129,10 +135,11 @@ public:
      */
     void Reset()
     {
-        mNodeId   = kUndefinedNodeId;
-        mAdmin    = kUndefinedAdminId;
-        mFabricId = kUndefinedFabricId;
-        mVendorId = kUndefinedVendorId;
+        mNodeId         = kUndefinedNodeId;
+        mAdmin          = kUndefinedAdminId;
+        mFabricId       = kUndefinedFabricId;
+        mVendorId       = kUndefinedVendorId;
+        mFabricLabel[0] = '\0';
 
         if (mOperationalKey != nullptr)
         {
@@ -145,10 +152,11 @@ public:
     friend class AdminPairingTable;
 
 private:
-    NodeId mNodeId     = kUndefinedNodeId;
-    FabricId mFabricId = kUndefinedFabricId;
-    AdminId mAdmin     = kUndefinedAdminId;
-    uint16_t mVendorId = kUndefinedVendorId;
+    NodeId mNodeId                                      = kUndefinedNodeId;
+    FabricId mFabricId                                  = kUndefinedFabricId;
+    AdminId mAdmin                                      = kUndefinedAdminId;
+    uint16_t mVendorId                                  = kUndefinedVendorId;
+    char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
     AccessControlList mACL;
 
@@ -183,8 +191,10 @@ private:
         uint16_t mOpCertLen;   /* This field is serialized in LittleEndian byte order */
 
         Crypto::P256SerializedKeypair mOperationalKey;
-        uint8_t mRootCert[kMaxChipCertSize];
-        uint8_t mOperationalCert[kMaxChipCertSize];
+        uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
+        // The operationa credentials set can have up to two certs -> ICAC and NOC
+        uint8_t mOperationalCert[Credentials::kMaxCHIPCertLength * 2];
+        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
     };
 };
 

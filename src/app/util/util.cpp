@@ -133,9 +133,6 @@ uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0,
 };
 
-#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
-void emberAfPluginTemperatureMeasurementServerInitCallback(void);
-#endif
 #ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
 void emberAfPluginBarrierControlServerInitCallback(void);
 #endif
@@ -303,9 +300,6 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
     // Initialize the reporting plugin
     emberAfPluginReportingInitCallback();
 
-#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
-    emberAfPluginTemperatureMeasurementServerInitCallback();
-#endif
 #ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
     emberAfPluginBarrierControlServerInitCallback();
 #endif
@@ -755,7 +749,7 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
     else if (!isBroadcastDestination(emberAfResponseDestination))
     {
         label  = 'U';
-        status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_VIA_EXCHANGE, MessageSendDestination(emberAfResponseDestination),
+        status = emberAfSendUnicastWithCallback(MessageSendDestination::ViaExchange(emberAfResponseDestination),
                                                 &emberAfResponseApsFrame, appResponseLength, appResponseData, callback);
     }
     else

@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>Target Navigator</name>
     <code>0x0505</code>
     <define>TARGET_NAVIGATOR_CLUSTER</define>
@@ -40,7 +40,7 @@ limitations under the License.
       <arg name="data" type="CHAR_STRING"/>
     </command>
   </cluster>
-  
+
   <enum name="NavigateTargetStatus" type="ENUM8">
       <item name="Success" value="0x00"/>
       <item name="AppNotAvailable" value="0x01"/>
@@ -49,6 +49,6 @@ limitations under the License.
 
   <struct name="NavigateTargetTargetInfo">
       <item name="identifier" type="INT8U"/>
-      <item name="name" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
+      <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
   </struct>
 </configurator>

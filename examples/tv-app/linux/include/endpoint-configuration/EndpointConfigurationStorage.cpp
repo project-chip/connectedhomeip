@@ -19,7 +19,7 @@
 #include <fstream>
 #include <support/CodeUtils.h>
 
-constexpr const char kEndpointConfigurationPath[] = "include/endpoint-configuration/config.ini";
+constexpr const char kEndpointConfigurationPath[] = "/tmp/chip_tv_config.ini";
 
 CHIP_ERROR EndpointConfigurationStorage::Init()
 {

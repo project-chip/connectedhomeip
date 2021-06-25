@@ -21,6 +21,7 @@
 
 #include <cstdio>
 #include <inttypes.h>
+#include <string.h>
 
 namespace chip {
 namespace Mdns {
@@ -156,6 +157,13 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         }
         requiredSize = snprintf(buffer, bufferLen, "_C%u", subtype.code);
         break;
+    case DiscoveryFilterType::kCommissioner:
+        if (subtype.code > 1)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        requiredSize = snprintf(buffer, bufferLen, "_D%u", subtype.code);
+        break;
     case DiscoveryFilterType::kCommissioningModeFromCommand:
         // 1 is the only valid value
         if (subtype.code != 1)
@@ -169,6 +177,24 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         buffer[0]    = '\0';
         break;
     }
+    return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+}
+
+CHIP_ERROR MakeCommissionableNodeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc)
+{
+    size_t requiredSize;
+    if (nameDesc.type == DiscoveryFilterType::kNone)
+    {
+        requiredSize = snprintf(buffer, bufferLen, "_chipc");
+    }
+    else
+    {
+        ReturnErrorOnFailure(MakeServiceSubtype(buffer, bufferLen, nameDesc));
+        size_t subtypeLen = strlen(buffer);
+        requiredSize =
+            snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionableServiceName);
+    }
+
     return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 

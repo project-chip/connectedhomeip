@@ -34,13 +34,13 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PairingSession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
-#include <transport/SessionEstablishmentDelegate.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -179,14 +179,18 @@ public:
     SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
 
     //// ExchangeDelegate Implementation ////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
     {
         return &mMessageDispatch;
     }
+
+    /** @brief This function zeroes out and resets the memory used by the object.
+     **/
+    void Clear();
 
 private:
     enum SigmaErrorType : uint8_t
@@ -224,12 +228,16 @@ private:
     CHIP_ERROR ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen);
 
     void SendErrorMsg(SigmaErrorType errorCode);
-    void HandleErrorMsg(const System::PacketBufferHandle & msg);
+
+    // This function always returns an error. The error value corresponds to the error in the received message.
+    // The returned error value helps top level message receiver/dispatcher to close the exchange context
+    // in a more seamless manner.
+    CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
+
+    void CloseExchange();
 
     // TODO: Remove this and replace with system method to retrieve current time
     CHIP_ERROR SetEffectiveTime(void);
-
-    void Clear();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg);

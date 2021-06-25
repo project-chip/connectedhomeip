@@ -96,8 +96,8 @@ template <typename... Ts>
 struct Variant
 {
 private:
-    static constexpr std::size_t kDataSize    = std::max(sizeof(Ts)...);
-    static constexpr std::size_t kDataAlign   = std::max(alignof(Ts)...);
+    static constexpr std::size_t kDataSize    = std::max({ sizeof(Ts)... });
+    static constexpr std::size_t kDataAlign   = std::max({ alignof(Ts)... });
     static constexpr std::size_t kInvalidType = SIZE_MAX;
 
     using Data  = typename std::aligned_storage<kDataSize, kDataAlign>::type;
@@ -118,7 +118,7 @@ public:
         that.mTypeId = kInvalidType;
     }
 
-    Variant<Ts...> & operator=(Variant<Ts...> & that)
+    Variant<Ts...> & operator=(const Variant<Ts...> & that)
     {
         Curry::Destroy(mTypeId, &mData);
         mTypeId = that.mTypeId;
@@ -137,12 +137,14 @@ public:
     }
 
     template <typename T>
-    bool Is()
+    bool Is() const
     {
         return (mTypeId == T::VariantId);
     }
 
-    bool Valid() { return (mTypeId != kInvalidType); }
+    std::size_t GetType() const { return mTypeId; }
+
+    bool Valid() const { return (mTypeId != kInvalidType); }
 
     template <typename T, typename... Args>
     void Set(Args &&... args)
@@ -155,29 +157,15 @@ public:
     template <typename T>
     T & Get()
     {
-        if (mTypeId == T::VariantId)
-        {
-            return *reinterpret_cast<T *>(&mData);
-        }
-        else
-        {
-            assert(false);
-            return *static_cast<T *>(nullptr);
-        }
+        VerifyOrDie(mTypeId == T::VariantId);
+        return *reinterpret_cast<T *>(&mData);
     }
 
     template <typename T>
     const T & Get() const
     {
-        if (mTypeId == T::VariantId)
-        {
-            return *reinterpret_cast<const T *>(&mData);
-        }
-        else
-        {
-            assert(false);
-            return *static_cast<const T *>(nullptr);
-        }
+        VerifyOrDie(mTypeId == T::VariantId);
+        return *reinterpret_cast<const T *>(&mData);
     }
 
     ~Variant() { Curry::Destroy(mTypeId, &mData); }

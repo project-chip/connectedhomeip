@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,11 +24,11 @@
 
 #pragma once
 
+#include <platform/DeviceSafeQueue.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <fcntl.h>
 #include <sched.h>
-#include <sys/select.h>
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -52,22 +52,31 @@ template <class ImplClass>
 class GenericPlatformManagerImpl_POSIX : public GenericPlatformManagerImpl<ImplClass>
 {
 protected:
-    // Members for select loop
-    int mMaxFd;
-    fd_set mReadSet;
-    fd_set mWriteSet;
-    fd_set mErrorSet;
-    struct timeval mNextTimeout;
-
     // OS-specific members (pthread)
     pthread_mutex_t mChipStackLock;
-    std::queue<ChipDeviceEvent> mChipEventQueue;
+
+    enum TaskType
+    {
+        kExternallyManagedTask = 0,
+        kInternallyManagedTask = 1
+    };
 
     pthread_t mChipTask;
+    bool mHasValidChipTask = false;
+    TaskType mTaskType;
+    pthread_cond_t mEventQueueStoppedCond;
+    pthread_mutex_t mStateLock;
+
+    //
+    // TODO: This variable is very similar to mMainLoopIsStarted, track the
+    // cleanup and consolidation in this issue:
+    //
+    bool mEventQueueHasStopped = false;
+
     pthread_attr_t mChipTaskAttr;
     struct sched_param mChipTaskSchedParam;
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool mMainLoopStarted   = false;
     bool mChipStackIsLocked = false;
     pthread_t mChipStackLockOwnerThread;
@@ -83,10 +92,11 @@ protected:
     void _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop();
     CHIP_ERROR _StartEventLoopTask();
+    CHIP_ERROR _StopEventLoopTask();
     CHIP_ERROR _StartChipTimer(int64_t durationMS);
     CHIP_ERROR _Shutdown();
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool _IsChipStackLockedByCurrentThread() const;
 #endif
 
@@ -97,12 +107,9 @@ private:
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
-    void SysUpdate();
-    void SysProcess();
-    static void SysOnEventSignal(void * arg);
-
     void ProcessDeviceEvents();
 
+    DeviceSafeQueue mChipEventQueue;
     std::atomic<bool> mShouldRunEventLoop;
     static void * EventLoopTaskMain(void * arg);
 };

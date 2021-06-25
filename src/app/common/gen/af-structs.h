@@ -219,6 +219,7 @@ typedef struct _FabricDescriptor
     chip::FabricId FabricId;
     uint16_t VendorId;
     chip::NodeId NodeId;
+    chip::ByteSpan Label;
 } EmberAfFabricDescriptor;
 
 // Struct for GpPairingConfigurationGroupList

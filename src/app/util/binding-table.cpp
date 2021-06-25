@@ -19,8 +19,8 @@
  * @file Basic implementation of a binding table.
  */
 
-#include "gen/gen_config.h"
 #include <app/util/binding-table.h>
+#include <gen/gen_config.h>
 
 static EmberBindingTableEntry bindingTable[EMBER_BINDING_TABLE_SIZE];
 

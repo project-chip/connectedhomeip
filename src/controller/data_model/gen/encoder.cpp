@@ -60,11 +60,13 @@ using namespace chip::Encoding::LittleEndian;
 | AudioOutput                                                         | 0x050B |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
+| BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
-| ContentLaunch                                                       | 0x050A |
+| ContentLauncher                                                     | 0x050A |
 | Descriptor                                                          | 0x001D |
+| DiagnosticLogs                                                      | 0x0032 |
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
@@ -79,8 +81,10 @@ using namespace chip::Encoding::LittleEndian;
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
+| OtaSoftwareUpdateServer                                             | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
+| PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
 | Scenes                                                              | 0x0005 |
@@ -91,7 +95,7 @@ using namespace chip::Encoding::LittleEndian;
 | TemperatureMeasurement                                              | 0x0402 |
 | TestCluster                                                         | 0x050F |
 | Thermostat                                                          | 0x0201 |
-| TrustedRootCertificates                                             | 0x003F |
+| ThreadNetworkDiagnostics                                            | 0x0035 |
 | WakeOnLan                                                           | 0x0503 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
@@ -127,6 +131,7 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_LOGIN_COMMAND_ID (0x01)
 
 #define APPLICATION_BASIC_CLUSTER_ID 0x050D
+#define ZCL_CHANGE_STATUS_COMMAND_ID (0x00)
 
 #define APPLICATION_LAUNCHER_CLUSTER_ID 0x050C
 #define ZCL_LAUNCH_APP_COMMAND_ID (0x00)
@@ -141,6 +146,8 @@ using namespace chip::Encoding::LittleEndian;
 
 #define BASIC_CLUSTER_ID 0x0028
 #define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
+
+#define BINARY_INPUT_BASIC_CLUSTER_ID 0x000F
 
 #define BINDING_CLUSTER_ID 0xF000
 #define ZCL_BIND_COMMAND_ID (0x00)
@@ -169,6 +176,9 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_LAUNCH_URL_COMMAND_ID (0x01)
 
 #define DESCRIPTOR_CLUSTER_ID 0x001D
+
+#define DIAGNOSTIC_LOGS_CLUSTER_ID 0x0032
+#define ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID (0x00)
 
 #define DOOR_LOCK_CLUSTER_ID 0x0101
 #define ZCL_CLEAR_ALL_PINS_COMMAND_ID (0x08)
@@ -267,6 +277,11 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID (0x08)
 #define ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID (0x04)
 
+#define OTA_SERVER_CLUSTER_ID 0x0029
+#define ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID (0x01)
+#define ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID (0x02)
+#define ZCL_QUERY_IMAGE_COMMAND_ID (0x00)
+
 #define ON_OFF_CLUSTER_ID 0x0006
 #define ZCL_OFF_COMMAND_ID (0x00)
 #define ZCL_ON_COMMAND_ID (0x01)
@@ -274,11 +289,15 @@ using namespace chip::Encoding::LittleEndian;
 
 #define OPERATIONAL_CREDENTIALS_CLUSTER_ID 0x003E
 #define ZCL_ADD_OP_CERT_COMMAND_ID (0x06)
+#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0xA1)
 #define ZCL_OP_CSR_REQUEST_COMMAND_ID (0x04)
 #define ZCL_REMOVE_ALL_FABRICS_COMMAND_ID (0x0B)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
+#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0xA2)
 #define ZCL_SET_FABRIC_COMMAND_ID (0x00)
 #define ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID (0x09)
+
+#define PRESSURE_MEASUREMENT_CLUSTER_ID 0x0403
 
 #define PUMP_CONFIG_CONTROL_CLUSTER_ID 0x0200
 
@@ -312,6 +331,7 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_TEST_COMMAND_ID (0x00)
 #define ZCL_TEST_NOT_HANDLED_COMMAND_ID (0x01)
 #define ZCL_TEST_SPECIFIC_COMMAND_ID (0x02)
+#define ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID (0x03)
 
 #define THERMOSTAT_CLUSTER_ID 0x0201
 #define ZCL_CLEAR_WEEKLY_SCHEDULE_COMMAND_ID (0x03)
@@ -320,20 +340,19 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_SET_WEEKLY_SCHEDULE_COMMAND_ID (0x01)
 #define ZCL_SETPOINT_RAISE_LOWER_COMMAND_ID (0x00)
 
-#define TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID 0x003F
-#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x00)
-#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x01)
+#define THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID 0x0035
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
 #define WAKE_ON_LAN_CLUSTER_ID 0x0503
 
 #define WINDOW_COVERING_CLUSTER_ID 0x0102
-#define ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID (0x01)
-#define ZCL_WINDOW_COVERING_GO_TO_LIFT_PERCENTAGE_COMMAND_ID (0x05)
-#define ZCL_WINDOW_COVERING_GO_TO_LIFT_VALUE_COMMAND_ID (0x04)
-#define ZCL_WINDOW_COVERING_GO_TO_TILT_PERCENTAGE_COMMAND_ID (0x08)
-#define ZCL_WINDOW_COVERING_GO_TO_TILT_VALUE_COMMAND_ID (0x07)
-#define ZCL_WINDOW_COVERING_STOP_COMMAND_ID (0x02)
-#define ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID (0x00)
+#define ZCL_DOWN_OR_CLOSE_COMMAND_ID (0x01)
+#define ZCL_GO_TO_LIFT_PERCENTAGE_COMMAND_ID (0x05)
+#define ZCL_GO_TO_LIFT_VALUE_COMMAND_ID (0x04)
+#define ZCL_GO_TO_TILT_PERCENTAGE_COMMAND_ID (0x08)
+#define ZCL_GO_TO_TILT_VALUE_COMMAND_ID (0x07)
+#define ZCL_STOP_MOTION_COMMAND_ID (0x02)
+#define ZCL_UP_OR_OPEN_COMMAND_ID (0x00)
 
 // TODO: Find a way to calculate maximum message length for clusters
 //       https://github.com/project-chip/connectedhomeip/issues/965
@@ -379,6 +398,7 @@ PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t
 | Cluster ApplicationBasic                                            | 0x050D |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ChangeStatus                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * VendorName                                                        | 0x0000 |
@@ -652,6 +672,7 @@ PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionAttribute(uint8
 | * ProductLabel                                                      | 0x000E |
 | * SerialNumber                                                      | 0x000F |
 | * LocalConfigDisabled                                               | 0x0010 |
+| * Reachable                                                         | 0x0011 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -729,7 +750,7 @@ PacketBufferHandle encodeBasicClusterWriteUserLabelAttribute(uint8_t seqNum, End
     size_t userLabelStrLen = userLabel.size();
     if (!CanCastTo<uint8_t>(userLabelStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, userLabelStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, userLabelStrLen);
         return PacketBufferHandle();
     }
 
@@ -759,7 +780,7 @@ PacketBufferHandle encodeBasicClusterWriteLocationAttribute(uint8_t seqNum, Endp
     size_t locationStrLen = location.size();
     if (!CanCastTo<uint8_t>(locationStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, locationStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, locationStrLen);
         return PacketBufferHandle();
     }
 
@@ -887,11 +908,136 @@ PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t s
 }
 
 /*
+ * Attribute Reachable
+ */
+PacketBufferHandle encodeBasicClusterReadReachableAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBasicReachable", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
+    COMMAND_FOOTER();
+}
+
+/*
  * Attribute ClusterRevision
  */
 PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicClusterRevision", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster BinaryInputBasic                                            | 0x000F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * OutOfService                                                      | 0x0051 |
+| * PresentValue                                                      | 0x0055 |
+| * StatusFlags                                                       | 0x006F |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeBinaryInputBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverBinaryInputBasicAttributes", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OutOfService
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadOutOfServiceAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicOutOfService", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0051);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterWriteOutOfServiceAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                           uint8_t outOfService)
+{
+    COMMAND_HEADER("WriteBinaryInputBasicOutOfService", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0051)
+        .Put8(16)
+        .Put8(static_cast<uint8_t>(outOfService));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PresentValue
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadPresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0055);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterWritePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                           uint8_t presentValue)
+{
+    COMMAND_HEADER("WriteBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0055)
+        .Put8(16)
+        .Put8(static_cast<uint8_t>(presentValue));
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterConfigurePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                               uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0055)
+        .Put8(16)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StatusFlags
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadStatusFlagsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicStatusFlags", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x006F);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterConfigureStatusFlagsAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                              uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportBinaryInputBasicStatusFlags", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x006F)
+        .Put8(24)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicClusterRevision", BINARY_INPUT_BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
@@ -1001,7 +1147,7 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterWriteUserLabelAttribute(uint8_
     size_t userLabelStrLen = userLabel.size();
     if (!CanCastTo<uint8_t>(userLabelStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, userLabelStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, userLabelStrLen);
         return PacketBufferHandle();
     }
 
@@ -1970,7 +2116,7 @@ PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster ContentLaunch                                               | 0x050A |
+| Cluster ContentLauncher                                             | 0x050A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * LaunchContent                                                     |   0x00 |
@@ -1982,9 +2128,9 @@ PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeContentLauncherClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverContentLaunchAttributes", CONTENT_LAUNCH_CLUSTER_ID);
+    COMMAND_HEADER("DiscoverContentLauncherAttributes", CONTENT_LAUNCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
@@ -1992,9 +2138,9 @@ PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, 
 /*
  * Attribute AcceptsHeaderList
  */
-PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeContentLauncherClusterReadAcceptsHeaderListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadContentLaunchAcceptsHeaderList", CONTENT_LAUNCH_CLUSTER_ID);
+    COMMAND_HEADER("ReadContentLauncherAcceptsHeaderList", CONTENT_LAUNCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
     COMMAND_FOOTER();
 }
@@ -2002,9 +2148,9 @@ PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint
 /*
  * Attribute SupportedStreamingTypes
  */
-PacketBufferHandle encodeContentLaunchClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeContentLauncherClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadContentLaunchSupportedStreamingTypes", CONTENT_LAUNCH_CLUSTER_ID);
+    COMMAND_HEADER("ReadContentLauncherSupportedStreamingTypes", CONTENT_LAUNCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
     COMMAND_FOOTER();
 }
@@ -2012,9 +2158,9 @@ PacketBufferHandle encodeContentLaunchClusterReadSupportedStreamingTypesAttribut
 /*
  * Attribute ClusterRevision
  */
-PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeContentLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadContentLaunchClusterRevision", CONTENT_LAUNCH_CLUSTER_ID);
+    COMMAND_HEADER("ReadContentLauncherClusterRevision", CONTENT_LAUNCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
@@ -2086,6 +2232,22 @@ PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t s
 {
     COMMAND_HEADER("ReadDescriptorClusterRevision", DESCRIPTOR_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster DiagnosticLogs                                              | 0x0032 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RetrieveLogsRequest                                               |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeDiagnosticLogsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverDiagnosticLogsAttributes", DIAGNOSTIC_LOGS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2792,6 +2954,35 @@ PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ApplyUpdateRequest                                                |   0x01 |
+| * NotifyUpdateApplied                                               |   0x02 |
+| * QueryImage                                                        |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverOtaSoftwareUpdateServerAttributes", OTA_SERVER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOtaSoftwareUpdateServerClusterRevision", OTA_SERVER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -2801,6 +2992,11 @@ PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * OnOff                                                             | 0x0000 |
+| * GlobalSceneControl                                                | 0x4000 |
+| * OnTime                                                            | 0x4001 |
+| * OffWaitTime                                                       | 0x4002 |
+| * StartUpOnOff                                                      | 0x4003 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -2837,6 +3033,93 @@ PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8_t seqNum, End
 }
 
 /*
+ * Attribute GlobalSceneControl
+ */
+PacketBufferHandle encodeOnOffClusterReadGlobalSceneControlAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffGlobalSceneControl", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OnTime
+ */
+PacketBufferHandle encodeOnOffClusterReadOnTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffOnTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4001);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOnOffClusterWriteOnTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t onTime)
+{
+    COMMAND_HEADER("WriteOnOffOnTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x4001)
+        .Put8(33)
+        .Put16(static_cast<uint16_t>(onTime));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OffWaitTime
+ */
+PacketBufferHandle encodeOnOffClusterReadOffWaitTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffOffWaitTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4002);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOnOffClusterWriteOffWaitTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t offWaitTime)
+{
+    COMMAND_HEADER("WriteOnOffOffWaitTime", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x4002)
+        .Put8(33)
+        .Put16(static_cast<uint16_t>(offWaitTime));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StartUpOnOff
+ */
+PacketBufferHandle encodeOnOffClusterReadStartUpOnOffAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffStartUpOnOff", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x4003);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOnOffClusterWriteStartUpOnOffAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                uint8_t startUpOnOff)
+{
+    COMMAND_HEADER("WriteOnOffStartUpOnOff", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x4003)
+        .Put8(48)
+        .Put8(static_cast<uint8_t>(startUpOnOff));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute FeatureMap
+ */
+PacketBufferHandle encodeOnOffClusterReadFeatureMapAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOnOffFeatureMap", ON_OFF_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFC);
+    COMMAND_FOOTER();
+}
+
+/*
  * Attribute ClusterRevision
  */
 PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
@@ -2851,9 +3134,11 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddOpCert                                                         |   0x06 |
+| * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
+| * RemoveTrustedRootCertificate                                      |   0xA2 |
 | * SetFabric                                                         |   0x00 |
 | * UpdateFabricLabel                                                 |   0x09 |
 |------------------------------------------------------------------------------|
@@ -2885,6 +3170,82 @@ PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(u
 PacketBufferHandle encodeOperationalCredentialsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadOperationalCredentialsClusterRevision", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster PressureMeasurement                                         | 0x0403 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodePressureMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverPressureMeasurementAttributes", PRESSURE_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MeasuredValue
+ */
+PacketBufferHandle encodePressureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPressureMeasurementMeasuredValue", PRESSURE_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodePressureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                                   uint16_t minInterval, uint16_t maxInterval,
+                                                                                   int16_t change)
+{
+    COMMAND_HEADER("ReportPressureMeasurementMeasuredValue", PRESSURE_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0000)
+        .Put8(41)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    buf.Put16(static_cast<uint16_t>(change));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MinMeasuredValue
+ */
+PacketBufferHandle encodePressureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPressureMeasurementMinMeasuredValue", PRESSURE_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MaxMeasuredValue
+ */
+PacketBufferHandle encodePressureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPressureMeasurementMaxMeasuredValue", PRESSURE_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodePressureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPressureMeasurementClusterRevision", PRESSURE_MEASUREMENT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
@@ -3484,6 +3845,7 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * Test                                                              |   0x00 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
+| * TestUnknownCommand                                                |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Boolean                                                           | 0x0000 |
@@ -3505,6 +3867,8 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * ListInt8u                                                         | 0x001A |
 | * ListOctetString                                                   | 0x001B |
 | * ListStructOctetString                                             | 0x001C |
+| * LongOctetString                                                   | 0x001D |
+| * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3862,7 +4226,7 @@ PacketBufferHandle encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seq
     size_t octetStringStrLen = octetString.size();
     if (!CanCastTo<uint8_t>(octetStringStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, octetStringStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, octetStringStrLen);
         return PacketBufferHandle();
     }
 
@@ -3903,6 +4267,60 @@ PacketBufferHandle encodeTestClusterClusterReadListStructOctetStringAttribute(ui
 {
     COMMAND_HEADER("ReadTestClusterListStructOctetString", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001C);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute LongOctetString
+ */
+PacketBufferHandle encodeTestClusterClusterReadLongOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterLongOctetString", TEST_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001D);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTestClusterClusterWriteLongOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                         chip::ByteSpan longOctetString)
+{
+    COMMAND_HEADER("WriteTestClusterLongOctetString", TEST_CLUSTER_ID);
+    size_t longOctetStringStrLen = longOctetString.size();
+    if (!CanCastTo<uint16_t>(longOctetStringStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, longOctetStringStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x001D)
+        .Put8(67)
+        .Put16(static_cast<uint16_t>(longOctetStringStrLen))
+        .Put(longOctetString.data(), longOctetStringStrLen);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Unsupported
+ */
+PacketBufferHandle encodeTestClusterClusterReadUnsupportedAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterUnsupported", TEST_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x00FF);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTestClusterClusterWriteUnsupportedAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                     uint8_t unsupported)
+{
+    COMMAND_HEADER("WriteTestClusterUnsupported", TEST_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x00FF)
+        .Put8(16)
+        .Put8(static_cast<uint8_t>(unsupported));
     COMMAND_FOOTER();
 }
 
@@ -4072,29 +4490,712 @@ PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t s
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster TrustedRootCertificates                                     | 0x003F |
+| Cluster ThreadNetworkDiagnostics                                    | 0x0035 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddTrustedRootCertificate                                         |   0x00 |
-| * RemoveTrustedRootCertificate                                      |   0x01 |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * Channel                                                           | 0x0000 |
+| * RoutingRole                                                       | 0x0001 |
+| * NetworkName                                                       | 0x0002 |
+| * PanId                                                             | 0x0003 |
+| * ExtendedPanId                                                     | 0x0004 |
+| * MeshLocalPrefix                                                   | 0x0005 |
+| * OverrunCount                                                      | 0x0006 |
+| * NeighborTableList                                                 | 0x0007 |
+| * RouteTableList                                                    | 0x0008 |
+| * PartitionId                                                       | 0x0009 |
+| * Weighting                                                         | 0x000A |
+| * DataVersion                                                       | 0x000B |
+| * StableDataVersion                                                 | 0x000C |
+| * LeaderRouterId                                                    | 0x000D |
+| * DetachedRoleCount                                                 | 0x000E |
+| * ChildRoleCount                                                    | 0x000F |
+| * RouterRoleCount                                                   | 0x0010 |
+| * LeaderRoleCount                                                   | 0x0011 |
+| * AttachAttemptCount                                                | 0x0012 |
+| * PartitionIdChangeCount                                            | 0x0013 |
+| * BetterPartitionAttachAttemptCount                                 | 0x0014 |
+| * ParentChangeCount                                                 | 0x0015 |
+| * TxTotalCount                                                      | 0x0016 |
+| * TxUnicastCount                                                    | 0x0017 |
+| * TxBroadcastCount                                                  | 0x0018 |
+| * TxAckRequestedCount                                               | 0x0019 |
+| * TxAckedCount                                                      | 0x001A |
+| * TxNoAckRequestedCount                                             | 0x001B |
+| * TxDataCount                                                       | 0x001C |
+| * TxDataPollCount                                                   | 0x001D |
+| * TxBeaconCount                                                     | 0x001E |
+| * TxBeaconRequestCount                                              | 0x001F |
+| * TxOtherCount                                                      | 0x0020 |
+| * TxRetryCount                                                      | 0x0021 |
+| * TxDirectMaxRetryExpiryCount                                       | 0x0022 |
+| * TxIndirectMaxRetryExpiryCount                                     | 0x0023 |
+| * TxErrCcaCount                                                     | 0x0024 |
+| * TxErrAbortCount                                                   | 0x0025 |
+| * TxErrBusyChannelCount                                             | 0x0026 |
+| * RxTotalCount                                                      | 0x0027 |
+| * RxUnicastCount                                                    | 0x0028 |
+| * RxBroadcastCount                                                  | 0x0029 |
+| * RxDataCount                                                       | 0x002A |
+| * RxDataPollCount                                                   | 0x002B |
+| * RxBeaconCount                                                     | 0x002C |
+| * RxBeaconRequestCount                                              | 0x002D |
+| * RxOtherCount                                                      | 0x002E |
+| * RxAddressFilteredCount                                            | 0x002F |
+| * RxDestAddrFilteredCount                                           | 0x0030 |
+| * RxDuplicatedCount                                                 | 0x0031 |
+| * RxErrNoFrameCount                                                 | 0x0032 |
+| * RxErrUnknownNeighborCount                                         | 0x0033 |
+| * RxErrInvalidSrcAddrCount                                          | 0x0034 |
+| * RxErrSecCount                                                     | 0x0035 |
+| * RxErrFcsCount                                                     | 0x0036 |
+| * RxErrOtherCount                                                   | 0x0037 |
+| * SecurityPolicy                                                    | 0x003B |
+| * ChannelMask                                                       | 0x003C |
+| * OperationalDatasetComponents                                      | 0x003D |
+| * ActiveNetworkFaultsList                                           | 0x003E |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-PacketBufferHandle encodeTrustedRootCertificatesClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverTrustedRootCertificatesAttributes", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
+    COMMAND_HEADER("DiscoverThreadNetworkDiagnosticsAttributes", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Channel
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadChannelAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsChannel", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RoutingRole
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRoutingRoleAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRoutingRole", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NetworkName
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadNetworkNameAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsNetworkName", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PanId
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadPanIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsPanId", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ExtendedPanId
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadExtendedPanIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsExtendedPanId", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MeshLocalPrefix
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadMeshLocalPrefixAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsMeshLocalPrefix", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OverrunCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadOverrunCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsOverrunCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NeighborTableList
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadNeighborTableListAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsNeighborTableList", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RouteTableList
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRouteTableListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRouteTableList", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0008);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PartitionId
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadPartitionIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsPartitionId", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0009);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Weighting
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadWeightingAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsWeighting", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000A);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute DataVersion
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadDataVersionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsDataVersion", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000B);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StableDataVersion
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadStableDataVersionAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsStableDataVersion", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000C);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute LeaderRouterId
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadLeaderRouterIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsLeaderRouterId", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000D);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute DetachedRoleCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadDetachedRoleCountAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsDetachedRoleCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000E);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ChildRoleCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadChildRoleCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsChildRoleCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000F);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RouterRoleCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRouterRoleCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRouterRoleCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0010);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute LeaderRoleCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadLeaderRoleCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsLeaderRoleCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute AttachAttemptCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadAttachAttemptCountAttribute(uint8_t seqNum,
+                                                                                        EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsAttachAttemptCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0012);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PartitionIdChangeCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadPartitionIdChangeCountAttribute(uint8_t seqNum,
+                                                                                            EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsPartitionIdChangeCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0013);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute BetterPartitionAttachAttemptCount
+ */
+PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadBetterPartitionAttachAttemptCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0014);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ParentChangeCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadParentChangeCountAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsParentChangeCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0015);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxTotalCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxTotalCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxTotalCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0016);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxUnicastCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxUnicastCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxUnicastCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0017);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxBroadcastCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxBroadcastCountAttribute(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxBroadcastCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0018);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxAckRequestedCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxAckRequestedCountAttribute(uint8_t seqNum,
+                                                                                         EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxAckRequestedCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0019);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxAckedCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxAckedCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxAckedCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001A);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxNoAckRequestedCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxNoAckRequestedCountAttribute(uint8_t seqNum,
+                                                                                           EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxNoAckRequestedCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001B);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxDataCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxDataCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxDataCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001C);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxDataPollCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxDataPollCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxDataPollCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001D);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxBeaconCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxBeaconCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxBeaconCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001E);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxBeaconRequestCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxBeaconRequestCountAttribute(uint8_t seqNum,
+                                                                                          EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxBeaconRequestCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001F);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxOtherCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxOtherCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxOtherCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0020);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxRetryCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxRetryCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxRetryCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0021);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxDirectMaxRetryExpiryCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxDirectMaxRetryExpiryCountAttribute(uint8_t seqNum,
+                                                                                                 EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0022);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxIndirectMaxRetryExpiryCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxIndirectMaxRetryExpiryCountAttribute(uint8_t seqNum,
+                                                                                                   EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0023);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxErrCcaCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxErrCcaCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxErrCcaCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0024);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxErrAbortCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxErrAbortCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxErrAbortCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0025);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxErrBusyChannelCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadTxErrBusyChannelCountAttribute(uint8_t seqNum,
+                                                                                           EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsTxErrBusyChannelCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0026);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxTotalCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxTotalCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxTotalCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0027);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxUnicastCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxUnicastCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxUnicastCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0028);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxBroadcastCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxBroadcastCountAttribute(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxBroadcastCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0029);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxDataCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxDataCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxDataCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x002A);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxDataPollCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxDataPollCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxDataPollCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x002B);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxBeaconCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxBeaconCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxBeaconCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x002C);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxBeaconRequestCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxBeaconRequestCountAttribute(uint8_t seqNum,
+                                                                                          EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxBeaconRequestCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x002D);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxOtherCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxOtherCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxOtherCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x002E);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxAddressFilteredCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxAddressFilteredCountAttribute(uint8_t seqNum,
+                                                                                            EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxAddressFilteredCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x002F);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxDestAddrFilteredCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxDestAddrFilteredCountAttribute(uint8_t seqNum,
+                                                                                             EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0030);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxDuplicatedCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxDuplicatedCountAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxDuplicatedCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0031);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxErrNoFrameCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxErrNoFrameCountAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxErrNoFrameCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0032);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxErrUnknownNeighborCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxErrUnknownNeighborCountAttribute(uint8_t seqNum,
+                                                                                               EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0033);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxErrInvalidSrcAddrCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxErrInvalidSrcAddrCountAttribute(uint8_t seqNum,
+                                                                                              EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0034);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxErrSecCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxErrSecCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxErrSecCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0035);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxErrFcsCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxErrFcsCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxErrFcsCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0036);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RxErrOtherCount
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadRxErrOtherCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsRxErrOtherCount", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0037);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute SecurityPolicy
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadSecurityPolicyAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsSecurityPolicy", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x003B);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ChannelMask
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadChannelMaskAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsChannelMask", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x003C);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OperationalDatasetComponents
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadOperationalDatasetComponentsAttribute(uint8_t seqNum,
+                                                                                                  EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsOperationalDatasetComponents", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x003D);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ActiveNetworkFaultsList
+ */
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadActiveNetworkFaultsListAttribute(uint8_t seqNum,
+                                                                                             EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsActiveNetworkFaultsList", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x003E);
     COMMAND_FOOTER();
 }
 
 /*
  * Attribute ClusterRevision
  */
-PacketBufferHandle encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadTrustedRootCertificatesClusterRevision", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
+    COMMAND_HEADER("ReadThreadNetworkDiagnosticsClusterRevision", THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
@@ -4140,16 +5241,16 @@ PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t se
 | Cluster WindowCovering                                              | 0x0102 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * WindowCoveringDownClose                                           |   0x01 |
-| * WindowCoveringGoToLiftPercentage                                  |   0x05 |
-| * WindowCoveringGoToLiftValue                                       |   0x04 |
-| * WindowCoveringGoToTiltPercentage                                  |   0x08 |
-| * WindowCoveringGoToTiltValue                                       |   0x07 |
-| * WindowCoveringStop                                                |   0x02 |
-| * WindowCoveringUpOpen                                              |   0x00 |
+| * DownOrClose                                                       |   0x01 |
+| * GoToLiftPercentage                                                |   0x05 |
+| * GoToLiftValue                                                     |   0x04 |
+| * GoToTiltPercentage                                                |   0x08 |
+| * GoToTiltValue                                                     |   0x07 |
+| * StopMotion                                                        |   0x02 |
+| * UpOrOpen                                                          |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * WindowCoveringType                                                | 0x0000 |
+| * Type                                                              | 0x0000 |
 | * CurrentPositionLift                                               | 0x0003 |
 | * CurrentPositionTilt                                               | 0x0004 |
 | * ConfigStatus                                                      | 0x0007 |
@@ -4169,19 +5270,19 @@ PacketBufferHandle encodeWindowCoveringClusterDiscoverAttributes(uint8_t seqNum,
 }
 
 /*
- * Attribute WindowCoveringType
+ * Attribute Type
  */
-PacketBufferHandle encodeWindowCoveringClusterReadWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeWindowCoveringClusterReadTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadWindowCoveringWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
+    COMMAND_HEADER("ReadWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
+PacketBufferHandle encodeWindowCoveringClusterConfigureTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                     uint16_t minInterval, uint16_t maxInterval)
 {
-    COMMAND_HEADER("ReportWindowCoveringWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
+    COMMAND_HEADER("ReportWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
         .Put8(seqNum)
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)

@@ -144,10 +144,12 @@ limitations under the License.
     <attribute side="server" code="0x39" define="PENDING_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">PendingTimestamp</attribute>
     <attribute side="server" code="0x3A" define="DELAY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">delay</attribute>
     <!--TODO Attribute with struct as type is not currently supported. See attr 0x3B - SECURITY_POLICY and 0x3D OPERATIONAL_DATASET_COMPONENTS -->
-    <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="ARRAY" entryType="SecurityPolicy" length="1" writable="false" optional="false">SecurityPolicy</attribute>
+    <!-- SECURITY_POLICY Length = 2 + (arraysize(1) * Size of Struct (3b))-->
+    <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="ARRAY" entryType="SecurityPolicy" length="5" writable="false" optional="false">SecurityPolicy</attribute>
     <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x0000" optional="false">ChannelMask</attribute>
     <!-- Attribute with struct as type is not currently supported -->
-    <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="ARRAY" entryType="OperationalDatasetComponents" length="1" writable="false" optional="false">OperationalDatasetComponents</attribute>
+    <!-- OPERATIONAL_DATASET_COMPONENTS Length = 2 + (arraysize(1) * Size of Struct (12b))-->
+    <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="ARRAY" entryType="OperationalDatasetComponents" length="14" writable="false" optional="false">OperationalDatasetComponents</attribute>
     <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFault" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>

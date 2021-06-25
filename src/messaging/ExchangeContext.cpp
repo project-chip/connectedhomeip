@@ -157,7 +157,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     FlushAcks();
 
     // In case the protocol wants a harder release of the EC right away, such as calling Abort(), exchange
-    // needs to clear the CRMP retransmission table immediately.
+    // needs to clear the MRP retransmission table immediately.
     if (clearRetransTable)
     {
         mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(static_cast<ReliableMessageContext *>(this));
@@ -382,7 +382,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
     SuccessOrExit(err);
 
-    // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
+    // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
     {
         ExitNow(err = CHIP_NO_ERROR);
@@ -397,7 +397,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+        err = mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
     }
     else
     {

@@ -35,14 +35,16 @@ DEVICE_CONFIG = {
     'device0': {
         'type': 'CHIP-Echo-Requester',
         'base_image': 'chip_echo_requester',
-        'capability': ['Thread', 'Interactive'],
+        'capability': ['Thread', 'Interactive', 'TrafficControl'],
         'rcp_mode': True,
+        'traffic_control': {'latencyMs': 100}
     },
     'device1': {
         'type': 'CHIP-Echo-Responder',
         'base_image': 'chip_echo_responder',
-        'capability': ['Thread', 'Interactive'],
+        'capability': ['Thread', 'Interactive', 'TrafficControl'],
         'rcp_mode': True,
+        'traffic_control': {'latencyMs': 100}
     }
 }
 
@@ -71,7 +73,7 @@ class TestEcho(CHIPVirtualHome):
 
         req_device_id = req_ids[0]
 
-        command = "gdb -batch -return-child-result -q -ex run -ex bt --args chip-echo-requester {}"
+        command = "gdb -return-child-result -q -ex run -ex bt --args chip-echo-requester {}"
 
         for ip in resp_ips:
             ret = self.execute_device_cmd(

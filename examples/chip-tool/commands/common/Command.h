@@ -18,8 +18,10 @@
 
 #pragma once
 
+#include "controller/ExampleOperationalCredentialsIssuer.h"
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
+#include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <atomic>
@@ -56,7 +58,8 @@ enum ArgumentType
     Number_int16,
     Number_int32,
     Number_int64,
-    String,
+    CharString,
+    OctetString,
     Attribute,
     Address
 };
@@ -88,8 +91,24 @@ public:
         ::chip::Inet::InterfaceId interfaceId;
     };
 
+    /**
+     * @brief
+     *   Encapsulates key objects in the CHIP stack that need continued
+     *   access, so wrapping it in here makes it nice and compactly encapsulated.
+     */
+    struct ExecutionContext
+    {
+        ChipDeviceCommissioner * commissioner;
+        chip::Controller::ExampleOperationalCredentialsIssuer * opCredsIssuer;
+        PersistentStorage * storage;
+        chip::NodeId localId;
+        chip::NodeId remoteId;
+    };
+
     Command(const char * commandName) : mName(commandName) {}
     virtual ~Command() {}
+
+    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = &execContext; }
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
@@ -100,13 +119,17 @@ public:
     size_t AddArgument(const char * name, const char * value);
     /**
      * @brief
-     *   Add a string command argument
+     *   Add a char string command argument
      *
      * @param name  The name that will be displayed in the command help
      * @param value A pointer to a `char *` where the argv value will be stored
      * @returns The number of arguments currently added to the command
      */
     size_t AddArgument(const char * name, char ** value);
+    /**
+     * Add an octet string command argument
+     */
+    size_t AddArgument(const char * name, chip::ByteSpan * value);
     size_t AddArgument(const char * name, AddressWithInterface * out);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, int8_t * out)
     {
@@ -141,28 +164,58 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64);
     }
 
-    virtual CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) = 0;
+    // Will be called in a setting in which it's safe to touch the CHIP
+    // stack. The rules for Run() are as follows:
+    //
+    // 1) If error is returned, Run() must not call SetCommandExitStatus.
+    // 2) If success is returned Run() must either have called
+    //    SetCommandExitStatus() or scheduled async work that will do that.
+    virtual CHIP_ERROR Run() = 0;
 
-    bool GetCommandExitStatus() const { return mCommandExitStatus; }
-    void SetCommandExitStatus(bool status)
+    // Get the wait duration, in seconds, before the command times out.
+    virtual uint16_t GetWaitDurationInSeconds() const = 0;
+
+    // Shut down the command, in case any work needs to be done after the event
+    // loop has been stopped.
+    virtual void Shutdown() {}
+
+    CHIP_ERROR GetCommandExitStatus() const { return mCommandExitStatus; }
+    void SetCommandExitStatus(CHIP_ERROR status)
     {
         mCommandExitStatus = status;
         UpdateWaitForResponse(false);
     }
 
     void UpdateWaitForResponse(bool value);
-    void WaitForResponse(uint16_t duration);
+
+    // There is a certain symmetry between the single-event-loop and
+    // separate-event-loop approaches.  With a separate event loop, we schedule
+    // our work on that event loop and synchronously wait (block) waiting for a
+    // response. When using a single event loop, we ask for an async response
+    // notification and then block processing work on the event loop
+    // synchronously until that notification happens.
+#if CONFIG_USE_SEPARATE_EVENTLOOP
+    void WaitForResponse(uint16_t seconds);
+#else  // CONFIG_USE_SEPARATE_EVENTLOOP
+    CHIP_ERROR ScheduleWaitForResponse(uint16_t seconds);
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
+
+protected:
+    ExecutionContext * GetExecContext() { return mExecContext; }
+    ExecutionContext * mExecContext;
 
 private:
-    bool InitArgument(size_t argIndex, const char * argValue);
+    bool InitArgument(size_t argIndex, char * argValue);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out);
 
-    bool mCommandExitStatus = false;
-    const char * mName      = nullptr;
+    CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
+    const char * mName            = nullptr;
     std::vector<Argument> mArgs;
 
+#if CONFIG_USE_SEPARATE_EVENTLOOP
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ false };
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 };

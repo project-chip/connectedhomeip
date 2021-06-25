@@ -17,6 +17,8 @@
  */
 #pragma once
 
+#include "JniReferences.h"
+
 #include <memory>
 
 #include <jni.h>
@@ -65,9 +67,9 @@ public:
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
-    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                                        chip::System::Layer * systemLayer, chip::Inet::InetLayer * inetLayer,
-                                                        CHIP_ERROR * errInfoOnFailure);
+    static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, pthread_mutex_t * stackLock,
+                                                        chip::NodeId nodeId, chip::System::Layer * systemLayer,
+                                                        chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
@@ -75,14 +77,14 @@ private:
     ChipDeviceControllerPtr mController;
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
+    pthread_mutex_t * mStackLock;
+
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
 
-    JNIEnv * GetJavaEnv();
-
-    jclass GetPersistentStorageClass() { return GetJavaEnv()->FindClass("chip/devicecontroller/PersistentStorage"); }
-
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller)) {}
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, pthread_mutex_t * stackLock) :
+        mController(std::move(controller)), mStackLock(stackLock)
+    {}
 };
 
 inline jlong AndroidDeviceControllerWrapper::ToJNIHandle()

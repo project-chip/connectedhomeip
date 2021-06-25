@@ -57,6 +57,10 @@ static bool sHaveServiceConnectivity = false;
 
 static uint32_t eventMask = 0;
 
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+extern "C" void K32WUartProcess(void);
+#endif
+
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -168,6 +172,9 @@ void AppTask::AppTaskMain(void * pvParameter)
         // task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+            K32WUartProcess();
+#endif
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
@@ -620,6 +627,6 @@ void AppTask::UpdateClusterState(void)
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx32, status);
     }
 }

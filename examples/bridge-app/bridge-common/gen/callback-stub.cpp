@@ -35,8 +35,14 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_DESCRIPTOR_CLUSTER_ID:
         emberAfDescriptorClusterInitCallback(endpoint);
         break;
+    case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
+        emberAfDiagnosticLogsClusterInitCallback(endpoint);
+        break;
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
+    case ZCL_FIXED_LABEL_CLUSTER_ID:
+        emberAfFixedLabelClusterInitCallback(endpoint);
         break;
     case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
@@ -52,6 +58,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
+        break;
+    case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
+        emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
     case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID:
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
@@ -78,7 +87,17 @@ void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpo
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfDiagnosticLogsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfFixedLabelClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -104,6 +123,11 @@ void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(Endpoi
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -406,9 +430,8 @@ bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * 
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool __attribute__((weak))
-emberAfMessageSentCallback(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                           uint16_t msgLen, uint8_t * message, EmberStatus status)
+bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                      uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
     return false;
 }
@@ -508,10 +531,11 @@ bool __attribute__((weak)) emberAfReadAttributesResponseCallback(ClusterId clust
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
  * @param maxReadLength   Ver.: always
+ * @param index   Ver.: always
  */
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
-                                     uint16_t manufacturerCode, uint8_t * buffer, uint16_t maxReadLength)
+                                     uint16_t manufacturerCode, uint8_t * buffer, uint16_t maxReadLength, int32_t index)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
@@ -577,10 +601,11 @@ bool __attribute__((weak)) emberAfWriteAttributesResponseCallback(ClusterId clus
  * @param attributeMetadata   Ver.: always
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
+ * @param index   Ver.: always
  */
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
-                                      uint16_t manufacturerCode, uint8_t * buffer)
+                                      uint16_t manufacturerCode, uint8_t * buffer, int32_t index)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }

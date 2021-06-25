@@ -21,4 +21,7 @@ chip_data_model("bridge-common") {
 
   zap_pregenerated_dir = "gen"
   is_server = true
+
+  # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!
+  cflags = [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
 }

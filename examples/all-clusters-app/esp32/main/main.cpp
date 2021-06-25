@@ -35,6 +35,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include "shell_extension/launch.h"
 
 #include <cmath>
 #include <cstdio>
@@ -42,6 +43,7 @@
 #include <string>
 #include <vector>
 
+#include <app/common/gen/att-storage.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
@@ -49,6 +51,8 @@
 #include <app/server/Mdns.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <app/util/af-types.h>
+#include <app/util/af.h>
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -80,6 +84,10 @@ using namespace ::chip::DeviceLayer;
 #elif CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
 #define STATUS_LED_GPIO_NUM GPIO_NUM_2 // Use LED1 (blue LED) as status LED on DevKitC
+
+#elif CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+
+#define STATUS_LED_GPIO_NUM GPIO_NUM_2
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
@@ -195,7 +203,7 @@ public:
             if (name == "Temperature")
             {
                 // update the temp attribute here for hardcoded endpoint 1
-                emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(n * 100));
+                emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(1, static_cast<int16_t>(n * 100));
             }
             value = buffer;
         }
@@ -363,6 +371,14 @@ public:
 
 #endif // CONFIG_DEVICE_TYPE_M5STACK
 
+void SetupInitialLevelControlValues(chip::EndpointId endpointId)
+{
+    uint8_t level = UINT8_MAX;
+
+    emberAfWriteAttribute(endpointId, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
+                          ZCL_DATA8_ATTRIBUTE_TYPE);
+}
+
 void SetupPretendDevices()
 {
     AddDevice("Watch");
@@ -380,16 +396,20 @@ void SetupPretendDevices()
     AddEndpoint("1");
     AddCluster("OnOff");
     AddAttribute("OnOff", "Off");
+    AddCluster("Level Control");
+    AddAttribute("Current Level", "255");
     AddEndpoint("2");
     AddCluster("OnOff");
     AddAttribute("OnOff", "Off");
+    AddCluster("Level Control");
+    AddAttribute("Current Level", "255");
 
     AddDevice("Thermometer");
     AddEndpoint("External");
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
     // write the temp attribute
-    emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(21 * 100));
+    emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(1, static_cast<int16_t>(21 * 100));
 
     AddDevice("Door Lock");
     AddEndpoint("Default");
@@ -445,6 +465,7 @@ std::string createSetupPayload()
         ESP_LOGE(TAG, "Couldn't get discriminator: %s", ErrorStr(err));
         return result;
     }
+    ESP_LOGI(TAG, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
 
     uint32_t setupPINCode;
     err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
@@ -453,6 +474,7 @@ std::string createSetupPayload()
         ESP_LOGE(TAG, "Couldn't get setupPINCode: %s", ErrorStr(err));
         return result;
     }
+    ESP_LOGI(TAG, "Setup PIN code: %u (0x%x)", setupPINCode, setupPINCode);
 
     uint16_t vendorId;
     err = ConfigurationMgr().GetVendorId(vendorId);
@@ -509,8 +531,8 @@ std::string createSetupPayload()
             ESP_LOGE(TAG, "Failed to get decimal setup code");
         }
 
-        payload.requiresCustomFlow = 1;
-        generator                  = ManualSetupPayloadGenerator(payload);
+        payload.commissioningFlow = CommissioningFlow::kCustom;
+        generator                 = ManualSetupPayloadGenerator(payload);
 
         if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
         {
@@ -546,13 +568,6 @@ public:
     void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
 };
 
-#if CONFIG_ENABLE_CHIP_SHELL
-void ChipShellTask(void * args)
-{
-    chip::Shell::Engine::Root().RunMainLoop();
-}
-#endif // CONFIG_ENABLE_CHIP_SHELL
-
 } // namespace
 
 extern "C" void app_main()
@@ -586,6 +601,10 @@ extern "C" void app_main()
         return;
     }
 
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+#endif // CONFIG_ENABLE_CHIP_SHELL
+
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
@@ -607,11 +626,9 @@ extern "C" void app_main()
     AppCallbacks callbacks;
     InitServer(&callbacks);
 
-#if CONFIG_ENABLE_CHIP_SHELL
-    xTaskCreate(&ChipShellTask, "chip_shell", 2048, NULL, 5, NULL);
-#endif
-
     SetupPretendDevices();
+    SetupInitialLevelControlValues(/* endpointId = */ 1);
+    SetupInitialLevelControlValues(/* endpointId = */ 2);
 
     std::string qrCodeText = createSetupPayload();
     ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
@@ -669,6 +686,16 @@ extern "C" void app_main()
                    [=]() {
                        ESP_LOGI(TAG, "Opening QR code screen");
                        ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
+                       uint16_t discriminator;
+                       if (ConfigurationMgr().GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
+                       {
+                           ESP_LOGI(TAG, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
+                       }
+                       uint32_t setupPINCode;
+                       if (ConfigurationMgr().GetSetupPinCode(setupPINCode) == CHIP_NO_ERROR)
+                       {
+                           ESP_LOGI(TAG, "Setup PIN code: %u (0x%x)", setupPINCode, setupPINCode);
+                       }
                        ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText));
                    })
             ->Item("Setup",

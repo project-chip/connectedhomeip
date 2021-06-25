@@ -34,13 +34,13 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMessageDispatch.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PairingSession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
-#include <transport/SessionEstablishmentDelegate.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -216,8 +216,8 @@ public:
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
 
     /**
      * @brief

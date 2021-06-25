@@ -11,8 +11,11 @@ static_library("secure_channel") {
     "PASESession.cpp",
     "PASESession.h",
     "RendezvousParameters.h",
+    "SessionEstablishmentDelegate.h",
     "SessionEstablishmentExchangeDispatch.cpp",
     "SessionEstablishmentExchangeDispatch.h",
+    "SessionIDAllocator.cpp",
+    "SessionIDAllocator.h",
     "StatusReport.cpp",
     "StatusReport.h",
   ]

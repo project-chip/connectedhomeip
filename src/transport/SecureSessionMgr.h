@@ -53,13 +53,18 @@ namespace chip {
  *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
-class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
+class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() {}
     EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 
     void operator=(EncryptedPacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
+
+    using System::PacketBufferHandle::IsNull;
+    // Pass-through to HasChainedBuffer on our underlying buffer without
+    // exposing operator->
+    bool HasChainedBuffer() const { return (*this)->HasChainedBuffer(); }
 
     uint32_t GetMsgId() const;
 
@@ -96,6 +101,13 @@ public:
     {
         return EncryptedPacketBufferHandle(std::move(aBuffer));
     }
+
+    /**
+     * Get a handle to the data that allows mutating the bytes.  This should
+     * only be used if absolutely necessary, because EncryptedPacketBufferHandle
+     * represents a buffer that we want to resend as-is.
+     */
+    PacketBufferHandle CastToWritable() const { return PacketBufferHandle::Retain(); }
 
 private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
@@ -167,17 +179,23 @@ public:
 
     /**
      * @brief
-     *   Send a message to a currently connected peer.
+     *   This function takes the payload and returns an encrypted message which can be sent multiple times.
      *
      * @details
-     *   msgBuf contains the data to be transmitted.  If bufferRetainSlot is not null and this function
-     *   returns success, the encrypted data that was sent, as well as various other information needed
-     *   to retransmit it, will be stored in *bufferRetainSlot.
+     *   It does the following:
+     *    1. Encrypt the msgBuf
+     *    2. construct the packet header
+     *    3. Encode the packet header and prepend it to message.
+     *   Returns a encrypted message in encryptedMessage.
      */
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
-    CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && msgBuf,
-                                    EncryptedPacketBufferHandle * bufferRetainSlot);
+    CHIP_ERROR BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                            System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle & encryptedMessage);
+
+    /**
+     * @brief
+     *   Send a prepared message to a currently connected peer.
+     */
+    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
 
     Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
 
@@ -201,6 +219,9 @@ public:
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
                           SecureSession::SessionRole direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
+
+    void ExpirePairing(SecureSessionHandle session);
+    void ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin);
 
     /**
      * @brief
@@ -285,10 +306,6 @@ private:
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
     GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
-
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                           System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
-                           EncryptionState encryptionState);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();

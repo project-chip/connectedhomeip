@@ -19,6 +19,7 @@
 #pragma once
 
 #include "DiscoverCommand.h"
+#include "DiscoverCommissionersCommand.h"
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <mdns/Resolver.h>
 
@@ -46,15 +47,15 @@ public:
         nodeData.mAddress.ToString(addrBuffer);
         ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Address: %s, Port: %" PRIu16, nodeData.mPeerId.GetNodeId(),
                         addrBuffer, nodeData.mPort);
-        SetCommandExitStatus(true);
+        SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "NodeId Resolution: failed!");
-        SetCommandExitStatus(false);
+        SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     }
-    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override {}
+    void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override {}
 };
 
 class Update : public DiscoverCommand
@@ -65,10 +66,8 @@ public:
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
-        ChipDevice * device;
-        ReturnErrorOnFailure(mCommissioner.GetDevice(remoteId, &device));
         ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return mCommissioner.UpdateDevice(device, fabricId);
+        return GetExecContext()->commissioner->UpdateDevice(remoteId, fabricId);
     }
 
     /////////// DeviceAddressUpdateDelegate Interface /////////
@@ -83,7 +82,7 @@ public:
             ChipLogError(chipTool, "Failed to update the device address: %s", chip::ErrorStr(error));
         }
 
-        SetCommandExitStatus(CHIP_NO_ERROR == error);
+        SetCommandExitStatus(error);
     }
 };
 
@@ -94,6 +93,7 @@ void registerCommandsDiscover(Commands & commands)
     commands_list clusterCommands = {
         make_unique<Resolve>(),
         make_unique<Update>(),
+        make_unique<DiscoverCommissionersCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);

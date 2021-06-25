@@ -35,17 +35,29 @@ struct ResolvedNodeData
     Inet::IPAddress mAddress;
     uint16_t mPort;
 };
-struct CommissionableNodeData
+
+constexpr size_t kMaxDeviceNameLen         = 32;
+constexpr size_t kMaxRotatingIdLen         = 50;
+constexpr size_t kMaxPairingInstructionLen = 128;
+struct DiscoveredNodeData
 {
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
     // Largest host name is 64-bits in hex.
     static constexpr int kHostNameSize = 16;
-
     char hostName[kHostNameSize + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
+    uint8_t additionalPairing;
+    uint8_t commissioningMode;
+    // TODO: possibly 32-bit - see spec issue #3226
+    uint16_t deviceType;
+    char deviceName[kMaxDeviceNameLen + 1];
+    uint8_t rotatingId[kMaxRotatingIdLen];
+    size_t rotatingIdLen;
+    char pairingInstruction[kMaxPairingInstructionLen + 1];
+    uint16_t pairingHint;
     int numIPs;
     Inet::IPAddress ipAddress[kMaxIPAddresses];
     void Reset()
@@ -54,13 +66,21 @@ struct CommissionableNodeData
         longDiscriminator = 0;
         vendorId          = 0;
         productId         = 0;
-        numIPs            = 0;
+        additionalPairing = 0;
+        commissioningMode = 0;
+        deviceType        = 0;
+        memset(deviceName, 0, sizeof(deviceName));
+        memset(rotatingId, 0, sizeof(rotatingId));
+        rotatingIdLen = 0;
+        memset(pairingInstruction, 0, sizeof(pairingInstruction));
+        pairingHint = 0;
+        numIPs      = 0;
         for (int i = 0; i < kMaxIPAddresses; ++i)
         {
             ipAddress[i] = chip::Inet::IPAddress::Any;
         }
     }
-    CommissionableNodeData() { Reset(); }
+    DiscoveredNodeData() { Reset(); }
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
 };
@@ -74,6 +94,7 @@ enum class DiscoveryFilterType : uint8_t
     kDeviceType,
     kCommissioningMode,
     kCommissioningModeFromCommand,
+    kCommissioner
 };
 struct DiscoveryFilter
 {
@@ -94,8 +115,8 @@ public:
     /// Called when a CHIP node ID resolution has failed
     virtual void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
 
-    // Called when a CHIP Node in commissioning mode is found
-    virtual void OnCommissionableNodeFound(const CommissionableNodeData & nodeData) = 0;
+    // Called when a CHIP Node acting as Commissioner or in commissioning mode is found
+    virtual void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) = 0;
 };
 
 /// Interface for resolving CHIP services
@@ -118,6 +139,9 @@ public:
 
     // Finds all nodes with the given filter that are currently in commissioning mode.
     virtual CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+
+    // Finds all nodes with the given filter that are currently acting as Commissioners.
+    virtual CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
     /// Provides the system-wide implementation of the service resolver
     static Resolver & Instance();

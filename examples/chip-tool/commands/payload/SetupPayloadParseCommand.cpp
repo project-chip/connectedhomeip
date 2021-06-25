@@ -23,7 +23,7 @@
 
 using namespace ::chip;
 
-CHIP_ERROR SetupPayloadParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR SetupPayloadParseCommand::Run()
 {
     std::string codeString(mCode);
     SetupPayload payload;
@@ -35,6 +35,10 @@ CHIP_ERROR SetupPayloadParseCommand::Run(PersistentStorage & storage, NodeId loc
     err = Print(payload);
     SuccessOrExit(err);
 exit:
+    if (err == CHIP_NO_ERROR)
+    {
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
     return err;
 }
 
@@ -44,13 +48,14 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
     std::vector<OptionalQRCodeInfo> optionalVendorData;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(SetupPayload, "RequiresCustomFlow: %u", payload.requiresCustomFlow);
+    ChipLogProgress(SetupPayload, "CommissioningFlow: %" PRIu8,
+                    static_cast<std::underlying_type_t<decltype(payload.commissioningFlow)>>(payload.commissioningFlow));
     ChipLogProgress(SetupPayload, "VendorID: %u", payload.vendorID);
     ChipLogProgress(SetupPayload, "Version: %u", payload.version);
     ChipLogProgress(SetupPayload, "ProductID: %u", payload.productID);
     ChipLogProgress(SetupPayload, "Discriminator: %u", payload.discriminator);
     ChipLogProgress(SetupPayload, "SetUpPINCode: %u", payload.setUpPINCode);
-    ChipLogProgress(SetupPayload, "RendezvousInformation: %u", payload.rendezvousInformation);
+    ChipLogProgress(SetupPayload, "RendezvousInformation: %u", payload.rendezvousInformation.Raw());
 
     if (payload.getSerialNumber(serialNumber) == CHIP_NO_ERROR)
     {
@@ -100,5 +105,5 @@ CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, chip::SetupPa
 
 bool SetupPayloadParseCommand::IsQRCode(std::string codeString)
 {
-    return codeString.rfind(QRCODE_PREFIX) == 0;
+    return codeString.rfind(kQRCodePrefix) == 0;
 }

@@ -17,9 +17,23 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")
 
+arm_toolchain("k32w_lighting_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/lighting-app/k32w/args.gni")
+  }
+}
+
 arm_toolchain("k32w_lock_app") {
   toolchain_args = {
     current_os = "freertos"
     import("${chip_root}/examples/lock-app/k32w/args.gni")
+  }
+}
+
+arm_toolchain("k32w_shell_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/shell/k32w/args.gni")
   }
 }

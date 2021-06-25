@@ -100,7 +100,7 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
 
     static char strBuf[64];
 
-    ChipLogDetail(DeviceLayer, "OpenThread State Changed (Flags: 0x%08x)", flags);
+    ChipLogDetail(DeviceLayer, "OpenThread State Changed (Flags: 0x%08" PRIx32 ")", flags);
     if ((flags & OT_CHANGED_THREAD_ROLE) != 0)
     {
         ChipLogDetail(DeviceLayer, "   Device Role: %s", OpenThreadRoleToStr(otThreadGetDeviceRole(otInst)));

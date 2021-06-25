@@ -63,6 +63,7 @@ shared_library("ChipDeviceCtrl") {
         "chip/ble/darwin/AdapterListing.mm",
         "chip/ble/darwin/Scanning.mm",
       ]
+      cflags = [ "-fobjc-arc" ]
     } else {
       assert(false, "No BLE implementation available for the current OS.")
     }

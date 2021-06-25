@@ -61,7 +61,6 @@ static void RemoveEndOfLineSymbol(char * str)
 
 static CHIP_ERROR GetCounterValueFromFile(const char * aKey, uint32_t & aValue)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     char key[CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH];
     char value[CHIP_CONFIG_PERSISTED_STORAGE_MAX_VALUE_LENGTH];
 
@@ -75,24 +74,18 @@ static CHIP_ERROR GetCounterValueFromFile(const char * aKey, uint32_t & aValue)
         {
             if (fgets(value, sizeof(value), sPersistentStoreFile) == nullptr)
             {
-                err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+                return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
             }
-            else
-            {
-                RemoveEndOfLineSymbol(value);
+            RemoveEndOfLineSymbol(value);
 
-                if (!ParseInt(value, aValue, 0))
-                    err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-            }
+            if (!ParseInt(value, aValue, 0))
+                return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 
-            ExitNow();
+            return CHIP_NO_ERROR;
         }
     }
 
-    err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-
-exit:
-    return err;
+    return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 }
 
 static CHIP_ERROR SaveCounterValueToFile(const char * aKey, uint32_t aValue)
@@ -142,8 +135,8 @@ CHIP_ERROR Read(const char * aKey, uint32_t & aValue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::map<std::string, std::string>::iterator it;
 
-    VerifyOrExit(aKey != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aKey) <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH, err = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrReturnError(aKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(strlen(aKey) <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH, CHIP_ERROR_INVALID_STRING_LENGTH);
 
     if (sPersistentStoreFile)
     {
@@ -152,14 +145,13 @@ CHIP_ERROR Read(const char * aKey, uint32_t & aValue)
     else
     {
         it = sPersistentStore.find(aKey);
-        VerifyOrExit(it != sPersistentStore.end(), err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        VerifyOrReturnError(it != sPersistentStore.end(), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         size_t aValueLength =
             Base64Decode(it->second.c_str(), static_cast<uint16_t>(it->second.length()), reinterpret_cast<uint8_t *>(&aValue));
-        VerifyOrExit(aValueLength == sizeof(uint32_t), err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+        VerifyOrReturnError(aValueLength == sizeof(uint32_t), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     }
 
-exit:
     return err;
 }
 
@@ -167,8 +159,8 @@ CHIP_ERROR Write(const char * aKey, uint32_t aValue)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(aKey != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aKey) <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH, err = CHIP_ERROR_INVALID_STRING_LENGTH);
+    VerifyOrReturnError(aKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(strlen(aKey) <= CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH, CHIP_ERROR_INVALID_STRING_LENGTH);
 
     if (sPersistentStoreFile)
     {
@@ -184,7 +176,6 @@ CHIP_ERROR Write(const char * aKey, uint32_t aValue)
         sPersistentStore[aKey] = encodedValue;
     }
 
-exit:
     return err;
 }
 

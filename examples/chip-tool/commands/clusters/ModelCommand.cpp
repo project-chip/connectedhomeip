@@ -23,10 +23,6 @@
 
 using namespace ::chip;
 
-namespace {
-constexpr uint16_t kWaitDurationInSeconds = 10;
-} // namespace
-
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
@@ -37,39 +33,33 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
-CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR ModelCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Controller::CommissionerInitParams initParams;
-    initParams.storageDelegate = &storage;
+    auto * ctx = GetExecContext();
 
-    err = mOpCredsIssuer.Initialize(storage);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", ErrorStr(err)));
-
-    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
-
-    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
-
-    err = mCommissioner.Init(localId, initParams);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
-
-    err = mCommissioner.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", ErrorStr(err)));
-
-    err = mCommissioner.GetDevice(remoteId, &mDevice);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
-
-    UpdateWaitForResponse(true);
-    err = SendCommand(mDevice, mEndPointId);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
-    WaitForResponse(kWaitDurationInSeconds);
-
-    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
+    err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %d", ctx->remoteId, err));
 
 exit:
-    mCommissioner.ServiceEventSignal();
-    mCommissioner.Shutdown();
     return err;
+}
+
+void ModelCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+{
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    VerifyOrReturn(command != nullptr,
+                   ChipLogError(chipTool, "Device connected, but cannot send the command, as the context is null"));
+    command->SendCommand(device, command->mEndPointId);
+}
+
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+{
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ModelCommand context is null"));
+    command->SetCommandExitStatus(error);
 }

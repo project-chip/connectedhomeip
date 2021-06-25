@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/lib/core/core.gni")
@@ -92,7 +93,7 @@ template("chip_data_model") {
       "${_app_root}/clusters/zll-level-control-server/zll-level-control-server.h",
       "${_app_root}/clusters/zll-on-off-server/zll-on-off-server.h",
       "${_app_root}/clusters/zll-scenes-server/zll-scenes-server.h",
-      "${_app_root}/encoder.cpp",
+      "${_app_root}/encoder-common.cpp",
       "${_app_root}/reporting/reporting-default-configuration.cpp",
       "${_app_root}/reporting/reporting-tokens.h",
       "${_app_root}/reporting/reporting.cpp",
@@ -101,7 +102,7 @@ template("chip_data_model") {
       "${_app_root}/util/af-event.cpp",
       "${_app_root}/util/af-main-common.cpp",
       "${_app_root}/util/attribute-list-byte-span.cpp",
-      "${_app_root}/util/attribute-size.cpp",
+      "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",
       "${_app_root}/util/binding-table.cpp",
@@ -119,10 +120,11 @@ template("chip_data_model") {
       _cluster_sources = invoker.cluster_sources
     } else if (defined(invoker.zap_file)) {
       _zap_path = rebase_path(invoker.zap_file, root_build_dir)
+      _script_path = rebase_path(_zap_cluster_list_script, root_build_dir)
       _script_args = [ "--zap_file=" + _zap_path ]
 
-      _cluster_sources = exec_script(_zap_cluster_list_script,
-                                     _script_args,
+      _cluster_sources = exec_script("${build_root}/gn_run_binary.py",
+                                     [ _script_path ] + _script_args,
                                      "list lines",
                                      [ invoker.zap_file ])
     }

@@ -41,22 +41,18 @@ uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * 
 
     chip::DataModelReader reader(buffer, buf_length);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Skip first byte, because that's the always-0 frame control.
     uint8_t ignored;
-    err = reader.ReadOctet(&ignored)
-              .ReadClusterId(&outApsFrame->clusterId)
-              .ReadEndpointId(&outApsFrame->sourceEndpoint)
-              .ReadEndpointId(&outApsFrame->destinationEndpoint)
-              .Read16(&outApsFrame->options)
-              .ReadGroupId(&outApsFrame->groupId)
-              .ReadOctet(&outApsFrame->sequence)
-              .ReadOctet(&outApsFrame->radius)
-              .StatusCode();
-    SuccessOrExit(err);
+    const CHIP_ERROR err = reader.ReadOctet(&ignored)
+                               .ReadClusterId(&outApsFrame->clusterId)
+                               .ReadEndpointId(&outApsFrame->sourceEndpoint)
+                               .ReadEndpointId(&outApsFrame->destinationEndpoint)
+                               .Read16(&outApsFrame->options)
+                               .ReadGroupId(&outApsFrame->groupId)
+                               .ReadOctet(&outApsFrame->sequence)
+                               .ReadOctet(&outApsFrame->radius)
+                               .StatusCode();
 
-exit:
     return err == CHIP_NO_ERROR ? reader.OctetsRead() : 0;
 }
 

@@ -71,7 +71,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
 
     if (!chip::CanCastTo<uint16_t>(index))
     {
-        ChipLogError(Zcl, "Index %l is invalid. Should be between 1 and 65534", index);
+        ChipLogError(Zcl, "Index %" PRId32 " is invalid. Should be between 1 and 65534", index);
         return 0;
     }
 

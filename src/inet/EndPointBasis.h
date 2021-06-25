@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,10 @@
 #include <inet/InetLayerEvents.h>
 
 #include <support/DLLUtil.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#include <system/SystemSockets.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #include <Network/Network.h>
@@ -93,11 +97,9 @@ protected:
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    int mSocket;             /**< Encapsulated socket descriptor. */
-    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
-    SocketEvents mPendingIO; /**< Socket event masks (read/write/error) currently available */
-    SocketEvents mRequestIO; /**< Socket event masks (read/write) to wait for */
-#endif                       // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    System::WatchableSocket mSocket; /**< Encapsulated socket descriptor. */
+    IPAddressType mAddrType;         /**< Protocol family, i.e. IPv4 or IPv6. */
+#endif                               // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /** Encapsulated LwIP protocol control block */
@@ -143,7 +145,7 @@ inline bool EndPointBasis::IsNetworkFrameworkEndPoint(void) const
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 inline bool EndPointBasis::IsSocketsEndPoint() const
 {
-    return mSocket >= 0;
+    return mSocket.HasFD();
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 

@@ -36,6 +36,7 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 NoneResolver gResolver;
