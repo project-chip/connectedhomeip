@@ -79,8 +79,8 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
         printf("StartEventLoopTask() - OK\r\n");
     }
 
- exit:
-     return err;
+exit:
+    return err;
 }
 } // namespace DeviceManager
 } // namespace chip

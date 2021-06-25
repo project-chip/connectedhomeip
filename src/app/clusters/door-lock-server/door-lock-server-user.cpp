@@ -245,7 +245,7 @@ bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::Command * commandObj, 
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), userId));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), (uint8_t)user->type));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), (uint8_t) user->type));
             SuccessOrExit(err = commandObj->FinishCommand());
         }
     }
@@ -391,8 +391,8 @@ bool emberAfDoorLockClusterGetPinCallback(chip::app::Command * commandObj, uint1
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), userId));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), (uint8_t)user.status));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(2), (uint8_t)user.type));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), (uint8_t) user.status));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(2), (uint8_t) user.type));
             if (getSendPinOverTheAir())
             {
                 SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(3), user.code.pin + 1, user.code.pin[0]));
@@ -574,8 +574,8 @@ bool emberAfDoorLockClusterGetRfidCallback(chip::app::Command * commandObj, uint
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), userId));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), (uint8_t)user.status));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(2), (uint8_t)user.type));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), (uint8_t) user.status));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(2), (uint8_t) user.type));
             SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(3), user.code.pin + 1, user.code.pin[0]));
             SuccessOrExit(err = commandObj->FinishCommand());
         }

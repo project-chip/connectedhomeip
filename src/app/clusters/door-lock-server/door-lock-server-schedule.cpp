@@ -503,7 +503,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(chip::app::Command * comma
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), zclStatus));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(2), entry->localStartTime));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(3), entry->localEndTime));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(4), (uint8_t)entry->operatingModeDuringHoliday));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(4), (uint8_t) entry->operatingModeDuringHoliday));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 exit:

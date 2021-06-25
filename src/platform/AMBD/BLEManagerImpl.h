@@ -88,7 +88,7 @@ private:
 
     enum
     {
-        kFlag_AsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kFlag_AsyncInitCompleted     = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
         kFlag_AdvertisingEnabled     = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
         kFlag_FastAdvertisingEnabled = 0x0004, /**< The application has enabled fast advertising. */
         kFlag_Advertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */

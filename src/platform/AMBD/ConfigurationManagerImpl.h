@@ -24,9 +24,9 @@
 
 #pragma once
 
+#include <platform/AMBD/AMBDConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <platform/AMBD/AMBDConfig.h>
 
 namespace chip {
 namespace DeviceLayer {

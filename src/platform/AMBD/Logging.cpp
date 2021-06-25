@@ -39,27 +39,27 @@ namespace Platform {
 
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-        char tag[11];
+    char tag[11];
 
-        snprintf(tag, sizeof(tag), "chip[%s]", module);
-        tag[sizeof(tag) - 1] = 0;
+    snprintf(tag, sizeof(tag), "chip[%s]", module);
+    tag[sizeof(tag) - 1] = 0;
 
-        char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-        vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
 
-        switch (category)
-        {
-        case kLogCategory_Error:
-            printf("%s %s\r\n", tag, formattedMsg);
-            break;
-        case kLogCategory_Progress:
-        default:
-            printf("%s %s\r\n", tag, formattedMsg);
-            break;
-        case kLogCategory_Detail:
-            printf("%s %s\r\n", tag, formattedMsg);
-            break;
-        }
+    switch (category)
+    {
+    case kLogCategory_Error:
+        printf("%s %s\r\n", tag, formattedMsg);
+        break;
+    case kLogCategory_Progress:
+    default:
+        printf("%s %s\r\n", tag, formattedMsg);
+        break;
+    case kLogCategory_Detail:
+        printf("%s %s\r\n", tag, formattedMsg);
+        break;
+    }
 }
 
 } // namespace Platform

@@ -27,16 +27,17 @@
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
-#include <time.h>
 #include "task.h"
+#include <time.h>
 
 extern void rtc_init(void);
 extern time_t rtc_read(void);
 extern void rtc_write(time_t t);
 
-struct rtkTimeVal {
-    uint32_t    tv_sec;     /* seconds */
-    uint32_t    tv_usec;    /* microseconds */
+struct rtkTimeVal
+{
+    uint32_t tv_sec;  /* seconds */
+    uint32_t tv_usec; /* microseconds */
 };
 
 namespace chip {
@@ -46,7 +47,7 @@ namespace Layer {
 
 uint64_t GetClock_Monotonic(void)
 {
-    return xTaskGetTickCount()*1000;
+    return xTaskGetTickCount() * 1000;
 }
 
 uint64_t GetClock_MonotonicMS(void)
@@ -56,7 +57,7 @@ uint64_t GetClock_MonotonicMS(void)
 
 uint64_t GetClock_MonotonicHiRes(void)
 {
-    return xTaskGetTickCount()*1000;
+    return xTaskGetTickCount() * 1000;
 }
 
 Error GetClock_RealTime(uint64_t & curTime)
@@ -66,7 +67,7 @@ Error GetClock_RealTime(uint64_t & curTime)
 
     seconds = rtc_read();
 
-    tv.tv_sec = (uint32_t)seconds;
+    tv.tv_sec  = (uint32_t) seconds;
     tv.tv_usec = 0;
 
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
@@ -85,7 +86,7 @@ Error GetClock_RealTimeMS(uint64_t & curTime)
 
     seconds = rtc_read();
 
-    tv.tv_sec = (uint32_t)seconds;
+    tv.tv_sec  = (uint32_t) seconds;
     tv.tv_usec = 0;
 
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
@@ -93,7 +94,7 @@ Error GetClock_RealTimeMS(uint64_t & curTime)
         return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
     }
 
-    curTime = (tv.tv_sec * UINT64_C(1000)) + (tv.tv_usec/1000);
+    curTime = (tv.tv_sec * UINT64_C(1000)) + (tv.tv_usec / 1000);
 
     return CHIP_SYSTEM_NO_ERROR;
 }

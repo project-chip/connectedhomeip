@@ -21,8 +21,8 @@
  *          General utility methods for the AmebaD platform.
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/AMBD/AMBDUtils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
@@ -72,13 +72,11 @@ int AMBDUtils::OrderScanResultsByRSSI(const void * _res1, const void * _res2)
     return CHIP_NO_ERROR;
 }
 
-
 const char * AMBDUtils::WiFiModeToStr(int wifiMode)
 {
     // TODO
     return "(unknown)";
 }
-
 
 struct netif * AMBDUtils::GetStationNetif(void)
 {

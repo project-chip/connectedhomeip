@@ -36,18 +36,17 @@ CHIP_ERROR InitLwIPCoreLock(void);
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-extern "C"
-{
-    extern int rtw_get_random_bytes(void* dst, size_t size);
+extern "C" {
+extern int rtw_get_random_bytes(void * dst, size_t size);
 }
-static int app_entropy_source(void *data, unsigned char *output, size_t len, size_t *olen )
+static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
     *olen = 0;
 
-    if( len < sizeof(unsigned char) )
-        return( 0 );
+    if (len < sizeof(unsigned char))
+        return (0);
 
-    rtw_get_random_bytes(output,len);
+    rtw_get_random_bytes(output, len);
     *olen = len;
 
     return 0;
@@ -63,7 +62,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     SuccessOrExit(err);
 
-
     // TODO Wi-Fi Initialzation currently done through the example app needs to be moved into here.
     // for now we will let this happen that way and assume all is OK
 
@@ -76,8 +74,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
-
 }
 
 } // namespace DeviceLayer
-} // namespace chip+
+} // namespace chip
