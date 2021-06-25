@@ -149,7 +149,7 @@ private:
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
 
     // The lifetime of provided csrNonce should exceed the lifetime of RendezvousParameter object.
-    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
+    Optional<ByteSpan> mCSRNonce; ///< CSR Nonce passed by the commissioner
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
