@@ -971,48 +971,48 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label);
 
 /**
- * @brief Window Covering Cluster WindowCoveringDownClose Command callback
+ * @brief Window Covering Cluster DownOrClose Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(chip::app::Command * commandObj);
+bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::app::Command * commandObj);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToLiftPercentage Command callback
+ * @brief Window Covering Cluster GoToLiftPercentage Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(chip::app::Command * commandObj,
-                                                                          uint8_t percentageLiftValue);
+bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::Command * commandObj, uint8_t liftPercentageValue,
+                                                            uint16_t liftPercent100thsValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToLiftValue Command callback
+ * @brief Window Covering Cluster GoToLiftValue Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(chip::app::Command * commandObj, uint16_t liftValue);
+bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::app::Command * commandObj, uint16_t liftValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToTiltPercentage Command callback
+ * @brief Window Covering Cluster GoToTiltPercentage Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(chip::app::Command * commandObj,
-                                                                          uint8_t percentageTiltValue);
+bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::Command * commandObj, uint8_t tiltPercentageValue,
+                                                            uint16_t tiltPercent100thsValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToTiltValue Command callback
+ * @brief Window Covering Cluster GoToTiltValue Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(chip::app::Command * commandObj, uint16_t tiltValue);
+bool emberAfWindowCoveringClusterGoToTiltValueCallback(chip::app::Command * commandObj, uint16_t tiltValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringStop Command callback
+ * @brief Window Covering Cluster StopMotion Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringStopCallback(chip::app::Command * commandObj);
+bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::Command * commandObj);
 
 /**
- * @brief Window Covering Cluster WindowCoveringUpOpen Command callback
+ * @brief Window Covering Cluster UpOrOpen Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(chip::app::Command * commandObj);
+bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::app::Command * commandObj);
 
 //
 // Non-Cluster Related Callbacks

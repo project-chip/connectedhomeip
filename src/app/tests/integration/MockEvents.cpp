@@ -132,7 +132,7 @@ MockEventGeneratorImpl::MockEventGeneratorImpl(void) :
 {}
 
 CHIP_ERROR MockEventGeneratorImpl::Init(chip::Messaging::ExchangeManager * apExchangeMgr, EventGenerator * apEventGenerator,
-                                        int aDelayBetweenEvents, bool aWraparound)
+                                        uint32_t aDelayBetweenEvents, bool aWraparound)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     mpExchangeMgr      = apExchangeMgr;

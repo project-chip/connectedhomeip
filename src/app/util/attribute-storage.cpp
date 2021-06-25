@@ -167,7 +167,7 @@ uint8_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     {
         if (emAfEndpoints[index].endpoint == id)
         {
-            return index - FIXED_ENDPOINT_COUNT;
+            return static_cast<uint8_t>(index - FIXED_ENDPOINT_COUNT);
         }
     }
     return 0xFF;
@@ -176,12 +176,14 @@ uint8_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 EmberAfStatus emberAfSetDynamicEndpoint(uint8_t index, EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
                                         uint8_t deviceVersion)
 {
-    index += FIXED_ENDPOINT_COUNT;
+    auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
-    if (index >= MAX_ENDPOINT_COUNT)
+    if (realIndex >= MAX_ENDPOINT_COUNT)
     {
         return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
     }
+
+    index = static_cast<uint8_t>(realIndex);
 
     for (uint8_t i = FIXED_ENDPOINT_COUNT; i < MAX_ENDPOINT_COUNT; i++)
     {
@@ -213,7 +215,7 @@ EndpointId emberAfClearDynamicEndpoint(uint8_t index)
 {
     EndpointId ep = 0;
 
-    index += FIXED_ENDPOINT_COUNT;
+    index = static_cast<uint8_t>(index + FIXED_ENDPOINT_COUNT);
 
     if ((index < MAX_ENDPOINT_COUNT) && (emAfEndpoints[index].endpoint != 0) && (emberAfEndpointIndexIsEnabled(index)))
     {

@@ -186,9 +186,9 @@ public:
     {
         {{#chip_server_cluster_command_arguments}}
         {{#if (isString type)}}
-        AddArgument("{{asCamelCased label}}", &m{{asCamelCased label false}});
+        AddArgument("{{asCamelCased label false}}", &m{{asCamelCased label false}});
         {{else}}
-        AddArgument("{{asCamelCased label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asCamelCased label false}});
+        AddArgument("{{asCamelCased label false}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asCamelCased label false}});
         {{/if}}
         {{/chip_server_cluster_command_arguments}}
         ModelCommand::AddArguments();
@@ -266,7 +266,7 @@ class Read{{asCamelCased parent.name false}}{{asCamelCased name false}}: public 
 public:
     Read{{asCamelCased parent.name false}}{{asCamelCased name false}}(): ModelCommand("read")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name)}}");
+        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name false)}}");
         ModelCommand::AddArguments();
     }
 
@@ -300,7 +300,7 @@ class Write{{asCamelCased parent.name false}}{{asCamelCased name false}}: public
 public:
     Write{{asCamelCased parent.name false}}{{asCamelCased name false}}(): ModelCommand("write")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name)}}");
+        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name false)}}");
         {{#if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
@@ -341,7 +341,7 @@ class Report{{asCamelCased parent.name false}}{{asCamelCased name false}}: publi
 public:
     Report{{asCamelCased parent.name false}}{{asCamelCased name false}}(): ModelCommand("report")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name)}}");
+        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name false)}}");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         {{#unless (isDiscreteType)}}

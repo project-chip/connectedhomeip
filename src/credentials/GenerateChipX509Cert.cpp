@@ -206,8 +206,7 @@ CHIP_ERROR EncodeNOCSpecificExtensions(ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint16_t keyUsageBits =
-        static_cast<uint16_t>(KeyUsageFlags::kDigitalSignature) | static_cast<uint16_t>(KeyUsageFlags::kKeyEncipherment);
+    uint16_t keyUsageBits = static_cast<uint16_t>(KeyUsageFlags::kDigitalSignature);
 
     ReturnErrorOnFailure(EncodeIsCAExtension(kNotCACert, writer));
     ReturnErrorOnFailure(EncodeKeyUsageExtension(keyUsageBits, writer));

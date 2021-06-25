@@ -132,18 +132,23 @@ function asReadType(type)
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
       case 'int8_t':
+        return 'Int8s';
       case 'uint8_t':
         return 'Int8u';
       case 'int16_t':
+        return 'Int16s';
       case 'uint16_t':
         return 'Int16u';
       case 'int24_t':
+        return 'Int24s';
       case 'uint24_t':
         return 'Int24u';
       case 'int32_t':
+        return 'Int32s';
       case 'uint32_t':
         return 'Int32u';
       case 'int64_t':
+        return 'Int64s';
       case 'uint64_t':
         return 'Int64u';
       default:

@@ -601,7 +601,7 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
     if (certType == kCertType_Node)
     {
         res = AddExtension(newCert, NID_basic_constraints, "critical,CA:FALSE") &&
-            AddExtension(newCert, NID_key_usage, "critical,digitalSignature,keyEncipherment") &&
+            AddExtension(newCert, NID_key_usage, "critical,digitalSignature") &&
             AddExtension(newCert, NID_ext_key_usage, "critical,clientAuth,serverAuth");
     }
     else if (certType == kCertType_FirmwareSigning)

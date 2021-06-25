@@ -55,16 +55,16 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
     switch (aAction)
     {
     case ON_ACTION:
-        ChipLogProgress(NotSpecified, "LightingManager::InitiateAction(ON_ACTION)");
+        ChipLogProgress(NotSpecified, "LightMgr:ON: %s->ON", mState == kState_On ? "ON" : "OFF");
         break;
     case OFF_ACTION:
-        ChipLogProgress(NotSpecified, "LightingManager::InitiateAction(OFF_ACTION)");
+        ChipLogProgress(NotSpecified, "LightMgr:OFF: %s->OFF", mState == kState_On ? "ON" : "OFF");
         break;
     case LEVEL_ACTION:
-        ChipLogProgress(NotSpecified, "LightingManager::InitiateAction(LEVEL_ACTION)");
+        ChipLogProgress(NotSpecified, "LightMgr:LEVEL: lev:%u->%u", mLevel, *value);
         break;
     default:
-        ChipLogProgress(NotSpecified, "LightingManager::InitiateAction(unknown)");
+        ChipLogProgress(NotSpecified, "LightMgr:Unknown");
         break;
     }
 

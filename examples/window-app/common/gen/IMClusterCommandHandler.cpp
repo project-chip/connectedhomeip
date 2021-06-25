@@ -1448,16 +1448,17 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID: {
+        case ZCL_DOWN_OR_CLOSE_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(apCommandObj);
+            wasHandled = emberAfWindowCoveringClusterDownOrCloseCallback(apCommandObj);
             break;
         }
-        case ZCL_WINDOW_COVERING_GO_TO_LIFT_PERCENTAGE_COMMAND_ID: {
-            expectArgumentCount = 1;
-            uint8_t percentageLiftValue;
-            bool argExists[1];
+        case ZCL_GO_TO_LIFT_PERCENTAGE_COMMAND_ID: {
+            expectArgumentCount = 2;
+            uint8_t liftPercentageValue;
+            uint16_t liftPercent100thsValue;
+            bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -1470,7 +1471,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 1)
+                if (currentDecodeTagId < 2)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -1487,7 +1488,10 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(percentageLiftValue);
+                    TLVUnpackError = aDataTlv.Get(liftPercentageValue);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(liftPercent100thsValue);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1506,15 +1510,15 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled =
-                    emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(apCommandObj, percentageLiftValue);
+                wasHandled = emberAfWindowCoveringClusterGoToLiftPercentageCallback(apCommandObj, liftPercentageValue,
+                                                                                    liftPercent100thsValue);
             }
             break;
         }
-        case ZCL_WINDOW_COVERING_GO_TO_LIFT_VALUE_COMMAND_ID: {
+        case ZCL_GO_TO_LIFT_VALUE_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t liftValue;
             bool argExists[1];
@@ -1569,14 +1573,15 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(apCommandObj, liftValue);
+                wasHandled = emberAfWindowCoveringClusterGoToLiftValueCallback(apCommandObj, liftValue);
             }
             break;
         }
-        case ZCL_WINDOW_COVERING_GO_TO_TILT_PERCENTAGE_COMMAND_ID: {
-            expectArgumentCount = 1;
-            uint8_t percentageTiltValue;
-            bool argExists[1];
+        case ZCL_GO_TO_TILT_PERCENTAGE_COMMAND_ID: {
+            expectArgumentCount = 2;
+            uint8_t tiltPercentageValue;
+            uint16_t tiltPercent100thsValue;
+            bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -1589,7 +1594,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 1)
+                if (currentDecodeTagId < 2)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -1606,7 +1611,10 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(percentageTiltValue);
+                    TLVUnpackError = aDataTlv.Get(tiltPercentageValue);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(tiltPercent100thsValue);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1625,15 +1633,15 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled =
-                    emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(apCommandObj, percentageTiltValue);
+                wasHandled = emberAfWindowCoveringClusterGoToTiltPercentageCallback(apCommandObj, tiltPercentageValue,
+                                                                                    tiltPercent100thsValue);
             }
             break;
         }
-        case ZCL_WINDOW_COVERING_GO_TO_TILT_VALUE_COMMAND_ID: {
+        case ZCL_GO_TO_TILT_VALUE_COMMAND_ID: {
             expectArgumentCount = 1;
             uint16_t tiltValue;
             bool argExists[1];
@@ -1688,20 +1696,20 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(apCommandObj, tiltValue);
+                wasHandled = emberAfWindowCoveringClusterGoToTiltValueCallback(apCommandObj, tiltValue);
             }
             break;
         }
-        case ZCL_WINDOW_COVERING_STOP_COMMAND_ID: {
+        case ZCL_STOP_MOTION_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringStopCallback(apCommandObj);
+            wasHandled = emberAfWindowCoveringClusterStopMotionCallback(apCommandObj);
             break;
         }
-        case ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID: {
+        case ZCL_UP_OR_OPEN_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(apCommandObj);
+            wasHandled = emberAfWindowCoveringClusterUpOrOpenCallback(apCommandObj);
             break;
         }
         default: {
