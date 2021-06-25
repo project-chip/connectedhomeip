@@ -706,7 +706,7 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     // OnLevel is not used for Move commands.
     state->useOnLevel = false;
 
-    // storedLevel is not use for Move commands.
+    // storedLevel is not used for Move commands.
     state->storedLevel = INVALID_STORED_LEVEL;
 
     // The setup was successful, so mark the new state as active and return.
