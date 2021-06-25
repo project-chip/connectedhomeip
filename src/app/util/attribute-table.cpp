@@ -366,7 +366,7 @@ void emberAfRetrieveAttributeAndCraftResponse(EndpointId endpoint, ClusterId clu
     else
     {
         emberAfPutInt16uInResp(attrId);
-        emberAfPutInt8uInResp(status);
+        emberAfPutStatusInResp(status);
         emberAfAttributesPrintln("READ: clus %2x, attr %2x failed %x", clusterId, attrId, status);
         emberAfAttributesFlush();
         return;

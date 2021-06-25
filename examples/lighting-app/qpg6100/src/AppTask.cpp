@@ -185,8 +185,10 @@ void AppTask::AppTaskMain(void * pvParameter)
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
     LightingManager::Action_t action;
+
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
+        // Toggle light
         if (LightingMgr().IsTurnedOn())
         {
             action = LightingManager::OFF_ACTION;
@@ -195,25 +197,30 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
         {
             action = LightingManager::ON_ACTION;
         }
+
+        sAppTask.mSyncClusterToButtonAction = true;
         LightingMgr().InitiateAction(action, 0, 0, 0);
     }
     if (aEvent->Type == AppEvent::kEventType_Level && aEvent->ButtonEvent.Action != 0)
     {
+        // Toggle Dimming of light between 2 fixed levels
         uint8_t val = 0x0;
         val         = LightingMgr().GetLevel() == 0x7f ? 0x1 : 0x7f;
         action      = LightingManager::LEVEL_ACTION;
+
+        sAppTask.mSyncClusterToButtonAction = true;
         LightingMgr().InitiateAction(action, 0, 1, &val);
     }
-    return;
 }
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 {
-    ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
     if (btnIdx != APP_ON_OFF_BUTTON && btnIdx != APP_FUNCTION_BUTTON && btnIdx != APP_LEVEL_BUTTON)
     {
         return;
     }
+
+    ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
 
     AppEvent button_event              = {};
     button_event.Type                  = AppEvent::kEventType_Button;
@@ -222,21 +229,26 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 
     if (btnIdx == APP_ON_OFF_BUTTON && btnPressed == true)
     {
+        // Hand off to Light handler - On/Off light
         button_event.Handler = LightingActionEventHandler;
-        sAppTask.PostEvent(&button_event);
     }
     else if (btnIdx == APP_LEVEL_BUTTON)
     {
+        // Hand off to Light handler - Change level of light
         button_event.Type    = AppEvent::kEventType_Level;
         button_event.Handler = LightingActionEventHandler;
-        sAppTask.PostEvent(&button_event);
     }
     else if (btnIdx == APP_FUNCTION_BUTTON)
     {
-        button_event.Type    = AppEvent::kEventType_Level;
+        // Hand off to Functionality handler - depends on duration of press
         button_event.Handler = FunctionHandler;
-        sAppTask.PostEvent(&button_event);
     }
+    else
+    {
+        return;
+    }
+
+    sAppTask.PostEvent(&button_event);
 }
 
 void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, chip::System::Error aError)
@@ -430,25 +442,30 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
+/**
+ * Update cluster status after application level changes
+ */
 void AppTask::UpdateClusterState(void)
 {
-    uint8_t newValue = !LightingMgr().IsTurnedOn();
+    uint8_t newValue;
+
+    ChipLogProgress(NotSpecified, "UpdateClusterState");
+
     // write the new on/off value
+    newValue             = LightingMgr().IsTurnedOn();
     EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx32, status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx8, status);
     }
 
-    ChipLogProgress(NotSpecified, "UpdateClusterState");
     newValue = LightingMgr().GetLevel();
-    // TODO understand well enough to implement the level cluster ZCL_CURRENT_LEVEL_ATTRIBUTE_ID
-    status = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+    status   = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                                    (uint8_t *) &newValue, ZCL_DATA8_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating level %" PRIx32, status);
+        ChipLogError(NotSpecified, "ERR: updating level %" PRIx8, status);
     }
 }

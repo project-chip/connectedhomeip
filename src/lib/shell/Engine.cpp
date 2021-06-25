@@ -105,6 +105,11 @@ void Engine::RegisterDefaultCommands()
 #endif
 #if CONFIG_DEVICE_LAYER
     RegisterConfigCommands();
+    RegisterDeviceCommands();
+    RegisterOnboardingCodesCommands();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC
+    RegisterNFCCommands();
 #endif
 }
 

@@ -138,7 +138,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         {
         case 0x0000: // accepts header list
         {
-            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, index - 1);
+            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
             if (entryOffset == 0)
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -155,7 +155,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
 
-            entryLength = acceptsHeaderListSpan->size();
+            if (!CanCastTo<uint16_t>(acceptsHeaderListSpan->size()))
+            {
+                ChipLogError(Zcl, "Span size %zu is too large", acceptsHeaderListSpan->size());
+                return 0;
+            }
+            entryLength = static_cast<uint16_t>(acceptsHeaderListSpan->size());
             break;
         }
         case 0x0001: // supported streaming types
@@ -548,7 +553,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         case 0x001B: // list_octet_string
         {
-            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, index - 1);
+            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
             if (entryOffset == 0)
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -565,7 +570,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
 
-            entryLength = listOctetStringSpan->size();
+            if (!CanCastTo<uint16_t>(listOctetStringSpan->size()))
+            {
+                ChipLogError(Zcl, "Span size %zu is too large", listOctetStringSpan->size());
+                return 0;
+            }
+            entryLength = static_cast<uint16_t>(listOctetStringSpan->size());
             break;
         }
         case 0x001C: // list_struct_octet_string

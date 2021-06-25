@@ -267,7 +267,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
             {
                 numFailures++;
                 // Write to the response buffer - status and then attrID
-                emberAfPutInt8uInResp(status);
+                emberAfPutStatusInResp(status);
                 emberAfPutInt16uInResp(attrId);
 
                 emberAfAttributesPrintln("WRITE: clus %2x attr %2x ", clusterId, attrId);
@@ -375,7 +375,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
                 {
                     numFailures++;
                     // write to the response buffer - status and then attrID
-                    emberAfPutInt8uInResp(status);
+                    emberAfPutStatusInResp(status);
                     emberAfPutInt16uInResp(attrId);
                     emberAfAttributesPrintln("FAIL %x", status);
                 }
@@ -390,7 +390,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
                 numFailures++;
                 status = EMBER_ZCL_STATUS_INVALID_VALUE;
                 // write to the response buffer - status and then attrID
-                emberAfPutInt8uInResp(status);
+                emberAfPutStatusInResp(status);
                 emberAfPutInt16uInResp(attrId);
                 emberAfAttributesPrintln("FAIL %x", status);
                 // size exceeds buffer, terminate loop

@@ -183,6 +183,12 @@ template("chip_data_model") {
       public_deps += [ "${chip_root}/src/app/server" ]
     }
 
+    if (!defined(cflags)) {
+      cflags = []
+    }
+
+    cflags += [ "-Wconversion" ]
+
     if (!defined(public_configs)) {
       public_configs = []
     }

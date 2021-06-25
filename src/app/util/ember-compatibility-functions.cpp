@@ -46,7 +46,8 @@ void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId comma
     imCompatibilityEmberApsFrame.clusterId           = clusterId;
     imCompatibilityEmberApsFrame.destinationEndpoint = endpointId;
     imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
-    imCompatibilityEmberApsFrame.sequence = (commandExchangeCtx != nullptr ? commandExchangeCtx->GetExchangeId() & 0xFF : 0);
+    imCompatibilityEmberApsFrame.sequence =
+        (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
 
     imCompatibilityEmberAfCluster.commandId      = commandId;
     imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;

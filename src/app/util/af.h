@@ -72,6 +72,8 @@
 #include <app/util/debug-printing.h>
 #include <app/util/ember-print.h>
 
+#include <lib/support/SafeInt.h>
+
 /** @name Attribute Storage */
 // @{
 
@@ -496,21 +498,26 @@ bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
  * @brief Function that extracts a 64-bit integer from the message buffer
  */
 uint64_t emberAfGetInt64u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt64s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt64u(message, currentIndex, msgLen))
 
 /**
  * @brief Function that extracts a 32-bit integer from the message buffer
  */
 uint32_t emberAfGetInt32u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt32s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt32u(message, currentIndex, msgLen))
 
 /**
  * @brief Function that extracts a 24-bit integer from the message buffer
  */
 uint32_t emberAfGetInt24u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt24s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt24u(message, currentIndex, msgLen))
 
 /**
  * @brief Function that extracts a 16-bit integer from the message buffer
  */
 uint16_t emberAfGetInt16u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt16s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt16u(message, currentIndex, msgLen))
+
 /**
  * @brief Function that extracts a ZCL string from the message buffer
  */
@@ -529,6 +536,7 @@ uint8_t emberAfGetDate(uint8_t * message, uint16_t currentIndex, uint16_t msgLen
  * @brief Macro for consistency, that extracts single byte out of the message
  */
 #define emberAfGetInt8u(message, currentIndex, msgLen) message[currentIndex]
+#define emberAfGetInt8s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt8u(message, currentIndex, msgLen))
 
 /**
  * @brief Macro for consistency that copies a uint8_t from variable into buffer.
