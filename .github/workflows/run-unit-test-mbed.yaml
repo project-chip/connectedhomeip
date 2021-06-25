@@ -56,6 +56,13 @@ jobs:
           yq e -i ".environment.GITHUB_SHA = \"$GITHUB_SHA\"" $JOB_FILE
           yq e -i ".secrets.GITHUB_TOKEN = \"$GITHUB_TOKEN\"" $JOB_FILE  
           cat $JOB_FILE
+
+      - name: upload_test_file
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: lava_unit_tests.yml
+          path: $GITHUB_WORKSPACE/scripts/tests/mbed/lava_unit_tests.yml
+
       - name: launch lava job
         env:
           LAVA_SERVER_TOKEN: ${{ secrets.LAVA_SERVER_TOKEN }}
@@ -67,6 +74,7 @@ jobs:
           lavacli jobs wait $LAVA_JOB_ID
           lavacli results $LAVA_JOB_ID >lava_results.txt
           bash $GITHUB_WORKSPACE/scripts/tests/mbed/check_lava_results.sh lava_results.txt
+
       - name: Upload unit test logs
         uses: actions/upload-artifact@v2.2.3
         with:
