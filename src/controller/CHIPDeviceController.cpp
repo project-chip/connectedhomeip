@@ -311,7 +311,7 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * 
             //        Make sure it chains back to the trusted root.
             ChipLogProgress(Controller, "Generating operational certificate for the controller");
             ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
-                Optional<NodeId>(mLocalDeviceId), 0, ByteSpan(CSR.Get(), csrLength), 1, &mLocalNOCCallback));
+                Optional<NodeId>(mLocalDeviceId), 0, ByteSpan(CSR.Get(), csrLength), ByteSpan(), &mLocalNOCCallback));
         }
 
         ReturnErrorOnFailure(mAdmins.Store(admin->GetAdminId()));
@@ -1237,6 +1237,8 @@ void DeviceCommissioner::OnDeviceNOCGenerated(void * context, const ByteSpan & n
 
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
 
+    // The operational certificate array can contain upto 2 certificates (NOC, and ICAC)
+    // The memory is allocated to account for both these certificates.
     uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
 
@@ -1275,9 +1277,6 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    // TODO: Verify the OpCSR signature using pubkey from DAC
-    //       This will be done when device attestation is implemented.
-
     // Verify that Nonce matches with what we sent
     const ByteSpan nonce = device->GetCSRNonce();
     VerifyOrReturnError(CSRNonce.size() == nonce.size(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1286,8 +1285,10 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipOpCert;
     ReturnErrorCodeIf(!chipOpCert.Alloc(kMaxCHIPCertLength * 2), CHIP_ERROR_NO_MEMORY);
 
+    // TODO: Send DAC as input parameter to GenerateNodeOperationalCertificate()
+    //       This will be done when device attestation is implemented.
     ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
-        Optional<NodeId>(device->GetDeviceId()), 0, CSR, 1, &mDeviceNOCCallback));
+        Optional<NodeId>(device->GetDeviceId()), 0, CSR, ByteSpan(), &mDeviceNOCCallback));
 
     return CHIP_NO_ERROR;
 }

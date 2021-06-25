@@ -186,8 +186,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificate(const chip::Optional<chip::NodeId> & deviceId,
-    chip::FabricId fabricId, const chip::ByteSpan & csr, int64_t serialNumber,
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificate(const chip::Optional<chip::NodeId> & nodeId,
+    chip::FabricId fabricId, const chip::ByteSpan & csr, const chip::ByteSpan & DAC,
     chip::Callback::Callback<chip::Controller::NOCGenerated> * onNOCGenerated)
 {
     uint32_t validityStart, validityEnd;
@@ -203,8 +203,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificat
     }
 
     chip::NodeId assignedId;
-    if (deviceId.HasValue()) {
-        assignedId = deviceId.Value();
+    if (nodeId.HasValue()) {
+        assignedId = nodeId.Value();
     } else {
         if (mDeviceBeingPaired == chip::kUndefinedNodeId) {
             return CHIP_ERROR_INCORRECT_STATE;
@@ -213,7 +213,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificat
     }
 
     chip::Credentials::X509CertRequestParams request
-        = { serialNumber, mIssuerId, validityStart, validityEnd, true, fabricId, true, assignedId };
+        = { 1, mIssuerId, validityStart, validityEnd, true, fabricId, true, assignedId };
 
     chip::Crypto::P256PublicKey pubkey;
     CHIP_ERROR err = chip::Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey);

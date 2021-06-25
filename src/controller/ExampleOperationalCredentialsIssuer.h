@@ -43,8 +43,8 @@ class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredent
 public:
     virtual ~ExampleOperationalCredentialsIssuer() {}
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(const Optional<NodeId> & deviceId, FabricId fabricId, const ByteSpan & csr,
-                                                  int64_t serialNumber, Callback::Callback<NOCGenerated> * onNOCGenerated) override;
+    CHIP_ERROR GenerateNodeOperationalCertificate(const Optional<NodeId> & nodeId, FabricId fabricId, const ByteSpan & csr,
+                                                  const ByteSpan & DAC, Callback::Callback<NOCGenerated> * onNOCGenerated) override;
 
     CHIP_ERROR GetRootCACertificate(FabricId fabricId, MutableByteSpan & outCert) override;
 

@@ -29,13 +29,9 @@
 namespace chip {
 namespace Controller {
 
-typedef void (*NOCGenerated)(void * context, const ByteSpan & noc, const PeerId & deviceId);
+typedef void (*NOCGenerated)(void * context, const ByteSpan & noc, const PeerId & nodeId);
 
-// TODO - Reduce memory requirement for generating x509 certificates
-// As per specifications (section 6.3.7. Trusted Root CA Certificates), DER certs
-// should require 600 bytes. Currently, due to ASN writer overheads, a larger buffer
-// is needed, even though the generated certificate fits in 600 bytes limit.
-constexpr uint32_t kMaxCHIPDERCertLength = 1024;
+constexpr uint32_t kMaxCHIPDERCertLength = 600;
 
 /// Callbacks for CHIP operational credentials generation
 class DLL_EXPORT OperationalCredentialsDelegate
@@ -54,17 +50,17 @@ public:
      *
      *   The delegate will call `onNOCGenerated` when the NOC is ready.
      *
-     * @param[in] deviceId        Optional device ID. If provided, the generated NOC must use the provided ID.
+     * @param[in] nodeId          Optional node ID. If provided, the generated NOC must use the provided ID.
      *                            If ID is not provided, the delegate must generate one.
      * @param[in] fabricId        Fabric ID for which the certificate is being requested.
      * @param[in] csr             Certificate Signing Request from the node in DER format.
-     * @param[in] serialNumber    Serial number to assign to the new certificate.
+     * @param[in] DAC             Device attestation certificate received from the device being commissioned
      * @param[in] onNOCGenerated  Callback handler to provide generated NOC to the caller of GenerateNodeOperationalCertificate()
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateNodeOperationalCertificate(const Optional<NodeId> & deviceId, FabricId fabricId,
-                                                          const ByteSpan & csr, int64_t serialNumber,
+    virtual CHIP_ERROR GenerateNodeOperationalCertificate(const Optional<NodeId> & nodeId, FabricId fabricId, const ByteSpan & csr,
+                                                          const ByteSpan & DAC,
                                                           Callback::Callback<NOCGenerated> * onNOCGenerated) = 0;
 
     /**

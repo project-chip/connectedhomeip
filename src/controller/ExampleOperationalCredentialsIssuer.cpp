@@ -64,22 +64,22 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 }
 
 CHIP_ERROR
-ExampleOperationalCredentialsIssuer::GenerateNodeOperationalCertificate(const Optional<NodeId> & deviceId, FabricId fabricId,
-                                                                        const ByteSpan & csr, int64_t serialNumber,
+ExampleOperationalCredentialsIssuer::GenerateNodeOperationalCertificate(const Optional<NodeId> & nodeId, FabricId fabricId,
+                                                                        const ByteSpan & csr, const ByteSpan & DAC,
                                                                         Callback::Callback<NOCGenerated> * onNOCGenerated)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     NodeId assignedId;
-    if (deviceId.HasValue())
+    if (nodeId.HasValue())
     {
-        assignedId = deviceId.Value();
+        assignedId = nodeId.Value();
     }
     else
     {
         assignedId = mNextAvailableNodeId++;
     }
 
-    X509CertRequestParams request = { serialNumber, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
+    X509CertRequestParams request = { 1, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
