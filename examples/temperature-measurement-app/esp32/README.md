@@ -58,7 +58,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Configuration Options
 
-    This application uses `ESP32-DevKitC` as a default device type. To use other ESP32 based device types, please refer [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
+    This application uses `ESP32-DevKitC` as a default device type. To use other
+    ESP32 based device types, please refer
+    [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
 
 -   To build the demo application.
 

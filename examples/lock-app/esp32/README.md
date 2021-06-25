@@ -58,7 +58,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Configuration Options
 
-    This application uses `ESP32-DevKitC` as a default device type. To use other ESP32 based device types, please refer [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
+    This application uses `ESP32-DevKitC` as a default device type. To use other
+    ESP32 based device types, please refer
+    [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
 
 -   To build the demo application.
 
@@ -188,7 +190,8 @@ commissioning and cluster control.
 ### Example Demo
 
 This demo app illustrates controlling OnOff cluster (Server) attributes of an
-endpoint and lock/unlock status of door using LED's. For `ESP32-DevKitC`, a GPIO (configurable through `LOCK_STATE_LED` in `main/include/AppConfig.h`) is updated through the on/off/toggle commands from
-the `python-controller`.
-If you wish to see the actual effect of the commands on `ESP32-DevKitC`, you will have to connect an external LED to GPIO.
-
+endpoint and lock/unlock status of door using LED's. For `ESP32-DevKitC`, a GPIO
+(configurable through `LOCK_STATE_LED` in `main/include/AppConfig.h`) is updated
+through the on/off/toggle commands from the `python-controller`. If you wish to
+see the actual effect of the commands on `ESP32-DevKitC`, you will have to
+connect an external LED to GPIO.
