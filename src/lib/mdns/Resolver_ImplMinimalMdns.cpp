@@ -308,6 +308,7 @@ void PacketDataReporter::OnComplete()
     }
     else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
     {
+        mNodeData.LogNodeIdResolved();
         mDelegate->OnNodeIdResolved(mNodeData);
     }
 }
