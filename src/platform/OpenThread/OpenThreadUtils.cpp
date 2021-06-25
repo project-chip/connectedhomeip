@@ -42,7 +42,7 @@ namespace Internal {
  */
 CHIP_ERROR MapOpenThreadError(otError otErr)
 {
-    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_CONFIG_OPENTHREAD_ERROR_MIN + (CHIP_ERROR) otErr;
+    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_CONFIG_OPENTHREAD_ERROR_MIN + static_cast<CHIP_ERROR>(otErr);
 }
 
 /**

@@ -637,7 +637,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "Endpoint pool full";
         break;
     case CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG:
-        desc = "Inbound message too big,More inbound message data is pending than available buffer space available to copy it.";
+        desc = "Inbound message too big";
         break;
     case CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG:
         desc = "Outbound message too big";

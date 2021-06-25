@@ -550,7 +550,7 @@ CHIP_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj,
     }
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    err = (CHIP_ERROR) mTxQueueMutex.Init(mTxQueueMutex);
+    err = static_cast<CHIP_ERROR>(mTxQueueMutex.Init(mTxQueueMutex));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "%s: Mutex init failed", __FUNCTION__);

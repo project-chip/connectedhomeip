@@ -85,7 +85,7 @@
 #include <inttypes.h>
 #include <stdint.h>
 
-#define CHIP_CONFIG_ERROR_TYPE uint32_t
+#define CHIP_CONFIG_ERROR_TYPE int32_t
 #define CHIP_CONFIG_ERROR_FORMAT PRId32
 #endif // CHIP_CONFIG_ERROR_TYPE
 

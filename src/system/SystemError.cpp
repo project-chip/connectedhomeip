@@ -113,7 +113,7 @@ namespace System {
  */
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
 {
-    return (aError == 0 ? CHIP_NO_ERROR : static_cast<CHIP_ERROR>(CHIP_SYSTEM_POSIX_ERROR_MIN + aError)); // XXX
+    return (aError == 0 ? CHIP_NO_ERROR : static_cast<CHIP_ERROR>(CHIP_SYSTEM_POSIX_ERROR_MIN + aError));
 }
 
 /**
@@ -126,7 +126,7 @@ DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
  */
 DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 {
-    const int lError = ((int) aError - CHIP_SYSTEM_POSIX_ERROR_MIN); // XXX
+    const int lError = (static_cast<int>(aError) - CHIP_SYSTEM_POSIX_ERROR_MIN);
     return strerror(lError);
 }
 

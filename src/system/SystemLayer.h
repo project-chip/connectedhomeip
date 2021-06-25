@@ -62,7 +62,6 @@ class Object;
 namespace Platform {
 namespace Layer {
 
-using ::CHIP_ERROR;
 using ::chip::System::Layer;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
