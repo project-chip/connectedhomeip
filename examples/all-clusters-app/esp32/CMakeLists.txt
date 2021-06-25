@@ -24,12 +24,11 @@ set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../../common/QRCode"
 )
 if(${IDF_TARGET} STREQUAL "esp32")
-set(EXTRA_COMPONENT_DIRS
-    ${EXTRA_COMPONENT_DIRS}
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/tft"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/spidriver"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework"
-)
+    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/tft"
+                                     "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/spidriver"
+                                     "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework")
+elseif(${IDF_TARGET} STREQUAL "esp32c3")
+    list(APPEND EXTRA_COMPONENT_DIRS "$ENV{IDF_PATH}/examples/peripherals/rmt/led_strip/components")
 endif()
 
 project(chip-all-clusters-app)

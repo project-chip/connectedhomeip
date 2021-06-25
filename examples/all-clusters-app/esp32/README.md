@@ -243,5 +243,6 @@ through the on/off/toggle commands from the `python-controller`. For `M5Stack`,
 a virtual Green LED on the display is used for the same.
 
 If you wish to see the actual effect of the commands on `ESP32-DevKitC`,
-`ESP32-WROVER-KIT_V4.1` and `ESP32C3-DevKitM`, you will have to connect an
-external LED to GPIO `STATUS_LED_GPIO_NUM`.
+`ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
+`STATUS_LED_GPIO_NUM`. For `ESP32C3-DevKitM`, the on-board LED will show the
+actual effect of the commands.
