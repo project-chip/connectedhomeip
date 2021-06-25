@@ -411,6 +411,8 @@ void Device::Reset()
     }
 
     SetActive(false);
+    mCASESession.Clear();
+
     mState          = ConnectionState::NotConnected;
     mSessionManager = nullptr;
     mStatusDelegate = nullptr;
