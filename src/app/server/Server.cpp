@@ -769,7 +769,7 @@ CHIP_ERROR ResetUDCStates()
 {
     InitCommissioner();
 
-    mCommissioner.ResetUserDirectedCommissioningStates();
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().ResetUDCClientProcessingStates();
 
     return CHIP_NO_ERROR;
 }

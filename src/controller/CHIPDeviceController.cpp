@@ -1467,11 +1467,6 @@ void DeviceCommissioner::OnUserDirectedCommissioningRequest(const Mdns::Discover
     ChipLogDetail(Controller, "------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s", nodeData.instanceName);
 }
 
-void DeviceCommissioner::ResetUserDirectedCommissioningStates()
-{
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().ResetUDCClientProcessingStates();
-}
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(

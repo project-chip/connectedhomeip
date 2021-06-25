@@ -108,17 +108,17 @@ bool ParseAAAARecord(const BytesRange & data, chip::Inet::IPAddress * addr)
     return true;
 }
 
-// bool ParsePtrRecord(const BytesRange & data, const BytesRange & packet, SerializedQNameIterator * name)
-// {
-//     if (data.Size() < 1)
-//     {
-//         return false;
-//     }
+bool ParsePtrRecord(const BytesRange & data, const BytesRange & packet, SerializedQNameIterator * name)
+{
+    if (data.Size() < 1)
+    {
+        return false;
+    }
 
-//     *name = SerializedQNameIterator(packet, data.Start());
+    *name = SerializedQNameIterator(packet, data.Start());
 
-//     return true;
-// }
+    return true;
+}
 
 } // namespace Minimal
 } // namespace mdns

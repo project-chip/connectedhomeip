@@ -107,7 +107,6 @@ CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::Pack
 
 void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer, const Inet::IPPacketInfo * pktInfo)
 {
-    // TODO: remove diagnostic (or put behind compile time #ifdef)
     char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
     pktInfo->SrcAddress.ToString(addrBuffer, sizeof(addrBuffer));
 

@@ -548,12 +548,6 @@ public:
      *
      */
     void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) override;
-
-    /**
-     * Reset the processing states for all UDC Clients
-     *
-     */
-    void ResetUserDirectedCommissioningStates();
 #endif
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }

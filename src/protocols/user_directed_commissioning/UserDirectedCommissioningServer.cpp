@@ -100,11 +100,6 @@ CHIP_ERROR UserDirectedCommissioningServer::OnMessageReceived(Messaging::Exchang
             ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived no mInstanceNameResolver registered");
         }
     }
-    // else
-    // {
-    //     printf("UDC Received existing instance: name=%s, expiration=%lu state=%d\n", client->GetInstanceName(),
-    //            client->GetExpirationTimeMs(), (int) client->GetUDCClientProcessingState());
-    // }
 
     mUdcClients.MarkUDCClientActive(client);
 
@@ -133,11 +128,6 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
             return;
         }
     }
-    // else
-    // {
-    //     printf("SetUDCClientProcessingState existing instance: name=%s, expiration=%lu state=%d\n", client->GetInstanceName(),
-    //            client->GetExpirationTimeMs(), (int) client->GetUDCClientProcessingState());
-    // }
 
     ChipLogDetail(AppServer, "SetUDCClientProcessingState instance=%s new state=%d", instanceName, (int) state);
 

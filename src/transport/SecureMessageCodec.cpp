@@ -48,7 +48,6 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
 
-    // TODO: Echo should be encrypted so remove this from list of exceptions
     if (!payloadHeader.HasProtocol(Protocols::UserDirectedCommissioning::Id))
     {
         packetHeader

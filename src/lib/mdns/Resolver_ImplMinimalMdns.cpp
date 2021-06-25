@@ -250,18 +250,18 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         }
         break;
     }
-    // case QType::PTR: {
-    //     if (mDiscoveryType == DiscoveryType::kCommissionableNode)
-    //     {
-    //         SerializedQNameIterator qname;
-    //         ParsePtrRecord(data.GetData(), mPacketRange, &qname);
-    //         if (qname.Next())
-    //         {
-    //             strncpy(mCommissionableNodeData.instanceName, qname.Value(), sizeof(CommissionableNodeData::instanceName));
-    //         }
-    //     }
-    //     break;
-    // }
+    case QType::PTR: {
+        if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+        {
+            SerializedQNameIterator qname;
+            ParsePtrRecord(data.GetData(), mPacketRange, &qname);
+            if (qname.Next())
+            {
+                strncpy(mDiscoveredNodeData.instanceName, qname.Value(), sizeof(DiscoveredNodeData::instanceName));
+            }
+        }
+        break;
+    }
     case QType::TXT:
         if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
