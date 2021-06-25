@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPError.h>
@@ -81,7 +83,11 @@ private:
         Callback::Cancelable * ca = &queue;
         while (ca != nullptr && ca->mNext != &queue)
         {
-            if (*reinterpret_cast<T *>(&ca->mNext->mInfoPtr) == info)
+            T callbackInfo;
+            static_assert(std::is_pod<T>::value, "Callback info must be POD");
+            static_assert(sizeof(ca->mNext->mInfo) >= sizeof(callbackInfo), "Callback info too large");
+            memcpy(&callbackInfo, ca->mNext->mInfo, sizeof(callbackInfo));
+            if (callbackInfo == info)
             {
                 *callback = ca->mNext;
                 return CHIP_NO_ERROR;

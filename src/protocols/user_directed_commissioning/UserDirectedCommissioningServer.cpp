@@ -56,8 +56,9 @@ void UserDirectedCommissioningServer::Shutdown()
     }
 }
 
-void UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+CHIP_ERROR UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                                              const PayloadHeader & payloadHeader,
+                                                              System::PacketBufferHandle && payload)
 {
     payload->DebugDump("UserDirectedCommissioningServer::OnMessageReceive");
 
@@ -81,12 +82,12 @@ void UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeConte
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived error creating new connection state");
-            return;
+            return err;
         }
         if (client == nullptr)
         {
             ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived no memory");
-            return;
+            return CHIP_ERROR_NO_MEMORY;
         }
 
         // Call the registered InstanceNameResolver, if any.
@@ -109,6 +110,7 @@ void UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeConte
 
     // Discard the exchange context.
     ec->Close();
+    return CHIP_NO_ERROR;
 }
 
 void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanceName, UDCClientProcessingState state)
@@ -146,7 +148,7 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
     return;
 }
 
-void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Mdns::CommissionableNodeData & nodeData)
+void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Mdns::DiscoveredNodeData & nodeData)
 {
     UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName, nullptr);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)

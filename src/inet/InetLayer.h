@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,9 +74,11 @@
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 #if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #include <inet/AsyncDNSResolverSockets.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #include <system/SystemLayer.h>
@@ -179,6 +181,8 @@ public:
     InetLayer();
 
     INET_ERROR Init(chip::System::Layer & aSystemLayer, void * aContext);
+
+    // Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
     INET_ERROR Shutdown();
 
     chip::System::Layer * SystemLayer() const;
@@ -217,11 +221,6 @@ public:
 
     INET_ERROR GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr);
     bool MatchLocalIPv6Subnet(const IPAddress & addr);
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    void PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval & sleepTime);
-    void HandleSelectResult(int selectRes, fd_set * readfds, fd_set * writefds, fd_set * exceptfds);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     static void UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot);
 

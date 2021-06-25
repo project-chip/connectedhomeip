@@ -36,6 +36,7 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
+#include <type_traits>
 
 /**
  * @namespace chip::TLV
@@ -1107,6 +1108,15 @@ public:
      *
      */
     CHIP_ERROR Put(uint64_t tag, ByteSpan data);
+
+    /**
+     * static_cast to enumerations' underlying type when data is an enumeration.
+     */
+    template <typename T>
+    CHIP_ERROR Put(uint64_t tag, T data)
+    {
+        return Put(tag, static_cast<std::underlying_type_t<T>>(data));
+    }
 
     /**
      * Encodes a TLV boolean value.

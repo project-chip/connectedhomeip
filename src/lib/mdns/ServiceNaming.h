@@ -52,5 +52,7 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
 
 CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype);
 
+CHIP_ERROR MakeCommissionableNodeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc);
+
 } // namespace Mdns
 } // namespace chip

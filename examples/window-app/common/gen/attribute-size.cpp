@@ -78,6 +78,82 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x0033: // General Diagnostics Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // NetworkInterfaces
+        {
+            entryLength = 46;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _NetworkInterfaceType
+            _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
+            chip::ByteSpan * NameSpan     = &entry->Name; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricConnected, write ? (uint8_t *) &entry->FabricConnected : src,
+                           write, &entryOffset, sizeof(entry->FabricConnected)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv4,
+                           write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv4 : src, write, &entryOffset,
+                           sizeof(entry->OffPremiseServicesReachableIPv4)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv6,
+                           write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv6 : src, write, &entryOffset,
+                           sizeof(entry->OffPremiseServicesReachableIPv6)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->HardwareAddress, write ? (uint8_t *) &entry->HardwareAddress : src,
+                           write, &entryOffset, sizeof(entry->HardwareAddress)); // IEEE_ADDRESS
+            copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
+                           sizeof(entry->Type)); // ENUM8
+            break;
+        }
+        }
+        break;
+    }
+    case 0x003E: // Operational Credentials Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0001: // fabrics list
+        {
+            entryLength = 52;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _FabricDescriptor
+            _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
+                           &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
+                           &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
+                           sizeof(entry->NodeId));      // NODE_ID
+            chip::ByteSpan * LabelSpan = &entry->Label; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            break;
+        }
+        }
+        break;
+    }
     case 0x0035: // Thread Network Diagnostics Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -252,6 +328,24 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x0033: // General Diagnostics Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // NetworkInterfaces
+            // Struct _NetworkInterfaceType
+            entryLength = 46;
+            break;
+        }
+        break;
+    case 0x003E: // Operational Credentials Cluster
+        switch (attributeId)
+        {
+        case 0x0001: // fabrics list
+            // Struct _FabricDescriptor
+            entryLength = 52;
+            break;
+        }
+        break;
     case 0x0035: // Thread Network Diagnostics Cluster
         switch (attributeId)
         {

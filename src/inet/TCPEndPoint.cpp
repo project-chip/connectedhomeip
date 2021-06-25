@@ -190,7 +190,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
     if (res == INET_NO_ERROR && reuseAddr)
     {
         int n = 1;
-        setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &n, sizeof(n));
+        setsockopt(mSocket.GetFD(), SOL_SOCKET, SO_REUSEADDR, &n, sizeof(n));
 
 #ifdef SO_REUSEPORT
         // Enable SO_REUSEPORT.  This permits coexistence between an
@@ -203,7 +203,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
         // e.g. two untargetted-listen CHIP clients, or two
         // targetted-listen CHIP clients with the same node id.
 
-        if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &n, sizeof(n)) != 0)
+        if (setsockopt(mSocket.GetFD(), SOL_SOCKET, SO_REUSEPORT, &n, sizeof(n)) != 0)
         {
             ChipLogError(Inet, "SO_REUSEPORT: %d", errno);
         }
@@ -222,7 +222,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
             sa.sin6_addr     = addr.ToIPv6();
             sa.sin6_scope_id = 0;
 
-            if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
+            if (bind(mSocket.GetFD(), reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
                 res = chip::System::MapErrorPOSIX(errno);
         }
 #if INET_CONFIG_ENABLE_IPV4
@@ -234,7 +234,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
             sa.sin_port   = htons(port);
             sa.sin_addr   = addr.ToIPv4();
 
-            if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
+            if (bind(mSocket.GetFD(), reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
                 res = chip::System::MapErrorPOSIX(errno);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -246,7 +246,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
     dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
-        unsigned long fd = static_cast<unsigned long>(mSocket);
+        unsigned long fd = static_cast<unsigned long>(mSocket.GetFD());
 
         mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
         ReturnErrorCodeIf(mReadableSource == nullptr, INET_ERROR_NO_MEMORY);
@@ -255,16 +255,12 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
         ReturnErrorCodeIf(mWriteableSource == nullptr, INET_ERROR_NO_MEMORY);
 
         dispatch_source_set_event_handler(mReadableSource, ^{
-            SocketEvents events;
-            events.SetRead();
-            this->mPendingIO = events;
+            this->mSocket.SetPendingIO(System::SocketEventFlags::kRead);
             this->HandlePendingIO();
         });
 
         dispatch_source_set_event_handler(mWriteableSource, ^{
-            SocketEvents events;
-            events.SetWrite();
-            this->mPendingIO = events;
+            this->mSocket.SetPendingIO(System::SocketEventFlags::kWrite);
             this->HandlePendingIO();
         });
 
@@ -303,14 +299,12 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    if (listen(mSocket, backlog) != 0)
+    if (listen(mSocket.GetFD(), backlog) != 0)
         res = chip::System::MapErrorPOSIX(errno);
 
     // Wait for ability to read on this endpoint.
-    mRequestIO.SetRead();
-
-    // Wake the thread calling select so that it recognizes the new socket.
-    SystemLayer().WakeSelect();
+    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
+    mSocket.RequestCallbackOnPendingRead();
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -328,10 +322,6 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
 INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     INET_ERROR res = INET_NO_ERROR;
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    chip::System::Layer & lSystemLayer = SystemLayer();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (State != kState_Ready && State != kState_Bound)
         return INET_ERROR_INCORRECT_STATE;
@@ -443,7 +433,7 @@ INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
             // If the permission is denied(EACCES) because CHIP is running in a context
             // that does not have privileged access, choose a source address on the
             // interface to bind the connetion to.
-            int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr));
+            int r = setsockopt(mSocket.GetFD(), SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr));
             if (r < 0 && errno != EACCES)
             {
                 return res = chip::System::MapErrorPOSIX(errno);
@@ -465,12 +455,12 @@ INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
     // Disable generation of SIGPIPE.
 #ifdef SO_NOSIGPIPE
     int n = 1;
-    setsockopt(mSocket, SOL_SOCKET, SO_NOSIGPIPE, &n, sizeof(n));
+    setsockopt(mSocket.GetFD(), SOL_SOCKET, SO_NOSIGPIPE, &n, sizeof(n));
 #endif // defined(SO_NOSIGPIPE)
 
     // Enable non-blocking mode for the socket.
-    int flags = fcntl(mSocket, F_GETFL, 0);
-    fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
+    int flags = fcntl(mSocket.GetFD(), F_GETFL, 0);
+    fcntl(mSocket.GetFD(), F_SETFL, flags | O_NONBLOCK);
 
     socklen_t sockaddrsize       = 0;
     const sockaddr * sockaddrptr = nullptr;
@@ -508,7 +498,7 @@ INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
     else
         return INET_ERROR_WRONG_ADDRESS_TYPE;
 
-    int conRes = connect(mSocket, sockaddrptr, sockaddrsize);
+    int conRes = connect(mSocket.GetFD(), sockaddrptr, sockaddrsize);
 
     if (conRes == -1 && errno != EINPROGRESS)
     {
@@ -516,6 +506,8 @@ INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
         DoClose(res, true);
         return res;
     }
+
+    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
 
     // Once Connecting or Connected, bump the reference count.  The corresponding Release()
     // [or on LwIP, DeferredRelease()] will happen in DoClose().
@@ -525,7 +517,7 @@ INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
     {
         State = kState_Connected;
         // Wait for ability to read on this endpoint.
-        mRequestIO.SetRead();
+        mSocket.RequestCallbackOnPendingRead();
         if (OnConnectComplete != nullptr)
             OnConnectComplete(this, INET_NO_ERROR);
     }
@@ -533,11 +525,8 @@ INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
     {
         State = kState_Connecting;
         // Wait for ability to write on this endpoint.
-        mRequestIO.SetWrite();
+        mSocket.RequestCallbackOnPendingWrite();
     }
-
-    // Wake the thread calling select so that it recognizes the new socket.
-    lSystemLayer.WakeSelect();
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -632,7 +621,7 @@ INET_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) con
     memset(&sa, 0, sizeof(sa));
     socklen_t saLen = sizeof(sa);
 
-    if (getpeername(mSocket, &sa.any, &saLen) != 0)
+    if (getpeername(mSocket.GetFD(), &sa.any, &saLen) != 0)
         return chip::System::MapErrorPOSIX(errno);
 
     if (sa.any.sa_family == AF_INET6)
@@ -703,7 +692,7 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
     memset(&sa, 0, sizeof(sa));
     socklen_t saLen = sizeof(sa);
 
-    if (getsockname(mSocket, &sa.any, &saLen) != 0)
+    if (getsockname(mSocket.GetFD(), &sa.any, &saLen) != 0)
         return chip::System::MapErrorPOSIX(errno);
 
     if (sa.any.sa_family == AF_INET6)
@@ -752,7 +741,7 @@ INET_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
     memset(&sa, 0, sizeof(sa));
     socklen_t saLen = sizeof(sa);
 
-    if (getpeername(mSocket, &sa.any, &saLen) != 0)
+    if (getpeername(mSocket.GetFD(), &sa.any, &saLen) != 0)
     {
         return chip::System::MapErrorPOSIX(errno);
     }
@@ -801,7 +790,7 @@ INET_ERROR TCPEndPoint::Send(System::PacketBufferHandle && data, bool push)
         mSendQueue = std::move(data);
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         // Wait for ability to write on this endpoint.
-        mRequestIO.SetWrite();
+        mSocket.RequestCallbackOnPendingWrite();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
     }
     else
@@ -836,21 +825,14 @@ void TCPEndPoint::DisableReceive()
 
 void TCPEndPoint::EnableReceive()
 {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    chip::System::Layer & lSystemLayer = SystemLayer();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
     ReceiveEnabled = true;
 
     DriveReceiving();
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    // Wake the thread calling select so that it can include the socket
-    // in the select read fd_set.
-    lSystemLayer.WakeSelect();
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    // Wake the thread waiting for I/O so that it can include the socket.
+    SystemLayer().WakeIOThread();
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 }
 
 /**
@@ -890,7 +872,7 @@ INET_ERROR TCPEndPoint::EnableNoDelay()
 #ifdef TCP_NODELAY
         // Disable TCP Nagle buffering by setting TCP_NODELAY socket option to true
         val = 1;
-        if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_NODELAY, &val, sizeof(val)) != 0)
+        if (setsockopt(mSocket.GetFD(), TCP_SOCKOPT_LEVEL, TCP_NODELAY, &val, sizeof(val)) != 0)
             return chip::System::MapErrorPOSIX(errno);
 #endif // defined(TCP_NODELAY)
     }
@@ -948,22 +930,22 @@ INET_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount
 
         // Set the idle interval
         val = interval;
-        if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_IDLE_INTERVAL_OPT_NAME, &val, sizeof(val)) != 0)
+        if (setsockopt(mSocket.GetFD(), TCP_SOCKOPT_LEVEL, TCP_IDLE_INTERVAL_OPT_NAME, &val, sizeof(val)) != 0)
             return chip::System::MapErrorPOSIX(errno);
 
         // Set the probe retransmission interval.
         val = interval;
-        if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPINTVL, &val, sizeof(val)) != 0)
+        if (setsockopt(mSocket.GetFD(), TCP_SOCKOPT_LEVEL, TCP_KEEPINTVL, &val, sizeof(val)) != 0)
             return chip::System::MapErrorPOSIX(errno);
 
         // Set the probe timeout count
         val = timeoutCount;
-        if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPCNT, &val, sizeof(val)) != 0)
+        if (setsockopt(mSocket.GetFD(), TCP_SOCKOPT_LEVEL, TCP_KEEPCNT, &val, sizeof(val)) != 0)
             return chip::System::MapErrorPOSIX(errno);
 
         // Enable keepalives for the connection.
         val = 1; // enable
-        if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
+        if (setsockopt(mSocket.GetFD(), SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
             return chip::System::MapErrorPOSIX(errno);
     }
 
@@ -1024,7 +1006,7 @@ INET_ERROR TCPEndPoint::DisableKeepAlive()
 
         // Disable keepalives on the connection.
         val = 0; // disable
-        if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
+        if (setsockopt(mSocket.GetFD(), SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
             return chip::System::MapErrorPOSIX(errno);
     }
 
@@ -1074,7 +1056,7 @@ INET_ERROR TCPEndPoint::SetUserTimeout(uint32_t userTimeoutMillis)
 #if defined(TCP_USER_TIMEOUT)
     // Set the user timeout
     uint32_t val = userTimeoutMillis;
-    if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_USER_TIMEOUT, &val, sizeof(val)) != 0)
+    if (setsockopt(mSocket.GetFD(), TCP_SOCKOPT_LEVEL, TCP_USER_TIMEOUT, &val, sizeof(val)) != 0)
         return chip::System::MapErrorPOSIX(errno);
 #else  // TCP_USER_TIMEOUT
     res = INET_ERROR_NOT_IMPLEMENTED;
@@ -1228,9 +1210,7 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
-        chip::System::Layer & lSystemLayer = SystemLayer();
-
-        lSystemLayer.StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, InetLayer::HandleTCPInactivityTimer, &lInetLayer);
+        SystemLayer().StartTimer(INET_TCP_IDLE_CHECK_INTERVAL, InetLayer::HandleTCPInactivityTimer, &lInetLayer);
     }
 }
 #endif // INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -1243,6 +1223,7 @@ bool TCPEndPoint::IsConnected(int state)
 void TCPEndPoint::Init(InetLayer * inetLayer)
 {
     InitEndPointBasis(*inetLayer);
+
     ReceiveEnabled = true;
 
     // Initialize to zero for using system defaults.
@@ -1264,7 +1245,6 @@ void TCPEndPoint::Init(InetLayer * inetLayer)
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
     mBytesWrittenSinceLastProbe = 0;
 
     mLastTCPKernelSendQueueLen = 0;
@@ -1402,7 +1382,7 @@ INET_ERROR TCPEndPoint::DriveSending()
     {
         uint16_t bufLen = mSendQueue->DataLength();
 
-        ssize_t lenSentRaw = send(mSocket, mSendQueue->Start(), bufLen, sendFlags);
+        ssize_t lenSentRaw = send(mSocket.GetFD(), mSendQueue->Start(), bufLen, sendFlags);
 
         if (lenSentRaw == -1)
         {
@@ -1433,7 +1413,7 @@ INET_ERROR TCPEndPoint::DriveSending()
             if (mSendQueue.IsNull())
             {
                 // Do not wait for ability to write on this endpoint.
-                mRequestIO.ClearWrite();
+                mSocket.ClearCallbackOnPendingWrite();
             }
         }
 
@@ -1482,7 +1462,7 @@ INET_ERROR TCPEndPoint::DriveSending()
         // If we're in the SendShutdown state and the send queue is now empty, shutdown writing on the socket.
         if (State == kState_SendShutdown && mSendQueue.IsNull())
         {
-            if (shutdown(mSocket, SHUT_WR) != 0)
+            if (shutdown(mSocket.GetFD(), SHUT_WR) != 0)
                 err = chip::System::MapErrorPOSIX(errno);
         }
     }
@@ -1536,8 +1516,8 @@ void TCPEndPoint::HandleConnectComplete(INET_ERROR err)
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         // Wait for ability to read or write on this endpoint.
-        mRequestIO.SetRead();
-        mRequestIO.SetWrite();
+        mSocket.RequestCallbackOnPendingRead();
+        mSocket.RequestCallbackOnPendingWrite();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
         if (OnConnectComplete != nullptr)
@@ -1647,32 +1627,25 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     // If the socket hasn't been closed already...
-    if (mSocket != INET_INVALID_SOCKET_FD)
+    if (mSocket.HasFD())
     {
         // If entering the Closed state
         // OR if entering the Closing state, and there's no unsent data in the send queue
         // THEN close the socket.
         if (State == kState_Closed || (State == kState_Closing && mSendQueue.IsNull()))
         {
-            chip::System::Layer & lSystemLayer = SystemLayer();
-
             // If aborting the connection, ensure we send a TCP RST.
             if (IsConnected(oldState) && err != INET_NO_ERROR)
             {
                 lingerStruct.l_onoff  = 1;
                 lingerStruct.l_linger = 0;
 
-                if (setsockopt(mSocket, SOL_SOCKET, SO_LINGER, &lingerStruct, sizeof(lingerStruct)) != 0)
+                if (setsockopt(mSocket.GetFD(), SOL_SOCKET, SO_LINGER, &lingerStruct, sizeof(lingerStruct)) != 0)
                     ChipLogError(Inet, "SO_LINGER: %d", errno);
             }
 
-            if (close(mSocket) != 0 && err == INET_NO_ERROR)
+            if (mSocket.Close() != 0 && err == INET_NO_ERROR)
                 err = chip::System::MapErrorPOSIX(errno);
-            mSocket = INET_INVALID_SOCKET_FD;
-            mRequestIO.Clear();
-
-            // Wake the thread calling select so that it recognizes the socket is closed.
-            lSystemLayer.WakeSelect();
         }
     }
 
@@ -1690,7 +1663,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     // Clear any results from select() that indicate pending I/O for the socket.
-    mPendingIO.Clear();
+    mSocket.ClearPendingIO();
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -2418,7 +2391,7 @@ INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
 
 INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
 {
-    if (mSocket == INET_INVALID_SOCKET_FD)
+    if (!mSocket.HasFD())
     {
         int family;
         if (addrType == kIPAddressType_IPv6)
@@ -2429,9 +2402,10 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
 #endif // INET_CONFIG_ENABLE_IPV4
         else
             return INET_ERROR_WRONG_ADDRESS_TYPE;
-        mSocket = ::socket(family, SOCK_STREAM | SOCK_FLAGS, 0);
-        if (mSocket == -1)
+        const int fd = ::socket(family, SOCK_STREAM | SOCK_FLAGS, 0);
+        if (fd == -1)
             return chip::System::MapErrorPOSIX(errno);
+        mSocket.Attach(fd);
         mAddrType = addrType;
 
         // If creating an IPv6 socket, tell the kernel that it will be IPv6 only.  This makes it
@@ -2440,7 +2414,7 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
         if (family == PF_INET6)
         {
             int one = 1;
-            setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
+            setsockopt(mSocket.GetFD(), IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
         }
 #endif // defined(IPV6_V6ONLY)
 
@@ -2449,7 +2423,7 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
 #ifdef SO_NOSIGPIPE
         {
             int one = 1;
-            int res = setsockopt(mSocket, SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
+            int res = setsockopt(mSocket.GetFD(), SOL_SOCKET, SO_NOSIGPIPE, &one, sizeof(one));
             if (res != 0)
             {
                 ChipLogError(Inet, "SO_NOSIGPIPE: %d", errno);
@@ -2463,6 +2437,12 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
     return INET_NO_ERROR;
 }
 
+// static
+void TCPEndPoint::HandlePendingIO(System::WatchableSocket & socket)
+{
+    reinterpret_cast<TCPEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
+}
+
 void TCPEndPoint::HandlePendingIO()
 {
     // Prevent the end point from being freed while in the middle of a callback.
@@ -2472,20 +2452,22 @@ void TCPEndPoint::HandlePendingIO()
     // ready to be received on the socket, process the incoming connection.
     if (State == kState_Listening)
     {
-        if (OnConnectionReceived != nullptr && mPendingIO.IsReadable())
+        if (OnConnectionReceived != nullptr && mSocket.HasPendingRead())
+        {
             HandleIncomingConnection();
+        }
     }
 
     // If in the processes of initiating a connection...
     else if (State == kState_Connecting)
     {
         // The socket being writable indicates the connection has completed (successfully or otherwise).
-        if (mPendingIO.IsWriteable())
+        if (mSocket.HasPendingWrite())
         {
             // Get the connection result from the socket.
             int osConRes;
             socklen_t optLen = sizeof(osConRes);
-            if (getsockopt(mSocket, SOL_SOCKET, SO_ERROR, &osConRes, &optLen) != 0)
+            if (getsockopt(mSocket.GetFD(), SOL_SOCKET, SO_ERROR, &osConRes, &optLen) != 0)
                 osConRes = errno;
             INET_ERROR conRes = chip::System::MapErrorPOSIX(osConRes);
 
@@ -2498,17 +2480,17 @@ void TCPEndPoint::HandlePendingIO()
     {
         // If in a state where sending is allowed, and there is data to be sent, and the socket is ready for
         // writing, drive outbound data into the connection.
-        if (IsConnected() && !mSendQueue.IsNull() && mPendingIO.IsWriteable())
+        if (IsConnected() && !mSendQueue.IsNull() && mSocket.HasPendingWrite())
             DriveSending();
 
         // If in a state were receiving is allowed, and the app is ready to receive data, and data is ready
         // on the socket, receive inbound data from the connection.
         if ((State == kState_Connected || State == kState_SendShutdown) && ReceiveEnabled && OnDataReceived != nullptr &&
-            mPendingIO.IsReadable())
+            mSocket.HasPendingRead())
             ReceiveData();
     }
 
-    mPendingIO.Clear();
+    mSocket.ClearPendingIO();
 
     Release();
 }
@@ -2541,7 +2523,7 @@ void TCPEndPoint::ReceiveData()
     }
 
     // Attempt to receive data from the socket.
-    ssize_t rcvLen = recv(mSocket, rcvBuf->Start() + rcvBuf->DataLength(), rcvBuf->AvailableDataLength(), 0);
+    ssize_t rcvLen = recv(mSocket.GetFD(), rcvBuf->Start() + rcvBuf->DataLength(), rcvBuf->AvailableDataLength(), 0);
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     INET_ERROR err;
@@ -2613,7 +2595,7 @@ void TCPEndPoint::ReceiveData()
             else
                 State = kState_Closing;
             // Do not wait for ability to read on this endpoint.
-            mRequestIO.ClearRead();
+            mSocket.ClearCallbackOnPendingRead();
             // Call the app's OnPeerClose.
             if (OnPeerClose != nullptr)
                 OnPeerClose(this);
@@ -2662,7 +2644,7 @@ void TCPEndPoint::HandleIncomingConnection()
     socklen_t saLen = sizeof(sa);
 
     // Accept the new connection.
-    int conSocket = accept(mSocket, &sa.any, &saLen);
+    int conSocket = accept(mSocket.GetFD(), &sa.any, &saLen);
     if (conSocket == -1)
         err = chip::System::MapErrorPOSIX(errno);
 
@@ -2701,8 +2683,8 @@ void TCPEndPoint::HandleIncomingConnection()
     if (err == INET_NO_ERROR)
     {
         // Put the new end point into the Connected state.
-        conEP->State   = kState_Connected;
-        conEP->mSocket = conSocket;
+        conEP->mSocket.Attach(conSocket);
+        conEP->State = kState_Connected;
 #if INET_CONFIG_ENABLE_IPV4
         conEP->mAddrType = (sa.any.sa_family == AF_INET6) ? kIPAddressType_IPv6 : kIPAddressType_IPv4;
 #else  // !INET_CONFIG_ENABLE_IPV4
@@ -2711,7 +2693,8 @@ void TCPEndPoint::HandleIncomingConnection()
         conEP->Retain();
 
         // Wait for ability to read on this endpoint.
-        conEP->mRequestIO.SetRead();
+        conEP->mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(conEP));
+        conEP->mSocket.RequestCallbackOnPendingRead();
 
         // Call the app's callback function.
         OnConnectionReceived(this, conEP, peerAddr, peerPort);
@@ -2745,7 +2728,7 @@ INET_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
 
     // Fetch the bytes pending successful transmission in the TCP out queue.
 
-    if (ioctl(mSocket, TIOCOUTQ, &currPendingBytesRaw) < 0)
+    if (ioctl(mSocket.GetFD(), TIOCOUTQ, &currPendingBytesRaw) < 0)
     {
         return chip::System::MapErrorPOSIX(errno);
     }

@@ -18,32 +18,30 @@
 
 #include "TestCommand.h"
 
-constexpr uint16_t kWaitDurationInSeconds = 30;
-
-CHIP_ERROR TestCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR TestCommand::Run()
 {
-    ReturnErrorOnFailure(mOpCredsIssuer.Initialize(storage));
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Controller::CommissionerInitParams params;
+    auto * ctx = GetExecContext();
 
-    params.storageDelegate                = &storage;
-    params.operationalCredentialsDelegate = &mOpCredsIssuer;
-
-    ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
-    ReturnErrorOnFailure(mCommissioner.Init(localId, params));
-    ReturnErrorOnFailure(mCommissioner.ServiceEvents());
-    ReturnErrorOnFailure(mCommissioner.GetDevice(remoteId, &mDevice));
-
-    ReturnErrorOnFailure(NextTest());
-
-    UpdateWaitForResponse(true);
-    WaitForResponse(kWaitDurationInSeconds);
-
-    mCommissioner.ServiceEventSignal();
-
-    mCommissioner.Shutdown();
-
-    VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
+    err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    ReturnErrorOnFailure(err);
 
     return CHIP_NO_ERROR;
+}
+
+void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+{
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
+    command->mDevice = device;
+    command->NextTest();
+}
+
+void TestCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+{
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
+    command->SetCommandExitStatus(error);
 }

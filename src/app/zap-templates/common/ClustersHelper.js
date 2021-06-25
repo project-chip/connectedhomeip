@@ -18,7 +18,6 @@
 // Import helpers from zap core
 const zapPath       = '../../../../third_party/zap/repo/src-electron/';
 const queryConfig   = require(zapPath + 'db/query-config.js')
-const queryImpexp   = require(zapPath + 'db/query-impexp.js')
 const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
 const templateUtil  = require(zapPath + 'generator/template-util.js')
 const zclHelper     = require(zapPath + 'generator/helper-zcl.js')
@@ -78,8 +77,8 @@ function loadStructs(packageId)
 function loadClusters()
 {
   const { db, sessionId } = this.global;
-  return queryImpexp.exportEndPointTypeIds(db, sessionId)
-      .then(endpointTypes => zclQuery.exportAllClustersDetailsFromEndpointTypes(db, endpointTypes))
+  return queryEndpoint.selectEndPointTypeIds(db, sessionId)
+      .then(endpointTypes => zclQuery.selectAllClustersDetailsFromEndpointTypes(db, endpointTypes))
       .then(clusters => clusters.filter(cluster => cluster.enabled == 1));
 }
 
@@ -95,7 +94,7 @@ function loadCommandArguments(command, packageId)
 function loadCommands(packageId)
 {
   const { db, sessionId } = this.global;
-  return queryImpexp.exportEndPointTypeIds(db, sessionId)
+  return queryEndpoint.selectEndPointTypeIds(db, sessionId)
       .then(endpointTypes => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
       .then(endpointTypesAndClusters => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(db, endpointTypesAndClusters))
       .then(commands => Promise.all(commands.map(command => loadCommandArguments.call(this, command, packageId))));
@@ -106,12 +105,12 @@ function loadAttributes(packageId)
   // The 'server' side is enforced here, because the list of attributes is used to generate client global
   // commands to retrieve server side attributes.
   const { db, sessionId } = this.global;
-  return queryImpexp.exportEndPointTypeIds(db, sessionId)
+  return queryEndpoint.selectEndPointTypeIds(db, sessionId)
       .then(endpointTypes => Promise.all(
-                endpointTypes.map(({ endpointTypeId }) => queryEndpoint.queryEndpointClusters(db, endpointTypeId))))
+                endpointTypes.map(({ endpointTypeId }) => queryEndpoint.selectEndpointClusters(db, endpointTypeId))))
       .then(clusters => clusters.flat())
       .then(clusters => Promise.all(
-                clusters.map(({ clusterId, side, endpointTypeId }) => queryEndpoint.queryEndpointClusterAttributes(
+                clusters.map(({ clusterId, side, endpointTypeId }) => queryEndpoint.selectEndpointClusterAttributes(
                                  db, clusterId, 'server', endpointTypeId))))
       .then(attributes => attributes.flat())
       .then(attributes => attributes.filter(attribute => attribute.isIncluded))
@@ -371,7 +370,7 @@ function enhancedAttributes(attributes, types)
   });
 
   attributes.forEach(attribute => {
-    const argument      = { name : attribute.name, chipType : attribute.chipType };
+    const argument = { isList : attribute.isList, name : attribute.name, chipType : attribute.chipType, type : attribute.type };
     attribute.arguments = [ argument ];
     attribute.response  = { arguments : [ argument ] };
   });

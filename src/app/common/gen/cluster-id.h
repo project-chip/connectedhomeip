@@ -100,6 +100,9 @@ static constexpr chip::ClusterId ZCL_GENERAL_COMMISSIONING_CLUSTER_ID = 0x0030;
 // Definitions for cluster: Network Commissioning
 static constexpr chip::ClusterId ZCL_NETWORK_COMMISSIONING_CLUSTER_ID = 0x0031;
 
+// Definitions for cluster: Diagnostic Logs
+static constexpr chip::ClusterId ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID = 0x0032;
+
 // Definitions for cluster: General Diagnostics
 static constexpr chip::ClusterId ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID = 0x0033;
 
@@ -123,9 +126,6 @@ static constexpr chip::ClusterId ZCL_SWITCH_CLUSTER_ID = 0x003B;
 
 // Definitions for cluster: Operational Credentials
 static constexpr chip::ClusterId ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID = 0x003E;
-
-// Definitions for cluster: Trusted Root Certificates
-static constexpr chip::ClusterId ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID = 0x003F;
 
 // Definitions for cluster: Fixed Label
 static constexpr chip::ClusterId ZCL_FIXED_LABEL_CLUSTER_ID = 0x0040;
@@ -304,7 +304,7 @@ static constexpr chip::ClusterId ZCL_LOW_POWER_CLUSTER_ID = 0x0508;
 // Definitions for cluster: Keypad Input
 static constexpr chip::ClusterId ZCL_KEYPAD_INPUT_CLUSTER_ID = 0x0509;
 
-// Definitions for cluster: Content Launch
+// Definitions for cluster: Content Launcher
 static constexpr chip::ClusterId ZCL_CONTENT_LAUNCH_CLUSTER_ID = 0x050A;
 
 // Definitions for cluster: Audio Output

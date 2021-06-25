@@ -89,14 +89,16 @@ CHIP_ERROR UserDirectedCommissioningClient::SendUDCRequest(System::PacketBufferH
     return err;
 }
 
-void UserDirectedCommissioningClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+CHIP_ERROR UserDirectedCommissioningClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                                              const PayloadHeader & payloadHeader,
+                                                              System::PacketBufferHandle && payload)
 {
     // There is no response to UDC at this time
     ChipLogProgress(Echo, "Unexpected UDC response from Exchange: %p", ec);
     ec->Close();
     mExchangeCtx->Abort();
     mExchangeCtx = nullptr;
+    return CHIP_NO_ERROR;
 }
 
 void UserDirectedCommissioningClient::OnResponseTimeout(Messaging::ExchangeContext * ec)

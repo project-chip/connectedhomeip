@@ -12,6 +12,7 @@ chip_test_suite("tests") {
     "TestCASESession.cpp",
     "TestMessageCounterManager.cpp",
     "TestPASESession.cpp",
+    "TestSessionIDAllocator.cpp",
     "TestStatusReport.cpp",
   ]
 

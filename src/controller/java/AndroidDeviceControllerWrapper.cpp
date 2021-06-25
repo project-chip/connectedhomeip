@@ -17,6 +17,7 @@
  */
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
+#include "StackLock.h"
 
 #include <algorithm>
 #include <memory>
@@ -24,7 +25,7 @@
 #include <platform/KeyValueStoreManager.h>
 #include <support/ThreadOperationalDataset.h>
 
-using chip::Controller::DeviceCommissioner;
+using namespace chip::Controller;
 
 extern chip::Ble::BleLayer * GetJNIBleLayer();
 
@@ -32,7 +33,7 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
     if ((mJavaVM != nullptr) && (mJavaObjectRef != nullptr))
     {
-        GetEnvForCurrentThread()->DeleteGlobalRef(mJavaObjectRef);
+        JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mJavaObjectRef);
     }
     mController->Shutdown();
 }
@@ -40,12 +41,13 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
 {
     mJavaVM        = vm;
-    mJavaObjectRef = GetEnvForCurrentThread()->NewGlobalRef(obj);
+    mJavaObjectRef = JniReferences::GetInstance().GetEnvForCurrentThread()->NewGlobalRef(obj);
 }
 
 void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jint argument)
 {
-    CallVoidInt(GetEnvForCurrentThread(), mJavaObjectRef, methodName, argument);
+    JniReferences::GetInstance().CallVoidInt(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef, methodName,
+                                             argument);
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,

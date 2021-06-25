@@ -45,15 +45,13 @@ public:
         return ExchangeMessageDispatch::Init();
     }
 
-    CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
-                             EncryptedPacketBufferHandle * retainedMessage) const override;
+    CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
+                              EncryptedPacketBufferHandle & preparedMessage) override;
+    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & message) const override;
 
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
 protected:
-    CHIP_ERROR SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
-                               EncryptedPacketBufferHandle * retainedMessage) override;
-
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
 
 private:

@@ -3584,6 +3584,33 @@
                                                                                                                                    \
                                   ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID, "u", timeoutMs);
 
+/** @brief Command description for RetrieveLogsRequest
+ *
+ * Command: RetrieveLogsRequest
+ * @param intent LogsIntent
+ * @param requestedProtocol LogsTransferProtocol
+ * @param transferFileDesignator OCTET_STRING
+ */
+#define emberAfFillCommandDiagnostic                                                                                               \
+    LogsClusterRetrieveLogsRequest(intent, requestedProtocol, transferFileDesignator)                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID, "uuu", intent, requestedProtocol, transferFileDesignator);
+
+/** @brief Command description for RetrieveLogsResponse
+ *
+ * Command: RetrieveLogsResponse
+ * @param status LogsStatus
+ * @param content OCTET_STRING
+ * @param timeStamp UTC_TIME
+ * @param timeSinceBoot INT32U
+ */
+#define emberAfFillCommandDiagnostic                                                                                               \
+    LogsClusterRetrieveLogsResponse(status, content, timeStamp, timeSinceBoot)                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_RETRIEVE_LOGS_RESPONSE_COMMAND_ID, "uuuu", status, content, timeStamp, timeSinceBoot);
+
 /** @brief Command description for ResetWatermarks
  *
  * Command: ResetWatermarks
@@ -3706,17 +3733,16 @@
 /** @brief Command description for AddOpCert
  *
  * Command: AddOpCert
- * @param NOC OCTET_STRING
- * @param ICACertificate OCTET_STRING
+ * @param OperationalCert OCTET_STRING
  * @param IPKValue OCTET_STRING
  * @param CaseAdminNode NODE_ID
  * @param AdminVendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterAddOpCert(NOC, ICACertificate, IPKValue, CaseAdminNode, AdminVendorId) emberAfFillExternalBuffer(            \
-        mask,                                                                                                                      \
+    CredentialsClusterAddOpCert(OperationalCert, IPKValue, CaseAdminNode, AdminVendorId)                                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-        ZCL_ADD_OP_CERT_COMMAND_ID, "uuuuu", NOC, ICACertificate, IPKValue, CaseAdminNode, AdminVendorId);
+                                  ZCL_ADD_OP_CERT_COMMAND_ID, "uuuu", OperationalCert, IPKValue, CaseAdminNode, AdminVendorId);
 
 /** @brief Command description for OpCertResponse
  *
@@ -3768,8 +3794,8 @@
  * Command: AddTrustedRootCertificate
  * @param RootCertificate OCTET_STRING
  */
-#define emberAfFillCommandTrusted                                                                                                  \
-    Root CertificatesClusterAddTrustedRootCertificate(RootCertificate)                                                             \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAddTrustedRootCertificate(RootCertificate)                                                                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", RootCertificate);
@@ -3779,8 +3805,8 @@
  * Command: RemoveTrustedRootCertificate
  * @param TrustedRootIdentifier OCTET_STRING
  */
-#define emberAfFillCommandTrusted                                                                                                  \
-    Root CertificatesClusterRemoveTrustedRootCertificate(TrustedRootIdentifier)                                                    \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveTrustedRootCertificate(TrustedRootIdentifier)                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", TrustedRootIdentifier);
@@ -5857,9 +5883,9 @@
  * @param autoPlay BOOLEAN
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchContent(autoPlay) emberAfFillExternalBuffer(mask,                                                           \
+    LauncherClusterLaunchContent(autoPlay) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
-                                                                   ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", autoPlay);
+                                                                     ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", autoPlay);
 
 /** @brief Command description for LaunchContentResponse
  *
@@ -5867,9 +5893,9 @@
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchContentResponse(data) emberAfFillExternalBuffer(mask,                                                       \
+    LauncherClusterLaunchContentResponse(data) emberAfFillExternalBuffer(mask,                                                     \
                                                                                                                                    \
-                                                                       ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID, "u", data);
+                                                                         ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID, "u", data);
 
 /** @brief Command description for LaunchContent
  *
@@ -5877,9 +5903,9 @@
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchContent(data) emberAfFillExternalBuffer(mask,                                                               \
+    LauncherClusterLaunchContent(data) emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
-                                                               ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", data);
+                                                                 ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", data);
 
 /** @brief Command description for LaunchContentResponse
  *
@@ -5887,7 +5913,7 @@
  * @param contentLaunchStatus ContentLaunchStatus
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchContentResponse(contentLaunchStatus)                                                                        \
+    LauncherClusterLaunchContentResponse(contentLaunchStatus)                                                                      \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID, "u", contentLaunchStatus);
@@ -5898,9 +5924,9 @@
  * @param contentURL CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchURL(contentURL) emberAfFillExternalBuffer(mask,                                                             \
+    LauncherClusterLaunchURL(contentURL) emberAfFillExternalBuffer(mask,                                                           \
                                                                                                                                    \
-                                                                 ZCL_LAUNCH_URL_COMMAND_ID, "u", contentURL);
+                                                                   ZCL_LAUNCH_URL_COMMAND_ID, "u", contentURL);
 
 /** @brief Command description for LaunchURLResponse
  *
@@ -5908,9 +5934,9 @@
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchURLResponse(data) emberAfFillExternalBuffer(mask,                                                           \
+    LauncherClusterLaunchURLResponse(data) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
-                                                                   ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID, "u", data);
+                                                                     ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID, "u", data);
 
 /** @brief Command description for LaunchURL
  *
@@ -5918,9 +5944,9 @@
  * @param displayString CHAR_STRING
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchURL(displayString) emberAfFillExternalBuffer(mask,                                                          \
+    LauncherClusterLaunchURL(displayString) emberAfFillExternalBuffer(mask,                                                        \
                                                                                                                                    \
-                                                                    ZCL_LAUNCH_URL_COMMAND_ID, "u", displayString);
+                                                                      ZCL_LAUNCH_URL_COMMAND_ID, "u", displayString);
 
 /** @brief Command description for LaunchURLResponse
  *
@@ -5928,7 +5954,7 @@
  * @param contentLaunchStatus ContentLaunchStatus
  */
 #define emberAfFillCommandContent                                                                                                  \
-    LaunchClusterLaunchURLResponse(contentLaunchStatus)                                                                            \
+    LauncherClusterLaunchURLResponse(contentLaunchStatus)                                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID, "u", contentLaunchStatus);
@@ -5995,6 +6021,16 @@
     LauncherClusterLaunchAppResponse(data) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
                                                                      ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, "u", data);
+
+/** @brief Command description for ChangeStatus
+ *
+ * Command: ChangeStatus
+ * @param status ApplicationBasicStatus
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    BasicClusterChangeStatus(status) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_CHANGE_STATUS_COMMAND_ID, "u", status);
 
 /** @brief Command description for GetSetupPIN
  *

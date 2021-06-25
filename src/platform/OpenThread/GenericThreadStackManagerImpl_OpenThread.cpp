@@ -980,7 +980,7 @@ exit:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-static_assert(OPENTHREAD_API_VERSION >= 80, "SRP Client requires a more recent OpenThread version");
+static_assert(OPENTHREAD_API_VERSION >= 120, "SRP Client requires a more recent OpenThread version");
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotification(otError aError,
@@ -1092,8 +1092,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
         }
         else
         {
-            VerifyOrExit((strcmp(service.mInstanceName, aInstanceName) != 0) || (strcmp(service.mName, aName) != 0),
-                         error = MapOpenThreadError(OT_ERROR_DUPLICATED));
+            if ((strcmp(service.mInstanceName, aInstanceName) == 0) && (strcmp(service.mName, aName) == 0))
+            {
+                VerifyOrExit(MapOpenThreadError(otSrpClientClearService(mOTInst, &(service.mService))) == CHIP_NO_ERROR,
+                             error = MapOpenThreadError(OT_ERROR_FAILED));
+
+                // Free memory immediately, as OnSrpClientNotification will not be called.
+                memset(&service, 0, sizeof(service));
+            }
         }
     }
 

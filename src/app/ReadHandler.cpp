@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPath.h>
 #include <app/ReadHandler.h>
@@ -78,9 +79,7 @@ CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeCon
 
     mpExchangeCtx = apExchangeContext;
     err           = ProcessReadRequest(std::move(aPayload));
-    SuccessOrExit(err);
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogFunctError(err);

@@ -29,24 +29,158 @@
 
 using namespace chip;
 
-static void SpanConstructors(nlTestSuite * inSuite, void * inContext)
+static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t arr[] = { 1, 2, 3 };
-    Span<uint8_t> s1(arr, 2);
 
+    ByteSpan s0 = ByteSpan();
+    NL_TEST_ASSERT(inSuite, s0.data() == nullptr);
+    NL_TEST_ASSERT(inSuite, s0.size() == 0);
+    NL_TEST_ASSERT(inSuite, s0.empty());
+    NL_TEST_ASSERT(inSuite, s0.data_equal(s0));
+
+    ByteSpan s1(arr, 2);
     NL_TEST_ASSERT(inSuite, s1.data() == arr);
     NL_TEST_ASSERT(inSuite, s1.size() == 2);
+    NL_TEST_ASSERT(inSuite, !s1.empty());
+    NL_TEST_ASSERT(inSuite, s1.data_equal(s1));
+    NL_TEST_ASSERT(inSuite, !s1.data_equal(s0));
 
-    Span<uint8_t> s2(arr);
+    ByteSpan s2(arr);
     NL_TEST_ASSERT(inSuite, s2.data() == arr);
     NL_TEST_ASSERT(inSuite, s2.size() == 3);
+    NL_TEST_ASSERT(inSuite, s2.data()[2] == 3);
+    NL_TEST_ASSERT(inSuite, !s2.empty());
+    NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
+    NL_TEST_ASSERT(inSuite, !s2.data_equal(s1));
+
+    ByteSpan s3 = s2;
+    NL_TEST_ASSERT(inSuite, s3.data() == arr);
+    NL_TEST_ASSERT(inSuite, s3.size() == 3);
+    NL_TEST_ASSERT(inSuite, s3.data()[2] == 3);
+    NL_TEST_ASSERT(inSuite, !s3.empty());
+    NL_TEST_ASSERT(inSuite, s3.data_equal(s2));
+
+    uint8_t arr2[] = { 3, 2, 1 };
+    ByteSpan s4(arr2);
+    NL_TEST_ASSERT(inSuite, !s4.data_equal(s2));
+
+    ByteSpan s5(arr2, 0);
+    NL_TEST_ASSERT(inSuite, s5.data() != nullptr);
+    NL_TEST_ASSERT(inSuite, !s5.data_equal(s4));
+    NL_TEST_ASSERT(inSuite, s5.data_equal(s0));
+    NL_TEST_ASSERT(inSuite, s0.data_equal(s5));
+
+    ByteSpan s6(arr2);
+    s6.reduce_size(2);
+    NL_TEST_ASSERT(inSuite, s6.size() == 2);
+    ByteSpan s7(arr2, 2);
+    NL_TEST_ASSERT(inSuite, s6.data_equal(s7));
+    NL_TEST_ASSERT(inSuite, s7.data_equal(s6));
+}
+
+static void TestMutableByteSpan(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t arr[] = { 1, 2, 3 };
+
+    MutableByteSpan s0 = MutableByteSpan();
+    NL_TEST_ASSERT(inSuite, s0.data() == nullptr);
+    NL_TEST_ASSERT(inSuite, s0.size() == 0);
+    NL_TEST_ASSERT(inSuite, s0.empty());
+    NL_TEST_ASSERT(inSuite, s0.data_equal(s0));
+
+    MutableByteSpan s1(arr, 2);
+    NL_TEST_ASSERT(inSuite, s1.data() == arr);
+    NL_TEST_ASSERT(inSuite, s1.size() == 2);
+    NL_TEST_ASSERT(inSuite, !s1.empty());
+    NL_TEST_ASSERT(inSuite, s1.data_equal(s1));
+    NL_TEST_ASSERT(inSuite, !s1.data_equal(s0));
+
+    MutableByteSpan s2(arr);
+    NL_TEST_ASSERT(inSuite, s2.data() == arr);
+    NL_TEST_ASSERT(inSuite, s2.size() == 3);
+    NL_TEST_ASSERT(inSuite, s2.data()[2] == 3);
+    NL_TEST_ASSERT(inSuite, !s2.empty());
+    NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
+    NL_TEST_ASSERT(inSuite, !s2.data_equal(s1));
+
+    MutableByteSpan s3 = s2;
+    NL_TEST_ASSERT(inSuite, s3.data() == arr);
+    NL_TEST_ASSERT(inSuite, s3.size() == 3);
+    NL_TEST_ASSERT(inSuite, s3.data()[2] == 3);
+    NL_TEST_ASSERT(inSuite, !s3.empty());
+    NL_TEST_ASSERT(inSuite, s3.data_equal(s2));
+
+    uint8_t arr2[] = { 3, 2, 1 };
+    MutableByteSpan s4(arr2);
+    NL_TEST_ASSERT(inSuite, !s4.data_equal(s2));
+
+    MutableByteSpan s5(arr2, 0);
+    NL_TEST_ASSERT(inSuite, s5.data() != nullptr);
+    NL_TEST_ASSERT(inSuite, !s5.data_equal(s4));
+    NL_TEST_ASSERT(inSuite, s5.data_equal(s0));
+    NL_TEST_ASSERT(inSuite, s0.data_equal(s5));
+
+    MutableByteSpan s6(arr2);
+    s6.reduce_size(2);
+    NL_TEST_ASSERT(inSuite, s6.size() == 2);
+    MutableByteSpan s7(arr2, 2);
+    NL_TEST_ASSERT(inSuite, s6.data_equal(s7));
+    NL_TEST_ASSERT(inSuite, s7.data_equal(s6));
+
+    uint8_t arr3[] = { 1, 2, 3 };
+    MutableByteSpan s8(arr3);
+    NL_TEST_ASSERT(inSuite, arr3[1] == 2);
+    s8.data()[1] = 3;
+    NL_TEST_ASSERT(inSuite, arr3[1] == 3);
+
+    // Not mutable span on purpose, to test conversion.
+    ByteSpan s9 = s8;
+    NL_TEST_ASSERT(inSuite, s9.data_equal(s8));
+    NL_TEST_ASSERT(inSuite, s8.data_equal(s9));
+}
+
+static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t arr[] = { 1, 2, 3 };
+
+    FixedByteSpan<3> s0 = FixedByteSpan<3>();
+    NL_TEST_ASSERT(inSuite, s0.data() == nullptr);
+    NL_TEST_ASSERT(inSuite, s0.size() == 3);
+    NL_TEST_ASSERT(inSuite, s0.empty());
+    NL_TEST_ASSERT(inSuite, s0.data_equal(s0));
+
+    FixedByteSpan<2> s1(arr);
+    NL_TEST_ASSERT(inSuite, s1.data() == arr);
+    NL_TEST_ASSERT(inSuite, s1.size() == 2);
+    NL_TEST_ASSERT(inSuite, !s1.empty());
+    NL_TEST_ASSERT(inSuite, s1.data_equal(s1));
+
+    FixedByteSpan<3> s2(arr);
+    NL_TEST_ASSERT(inSuite, s2.data() == arr);
+    NL_TEST_ASSERT(inSuite, s2.size() == 3);
+    NL_TEST_ASSERT(inSuite, s2.data()[2] == 3);
+    NL_TEST_ASSERT(inSuite, !s2.empty());
+    NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
+
+    FixedByteSpan<3> s3 = s2;
+    NL_TEST_ASSERT(inSuite, s3.data() == arr);
+    NL_TEST_ASSERT(inSuite, s3.size() == 3);
+    NL_TEST_ASSERT(inSuite, s3.data()[2] == 3);
+    NL_TEST_ASSERT(inSuite, !s3.empty());
+    NL_TEST_ASSERT(inSuite, s3.data_equal(s2));
+
+    uint8_t arr2[] = { 3, 2, 1 };
+    FixedByteSpan<3> s4(arr2);
+    NL_TEST_ASSERT(inSuite, !s4.data_equal(s2));
 }
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(SpanConstructors), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestByteSpan), NL_TEST_DEF_FN(TestMutableByteSpan),
+                                 NL_TEST_DEF_FN(TestFixedByteSpan), NL_TEST_SENTINEL() };
 
 int TestSpan(void)
 {

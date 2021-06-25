@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>TV Channel</name>
     <code>0x0504</code>
     <define>TV_CHANNEL_CLUSTER</define>
@@ -58,9 +58,9 @@ limitations under the License.
   <struct name="TvChannelInfo">
     <item name="majorNumber" type="INT16U"/>
     <item name="minorNumber" type="INT16U"/>
-    <item name="name" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
-    <item name="callSign" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
-    <item name="affiliateCallSign" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
+    <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
+    <item name="callSign" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
+    <item name="affiliateCallSign" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
   </struct>
 
   <struct name="TvChannelLineupInfo">

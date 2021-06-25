@@ -23,8 +23,10 @@
 #include <mdns/Advertiser.h>
 #include <mdns/ServiceNaming.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#endif
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <support/Span.h>
@@ -71,11 +73,13 @@ chip::ByteSpan FillMAC(uint8_t (&mac)[8])
         return chip::ByteSpan(mac, 8);
     }
 #endif
+#if CONFIG_DEVICE_LAYER
     if (DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac) == CHIP_NO_ERROR)
     {
         ChipLogDetail(Discovery, "Using wifi MAC for hostname");
         return chip::ByteSpan(mac, 6);
     }
+#endif
     ChipLogError(Discovery, "Wifi mac not known. Using a default.");
     uint8_t temp[6] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0 };
     memcpy(mac, temp, 6);
@@ -95,13 +99,14 @@ CHIP_ERROR GetInstanceName(char * buffer, size_t bufferLen)
 /// Set MDNS operational advertisement
 CHIP_ERROR AdvertiseOperational()
 {
-    uint64_t fabricId;
+    uint64_t fabricId = 5544332211; // default value
 
+#if CONFIG_DEVICE_LAYER
     if (DeviceLayer::ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Fabric ID not known. Using a default");
-        fabricId = 5544332211;
     }
+#endif
 
     uint8_t mac[8];
 
@@ -141,6 +146,16 @@ CHIP_ERROR Advertise(bool commissionableNode)
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Mdns::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Mdns::CommssionAdvertiseMode::kCommissioner);
 
+    uint8_t mac[8];
+    advertiseParameters.SetMac(FillMAC(mac));
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+    ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
+    advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
+#endif
+
+#if CONFIG_DEVICE_LAYER
     // TODO: device can re-enter commissioning mode after being fully provisioned
     // (additionalPairing == true)
     bool notYetCommissioned = !DeviceLayer::ConfigurationMgr().IsFullyProvisioned();
@@ -148,9 +163,6 @@ CHIP_ERROR Advertise(bool commissionableNode)
     advertiseParameters.SetCommissioningMode(notYetCommissioned, additionalPairing);
 
     char pairingInst[chip::Mdns::kKeyPairingInstructionMaxLength + 1];
-
-    uint8_t mac[8];
-    advertiseParameters.SetMac(FillMAC(mac));
 
     uint16_t value;
     if (DeviceLayer::ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
@@ -190,12 +202,6 @@ CHIP_ERROR Advertise(bool commissionableNode)
     {
         advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
     }
-
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
-    ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
-    advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
-#endif
 
     if (notYetCommissioned)
     {
@@ -237,7 +243,7 @@ CHIP_ERROR Advertise(bool commissionableNode)
             advertiseParameters.SetPairingInstr(chip::Optional<const char *>::Value(pairingInst));
         }
     }
-
+#endif
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
     ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
@@ -250,8 +256,9 @@ CHIP_ERROR Advertise(bool commissionableNode)
 void StartServer()
 {
     ChipLogProgress(Discovery, "Start dns-sd server");
-    CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
-
+    CHIP_ERROR err = CHIP_NO_ERROR;
+#if CONFIG_DEVICE_LAYER
+    err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
     // TODO: advertise this only when really operational once we support both
     // operational and commisioning advertising is supported.
     if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
@@ -270,7 +277,7 @@ void StartServer()
         err = app::Mdns::AdvertiseCommissionableNode();
 #endif
     }
-
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     err = app::Mdns::AdvertiseCommisioner();
 #endif
@@ -284,20 +291,21 @@ void StartServer()
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize                = 0;
     uint16_t lifetimeCounter               = 0;
     size_t rotatingDeviceIdValueOutputSize = 0;
 
-    SuccessOrExit(error =
-                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
-    SuccessOrExit(error = AdditionalDataPayloadGenerator().generateRotatingDeviceId(
-                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
-                      rotatingDeviceIdValueOutputSize));
-exit:
-    return error;
+#if CONFIG_DEVICE_LAYER
+    ReturnErrorOnFailure(
+        chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
+    return AdditionalDataPayloadGenerator().generateRotatingDeviceId(lifetimeCounter, serialNumber, serialNumberSize,
+                                                                     rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+                                                                     rotatingDeviceIdValueOutputSize);
+#else
+    error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 #endif
 

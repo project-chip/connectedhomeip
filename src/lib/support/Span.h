@@ -19,6 +19,10 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <string.h>
+#include <type_traits>
+
+#include <support/CodeUtils.h>
 
 namespace chip {
 
@@ -30,17 +34,48 @@ template <class T>
 class Span
 {
 public:
+    using pointer = T *;
+
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
-    constexpr Span(const T * databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
+    constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
     template <size_t N>
-    constexpr explicit Span(const T (&databuf)[N]) : Span(databuf, N)
+    constexpr explicit Span(T (&databuf)[N]) : Span(databuf, N)
     {}
 
-    const T * data() const { return mDataBuf; }
+    constexpr pointer data() const { return mDataBuf; }
     size_t size() const { return mDataLen; }
+    bool empty() const { return size() == 0; }
+
+    // Allow data_equal for spans that are over the same type up to const-ness.
+    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    bool data_equal(const Span<U> & other) const
+    {
+        return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
+    }
+
+    Span SubSpan(size_t offset, size_t length) const
+    {
+        VerifyOrDie(offset <= mDataLen);
+        VerifyOrDie(length <= mDataLen - offset);
+        return Span(mDataBuf + offset, length);
+    }
+
+    // Allow converting a span with non-const T into a span with const T.
+    template <class U = T>
+    operator typename std::enable_if_t<!std::is_const<U>::value, Span<const T>>() const
+    {
+        return Span<const T>(data(), size());
+    }
+
+    // Allow reducing the size of a span.
+    void reduce_size(size_t new_size)
+    {
+        VerifyOrDie(new_size <= size());
+        mDataLen = new_size;
+    }
 
 private:
-    const T * mDataBuf;
+    pointer mDataBuf;
     size_t mDataLen;
 };
 
@@ -48,18 +83,37 @@ template <class T, size_t N>
 class FixedSpan
 {
 public:
-    constexpr FixedSpan() : mDataBuf(nullptr) {}
-    constexpr explicit FixedSpan(const T * databuf) : mDataBuf(databuf) {}
+    using pointer = T *;
 
-    const T * data() const { return mDataBuf; }
+    constexpr FixedSpan() : mDataBuf(nullptr) {}
+    constexpr explicit FixedSpan(pointer databuf) : mDataBuf(databuf) {}
+
+    constexpr pointer data() const { return mDataBuf; }
     size_t size() const { return N; }
+    bool empty() const { return data() == nullptr; }
+
+    // Allow data_equal for spans that are over the same type up to const-ness.
+    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    bool data_equal(const FixedSpan<U, N> & other) const
+    {
+        return (empty() && other.empty()) ||
+            (!empty() && !other.empty() && (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
+    }
+
+    // Allow converting a span with non-const T into a span with const T.
+    template <class U = T>
+    operator typename std::enable_if_t<!std::is_const<U>::value, FixedSpan<const T, N>>() const
+    {
+        return FixedSpan<const T, N>(data());
+    }
 
 private:
-    const T * mDataBuf;
+    pointer mDataBuf;
 };
 
-using ByteSpan = Span<uint8_t>;
+using ByteSpan        = Span<const uint8_t>;
+using MutableByteSpan = Span<uint8_t>;
 template <size_t N>
-using FixedByteSpan = FixedSpan<uint8_t, N>;
+using FixedByteSpan = FixedSpan<const uint8_t, N>;
 
 } // namespace chip

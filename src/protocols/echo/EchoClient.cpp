@@ -86,8 +86,8 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, co
     return err;
 }
 
-void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+CHIP_ERROR EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     payload->DebugDump("EchoClient::OnMessageReceive");
     // Assert that the exchange context matches the client's current context.
@@ -102,7 +102,7 @@ void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     {
         ec->Close();
         mExchangeCtx = nullptr;
-        return;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     // Remove the EC from the app state now. OnEchoResponseReceived can call
@@ -117,6 +117,7 @@ void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     {
         OnEchoResponseReceived(ec, std::move(payload));
     }
+    return CHIP_NO_ERROR;
 }
 
 void EchoClient::OnResponseTimeout(Messaging::ExchangeContext * ec)

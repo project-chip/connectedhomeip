@@ -50,6 +50,10 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
         Application application = aManager.getApplicationForEndpoint(endpoint);
         aManager.store(endpoint, &application);
     }
+    else
+    {
+        ChipLogError(Zcl, "Failed to store application for endpoint: %d. Error:%s", endpoint, chip::ErrorStr(err));
+    }
 }
 
 /** @brief Wake On LAN Cluster Init
@@ -71,6 +75,10 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
         char macAddress[17] = "";
         wolManager.setMacAddress(endpoint, macAddress);
         wolManager.store(endpoint, macAddress);
+    }
+    else
+    {
+        ChipLogError(Zcl, "Failed to store mac address for endpoint: %d. Error:%s", endpoint, chip::ErrorStr(err));
     }
 }
 
@@ -128,7 +136,7 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
  * @param endpoint   Ver.: always
  *
  */
-void emberAfContentLaunchClusterInitCallback(EndpointId endpoint)
+void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
     ClusterManager().writeListAttribute(endpoint, ZCL_CONTENT_LAUNCH_CLUSTER_ID, ZCL_CONTENT_LAUNCHER_ACCEPTS_HEADER_ATTRIBUTE_ID,
                                         ContentLauncherManager().proxyGetAcceptsHeader());

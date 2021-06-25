@@ -21,11 +21,12 @@
 
 #include "ServiceNaming.h"
 #include "lib/core/CHIPSafeCasts.h"
+#include "lib/mdns/TxtFields.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
-#include "setup_payload/AdditionalDataPayloadGenerator.h"
+#include "support/CHIPMemString.h"
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
 #include "support/RandUtils.h"
@@ -168,7 +169,12 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
+    error = MakeHostName(service.mHostName, sizeof(service.mHostName), params.GetMac());
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to create mdns hostname: %s", ErrorStr(error));
+        return error;
+    }
 
     ReturnErrorOnFailure(GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
 
@@ -401,7 +407,12 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     mrpRetryIntervalEntries[textEntrySize++] = { "CRA", reinterpret_cast<const uint8_t *>(mrpRetryIntervalActiveBuf),
                                                  strlen(mrpRetryIntervalActiveBuf) };
 
-    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
+    error = MakeHostName(service.mHostName, sizeof(service.mHostName), params.GetMac());
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to create mdns hostname: %s", ErrorStr(error));
+        return error;
+    }
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetPeerId()));
     strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
@@ -451,6 +462,49 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
     return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
+}
+
+void DiscoveryImplPlatform::HandleCommissionableNodeBrowse(void * context, MdnsService * services, size_t servicesSize,
+                                                           CHIP_ERROR error)
+{
+    for (size_t i = 0; i < servicesSize; ++i)
+    {
+        ChipMdnsResolve(&services[i], INET_NULL_INTERFACEID, HandleCommissionableNodeResolve, context);
+    }
+}
+
+void DiscoveryImplPlatform::HandleCommissionableNodeResolve(void * context, MdnsService * result, CHIP_ERROR error)
+{
+    if (error != CHIP_NO_ERROR)
+    {
+        return;
+    }
+    DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
+    DiscoveredNodeData data;
+    Platform::CopyString(data.hostName, result->mHostName);
+
+    if (result->mAddress.HasValue())
+    {
+        data.ipAddress[data.numIPs++] = result->mAddress.Value();
+    }
+
+    for (size_t i = 0; i < result->mTextEntrySize; ++i)
+    {
+        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
+        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
+        FillNodeDataFromTxt(key, val, &data);
+    }
+    mgr->mResolverDelegate->OnNodeDiscoveryComplete(data);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
+{
+    ReturnErrorOnFailure(Init());
+    char serviceName[kMaxCommisisonableServiceNameSize];
+    ReturnErrorOnFailure(MakeCommissionableNodeServiceTypeName(serviceName, sizeof(serviceName), filter));
+
+    return ChipMdnsBrowse(serviceName, MdnsServiceProtocol::kMdnsProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
+                          HandleCommissionableNodeBrowse, this);
 }
 
 void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error)

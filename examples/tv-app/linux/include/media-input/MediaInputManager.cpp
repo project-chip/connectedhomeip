@@ -90,7 +90,7 @@ static void storeCurrentInput(chip::EndpointId endpoint, uint8_t currentInput)
                                     (uint8_t *) &currentInput, ZCL_INT8U_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to store media playback attribute.");
+        ChipLogError(Zcl, "Failed to store media playback attribute.");
     }
 }
 

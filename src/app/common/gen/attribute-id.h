@@ -392,6 +392,7 @@
 #define ZCL_PRODUCT_LABEL_ATTRIBUTE_ID (0x000E)
 #define ZCL_SERIAL_NUMBER_ATTRIBUTE_ID (0x000F)
 #define ZCL_LOCAL_CONFIG_DISABLED_ATTRIBUTE_ID (0x0010)
+#define ZCL_REACHABLE_ATTRIBUTE_ID (0x0011)
 
 // Attribute ids for cluster: OTA Software Update Server
 
@@ -416,6 +417,12 @@
 #define ZCL_BREADCRUMB_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Network Commissioning
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Diagnostic Logs
 
 // Client attributes
 
@@ -583,12 +590,6 @@
 
 // Server attributes
 #define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
-
-// Attribute ids for cluster: Trusted Root Certificates
-
-// Client attributes
-
-// Server attributes
 
 // Attribute ids for cluster: Fixed Label
 
@@ -1356,7 +1357,7 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Content Launch
+// Attribute ids for cluster: Content Launcher
 
 // Client attributes
 
@@ -1424,6 +1425,8 @@
 #define ZCL_LIST_ATTRIBUTE_ID (0x001A)
 #define ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID (0x001B)
 #define ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID (0x001C)
+#define ZCL_LONG_OCTET_STRING_ATTRIBUTE_ID (0x001D)
+#define ZCL_UNSUPPORTED_ATTRIBUTE_ID (0x00FF)
 
 // Attribute ids for cluster: Generic Tunnel
 

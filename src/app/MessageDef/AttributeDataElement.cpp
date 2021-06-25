@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -393,27 +395,22 @@ exit:
 AttributeDataElement::Builder & AttributeDataElement::Builder::DataVersion(const chip::DataVersion aDataVersion)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DataVersion), aDataVersion);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DataVersion), aDataVersion);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 AttributeDataElement::Builder & AttributeDataElement::Builder::MoreClusterData(const bool aMoreClusterData)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    if (aMoreClusterData)
+    if ((mError == CHIP_NO_ERROR) && aMoreClusterData)
     {
         mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_MoreClusterDataFlag), true);
         ChipLogFunctError(mError);
     }
-
-exit:
     return *this;
 }
 

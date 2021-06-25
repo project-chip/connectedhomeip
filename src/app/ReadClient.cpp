@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 
@@ -193,8 +194,8 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(ReadRequest::Builder & aRequest
     return attributePathListBuilder.GetError();
 }
 
-void ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                   const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                         const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -223,7 +224,7 @@ exit:
         }
     }
 
-    return;
+    return err;
 }
 
 CHIP_ERROR ReadClient::AbortExistingExchangeContext()
@@ -378,8 +379,6 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
-        SuccessOrExit(err);
-        err = WriteSingleClusterData(clusterInfo, dataReader);
         SuccessOrExit(err);
     }
 

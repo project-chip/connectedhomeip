@@ -49,7 +49,7 @@ static void writePlaybackState(chip::EndpointId endpoint, uint8_t playbackState)
                                     (uint8_t *) &playbackState, ZCL_INT8U_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to store media playback attribute.");
+        ChipLogError(Zcl, "Failed to store media playback attribute.");
     }
 }
 
@@ -61,7 +61,7 @@ static uint8_t readPlaybackStatus(chip::EndpointId endpoint)
                                    (uint8_t *) &playbackState, sizeof(uint8_t));
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to read media playback attribute.");
+        ChipLogError(Zcl, "Failed to read media playback attribute.");
     }
 
     return playbackState;
@@ -81,15 +81,16 @@ void MediaPlaybackManager::storeNewPlaybackState(chip::EndpointId endpoint, uint
     }
 }
 
-static void sendResponse(const char * responseName, chip::CommandId commandId, uint8_t mediaPlaybackStatus)
+static void sendResponse(const char * responseName, chip::CommandId commandId, EmberAfMediaPlaybackStatus mediaPlaybackStatus)
 {
+    static_assert(std::is_same<std::underlying_type_t<EmberAfMediaPlaybackStatus>, uint8_t>::value, "Wrong enum size");
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_MEDIA_PLAYBACK_CLUSTER_ID,
                               commandId, "u", mediaPlaybackStatus);
 
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        emberAfMediaPlaybackClusterPrintln("Failed to send %s: 0x%X", responseName, status);
+        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
     }
 }
 

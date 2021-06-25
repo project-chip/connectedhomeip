@@ -28,6 +28,8 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+using namespace chip::Controller;
+
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
@@ -47,7 +49,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     ReturnErrorCodeIf(mGetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(offset != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    JNIEnv * env = GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString javaKey(env, key);
@@ -100,7 +102,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     ReturnErrorCodeIf(mKeyValueStoreManagerClass == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mDeleteMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    JNIEnv * env = GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString javaKey(env, key);
@@ -124,7 +126,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     ReturnErrorCodeIf(mSetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(value_size > kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
-    JNIEnv * env = GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value_size) + 1]);
@@ -152,7 +154,8 @@ void KeyValueStoreManagerImpl::InitializeMethodForward(JavaVM * vm, JNIEnv * env
 {
     mJvm = vm;
 
-    CHIP_ERROR err = GetClassRef(env, "chip/devicecontroller/KeyValueStoreManager", mKeyValueStoreManagerClass);
+    CHIP_ERROR err =
+        JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/KeyValueStoreManager", mKeyValueStoreManagerClass);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to get reference to KeyValueStoreManager");

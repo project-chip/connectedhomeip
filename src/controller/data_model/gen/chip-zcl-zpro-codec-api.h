@@ -38,8 +38,9 @@
 | Binding                                                             | 0xF000 |
 | BridgedDeviceBasic                                                  | 0x0039 |
 | ColorControl                                                        | 0x0300 |
-| ContentLaunch                                                       | 0x050A |
+| ContentLauncher                                                     | 0x050A |
 | Descriptor                                                          | 0x001D |
+| DiagnosticLogs                                                      | 0x0032 |
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
@@ -54,8 +55,10 @@
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
+| OtaSoftwareUpdateServer                                             | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
+| PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
 | Scenes                                                              | 0x0005 |
@@ -66,7 +69,7 @@
 | TemperatureMeasurement                                              | 0x0402 |
 | TestCluster                                                         | 0x050F |
 | Thermostat                                                          | 0x0201 |
-| TrustedRootCertificates                                             | 0x003F |
+| ThreadNetworkDiagnostics                                            | 0x0035 |
 | WakeOnLan                                                           | 0x0503 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
@@ -99,6 +102,7 @@ chip::System::PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAtt
 | Cluster ApplicationBasic                                            | 0x050D |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ChangeStatus                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * VendorName                                                        | 0x0000 |
@@ -320,6 +324,7 @@ chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionA
 | * ProductLabel                                                      | 0x000E |
 | * SerialNumber                                                      | 0x000F |
 | * LocalConfigDisabled                                               | 0x0010 |
+| * Reachable                                                         | 0x0011 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -459,6 +464,12 @@ chip::System::PacketBufferHandle encodeBasicClusterReadLocalConfigDisabledAttrib
 chip::System::PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t seqNum,
                                                                                      chip::EndpointId destinationEndpoint,
                                                                                      uint8_t localConfigDisabled);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the Reachable attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadReachableAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -1297,7 +1308,7 @@ chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAtt
                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster ContentLaunch                                               | 0x050A |
+| Cluster ContentLauncher                                             | 0x050A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * LaunchContent                                                     |   0x00 |
@@ -1311,30 +1322,31 @@ chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAtt
 
 /**
  * @brief
- *    Encode a Content Launch server discover command into buffer including the APS frame
+ *    Encode a Content Launcher server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeContentLauncherClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Content Launch server read command for the accepts header list attribute into buffer including the APS frame
+ *    Encode a Content Launcher server read command for the accepts header list attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint8_t seqNum,
-                                                                                          chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeContentLauncherClusterReadAcceptsHeaderListAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Content Launch server read command for the supported streaming types attribute into buffer including the APS frame
+ *    Encode a Content Launcher server read command for the supported streaming types attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
-encodeContentLaunchClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+encodeContentLauncherClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Content Launch server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a Content Launcher server read command for the cluster revision attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                        chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeContentLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Descriptor                                                  | 0x001D |
@@ -1389,6 +1401,22 @@ chip::System::PacketBufferHandle encodeDescriptorClusterReadPartsListAttribute(u
  */
 chip::System::PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                      chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster DiagnosticLogs                                              | 0x0032 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RetrieveLogsRequest                                               |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Diagnostic Logs server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDiagnosticLogsClusterDiscoverAttributes(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
@@ -1955,6 +1983,32 @@ chip::System::PacketBufferHandle
 encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
+| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ApplyUpdateRequest                                                |   0x01 |
+| * NotifyUpdateApplied                                               |   0x02 |
+| * QueryImage                                                        |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a OTA Software Update Server server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a OTA Software Update Server server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -1964,6 +2018,11 @@ encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, ch
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * OnOff                                                             | 0x0000 |
+| * GlobalSceneControl                                                | 0x4000 |
+| * OnTime                                                            | 0x4001 |
+| * OffWaitTime                                                       | 0x4002 |
+| * StartUpOnOff                                                      | 0x4003 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -1988,6 +2047,58 @@ chip::System::PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8
 
 /**
  * @brief
+ *    Encode a On/off server read command for the global scene control attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadGlobalSceneControlAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a On/off server read command for the on time attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadOnTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a On/off server write command for the on time attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterWriteOnTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                        uint16_t onTime);
+
+/**
+ * @brief
+ *    Encode a On/off server read command for the off wait time attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadOffWaitTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a On/off server write command for the off wait time attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterWriteOffWaitTimeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             uint16_t offWaitTime);
+
+/**
+ * @brief
+ *    Encode a On/off server read command for the start up on off attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadStartUpOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a On/off server write command for the start up on off attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterWriteStartUpOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              uint8_t startUpOnOff);
+
+/**
+ * @brief
+ *    Encode a On/off server read command for the feature map attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOnOffClusterReadFeatureMapAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
  *    Encode a On/off server read command for the cluster revision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum,
@@ -1998,9 +2109,11 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddOpCert                                                         |   0x06 |
+| * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
+| * RemoveTrustedRootCertificate                                      |   0xA2 |
 | * SetFabric                                                         |   0x00 |
 | * UpdateFabricLabel                                                 |   0x09 |
 |------------------------------------------------------------------------------|
@@ -2029,6 +2142,62 @@ chip::System::PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsL
  */
 chip::System::PacketBufferHandle
 encodeOperationalCredentialsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster PressureMeasurement                                         | 0x0403 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePressureMeasurementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server read command for the measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePressureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server configure report command for the measured value attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePressureMeasurementClusterConfigureMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                uint16_t minInterval, uint16_t maxInterval, int16_t change);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server read command for the min measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePressureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server read command for the max measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePressureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pressure Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePressureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster PumpConfigurationAndControl                                 | 0x0200 |
@@ -2500,6 +2669,8 @@ encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, 
 | * ListInt8u                                                         | 0x001A |
 | * ListOctetString                                                   | 0x001B |
 | * ListStructOctetString                                             | 0x001C |
+| * LongOctetString                                                   | 0x001D |
+| * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -2744,6 +2915,35 @@ chip::System::PacketBufferHandle encodeTestClusterClusterReadListStructOctetStri
 
 /**
  * @brief
+ *    Encode a Test Cluster server read command for the long_octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadLongOctetStringAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the long_octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteLongOctetStringAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint,
+                                                                                       chip::ByteSpan longOctetString);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the unsupported attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadUnsupportedAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the unsupported attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTestClusterClusterWriteUnsupportedAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t unsupported);
+
+/**
+ * @brief
  *    Encode a Test Cluster server read command for the cluster revision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeTestClusterClusterReadClusterRevisionAttribute(uint8_t seqNum,
@@ -2857,29 +3057,533 @@ chip::System::PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttri
                                                                                      chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster TrustedRootCertificates                                     | 0x003F |
+| Cluster ThreadNetworkDiagnostics                                    | 0x0035 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddTrustedRootCertificate                                         |   0x00 |
-| * RemoveTrustedRootCertificate                                      |   0x01 |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * Channel                                                           | 0x0000 |
+| * RoutingRole                                                       | 0x0001 |
+| * NetworkName                                                       | 0x0002 |
+| * PanId                                                             | 0x0003 |
+| * ExtendedPanId                                                     | 0x0004 |
+| * MeshLocalPrefix                                                   | 0x0005 |
+| * OverrunCount                                                      | 0x0006 |
+| * NeighborTableList                                                 | 0x0007 |
+| * RouteTableList                                                    | 0x0008 |
+| * PartitionId                                                       | 0x0009 |
+| * Weighting                                                         | 0x000A |
+| * DataVersion                                                       | 0x000B |
+| * StableDataVersion                                                 | 0x000C |
+| * LeaderRouterId                                                    | 0x000D |
+| * DetachedRoleCount                                                 | 0x000E |
+| * ChildRoleCount                                                    | 0x000F |
+| * RouterRoleCount                                                   | 0x0010 |
+| * LeaderRoleCount                                                   | 0x0011 |
+| * AttachAttemptCount                                                | 0x0012 |
+| * PartitionIdChangeCount                                            | 0x0013 |
+| * BetterPartitionAttachAttemptCount                                 | 0x0014 |
+| * ParentChangeCount                                                 | 0x0015 |
+| * TxTotalCount                                                      | 0x0016 |
+| * TxUnicastCount                                                    | 0x0017 |
+| * TxBroadcastCount                                                  | 0x0018 |
+| * TxAckRequestedCount                                               | 0x0019 |
+| * TxAckedCount                                                      | 0x001A |
+| * TxNoAckRequestedCount                                             | 0x001B |
+| * TxDataCount                                                       | 0x001C |
+| * TxDataPollCount                                                   | 0x001D |
+| * TxBeaconCount                                                     | 0x001E |
+| * TxBeaconRequestCount                                              | 0x001F |
+| * TxOtherCount                                                      | 0x0020 |
+| * TxRetryCount                                                      | 0x0021 |
+| * TxDirectMaxRetryExpiryCount                                       | 0x0022 |
+| * TxIndirectMaxRetryExpiryCount                                     | 0x0023 |
+| * TxErrCcaCount                                                     | 0x0024 |
+| * TxErrAbortCount                                                   | 0x0025 |
+| * TxErrBusyChannelCount                                             | 0x0026 |
+| * RxTotalCount                                                      | 0x0027 |
+| * RxUnicastCount                                                    | 0x0028 |
+| * RxBroadcastCount                                                  | 0x0029 |
+| * RxDataCount                                                       | 0x002A |
+| * RxDataPollCount                                                   | 0x002B |
+| * RxBeaconCount                                                     | 0x002C |
+| * RxBeaconRequestCount                                              | 0x002D |
+| * RxOtherCount                                                      | 0x002E |
+| * RxAddressFilteredCount                                            | 0x002F |
+| * RxDestAddrFilteredCount                                           | 0x0030 |
+| * RxDuplicatedCount                                                 | 0x0031 |
+| * RxErrNoFrameCount                                                 | 0x0032 |
+| * RxErrUnknownNeighborCount                                         | 0x0033 |
+| * RxErrInvalidSrcAddrCount                                          | 0x0034 |
+| * RxErrSecCount                                                     | 0x0035 |
+| * RxErrFcsCount                                                     | 0x0036 |
+| * RxErrOtherCount                                                   | 0x0037 |
+| * SecurityPolicy                                                    | 0x003B |
+| * ChannelMask                                                       | 0x003C |
+| * OperationalDatasetComponents                                      | 0x003D |
+| * ActiveNetworkFaultsList                                           | 0x003E |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
 /**
  * @brief
- *    Encode a Trusted Root Certificates server discover command into buffer including the APS frame
+ *    Encode a Thread Network Diagnostics server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeTrustedRootCertificatesClusterDiscoverAttributes(uint8_t seqNum,
-                                                                                        chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeThreadNetworkDiagnosticsClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Trusted Root Certificates server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a Thread Network Diagnostics server read command for the channel attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadChannelAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RoutingRole attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
-encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+encodeThreadNetworkDiagnosticsClusterReadRoutingRoleAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the NetworkName attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadNetworkNameAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the PanId attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadPanIdAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the ExtendedPanId attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadExtendedPanIdAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the MeshLocalPrefix attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadMeshLocalPrefixAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the OverrunCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadOverrunCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the NeighborTableList attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadNeighborTableListAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RouteTableList attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRouteTableListAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the PartitionId attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadPartitionIdAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the weighting attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThreadNetworkDiagnosticsClusterReadWeightingAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the DataVersion attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadDataVersionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the StableDataVersion attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadStableDataVersionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the LeaderRouterId attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadLeaderRouterIdAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the DetachedRoleCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadDetachedRoleCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the ChildRoleCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadChildRoleCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RouterRoleCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRouterRoleCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the LeaderRoleCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadLeaderRoleCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the AttachAttemptCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadAttachAttemptCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the PartitionIdChangeCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadPartitionIdChangeCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the BetterPartitionAttachAttemptCount attribute into buffer
+ * including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadBetterPartitionAttachAttemptCountAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the ParentChangeCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadParentChangeCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxTotalCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxTotalCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxUnicastCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxUnicastCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxBroadcastCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxBroadcastCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxAckRequestedCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxAckRequestedCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxAckedCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxAckedCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxNoAckRequestedCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxNoAckRequestedCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxDataCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxDataCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxDataPollCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxDataPollCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxBeaconCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxBeaconCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxBeaconRequestCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxBeaconRequestCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxOtherCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxOtherCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxRetryCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxRetryCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxDirectMaxRetryExpiryCount attribute into buffer including
+ * the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxDirectMaxRetryExpiryCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxIndirectMaxRetryExpiryCount attribute into buffer including
+ * the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxIndirectMaxRetryExpiryCountAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxErrCcaCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxErrCcaCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxErrAbortCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxErrAbortCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the TxErrBusyChannelCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadTxErrBusyChannelCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxTotalCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxTotalCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxUnicastCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxUnicastCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxBroadcastCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxBroadcastCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxDataCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxDataCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxDataPollCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxDataPollCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxBeaconCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxBeaconCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxBeaconRequestCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxBeaconRequestCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxOtherCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxOtherCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxAddressFilteredCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxAddressFilteredCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxDestAddrFilteredCount attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxDestAddrFilteredCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxDuplicatedCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxDuplicatedCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxErrNoFrameCount attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxErrNoFrameCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxErrUnknownNeighborCount attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxErrUnknownNeighborCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxErrInvalidSrcAddrCount attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxErrInvalidSrcAddrCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxErrSecCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxErrSecCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxErrFcsCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxErrFcsCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the RxErrOtherCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadRxErrOtherCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the SecurityPolicy attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadSecurityPolicyAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the ChannelMask attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadChannelMaskAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the OperationalDatasetComponents attribute into buffer including
+ * the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadOperationalDatasetComponentsAttribute(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the ActiveNetworkFaultsList attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadActiveNetworkFaultsListAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thread Network Diagnostics server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThreadNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster WakeOnLan                                                   | 0x0503 |

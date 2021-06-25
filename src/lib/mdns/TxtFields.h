@@ -61,7 +61,7 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction);
 } // namespace Internal
 #endif
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommissionableNodeData * nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, DiscoveredNodeData * nodeData);
 
 } // namespace Mdns
 } // namespace chip

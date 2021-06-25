@@ -26,9 +26,9 @@ k32w_platform_dir = "${chip_root}/examples/platform/k32w"
 
 k32w_sdk("sdk") {
   sources = [
-    "${k32w_platform_dir}/app/project_include/CHIPProjectConfig.h",
-    "${k32w_platform_dir}/app/project_include/FreeRTOSConfig.h",
     "${k32w_platform_dir}/app/project_include/OpenThreadConfig.h",
+    "include/CHIPProjectConfig.h",
+    "include/FreeRTOSConfig.h",
     "main/include/app_config.h",
   ]
 
@@ -38,7 +38,7 @@ k32w_sdk("sdk") {
   include_dirs = [
     "main/include",
     "main",
-    "${k32w_platform_dir}/app/project_include",
+    "include",
     "${k32w_platform_dir}/app/support",
     "${k32w_platform_dir}/util/include",
   ]

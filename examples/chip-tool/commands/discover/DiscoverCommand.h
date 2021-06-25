@@ -35,15 +35,12 @@ public:
     void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override{};
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
+    uint16_t GetWaitDurationInSeconds() const override { return 30; }
 
     virtual CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) = 0;
-
-protected:
-    ChipDeviceCommissioner mCommissioner;
 
 private:
     chip::NodeId mNodeId;
     uint64_t mFabricId;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 };

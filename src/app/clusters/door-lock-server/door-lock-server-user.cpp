@@ -226,23 +226,13 @@ bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::Command * commandObj, 
     if (emAfPluginDoorLockServerCheckForSufficientSpace(userId, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE))
     {
         EmberAfPluginDoorLockServerUser * user = &pinUserTable[userId];
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_GET_USER_TYPE_RESPONSE_COMMAND_ID, "vu", userId, user->type);
-            EmberStatus status = emberAfSendResponse();
-            if (status != EMBER_SUCCESS)
-            {
-                emberAfDoorLockClusterPrintln("Failed to send GetUserTypeResponse: 0x%X", status);
-            }
-        }
-        else
+
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_USER_TYPE_RESPONSE_COMMAND_ID,
                                                  (chip::app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), userId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), user->type));
@@ -264,24 +254,13 @@ bool emberAfDoorLockClusterSetUserTypeCallback(chip::app::Command * commandObj, 
     uint8_t status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType))
                           ? 0x00   // success (per 7.3.2.17.21)
                           : 0x01); // failure (per 7.3.2.17.21)
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID, "u", status);
 
-        EmberStatus emberStatus = emberAfSendResponse();
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send SetUserTypeResponse: 0x%X", emberStatus);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -317,18 +296,12 @@ bool emberAfDoorLockClusterSetPinCallback(chip::app::Command * commandObj, uint1
     // send response
     uint8_t status = setUser(userId, userStatus, userType, pin, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     uint16_t rfProgrammingEventMask = 0xffff; // send event by default
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_SET_PIN_RESPONSE_COMMAND_ID, "u", status);
-        emberAfSendResponse();
-    }
-    else
+
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_SET_PIN_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -375,20 +348,11 @@ bool emberAfDoorLockClusterGetPinCallback(chip::app::Command * commandObj, uint1
     CHIP_ERROR err     = CHIP_NO_ERROR;
     if (getUser(userId, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE, &user))
     {
-        uint8_t fakePin = 0x00;
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_GET_PIN_RESPONSE_COMMAND_ID, "vuus", userId, user.status, user.type,
-                                      (getSendPinOverTheAir() ? user.code.pin : &fakePin));
-            status = emberAfSendResponse();
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_PIN_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), userId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), user.status));
@@ -429,23 +393,11 @@ bool emberAfDoorLockClusterClearPinCallback(chip::app::Command * commandObj, uin
     uint16_t rfProgrammingEventMask = 0xffff; // event sent by default
     uint8_t userPin                 = 0x00;   // Zero length Zigbee string
 
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_CLEAR_PIN_RESPONSE_COMMAND_ID, "u", status);
-
-        EmberStatus emberStatus = emberAfSendResponse();
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send ClearPinResponse: 0x%X", emberStatus);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_CLEAR_PIN_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -485,25 +437,14 @@ bool emberAfDoorLockClusterClearAllPinsCallback(chip::app::Command * commandObj)
     }
 
     // 7.3.2.17.9 says that "0x00" indicates success.
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_CLEAR_ALL_PINS_RESPONSE_COMMAND_ID, "u", 0x00);
-        EmberStatus status = emberAfSendResponse();
-        if (status != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send ClearAllPins: 0x%X", status);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_CLEAR_ALL_PINS_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), 0));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint8_t>(0)));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 exit:
@@ -523,23 +464,12 @@ bool emberAfDoorLockClusterSetRfidCallback(chip::app::Command * commandObj, uint
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status =
         setUser(userId, userStatus, userType, rfid, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_SET_RFID_RESPONSE_COMMAND_ID, "u", status);
 
-        EmberStatus emberStatus = emberAfSendResponse();
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send SetRfidResponse: 0x%X", emberStatus);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_SET_RFID_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -559,19 +489,12 @@ bool emberAfDoorLockClusterGetRfidCallback(chip::app::Command * commandObj, uint
     CHIP_ERROR err     = CHIP_NO_ERROR;
     if (getUser(userId, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE, &user))
     {
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_GET_RFID_RESPONSE_COMMAND_ID, "vuus", userId, user.status, user.type, user.code.pin);
-            status = emberAfSendResponse();
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_RFID_RESPONSE_COMMAND_ID,
                                                  (chip::app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), userId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), user.status));
@@ -602,24 +525,11 @@ bool emberAfDoorLockClusterClearRfidCallback(chip::app::Command * commandObj, ui
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status = clearUserPinOrRfid(userId, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
 
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_CLEAR_RFID_RESPONSE_COMMAND_ID, "u", status);
-
-        EmberStatus emberStatus = emberAfSendResponse();
-
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send ClearRfidResponse: 0x%X", emberStatus);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_CLEAR_RFID_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -641,25 +551,14 @@ bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::Command * commandObj
     }
 
     // 7.3.2.17.26 says that "0x00" indicates success.
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_CLEAR_ALL_RFIDS_RESPONSE_COMMAND_ID, "u", 0x00);
-        EmberStatus status = emberAfSendResponse();
-        if (status != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send ClearAllRfidsResponse: 0x%X", status);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_CLEAR_ALL_RFIDS_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), 0));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint8_t>(0)));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 exit:
@@ -749,19 +648,11 @@ bool emberAfDoorLockClusterLockDoorCallback(chip::app::Command * commandObj, uin
     }
 
     // send response
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID, "u",
-                                  doorLocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-        emberAfSendResponse();
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), doorLocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -819,19 +710,11 @@ bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::Command * commandObj, u
                                     &lockStateUnlocked, ZCL_INT8U_ATTRIBUTE_TYPE);
     }
 
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_UNLOCK_DOOR_RESPONSE_COMMAND_ID, "u",
-                                  doorUnlocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-        emberAfSendResponse();
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_UNLOCK_DOOR_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), doorUnlocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE));
         SuccessOrExit(err = commandObj->FinishCommand());
@@ -1018,23 +901,12 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::Command * comman
         status = 0x01; // failure (per 7.3.2.17.4)
     }
 
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND_ID, "u", status);
-        EmberStatus emberStatus = emberAfSendResponse();
-        if (emberStatus != EMBER_SUCCESS)
-        {
-            emberAfDoorLockClusterPrintln("Failed to send UnlockWithTimeoutResponse: 0x%X", status);
-        }
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                              ZCL_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = commandObj->FinishCommand());

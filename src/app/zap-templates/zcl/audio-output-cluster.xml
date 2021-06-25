@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <cluster>
-    <domain>General</domain>
+    <domain>Media</domain>
     <name>Audio Output</name>
     <code>0x050b</code>
     <define>AUDIO_OUTPUT_CLUSTER</define>
@@ -44,7 +44,7 @@ limitations under the License.
   <struct name="AudioOutputInfo">
     <item name="index" type="INT8U"/>
     <item name="outputType" type="AudioOutputType"/>
-    <item name="name" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
+    <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
   </struct>
 
   <enum name="AudioOutputType" type="ENUM8">

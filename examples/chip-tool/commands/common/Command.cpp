@@ -17,6 +17,7 @@
  */
 
 #include "Command.h"
+#include "platform/PlatformManager.h"
 
 #include <netdb.h>
 #include <sstream>
@@ -378,16 +379,30 @@ const char * Command::GetAttribute(void) const
 
 void Command::UpdateWaitForResponse(bool value)
 {
+#if CONFIG_USE_SEPARATE_EVENTLOOP
     {
         std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
         mWaitingForResponse = value;
     }
     cvWaitingForResponse.notify_all();
+#else  // CONFIG_USE_SEPARATE_EVENTLOOP
+    if (value == false)
+    {
+        if (mCommandExitStatus != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(mCommandExitStatus));
+        }
+
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    }
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 }
 
-void Command::WaitForResponse(uint16_t duration)
+#if CONFIG_USE_SEPARATE_EVENTLOOP
+
+void Command::WaitForResponse(uint16_t seconds)
 {
-    std::chrono::seconds waitingForResponseTimeout(duration);
+    std::chrono::seconds waitingForResponseTimeout(seconds);
     std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
     auto waitingUntil = std::chrono::system_clock::now() + waitingForResponseTimeout;
     if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
@@ -395,3 +410,30 @@ void Command::WaitForResponse(uint16_t duration)
         ChipLogError(chipTool, "No response from device");
     }
 }
+
+#else // CONFIG_USE_SEPARATE_EVENTLOOP
+
+static void OnResponseTimeout(chip::System::Layer *, void *, chip::System::Error)
+{
+    ChipLogError(chipTool, "No response from device");
+
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+}
+
+CHIP_ERROR Command::ScheduleWaitForResponse(uint16_t seconds)
+{
+    chip::System::Timer * timer = nullptr;
+
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer.NewTimer(timer);
+    if (err == CHIP_NO_ERROR)
+    {
+        timer->Start(seconds * 1000, OnResponseTimeout, this);
+    }
+    else
+    {
+        ChipLogError(chipTool, "Failed to allocate timer");
+    }
+    return err;
+}
+
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP

@@ -24,6 +24,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
@@ -319,7 +320,7 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
     service.mProtocol   = context->protocol;
 
     strncpy(service.mName, name, sizeof(service.mName));
-    service.mName[kMdnsNameMaxSize] = 0;
+    service.mName[kMdnsInstanceNameMaxSize] = 0;
 
     strncpy(service.mType, regtype, sizeof(service.mType));
     service.mType[kMdnsTypeMaxSize] = 0;
@@ -386,7 +387,8 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     service.mTextEntries   = sdCtx->textEntries.empty() ? nullptr : sdCtx->textEntries.data();
     service.mTextEntrySize = sdCtx->textEntries.empty() ? 0 : sdCtx->textEntries.size();
     service.mAddress.SetValue(chip::Inet::IPAddress::FromSockAddr(*address));
-    strncpy(service.mName, sdCtx->name, sizeof(service.mName));
+    Platform::CopyString(service.mName, sdCtx->name);
+    Platform::CopyString(service.mHostName, hostname);
     service.mInterface = sdCtx->interfaceId;
 
     sdCtx->callback(sdCtx->context, &service, CHIP_NO_ERROR);
@@ -483,17 +485,15 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback successCallback, MdnsAsyncReturn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
-{
-    MdnsContexts::GetInstance().SetHostname(hostname);
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
 
+    if (strcmp(service->mHostName, "") != 0)
+    {
+        MdnsContexts::GetInstance().SetHostname(service->mHostName);
+    }
     std::string regtype  = GetFullTypeWithSubTypes(service->mType, service->mProtocol, service->mSubTypes, service->mSubTypeSize);
     uint32_t interfaceId = GetInterfaceId(service->mInterface);
 
@@ -544,9 +544,9 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interf
     return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
 }
 
-void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout) {}
+void GetMdnsTimeout(timeval & timeout) {}
 
-void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet) {}
+void HandleMdnsTimeout() {}
 
 } // namespace Mdns
 } // namespace chip

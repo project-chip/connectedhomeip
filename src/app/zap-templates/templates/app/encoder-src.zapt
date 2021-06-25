@@ -111,7 +111,7 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamel
        .Put16({{asHex code 4}})
        .Put8({{atomicTypeId}})
     {{#if (isString type)}}
-       .Put(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased name}}StrLen))
+       .Put{{#if (isLongString type)}}16{{/if}}(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased name}}StrLen))
        .Put({{asCamelCased name}}.data(), {{asCamelCased name }}StrLen)
     {{else}}
        .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asCamelCased name}}))

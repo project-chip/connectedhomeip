@@ -78,7 +78,7 @@ public:
      * @param nodeData DNS-SD node information for the client requesting commissioning
      *
      */
-    virtual void OnUserDirectedCommissioningRequest(const Mdns::CommissionableNodeData & nodeData) {}
+    virtual void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) {}
 
     virtual ~UserConfirmationProvider() {}
 };
@@ -129,8 +129,8 @@ private:
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     SecureSessionHandle mSecureSession;
 
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 };
 
@@ -221,15 +221,15 @@ public:
      *  @param[in]    nodeData        DNS-SD response data.
      *
      */
-    void OnCommissionableNodeFound(const Mdns::CommissionableNodeData & nodeData);
+    void OnCommissionableNodeFound(const Mdns::DiscoveredNodeData & nodeData);
 
 private:
     Messaging::ExchangeManager * mExchangeMgr            = nullptr;
     InstanceNameResolver * mInstanceNameResolver         = nullptr;
     UserConfirmationProvider * mUserConfirmationProvider = nullptr;
 
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 
     UDCClients<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mUdcClients; // < Active UDC clients
