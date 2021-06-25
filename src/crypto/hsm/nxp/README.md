@@ -22,7 +22,7 @@ Following are the list operations supported by secure element.
     layer,
 
 ```
-chip_with_se05x=1
+chip_with_se05x=1 host = "host_k32w"
 ```
 
 ## Known Limitations:
