@@ -396,7 +396,9 @@ int TestBytesCircularBuffer()
 {
     nlTestSuite theSuite = { "CHIP BytesCircularBuffer tests", &sTests[0], Setup, Teardown };
 
-    std::srand(static_cast<unsigned>(std::time(nullptr)));
+    unsigned seed = static_cast<unsigned>(std::time(nullptr));
+    printf("Running " __FILE__ " using seed %d", seed);
+    std::srand(seed);
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);

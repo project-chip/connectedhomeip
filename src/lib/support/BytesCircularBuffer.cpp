@@ -36,6 +36,7 @@ size_t BytesCircularBuffer::Advance(size_t dataLocation, size_t amount) const
 
 void BytesCircularBuffer::Read(uint8_t * dest, size_t length, size_t offset) const
 {
+    // length is an instance of SizeType
     // offset is maximized at sizeof(SizeType) for all use cases.
     static_assert(std::numeric_limits<SizeType>::max() < std::numeric_limits<size_t>::max() - sizeof(SizeType),
                   "SizeType too large, may cause overflow");
