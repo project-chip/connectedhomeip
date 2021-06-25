@@ -54,6 +54,19 @@ void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::Syst
     payload->DebugDump("HandleEchoRequestReceived Echo Request ... sending response.");
 }
 
+class DLL_EXPORT UDCListener : public chip::Protocols::UserDirectedCommissioning::InstanceNameResolver
+{
+public:
+    void FindCommissionableNode(chip::Messaging::ExchangeContext * ec, char * instanceName) override;
+};
+
+void UDCListener::FindCommissionableNode(chip::Messaging::ExchangeContext * ec, char * instanceName)
+{
+    printf("FindCommissionableNode instanceName=%s\n", instanceName);
+}
+
+UDCListener gListener;
+
 } // namespace
 
 int main(int argc, char * argv[])
@@ -109,7 +122,7 @@ int main(int argc, char * argv[])
     {
         err = gUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
                                    .SetAddressType(chip::Inet::kIPAddressType_IPv4)
-                                   .SetListenPort(CHIP_PORT + 2));
+                                   .SetListenPort(CHIP_PORT));
         SuccessOrExit(err);
 
         err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins,
@@ -149,7 +162,7 @@ int main(int argc, char * argv[])
     if (!disableUDC)
     {
         // Arrange to get a callback whenever an Echo Request is received.
-        gUDCServer.SetUDCRequestReceived(HandleEchoRequestReceived);
+        gUDCServer.SetInstanceNameResolver(&gListener);
         printf("Listening for UDC requests...\n");
     }
 

@@ -204,20 +204,6 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
     payload->DebugDump("HandleEchoResponseReceived");
 }
 
-void HandleUDCResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
-{
-    uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
-    uint32_t transitTime = respTime - gLastEchoTime;
-
-    gWaitingForEchoResp = false;
-    gEchoRespCount++;
-
-    printf("UDC Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
-           static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
-
-    payload->DebugDump("HandleUDCResponseReceived");
-}
-
 void RunPinging()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -337,9 +323,6 @@ int main(int argc, char * argv[])
     {
         err = gUDCClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
         SuccessOrExit(err);
-
-        // Arrange to get a callback whenever an Echo Response is received.
-        gUDCClient.SetUDCResponseReceived(HandleUDCResponseReceived);
 
         RunPinging();
 
