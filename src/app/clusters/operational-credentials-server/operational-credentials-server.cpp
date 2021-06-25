@@ -348,7 +348,7 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * 
     // can't just wait until we get network configuration commands, because we
     // might be on the operational network already, in which case we are
     // expected to be live with our new identity at this point.
-    chip::app::Mdns::StartServer();
+    chip::app::Mdns::AdvertiseOperational();
 
 exit:
     emberAfSendImmediateDefaultResponse(status);

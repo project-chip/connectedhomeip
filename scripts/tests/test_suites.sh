@@ -88,7 +88,7 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        out/debug/standalone/chip-tool pairing onnetwork 1 20202021 3840 ::1 11097
+        out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
         echo "          * Starting test run: $i"
         out/debug/standalone/chip-tool tests "$i"
         # Prevent cleanup trying to kill a process we already killed.
