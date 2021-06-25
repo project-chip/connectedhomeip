@@ -333,7 +333,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
         PayloadHeader payloadHeader;
         ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
         mCB->OnMessageReceived(packetHeader, payloadHeader, SecureSessionHandle(), peerAddress,
-                               SecureSessionMgrDelegate::DuplicateMessage::kNo, std::move(msg));
+                               SecureSessionMgrDelegate::DuplicateMessage::No, std::move(msg));
     }
 }
 
@@ -352,7 +352,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     NodeId localNodeId;
     FabricId fabricId;
 
-    SecureSessionMgrDelegate::DuplicateMessage isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::kNo;
+    SecureSessionMgrDelegate::DuplicateMessage isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::No;
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
@@ -395,7 +395,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
         {
             ChipLogDetail(Inet, "Received a duplicate message");
-            isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::kYes;
+            isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::Yes;
             err         = CHIP_NO_ERROR;
         }
         if (err != CHIP_NO_ERROR)
@@ -437,7 +437,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
                  ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
 
-    if (isDuplicate == SecureSessionMgrDelegate::DuplicateMessage::kYes && !payloadHeader.NeedsAck())
+    if (isDuplicate == SecureSessionMgrDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
         // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
         // cycles on further message processing.

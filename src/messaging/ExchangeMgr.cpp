@@ -207,6 +207,12 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                     payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
                     payloadHeader.GetExchangeID());
 
+    MessageFlags msgFlags;
+    if (isDuplicate == DuplicateMessage::Yes)
+    {
+        msgFlags.Set(MessageFlagValues::kDuplicateMessage);
+    }
+
     // Search for an existing exchange that the message applies to. If a match is found...
     bool found = false;
     mContextPool.ForEachActiveObject([&](auto * ec) {
@@ -219,11 +225,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                 ec->SetMsgRcvdFromPeer(true);
             }
 
-            MessageFlags msgFlags;
-            if (isDuplicate == DuplicateMessage::kYes)
-            {
-                msgFlags.Set(MessageFlagValues::kDuplicateMessage);
-            }
             // Matched ExchangeContext; send to message handler.
             ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
             found = true;
@@ -232,15 +233,15 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         return true;
     });
 
-    if (found || isDuplicate == DuplicateMessage::kYes)
+    if (found)
     {
         ExitNow(err = CHIP_NO_ERROR);
     }
 
-    // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
-    // find an existing exchange that matches the message, it must be an unsolicited message. However all
+    // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
+    // Since we didn't find an existing exchange that matches the message, it must be an unsolicited message. However all
     // unsolicited messages must be marked as being from an initiator.
-    if (payloadHeader.IsInitiator())
+    if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsInitiator())
     {
         // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.
@@ -293,11 +294,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
 
-        MessageFlags msgFlags;
-        if (isDuplicate == DuplicateMessage::kYes)
-        {
-            msgFlags.Set(MessageFlagValues::kDuplicateMessage);
-        }
         ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
 
         // Close exchange if it was created only to send ack for a duplicate message.

@@ -125,8 +125,8 @@ class DLL_EXPORT SecureSessionMgrDelegate
 public:
     enum class DuplicateMessage : uint8_t
     {
-        kYes,
-        kNo,
+        Yes,
+        No,
     };
 
     /**
