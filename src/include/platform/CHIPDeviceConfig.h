@@ -659,6 +659,24 @@
 #define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES 3
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+ *
+ * Enable support to Commissionable Discovery for Thread devices.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+ *
+ * Enable support to DNS client usage for resolving and browsing services in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
+#endif
+
 // -------------------- Thread Configuration --------------------
 
 /**
