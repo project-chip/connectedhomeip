@@ -21,26 +21,26 @@
 #
 # This file can also be used as an executable
 
-CURR_PATH=`test -d ${0%/*} && cd ${0%/*}; pwd`
-CHIP_PATH=${CURR_PATH}/../../..
-AMBD_PATH=${CHIP_PATH}/../..
-AMBD_LP_PATH=${AMBD_PATH}/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
-AMBD_HP_PATH=${AMBD_PATH}/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
-AMBD_CHIP_MAIN=${AMBD_HP_PATH}/asdk/make/chip_main
+CURR_PATH=`test -d "${0%/*}" && cd "${0%/*}"; pwd`
+CHIP_PATH=$CURR_PATH/../../..
+AMBD_PATH=$CHIP_PATH/../..
+AMBD_LP_PATH=$AMBD_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
+AMBD_HP_PATH=$AMBD_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+AMBD_CHIP_MAIN=$AMBD_HP_PATH/asdk/make/chip_main
 
-if test -f "${AMBD_CHIP_MAIN}/Makefile"; then
-	rm ${AMBD_CHIP_MAIN}/Makefile
+if test -f "$AMBD_CHIP_MAIN/Makefile"; then
+	rm "$AMBD_CHIP_MAIN"/Makefile
 fi
-cp -p ${CURR_PATH}/main/Makefile ${AMBD_CHIP_MAIN}/Makefile
+cp -p "$CURR_PATH"/main/Makefile "$AMBD_CHIP_MAIN"/Makefile
 
-cd ${CHIP_PATH}
+cd "$CHIP_PATH"
 source scripts/activate.sh
 
-cd ${AMBD_LP_PATH}
+cd "$AMBD_LP_PATH"
 make clean
 make all
 
-cd ${AMBD_HP_PATH}
+cd "$AMBD_HP_PATH"
 make clean
 make -C asdk lib_all
 make all
