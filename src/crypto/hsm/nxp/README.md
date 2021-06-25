@@ -2,7 +2,7 @@
 
 ## Introduction
 
-CHIPCryptoPALHsm_SE05X_*.cpp file provides the integration of secure element
+CHIPCryptoPALHsm*SE05X*\*.cpp file provides the integration of secure element
 (SE05x) in crypto layer of CHIP stack. By enabling the required directives in
 CHIPCryptoPALHsm_config.h header file, required crypto operations can be
 performed using SE05x. By default, the secure element is enabled only for PAKE
@@ -10,11 +10,10 @@ performed using SE05x. By default, the secure element is enabled only for PAKE
 
 Following are the list operations supported by secure element.
 
-	1. PAKE
-	2. ECC KEY - P256 (Disabled by default)
-	3. PBKDF (Disabled by default)
-	4. HKDF
-
+    1. PAKE
+    2. ECC KEY - P256 (Disabled by default)
+    3. PBKDF (Disabled by default)
+    4. HKDF
 
 ## Build
 
