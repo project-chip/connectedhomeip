@@ -616,7 +616,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].OffPremiseServicesReachableIPv6 = emberAfGetInt8u(message, 0, 1);
                             message += 1;
                             CHECK_STATUS(ReadByteSpan(message, 10, &data[i].HardwareAddress));
-                            messageLen -= 10;
+                            messageLen = static_cast<uint16_t>(messageLen - 10);
                             message += 10;
                             CHECK_MESSAGE_LENGTH(1);
                             data[i].Type = emberAfGetInt8u(message, 0, 1);
