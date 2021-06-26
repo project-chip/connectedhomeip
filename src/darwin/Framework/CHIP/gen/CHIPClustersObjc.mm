@@ -5914,6 +5914,8 @@ private:
            direction:(uint8_t)direction
                 time:(uint16_t)time
             startHue:(uint16_t)startHue
+         optionsMask:(uint8_t)optionsMask
+     optionsOverride:(uint8_t)optionsOverride
      responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -5932,7 +5934,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ColorLoopSet(
-            onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue);
+            onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue, optionsMask, optionsOverride);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -5941,7 +5943,11 @@ private:
         responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)enhancedMoveHue:(uint8_t)moveMode rate:(uint16_t)rate responseHandler:(ResponseHandler)responseHandler
+- (void)enhancedMoveHue:(uint8_t)moveMode
+                   rate:(uint16_t)rate
+            optionsMask:(uint8_t)optionsMask
+        optionsOverride:(uint8_t)optionsOverride
+        responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -5958,7 +5964,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.EnhancedMoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate);
+        err = self.cppCluster.EnhancedMoveHue(
+            onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -5970,6 +5977,8 @@ private:
 - (void)enhancedMoveToHue:(uint16_t)enhancedHue
                 direction:(uint8_t)direction
            transitionTime:(uint16_t)transitionTime
+              optionsMask:(uint8_t)optionsMask
+          optionsOverride:(uint8_t)optionsOverride
           responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -5987,7 +5996,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime);
+        err = self.cppCluster.EnhancedMoveToHue(
+            onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime, optionsMask, optionsOverride);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -5999,6 +6009,8 @@ private:
 - (void)enhancedMoveToHueAndSaturation:(uint16_t)enhancedHue
                             saturation:(uint8_t)saturation
                         transitionTime:(uint16_t)transitionTime
+                           optionsMask:(uint8_t)optionsMask
+                       optionsOverride:(uint8_t)optionsOverride
                        responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -6017,7 +6029,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.EnhancedMoveToHueAndSaturation(
-            onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, saturation, transitionTime);
+            onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, saturation, transitionTime, optionsMask, optionsOverride);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -6029,6 +6041,8 @@ private:
 - (void)enhancedStepHue:(uint8_t)stepMode
                stepSize:(uint16_t)stepSize
          transitionTime:(uint16_t)transitionTime
+            optionsMask:(uint8_t)optionsMask
+        optionsOverride:(uint8_t)optionsOverride
         responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -6046,7 +6060,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime);
+        err = self.cppCluster.EnhancedStepHue(
+            onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     });
 
     if (err != CHIP_NO_ERROR) {

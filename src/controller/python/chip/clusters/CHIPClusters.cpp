@@ -1063,48 +1063,54 @@ CHIP_ERROR chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision(chip::Contr
 
 CHIP_ERROR chip_ime_AppendCommand_ColorControl_ColorLoopSet(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                             chip::GroupId, uint8_t updateFlags, uint8_t action, uint8_t direction,
-                                                            uint16_t time, uint16_t startHue)
+                                                            uint16_t time, uint16_t startHue, uint8_t optionsMask,
+                                                            uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ColorLoopSet(nullptr, nullptr, updateFlags, action, direction, time, startHue);
+    return cluster.ColorLoopSet(nullptr, nullptr, updateFlags, action, direction, time, startHue, optionsMask, optionsOverride);
 }
 CHIP_ERROR chip_ime_AppendCommand_ColorControl_EnhancedMoveHue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                               chip::GroupId, uint8_t moveMode, uint16_t rate)
+                                                               chip::GroupId, uint8_t moveMode, uint16_t rate, uint8_t optionsMask,
+                                                               uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.EnhancedMoveHue(nullptr, nullptr, moveMode, rate);
+    return cluster.EnhancedMoveHue(nullptr, nullptr, moveMode, rate, optionsMask, optionsOverride);
 }
 CHIP_ERROR chip_ime_AppendCommand_ColorControl_EnhancedMoveToHue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                  chip::GroupId, uint16_t enhancedHue, uint8_t direction,
-                                                                 uint16_t transitionTime)
+                                                                 uint16_t transitionTime, uint8_t optionsMask,
+                                                                 uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.EnhancedMoveToHue(nullptr, nullptr, enhancedHue, direction, transitionTime);
+    return cluster.EnhancedMoveToHue(nullptr, nullptr, enhancedHue, direction, transitionTime, optionsMask, optionsOverride);
 }
 CHIP_ERROR chip_ime_AppendCommand_ColorControl_EnhancedMoveToHueAndSaturation(chip::Controller::Device * device,
                                                                               chip::EndpointId ZCLendpointId, chip::GroupId,
                                                                               uint16_t enhancedHue, uint8_t saturation,
-                                                                              uint16_t transitionTime)
+                                                                              uint16_t transitionTime, uint8_t optionsMask,
+                                                                              uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.EnhancedMoveToHueAndSaturation(nullptr, nullptr, enhancedHue, saturation, transitionTime);
+    return cluster.EnhancedMoveToHueAndSaturation(nullptr, nullptr, enhancedHue, saturation, transitionTime, optionsMask,
+                                                  optionsOverride);
 }
 CHIP_ERROR chip_ime_AppendCommand_ColorControl_EnhancedStepHue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                chip::GroupId, uint8_t stepMode, uint16_t stepSize,
-                                                               uint16_t transitionTime)
+                                                               uint16_t transitionTime, uint8_t optionsMask,
+                                                               uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.EnhancedStepHue(nullptr, nullptr, stepMode, stepSize, transitionTime);
+    return cluster.EnhancedStepHue(nullptr, nullptr, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
 }
 CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveColor(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                          chip::GroupId, int16_t rateX, int16_t rateY, uint8_t optionsMask,

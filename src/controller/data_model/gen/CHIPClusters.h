@@ -312,15 +312,18 @@ public:
 
     // Cluster Commands
     CHIP_ERROR ColorLoopSet(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t updateFlags,
-                            uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue);
+                            uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue, uint8_t optionsMask,
+                            uint8_t optionsOverride);
     CHIP_ERROR EnhancedMoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
-                               uint16_t rate);
+                               uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride);
     CHIP_ERROR EnhancedMoveToHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint16_t enhancedHue, uint8_t direction, uint16_t transitionTime);
+                                 uint16_t enhancedHue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
+                                 uint8_t optionsOverride);
     CHIP_ERROR EnhancedMoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t enhancedHue, uint8_t saturation, uint16_t transitionTime);
+                                              uint16_t enhancedHue, uint8_t saturation, uint16_t transitionTime,
+                                              uint8_t optionsMask, uint8_t optionsOverride);
     CHIP_ERROR EnhancedStepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                               uint16_t stepSize, uint16_t transitionTime);
+                               uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
     CHIP_ERROR MoveColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t rateX,
                          int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride);
     CHIP_ERROR MoveColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
