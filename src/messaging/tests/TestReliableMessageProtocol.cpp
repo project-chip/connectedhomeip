@@ -549,6 +549,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    exchange->Close();
 
     // Ensure the message was sent
     // The ack was dropped, and message was added to the retransmit table
@@ -558,6 +559,9 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 
     // Let's not drop the duplicate message
     mockReceiver.mDropAckResponse = false;
+
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
@@ -570,9 +574,6 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     mockReceiver.CloseExchangeIfNeeded();
-
-    rm->ClearRetransTable(rc);
-    exchange->Close();
 }
 
 void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)
@@ -709,11 +710,16 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    exchange->Close();
+
     // Ensure the message was sent
     // The ack was dropped, and message was added to the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Let's not drop the duplicate message
     mockReceiver.mDropAckResponse = false;
@@ -730,9 +736,6 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     mockReceiver.CloseExchangeIfNeeded();
-
-    rm->ClearRetransTable(rc);
-    exchange->Close();
 }
 
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
