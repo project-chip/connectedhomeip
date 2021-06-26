@@ -17,9 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/linux/gdbus_library.gni")
 
 gdbus_library("openthread") {
-  sources = [
-    "introspect.xml",
-  ]
+  sources = [ "introspect.xml" ]
 
   c_namespace = "Openthread"
   c_generate_object_manager = false
