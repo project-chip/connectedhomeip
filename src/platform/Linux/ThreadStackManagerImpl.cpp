@@ -45,7 +45,8 @@ ThreadStackManagerImpl::ThreadStackManagerImpl() : mProxy(nullptr, g_object_unre
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
     GError * gdbusError = nullptr;
-    mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr, &gdbusError));
+    mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
+        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr, &gdbusError));
     auto err = wrap_unique(gdbusError, &g_error_free);
     if (!mProxy)
     {
@@ -55,32 +56,41 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     g_signal_connect(mProxy.get(), "g-properties-changed", G_CALLBACK(OnDbusPropertiesChanged), this);
 
-    // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
+    // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX
+    // which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
     auto role = wrap_unique(openthread_io_openthread_border_router_dup_device_role(mProxy.get()), g_free);
-    if (role) {
+    if (role)
+    {
         ThreadDevcieRoleChangedHandler(role.get());
     }
 
     return CHIP_NO_ERROR;
 }
 
-void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter *proxy, GVariant *changed_properties, const gchar* const *invalidated_properties, gpointer user_data)
+void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
+                                                     const gchar * const * invalidated_properties, gpointer user_data)
 {
-    ThreadStackManagerImpl * me = reinterpret_cast<ThreadStackManagerImpl*>(user_data);
-    if (g_variant_n_children(changed_properties) > 0) {
-        GVariantIter *iter;
-        const gchar *key;
-        GVariant *value;
+    ThreadStackManagerImpl * me = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
+    if (g_variant_n_children(changed_properties) > 0)
+    {
+        GVariantIter * iter;
+        const gchar * key;
+        GVariant * value;
 
         g_variant_get(changed_properties, "a{sv}", &iter);
         auto pIter = wrap_unique(iter, g_variant_iter_free);
-        if (!pIter) return;
-        while(g_variant_iter_loop(iter, "{&sv}", &key, &value)) {
-            if (key == nullptr || value == nullptr) continue;
+        if (!pIter)
+            return;
+        while (g_variant_iter_loop(iter, "{&sv}", &key, &value))
+        {
+            if (key == nullptr || value == nullptr)
+                continue;
             // ownership of key and value is still holding by the iter
-            if (strcmp(key, kPropertyDeviceRole) == 0) {
+            if (strcmp(key, kPropertyDeviceRole) == 0)
+            {
                 const gchar * value_str = g_variant_get_string(value, nullptr);
-                if (value_str == nullptr) continue;
+                if (value_str == nullptr)
+                    continue;
                 ChipLogProgress(DeviceLayer, "Thread role changed to: %s", value_str);
                 me->ThreadDevcieRoleChangedHandler(value_str);
             }
@@ -90,7 +100,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
 
 void ThreadStackManagerImpl::ThreadDevcieRoleChangedHandler(const gchar * role)
 {
-    bool attached = strcmp(role, kOpenthreadDeviceRoleDetached) != 0 && strcmp(role, kOpenthreadDeviceRoleDisabled) !=0;
+    bool attached = strcmp(role, kOpenthreadDeviceRoleDetached) != 0 && strcmp(role, kOpenthreadDeviceRoleDisabled) != 0;
 
     ChipDeviceEvent event = ChipDeviceEvent{};
 
@@ -112,7 +122,8 @@ void ThreadStackManagerImpl::_ProcessThreadActivity() {}
 
 bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAddr)
 {
-    if (!mProxy || !_IsThreadAttached()) {
+    if (!mProxy || !_IsThreadAttached())
+    {
         return false;
     }
     if (destAddr.IsIPv6LinkLocal())
@@ -121,44 +132,55 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
     }
 
     auto routes = wrap_unique(openthread_io_openthread_border_router_dup_external_routes(mProxy.get()), &g_variant_unref);
-    if (!routes) return false;
+    if (!routes)
+        return false;
 
-    if (g_variant_n_children(routes.get()) > 0) {
-        GVariantIter *iter;
-        GVariant *route;
+    if (g_variant_n_children(routes.get()) > 0)
+    {
+        GVariantIter * iter;
+        GVariant * route;
 
         g_variant_get(routes.get(), "av", &iter);
         auto pIter = wrap_unique(iter, g_variant_iter_free);
-        if (!pIter) return false;
-        while(g_variant_iter_loop(iter, "&v", &route)) {
-            if (route == nullptr) continue;
-            GVariant *prefix;
+        if (!pIter)
+            return false;
+        while (g_variant_iter_loop(iter, "&v", &route))
+        {
+            if (route == nullptr)
+                continue;
+            GVariant * prefix;
             guint16 rloc16;
             guchar preference;
             gboolean stable;
             gboolean nextHopIsThisDevice;
             g_variant_get(route, "(&vqybb)", &prefix, &rloc16, &preference, &stable, &nextHopIsThisDevice);
             auto pPrefix = wrap_unique(prefix, &g_variant_unref);
-            if (!pPrefix) continue;
+            if (!pPrefix)
+                continue;
 
-            GVariant *address;
+            GVariant * address;
             guchar prefixLength;
             g_variant_get(prefix, "(&vy)", &address, &prefixLength);
             auto pAddress = wrap_unique(address, &g_variant_unref);
-            if (!pAddress) continue;
+            if (!pAddress)
+                continue;
 
             GBytes * bytes = g_variant_get_data_as_bytes(address); // the ownership still hold by address
-            if (bytes == nullptr) continue;
+            if (bytes == nullptr)
+                continue;
             gsize size;
             gconstpointer data = g_bytes_get_data(bytes, &size);
-            if (data == nullptr) continue;
-            if (size != sizeof(struct in6_addr)) continue;
+            if (data == nullptr)
+                continue;
+            if (size != sizeof(struct in6_addr))
+                continue;
 
             Inet::IPPrefix p;
             p.IPAddr = Inet::IPAddress::FromIPv6(*reinterpret_cast<const struct in6_addr *>(data));
             p.Length = prefixLength;
 
-            if (p.MatchAddress(destAddr)) {
+            if (p.MatchAddress(destAddr))
+            {
                 return true;
             }
         }
@@ -181,9 +203,11 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
 
     {
         auto bytes = wrap_unique(g_bytes_new(netInfo.data(), netInfo.size()), g_bytes_unref);
-        if (!bytes) return CHIP_ERROR_NO_MEMORY;
+        if (!bytes)
+            return CHIP_ERROR_NO_MEMORY;
         auto value = wrap_unique(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true), &g_variant_unref);
-        if (!value) return CHIP_ERROR_NO_MEMORY;
+        if (!value)
+            return CHIP_ERROR_NO_MEMORY;
         openthread_io_openthread_border_router_set_active_dataset_tlvs(mProxy.get(), value.release());
     }
 
@@ -204,7 +228,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
         auto value = wrap_unique(openthread_io_openthread_border_router_dup_active_dataset_tlvs(mProxy.get()), &g_variant_unref);
         GBytes * bytes = g_variant_get_data_as_bytes(value.get());
         gsize size;
-        const uint8_t * data = reinterpret_cast<const uint8_t*>(g_bytes_get_data(bytes, &size));
+        const uint8_t * data = reinterpret_cast<const uint8_t *>(g_bytes_get_data(bytes, &size));
         ReturnErrorOnFailure(mDataset.Init(ByteSpan(data, size)));
     }
 
@@ -225,7 +249,8 @@ void ThreadStackManagerImpl::_ErasePersistentInfo()
 
 bool ThreadStackManagerImpl::_IsThreadEnabled()
 {
-    if (!mProxy) {
+    if (!mProxy)
+    {
         return false;
     }
 
@@ -244,15 +269,16 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     if (val)
     {
         GError * gdbusError = nullptr;
-        gboolean result = openthread_io_openthread_border_router_call_attach_sync(mProxy.get(), nullptr, &gdbusError);
-        auto err = wrap_unique(gdbusError, &g_error_free);
+        gboolean result     = openthread_io_openthread_border_router_call_attach_sync(mProxy.get(), nullptr, &gdbusError);
+        auto err            = wrap_unique(gdbusError, &g_error_free);
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Attach", err->message);
             return CHIP_ERROR_INTERNAL;
         }
 
-        if (!result) {
+        if (!result)
+        {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Attach", "return false");
             return CHIP_ERROR_INTERNAL;
         }
@@ -260,15 +286,16 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     else
     {
         GError * gdbusError = nullptr;
-        gboolean result = openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &gdbusError);
-        auto err = wrap_unique(gdbusError, &g_error_free);
+        gboolean result     = openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &gdbusError);
+        auto err            = wrap_unique(gdbusError, &g_error_free);
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Reset", err->message);
             return CHIP_ERROR_INTERNAL;
         }
 
-        if (!result) {
+        if (!result)
+        {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Reset", "return false");
             return CHIP_ERROR_INTERNAL;
         }
@@ -286,12 +313,17 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     }
 
     auto role = wrap_unique(openthread_io_openthread_border_router_dup_device_role(mProxy.get()), g_free);
-    if (!role) return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
-    if (strcmp(role.get(), kOpenthreadDeviceRoleDetached) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleDisabled) == 0) {
+    if (!role)
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
-    } else if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0) {
+    if (strcmp(role.get(), kOpenthreadDeviceRoleDetached) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleDisabled) == 0)
+    {
+        return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
+    }
+    else if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
+    {
         auto linkMode = wrap_unique(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()), &g_variant_unref);
-        if (!linkMode) return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
+        if (!linkMode)
+            return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
         gboolean rx_on_when_idle;
         gboolean device_type;
         gboolean network_data;
@@ -302,12 +334,17 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         }
         else
         {
-            type = device_type ? ConnectivityManager::ThreadDeviceType::kThreadDeviceType_FullEndDevice : ConnectivityManager::ThreadDeviceType::kThreadDeviceType_MinimalEndDevice;
+            type = device_type ? ConnectivityManager::ThreadDeviceType::kThreadDeviceType_FullEndDevice
+                               : ConnectivityManager::ThreadDeviceType::kThreadDeviceType_MinimalEndDevice;
         }
         return type;
-    } else if (strcmp(role.get(), kOpenthreadDeviceRoleLeader) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleRouter) == 0) {
+    }
+    else if (strcmp(role.get(), kOpenthreadDeviceRoleLeader) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleRouter) == 0)
+    {
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_Router;
-    } else {
+    }
+    else
+    {
         ChipLogError(DeviceLayer, "Unknown Thread role: %s", role.get());
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
@@ -316,8 +353,8 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
 CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
     gboolean rx_on_when_idle = true;
-    gboolean device_type = true;
-    gboolean network_data = true;
+    gboolean device_type     = true;
+    gboolean network_data    = true;
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     if (deviceType == ConnectivityManager::ThreadDeviceType::kThreadDeviceType_MinimalEndDevice)
     {
@@ -326,13 +363,14 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
     else if (deviceType == ConnectivityManager::ThreadDeviceType::kThreadDeviceType_SleepyEndDevice)
     {
         rx_on_when_idle = false;
-        network_data = false;
+        network_data    = false;
     }
 
     if (!network_data)
     {
         auto linkMode = wrap_unique(g_variant_new("(bbb)", rx_on_when_idle, device_type, network_data), &g_variant_unref);
-        if (!linkMode) return CHIP_ERROR_NO_MEMORY;
+        if (!linkMode)
+            return CHIP_ERROR_NO_MEMORY;
         openthread_io_openthread_border_router_set_link_mode(mProxy.get(), linkMode.release());
     }
 

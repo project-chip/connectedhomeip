@@ -23,7 +23,8 @@
 /**
  *  @brief Wrap a object which is disposable using a deleter into a unique_ptr.
  */
-template<typename T, typename Deleter> auto wrap_unique(T* object, Deleter && deleter)
+template <typename T, typename Deleter>
+auto wrap_unique(T * object, Deleter && deleter)
 {
     return std::unique_ptr<T, Deleter>(object, std::forward<Deleter>(deleter));
 }

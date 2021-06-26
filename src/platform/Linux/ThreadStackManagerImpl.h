@@ -89,20 +89,21 @@ public:
     static ThreadStackManagerImpl sInstance;
 
 private:
-    static constexpr char kDBusOpenThreadService[] = "io.openthread.BorderRouter.wpan0";
+    static constexpr char kDBusOpenThreadService[]    = "io.openthread.BorderRouter.wpan0";
     static constexpr char kDBusOpenThreadObjectPath[] = "/io/openthread/BorderRouter/wpan0";
 
     static constexpr char kOpenthreadDeviceRoleDisabled[] = "disabled";
     static constexpr char kOpenthreadDeviceRoleDetached[] = "detached";
-    static constexpr char kOpenthreadDeviceRoleChild[] = "child";
-    static constexpr char kOpenthreadDeviceRoleRouter[] = "router";
-    static constexpr char kOpenthreadDeviceRoleLeader[] = "leader";
+    static constexpr char kOpenthreadDeviceRoleChild[]    = "child";
+    static constexpr char kOpenthreadDeviceRoleRouter[]   = "router";
+    static constexpr char kOpenthreadDeviceRoleLeader[]   = "leader";
 
     static constexpr char kPropertyDeviceRole[] = "DeviceRole";
 
     std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, decltype(&g_object_unref)> mProxy;
 
-    static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter *proxy, GVariant *changed_properties, const gchar* const *invalidated_properties, gpointer user_data);
+    static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
+                                        const gchar * const * invalidated_properties, gpointer user_data);
     void ThreadDevcieRoleChangedHandler(const gchar * role);
 
     Thread::OperationalDataset mDataset = {};
