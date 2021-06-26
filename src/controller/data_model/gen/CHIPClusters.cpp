@@ -1334,7 +1334,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeClusterRevision(Callback::Can
 // ColorControl Cluster Commands
 CHIP_ERROR ColorControlCluster::ColorLoopSet(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint8_t updateFlags, uint8_t action, uint8_t direction, uint16_t time,
-                                             uint16_t startHue)
+                                             uint16_t startHue, uint8_t optionsMask, uint8_t optionsOverride)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -1365,6 +1365,10 @@ CHIP_ERROR ColorControlCluster::ColorLoopSet(Callback::Cancelable * onSuccessCal
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), time));
     // startHue: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), startHue));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1383,7 +1387,7 @@ exit:
 }
 
 CHIP_ERROR ColorControlCluster::EnhancedMoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                uint8_t moveMode, uint16_t rate)
+                                                uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -1408,6 +1412,10 @@ CHIP_ERROR ColorControlCluster::EnhancedMoveHue(Callback::Cancelable * onSuccess
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), rate));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1427,7 +1435,7 @@ exit:
 
 CHIP_ERROR ColorControlCluster::EnhancedMoveToHue(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, uint16_t enhancedHue, uint8_t direction,
-                                                  uint16_t transitionTime)
+                                                  uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -1454,6 +1462,10 @@ CHIP_ERROR ColorControlCluster::EnhancedMoveToHue(Callback::Cancelable * onSucce
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), direction));
     // transitionTime: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1473,7 +1485,8 @@ exit:
 
 CHIP_ERROR ColorControlCluster::EnhancedMoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback, uint16_t enhancedHue,
-                                                               uint8_t saturation, uint16_t transitionTime)
+                                                               uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
+                                                               uint8_t optionsOverride)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -1500,6 +1513,10 @@ CHIP_ERROR ColorControlCluster::EnhancedMoveToHueAndSaturation(Callback::Cancela
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), saturation));
     // transitionTime: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -1518,7 +1535,8 @@ exit:
 }
 
 CHIP_ERROR ColorControlCluster::EnhancedStepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime)
+                                                uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
+                                                uint8_t optionsOverride)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -1545,6 +1563,10 @@ CHIP_ERROR ColorControlCluster::EnhancedStepHue(Callback::Cancelable * onSuccess
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), stepSize));
     // transitionTime: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
     SuccessOrExit(err = sender->FinishCommand());
 

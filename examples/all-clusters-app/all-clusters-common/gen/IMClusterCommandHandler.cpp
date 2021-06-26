@@ -410,13 +410,15 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         switch (aCommandId)
         {
         case ZCL_COLOR_LOOP_SET_COMMAND_ID: {
-            expectArgumentCount = 5;
+            expectArgumentCount = 7;
             uint8_t updateFlags;
             uint8_t action;
             uint8_t direction;
             uint16_t time;
             uint16_t startHue;
-            bool argExists[5];
+            uint8_t optionsMask;
+            uint8_t optionsOverride;
+            bool argExists[7];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -429,7 +431,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 5)
+                if (currentDecodeTagId < 7)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -460,6 +462,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 case 4:
                     TLVUnpackError = aDataTlv.Get(startHue);
                     break;
+                case 5:
+                    TLVUnpackError = aDataTlv.Get(optionsMask);
+                    break;
+                case 6:
+                    TLVUnpackError = aDataTlv.Get(optionsOverride);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -477,19 +485,21 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 7 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled =
-                    emberAfColorControlClusterColorLoopSetCallback(apCommandObj, updateFlags, action, direction, time, startHue);
+                wasHandled = emberAfColorControlClusterColorLoopSetCallback(apCommandObj, updateFlags, action, direction, time,
+                                                                            startHue, optionsMask, optionsOverride);
             }
             break;
         }
         case ZCL_ENHANCED_MOVE_HUE_COMMAND_ID: {
-            expectArgumentCount = 2;
+            expectArgumentCount = 4;
             uint8_t moveMode;
             uint16_t rate;
-            bool argExists[2];
+            uint8_t optionsMask;
+            uint8_t optionsOverride;
+            bool argExists[4];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -502,7 +512,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 2)
+                if (currentDecodeTagId < 4)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -524,6 +534,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 case 1:
                     TLVUnpackError = aDataTlv.Get(rate);
                     break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(optionsMask);
+                    break;
+                case 3:
+                    TLVUnpackError = aDataTlv.Get(optionsOverride);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -541,19 +557,22 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfColorControlClusterEnhancedMoveHueCallback(apCommandObj, moveMode, rate);
+                wasHandled =
+                    emberAfColorControlClusterEnhancedMoveHueCallback(apCommandObj, moveMode, rate, optionsMask, optionsOverride);
             }
             break;
         }
         case ZCL_ENHANCED_MOVE_TO_HUE_COMMAND_ID: {
-            expectArgumentCount = 3;
+            expectArgumentCount = 5;
             uint16_t enhancedHue;
             uint8_t direction;
             uint16_t transitionTime;
-            bool argExists[3];
+            uint8_t optionsMask;
+            uint8_t optionsOverride;
+            bool argExists[5];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -566,7 +585,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 3)
+                if (currentDecodeTagId < 5)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -591,6 +610,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 case 2:
                     TLVUnpackError = aDataTlv.Get(transitionTime);
                     break;
+                case 3:
+                    TLVUnpackError = aDataTlv.Get(optionsMask);
+                    break;
+                case 4:
+                    TLVUnpackError = aDataTlv.Get(optionsOverride);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -608,20 +633,22 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled =
-                    emberAfColorControlClusterEnhancedMoveToHueCallback(apCommandObj, enhancedHue, direction, transitionTime);
+                wasHandled = emberAfColorControlClusterEnhancedMoveToHueCallback(apCommandObj, enhancedHue, direction,
+                                                                                 transitionTime, optionsMask, optionsOverride);
             }
             break;
         }
         case ZCL_ENHANCED_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID: {
-            expectArgumentCount = 3;
+            expectArgumentCount = 5;
             uint16_t enhancedHue;
             uint8_t saturation;
             uint16_t transitionTime;
-            bool argExists[3];
+            uint8_t optionsMask;
+            uint8_t optionsOverride;
+            bool argExists[5];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -634,7 +661,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 3)
+                if (currentDecodeTagId < 5)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -659,6 +686,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 case 2:
                     TLVUnpackError = aDataTlv.Get(transitionTime);
                     break;
+                case 3:
+                    TLVUnpackError = aDataTlv.Get(optionsMask);
+                    break;
+                case 4:
+                    TLVUnpackError = aDataTlv.Get(optionsOverride);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -676,20 +709,22 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(apCommandObj, enhancedHue, saturation,
-                                                                                              transitionTime);
+                wasHandled = emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(
+                    apCommandObj, enhancedHue, saturation, transitionTime, optionsMask, optionsOverride);
             }
             break;
         }
         case ZCL_ENHANCED_STEP_HUE_COMMAND_ID: {
-            expectArgumentCount = 3;
+            expectArgumentCount = 5;
             uint8_t stepMode;
             uint16_t stepSize;
             uint16_t transitionTime;
-            bool argExists[3];
+            uint8_t optionsMask;
+            uint8_t optionsOverride;
+            bool argExists[5];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -702,7 +737,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 3)
+                if (currentDecodeTagId < 5)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -727,6 +762,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 case 2:
                     TLVUnpackError = aDataTlv.Get(transitionTime);
                     break;
+                case 3:
+                    TLVUnpackError = aDataTlv.Get(optionsMask);
+                    break;
+                case 4:
+                    TLVUnpackError = aDataTlv.Get(optionsOverride);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -744,10 +785,11 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfColorControlClusterEnhancedStepHueCallback(apCommandObj, stepMode, stepSize, transitionTime);
+                wasHandled = emberAfColorControlClusterEnhancedStepHueCallback(apCommandObj, stepMode, stepSize, transitionTime,
+                                                                               optionsMask, optionsOverride);
             }
             break;
         }

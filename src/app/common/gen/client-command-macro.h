@@ -3512,24 +3512,29 @@
  * @param enhancedHue INT16U
  * @param direction HueDirection
  * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterEnhancedMoveToHue(enhancedHue, direction, transitionTime)                                                        \
+    ControlClusterEnhancedMoveToHue(enhancedHue, direction, transitionTime, optionsMask, optionsOverride)                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ENHANCED_MOVE_TO_HUE_COMMAND_ID, "uuu", enhancedHue, direction, transitionTime);
+                                  ZCL_ENHANCED_MOVE_TO_HUE_COMMAND_ID, "uuuuu", enhancedHue, direction, transitionTime,            \
+                                  optionsMask, optionsOverride);
 
 /** @brief Command description for EnhancedMoveHue
  *
  * Command: EnhancedMoveHue
  * @param moveMode HueMoveMode
  * @param rate INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterEnhancedMoveHue(moveMode, rate)                                                                                  \
+    ControlClusterEnhancedMoveHue(moveMode, rate, optionsMask, optionsOverride)                                                    \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ENHANCED_MOVE_HUE_COMMAND_ID, "uu", moveMode, rate);
+                                  ZCL_ENHANCED_MOVE_HUE_COMMAND_ID, "uuuu", moveMode, rate, optionsMask, optionsOverride);
 
 /** @brief Command description for EnhancedStepHue
  *
@@ -3537,12 +3542,14 @@
  * @param stepMode HueStepMode
  * @param stepSize INT16U
  * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterEnhancedStepHue(stepMode, stepSize, transitionTime)                                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    ControlClusterEnhancedStepHue(stepMode, stepSize, transitionTime, optionsMask, optionsOverride) emberAfFillExternalBuffer(     \
+        mask,                                                                                                                      \
                                                                                                                                    \
-                                  ZCL_ENHANCED_STEP_HUE_COMMAND_ID, "uuu", stepMode, stepSize, transitionTime);
+        ZCL_ENHANCED_STEP_HUE_COMMAND_ID, "uuuuu", stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
 
 /** @brief Command description for EnhancedMoveToHueAndSaturation
  *
@@ -3550,12 +3557,15 @@
  * @param enhancedHue INT16U
  * @param saturation INT8U
  * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterEnhancedMoveToHueAndSaturation(enhancedHue, saturation, transitionTime) emberAfFillExternalBuffer(               \
-        mask,                                                                                                                      \
+    ControlClusterEnhancedMoveToHueAndSaturation(enhancedHue, saturation, transitionTime, optionsMask, optionsOverride)            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-        ZCL_ENHANCED_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID, "uuu", enhancedHue, saturation, transitionTime);
+                                  ZCL_ENHANCED_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID, "uuuuu", enhancedHue, saturation,            \
+                                  transitionTime, optionsMask, optionsOverride);
 
 /** @brief Command description for ColorLoopSet
  *
@@ -3565,12 +3575,15 @@
  * @param direction ColorLoopDirection
  * @param time INT16U
  * @param startHue INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterColorLoopSet(updateFlags, action, direction, time, startHue)                                                     \
+    ControlClusterColorLoopSet(updateFlags, action, direction, time, startHue, optionsMask, optionsOverride)                       \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_COLOR_LOOP_SET_COMMAND_ID, "uuuuu", updateFlags, action, direction, time, startHue);
+                                  ZCL_COLOR_LOOP_SET_COMMAND_ID, "uuuuuuu", updateFlags, action, direction, time, startHue,        \
+                                  optionsMask, optionsOverride);
 
 /** @brief Command description for StopMoveStep
  *

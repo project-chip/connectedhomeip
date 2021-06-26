@@ -4307,11 +4307,13 @@ class ColorControlColorLoopSet : public ModelCommand
 public:
     ColorControlColorLoopSet() : ModelCommand("color-loop-set")
     {
-        AddArgument("updateFlags", 0, UINT8_MAX, &mUpdateFlags);
-        AddArgument("action", 0, UINT8_MAX, &mAction);
-        AddArgument("direction", 0, UINT8_MAX, &mDirection);
-        AddArgument("time", 0, UINT16_MAX, &mTime);
-        AddArgument("startHue", 0, UINT16_MAX, &mStartHue);
+        AddArgument("UpdateFlags", 0, UINT8_MAX, &mUpdateFlags);
+        AddArgument("Action", 0, UINT8_MAX, &mAction);
+        AddArgument("Direction", 0, UINT8_MAX, &mDirection);
+        AddArgument("Time", 0, UINT16_MAX, &mTime);
+        AddArgument("StartHue", 0, UINT16_MAX, &mStartHue);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
         ModelCommand::AddArguments();
     }
     ~ColorControlColorLoopSet()
@@ -4327,7 +4329,7 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ColorLoopSet(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUpdateFlags, mAction, mDirection,
-                                    mTime, mStartHue);
+                                    mTime, mStartHue, mOptionsMask, mOptionsOverride);
     }
 
 private:
@@ -4340,6 +4342,8 @@ private:
     uint8_t mDirection;
     uint16_t mTime;
     uint16_t mStartHue;
+    uint8_t mOptionsMask;
+    uint8_t mOptionsOverride;
 };
 
 /*
@@ -4350,8 +4354,10 @@ class ColorControlEnhancedMoveHue : public ModelCommand
 public:
     ColorControlEnhancedMoveHue() : ModelCommand("enhanced-move-hue")
     {
-        AddArgument("moveMode", 0, UINT8_MAX, &mMoveMode);
-        AddArgument("rate", 0, UINT16_MAX, &mRate);
+        AddArgument("MoveMode", 0, UINT8_MAX, &mMoveMode);
+        AddArgument("Rate", 0, UINT16_MAX, &mRate);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
         ModelCommand::AddArguments();
     }
     ~ColorControlEnhancedMoveHue()
@@ -4366,7 +4372,8 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.EnhancedMoveHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMoveMode, mRate);
+        return cluster.EnhancedMoveHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMoveMode, mRate, mOptionsMask,
+                                       mOptionsOverride);
     }
 
 private:
@@ -4376,6 +4383,8 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mMoveMode;
     uint16_t mRate;
+    uint8_t mOptionsMask;
+    uint8_t mOptionsOverride;
 };
 
 /*
@@ -4386,9 +4395,11 @@ class ColorControlEnhancedMoveToHue : public ModelCommand
 public:
     ColorControlEnhancedMoveToHue() : ModelCommand("enhanced-move-to-hue")
     {
-        AddArgument("enhancedHue", 0, UINT16_MAX, &mEnhancedHue);
-        AddArgument("direction", 0, UINT8_MAX, &mDirection);
-        AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
+        AddArgument("EnhancedHue", 0, UINT16_MAX, &mEnhancedHue);
+        AddArgument("Direction", 0, UINT8_MAX, &mDirection);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
         ModelCommand::AddArguments();
     }
     ~ColorControlEnhancedMoveToHue()
@@ -4404,7 +4415,7 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.EnhancedMoveToHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mEnhancedHue, mDirection,
-                                         mTransitionTime);
+                                         mTransitionTime, mOptionsMask, mOptionsOverride);
     }
 
 private:
@@ -4415,6 +4426,8 @@ private:
     uint16_t mEnhancedHue;
     uint8_t mDirection;
     uint16_t mTransitionTime;
+    uint8_t mOptionsMask;
+    uint8_t mOptionsOverride;
 };
 
 /*
@@ -4425,9 +4438,11 @@ class ColorControlEnhancedMoveToHueAndSaturation : public ModelCommand
 public:
     ColorControlEnhancedMoveToHueAndSaturation() : ModelCommand("enhanced-move-to-hue-and-saturation")
     {
-        AddArgument("enhancedHue", 0, UINT16_MAX, &mEnhancedHue);
-        AddArgument("saturation", 0, UINT8_MAX, &mSaturation);
-        AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
+        AddArgument("EnhancedHue", 0, UINT16_MAX, &mEnhancedHue);
+        AddArgument("Saturation", 0, UINT8_MAX, &mSaturation);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
         ModelCommand::AddArguments();
     }
     ~ColorControlEnhancedMoveToHueAndSaturation()
@@ -4443,7 +4458,7 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.EnhancedMoveToHueAndSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mEnhancedHue,
-                                                      mSaturation, mTransitionTime);
+                                                      mSaturation, mTransitionTime, mOptionsMask, mOptionsOverride);
     }
 
 private:
@@ -4454,6 +4469,8 @@ private:
     uint16_t mEnhancedHue;
     uint8_t mSaturation;
     uint16_t mTransitionTime;
+    uint8_t mOptionsMask;
+    uint8_t mOptionsOverride;
 };
 
 /*
@@ -4464,9 +4481,11 @@ class ColorControlEnhancedStepHue : public ModelCommand
 public:
     ColorControlEnhancedStepHue() : ModelCommand("enhanced-step-hue")
     {
-        AddArgument("stepMode", 0, UINT8_MAX, &mStepMode);
-        AddArgument("stepSize", 0, UINT16_MAX, &mStepSize);
-        AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
+        AddArgument("StepMode", 0, UINT8_MAX, &mStepMode);
+        AddArgument("StepSize", 0, UINT16_MAX, &mStepSize);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
+        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
+        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
         ModelCommand::AddArguments();
     }
     ~ColorControlEnhancedStepHue()
@@ -4482,7 +4501,7 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.EnhancedStepHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mStepMode, mStepSize,
-                                       mTransitionTime);
+                                       mTransitionTime, mOptionsMask, mOptionsOverride);
     }
 
 private:
@@ -4493,6 +4512,8 @@ private:
     uint8_t mStepMode;
     uint16_t mStepSize;
     uint16_t mTransitionTime;
+    uint8_t mOptionsMask;
+    uint8_t mOptionsOverride;
 };
 
 /*

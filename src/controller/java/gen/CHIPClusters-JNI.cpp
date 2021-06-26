@@ -5726,9 +5726,9 @@ JNI_METHOD(jlong, ColorControlCluster, initWithDevice)(JNIEnv * env, jobject sel
 
 JNI_METHOD(void, ColorControlCluster, colorLoopSet)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint updateFlags, jint action, jint direction, jint time,
- jint startHue)
+ jint startHue, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5743,7 +5743,8 @@ JNI_METHOD(void, ColorControlCluster, colorLoopSet)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue);
+    err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue,
+                                   optionsMask, optionsOverride);
     SuccessOrExit(err);
 
 exit:
@@ -5755,7 +5756,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5772,9 +5773,9 @@ exit:
     }
 }
 JNI_METHOD(void, ColorControlCluster, enhancedMoveHue)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5789,7 +5790,7 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveHue)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->EnhancedMoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate);
+    err = cppCluster->EnhancedMoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
 exit:
@@ -5801,7 +5802,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5818,9 +5819,10 @@ exit:
     }
 }
 JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint enhancedHue, jint direction, jint transitionTime)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint enhancedHue, jint direction, jint transitionTime,
+ jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5835,7 +5837,8 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime);
+    err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime,
+                                        optionsMask, optionsOverride);
     SuccessOrExit(err);
 
 exit:
@@ -5847,7 +5850,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5864,9 +5867,10 @@ exit:
     }
 }
 JNI_METHOD(void, ColorControlCluster, enhancedMoveToHueAndSaturation)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint enhancedHue, jint saturation, jint transitionTime)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint enhancedHue, jint saturation, jint transitionTime,
+ jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5882,7 +5886,7 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHueAndSaturation)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->EnhancedMoveToHueAndSaturation(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, saturation,
-                                                     transitionTime);
+                                                     transitionTime, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
 exit:
@@ -5894,7 +5898,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5911,9 +5915,10 @@ exit:
     }
 }
 JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime,
+ jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5928,7 +5933,8 @@ JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime);
+    err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
+                                      optionsOverride);
     SuccessOrExit(err);
 
 exit:
@@ -5940,7 +5946,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10291,7 +10297,7 @@ exit:
 }
 JNI_METHOD(jlong, OccupancySensingCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     OccupancySensingCluster * cppCluster = new OccupancySensingCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
