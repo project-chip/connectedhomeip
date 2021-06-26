@@ -1668,7 +1668,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 33
+#define GENERATED_CLUSTER_COUNT 34
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
@@ -1689,6 +1689,9 @@
             {                                                                                                                      \
                 0x0031, ZAP_ATTRIBUTE_INDEX(27), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x0032, ZAP_ATTRIBUTE_INDEX(28), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                \
             {                                                                                                                      \
                 0x0033, ZAP_ATTRIBUTE_INDEX(28), 3, 258, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                            \
@@ -1789,8 +1792,8 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 14, 3527 }, { ZAP_CLUSTER_INDEX(14), 9, 1639 }, { ZAP_CLUSTER_INDEX(23), 3, 263 },                 \
-            { ZAP_CLUSTER_INDEX(26), 4, 676 }, { ZAP_CLUSTER_INDEX(30), 2, 615 }, { ZAP_CLUSTER_INDEX(32), 1, 105 },               \
+        { ZAP_CLUSTER_INDEX(0), 15, 3527 }, { ZAP_CLUSTER_INDEX(15), 9, 1639 }, { ZAP_CLUSTER_INDEX(24), 3, 263 },                 \
+            { ZAP_CLUSTER_INDEX(27), 4, 676 }, { ZAP_CLUSTER_INDEX(31), 2, 615 }, { ZAP_CLUSTER_INDEX(33), 1, 105 },               \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1844,7 +1847,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (116)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (117)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -1888,6 +1891,9 @@
             { 0x0031, 0x0E, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* DisableNetwork */                                              \
             { 0x0031, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* DisableNetworkResponse */                                      \
             { 0x0031, 0x10, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* GetLastNetworkCommissioningResult */                           \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                   \
+            { 0x0032, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RetrieveLogsRequest */                                         \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                              \
             { 0x0034, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetWatermarks */                                             \

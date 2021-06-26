@@ -39,9 +39,6 @@
 
 namespace chip {
 
-// TODO: Remove Later
-static P256ECDHDerivedSecret fabricSecret;
-
 constexpr uint8_t kIPKInfo[] = { 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x50, 0x72, 0x6f,
                                  0x74, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4b, 0x65, 0x79 };
 
@@ -76,11 +73,11 @@ CASESession::CASESession()
 {
     mTrustedRootId.mId = nullptr;
     // dummy initialization REMOVE LATER
-    for (size_t i = 0; i < fabricSecret.Capacity(); i++)
+    for (size_t i = 0; i < mFabricSecret.Capacity(); i++)
     {
-        fabricSecret[i] = static_cast<uint8_t>(i);
+        mFabricSecret[i] = static_cast<uint8_t>(i);
     }
-    fabricSecret.SetLength(fabricSecret.Capacity());
+    mFabricSecret.SetLength(mFabricSecret.Capacity());
 }
 
 CASESession::~CASESession()
@@ -1094,7 +1091,7 @@ CHIP_ERROR CASESession::ConstructSignedCredentials(const uint8_t ** msgIterator,
 CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen)
 {
     HKDF_sha_crypto mHKDF;
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(fabricSecret, fabricSecret.Length(), reinterpret_cast<const uint8_t *>(&sessionID),
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mFabricSecret, mFabricSecret.Length(), reinterpret_cast<const uint8_t *>(&sessionID),
                                            sizeof(sessionID), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
 
     return CHIP_NO_ERROR;

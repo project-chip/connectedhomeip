@@ -257,6 +257,8 @@ private:
 #else
     P256Keypair mEphemeralKey;
 #endif
+    // TODO: Remove mFabricSecret later
+    P256ECDHDerivedSecret mFabricSecret;
     P256ECDHDerivedSecret mSharedSecret;
     OperationalCredentialSet * mOpCredSet;
     CertificateKeyId mTrustedRootId;

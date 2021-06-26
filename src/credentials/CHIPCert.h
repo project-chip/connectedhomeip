@@ -74,7 +74,7 @@ enum
     kTag_ExtendedKeyUsage       = 3, /**< [ array ] Enumerated values giving the purposes for which the public key can be used. */
     kTag_SubjectKeyIdentifier   = 4, /**< [ byte string ] Identifier of the certificate's public key. */
     kTag_AuthorityKeyIdentifier = 5, /**< [ byte string ] Identifier of the public key used to sign the certificate. */
-    kTag_FutureExtension        = 6, /**< [ byte string ] Arbitrary extention. DER encoded SEQUENCE as in X.509 form. */
+    kTag_FutureExtension        = 6, /**< [ byte string ] Arbitrary extension. DER encoded SEQUENCE as in X.509 form. */
 
     // ---- Context-specific Tags for BasicConstraints Structure ----
     kTag_BasicConstraints_IsCA = 1,              /**< [ boolean ] True if the certificate can be used to verify certificate

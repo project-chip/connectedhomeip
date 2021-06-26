@@ -206,7 +206,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 43
+#define GENERATED_CLUSTER_COUNT 44
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Identify (client) */    \
@@ -232,6 +232,9 @@
             {                                                                                                                      \
                 0x0031, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Network Commissioning (client) */                                                          \
+            {                                                                                                                      \
+                0x0032, ZAP_ATTRIBUTE_INDEX(11), 0, 0, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Diagnostic Logs (client) */                                                                \
             {                                                                                                                      \
                 0x0033, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: General Diagnostics (client) */                                                            \
@@ -333,7 +336,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 43, 86 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 44, 86 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -387,7 +390,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (219)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (220)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -479,6 +482,9 @@
             { 0x0031, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* DisableNetworkResponse */                                      \
             { 0x0031, 0x10, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* GetLastNetworkCommissioningResult */                           \
                                                                                                                                    \
+            /* Endpoint: 1, Cluster: Diagnostic Logs (client) */                                                                   \
+            { 0x0032, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RetrieveLogsRequest */                                         \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Software Diagnostics (client) */                                                              \
             { 0x0034, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetWatermarks */                                             \
                                                                                                                                    \
@@ -568,13 +574,13 @@
             { 0x0101, 0x19, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* ClearAllRfidsResponse */   \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Window Covering (client) */                                                                   \
-            { 0x0102, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringUpOpen */                                        \
-            { 0x0102, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringDownClose */                                     \
-            { 0x0102, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringStop */                                          \
-            { 0x0102, 0x04, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* WindowCoveringGoToLiftValue */                                 \
-            { 0x0102, 0x05, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* WindowCoveringGoToLiftPercentage */                            \
-            { 0x0102, 0x07, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* WindowCoveringGoToTiltValue */                                 \
-            { 0x0102, 0x08, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* WindowCoveringGoToTiltPercentage */                            \
+            { 0x0102, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpOrOpen */                                                    \
+            { 0x0102, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* DownOrClose */                                                 \
+            { 0x0102, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* StopMotion */                                                  \
+            { 0x0102, 0x04, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* GoToLiftValue */                                               \
+            { 0x0102, 0x05, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* GoToLiftPercentage */                                          \
+            { 0x0102, 0x07, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* GoToTiltValue */                                               \
+            { 0x0102, 0x08, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* GoToTiltPercentage */                                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Barrier Control (client) */                                                                   \
             { 0x0103, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* BarrierControlGoToPercent */                                   \

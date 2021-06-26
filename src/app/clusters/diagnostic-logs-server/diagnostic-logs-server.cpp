@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Silicon Labs
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,16 +15,13 @@
  *    limitations under the License.
  */
 
-const libxmljs = require('libxmljs')
+#include <app/Command.h>
+#include <app/util/af.h>
 
-// validateZclFile will have validationSchema be bound to it.
-function validateZclFile(validationSchemaBuffer, zclFileBuffer)
+bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::Command * commandObj, uint8_t intent,
+                                                             uint8_t requestedProtocol, chip::ByteSpan transferFileDesignator)
 {
-  let zclFile          = libxmljs.parseXml(zclFileBuffer.toString())
-  let xsdDoc           = libxmljs.parseXml(validationSchemaBuffer.toString())
-  let validationStatus = zclFile.validate(xsdDoc)
-  let validationErrors = zclFile.validationErrors
-  let returnValue      = { isValid : validationStatus, errors : validationErrors } return returnValue
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
 }
-
-exports.validateZclFile = validateZclFile

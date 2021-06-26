@@ -16,6 +16,26 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
+
+  <struct name="GroupState">
+    <item name="VendorId" type="INT16U"/>
+    <item name="VendorGroupId" type="INT16U"/>
+    <item name="GroupKeySetIndex" type="INT16U"/>
+  </struct>
+
+  <struct name="GroupKey">
+    <item name="VendorId" type="INT16U"/>
+    <item name="GroupKeyIndex" type="INT16U"/>
+    <item name="GroupKeyRoot" type="OCTET_STRING" length="16"/>
+    <item name="GroupKeyEpochStartTime" type="INT64U"/>
+    <item name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicy"/>
+  </struct>
+
+  <enum name="GroupKeySecurityPolicy" type="ENUM8">
+    <item name="Standard" value="0x00"/>
+    <item name="LowLatency" value="0x01"/>
+  </enum>
+
   <cluster>
     <domain>General</domain>
     <name>Group Key Management</name>

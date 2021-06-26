@@ -15,64 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <atomic>
-    <type id="0x00" name="no_data" size="0" description="No data"/>
-    <type id="0x08" name="data8" size="1" description="8-bit data" discrete="true" />
-    <type id="0x09" name="data16" size="2" description="16-bit data" discrete="true" />
-    <type id="0x0A" name="data24" size="3" description="24-bit data" discrete="true" />
-    <type id="0x0B" name="data32" size="4" description="32-bit data" discrete="true" />
-    <type id="0x0C" name="data40" size="5" description="40-bit data" discrete="true" />
-    <type id="0x0D" name="data48" size="6" description="48-bit data" discrete="true" />
-    <type id="0x0E" name="data56" size="7" description="56-bit data" discrete="true" />
-    <type id="0x0F" name="data64" size="8" description="64-bit data" discrete="true" />
-    <type id="0x10" name="boolean" size="1" description="Boolean" discrete="true" />
-    <type id="0x18" name="bitmap8" size="1" description="8-bit bitmap" discrete="true" />
-    <type id="0x19" name="bitmap16" size="2" description="16-bit bitmap" discrete="true" />
-    <type id="0x1A" name="bitmap24" size="3" description="24-bit bitmap" discrete="true" />
-    <type id="0x1B" name="bitmap32" size="4" description="32-bit bitmap" discrete="true" />
-    <type id="0x1C" name="bitmap40" size="5" description="40-bit bitmap" discrete="true" />
-    <type id="0x1D" name="bitmap48" size="6" description="48-bit bitmap" discrete="true" />
-    <type id="0x1E" name="bitmap56" size="7" description="56-bit bitmap" discrete="true" />
-    <type id="0x1F" name="bitmap64" size="8" description="64-bit bitmap" discrete="true" />
-    <type id="0x20" name="int8u" size="1" description="Unsigned 8-bit integer"/>
-    <type id="0x21" name="int16u" size="2" description="Unsigned 16-bit integer"/>
-    <type id="0x22" name="int24u" size="3" description="Unsigned 24-bit integer"/>
-    <type id="0x23" name="int32u" size="4" description="Unsigned 32-bit integer"/>
-    <type id="0x24" name="int40u" size="5" description="Unsigned 40-bit integer"/>
-    <type id="0x25" name="int48u" size="6" description="Unsigned 48-bit integer"/>
-    <type id="0x26" name="int56u" size="7" description="Unsigned 56-bit integer"/>
-    <type id="0x27" name="int64u" size="8" description="Unsigned 64-bit integer"/>
-    <type id="0x28" name="int8s" size="1" description="Signed 8-bit integer"/>
-    <type id="0x29" name="int16s" size="2" description="Signed 16-bit integer"/>
-    <type id="0x2A" name="int24s" size="3" description="Signed 24-bit integer"/>
-    <type id="0x2B" name="int32s" size="4" description="Signed 32-bit integer"/>
-    <type id="0x2C" name="int40s" size="5" description="Signed 40-bit integer"/>
-    <type id="0x2D" name="int48s" size="6" description="Signed 48-bit integer"/>
-    <type id="0x2E" name="int56s" size="7" description="Signed 56-bit integer"/>
-    <type id="0x2F" name="int64s" size="8" description="Signed 64-bit integer"/>
-    <type id="0x30" name="enum8" size="1" description="8-bit enumeration" discrete="true" />
-    <type id="0x31" name="enum16" size="2" description="16-bit enumeration" discrete="true" />
-    <type id="0x38" name="float_semi" size="2" description="Semi-precision"/>
-    <type id="0x39" name="float_single" size="4" description="Single precision"/>
-    <type id="0x3A" name="float_double" size="8" description="Double precision"/>
-    <type id="0x41" name="octet_string" description="Octet string" discrete="true" />
-    <type id="0x42" name="char_string" description="Character string" discrete="true" />
-    <type id="0x43" name="long_octet_string" description="Long octet string" discrete="true" />
-    <type id="0x44" name="long_char_string" description="Long character string" discrete="true" />
-    <type id="0x48" name="array" description="Array" discrete="true" />
-    <type id="0x4C" name="struct" description="Structure" discrete="true" />
-    <type id="0x50" name="set" description="Set" discrete="true" />
-    <type id="0x51" name="bag" description="Bag" discrete="true" />
-    <type id="0xE0" name="time_of_day" size="4" description="Time of day"/>
-    <type id="0xE1" name="date" size="4" description="Date"/>
-    <type id="0xE2" name="utc_time" size="4" description="UTC Time"/>
-    <type id="0xE8" name="cluster_id" size="2" description="Cluster ID" discrete="true" />
-    <type id="0xE9" name="attribute_id" size="2" description="Attribute ID" discrete="true" />
-    <type id="0xEA" name="bacnet_oid" size="4" description="BACnet OID" discrete="true" />
-    <type id="0xF0" name="ieee_address" size="8" description="IEEE address" discrete="true" />
-    <type id="0xF1" name="security_key" size="16" description="128-bit security key" discrete="true" />
-    <type id="0xFF" name="unknown" size="0" description="Unknown"/>
-  </atomic>
   <bitmap name="ShadeClosureStatus" type="BITMAP8">
     <field name="operational" mask="0x1"/>
     <field name="adjusting" mask="0x2"/>
@@ -83,27 +25,6 @@ limitations under the License.
     <field name="GeneralHwFault" mask="0x1"/>
     <field name="GeneralSwFault" mask="0x2"/>
   </bitmap>
-  <bitmap name="RestartOptions" type="BITMAP8">
-    <field name="StartMode1" mask="0x1"/>
-    <field name="StartupMode2" mask="0x2"/>
-    <field name="StartupMode3" mask="0x4"/>
-    <field name="Immediate" mask="0x8"/>
-  </bitmap>
-  <bitmap name="ResetOptions" type="BITMAP8">
-    <field name="ResetCurrent" mask="0x1"/>
-    <field name="ResetAll" mask="0x2"/>
-    <field name="EraseIndex" mask="0x4"/>
-  </bitmap>
-  <enum name="CommissioningStartupControl" type="ENUM8">
-    <item name="NoAction" value="0x00"/>
-    <item name="FormNetwork" value="0x01"/>
-    <item name="RejoinNetwork" value="0x02"/>
-    <item name="StartFromScratch" value="0x03"/>
-  </enum>
-  <enum name="EzModeCommissioningClusterType" type="ENUM8">
-    <item name="Server" value="0x00"/>
-    <item name="Client" value="0x01"/>
-  </enum>
   <bitmap name="MainsAlarmMask" type="BITMAP8">
     <field name="VoltageTooLow" mask="0x1"/>
     <field name="VoltageTooHigh" mask="0x2"/>
@@ -121,18 +42,6 @@ limitations under the License.
     <field name="Synchronized" mask="0x2"/>
     <field name="MasterZoneDst" mask="0x4"/>
     <field name="Superseding" mask="0x8"/>
-  </bitmap>
-  <bitmap name="LocationType" type="BITMAP8">
-    <field name="absolute" mask="0x1"/>
-    <field name="2-D" mask="0x2"/>
-    <field name="coordinateSystem" mask="0xc"/>
-  </bitmap>
-  <bitmap name="GetLocationDataFlags" type="BITMAP8">
-    <field name="absoluteOnly" mask="0x1"/>
-    <field name="recalculate" mask="0x2"/>
-    <field name="broadcast" mask="0x4"/>
-    <field name="broadcastResponse" mask="0x8"/>
-    <field name="compactResponse" mask="0x10"/>
   </bitmap>
   <bitmap name="ThermostatOccupancy" type="BITMAP8">
     <field name="occupied" mask="0x1"/>
@@ -276,12 +185,6 @@ limitations under the License.
   <enum name="StepMode" type="ENUM8">
     <item name="Up" value="0x0"/>
     <item name="Down" value="0x1"/>
-  </enum>
-  <enum name="LocationMethod" type="ENUM8">
-    <item name="Lateration" value="0x0"/>
-    <item name="Signposting" value="0x1"/>
-    <item name="RfFingerprinting" value="0x2"/>
-    <item name="OutOfBand" value="0x3"/>
   </enum>
   <enum name="ThermostatControlSequence" type="ENUM8">
     <item name="coolingOnly" value="0x0"/>
@@ -620,39 +523,9 @@ limitations under the License.
     <item name="length" type="INT8U"/>
     <item name="value" type="INT8U"/>
   </struct>
-  <struct name="BlockThreshold">
-    <item name="blockThreshold" type="ENUM8"/>
-    <item name="priceControl" type="BITMAP8"/>
-    <item name="blockPeriodStartTime" type="UTC_TIME"/>
-    <item name="blockPeriodDurationMinutes" type="INT24U"/>
-    <item name="fuelType" type="ENUM8"/>
-    <item name="standingCharge" type="INT32U"/>
-  </struct>
   <struct name="Notification">
     <item name="contentId" type="INT16U"/>
     <item name="statusFeedback" type="Status"/>
-  </struct>
-  <struct name="NeighborInfo">
-    <item name="neighbor" type="IEEE_ADDRESS"/>
-    <item name="x" type="INT16S"/>
-    <item name="y" type="INT16S"/>
-    <item name="z" type="INT16S"/>
-    <item name="rssi" type="INT8S"/>
-    <item name="numberRssiMeasurements" type="INT8U"/>
-  </struct>
-  <struct name="ChatParticipant">
-    <item name="uid" type="INT16U"/>
-    <item name="nickname" type="CHAR_STRING"/>
-  </struct>
-  <struct name="ChatRoom">
-    <item name="cid" type="INT16U"/>
-    <item name="name" type="CHAR_STRING"/>
-  </struct>
-  <struct name="NodeInformation">
-    <item name="uid" type="INT16U"/>
-    <item name="address" type="DATA16"/>
-    <item name="endpoint" type="INT8U"/>
-    <item name="nickname" type="CHAR_STRING"/>
   </struct>
   <bitmap name="EnergyFormatting" type="BITMAP8">
     <field name="NumberOfDigitsToTheRightOfTheDecimalPoint" mask="0x07"/>

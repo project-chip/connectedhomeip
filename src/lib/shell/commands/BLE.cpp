@@ -72,12 +72,23 @@ int BLEAdvertiseHandler(int argc, char ** argv)
             streamer_printf(sout, "BLE advertising already stopped\r\n");
         }
     }
+    else if (strcmp(argv[0], "state") == 0)
+    {
+        if (adv_enabled)
+        {
+            streamer_printf(sout, "BLE advertising is enabled\r\n");
+        }
+        else
+        {
+            streamer_printf(sout, "BLE advertising is disabled\r\n");
+        }
+    }
     else
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 int BLEDispatch(int argc, char ** argv)
@@ -94,7 +105,7 @@ void RegisterBLECommands()
 {
     static const shell_command_t sBLESubCommands[] = {
         { &BLEHelpHandler, "help", "Usage: ble <subcommand>" },
-        { &BLEAdvertiseHandler, "adv", "Enable or disable advertisement. Usage: ble adv <start|stop>" },
+        { &BLEAdvertiseHandler, "adv", "Enable or disable advertisement. Usage: ble adv <start|stop|state>" },
     };
 
     static const shell_command_t sBLECommand = { &BLEDispatch, "ble", "BLE transport commands" };

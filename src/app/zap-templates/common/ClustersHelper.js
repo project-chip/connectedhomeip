@@ -232,10 +232,10 @@ function handleStruct(item, [ atomics, enums, bitmaps, structs ])
     return false;
   }
 
-  item.isStruct = true;
   // Add a leading `_` before the name of struct to match what is done in the af-structs.zapt template.
   // For instance structs are declared as "typedef struct _{{asType label}}".
   item.chipType = '_' + item.type;
+  item.isStruct = true;
 
   struct.items.map(structItem => enhancedItem(structItem, [ atomics, enums, bitmaps, structs ]));
   item.items = struct.items;
@@ -259,17 +259,14 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
 
   const atomic = getAtomic(atomics, itemType);
   if (atomic) {
-    item.name         = item.name || item.label;
-    item.isStruct     = false;
-    item.atomicTypeId = atomic.atomicId;
-    item.discrete     = atomic.isDiscrete;
-    item.size         = atomic.size;
-    item.chipType     = atomic.chipType;
-    // For the moment, SECURITY_KEY is unhandled.
-    if (atomic.atomicId != 0xF1) {
-      item.chipTypePutLength   = asPutLength(atomic.chipType);
-      item.chipTypePutCastType = asPutCastType(atomic.chipType);
-    }
+    item.name                = item.name || item.label;
+    item.isStruct            = false;
+    item.atomicTypeId        = atomic.atomicId;
+    item.discrete            = atomic.isDiscrete;
+    item.size                = atomic.size;
+    item.chipType            = atomic.chipType;
+    item.chipTypePutLength   = asPutLength(atomic.chipType);
+    item.chipTypePutCastType = asPutCastType(atomic.chipType);
     return true;
   }
 

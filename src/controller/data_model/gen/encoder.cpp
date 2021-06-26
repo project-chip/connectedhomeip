@@ -66,6 +66,7 @@ using namespace chip::Encoding::LittleEndian;
 | ColorControl                                                        | 0x0300 |
 | ContentLauncher                                                     | 0x050A |
 | Descriptor                                                          | 0x001D |
+| DiagnosticLogs                                                      | 0x0032 |
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
@@ -175,6 +176,9 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_LAUNCH_URL_COMMAND_ID (0x01)
 
 #define DESCRIPTOR_CLUSTER_ID 0x001D
+
+#define DIAGNOSTIC_LOGS_CLUSTER_ID 0x0032
+#define ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID (0x00)
 
 #define DOOR_LOCK_CLUSTER_ID 0x0101
 #define ZCL_CLEAR_ALL_PINS_COMMAND_ID (0x08)
@@ -342,13 +346,13 @@ using namespace chip::Encoding::LittleEndian;
 #define WAKE_ON_LAN_CLUSTER_ID 0x0503
 
 #define WINDOW_COVERING_CLUSTER_ID 0x0102
-#define ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID (0x01)
-#define ZCL_WINDOW_COVERING_GO_TO_LIFT_PERCENTAGE_COMMAND_ID (0x05)
-#define ZCL_WINDOW_COVERING_GO_TO_LIFT_VALUE_COMMAND_ID (0x04)
-#define ZCL_WINDOW_COVERING_GO_TO_TILT_PERCENTAGE_COMMAND_ID (0x08)
-#define ZCL_WINDOW_COVERING_GO_TO_TILT_VALUE_COMMAND_ID (0x07)
-#define ZCL_WINDOW_COVERING_STOP_COMMAND_ID (0x02)
-#define ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID (0x00)
+#define ZCL_DOWN_OR_CLOSE_COMMAND_ID (0x01)
+#define ZCL_GO_TO_LIFT_PERCENTAGE_COMMAND_ID (0x05)
+#define ZCL_GO_TO_LIFT_VALUE_COMMAND_ID (0x04)
+#define ZCL_GO_TO_TILT_PERCENTAGE_COMMAND_ID (0x08)
+#define ZCL_GO_TO_TILT_VALUE_COMMAND_ID (0x07)
+#define ZCL_STOP_MOTION_COMMAND_ID (0x02)
+#define ZCL_UP_OR_OPEN_COMMAND_ID (0x00)
 
 // TODO: Find a way to calculate maximum message length for clusters
 //       https://github.com/project-chip/connectedhomeip/issues/965
@@ -2228,6 +2232,22 @@ PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t s
 {
     COMMAND_HEADER("ReadDescriptorClusterRevision", DESCRIPTOR_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster DiagnosticLogs                                              | 0x0032 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RetrieveLogsRequest                                               |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeDiagnosticLogsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverDiagnosticLogsAttributes", DIAGNOSTIC_LOGS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -5221,16 +5241,16 @@ PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t se
 | Cluster WindowCovering                                              | 0x0102 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * WindowCoveringDownClose                                           |   0x01 |
-| * WindowCoveringGoToLiftPercentage                                  |   0x05 |
-| * WindowCoveringGoToLiftValue                                       |   0x04 |
-| * WindowCoveringGoToTiltPercentage                                  |   0x08 |
-| * WindowCoveringGoToTiltValue                                       |   0x07 |
-| * WindowCoveringStop                                                |   0x02 |
-| * WindowCoveringUpOpen                                              |   0x00 |
+| * DownOrClose                                                       |   0x01 |
+| * GoToLiftPercentage                                                |   0x05 |
+| * GoToLiftValue                                                     |   0x04 |
+| * GoToTiltPercentage                                                |   0x08 |
+| * GoToTiltValue                                                     |   0x07 |
+| * StopMotion                                                        |   0x02 |
+| * UpOrOpen                                                          |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * WindowCoveringType                                                | 0x0000 |
+| * Type                                                              | 0x0000 |
 | * CurrentPositionLift                                               | 0x0003 |
 | * CurrentPositionTilt                                               | 0x0004 |
 | * ConfigStatus                                                      | 0x0007 |
@@ -5250,19 +5270,19 @@ PacketBufferHandle encodeWindowCoveringClusterDiscoverAttributes(uint8_t seqNum,
 }
 
 /*
- * Attribute WindowCoveringType
+ * Attribute Type
  */
-PacketBufferHandle encodeWindowCoveringClusterReadWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeWindowCoveringClusterReadTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadWindowCoveringWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
+    COMMAND_HEADER("ReadWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
     COMMAND_FOOTER();
 }
 
-PacketBufferHandle encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
+PacketBufferHandle encodeWindowCoveringClusterConfigureTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                     uint16_t minInterval, uint16_t maxInterval)
 {
-    COMMAND_HEADER("ReportWindowCoveringWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
+    COMMAND_HEADER("ReportWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand)
         .Put8(seqNum)
         .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)

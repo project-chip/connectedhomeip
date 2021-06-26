@@ -455,7 +455,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].outputType = emberAfGetInt8u(message, 0, 1);
                             message += 1;
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                         }
 
@@ -476,7 +476,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                         {
                             CHECK_STATUS(ReadByteSpan(message, messageLen, &data[i]));
                             uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
-                            messageLen -= entryLength;
+                            messageLen           = static_cast<uint16_t>(messageLen - entryLength);
                             message += entryLength;
                         }
 
@@ -581,10 +581,10 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                         for (size_t i = 0; i < count; i++)
                         {
                             CHECK_STATUS(ReadByteSpan(message, 18, &data[i].label));
-                            messageLen -= 18;
+                            messageLen = static_cast<uint16_t>(messageLen - 18);
                             message += 18;
                             CHECK_STATUS(ReadByteSpan(message, 18, &data[i].value));
-                            messageLen -= 18;
+                            messageLen = static_cast<uint16_t>(messageLen - 18);
                             message += 18;
                         }
 
@@ -604,7 +604,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                         for (size_t i = 0; i < count; i++)
                         {
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].Name));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                             CHECK_MESSAGE_LENGTH(1);
                             data[i].FabricConnected = emberAfGetInt8u(message, 0, 1);
@@ -615,9 +615,9 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             CHECK_MESSAGE_LENGTH(1);
                             data[i].OffPremiseServicesReachableIPv6 = emberAfGetInt8u(message, 0, 1);
                             message += 1;
-                            CHECK_MESSAGE_LENGTH(8);
-                            data[i].HardwareAddress = emberAfGetInt64u(message, 0, 8);
-                            message += 8;
+                            CHECK_STATUS(ReadByteSpan(message, 10, &data[i].HardwareAddress));
+                            messageLen = static_cast<uint16_t>(messageLen - 10);
+                            message += 10;
                             CHECK_MESSAGE_LENGTH(1);
                             data[i].Type = emberAfGetInt8u(message, 0, 1);
                             message += 1;
@@ -667,7 +667,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].GroupKeyIndex = emberAfGetInt16u(message, 0, 2);
                             message += 2;
                             CHECK_STATUS(ReadByteSpan(message, 18, &data[i].GroupKeyRoot));
-                            messageLen -= 18;
+                            messageLen = static_cast<uint16_t>(messageLen - 18);
                             message += 18;
                             CHECK_MESSAGE_LENGTH(8);
                             data[i].GroupKeyEpochStartTime = emberAfGetInt64u(message, 0, 8);
@@ -699,10 +699,10 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].inputType = emberAfGetInt8u(message, 0, 1);
                             message += 1;
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].description));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                         }
 
@@ -731,7 +731,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].NodeId = emberAfGetInt64u(message, 0, 8);
                             message += 8;
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].Label));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                         }
 
@@ -758,13 +758,13 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].minorNumber = emberAfGetInt16u(message, 0, 2);
                             message += 2;
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].callSign));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].affiliateCallSign));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                         }
 
@@ -787,7 +787,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].identifier = emberAfGetInt8u(message, 0, 1);
                             message += 1;
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                         }
 
@@ -824,7 +824,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                         {
                             CHECK_STATUS(ReadByteSpan(message, messageLen, &data[i]));
                             uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
-                            messageLen -= entryLength;
+                            messageLen           = static_cast<uint16_t>(messageLen - entryLength);
                             message += entryLength;
                         }
 
@@ -842,7 +842,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].fabricIndex = emberAfGetInt64u(message, 0, 8);
                             message += 8;
                             CHECK_STATUS(ReadByteSpan(message, 34, &data[i].operationalCert));
-                            messageLen -= 34;
+                            messageLen = static_cast<uint16_t>(messageLen - 34);
                             message += 34;
                         }
 
@@ -881,10 +881,10 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].LQI = emberAfGetInt8u(message, 0, 1);
                             message += 1;
                             CHECK_MESSAGE_LENGTH(1);
-                            data[i].AverageRssi = emberAfGetInt8u(message, 0, 1);
+                            data[i].AverageRssi = emberAfGetInt8s(message, 0, 1);
                             message += 1;
                             CHECK_MESSAGE_LENGTH(1);
-                            data[i].LastRssi = emberAfGetInt8u(message, 0, 1);
+                            data[i].LastRssi = emberAfGetInt8s(message, 0, 1);
                             message += 1;
                             CHECK_MESSAGE_LENGTH(1);
                             data[i].FrameErrorRate = emberAfGetInt8u(message, 0, 1);

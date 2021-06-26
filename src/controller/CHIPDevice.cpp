@@ -390,7 +390,14 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
-    VerifyOrReturnError(connectionState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (connectionState == nullptr)
+    {
+        // Nothing needs to be done here.  It's not an error to not have a
+        // connectionState.  For one thing, we could have gotten an different
+        // UpdateAddress already and that caused connections to be torn down and
+        // whatnot.
+        return CHIP_NO_ERROR;
+    }
 
     mDeviceAddress = addr;
     connectionState->SetPeerAddress(addr);
@@ -411,6 +418,8 @@ void Device::Reset()
     }
 
     SetActive(false);
+    mCASESession.Clear();
+
     mState          = ConnectionState::NotConnected;
     mSessionManager = nullptr;
     mStatusDelegate = nullptr;
