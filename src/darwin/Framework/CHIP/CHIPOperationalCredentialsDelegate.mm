@@ -232,8 +232,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificat
         return err;
     }
 
-    onNOCGenerated->mCall(
-        onNOCGenerated->mContext, chip::ByteSpan(noc, nocLen), chip::PeerId().SetNodeId(assignedId).SetFabricId(fabricId));
+    onNOCGenerated->mCall(onNOCGenerated->mContext, chip::ByteSpan(noc, nocLen));
 
     return CHIP_NO_ERROR;
 }

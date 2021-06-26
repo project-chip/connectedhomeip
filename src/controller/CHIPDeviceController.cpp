@@ -241,7 +241,7 @@ CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & no
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnLocalNOCGenerated(void * context, const ByteSpan & noc, const PeerId & deviceId)
+void DeviceController::OnLocalNOCGenerated(void * context, const ByteSpan & noc)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1231,7 +1231,7 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
     }
 }
 
-void DeviceCommissioner::OnDeviceNOCGenerated(void * context, const ByteSpan & noc, const PeerId & deviceId)
+void DeviceCommissioner::OnDeviceNOCGenerated(void * context, const ByteSpan & noc)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

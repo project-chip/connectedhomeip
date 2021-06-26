@@ -91,8 +91,7 @@ ExampleOperationalCredentialsIssuer::GenerateNodeOperationalCertificate(const Op
     ReturnErrorOnFailure(NewNodeOperationalX509Cert(request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, noc.Get(),
                                                     kMaxCHIPDERCertLength, nocLen));
 
-    onNOCGenerated->mCall(onNOCGenerated->mContext, ByteSpan(noc.Get(), nocLen),
-                          PeerId().SetNodeId(assignedId).SetFabricId(fabricId));
+    onNOCGenerated->mCall(onNOCGenerated->mContext, ByteSpan(noc.Get(), nocLen));
 
     return CHIP_NO_ERROR;
 }

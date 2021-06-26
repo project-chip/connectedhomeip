@@ -368,7 +368,7 @@ private:
 
     CHIP_ERROR LoadLocalCredentials(Transport::AdminPairingInfo * admin);
 
-    static void OnLocalNOCGenerated(void * context, const ByteSpan & noc, const PeerId & deviceId);
+    static void OnLocalNOCGenerated(void * context, const ByteSpan & noc);
     Callback::Callback<NOCGenerated> mLocalNOCCallback;
 };
 
@@ -605,7 +605,7 @@ private:
     static void OnDeviceConnectedFn(void * context, Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
-    static void OnDeviceNOCGenerated(void * context, const ByteSpan & noc, const PeerId & deviceId);
+    static void OnDeviceNOCGenerated(void * context, const ByteSpan & noc);
 
     /**
      * @brief

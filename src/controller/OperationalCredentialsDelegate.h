@@ -29,7 +29,7 @@
 namespace chip {
 namespace Controller {
 
-typedef void (*NOCGenerated)(void * context, const ByteSpan & noc, const PeerId & nodeId);
+typedef void (*NOCGenerated)(void * context, const ByteSpan & noc);
 
 constexpr uint32_t kMaxCHIPDERCertLength = 600;
 
