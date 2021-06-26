@@ -209,9 +209,6 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
         // If requested, generate the hash of the TBS portion of the certificate...
         if (decodeFlags.Has(CertDecodeFlags::kGenerateTBSHash))
         {
-            // Finish writing the ASN.1 DER encoding of the TBS certificate.
-            ReturnErrorOnFailure(writer.Finalize());
-
             // Generate a SHA hash of the encoded TBS certificate.
             chip::Crypto::Hash_SHA256(mDecodeBuf, writer.GetLengthWritten(), cert.mTBSHash);
 
@@ -916,8 +913,6 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, uint8_t 
     writer.Init(derSig, derSigBufSize);
 
     ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(rawSig, writer));
-
-    ReturnErrorOnFailure(writer.Finalize());
 
     derSigLen = writer.GetLengthWritten();
 

@@ -848,8 +848,6 @@ DLL_EXPORT CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, uint8_t
 
     ReturnErrorOnFailure(DecodeConvertCert(reader, writer, certData));
 
-    ReturnErrorOnFailure(writer.Finalize());
-
     x509CertLen = writer.GetLengthWritten();
 
     return CHIP_NO_ERROR;
