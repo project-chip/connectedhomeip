@@ -95,6 +95,21 @@ CHIP_ERROR JniReferences::GetClassRef(JNIEnv * env, const char * clsType, jclass
     return err;
 }
 
+CHIP_ERROR JniReferences::N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    outArray = env->NewByteArray((int) inArrayLen);
+    VerifyOrReturnError(outArray != NULL, CHIP_ERROR_NO_MEMORY);
+
+    env->ExceptionClear();
+    env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
+    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    return err;
+}
+
 CHIP_ERROR JniReferences::FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature,
                                      jmethodID * methodId)
 {
