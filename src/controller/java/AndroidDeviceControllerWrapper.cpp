@@ -123,13 +123,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         return nullptr;
     }
 
-    *errInfoOnFailure = wrapper->Controller()->ServiceEvents();
-
-    if (*errInfoOnFailure != CHIP_NO_ERROR)
-    {
-        return nullptr;
-    }
-
     return wrapper.release();
 }
 
