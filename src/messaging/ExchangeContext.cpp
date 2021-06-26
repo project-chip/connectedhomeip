@@ -237,7 +237,6 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Secu
 
     SetDropAckDebug(false);
     SetAckPending(false);
-    SetPeerRequestedAck(false);
     SetMsgRcvdFromPeer(false);
     SetAutoRequestAck(true);
 
