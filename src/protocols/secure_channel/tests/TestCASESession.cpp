@@ -91,8 +91,6 @@ P256Keypair accessoryOpKeys;
 enum
 {
     kStandardCertsCount = 4,
-    kTestCertBufSize    = 1024, // Size of buffer needed to hold any of the test certificates
-                                // (in either CHIP or DER form), or to decode the certificates.
 };
 
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
@@ -133,9 +131,9 @@ static CHIP_ERROR InitCredentialSets()
 
     ReturnErrorOnFailure(accessoryOpKeys.Deserialize(accessoryOpKeysSerialized));
 
-    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount, kTestCertBufSize));
+    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
 
-    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount, kTestCertBufSize));
+    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
 
     // Add the trusted root certificate to the certificate set.
     ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
