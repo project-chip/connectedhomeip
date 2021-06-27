@@ -105,6 +105,7 @@ enable_bluetooth() {
 }
 
 download_artifacts() {
+    set +x
     if [ $# -lt 4 ]; then
         echo "download_artifacts requires at least 4 arguments" && exit 1
     fi
@@ -125,9 +126,11 @@ download_artifacts() {
     AUTHORIZATION_HEADER="Authorization: token "${GITHUB_TOKEN}
 
     curl -s -H "$AUTHORIZATION_HEADER" $DOWNLOAD_URL -L --output $OUTPUT_NAME
+    set -x
 }
 
 download_artifacts_gh() {
+    set +x
     if [ $# -lt 4 ]; then
         echo "download_artifacts_gh requires at least 4 arguments" && exit 1
     fi
@@ -142,6 +145,7 @@ download_artifacts_gh() {
     rm token.txt
 
     gh run download --repo ${GITHUB_REPOSITORY} ${GITHUB_ACTION_ID} --dir ${OUTPUT_NAME}
+    set -x
 }
 
 mount_mbed_device() {
