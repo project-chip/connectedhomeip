@@ -51,7 +51,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'PRESSURE_MEASUREMENT_CLUSTER': [],
     'PUMP_CONFIG_CONTROL_CLUSTER': ['pump-configuration-and-control-server'],
     'RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER': ['relative-humidity-measurement-server'],
-    'ELECTRICAL_MEASUREMENT_CLUSTER': ['electrical-measurement-cluster-server'],
+    'ELECTRICAL_MEASUREMENT_CLUSTER': ['electrical-measurement-server'],
     'SCENES_CLUSTER': ['scenes'],
     'SOFTWARE_DIAGNOSTICS_CLUSTER': [], 
     'SWITCH_CLUSTER': [],
