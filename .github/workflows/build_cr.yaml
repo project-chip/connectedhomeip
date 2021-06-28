@@ -24,7 +24,7 @@ jobs:
     build-cr:
         strategy:
           matrix:
-            TARGET_ARCH: [amd64, arm64]
+            TARGET_ARCH: [x86_64, aarch64]
 
         name: chip-build-${{matrix.TARGET_ARCH}}
         runs-on: ubuntu-latest
