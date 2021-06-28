@@ -1235,7 +1235,7 @@ void DeviceCommissioner::OnDeviceNOCGenerated(void * context, const ByteSpan & n
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     // The operational certificate array can contain upto 2 certificates (NOC, and ICAC)
     // The memory is allocated to account for both these certificates.
