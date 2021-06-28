@@ -70,7 +70,7 @@ void WriteClient::Shutdown()
 
 void WriteClient::ClearExistingExchangeContext()
 {
-    // Discard any existing exchange context. Effectively we can only have one Echo exchange with
+    // Discard any existing exchange context. Effectively we can only have one IM exchange with
     // a single node at any one time.
     if (mpExchangeCtx != nullptr)
     {
@@ -255,7 +255,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdm
     ClearExistingExchangeContext();
 
     // Create a new exchange context.
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: we temprarily create a SecureSessionHandle from node id, this will be fixed in PR 3602
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     if (apSecureSession == nullptr)
     {
@@ -270,7 +270,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdm
 
     err = mpExchangeCtx->SendMessage(
         Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
-        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(State::AwaitingResponse);
 
