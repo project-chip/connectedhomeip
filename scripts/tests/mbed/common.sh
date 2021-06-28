@@ -145,8 +145,8 @@ download_artifacts_gh() {
 }
 
 download_artifacts_by_name_gh() {
-    if [ $# -lt 4 ]; then
-        echo "download_artifacts_gh requires at least 4 arguments" && exit 1
+    if [ $# -lt 5 ]; then
+        echo "download_artifacts_gh requires at least 5 arguments" && exit 1
     fi
 
     GITHUB_REPOSITORY="$1"
@@ -159,7 +159,7 @@ download_artifacts_by_name_gh() {
     gh auth login --with-token <token.txt
     rm token.txt
 
-    gh run download --repo ${GITHUB_REPOSITORY} ${GITHUB_ACTION_ID} -n ${GITHUB_ARTIFACT_NAME}--dir ${OUTPUT_NAME}
+    gh run download --repo ${GITHUB_REPOSITORY} ${GITHUB_ACTION_ID} --name ${GITHUB_ARTIFACT_NAME} --dir ${OUTPUT_NAME}
 }
 
 mount_mbed_device() {
