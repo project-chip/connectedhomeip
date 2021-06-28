@@ -5,7 +5,7 @@ development kits, built using the nRF Connect SDK.
 
 ## Building
 
-The steps to build the Shell Application for Nordic Semiconductor's development kits are
-exactly the same as in case of the Lock Example. Please refer to
-[this guide](../../lock-app/nrfconnect/README.md) to learn how to build, program,
-and debug the application.
+The steps to build the Shell Application for Nordic Semiconductor's development
+kits are exactly the same as in case of the Lock Example. Please refer to
+[this guide](../../lock-app/nrfconnect/README.md) to learn how to build,
+program, and debug the application.
