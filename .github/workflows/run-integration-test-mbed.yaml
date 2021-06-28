@@ -62,7 +62,7 @@ jobs:
             fi
       - name: Prepare lava job
         env:
-          GITHUB_TOKEN: ${{ secrets.TEST_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           JOB_FILE=$GITHUB_WORKSPACE/scripts/tests/mbed/lava_integration_tests.yml
           GITHUB_REPOSITORY_URL="$GITHUB_SERVER_URL"/"$GITHUB_REPOSITORY".git
