@@ -186,8 +186,9 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificate(const chip::PeerId & peerId,
-    const chip::ByteSpan & csr, int64_t serialNumber, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificate(const chip::Optional<chip::NodeId> & nodeId,
+    chip::FabricId fabricId, const chip::ByteSpan & csr, const chip::ByteSpan & DAC,
+    chip::Callback::Callback<chip::Controller::NOCGenerated> * onNOCGenerated)
 {
     uint32_t validityStart, validityEnd;
 
@@ -201,8 +202,18 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificat
         return CHIP_ERROR_INTERNAL;
     }
 
+    chip::NodeId assignedId;
+    if (nodeId.HasValue()) {
+        assignedId = nodeId.Value();
+    } else {
+        if (mDeviceBeingPaired == chip::kUndefinedNodeId) {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        assignedId = mDeviceBeingPaired;
+    }
+
     chip::Credentials::X509CertRequestParams request
-        = { serialNumber, mIssuerId, validityStart, validityEnd, true, peerId.GetFabricId(), true, peerId.GetNodeId() };
+        = { 1, mIssuerId, validityStart, validityEnd, true, fabricId, true, assignedId };
 
     chip::Crypto::P256PublicKey pubkey;
     CHIP_ERROR err = chip::Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey);
@@ -210,12 +221,23 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificat
         return err;
     }
 
-    return chip::Credentials::NewNodeOperationalX509Cert(
-        request, chip::Credentials::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuerKey, certBuf, certBufSize, outCertLen);
+    NSMutableData * nocBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
+    uint32_t nocLen = 0;
+
+    uint8_t * noc = (uint8_t *) [nocBuffer mutableBytes];
+
+    err = chip::Credentials::NewNodeOperationalX509Cert(request, chip::Credentials::CertificateIssuerLevel::kIssuerIsRootCA, pubkey,
+        mIssuerKey, noc, chip::Controller::kMaxCHIPDERCertLength, nocLen);
+    if (err != CHIP_NO_ERROR) {
+        return err;
+    }
+
+    onNOCGenerated->mCall(onNOCGenerated->mContext, chip::ByteSpan(noc, nocLen));
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GetRootCACertificate(
-    chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GetRootCACertificate(chip::FabricId fabricId, chip::MutableByteSpan & outCert)
 {
     // TODO: Don't generate root certificate unless there's none, or the current is expired.
     uint32_t validityStart, validityEnd;
@@ -232,7 +254,13 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GetRootCACertificate(
 
     chip::Credentials::X509CertRequestParams request = { 0, mIssuerId, validityStart, validityEnd, true, fabricId, false, 0 };
 
-    return chip::Credentials::NewRootX509Cert(request, mIssuerKey, certBuf, certBufSize, outCertLen);
+    size_t outCertSize = (outCert.size() > UINT32_MAX) ? UINT32_MAX : outCert.size();
+    uint32_t outCertLen = 0;
+    ReturnErrorOnFailure(
+        chip::Credentials::NewRootX509Cert(request, mIssuerKey, outCert.data(), static_cast<uint32_t>(outCertSize), outCertLen));
+    outCert.reduce_size(outCertLen);
+
+    return CHIP_NO_ERROR;
 }
 
 bool CHIPOperationalCredentialsDelegate::ToChipEpochTime(uint32_t offset, uint32_t & epoch)

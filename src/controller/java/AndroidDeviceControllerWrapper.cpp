@@ -26,8 +26,10 @@
 #include <support/CodeUtils.h>
 
 #include <platform/KeyValueStoreManager.h>
+#include <support/ScopedBuffer.h>
 #include <support/ThreadOperationalDataset.h>
 
+using namespace chip;
 using namespace chip::Controller;
 
 extern chip::Ble::BleLayer * GetJNIBleLayer();
@@ -54,13 +56,18 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
                                              argument);
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
-                                                                uint32_t & outCertLen)
+CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(FabricId fabricId, MutableByteSpan & outCert)
 {
     Initialize();
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     chip::X509CertRequestParams newCertParams = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
-    return NewRootX509Cert(newCertParams, mIssuer, certBuf, certBufSize, outCertLen);
+
+    size_t outCertSize  = (outCert.size() > UINT32_MAX) ? UINT32_MAX : outCert.size();
+    uint32_t outCertLen = 0;
+    ReturnErrorOnFailure(NewRootX509Cert(newCertParams, mIssuer, outCert.data(), static_cast<uint32_t>(outCertSize), outCertLen));
+    outCert.reduce_size(outCertLen);
+
+    return CHIP_NO_ERROR;
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
@@ -146,10 +153,10 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 
 // TODO Refactor this API to match latest spec, so that GenerateNodeOperationalCertificate receives the full CSR Elements data
 // payload.
-CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const chip::PeerId & peerId,
-                                                                              const chip::ByteSpan & csr, int64_t serialNumber,
-                                                                              uint8_t * certBuf, uint32_t certBufSize,
-                                                                              uint32_t & outCertLen)
+CHIP_ERROR
+AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const Optional<NodeId> & nodeId, FabricId fabricId,
+                                                                   const ByteSpan & csr, const ByteSpan & DAC,
+                                                                   Callback::Callback<NOCGenerated> * onNOCGenerated)
 {
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -164,16 +171,32 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(co
     // Initializing the KeyPair.
     Initialize();
 
-    chip::X509CertRequestParams request = { serialNumber, mIssuerId,         mNow, mNow + mValidity, true, peerId.GetFabricId(),
-                                            true,         peerId.GetNodeId() };
+    chip::NodeId assignedId;
+    if (nodeId.HasValue())
+    {
+        assignedId = nodeId.Value();
+    }
+    else
+    {
+        assignedId = mNextAvailableNodeId++;
+    }
+
+    chip::X509CertRequestParams request = { 1, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
 
     chip::P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
 
     ChipLogProgress(chipTool, "VerifyCertificateSigningRequest");
 
+    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+    ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    uint32_t nocLen = 0;
+
     CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer,
-                                                         certBuf, certBufSize, outCertLen);
+                                                         noc.Get(), kMaxCHIPDERCertLength, nocLen);
+
+    onNOCGenerated->mCall(onNOCGenerated->mContext, ByteSpan(noc.Get(), nocLen));
+
     jbyteArray argument;
     JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csr.data(), csr.size(),
