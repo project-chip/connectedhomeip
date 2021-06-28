@@ -173,6 +173,10 @@ public:
     CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
 
     CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
+
+    void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
+                      Protocols::InteractionModel::ProtocolCode status) override;
+    CHIP_ERROR ReportError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
 };
 
 /**
