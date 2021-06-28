@@ -1320,7 +1320,7 @@ void DeviceCommissioner::OnAddOpCertFailureResponse(void * context, uint8_t stat
 }
 
 void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex,
-                                                             uint8_t * DebugText)
+                                                             chip::ByteSpan DebugText)
 {
     ChipLogProgress(Controller, "Device confirmed that it has received the operational certificate");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);

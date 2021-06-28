@@ -29,7 +29,7 @@
 typedef struct _ApplicationLauncherApp
 {
     uint16_t catalogVendorId;
-    uint8_t * applicationId;
+    chip::ByteSpan applicationId;
 } EmberAfApplicationLauncherApp;
 
 // Struct for AudioOutputInfo
@@ -69,14 +69,14 @@ typedef struct _ConfigureReportingStatusRecord
 // Struct for ContentLaunchAdditionalInfo
 typedef struct _ContentLaunchAdditionalInfo
 {
-    uint8_t * name;
-    uint8_t * value;
+    chip::ByteSpan name;
+    chip::ByteSpan value;
 } EmberAfContentLaunchAdditionalInfo;
 
 // Struct for ContentLaunchBrandingInformation
 typedef struct _ContentLaunchBrandingInformation
 {
-    uint8_t * providerName;
+    chip::ByteSpan providerName;
     uint8_t background;
     uint8_t logo;
     uint8_t progressBar;
@@ -87,8 +87,8 @@ typedef struct _ContentLaunchBrandingInformation
 // Struct for ContentLaunchDimension
 typedef struct _ContentLaunchDimension
 {
-    uint8_t * width;
-    uint8_t * height;
+    chip::ByteSpan width;
+    chip::ByteSpan height;
     uint8_t metric;
 } EmberAfContentLaunchDimension;
 
@@ -96,15 +96,15 @@ typedef struct _ContentLaunchDimension
 typedef struct _ContentLaunchParamater
 {
     uint8_t Type;
-    uint8_t * Value;
+    chip::ByteSpan Value;
     /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
 } EmberAfContentLaunchParamater;
 
 // Struct for ContentLaunchStyleInformation
 typedef struct _ContentLaunchStyleInformation
 {
-    uint8_t * imageUrl;
-    uint8_t * color;
+    chip::ByteSpan imageUrl;
+    chip::ByteSpan color;
     uint8_t size;
 } EmberAfContentLaunchStyleInformation;
 
@@ -393,9 +393,9 @@ typedef struct _TvChannelInfo
 // Struct for TvChannelLineupInfo
 typedef struct _TvChannelLineupInfo
 {
-    uint8_t * operatorName;
-    uint8_t * lineupName;
-    uint8_t * postalCode;
+    chip::ByteSpan operatorName;
+    chip::ByteSpan lineupName;
+    chip::ByteSpan postalCode;
     uint8_t lineupInfoType;
 } EmberAfTvChannelLineupInfo;
 

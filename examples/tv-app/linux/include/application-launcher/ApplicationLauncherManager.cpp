@@ -80,10 +80,12 @@ EmberAfApplicationLauncherApp getApplicationFromCommand(EmberAfClusterCommand * 
     uint16_t extensionFieldSetsLen =
         static_cast<uint16_t>(cmd->bufLen - (cmd->payloadStartIndex + emberAfStringLength((uint8_t *) reqestData) + 1));
     uint16_t catalogVendorId = emberAfGetInt16u(requestApplication, 0, extensionFieldSetsLen);
+
+    uint8_t applicationIdLen = emberAfStringLength(requestApplication);
     uint8_t * applicationId  = emberAfGetString(requestApplication, 0, extensionFieldSetsLen);
 
     EmberAfApplicationLauncherApp application = {};
-    application.applicationId                 = applicationId;
+    application.applicationId                 = chip::ByteSpan(applicationId, applicationIdLen);
     application.catalogVendorId               = catalogVendorId;
     return application;
 }

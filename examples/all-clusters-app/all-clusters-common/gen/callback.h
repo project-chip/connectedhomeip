@@ -4021,7 +4021,7 @@ bool emberAfDoorLockClusterGetYeardayScheduleCallback(chip::app::Command * comma
  * @brief Door Lock Cluster LockDoor Command callback
  */
 
-bool emberAfDoorLockClusterLockDoorCallback(chip::app::Command * commandObj, uint8_t * PIN);
+bool emberAfDoorLockClusterLockDoorCallback(chip::app::Command * commandObj, chip::ByteSpan PIN);
 
 /**
  * @brief Door Lock Cluster SetHolidaySchedule Command callback
@@ -4035,14 +4035,14 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(chip::app::Command * comma
  */
 
 bool emberAfDoorLockClusterSetPinCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                          uint8_t * pin);
+                                          chip::ByteSpan pin);
 
 /**
  * @brief Door Lock Cluster SetRfid Command callback
  */
 
 bool emberAfDoorLockClusterSetRfidCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                           uint8_t * id);
+                                           chip::ByteSpan id);
 
 /**
  * @brief Door Lock Cluster SetUserType Command callback
@@ -4069,13 +4069,14 @@ bool emberAfDoorLockClusterSetYeardayScheduleCallback(chip::app::Command * comma
  * @brief Door Lock Cluster UnlockDoor Command callback
  */
 
-bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::Command * commandObj, uint8_t * PIN);
+bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::Command * commandObj, chip::ByteSpan PIN);
 
 /**
  * @brief Door Lock Cluster UnlockWithTimeout Command callback
  */
 
-bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::Command * commandObj, uint16_t timeoutInSeconds, uint8_t * pin);
+bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::Command * commandObj, uint16_t timeoutInSeconds,
+                                                     chip::ByteSpan pin);
 
 /**
  * @brief General Commissioning Cluster ArmFailSafe Command callback
@@ -4095,19 +4096,20 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::
  */
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
-                                                                   uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
+                                                                   chip::ByteSpan countryCode, uint64_t breadcrumb,
+                                                                   uint32_t timeoutMs);
 
 /**
  * @brief Groups Cluster AddGroup Command callback
  */
 
-bool emberAfGroupsClusterAddGroupCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t * groupName);
+bool emberAfGroupsClusterAddGroupCallback(chip::app::Command * commandObj, uint16_t groupId, chip::ByteSpan groupName);
 
 /**
  * @brief Groups Cluster AddGroupIfIdentifying Command callback
  */
 
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t * groupName);
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::app::Command * commandObj, uint16_t groupId, chip::ByteSpan groupName);
 
 /**
  * @brief Groups Cluster GetGroupMembership Command callback
@@ -4296,7 +4298,7 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::app:
 
 bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
     chip::app::Command * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
-    uint32_t currentVersion, /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location,
+    uint32_t currentVersion, /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, chip::ByteSpan location,
     uint8_t clientCanConsent, chip::ByteSpan metadataForServer);
 
 /**
@@ -4368,14 +4370,14 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
  * @brief Operational Credentials Cluster UpdateFabricLabel Command callback
  */
 
-bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label);
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, chip::ByteSpan Label);
 
 /**
  * @brief Scenes Cluster AddScene Command callback
  */
 
 bool emberAfScenesClusterAddSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId,
-                                          uint16_t transitionTime, uint8_t * sceneName,
+                                          uint16_t transitionTime, chip::ByteSpan sceneName,
                                           /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**

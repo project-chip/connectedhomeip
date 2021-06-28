@@ -40,6 +40,11 @@ function atomicType(arg)
     return 'chip::FabricIndex';
   case 'status':
     return 'chip::StatusCode';
+  case 'char_string':
+  case 'octet_string':
+  case 'long_char_string':
+  case 'long_octet_string':
+    return 'chip::ByteSpan';
   default:
     throw 'not overriding';
   }

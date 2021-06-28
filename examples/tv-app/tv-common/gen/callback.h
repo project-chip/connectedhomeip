@@ -2320,7 +2320,7 @@ bool emberAfApplicationBasicClusterChangeStatusCallback(chip::app::Command * com
  * @brief Audio Output Cluster RenameOutput Command callback
  */
 
-bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * commandObj, uint8_t index, uint8_t * name);
+bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * commandObj, uint8_t index, chip::ByteSpan name);
 
 /**
  * @brief Audio Output Cluster SelectOutput Command callback
@@ -2352,13 +2352,14 @@ bool emberAfBindingClusterUnbindCallback(chip::app::Command * commandObj, chip::
  * @brief Content Launcher Cluster LaunchContent Command callback
  */
 
-bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::Command * commandObj, uint8_t autoPlay, uint8_t * data);
+bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::Command * commandObj, uint8_t autoPlay, chip::ByteSpan data);
 
 /**
  * @brief Content Launcher Cluster LaunchURL Command callback
  */
 
-bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::Command * commandObj, uint8_t * contentURL, uint8_t * displayString);
+bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::Command * commandObj, chip::ByteSpan contentURL,
+                                                    chip::ByteSpan displayString);
 
 /**
  * @brief Diagnostic Logs Cluster RetrieveLogsRequest Command callback
@@ -2385,7 +2386,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::
  */
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
-                                                                   uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
+                                                                   chip::ByteSpan countryCode, uint64_t breadcrumb,
+                                                                   uint32_t timeoutMs);
 
 /**
  * @brief Level Control Cluster Move Command callback
@@ -2591,7 +2593,7 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::app:
 
 bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
     chip::app::Command * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
-    uint32_t currentVersion, /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location,
+    uint32_t currentVersion, /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, chip::ByteSpan location,
     uint8_t clientCanConsent, chip::ByteSpan metadataForServer);
 
 /**
@@ -2663,7 +2665,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
  * @brief Operational Credentials Cluster UpdateFabricLabel Command callback
  */
 
-bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label);
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, chip::ByteSpan Label);
 
 //
 // Non-Cluster Related Callbacks

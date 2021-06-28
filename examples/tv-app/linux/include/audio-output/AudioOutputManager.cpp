@@ -68,13 +68,13 @@ bool AudioOutputManager::proxySelectOutputRequest(uint8_t index)
     // TODO: Insert code here
     return true;
 }
-bool AudioOutputManager::proxyRenameOutputRequest(uint8_t index, uint8_t * name)
+bool AudioOutputManager::proxyRenameOutputRequest(uint8_t index, chip::ByteSpan name)
 {
     // TODO: Insert code here
     return true;
 }
 
-bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * command, unsigned char index, uint8_t * name)
+bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * command, unsigned char index, chip::ByteSpan name)
 {
     bool success         = AudioOutputManager().proxyRenameOutputRequest(index, name);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;

@@ -1010,7 +1010,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::
  */
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
-                                                                   uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
+                                                                   chip::ByteSpan countryCode, uint64_t breadcrumb,
+                                                                   uint32_t timeoutMs);
 
 /**
  * @brief Level Control Cluster Move Command callback
@@ -1199,7 +1200,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
  * @brief Operational Credentials Cluster UpdateFabricLabel Command callback
  */
 
-bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label);
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, chip::ByteSpan Label);
 
 //
 // Non-Cluster Related Callbacks

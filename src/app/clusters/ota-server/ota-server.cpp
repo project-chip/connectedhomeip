@@ -154,7 +154,7 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::app:
 bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
     chip::app::Command * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
     uint32_t currentVersion,
-    /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location, uint8_t clientCanConsent,
+    /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, chip::ByteSpan location, uint8_t clientCanConsent,
     chip::ByteSpan metadataForServer)
 {
     EmberAfStatus status         = EMBER_ZCL_STATUS_SUCCESS;
@@ -168,11 +168,9 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
 
     ChipLogDetail(Zcl, "OTA Server received QueryImage");
 
-    // TODO: (#7112) change location size checking once CHAR_STRING is supported
-    const uint8_t locationLen = emberAfStringLength(location);
-    if (locationLen != kLocationParamLength)
+    if (location.size() != kLocationParamLength)
     {
-        ChipLogError(Zcl, "expected location length %" PRIu8 ", got %" PRIu8, locationLen, kLocationParamLength);
+        ChipLogError(Zcl, "expected location length %zu, got %" PRIu8, location.size(), kLocationParamLength);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
     else if (metadataForServer.size() > kMaxMetadataLen)
@@ -181,10 +179,8 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    chip::ByteSpan locationSpan(location, locationLen);
-
     status = delegate->HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
-                                        locationSpan, clientCanConsent, metadataForServer);
+                                        location, clientCanConsent, metadataForServer);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
