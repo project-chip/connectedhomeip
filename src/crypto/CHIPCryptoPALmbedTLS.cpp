@@ -559,7 +559,8 @@ exit:
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-#if defined(MBEDTLS_ECDH_C) && !defined(MBEDTLS_ECP_ALT)
+// TODO: Enable ECDH_derive_secret for Qorvo when their mbedTLS static libraries are updated
+#if defined(MBEDTLS_ECDH_C) && !defined(QORVO_CRYPTO_ENGINE)
     CHIP_ERROR error     = CHIP_NO_ERROR;
     int result           = 0;
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
