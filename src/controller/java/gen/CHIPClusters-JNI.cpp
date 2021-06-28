@@ -253,7 +253,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * setupPIN)
+    static void CallbackFn(void * context, chip::ByteSpan setupPIN)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -324,7 +324,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data)
+    static void CallbackFn(void * context, chip::ByteSpan data)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -395,7 +395,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    static void CallbackFn(void * context, chip::ByteSpan data, uint8_t contentLaunchStatus)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -466,7 +466,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    static void CallbackFn(void * context, chip::ByteSpan data, uint8_t contentLaunchStatus)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1087,7 +1087,7 @@ public:
     };
 
     static void CallbackFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
-                           uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+                           uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1160,7 +1160,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
+    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1231,7 +1231,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2129,7 +2129,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2200,7 +2200,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2271,7 +2271,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2550,7 +2550,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t * groupName)
+    static void CallbackFn(void * context, uint16_t groupId, chip::ByteSpan groupName)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3512,7 +3512,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3583,7 +3583,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3654,7 +3654,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3725,7 +3725,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3796,7 +3796,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3867,7 +3867,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText,
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText,
                            /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
                            /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
     {
@@ -3945,7 +3945,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4016,7 +4016,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4156,7 +4156,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
+    static void CallbackFn(void * context, uint32_t delayedActionTime, chip::ByteSpan imageURI, uint32_t softwareVersion,
                            chip::ByteSpan updateToken, uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
@@ -4366,7 +4366,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText)
+    static void CallbackFn(void * context, uint8_t StatusCode, uint64_t FabricIndex, chip::ByteSpan DebugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4852,7 +4852,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::ByteSpan sceneName,
                            /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
@@ -5001,7 +5001,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data)
+    static void CallbackFn(void * context, chip::ByteSpan data)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;

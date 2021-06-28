@@ -1404,11 +1404,17 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
-bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::app::Command * commandObj, uint8_t * setupPIN)
+bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::app::Command * commandObj, chip::ByteSpan setupPIN)
 {
     ChipLogProgress(Zcl, "GetSetupPINResponse:");
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  setupPIN: %.*s", setupPIN.size(), setupPIN.data());
+    if (chip::CanCastTo<int>(setupPIN.size()))
+    {
+        ChipLogProgress(Zcl, "  setupPIN: %.*s", static_cast<int>(setupPIN.size()), setupPIN.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  setupPIN: %zu", setupPIN.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("AccountLoginClusterGetSetupPINResponseCallback");
 
@@ -1418,12 +1424,19 @@ bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::app::Command * 
     return true;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::app::Command * commandObj, uint8_t status, uint8_t * data)
+bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::app::Command * commandObj, uint8_t status,
+                                                                chip::ByteSpan data)
 {
     ChipLogProgress(Zcl, "LaunchAppResponse:");
     LogStatus(status);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  data: %.*s", data.size(), data.data());
+    if (chip::CanCastTo<int>(data.size()))
+    {
+        ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  data: %zu", data.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterLaunchAppResponseCallback");
 
@@ -1441,12 +1454,18 @@ bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::app::Comma
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::app::Command * commandObj, chip::ByteSpan data,
                                                                 uint8_t contentLaunchStatus)
 {
     ChipLogProgress(Zcl, "LaunchContentResponse:");
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  data: %.*s", data.size(), data.data());
+    if (chip::CanCastTo<int>(data.size()))
+    {
+        ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  data: %zu", data.size());
+    }
     ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchContentResponseCallback");
@@ -1457,12 +1476,18 @@ bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::app::Comma
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::app::Command * commandObj, chip::ByteSpan data,
                                                             uint8_t contentLaunchStatus)
 {
     ChipLogProgress(Zcl, "LaunchURLResponse:");
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  data: %.*s", data.size(), data.data());
+    if (chip::CanCastTo<int>(data.size()))
+    {
+        ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  data: %zu", data.size());
+    }
     ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchURLResponseCallback");
@@ -1649,7 +1674,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(chip::app::Command
 
 bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::app::Command * commandObj, uint16_t logEntryId, uint32_t timestamp,
                                                         uint8_t eventType, uint8_t source, uint8_t eventIdOrAlarmCode,
-                                                        uint16_t userId, uint8_t * pin)
+                                                        uint16_t userId, chip::ByteSpan pin)
 {
     ChipLogProgress(Zcl, "GetLogRecordResponse:");
     ChipLogProgress(Zcl, "  logEntryId: %" PRIu16 "", logEntryId);
@@ -1658,8 +1683,14 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::app::Command * com
     ChipLogProgress(Zcl, "  source: %" PRIu8 "", source);
     ChipLogProgress(Zcl, "  eventIdOrAlarmCode: %" PRIu8 "", eventIdOrAlarmCode);
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  pin: %.*s", pin.size(), pin.data());
+    if (chip::CanCastTo<int>(pin.size()))
+    {
+        ChipLogProgress(Zcl, "  pin: %.*s", static_cast<int>(pin.size()), pin.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  pin: %zu", pin.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetLogRecordResponseCallback");
 
@@ -1670,14 +1701,20 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::app::Command * com
 }
 
 bool emberAfDoorLockClusterGetPinResponseCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus,
-                                                  uint8_t userType, uint8_t * pin)
+                                                  uint8_t userType, chip::ByteSpan pin)
 {
     ChipLogProgress(Zcl, "GetPinResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  pin: %.*s", pin.size(), pin.data());
+    if (chip::CanCastTo<int>(pin.size()))
+    {
+        ChipLogProgress(Zcl, "  pin: %.*s", static_cast<int>(pin.size()), pin.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  pin: %zu", pin.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetPinResponseCallback");
 
@@ -1688,14 +1725,20 @@ bool emberAfDoorLockClusterGetPinResponseCallback(chip::app::Command * commandOb
 }
 
 bool emberAfDoorLockClusterGetRfidResponseCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus,
-                                                   uint8_t userType, uint8_t * rfid)
+                                                   uint8_t userType, chip::ByteSpan rfid)
 {
     ChipLogProgress(Zcl, "GetRfidResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  rfid: %.*s", rfid.size(), rfid.data());
+    if (chip::CanCastTo<int>(rfid.size()))
+    {
+        ChipLogProgress(Zcl, "  rfid: %.*s", static_cast<int>(rfid.size()), rfid.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  rfid: %zu", rfid.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetRfidResponseCallback");
 
@@ -1965,12 +2008,18 @@ bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(chip::app::Command 
 }
 
 bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                   uint8_t * debugText)
+                                                                   chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "ArmFailSafeResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterArmFailSafeResponseCallback");
 
@@ -1981,12 +2030,18 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::Co
 }
 
 bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                             uint8_t * debugText)
+                                                                             chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
 
@@ -1997,12 +2052,18 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chi
 }
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                           uint8_t * debugText)
+                                                                           chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "SetRegulatoryConfigResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetRegulatoryConfigResponseCallback");
 
@@ -2073,13 +2134,19 @@ bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::app::Command * comman
 }
 
 bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId,
-                                                   uint8_t * groupName)
+                                                   chip::ByteSpan groupName)
 {
     ChipLogProgress(Zcl, "ViewGroupResponse:");
     LogStatus(status);
     ChipLogProgress(Zcl, "  groupId: %" PRIu16 "", groupId);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  groupName: %.*s", groupName.size(), groupName.data());
+    if (chip::CanCastTo<int>(groupName.size()))
+    {
+        ChipLogProgress(Zcl, "  groupName: %.*s", static_cast<int>(groupName.size()), groupName.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  groupName: %zu", groupName.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GroupsClusterViewGroupResponseCallback");
 
@@ -2275,12 +2342,18 @@ bool emberAfMediaPlaybackClusterMediaStopResponseCallback(chip::app::Command * c
 }
 
 bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                        uint8_t * debugText)
+                                                                        chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "AddThreadNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddThreadNetworkResponseCallback");
 
@@ -2291,12 +2364,18 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::ap
 }
 
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                      uint8_t * debugText)
+                                                                      chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "AddWiFiNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddWiFiNetworkResponseCallback");
 
@@ -2307,12 +2386,18 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::app:
 }
 
 bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                      uint8_t * debugText)
+                                                                      chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "DisableNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterDisableNetworkResponseCallback");
 
@@ -2323,12 +2408,18 @@ bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::app:
 }
 
 bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                     uint8_t * debugText)
+                                                                     chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "EnableNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterEnableNetworkResponseCallback");
 
@@ -2339,12 +2430,18 @@ bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::app::
 }
 
 bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                     uint8_t * debugText)
+                                                                     chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "RemoveNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterRemoveNetworkResponseCallback");
 
@@ -2355,14 +2452,20 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::app::
 }
 
 bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-    chip::app::Command * commandObj, uint8_t errorCode, uint8_t * debugText,
+    chip::app::Command * commandObj, uint8_t errorCode, chip::ByteSpan debugText,
     /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
     /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
 {
     ChipLogProgress(Zcl, "ScanNetworksResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
     ChipLogProgress(Zcl, "  wifiScanResults: %p", wifiScanResults);
     ChipLogProgress(Zcl, "  threadScanResults: %p", threadScanResults);
 
@@ -2375,12 +2478,18 @@ bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
 }
 
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                           uint8_t * debugText)
+                                                                           chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "UpdateThreadNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateThreadNetworkResponseCallback");
 
@@ -2391,12 +2500,18 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip:
 }
 
 bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                         uint8_t * debugText)
+                                                                         chip::ByteSpan debugText)
 {
     ChipLogProgress(Zcl, "UpdateWiFiNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  debugText: %.*s", debugText.size(), debugText.data());
+    if (chip::CanCastTo<int>(debugText.size()))
+    {
+        ChipLogProgress(Zcl, "  debugText: %.*s", static_cast<int>(debugText.size()), debugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  debugText: %zu", debugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback");
 
@@ -2422,15 +2537,21 @@ bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(chi
 }
 
 bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
-                                                                     uint32_t delayedActionTime, uint8_t * imageURI,
+                                                                     uint32_t delayedActionTime, chip::ByteSpan imageURI,
                                                                      uint32_t softwareVersion, chip::ByteSpan updateToken,
                                                                      uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
 {
     ChipLogProgress(Zcl, "QueryImageResponse:");
     LogStatus(status);
     ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  imageURI: %.*s", imageURI.size(), imageURI.data());
+    if (chip::CanCastTo<int>(imageURI.size()))
+    {
+        ChipLogProgress(Zcl, "  imageURI: %.*s", static_cast<int>(imageURI.size()), imageURI.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  imageURI: %zu", imageURI.size());
+    }
     ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", softwareVersion);
     ChipLogProgress(Zcl, "  updateToken: %zu", updateToken.size());
     ChipLogProgress(Zcl, "  userConsentNeeded: %" PRIu8 "", userConsentNeeded);
@@ -2474,13 +2595,19 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Comman
 }
 
 bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::app::Command * commandObj, uint8_t StatusCode,
-                                                                uint64_t FabricIndex, uint8_t * DebugText)
+                                                                uint64_t FabricIndex, chip::ByteSpan DebugText)
 {
     ChipLogProgress(Zcl, "OpCertResponse:");
     ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", StatusCode);
     ChipLogProgress(Zcl, "  FabricIndex: %" PRIu64 "", FabricIndex);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  DebugText: %.*s", DebugText.size(), DebugText.data());
+    if (chip::CanCastTo<int>(DebugText.size()))
+    {
+        ChipLogProgress(Zcl, "  DebugText: %.*s", static_cast<int>(DebugText.size()), DebugText.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  DebugText: %zu", DebugText.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCertResponseCallback");
 
@@ -2625,7 +2752,7 @@ bool emberAfScenesClusterStoreSceneResponseCallback(chip::app::Command * command
 }
 
 bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId,
-                                                   uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+                                                   uint8_t sceneId, uint16_t transitionTime, chip::ByteSpan sceneName,
                                                    /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
 {
     ChipLogProgress(Zcl, "ViewSceneResponse:");
@@ -2633,8 +2760,14 @@ bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * commandO
     ChipLogProgress(Zcl, "  groupId: %" PRIu16 "", groupId);
     ChipLogProgress(Zcl, "  sceneId: %" PRIu8 "", sceneId);
     ChipLogProgress(Zcl, "  transitionTime: %" PRIu16 "", transitionTime);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  sceneName: %.*s", sceneName.size(), sceneName.data());
+    if (chip::CanCastTo<int>(sceneName.size()))
+    {
+        ChipLogProgress(Zcl, "  sceneName: %.*s", static_cast<int>(sceneName.size()), sceneName.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  sceneName: %zu", sceneName.size());
+    }
     ChipLogProgress(Zcl, "  extensionFieldSets: %p", extensionFieldSets);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ScenesClusterViewSceneResponseCallback");
@@ -2669,12 +2802,19 @@ bool emberAfTvChannelClusterChangeChannelResponseCallback(chip::app::Command * c
     return true;
 }
 
-bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::app::Command * commandObj, uint8_t status, uint8_t * data)
+bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::app::Command * commandObj, uint8_t status,
+                                                                 chip::ByteSpan data)
 {
     ChipLogProgress(Zcl, "NavigateTargetResponse:");
     LogStatus(status);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  data: %.*s", data.size(), data.data());
+    if (chip::CanCastTo<int>(data.size()))
+    {
+        ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  data: %zu", data.size());
+    }
 
     GET_CLUSTER_RESPONSE_CALLBACKS("TargetNavigatorClusterNavigateTargetResponseCallback");
 
