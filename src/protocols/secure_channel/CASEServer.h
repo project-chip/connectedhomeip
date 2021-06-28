@@ -56,6 +56,8 @@ public:
         return mPairingSession.GetMessageDispatch(reliableMessageManager, sessionMgr);
     }
 
+    CASESession & GetSession() { return mPairingSession; }
+
 private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
