@@ -55,14 +55,39 @@ void OnDefaultFailureResponse(void * /* context */, uint8_t status)
 }
 
 template <class AttributeType>
-void OnAttributeResponse(void * /* context */, AttributeType)
+void OnAttributeResponse(void * /* context */, AttributeType value)
 {
+    std::string strValue = std::to_string(value);
+    ChipLogProgress(Zcl, "  attributeValue: %s", strValue.c_str());
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <>
+void OnAttributeResponse<chip::ByteSpan>(void * /* context */, chip::ByteSpan value)
+{
+    std::string strValue = "";
+    for (size_t i = 0; i < value.size(); i++)
+    {
+        strValue += ' ';
+        strValue += std::to_string(value.data()[i]);
+    }
+    ChipLogProgress(Zcl, "  attributeValue: (span of length %zd) %s", value.size(), strValue.c_str());
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <>
+void OnAttributeResponse<bool>(void * /* context */, bool value)
+{
+    ChipLogProgress(Zcl, "  attributeValue: %s", value ? "true" : "false");
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
 
 static void OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context, uint16_t count, uint16_t * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -72,6 +97,7 @@ chip::Callback::Callback<ApplicationLauncherApplicationLauncherListListAttribute
     };
 static void OnAudioOutputAudioOutputListListAttributeResponse(void * context, uint16_t count, _AudioOutputInfo * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -80,6 +106,7 @@ chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> gAudio
 };
 static void OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -87,6 +114,7 @@ chip::Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>
     gContentLauncherAcceptsHeaderListListAttributeCallback{ OnContentLauncherAcceptsHeaderListListAttributeResponse, nullptr };
 static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -95,6 +123,7 @@ chip::Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCall
                                                                   nullptr };
 static void OnDescriptorDeviceListListAttributeResponse(void * context, uint16_t count, _DeviceType * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -103,6 +132,7 @@ chip::Callback::Callback<DescriptorDeviceListListAttributeCallback> gDescriptorD
 };
 static void OnDescriptorServerListListAttributeResponse(void * context, uint16_t count, chip::ClusterId * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -111,6 +141,7 @@ chip::Callback::Callback<DescriptorServerListListAttributeCallback> gDescriptorS
 };
 static void OnDescriptorClientListListAttributeResponse(void * context, uint16_t count, chip::ClusterId * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -119,6 +150,7 @@ chip::Callback::Callback<DescriptorClientListListAttributeCallback> gDescriptorC
 };
 static void OnDescriptorPartsListListAttributeResponse(void * context, uint16_t count, chip::EndpointId * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -127,6 +159,7 @@ chip::Callback::Callback<DescriptorPartsListListAttributeCallback> gDescriptorPa
 };
 static void OnFixedLabelLabelListListAttributeResponse(void * context, uint16_t count, _LabelStruct * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -136,6 +169,7 @@ chip::Callback::Callback<FixedLabelLabelListListAttributeCallback> gFixedLabelLa
 static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(void * context, uint16_t count,
                                                                        _NetworkInterfaceType * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -144,6 +178,7 @@ chip::Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallbac
                                                                nullptr };
 static void OnGroupKeyManagementGroupsListAttributeResponse(void * context, uint16_t count, _GroupState * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -152,6 +187,7 @@ chip::Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> gGroupKe
 };
 static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, uint16_t count, _GroupKey * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -160,6 +196,7 @@ chip::Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> gGrou
 };
 static void OnMediaInputMediaInputListListAttributeResponse(void * context, uint16_t count, _MediaInputInfo * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -168,6 +205,7 @@ chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback> gMediaIn
 };
 static void OnOperationalCredentialsFabricsListListAttributeResponse(void * context, uint16_t count, _FabricDescriptor * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -175,6 +213,7 @@ chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>
     gOperationalCredentialsFabricsListListAttributeCallback{ OnOperationalCredentialsFabricsListListAttributeResponse, nullptr };
 static void OnTvChannelTvChannelListListAttributeResponse(void * context, uint16_t count, _TvChannelInfo * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -184,6 +223,7 @@ chip::Callback::Callback<TvChannelTvChannelListListAttributeCallback> gTvChannel
 static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(void * context, uint16_t count,
                                                                       _NavigateTargetTargetInfo * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -191,6 +231,7 @@ chip::Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback
     gTargetNavigatorTargetNavigatorListListAttributeCallback{ OnTargetNavigatorTargetNavigatorListListAttributeResponse, nullptr };
 static void OnTestClusterListInt8uListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -199,6 +240,7 @@ chip::Callback::Callback<TestClusterListInt8uListAttributeCallback> gTestCluster
 };
 static void OnTestClusterListOctetStringListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -207,6 +249,7 @@ chip::Callback::Callback<TestClusterListOctetStringListAttributeCallback> gTestC
 };
 static void OnTestClusterListStructOctetStringListAttributeResponse(void * context, uint16_t count, _TestListStructOctet * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -215,6 +258,7 @@ chip::Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>
 static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(void * context, uint16_t count,
                                                                              _NeighborTable * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -224,6 +268,7 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeC
     };
 static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(void * context, uint16_t count, _RouteTable * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -232,6 +277,7 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCall
                                                                   nullptr };
 static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(void * context, uint16_t count, _SecurityPolicy * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -241,6 +287,7 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCall
 static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeResponse(void * context, uint16_t count,
                                                                                         _OperationalDatasetComponents * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -251,6 +298,7 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsLis
 static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse(void * context, uint16_t count,
                                                                                    uint8_t * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }

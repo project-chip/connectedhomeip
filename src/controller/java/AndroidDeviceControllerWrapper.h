@@ -57,11 +57,12 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
 
     // OperationalCredentialsDelegate implementation
-    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr, int64_t serialNumber,
-                                                  uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR
+    GenerateNodeOperationalCertificate(const chip::Optional<chip::NodeId> & nodeId, chip::FabricId fabricId,
+                                       const chip::ByteSpan & csr, const chip::ByteSpan & DAC,
+                                       chip::Callback::Callback<chip::Controller::NOCGenerated> * onNOCGenerated) override;
 
-    CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
-                                    uint32_t & outCertLen) override;
+    CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, chip::MutableByteSpan & outCert) override;
 
     // DeviceStatusDelegate implementation
     void OnMessage(chip::System::PacketBufferHandle && msg) override;
@@ -96,6 +97,8 @@ private:
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
+
+    chip::NodeId mNextAvailableNodeId = 1;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, pthread_mutex_t * stackLock) :
         mController(std::move(controller)), mStackLock(stackLock)
