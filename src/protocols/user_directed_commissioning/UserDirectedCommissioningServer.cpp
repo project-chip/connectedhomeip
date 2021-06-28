@@ -62,10 +62,9 @@ CHIP_ERROR UserDirectedCommissioningServer::OnMessageReceived(Messaging::Exchang
 {
     payload->DebugDump("UserDirectedCommissioningServer::OnMessageReceive");
 
-    char instanceName[USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME];
-    int instanceNameLength = (payload->DataLength() > (USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME - 1))
-        ? USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME - 1
-        : payload->DataLength();
+    char instanceName[chip::Mdns::kMaxInstanceNameSize + 1];
+    int instanceNameLength =
+        (payload->DataLength() > (chip::Mdns::kMaxInstanceNameSize)) ? chip::Mdns::kMaxInstanceNameSize : payload->DataLength();
     payload->Read((uint8_t *) instanceName, instanceNameLength);
 
     instanceName[instanceNameLength] = '\0';
@@ -93,7 +92,7 @@ CHIP_ERROR UserDirectedCommissioningServer::OnMessageReceived(Messaging::Exchang
         // Call the registered InstanceNameResolver, if any.
         if (mInstanceNameResolver != nullptr)
         {
-            mInstanceNameResolver->FindCommissionableNode(ec, instanceName);
+            mInstanceNameResolver->FindCommissionableNode(instanceName);
         }
         else
         {

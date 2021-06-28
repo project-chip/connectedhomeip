@@ -39,14 +39,16 @@ struct ResolvedNodeData
 constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
 constexpr size_t kMaxPairingInstructionLen = 128;
+
+// Largest host name is 64-bits in hex.
+static constexpr int kMaxHostNameSize     = 16;
+static constexpr int kMaxInstanceNameSize = 16;
 struct DiscoveredNodeData
 {
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
-    // Largest host name is 64-bits in hex.
-    static constexpr int kHostNameSize = 16;
-    char hostName[kHostNameSize + 1];
-    char instanceName[kHostNameSize + 1];
+    char hostName[kMaxHostNameSize + 1];
+    char instanceName[kMaxInstanceNameSize + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
@@ -101,9 +103,6 @@ enum class DiscoveryFilterType : uint8_t
 };
 struct DiscoveryFilter
 {
-    // Largest host name is 64-bits in hex.
-    static constexpr int kHostNameSize = 16;
-
     DiscoveryFilterType type;
     uint16_t code;
     char * instanceName;

@@ -495,13 +495,6 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     /**
      * @brief
-     *   Discover devices advertising as commissionable that match the long discriminator.
-     * @return CHIP_ERROR   The return status
-     */
-    CHIP_ERROR DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator);
-
-    /**
-     * @brief
      *   Discover all devices advertising as commissionable.
      *   Should be called on main loop thread.
      * * @param[in] filter  Browse filter - controller will look for only the specified subtype.
@@ -536,7 +529,7 @@ public:
      * @param instanceName DNS-SD instance name for the client requesting commissioning
      *
      */
-    void FindCommissionableNode(Messaging::ExchangeContext * ec, char * instanceName) override;
+    void FindCommissionableNode(char * instanceName) override;
 
     /**
      * @brief

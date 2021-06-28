@@ -288,7 +288,7 @@ public:
     static ServiceAdvertiser & Instance();
 
     /// Returns DNS-SD instance name formatted as hex string
-    virtual CHIP_ERROR GetCommissionableInstanceName(char * serviceName, size_t maxLength) = 0;
+    virtual CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) = 0;
 };
 
 } // namespace Mdns

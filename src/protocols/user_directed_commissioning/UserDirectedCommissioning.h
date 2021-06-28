@@ -60,7 +60,7 @@ public:
      * @param instanceName DNS-SD instance name for the client requesting commissioning
      *
      */
-    virtual void FindCommissionableNode(Messaging::ExchangeContext * ec, char * instanceName) {}
+    virtual void FindCommissionableNode(char * instanceName) {}
 
     virtual ~InstanceNameResolver() {}
 };

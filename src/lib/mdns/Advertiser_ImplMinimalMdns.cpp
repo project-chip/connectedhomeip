@@ -113,7 +113,7 @@ public:
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
     CHIP_ERROR StopPublishDevice() override;
-    CHIP_ERROR GetCommissionableInstanceName(char * serviceName, size_t maxLength) override;
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
     // MdnsPacketDelegate
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -270,13 +270,13 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * serviceName, size_t maxLength)
+CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
     if (maxLength < 17)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    size_t len = snprintf(serviceName, maxLength, ChipLogFormatX64, mCommissionInstanceName1, mCommissionInstanceName2);
+    size_t len = snprintf(instanceName, maxLength, ChipLogFormatX64, mCommissionInstanceName1, mCommissionInstanceName2);
     if (len >= maxLength)
     {
         return CHIP_ERROR_NO_MEMORY;

@@ -84,7 +84,7 @@ void TestExtractIdFromInstanceName(nlTestSuite * inSuite, void * inContext)
 void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
 {
     // TODO(cecille): These need to be changed to remove leading zeros
-    constexpr size_t kSize = 16;
+    constexpr size_t kSize = 17;
     char buffer[kSize];
     DiscoveryFilter filter;
 
@@ -151,6 +151,12 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     filter.type = DiscoveryFilterType::kNone;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "") == 0);
+
+    // Test buffer exactly the right size for subtype - "1234567890123456._chipc" = 23 + nullptr = 24
+    filter.type         = DiscoveryFilterType::kInstanceName;
+    filter.instanceName = (char *) "1234567890123456";
+    NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "1234567890123456") == 0);
 }
 
 void TestMakeCommissionableNodeServiceTypeName(nlTestSuite * inSuite, void * inContext)

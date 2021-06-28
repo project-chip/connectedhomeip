@@ -420,6 +420,21 @@ secure_channel::MessageCounterManager gMessageCounterManager;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
+constexpr chip::Transport::AdminId gAdminId = 0;
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
+ChipDeviceCommissioner mCommissioner;
+bool mCommissionerInited = false;
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 } // namespace
 
 CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
@@ -583,9 +598,9 @@ exit:
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
-constexpr chip::Transport::AdminId gAdminId = 0;
+// NOTE: UDC client is located in Server.cpp because it really only makes sense
+// to send UDC from a Matter device because its payload needs to include the device's
+// randomly generated service name.
 
 CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port)
 {
@@ -599,14 +614,15 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
     peerAddr = chip::Optional<chip::Transport::PeerAddress>::Value(
         chip::Transport::PeerAddress::UDP(commissioner, port, INET_NULL_INTERFACEID));
 
+    // TODO: remove this
     err = gSessions.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
                                chip::SecureSession::SessionRole::kInitiator, gAdminId);
 
-    char nameBuffer[USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME];
-    err = app::Mdns::GetInstanceName(nameBuffer, sizeof(nameBuffer));
+    char nameBuffer[chip::Mdns::kMaxInstanceNameSize + 1];
+    err = app::Mdns::GetCommissionInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to create mdns hostname: %s", ErrorStr(err));
+        ChipLogError(AppServer, "Failed to get mdns instance name error: %s", ErrorStr(err));
         return err;
     }
     ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
@@ -615,6 +631,7 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
 
     SuccessOrExit(err);
 
+    // send UDC message 5 times per spec (no ACK on this message)
     for (unsigned int i = 0; i < 5; i++)
     {
         chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
@@ -693,9 +710,6 @@ AdminPairingTable & GetGlobalAdminPairingTable()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
-ChipDeviceCommissioner mCommissioner;
-bool mCommissionerInited = false;
 
 CHIP_ERROR InitCommissioner()
 {

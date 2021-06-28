@@ -103,31 +103,13 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
     }
 }
 
-CHIP_ERROR DiscoveryImplPlatform::SetupHostname(chip::ByteSpan macOrEui64)
+CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    char nameBuffer[17];
-    CHIP_ERROR error = MakeHostName(nameBuffer, sizeof(nameBuffer), macOrEui64);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to create mdns hostname: %s", ErrorStr(error));
-        return error;
-    }
-    error = ChipMdnsSetHostname(nameBuffer);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
-        return error;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * serviceName, size_t maxLength)
-{
-    if (max_length < 17)
+    if (max_length < (chip::Mdns::kMaxInstanceNameSize + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    size_t len = snprintf(serviceName, maxLength, "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
+    size_t len = snprintf(instanceName, maxLength, "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
                           static_cast<uint32_t>(mCommissionInstanceName));
     if (len >= maxLength)
     {

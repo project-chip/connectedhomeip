@@ -43,7 +43,8 @@ namespace {
 
 // The EchoServer object.
 chip::Protocols::Echo::EchoServer gEchoServer;
-chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer gUDCServer;
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer gUDCServer =
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance();
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
@@ -57,10 +58,10 @@ void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::Syst
 class DLL_EXPORT UDCListener : public chip::Protocols::UserDirectedCommissioning::InstanceNameResolver
 {
 public:
-    void FindCommissionableNode(chip::Messaging::ExchangeContext * ec, char * instanceName) override;
+    void FindCommissionableNode(char * instanceName) override;
 };
 
-void UDCListener::FindCommissionableNode(chip::Messaging::ExchangeContext * ec, char * instanceName)
+void UDCListener::FindCommissionableNode(char * instanceName)
 {
     printf("FindCommissionableNode instanceName=%s\n", instanceName);
 }

@@ -151,7 +151,7 @@ public:
             }
 
             // TODO: check length of instanceName
-            if (strncmp(iter->GetInstanceName(), instanceName, USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME) == 0)
+            if (strncmp(iter->GetInstanceName(), instanceName, chip::Mdns::kMaxInstanceNameSize + 1) == 0)
             {
                 state = iter;
                 break;

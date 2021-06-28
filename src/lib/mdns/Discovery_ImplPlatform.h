@@ -49,7 +49,7 @@ public:
     CHIP_ERROR StopPublishDevice() override;
 
     /// Returns DNS-SD instance name formatted as hex string
-    CHIP_ERROR GetCommissionableInstanceName(char * serviceName, size_t maxLength) override;
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
     /// Registers a resolver delegate if none has been registered before
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;

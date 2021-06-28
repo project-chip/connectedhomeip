@@ -1456,7 +1456,7 @@ const Mdns::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx
     return GetDiscoveredNode(idx);
 }
 
-void DeviceCommissioner::FindCommissionableNode(Messaging::ExchangeContext * ec, char * instanceName)
+void DeviceCommissioner::FindCommissionableNode(char * instanceName)
 {
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kInstanceName, instanceName);
     DiscoverCommissionableNodes(filter);
@@ -1660,7 +1660,6 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         GeneralCommissioningCluster genCom;
         // TODO: should get the endpoint information from the descriptor cluster.
         genCom.Associate(device, 0);
-        // genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
 #if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
         uint16_t commissioningExpirySeconds = 5;
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);

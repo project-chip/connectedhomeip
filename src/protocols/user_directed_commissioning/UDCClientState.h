@@ -21,14 +21,13 @@
 
 #pragma once
 
+#include <mdns/Resolver.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
-
-#define USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME 17
 
 /**
  * Here we specified Type to be uint8_t, so the state can be serialized easily.
@@ -97,7 +96,7 @@ public:
 
 private:
     PeerAddress mPeerAddress;
-    char mInstanceName[USER_DIRECTED_COMMISSIONING_MAX_INSTANCE_NAME];
+    char mInstanceName[chip::Mdns::kMaxInstanceNameSize + 1];
     UDCClientProcessingState mUDCClientProcessingState;
     uint64_t mExpirationTimeMs = 0;
 };
