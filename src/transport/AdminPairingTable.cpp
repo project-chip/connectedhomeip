@@ -21,6 +21,7 @@
 
 #include <core/CHIPEncoding.h>
 #include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 #include <support/SafeInt.h>
 #include <transport/AdminPairingTable.h>
 
@@ -30,13 +31,9 @@ using namespace Crypto;
 
 namespace Transport {
 
-CHIP_ERROR AdminPairingInfo::SetFabricLabel(const uint8_t * fabricLabel)
+CHIP_ERROR AdminPairingInfo::SetFabricLabel(chip::ByteSpan fabricLabel)
 {
-    const char * charFabricLabel = Uint8::to_const_char(fabricLabel);
-    size_t stringLength          = strnlen(charFabricLabel, kFabricLabelMaxLengthInBytes);
-    memcpy(mFabricLabel, charFabricLabel, stringLength);
-    mFabricLabel[stringLength] = '\0'; // Set null terminator
-
+    Platform::CopyString(mFabricLabel, sizeof(mFabricLabel), fabricLabel);
     return CHIP_NO_ERROR;
 }
 

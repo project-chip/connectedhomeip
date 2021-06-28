@@ -429,7 +429,7 @@ public:
 
     ~CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge() {};
 
-    static void CallbackFn(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
+    static void CallbackFn(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
     {
         CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge * callback = reinterpret_cast<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge *>(context);
         if (callback && callback->mQueue)
@@ -439,12 +439,12 @@ public:
                   {{#zcl_command_arguments}}
                   {{#unless (isStrEqual label "status")}}
                   {{#if isArray}}
-                  // {{asSymbol label}}: {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}}
+                  // {{asSymbol label}}: {{asUnderlyingZclType type}}
                   // Conversion from this type to Objc is not properly implemented yet
                   {{else if (isOctetString type)}}
                   @"{{asSymbol label}}": [NSData dataWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size()],
                   {{else if (isCharString type)}}
-                  @"{{asSymbol label}}": [NSString stringWithFormat:@"%s", {{asSymbol label}}],
+                  @"{{asSymbol label}}": [[NSString alloc] initWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size() encoding:NSUTF8StringEncoding],
                   {{else}}
                   @"{{asSymbol label}}": [NSNumber numberWith{{asObjectiveCNumberType label type false}}:{{asSymbol label}}],
                   {{/if}}
@@ -494,7 +494,7 @@ public:
                     {{#if (isOctetString type)}}
                     [NSData dataWithBytes:entries[i].{{name}}.data() length:entries[i].{{name}}.size()],
                     {{else}}
-                    [[NSString alloc] initWithBytes:entries[i].{{name}}+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i].{{name}}) encoding:NSUTF8StringEncoding],
+                    [[NSString alloc] initWithBytes:entries[i].{{name}}.data() length:entries[i].{{name}}.size() encoding:NSUTF8StringEncoding],
                     {{/if}}
                     {{else}}
                     [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i].{{name}}],
@@ -507,7 +507,7 @@ public:
                 {{#if (isOctetString type)}}
                 values[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
                 {{else}}
-                values[i] = [[NSString alloc] initWithBytes:entries[i]+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i]) encoding:NSUTF8StringEncoding];
+                values[i] = [[NSString alloc] initWithBytes:entries[i].data() length:entries[i].size() encoding:NSUTF8StringEncoding];
                 {{/if}}
                 {{else}}
                 values[i] = [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i]];
@@ -633,7 +633,7 @@ private:
 {{#if isList}}
     CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge(responseHandler, [self callbackQueue]);
 {{else}}
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(responseHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
+    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(responseHandler, [self callbackQueue]{{#if (isString type)}},true{{/if}});
 {{/if}}
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
@@ -726,7 +726,7 @@ private:
 
 - (void) reportAttribute{{asCamelCased name false}}WithResponseHandler:(ResponseHandler)reportHandler
 {
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onReport = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(reportHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true);
+    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onReport = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(reportHandler, [self callbackQueue]{{#if (isString type)}}, true{{/if}}, true);
     if (!onReport) {
         reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;

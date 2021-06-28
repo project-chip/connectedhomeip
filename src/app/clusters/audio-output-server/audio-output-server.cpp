@@ -41,7 +41,7 @@
 #include <app/Command.h>
 #include <app/util/af.h>
 
-bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * commandObj, unsigned char, unsigned char *)
+bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * commandObj, unsigned char, chip::ByteSpan)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);

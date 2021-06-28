@@ -797,7 +797,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
 {{#if (isStrEqual clusterName parent.name)}}
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
 {{#if (isStrEndsWith name "Response")}}
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::Command * commandObj{{#zcl_command_arguments}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/zcl_command_arguments}})
+bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::Command * commandObj{{#zcl_command_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/zcl_command_arguments}})
 {
     ChipLogProgress(Zcl, "{{asCamelCased name false}}:");
     {{#zcl_command_arguments}}
@@ -806,8 +806,14 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
     {{else if (isOctetString type)}}
     ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", {{asSymbol label}}.size());
     {{else if (isCharString type)}}
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", {{asSymbol label}}.size(), {{asSymbol label}}.data());
+    if (chip::CanCastTo<int>({{asSymbol label}}.size()))
+    {
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>({{asSymbol label}}.size()), {{asSymbol label}}.data());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", {{asSymbol label}}.size());
+    }
     {{else}}
     ChipLogProgress(Zcl, "  {{asSymbol label}}: {{asPrintFormat type}}", {{asSymbol label}});
     {{/if}}

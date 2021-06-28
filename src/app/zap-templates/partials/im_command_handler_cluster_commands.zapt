@@ -1,13 +1,7 @@
 {{#if (zcl_command_arguments_count this.id)}}
 expectArgumentCount = {{ zcl_command_arguments_count this.id }};
 {{#zcl_command_arguments}}
-{{#if (isOctetString type)}}
-chip::ByteSpan {{asSymbol label}};
-{{else if (isString type)}}
-const uint8_t * {{asSymbol label}};
-{{else}}
 {{asUnderlyingZclType type}} {{asSymbol label}};
-{{/if}}
 {{/zcl_command_arguments}}
 bool argExists[{{zcl_command_arguments_count this.id}}];
 
@@ -40,15 +34,12 @@ while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
   {
 {{#zcl_command_arguments}}
     case {{index}}:
-{{#if (isOctetString type)}}
+{{#if (isString type)}}
     {
-        const uint8_t * data = nullptr;
-        TLVUnpackError = aDataTlv.GetDataPtr(data);
-        {{asSymbol label}} = chip::ByteSpan(data, aDataTlv.GetLength());
+        const uint8_t * {{asSymbol label}}Ptr = nullptr;
+        TLVUnpackError = aDataTlv.GetDataPtr({{asSymbol label}}Ptr);
+        {{asSymbol label}} = chip::ByteSpan({{asSymbol label}}Ptr, aDataTlv.GetLength());
     }
-{{else if (isString type)}}
-      // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-      TLVUnpackError = aDataTlv.GetDataPtr({{asSymbol label}});
 {{else if isArray}}
       // Just for compatibility, we will add array type support in IM later.
       TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>({{asSymbol label}}));
@@ -80,7 +71,7 @@ if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && {{zcl_comman
 {
 {{/if}}
 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(apCommandObj{{#zcl_command_arguments}}, {{#if (isCharString type)}}const_cast<uint8_t*>({{asSymbol label}}){{else}}{{asSymbol label}}{{/if}}{{/zcl_command_arguments}});
+wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(apCommandObj{{#zcl_command_arguments}}, {{asSymbol label}}{{/zcl_command_arguments}});
 {{#if (zcl_command_arguments_count this.id)}}
 }
 {{/if}}
