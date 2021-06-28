@@ -315,7 +315,7 @@ void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System
 
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
     {
         SecureMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
