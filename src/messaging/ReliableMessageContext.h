@@ -57,7 +57,16 @@ public:
      */
     CHIP_ERROR FlushAcks();
 
-    uint32_t GetPendingPeerAckId() { return mPendingPeerAckId; }
+    /**
+     * Take the pending peer ack id from the context.  This must only be called
+     * when IsAckPending() is true.  After this call, IsAckPending() will be
+     * false; it's the caller's responsibility to send the ack.
+     */
+    uint32_t TakePendingPeerAckId()
+    {
+        SetAckPending(false);
+        return mPendingPeerAckId;
+    }
 
     /**
      *  Get the initial retransmission interval. It would be the time to wait before
@@ -132,33 +141,6 @@ public:
     bool IsAckPending() const;
 
     /**
-     *  Set if an acknowledgment needs to be sent back to the peer on this exchange.
-     *
-     *  @param[in]  inAckPending A Boolean indicating whether (true) or not
-     *                          (false) an acknowledgment should be sent back
-     *                          in response to a received message.
-     */
-    void SetAckPending(bool inAckPending);
-
-    /**
-     *  Determine whether peer requested acknowledgment for at least one message
-     *  on this exchange.
-     *
-     *  @return Returns 'true' if acknowledgment requested, else 'false'.
-     */
-    bool HasPeerRequestedAck() const;
-
-    /**
-     *  Set if an acknowledgment was requested in the last message received
-     *  on this exchange.
-     *
-     *  @param[in]  inPeerRequestedAck A Boolean indicating whether (true) or not
-     *                                 (false) an acknowledgment was requested
-     *                                 in the last received message.
-     */
-    void SetPeerRequestedAck(bool inPeerRequestedAck);
-
-    /**
      *  Determine whether at least one message has been received
      *  on this exchange from peer.
      *
@@ -218,13 +200,8 @@ protected:
         /// When set, signifies that there is an acknowledgment pending to be sent back.
         kFlagAckPending = 0x0020,
 
-        /// When set, signifies that at least one message received on this exchange requested an acknowledgment.
-        /// This flag is read by the application to decide if it needs to request an acknowledgment for the
-        /// response message it is about to send. This flag can also indicate whether peer is using ReliableMessageProtocol.
-        kFlagPeerRequestedAck = 0x0040,
-
         /// When set, signifies that at least one message has been received from peer on this exchange context.
-        kFlagMsgRcvdFromPeer = 0x0080,
+        kFlagMsgRcvdFromPeer = 0x0040,
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
@@ -235,6 +212,19 @@ private:
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
     CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
     ExchangeContext * GetExchangeContext();
+
+    /**
+     *  Set if an acknowledgment needs to be sent back to the peer on this exchange.
+     *
+     *  @param[in]  inAckPending A Boolean indicating whether (true) or not
+     *                          (false) an acknowledgment should be sent back
+     *                          in response to a received message.
+     */
+    void SetAckPending(bool inAckPending);
+
+    // Set our pending peer ack id and any other state needed to ensure that we
+    // will send that ack at some point.
+    void SetPendingPeerAckId(uint32_t aPeerAckId);
 
 private:
     friend class ReliableMessageMgr;

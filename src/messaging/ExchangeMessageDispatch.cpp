@@ -50,18 +50,14 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
     payloadHeader.SetExchangeID(exchangeId).SetMessageType(protocol, type).SetInitiator(isInitiator);
 
     // If there is a pending acknowledgment piggyback it on this message.
-    if (reliableMessageContext->HasPeerRequestedAck())
+    if (reliableMessageContext->IsAckPending())
     {
-        payloadHeader.SetAckId(reliableMessageContext->GetPendingPeerAckId());
-
-        // Set AckPending flag to false since current outgoing message is going to serve as the ack on this exchange.
-        reliableMessageContext->SetAckPending(false);
+        payloadHeader.SetAckId(reliableMessageContext->TakePendingPeerAckId());
 
 #if !defined(NDEBUG)
         if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
         {
-            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
-                          reliableMessageContext->GetPendingPeerAckId());
+            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", payloadHeader.GetAckId().Value());
         }
 #endif
     }
@@ -115,11 +111,6 @@ CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(const PayloadHeader & payl
         if (payloadHeader.NeedsAck())
         {
             // An acknowledgment needs to be sent back to the peer for this message on this exchange,
-            // Set the flag in message header indicating an ack requested by peer;
-            msgFlags.Set(MessageFlagValues::kPeerRequestedAck);
-
-            // Also set the flag in the exchange context indicating an ack requested;
-            reliableMessageContext->SetPeerRequestedAck(true);
 
             ReturnErrorOnFailure(reliableMessageContext->HandleNeedsAck(messageId, msgFlags));
         }

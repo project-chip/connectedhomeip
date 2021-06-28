@@ -95,9 +95,17 @@ public:
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
+        if (payloadHeader.IsAckMsg())
+        {
+            mReceivedPiggybackAck = true;
+        }
         if (mDropAckResponse)
         {
-            ec->GetReliableMessageContext()->SetAckPending(false);
+            auto * rc = ec->GetReliableMessageContext();
+            if (rc->IsAckPending())
+            {
+                (void) rc->TakePendingPeerAckId();
+            }
         }
 
         if (mExchange != ec)
@@ -132,6 +140,7 @@ public:
     }
 
     bool IsOnMessageReceivedCalled = false;
+    bool mReceivedPiggybackAck     = false;
     bool mDropAckResponse          = false;
     bool mRetainExchange           = false;
     ExchangeContext * mExchange    = nullptr;
@@ -738,6 +747,229 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     mockReceiver.CloseExchangeIfNeeded();
 }
 
+void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver;
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    mockReceiver.mTestSuite = inSuite;
+
+    MockAppDelegate mockSender;
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    mockSender.mTestSuite = inSuite;
+
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    // We send a message, have it get received by the peer, then an ack is
+    // returned, then a reply is returned.  We need to keep both exchanges alive
+    // for that (so we can send the response from the receiver and so the
+    // initial sender exchange can get it).
+    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 0;
+    gLoopback.mDroppedMessageCount = 0;
+    mockReceiver.mRetainExchange   = true;
+    mockSender.mRetainExchange     = true;
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // And that it was received.
+    NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
+
+    // And that we have not seen an ack yet.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    ReliableMessageContext * receiverRc = mockReceiver.mExchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, receiverRc->IsAckPending());
+
+    // Send the standalone ack.
+    receiverRc->SendStandaloneAckMessage();
+
+    // Ensure the ack was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // Ensure that we have not gotten any app-level responses so far.
+    NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
+
+    // And that we have now gotten our ack.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    // Now send a message from the other side.
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    // Make sure we don't leave retransmits sitting around.
+    receiverRc->GetReliableMessageMgr()->ClearRetransTable(receiverRc);
+    mockReceiver.mExchange->Close();
+
+    // Ensure the response was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // Ensure that we have received that response.
+    NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
+
+    // Make sure we don't leave retransmits sitting around.
+    rm->ClearRetransTable(exchange->GetReliableMessageContext());
+    exchange->Close();
+
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+}
+
+void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver;
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    mockReceiver.mTestSuite = inSuite;
+
+    MockAppDelegate mockSender;
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    mockSender.mTestSuite = inSuite;
+
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    // We send a message, have it get received by the peer, have the peer return
+    // a piggybacked ack.  Then we send a second message this time _not_
+    // requesting an ack, get a response, and see whether an ack was
+    // piggybacked.  We need to keep both exchanges alive for that (so we can
+    // send the response from the receiver and so the initial sender exchange
+    // can get it).
+    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 0;
+    gLoopback.mDroppedMessageCount = 0;
+    mockReceiver.mRetainExchange   = true;
+    mockSender.mRetainExchange     = true;
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // And that it was received.
+    NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
+
+    // And that we have not seen an ack yet.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    ReliableMessageContext * receiverRc = mockReceiver.mExchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, receiverRc->IsAckPending());
+
+    // Ensure that we have not gotten any app-level responses or acks so far.
+    NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, !mockSender.mReceivedPiggybackAck);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    // Now send a message from the other side.
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer),
+                                        SendFlags(SendMessageFlags::kExpectResponse).Set(SendMessageFlags::kNoAutoRequestAck));
+
+    // Ensure the response was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // Ensure that we have received that response and it had a piggyback ack.
+    NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, mockSender.mReceivedPiggybackAck);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    // Reset various state so we can measure things again.
+    mockReceiver.IsOnMessageReceivedCalled = false;
+    mockSender.IsOnMessageReceivedCalled   = false;
+    mockSender.mReceivedPiggybackAck       = false;
+
+    // Now send a new message to the other side, but don't ask for an ack.
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer),
+                                SendFlags(SendMessageFlags::kExpectResponse).Set(SendMessageFlags::kNoAutoRequestAck));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // And that it was received.
+    NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
+
+    // And that we are not expecting an ack.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    // Send the final response.
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    // Make sure we don't leave retransmits sitting around.
+    receiverRc->GetReliableMessageMgr()->ClearRetransTable(receiverRc);
+    mockReceiver.mExchange->Close();
+
+    // Ensure the response was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 4);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // Ensure that we have received that response and it did not have a piggyback
+    // ack.
+    NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, !mockSender.mReceivedPiggybackAck);
+
+    // Make sure we don't leave retransmits sitting around.
+    rm->ClearRetransTable(exchange->GetReliableMessageContext());
+    exchange->Close();
+
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+}
+
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -775,6 +1007,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendSessionEstablishmentMessageWithPeerExchange", CheckResendSessionEstablishmentMessageWithPeerExchange),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessage", CheckDuplicateMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessageClosedExchange", CheckDuplicateMessageClosedExchange),
+    NL_TEST_DEF("Test that a reply after a standalone ack comes through correctly", CheckReceiveAfterStandaloneAck),
+    NL_TEST_DEF("Test that a reply to a non-MRP message does not piggyback an ack even if there were MRP things happening on the context before", CheckNoPiggybackAfterPiggyback),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
 
     NL_TEST_SENTINEL()
