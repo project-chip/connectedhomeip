@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y lavacli wget
+          apt-get install -y lavacli wget jq
           wget https://github.com/mikefarah/yq/releases/download/v4.9.3/yq_linux_amd64 -O /usr/bin/yq 
           chmod +x /usr/bin/yq
       - name: Binary artifact suffix
