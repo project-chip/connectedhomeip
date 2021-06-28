@@ -153,9 +153,9 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     err                            = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
-                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/,
-                                     eventNumber /*aEventNumber*/);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /* apSecureSession */, nullptr /*apEventPathParamsList*/,
+                                     0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
+                                     0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 
     GenerateReportData(apSuite, apContext, buf);
@@ -271,9 +271,9 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     err                            = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
-                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/,
-                                     eventNumber /*aEventNumber*/);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /* apSecureSession */, nullptr /*apEventPathParamsList*/,
+                                     0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
+                                     0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);

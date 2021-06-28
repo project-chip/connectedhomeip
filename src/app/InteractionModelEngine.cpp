@@ -320,16 +320,16 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 }
 
 CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId,
-                                                   EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                                                   AttributePathParams * apAttributePathParamsList,
+                                                   SecureSessionHandle * apSecureSession, EventPathParams * apEventPathParamsList,
+                                                   size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
                                                    size_t aAttributePathParamsListSize, EventNumber aEventNumber,
                                                    intptr_t aAppIdentifier)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, aAppIdentifier));
-    err = client->SendReadRequest(aNodeId, aAdminId, apEventPathParamsList, aEventPathParamsListSize, apAttributePathParamsList,
-                                  aAttributePathParamsListSize, aEventNumber);
+    err = client->SendReadRequest(aNodeId, aAdminId, apSecureSession, apEventPathParamsList, aEventPathParamsListSize,
+                                  apAttributePathParamsList, aAttributePathParamsListSize, aEventNumber);
     if (err != CHIP_NO_ERROR)
     {
         client->Shutdown();

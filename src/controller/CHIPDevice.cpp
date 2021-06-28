@@ -671,7 +671,8 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
     // use the seqNum.
     CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
-        GetDeviceId(), 0, nullptr /*event path params list*/, 0, &aPath, 1, 0 /* event number */, seqNum /* application context */);
+        GetDeviceId(), 0, &mSecureSession, nullptr /*event path params list*/, 0, &aPath, 1, 0 /* event number */,
+        seqNum /* application context */);
     if (err != CHIP_NO_ERROR)
     {
         CancelResponseHandler(seqNum);

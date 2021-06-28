@@ -80,9 +80,10 @@ void ReadClient::MoveToState(const ClientState aTargetState)
                   GetStateStr());
 }
 
-CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
-                                       size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
-                                       size_t aAttributePathParamsListSize, EventNumber aEventNumber)
+CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession,
+                                       EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
+                                       AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
+                                       EventNumber aEventNumber)
 {
     // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -146,7 +147,14 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
         SuccessOrExit(err);
     }
 
-    mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
+    if (apSecureSession != nullptr)
+    {
+        mpExchangeCtx = mpExchangeMgr->NewContext(*apSecureSession, this);
+    }
+    else
+    {
+        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
+    }
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 

@@ -69,9 +69,10 @@ public:
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
-                               size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
-                               size_t aAttributePathParamsListSize, EventNumber aEventNumber);
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * aSecureSession,
+                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
+                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
+                               EventNumber aEventNumber);
 
     intptr_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }

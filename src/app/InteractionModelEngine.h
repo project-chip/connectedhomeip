@@ -122,9 +122,10 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
-                               size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
-                               size_t aAttributePathParamsListSize, EventNumber aEventNumber, intptr_t aAppIdentifier = 0);
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession,
+                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
+                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
+                               EventNumber aEventNumber, intptr_t aAppIdentifier = 0);
 
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send do a write.  If the call succeeds, the consumer
