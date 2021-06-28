@@ -45,7 +45,7 @@ for sdkconfig in "$root"/sdkconfig*.defaults; do
     rm -f "$root"/sdkconfig
     (
         cd "$root"
-        idf.py set-target $idf_target
+        idf.py set-target "$idf_target"
         idf.py -D SDKCONFIG_DEFAULTS="$sdkconfig_name" build
     ) || {
         echo "build $sdkconfig_name failed"
