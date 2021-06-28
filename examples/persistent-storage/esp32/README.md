@@ -10,6 +10,7 @@ An example testing and demonstrating the key value storage API.
         -   [Building](#building)
         -   [Flashing the Application](#flashing-the-application)
         -   [Viewing Logging Output](#viewing-logging-output)
+        -   [Flashing app using script](#flashing-app-using-script)
 
 <hr>
 
@@ -105,6 +106,18 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     before the device shows up on `/dev/tty`.
 
 <a name="view-logging"></a>
+
+### Flashing app using script
+
+-   Follow these steps to use `${app_name}.flash.py`.
+
+```
+        $ export ESPPORT=/dev/tty.SLAB_USBtoUART
+        $ export ESPBAUD=${baud_value}
+        $ idf.py build
+        $ idf.py flashing_script
+        $ python ${app_name}.flash.py
+```
 
 ### Viewing Logging Output
 

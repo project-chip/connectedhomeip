@@ -101,6 +101,18 @@ To download and install packages.
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
     before the device shows up on `/dev/tty`.
 
+### Flashing app using script
+
+-   Follow these steps to use `${app_name}.flash.py`.
+
+```
+        $ export ESPPORT=/dev/tty.SLAB_USBtoUART
+        $ export ESPBAUD=${baud_value}
+        $ idf.py build
+        $ idf.py flashing_script
+        $ python ${app_name}.flash.py
+```
+
 ## Testing the Example Application
 
 Run the following command to start an interactive Python shell, where the Echo

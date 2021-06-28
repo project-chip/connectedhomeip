@@ -10,6 +10,7 @@ This example is meant to represent a minimal-sized application.
         -   [Setting up Python Controller](#setting-up-python-controller)
         -   [Commissioning over BLE](#commissioning-over-ble)
         -   [Cluster control](#cluster-control)
+    -   [Flashing app using script](#flashing-app-using-script)
     -   [Optimization](#optimization)
 
 ---
@@ -184,6 +185,18 @@ commissioning and cluster control.
 -   The demo application supports TemperatureMeasurement and Basic cluster.
 
     `chip-device-ctrl > zcl Basic MfgSpecificPing 135246 1 0`
+
+### Flashing app using script
+
+-   Follow these steps to use `${app_name}.flash.py`.
+
+```
+        $ export ESPPORT=/dev/tty.SLAB_USBtoUART
+        $ export ESPBAUD=${baud_value}
+        $ idf.py build
+        $ idf.py flashing_script
+        $ python ${app_name}.flash.py
+```
 
 ## Optimization
 
