@@ -1,4 +1,4 @@
-# Using CLI in nRF Connect SDK examples
+# Using CLI in nRF Connect examples
 
 The following examples for the development kits from Nordic Semiconductor
 include a command-line interface that allows access to application logs and
@@ -88,7 +88,7 @@ Done
 
 ## Using CHIP-specific commands
 
-The nRF Connect SDK examples let you use several CHIP-specific CLI commands.
+The nRF Connect examples let you use several CHIP-specific CLI commands.
 
 These commands are not available by default and to enable using them, set the
 `CONFIG_CHIP_LIB_SHELL=y` Kconfig option in the `prj.conf` file of the given
