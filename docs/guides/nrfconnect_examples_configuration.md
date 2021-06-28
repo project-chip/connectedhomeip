@@ -1,6 +1,6 @@
-# Configuring nRF Connect SDK examples
+# Configuring nRF Connect examples
 
-The nRF Connect SDK example applications all come with a default configuration
+The nRF Connect example applications all come with a default configuration
 for building. Check the information on this page if you want to modify the
 application configuration or add new functionalities to build your own
 application based on the provided example. This page also contains information
