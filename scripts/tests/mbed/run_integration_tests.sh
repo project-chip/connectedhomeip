@@ -13,6 +13,7 @@ GITHUB_CHIP_TOOLS_BUILD_ACTION_ID=$3
 GITHUB_TOKEN=$4
 CHIP_DIR=$5
 CHIP_TOOLS_DIR=chip-tools
+CHIP_TOOLS_ARTIFACT_NAME=chip-build-$(uname -i)
 
 source $CHIP_DIR/scripts/tests/mbed/common.sh
 
@@ -20,7 +21,7 @@ echo "Downloading applications images from $GITHUB_BUILD_APP_ACTION_ID action in
 download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_BUILD_APP_ACTION_ID $GITHUB_TOKEN app_images
 
 echo "Downloading chip-tools image from $GITHUB_CHIP_TOOLS_BUILD_ACTION_ID action in $GITHUB_REPOSITORY"
-download_artifacts_gh $GITHUB_REPOSITORY $GITHUB_CHIP_TOOLS_BUILD_ACTION_ID $GITHUB_TOKEN $CHIP_TOOLS_DIR
+download_artifacts_by_name_gh $GITHUB_REPOSITORY $GITHUB_CHIP_TOOLS_BUILD_ACTION_ID $CHIP_TOOLS_ARTIFACT_NAME $GITHUB_TOKEN $CHIP_TOOLS_DIR
 
 # Install Python Chip Device Controller
 pip install $CHIP_TOOLS_DIR/controller/python/chip*.whl
