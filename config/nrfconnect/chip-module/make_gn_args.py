@@ -53,7 +53,7 @@ def write_gn_args(args):
         sys.stdout.write('{} = filter_exclude(string_split("{}"), [{}])\n'.format(key, value, cflag_excludes))
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
     parser.add_argument('--module', action='store')
     parser.add_argument('--arg', action='append', nargs=2, default=[])
     parser.add_argument('--arg-string', action='append', nargs=2, default=[])
