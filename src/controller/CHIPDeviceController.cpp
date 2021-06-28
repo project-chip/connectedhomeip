@@ -245,7 +245,7 @@ void DeviceController::OnLocalNOCGenerated(void * context, const ByteSpan & noc)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    DeviceController * controller = reinterpret_cast<DeviceController *>(context);
+    DeviceController * controller = static_cast<DeviceController *>(context);
 
     Transport::AdminPairingInfo * const admin = controller->mAdmins.FindAdminWithId(controller->mAdminId);
 
