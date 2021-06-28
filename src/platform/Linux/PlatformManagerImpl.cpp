@@ -107,9 +107,7 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name,
                                       event.InternetConnectivityChange.address);
 
-                        PlatformMgr().LockChipStack();
                         PlatformMgr().PostEvent(&event);
-                        PlatformMgr().UnlockChipStack();
                     }
                     routeInfo = RTA_NEXT(routeInfo, rtl);
                 }

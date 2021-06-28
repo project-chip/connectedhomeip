@@ -145,7 +145,7 @@ EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddThreadNetwork: %d", err);
+    ChipLogDetail(Zcl, "AddThreadNetwork: %" PRIu8, err);
     return err;
 #else
     // The target does not supports ThreadNetwork. We should not add AddThreadNetwork command in that case then the upper layer will
@@ -199,11 +199,11 @@ EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Co
 
     VerifyOrExit(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS, );
 
-    ChipLogDetail(Zcl, "WiFi provisioning data: SSID: %s", ssid);
+    ChipLogDetail(Zcl, "WiFi provisioning data: SSID: %.*s", static_cast<int>(ssid.size()), ssid.data());
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddWiFiNetwork: %d", err);
+    ChipLogDetail(Zcl, "AddWiFiNetwork: %" PRIu8, err);
     return err;
 #else
     // The target does not supports WiFiNetwork.

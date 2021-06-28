@@ -1,0 +1,86 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/k32w_sdk.gni")
+import("//build_overrides/openthread.gni")
+import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
+
+import("${k32w_sdk_build_root}/k32w_executable.gni")
+import("${k32w_sdk_build_root}/k32w_sdk.gni")
+
+assert(current_os == "freertos")
+
+k32w_platform_dir = "${chip_root}/examples/platform/k32w"
+
+k32w_sdk("sdk") {
+  sources = [
+    "${k32w_platform_dir}/app/project_include/OpenThreadConfig.h",
+    "include/CHIPProjectConfig.h",
+    "include/FreeRTOSConfig.h",
+    "main/include/app_config.h",
+  ]
+
+  public_deps =
+      [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
+
+  include_dirs = [
+    "main/include",
+    "main",
+    "include",
+    "${k32w_platform_dir}/app/support",
+    "${k32w_platform_dir}/util/include",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+}
+
+k32w_executable("shell_app") {
+  output_name = "chip-k32w061-shell-example"
+
+  sources = [ "main/main.cpp" ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/mbedtls:mbedtls",
+    "${chip_root}/third_party/simw-top-mini:se05x",
+    "${k32w_platform_dir}/app/support:freertos_mbedtls_utils",
+    "${openthread_root}:libopenthread-ftd",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${k32w_platform_dir}/app/ldscripts/chip-k32w061-linker.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+}
+
+group("k32w") {
+  deps = [ ":shell_app" ]
+}
+
+group("default") {
+  deps = [ ":k32w" ]
+}

@@ -35,7 +35,8 @@
 namespace chip {
 namespace Mdns {
 
-static constexpr uint8_t kMdnsNameMaxSize            = 33; // [Node]-[Fabric] ID in hex - 16+1+16
+static constexpr uint8_t kMdnsInstanceNameMaxSize    = 33; // [Node]-[Fabric] ID in hex - 16+1+16
+static constexpr uint8_t kMdnsHostNameMaxSize        = 16; // 64-bits in hex.
 static constexpr uint8_t kMdnsProtocolTextMaxSize    = 4;  // "_tcp" or "_udp"
 static constexpr uint8_t kMdnsTypeMaxSize            = 6;  // "_chip", "_chipc" or "_chipd"
 static constexpr uint8_t kMdnsTypeAndProtocolMaxSize = kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1; // <type>.<protocol>
@@ -57,7 +58,8 @@ struct TextEntry
 
 struct MdnsService
 {
-    char mName[kMdnsNameMaxSize + 1];
+    char mName[kMdnsInstanceNameMaxSize + 1];
+    char mHostName[kMdnsHostNameMaxSize + 1] = "";
     char mType[kMdnsTypeMaxSize + 1];
     MdnsServiceProtocol mProtocol;
     Inet::IPAddressType mAddressType;
@@ -111,14 +113,6 @@ using MdnsAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
  *
  */
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context);
-
-/**
- * This function sets the host name for services.
- *
- * @param[in] hostname   The hostname.
- *
- */
-CHIP_ERROR ChipMdnsSetHostname(const char * hostname);
 
 /**
  * This function publishes an service via mDNS.

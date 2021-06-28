@@ -151,8 +151,8 @@ void ReliableMessageMgr::ExecuteActions()
         {
             err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
-            ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
-                         msgId, sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+            ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %d", msgId,
+                         sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // Remove from Table
             ClearRetransTable(entry);
@@ -366,8 +366,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     const ExchangeMessageDispatch * dispatcher = rc->GetExchangeContext()->GetMessageDispatch();
     VerifyOrExit(dispatcher != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err =
-        dispatcher->ResendMessage(rc->GetExchangeContext()->GetSecureSession(), std::move(entry->retainedBuf), &entry->retainedBuf);
+    err = dispatcher->SendPreparedMessage(rc->GetExchangeContext()->GetSecureSession(), entry->retainedBuf);
     SuccessOrExit(err);
 
     // Update the counters

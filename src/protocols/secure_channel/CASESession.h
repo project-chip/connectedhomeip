@@ -179,14 +179,18 @@ public:
     SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
 
     //// ExchangeDelegate Implementation ////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
     {
         return &mMessageDispatch;
     }
+
+    /** @brief This function zeroes out and resets the memory used by the object.
+     **/
+    void Clear();
 
 private:
     enum SigmaErrorType : uint8_t
@@ -234,8 +238,6 @@ private:
 
     // TODO: Remove this and replace with system method to retrieve current time
     CHIP_ERROR SetEffectiveTime(void);
-
-    void Clear();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg);

@@ -254,16 +254,16 @@ public:
     CHIP_ERROR SetDevOpCredKeypair(const CertificateKeyId & trustedRootId, P256Keypair * newKeypair);
 
 private:
-    ChipCertificateSet * mOpCreds; /**< Pointer to an array of certificate data. */
-    uint8_t mOpCredCount;          /**< Number of certificates in mOpCreds
-                                    array. We maintain the invariant that all
-                                    the slots at indices less than
-                                    mCertCount have been constructed and slots
-                                    at indices >= mCertCount have either never
-                                    had their constructor called, or have had
-                                    their destructor called since then. */
-    uint8_t mMaxCerts;             /**< Length of mOpCreds array. */
-    bool mMemoryAllocInternal;     /**< Indicates whether temporary memory buffers are allocated internally. */
+    ChipCertificateSet * mOpCreds;     /**< Pointer to an array of certificate data. */
+    uint8_t mOpCredCount;              /**< Number of certificates in mOpCreds
+                                        array. We maintain the invariant that all
+                                        the slots at indices less than
+                                        mCertCount have been constructed and slots
+                                        at indices >= mCertCount have either never
+                                        had their constructor called, or have had
+                                        their destructor called since then. */
+    uint8_t mMaxCerts;                 /**< Length of mOpCreds array. */
+    bool mMemoryAllocInternal = false; /**< Indicates whether temporary memory buffers are allocated internally. */
     NodeCredentialMap mChipDeviceCredentials[kOperationalCredentialsMax];
     uint8_t mChipDeviceCredentialsCount;
     NodeKeypairMap mDeviceOpCredKeypair[kOperationalCredentialsMax];

@@ -55,8 +55,10 @@
 #define EMBER_AF_MEDIA_INPUT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_MEDIA_PLAYBACK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_OTA_SERVER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_PRESSURE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -67,7 +69,7 @@
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEST_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_THERMOSTAT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_TRUSTED_ROOT_CERTIFICATES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WAKE_ON_LAN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WINDOW_COVERING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
@@ -113,9 +115,9 @@
 #define ZCL_USING_COLOR_CONTROL_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_COLOR_CONTROL_CLIENT
 
-// Use this macro to check if the client side of the Content Launch cluster is included
+// Use this macro to check if the client side of the Content Launcher cluster is included
 #define ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_CONTENT_LAUNCH_CLIENT
+#define EMBER_AF_PLUGIN_CONTENT_LAUNCHER_CLIENT
 
 // Use this macro to check if the client side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_CLIENT
@@ -177,6 +179,10 @@
 #define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_CLIENT
 
+// Use this macro to check if the client side of the OTA Software Update Server cluster is included
+#define ZCL_USING_OTA_SERVER_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_SERVER_CLIENT
+
 // Use this macro to check if the client side of the On/off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ON_OFF_CLIENT
@@ -184,6 +190,10 @@
 // Use this macro to check if the client side of the Operational Credentials cluster is included
 #define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_CLIENT
+
+// Use this macro to check if the client side of the Pressure Measurement cluster is included
+#define ZCL_USING_PRESSURE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_PRESSURE_MEASUREMENT_CLIENT
 
 // Use this macro to check if the client side of the Pump Configuration and Control cluster is included
 #define ZCL_USING_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT
@@ -225,9 +235,9 @@
 #define ZCL_USING_THERMOSTAT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_THERMOSTAT_CLIENT
 
-// Use this macro to check if the client side of the Trusted Root Certificates cluster is included
-#define ZCL_USING_TRUSTED_ROOT_CERTIFICATES_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_TRUSTED_ROOT_CERTIFICATES_CLIENT
+// Use this macro to check if the client side of the Thread Network Diagnostics cluster is included
+#define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_CLIENT
 
 // Use this macro to check if the client side of the Wake on LAN cluster is included
 #define ZCL_USING_WAKE_ON_LAN_CLUSTER_CLIENT

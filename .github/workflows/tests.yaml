@@ -17,11 +17,20 @@ name: Tests
 on:
     push:
     pull_request:
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
 
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
         timeout-minutes: 60
+
+        strategy:
+          matrix:
+            type: [debug, tsan]
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -37,25 +46,75 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
+            - name: Try to ensure the directories for core dumping exist and we can write them.
+              run: |
+                  mkdir /tmp/cores || true
+                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+                  mkdir objdir-clone || true
             - name: Bootstrap
-              timeout-minutes: 3
+              timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }}
+              with:
+                  name: bootstrap-logs-${{ matrix.type }}
+                  path: |
+                   .environment/gn_out/.ninja_log
+                   .environment/pigweed-venv/*.log
             - name: Build all clusters app
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+                  case ${{ matrix.type }} in
+                    "debug") GN_ARGS='is_tsan=false';;
+                    "tsan") GN_ARGS='is_tsan=true';;
+                    *) ;;
+                  esac
+              
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false "$GN_ARGS"
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+                  case ${{ matrix.type }} in
+                    "debug") GN_ARGS='is_tsan=false';;
+                    "tsan") GN_ARGS='is_tsan=true';;
+                    *) ;;
+                  esac
+                
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ "$GN_ARGS"
+            - name: Copy objdir
+              run: |
+                  # The idea is to not upload our objdir unless builds have
+                  # actually succeeded, because that just wastes space.
+                  rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Tests
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   ifconfig -a
                   scripts/tests/test_suites.sh
+            - name: Uploading core files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-core-linux-${{ matrix.type }}
+                  path: /tmp/cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            - name: Uploading objdir for debugging
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-objdir-linux-${{ matrix.type }}
+                  path: objdir-clone/
+                  # objdirs are big; don't hold on to them too long.
+                  retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
         timeout-minutes: 60
+
+        strategy:
+          matrix:
+            type: [debug, tsan]
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -66,7 +125,13 @@ jobs:
               with:
                   submodules: true
             - name: Setup Environment
-              run: brew install openssl pkg-config
+              # coreutils for stdbuf
+              run: brew install openssl pkg-config coreutils
+            - name: Try to ensure the directories for core dumping and diagnostic log collection exist and we can write them.
+              run: |
+                  sudo chown ${USER} /cores || true
+                  mkdir -p ~/Library/Logs/DiagnosticReports || true
+                  mkdir objdir-clone || true
             - name: Fix pkgconfig link
               working-directory: /usr/local/lib/pkgconfig
               run: |
@@ -76,17 +141,64 @@ jobs:
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
             - name: Bootstrap
-              timeout-minutes: 3
+              timeout-minutes: 15
               run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }}
+              with:
+                  name: bootstrap-logs-${{ matrix.type }}
+                  path: |
+                   .environment/gn_out/.ninja_log
+                   .environment/pigweed-venv/*.log
             - name: Run Build Test Server
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
+                  case ${{ matrix.type }} in
+                    "debug") GN_ARGS='is_tsan=false';;
+                    "tsan") GN_ARGS='is_tsan=true';;
+                    *) ;;
+                  esac
+
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false "$GN_ARGS"
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+                  case ${{ matrix.type }} in
+                    "debug") GN_ARGS='is_tsan=false';;
+                    "tsan") GN_ARGS='is_tsan=true';;
+                    *) ;;
+                  esac
+
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ "$GN_ARGS"
+            - name: Copy objdir
+              run: |
+                  # The idea is to not upload our objdir unless builds have
+                  # actually succeeded, because that just wastes space.
+                  rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Test Suites
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   scripts/tests/test_suites.sh
+            - name: Uploading core files
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-core-darwin-${{ matrix.type }}
+                  path: /cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            - name: Uploading diagnostic logs
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-log-darwin-${{ matrix.type }}
+                  path: ~/Library/Logs/DiagnosticReports/
+            - name: Uploading objdir for debugging
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }}
+              with:
+                  name: crash-objdir-darwin-${{ matrix.type }}
+                  path: objdir-clone/
+                  # objdirs are big; don't hold on to them too long.
+                  retention-days: 5

@@ -45,7 +45,7 @@ efr32_sdk("sdk") {
     "HAL_VCOM_ENABLE=1",
     "EFR32_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
-    "SL_HEAP_SIZE=(10 * 1024)",
+    "SL_HEAP_SIZE=(16 * 1024)",
   ]
 }
 

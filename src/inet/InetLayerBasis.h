@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,10 +27,12 @@
 
 #include <inet/InetConfig.h>
 
+#include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemObject.h>
 
 #include <stdint.h>
+#include <type_traits>
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <sys/select.h>
 #endif
@@ -93,121 +95,6 @@ inline void InetLayerBasis::InitInetLayerBasis(InetLayer & aInetLayer, void * aA
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-/**
- *  @class SocketEvents
- *
- *  @brief
- *    Represent a set of I/O events requested/pending on a socket.
- *
- */
-class SocketEvents
-{
-public:
-    enum : uint8_t
-    {
-        kRead  = 0x01, /**< Bit flag indicating if there is a read event on a socket. */
-        kWrite = 0x02, /**< Bit flag indicating if there is a write event on a socket. */
-        kError = 0x04, /**< Bit flag indicating if there is an error event on a socket. */
-    };
-
-    int Value; /**< Contains the bit flags for the socket event. */
-
-    /**
-     *  Constructor for the SocketEvents class.
-     *
-     */
-    SocketEvents() { Value = 0; }
-
-    /**
-     *  Copy constructor for the SocketEvents class.
-     *
-     */
-    SocketEvents(const SocketEvents & other) { Value = other.Value; }
-
-    /**
-     *  Copy assignment operator for the SocketEvents class.
-     *
-     */
-    SocketEvents & operator=(const SocketEvents & other) = default;
-
-    /**
-     *  Check if any of the bit flags for the socket events are set.
-     *
-     *  @return true if set, otherwise false.
-     *
-     */
-    bool IsSet() const { return Value != 0; }
-
-    /**
-     *  Check if the bit flags indicate that the socket is readable.
-     *
-     *  @return true if socket is readable, otherwise false.
-     *
-     */
-    bool IsReadable() const { return (Value & kRead) != 0; }
-
-    /**
-     *  Check if the bit flags indicate that the socket is writable.
-     *
-     *  @return true if socket is writable, otherwise false.
-     *
-     */
-    bool IsWriteable() const { return (Value & kWrite) != 0; }
-
-    /**
-     *  Check if the bit flags indicate that the socket has an error.
-     *
-     *  @return true if socket has an error, otherwise false.
-     *
-     */
-    bool IsError() const { return (Value & kError) != 0; }
-
-    /**
-     *  Set the read bit flag for the socket.
-     *
-     */
-    void SetRead() { Value |= kRead; }
-
-    /**
-     *  Set the write bit flag for the socket.
-     *
-     */
-    void SetWrite() { Value |= kWrite; }
-
-    /**
-     *  Set the error bit flag for the socket.
-     *
-     */
-    void SetError() { Value |= kError; }
-
-    /**
-     *  Clear the bit flags for the socket.
-     *
-     */
-    void Clear() { Value = 0; }
-
-    /**
-     *  Clear the read bit flag for the socket.
-     *
-     */
-    void ClearRead() { Value &= ~kRead; }
-
-    /**
-     *  Clear the write bit flag for the socket.
-     *
-     */
-    void ClearWrite() { Value &= ~kWrite; }
-
-    /**
-     *  Clear the error bit flag for the socket.
-     *
-     */
-    void ClearError() { Value &= ~kError; }
-
-    void SetFDs(int socket, int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds);
-    static SocketEvents FromFDs(int socket, fd_set * readfds, fd_set * writefds, fd_set * exceptfds);
-};
 
 /**
  *  @def INET_INVALID_SOCKET_FD

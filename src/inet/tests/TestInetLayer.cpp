@@ -447,19 +447,19 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
 
 bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
 {
-    bool retval = true;
-
     if (Common::IsSender())
     {
         if (argc == 0)
         {
             PrintArgError("%s: Please specify a destination address.\n", aProgram);
-            retval = false;
-            goto exit;
+            return false;
         }
 
-        retval = IPAddress::FromString(argv[0], sDestinationAddress);
-        VerifyOrExit(retval == true, PrintArgError("%s: Please specify a valid destination address: %s\n", aProgram, argv[0]));
+        if (!IPAddress::FromString(argv[0], sDestinationAddress))
+        {
+            PrintArgError("%s: Please specify a valid destination address: %s\n", aProgram, argv[0]);
+            return false;
+        }
 
         sDestinationString = argv[0];
 
@@ -470,8 +470,7 @@ bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
     if (argc > 0)
     {
         PrintArgError("%s: unexpected argument: %s\n", aProgram, argv[0]);
-        retval = false;
-        goto exit;
+        return false;
     }
 
     // If no IP version or transport flags were specified, use the defaults.
@@ -493,8 +492,7 @@ bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
         sTestState.mStats.mTransmit.mExpected = kExpectedTxSizeDefault;
     }
 
-exit:
-    return (retval);
+    return true;
 }
 
 static void PrintReceivedStats(const TransferStats & aStats)
@@ -504,28 +502,22 @@ static void PrintReceivedStats(const TransferStats & aStats)
 
 static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBuffer, uint8_t aFirstValue)
 {
-    const bool lStatsByPacket = true;
-    bool lStatus              = true;
+    constexpr bool lStatsByPacket = true;
 
-    lStatus = Common::HandleDataReceived(aBuffer, sTestState.mStats, !lStatsByPacket, aCheckBuffer, aFirstValue);
-    VerifyOrExit(lStatus == true, );
+    if (!Common::HandleDataReceived(aBuffer, sTestState.mStats, !lStatsByPacket, aCheckBuffer, aFirstValue))
+    {
+        return false;
+    }
 
     PrintReceivedStats(sTestState.mStats);
 
-exit:
-    return (lStatus);
+    return true;
 }
 
 static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBuffer)
 {
-    const uint8_t lFirstValue = 0;
-    bool lStatus              = true;
-
-    lStatus = HandleDataReceived(aBuffer, aCheckBuffer, lFirstValue);
-    VerifyOrExit(lStatus == true, );
-
-exit:
-    return (lStatus);
+    constexpr uint8_t lFirstValue = 0;
+    return HandleDataReceived(aBuffer, aCheckBuffer, lFirstValue);
 }
 
 // TCP Endpoint Callbacks
@@ -809,7 +801,6 @@ static INET_ERROR PrepareTransportForSend()
 static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
     PacketBufferHandle lBuffer;
-    INET_ERROR lStatus = INET_NO_ERROR;
 
     if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
     {
@@ -821,18 +812,17 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         if ((gOptFlags & kOptFlagUseIPv6) == (kOptFlagUseIPv6))
         {
             lBuffer = Common::MakeICMPv6DataBuffer(aSize);
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if ((gOptFlags & kOptFlagUseIPv4) == (kOptFlagUseIPv4))
         {
             lBuffer = Common::MakeICMPv4DataBuffer(aSize);
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        lStatus = sRawIPEndPoint->SendTo(aAddress, std::move(lBuffer));
-        SuccessOrExit(lStatus);
+        ReturnErrorOnFailure(sRawIPEndPoint->SendTo(aAddress, std::move(lBuffer)));
     }
     else
     {
@@ -844,15 +834,14 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
             // patterned from zero to aSize - 1.
 
             lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
 
-            lStatus = sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer));
-            SuccessOrExit(lStatus);
+            ReturnErrorOnFailure(sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer)));
         }
         else if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
         {
             const uint32_t lFirstValue = sTestState.mStats.mTransmit.mActual;
-            VerifyOrExit(lFirstValue < 256u, lStatus = INET_ERROR_UNEXPECTED_EVENT);
+            VerifyOrReturnError(lFirstValue < 256u, INET_ERROR_UNEXPECTED_EVENT);
 
             // For TCP, we'll send one byte stream of
             // sTestState.mStats.mTransmit.mExpected in n aSize or
@@ -860,15 +849,13 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
             // sTestState.mStats.mTransmit.mExpected - 1.
 
             lBuffer = Common::MakeDataBuffer(aSize, uint8_t(lFirstValue));
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
 
-            lStatus = sTCPIPEndPoint->Send(std::move(lBuffer));
-            SuccessOrExit(lStatus);
+            ReturnErrorOnFailure(sTCPIPEndPoint->Send(std::move(lBuffer)));
         }
     }
 
-exit:
-    return (lStatus);
+    return INET_NO_ERROR;
 }
 
 void DriveSend()

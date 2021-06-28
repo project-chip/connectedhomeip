@@ -37,33 +37,26 @@ namespace chip {
 
 CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayloadData::AdditionalDataPayload & outPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     TLV::TLVReader innerReader;
 
     reader.Init(mPayloadBufferData, mPayloadBufferLength);
-    err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag));
 
     // Open the container
-    err = reader.OpenContainer(innerReader);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.OpenContainer(innerReader));
 
-    err = innerReader.Next(TLV::kTLVType_UTF8String, TLV::ContextTag(SetupPayloadData::kRotatingDeviceIdTag));
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(innerReader.Next(TLV::kTLVType_UTF8String, TLV::ContextTag(SetupPayloadData::kRotatingDeviceIdTag)));
 
     // Get the value of the rotating device id
     char rotatingDeviceId[SetupPayloadData::kRotatingDeviceIdLength];
-    err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId)));
     outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
 
     // Verify the end of the container
-    err = reader.VerifyEndOfContainer();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

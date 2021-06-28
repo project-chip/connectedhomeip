@@ -78,9 +78,6 @@ static Mutex sSEObjMutex;
 void se05x_sessionOpen(void)
 {
     static int is_session_open = 0;
-    sss_status_t status        = kStatus_SSS_Fail;
-    const char * portName;
-
     if (is_session_open)
     {
         return;
@@ -88,31 +85,29 @@ void se05x_sessionOpen(void)
 
     memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
 
-    status = ex_sss_boot_connectstring(0, NULL, &portName);
+    const char * portName = nullptr;
+    sss_status_t status   = ex_sss_boot_connectstring(0, NULL, &portName);
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_connectstring failed");
-        goto exit;
+        return;
     }
 
     status = ex_sss_boot_open(&gex_sss_chip_ctx, portName);
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_open failed");
-        goto exit;
+        return;
     }
 
     status = ex_sss_key_store_and_object_init(&gex_sss_chip_ctx);
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_key_store_and_object_init failed");
-        goto exit;
+        return;
     }
 
     is_session_open = 1;
-
-exit:
-    return;
 }
 
 /* Delete key in se05x */
@@ -152,7 +147,6 @@ void se05x_delete_key(uint32_t keyid)
 /* Set key in se05x */
 CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart, sss_cipher_type_t cipherType)
 {
-    CHIP_ERROR error          = CHIP_NO_ERROR;
     sss_status_t status       = kStatus_SSS_Success;
     sss_object_t keyObject    = { 0 };
     const uint8_t keyBuf[128] = {
@@ -165,7 +159,7 @@ CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss
 
     if (cipherType == kSSS_CipherType_EC_NIST_P)
     {
-        VerifyOrExit(keylen < (sizeof(keyBuf) - sizeof(header1)), error = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(keylen < (sizeof(keyBuf) - sizeof(header1)), CHIP_ERROR_INTERNAL);
 
         memcpy((void *) keyBuf, (const uint8_t *) header1, sizeof(header1));
         keyBufLen = keyBufLen + sizeof(header1);
@@ -177,7 +171,7 @@ CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss
     }
     else
     {
-        VerifyOrExit(keylen < sizeof(keyBuf), error = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(keylen < sizeof(keyBuf), CHIP_ERROR_INTERNAL);
 
         memcpy((void *) keyBuf, (const uint8_t *) key, keylen);
         keyBufLen = keylen;
@@ -185,16 +179,15 @@ CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss
     }
 
     status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_allocate_handle(&keyObject, keyid, keyPart, cipherType, keyBufLen, kKeyObject_Mode_Persistent);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, keyBuf, keyBufLen, bitlen, NULL, 0);
-    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 #if ENABLE_REENTRANCY

@@ -24,47 +24,21 @@
 
 using namespace ::chip;
 
-namespace {
-constexpr uint16_t kWaitDurationInSeconds = UINT16_MAX;
-} // namespace
-
-CHIP_ERROR ReportingCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR ReportingCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     chip::Controller::BasicCluster cluster;
-    chip::Controller::CommissionerInitParams initParams;
 
-    initParams.storageDelegate = &storage;
-
-    err = mOpCredsIssuer.Initialize(storage);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", ErrorStr(err)));
-
-    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
-
-    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
-
-    err = mCommissioner.Init(localId, initParams);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
-
-    err = mCommissioner.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", ErrorStr(err)));
-
-    err = mCommissioner.GetDevice(remoteId, &mDevice);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
+    auto * ctx = GetExecContext();
+    err        = ctx->commissioner->GetDevice(ctx->remoteId, &mDevice);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, ctx->localId));
 
     AddReportCallbacks(mEndPointId);
-
     cluster.Associate(mDevice, mEndPointId);
+
     err = cluster.MfgSpecificPing(nullptr, nullptr);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
 
-    UpdateWaitForResponse(true);
-    WaitForResponse(kWaitDurationInSeconds);
-
 exit:
-    mCommissioner.ServiceEventSignal();
-    mCommissioner.Shutdown();
     return err;
 }

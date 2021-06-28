@@ -350,7 +350,7 @@ menu "CHIP Device Layer"
         config MAX_EVENT_QUEUE_SIZE
             int "Max Event Queue Size"
             range 0 65535
-            default 100
+            default 25
             help
                 The maximum number of events that can be held in the CHIP Platform event queue.
 
@@ -460,7 +460,7 @@ menu "CHIP Device Layer"
 
         config WIFI_AP_SSID_PREFIX
             string "WiFi AP SSID Prefix"
-            default "CHIP-"
+            default "MATTER-"
             help
                 A prefix string used in forming the WiFi soft-AP SSID.  The remainder of the SSID
                 consists of the final two bytes of the device's primary WiFi MAC address in hex.
@@ -510,7 +510,7 @@ menu "CHIP Device Layer"
 
         config BLE_DEVICE_NAME_PREFIX
             string "BLE Device Name Prefix"
-            default "CHIP-"
+            default "MATTER-"
             depends on ENABLE_CHIPOBLE
             help
                 A prefix string used in forming the BLE device name.  The remainder of the name
@@ -554,7 +554,7 @@ menu "CHIP Device Layer"
 
         config CHIPOBLE_SINGLE_CONNECTION
             bool "Single Connection Mode"
-            default n
+            default y
             depends on ENABLE_CHIPOBLE
             help
                 Limit support for CHIP-over-BLE (WoBLE) to a single inbound connection.

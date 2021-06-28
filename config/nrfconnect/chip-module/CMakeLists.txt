@@ -28,7 +28,7 @@
 if (CONFIG_CHIP)
 
 include(ExternalProject)
-include(zephyr-util.cmake)
+include(../../zephyr/zephyr-util.cmake)
 
 # ==============================================================================
 # Declare configuration variables and define constants

@@ -36,14 +36,12 @@ public:
     }
 
     /////////// Command Interface /////////
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
+    uint16_t GetWaitDurationInSeconds() const override { return UINT16_MAX; }
 
     virtual void AddReportCallbacks(uint8_t endPointId) = 0;
 
 private:
     uint8_t mEndPointId;
-
-    ChipDeviceCommissioner mCommissioner;
     ChipDevice * mDevice;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 };

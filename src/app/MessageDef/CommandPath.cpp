@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -43,11 +45,7 @@ CHIP_ERROR CommandPath::Parser::Init(const chip::TLV::TLVReader & aReader)
 
     VerifyOrExit(chip::TLV::kTLVType_List == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    // This is just a dummy, as we're not going to exit this container ever
-    chip::TLV::TLVType dummyContainerType;
-    // enter into the Path
-    err = mReader.EnterContainer(dummyContainerType);
-    SuccessOrExit(err);
+    err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -147,6 +145,8 @@ CHIP_ERROR CommandPath::Parser::CheckSchemaValidity() const
         }
     }
     SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
+
 exit:
     ChipLogFunctError(err);
 
@@ -198,48 +198,44 @@ CHIP_ERROR CommandPath::Builder::Init(chip::TLV::TLVWriter * const apWriter, con
 CommandPath::Builder & CommandPath::Builder::EndpointId(const chip::EndpointId aEndpointId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 CommandPath::Builder & CommandPath::Builder::GroupId(const chip::GroupId aGroupId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_GroupId), aGroupId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_GroupId), aGroupId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 CommandPath::Builder & CommandPath::Builder::ClusterId(const chip::ClusterId aClusterId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 CommandPath::Builder & CommandPath::Builder::CommandId(const chip::CommandId aCommandId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_CommandId), aCommandId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_CommandId), aCommandId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 

@@ -48,7 +48,7 @@ efr32_sdk("sdk") {
 
   defines = [
     "BOARD_ID=${efr32_board}",
-    "SL_HEAP_SIZE=(12 * 1024)",
+    "SL_HEAP_SIZE=(16 * 1024)",
     "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
     "ENABLE_CHIP_SHELL",
   ]

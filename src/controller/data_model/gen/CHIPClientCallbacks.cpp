@@ -415,7 +415,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
             {
                 CHECK_MESSAGE_LENGTH(2);
                 uint16_t count = chip::Encoding::LittleEndian::Read16(message);
-                ChipLogProgress(Zcl, "  count: %lu", count);
+                ChipLogProgress(Zcl, "  count: %" PRIu16, count);
 
                 switch (clusterId)
                 {
@@ -480,8 +480,8 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             message += entryLength;
                         }
 
-                        Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback> * cb =
-                            Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback>::FromCancelable(
+                        Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback> * cb =
+                            Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(
                                 onSuccessCallback);
                         cb->mCall(cb->mContext, count, data);
                         break;
@@ -496,8 +496,8 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             message += 1;
                         }
 
-                        Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback> * cb =
-                            Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback>::FromCancelable(
+                        Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback> * cb =
+                            Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(
                                 onSuccessCallback);
                         cb->mCall(cb->mContext, count, data);
                         break;
@@ -854,6 +854,193 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     }
                     }
                     break;
+                case 0x0035:
+                    switch (attributeId)
+                    {
+                    case 0x0007: // NeighborTable
+                    {
+                        _NeighborTable data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].Age = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].LinkFrameCounter = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].MleFrameCounter = emberAfGetInt32u(message, 0, 4);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LQI = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].AverageRssi = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LastRssi = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FrameErrorRate = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].MessageErrorRate = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].RxOnWhenIdle = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FullThreadDevice = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FullNetworkData = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].IsChild = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0008: // RouteTable
+                    {
+                        _RouteTable data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].RouterId = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].NextHop = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PathCost = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LQIIn = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LQIOut = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Age = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Allocated = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].LinkEstablished = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x003B: // SecurityPolicy
+                    {
+                        _SecurityPolicy data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].RotationTime = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Flags = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x003D: // OperationalDatasetComponents
+                    {
+                        _OperationalDatasetComponents data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ActiveTimestampPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PendingTimestampPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].MasterKeyPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].NetworkNamePresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ExtendedPanIdPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].MeshLocalPrefixPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].DelayPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PanIdPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ChannelPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].PskcPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].SecurityPolicyPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].ChannelMaskPresent = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>::
+                                FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x003E: // NetworkFault
+                    {
+                        uint8_t data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i] = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback> * cb =
+                            Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>::
+                                FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
                 }
                 break;
             }
@@ -916,7 +1103,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
             {
                 CHECK_MESSAGE_LENGTH(8);
                 uint64_t value = chip::Encoding::LittleEndian::Read64(message);
-                ChipLogProgress(Zcl, "  value: 0x%16x", value);
+                ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
 
                 Callback::Callback<Int64uAttributeCallback> * cb =
                     Callback::Callback<Int64uAttributeCallback>::FromCancelable(onSuccessCallback);
@@ -1188,7 +1375,7 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint1
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -1208,7 +1395,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -1254,34 +1441,34 @@ bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::app::Comma
     return true;
 }
 
-bool emberAfContentLaunchClusterLaunchContentResponseCallback(chip::app::Command * commandObj, uint8_t * data,
-                                                              uint8_t contentLaunchStatus)
+bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+                                                                uint8_t contentLaunchStatus)
 {
     ChipLogProgress(Zcl, "LaunchContentResponse:");
     // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
     // ChipLogProgress(Zcl, "  data: %.*s", data.size(), data.data());
     ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchContentResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchContentResponseCallback");
 
-    Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback> * cb =
-        Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback> * cb =
+        Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, data, contentLaunchStatus);
     return true;
 }
 
-bool emberAfContentLaunchClusterLaunchURLResponseCallback(chip::app::Command * commandObj, uint8_t * data,
-                                                          uint8_t contentLaunchStatus)
+bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+                                                            uint8_t contentLaunchStatus)
 {
     ChipLogProgress(Zcl, "LaunchURLResponse:");
     // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
     // ChipLogProgress(Zcl, "  data: %.*s", data.size(), data.data());
     ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchURLResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchURLResponseCallback");
 
-    Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback> * cb =
-        Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback> * cb =
+        Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, data, contentLaunchStatus);
     return true;
 }
@@ -2219,6 +2406,52 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
+bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(chip::app::Command * commandObj, uint8_t action,
+                                                                             uint32_t delayedActionTime)
+{
+    ChipLogProgress(Zcl, "ApplyUpdateRequestResponse:");
+    ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
+    ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback");
+
+    Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, action, delayedActionTime);
+    return true;
+}
+
+bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
+                                                                     uint32_t delayedActionTime, uint8_t * imageURI,
+                                                                     uint32_t softwareVersion, chip::ByteSpan updateToken,
+                                                                     uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
+{
+    ChipLogProgress(Zcl, "QueryImageResponse:");
+    LogStatus(status);
+    ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
+    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
+    // ChipLogProgress(Zcl, "  imageURI: %.*s", imageURI.size(), imageURI.data());
+    ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", softwareVersion);
+    ChipLogProgress(Zcl, "  updateToken: %zu", updateToken.size());
+    ChipLogProgress(Zcl, "  userConsentNeeded: %" PRIu8 "", userConsentNeeded);
+    ChipLogProgress(Zcl, "  metadataForClient: %zu", metadataForClient.size());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterQueryImageResponseCallback");
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
+        return true;
+    }
+
+    Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded, metadataForClient);
+    return true;
+}
+
 bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR,
                                                                chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
                                                                chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
@@ -2630,7 +2863,7 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
         {
             CHECK_MESSAGE_LENGTH(8);
             uint64_t value = chip::Encoding::LittleEndian::Read64(message);
-            ChipLogProgress(Zcl, "  value: 0x%16x", value);
+            ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
 
             Callback::Callback<Int64uAttributeCallback> * cb =
                 Callback::Callback<Int64uAttributeCallback>::FromCancelable(onReportCallback);

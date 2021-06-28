@@ -85,17 +85,18 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketH
     return CHIP_NO_ERROR;
 }
 
-void MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                              const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq))
     {
-        HandleMsgCounterSyncReq(exchangeContext, packetHeader, std::move(msgBuf));
+        return HandleMsgCounterSyncReq(exchangeContext, packetHeader, std::move(msgBuf));
     }
     else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
     {
-        HandleMsgCounterSyncResp(exchangeContext, packetHeader, std::move(msgBuf));
+        return HandleMsgCounterSyncResp(exchangeContext, packetHeader, std::move(msgBuf));
     }
+    return CHIP_NO_ERROR;
 }
 
 void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * exchangeContext)
@@ -253,8 +254,8 @@ exit:
     return err;
 }
 
-void MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                                    System::PacketBufferHandle && msgBuf)
+CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext,
+                                                          const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -277,11 +278,11 @@ exit:
     }
 
     exchangeContext->Close();
-    return;
+    return err;
 }
 
-void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
-                                                     const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
+                                                           const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -324,7 +325,7 @@ exit:
     }
 
     exchangeContext->Close();
-    return;
+    return err;
 }
 
 } // namespace secure_channel

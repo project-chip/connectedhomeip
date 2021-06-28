@@ -9,14 +9,14 @@ from base import TestTimeout, BaseTestHelper, FailIfNot, logger
 # The thread network dataset tlv for testing, splited into T-L-V.
 
 TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
-                "000300000c" + \
-                "35060004001fffe0" + \
-                "0208fedcba9876543210" + \
-                "0708fd00000000001234" + \
-                "0510ffeeddccbbaa99887766554433221100" + \
-                "030e54657374696e674e6574776f726b" + \
-                "0102d252" + \
-                "041081cb3b2efa781cc778397497ff520fa50c0302a0ff"
+    "000300000c" + \
+    "35060004001fffe0" + \
+    "0208fedcba9876543210" + \
+    "0708fd00000000001234" + \
+    "0510ffeeddccbbaa99887766554433221100" + \
+    "030e54657374696e674e6574776f726b" + \
+    "0102d252" + \
+    "041081cb3b2efa781cc778397497ff520fa50c0302a0ff"
 # Network id, for the thread network, current a const value, will be changed to XPANID of the thread network.
 TEST_THREAD_NETWORK_ID = "fedcba9876543210"
 
@@ -55,11 +55,13 @@ def main():
 
     test = BaseTestHelper(nodeid=112233)
 
+    logger.info("Testing key exchange")
     FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
                                    setuppin=20202021,
                                    nodeid=1),
               "Failed to finish key exchange")
 
+    logger.info("Testing network commissioning")
     FailIfNot(test.TestNetworkCommissioning(nodeid=1,
                                             endpoint=ENDPOINT_ID,
                                             group=GROUP_ID,
@@ -67,18 +69,27 @@ def main():
                                             network_id=TEST_THREAD_NETWORK_ID),
               "Failed to finish network commissioning")
 
+    logger.info("Testing on off cluster")
     FailIfNot(test.TestOnOffCluster(nodeid=1,
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
 
-    FailIfNot(test.TestOnOffCluster(nodeid=1,
-                                    endpoint=233,
-                                    group=GROUP_ID), "Failed to test on off cluster on non-exist endpoint")
+    logger.info("Testing sending commands to non exist endpoint")
+    FailIfNot(not test.TestOnOffCluster(nodeid=1,
+                                        endpoint=233,
+                                        group=GROUP_ID), "Failed to test on off cluster on non-exist endpoint")
 
+    logger.info("Testing attribute reading")
     FailIfNot(test.TestReadBasicAttribiutes(nodeid=1,
                                             endpoint=ENDPOINT_ID,
                                             group=GROUP_ID),
               "Failed to test Read Basic Attributes")
+
+    logger.info("Testing attribute writing")
+    FailIfNot(test.TestWriteBasicAttributes(nodeid=1,
+                                             endpoint=ENDPOINT_ID,
+                                             group=GROUP_ID),
+              "Failed to test Write Basic Attributes")
 
     timeoutTicker.stop()
 

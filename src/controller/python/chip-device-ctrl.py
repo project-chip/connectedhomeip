@@ -27,6 +27,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
 from chip import exceptions
+import argparse
 import ctypes
 import sys
 import os
@@ -100,7 +101,6 @@ def DecodeHexIntOption(option, opt, value):
     except ValueError:
         raise OptionValueError("option %s: invalid value: %r" % (opt, value))
 
-
 def ParseEncodedString(value):
     if value.find(":") < 0:
         raise ParsingError(
@@ -113,6 +113,17 @@ def ParseEncodedString(value):
     raise ParsingError("only str and hex encoding is supported")
 
 
+def ParseValueWithType(value, type):
+    if type == 'int':
+        return int(value)
+    elif type == 'str':
+        return value
+    elif type == 'bytes':
+        return ParseEncodedString(value)
+    else:
+        raise ParsingError('cannot recognize type: {}'.format(type))
+
+
 def FormatZCLArguments(args, command):
     commandArgs = {}
     for kvPair in args:
@@ -120,12 +131,7 @@ def FormatZCLArguments(args, command):
             raise ParsingError("Argument should in key=value format")
         key, value = kvPair.split("=", 1)
         valueType = command.get(key, None)
-        if valueType == 'int':
-            commandArgs[key] = int(value)
-        elif valueType == 'str':
-            commandArgs[key] = value
-        elif valueType == 'bytes':
-            commandArgs[key] = ParseEncodedString(value)
+        commandArgs[key] = ParseValueWithType(int(value), valueType)
     return commandArgs
 
 
@@ -195,6 +201,8 @@ class DeviceMgrCmd(Cmd):
 
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
+
+        "get-fabricid",
     ]
 
     def parseline(self, line):
@@ -408,7 +416,7 @@ class DeviceMgrCmd(Cmd):
         if int(setupPayload.attributes["RendezvousInformation"]) & onnetwork:
             print("Attempting to find device on Network")
             longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
-            self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
+            self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(longDiscriminator)
             print("Waiting for device responses...")
             strlen = 100;
             addrStrStorage = ctypes.create_string_buffer(strlen)
@@ -516,49 +524,90 @@ class DeviceMgrCmd(Cmd):
             print(str(ex))
             return
 
+    def wait_for_one_discovered_device(self):
+        print("Waiting for device responses...")
+        strlen = 100;
+        addrStrStorage = ctypes.create_string_buffer(strlen)
+        count = 0
+        maxWaitTime = 2
+        while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
+            time.sleep(0.2)
+            count = count + 0.2
+
+    def wait_for_many_discovered_devices(self):
+        # Discovery happens through mdns, which means we need to wait for responses to come back.
+        # TODO(cecille): I suppose we could make this a command line arg. Or Add a callback when
+        # x number of responses are received. For now, just 2 seconds. We can all wait that long.
+        print("Waiting for device responses...")
+        time.sleep(2)
+
     def do_discover(self, line):
         """
         discover -qr qrcode
         discover -all
+        discover -l long_discriminator
+        discover -s short_discriminator
+        discover -v vendor_id
+        discover -t device_type
+        discover -c commissioning_enabled
+        discover -a
 
         discover command is used to discover available devices.
         """
         try:
-            args = shlex.split(line)
-            if len(args) < 1:
+            arglist = shlex.split(line)
+            if len(arglist) < 1:
                 print("Usage:")
                 self.do_help("discover")
                 return
-
-            if args[0] == "-qr" and len(args) >= 2:
-                setupPayload = SetupPayload().ParseQrCode(args[1])
-                longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
-                self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
-                print("Waiting for device responses...")
-                strlen = 100;
-                addrStrStorage = ctypes.create_string_buffer(strlen)
-                count = 0
-                maxWaitTime = 2
-                while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
-                    time.sleep(0.2)
-                    count = count + 0.2
-            elif args[0] == "-all":
+            parser = argparse.ArgumentParser()
+            group = parser.add_mutually_exclusive_group()
+            group.add_argument('-all', help='discover all commissionable nodes', action='store_true')
+            group.add_argument('-qr', help='discover devices matching provided QR code', type=str)
+            group.add_argument('-l', help='discover devices with given long discriminator', type=int)
+            group.add_argument('-s', help='discover devices with given short discriminator', type=int)
+            group.add_argument('-v', help='discover devices wtih given vendor ID', type=int)
+            group.add_argument('-t', help='discover devices with given device type', type=int)
+            group.add_argument('-c', help='discover devices with given commissioning mode', type=int)
+            group.add_argument('-a', help='discover devices put in commissioning mode from command', action='store_true')
+            args=parser.parse_args(arglist)
+            if args.all:
                 self.devCtrl.DiscoverAllCommissioning()
-                # Discovery happens through mdns, which means we need to wait for responses to come back.
-                # TODO(cecille): I suppose we could make this a command line arg. Or Add a callback when
-                # x number of responses are received. For now, just 2 seconds. We can all wait that long.
-                print("Waiting for device responses...")
-                time.sleep(2)
+                self.wait_for_many_discovered_devices()
+            elif args.qr is not None:
+                setupPayload = SetupPayload().ParseQrCode(args.qr)
+                longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
+                self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(longDiscriminator)
+                self.wait_for_one_discovered_device()
+            elif args.l is not None:
+                self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(ctypes.c_uint16(args.l))
+                self.wait_for_one_discovered_device()
+            elif args.s is not None:
+                self.devCtrl.DiscoverCommissionableNodesShortDiscriminator(ctypes.c_uint16(args.s))
+                self.wait_for_one_discovered_device()
+            elif args.v is not None:
+                self.devCtrl.DiscoverCommissionableNodesVendor(ctypes.c_uint16(args.v))
+                self.wait_for_many_discovered_devices()
+            elif args.t is not None:
+                self.devCtrl.DiscoverCommissionableNodesDeviceType(ctypes.c_uint16(args.t))
+                self.wait_for_many_discovered_devices()
+            elif args.c is not None:
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled(ctypes.c_uint16(args.c))
+                self.wait_for_many_discovered_devices()
+            elif args.a is not None:
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabledFromCommand()
+                self.wait_for_many_discovered_devices()
             else:
-                print("Usage:")
                 self.do_help("discover")
                 return
+            self.devCtrl.PrintDiscoveredDevices()
         except exceptions.ChipStackException as ex:
             print('exception')
             print(str(ex))
             return
-
-        self.devCtrl.PrintDiscoveredDevices()
+        except:
+            self.do_help("discover")
+            return
 
     def do_zcl(self, line):
         """
@@ -627,7 +676,7 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 2 and args[0] == '?':
                 if args[1] not in all_attrs:
                     raise exceptions.UnknownCluster(args[1])
-                print('\n'.join(all_attrs.get(args[1])))
+                print('\n'.join(all_attrs.get(args[1]).keys()))
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
@@ -637,6 +686,37 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("zclread")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading ZCL attribute:")
+            print(str(ex))
+        except Exception as ex:
+            print("An exception occurred during processing input:")
+            print(str(ex))
+
+    def do_zclwrite(self, line):
+        """
+        To write ZCL attribute:
+        zclwrite <cluster> <attribute> <nodeid> <endpoint> <groupid> <value>
+        """
+        try:
+            args = shlex.split(line)
+            all_attrs = self.devCtrl.ZCLAttributeList()
+            if len(args) == 1 and args[0] == '?':
+                print('\n'.join(all_attrs.keys()))
+            elif len(args) == 2 and args[0] == '?':
+                if args[1] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[1])
+                cluster_attrs = all_attrs.get(args[1], {})
+                print('\n'.join(["{}: {}".format(key, cluster_attrs[key]["type"]) for key in cluster_attrs.keys() if cluster_attrs[key].get("writable", False)]))
+            elif len(args) == 6:
+                if args[0] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[0])
+                attribute_type = all_attrs.get(args[0], {}).get(
+                    args[1], {}).get("type", None)
+                self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), ParseValueWithType(args[5], attribute_type))
+            else:
+                self.do_help("zclwrite")
+        except exceptions.ChipStackException as ex:
+            print("An exception occurred during writing ZCL attribute:")
             print(str(ex))
         except Exception as ex:
             print("An exception occurred during processing input:")
@@ -655,7 +735,8 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 2 and args[0] == '?':
                 if args[1] not in all_attrs:
                     raise exceptions.UnknownCluster(args[1])
-                print('\n'.join(all_attrs.get(args[1])))
+                cluster_attrs = all_attrs.get(args[1], {})
+                print('\n'.join([key for key in cluster_attrs.keys() if cluster_attrs[key].get("reportable", False)]))
             elif len(args) == 7:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
@@ -685,6 +766,28 @@ class DeviceMgrCmd(Cmd):
         Removed, use network commissioning cluster instead.
         """
         print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
+
+    def do_getfabricid(self, line):
+        """
+          get-fabricid
+
+          Read the current Fabric Id of the controller device, return 0 if not available.
+        """
+        try:
+            args = shlex.split(line)
+
+            if (len(args) > 0):
+                print("Unexpected argument: " + args[1])
+                return
+
+            fabricid = self.devCtrl.GetFabricId()
+        except exceptions.ChipStackException as ex:
+            print("An exception occurred during reading FabricID:")
+            print(str(ex))
+            return
+
+        print("Get fabric ID complete")
+        print("Fabric ID: " + hex(fabricid))
 
     def do_history(self, line):
         """

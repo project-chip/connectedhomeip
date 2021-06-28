@@ -293,10 +293,8 @@
 #define ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID (0x09)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
 #define ZCL_REMOVE_ALL_FABRICS_COMMAND_ID (0x0B)
-
-// Commands for cluster: Trusted Root Certificates
-#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x00)
-#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x01)
+#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0xA1)
+#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0xA2)
 
 // Commands for cluster: Door Lock
 #define ZCL_LOCK_DOOR_COMMAND_ID (0x00)
@@ -478,7 +476,7 @@
 #define ZCL_SEND_KEY_COMMAND_ID (0x00)
 #define ZCL_SEND_KEY_RESPONSE_COMMAND_ID (0x00)
 
-// Commands for cluster: Content Launch
+// Commands for cluster: Content Launcher
 #define ZCL_LAUNCH_CONTENT_COMMAND_ID (0x00)
 #define ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID (0x00)
 #define ZCL_LAUNCH_URL_COMMAND_ID (0x01)
@@ -491,6 +489,9 @@
 // Commands for cluster: Application Launcher
 #define ZCL_LAUNCH_APP_COMMAND_ID (0x00)
 #define ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID (0x00)
+
+// Commands for cluster: Application Basic
+#define ZCL_CHANGE_STATUS_COMMAND_ID (0x00)
 
 // Commands for cluster: Account Login
 #define ZCL_GET_SETUP_PIN_COMMAND_ID (0x00)

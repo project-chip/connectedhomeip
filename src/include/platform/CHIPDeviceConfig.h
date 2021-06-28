@@ -307,7 +307,7 @@
  * consists of the final two bytes of the device's primary WiFi MAC address in hex.
  */
 #ifndef CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX
-#define CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX "CHIP-"
+#define CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX "MATTER-"
 #endif
 
 /**
@@ -424,7 +424,7 @@
  * may need to be shorter.
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX
-#define CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX "CHIP-"
+#define CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX "MATTER-"
 #endif
 
 /**
@@ -630,6 +630,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
 #define CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
+ *
+ * Maximum number of CHIP Commissioners or Commissionable Nodes that can be discovered
+ */
+#ifndef CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
+#define CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES 10
 #endif
 
 /**

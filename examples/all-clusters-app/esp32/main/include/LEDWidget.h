@@ -31,11 +31,21 @@ class LEDWidget
 {
 public:
     void Init(gpio_num_t gpioNum);
+
     void Set(bool state);
+
+    void SetStateMask(bool state);
+
+    void SetBrightness(uint8_t brightness);
+
     void Blink(uint32_t changeRateMS);
+
     void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
+
     void BlinkOnError();
+
     void Animate();
+
 #if CONFIG_HAVE_DISPLAY
     void SetVLED(int id1, int id2);
 #endif
@@ -44,6 +54,7 @@ private:
     int64_t mLastChangeTimeUS;
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
+    uint8_t mDefaultOnBrightness;
     gpio_num_t mGPIONum;
     int mVLED1;
     int mVLED2;

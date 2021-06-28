@@ -1,15 +1,25 @@
 {{#chip_tests tests}}
-class {{asCamelCased filename false}}: public TestCommand
+class {{filename}}: public TestCommand
 {
   public:
-    {{asCamelCased filename false}}(): TestCommand("{{filename}}") {}
+    {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
       CHIP_ERROR err = CHIP_NO_ERROR;
 
-      switch (mTestIndex)
+      if (mTestCount == mTestIndex)
+      {
+          ChipLogProgress(chipTool, "{{filename}}: Test complete");
+          SetCommandExitStatus(CHIP_NO_ERROR);
+      }
+
+      // Ensure we increment mTestIndex before we start running the relevant
+      // command.  That way if we lose the timeslice after we send the message
+      // but before our function call returns, we won't end up with an
+      // incorrect mTestIndex value observed when we get the response.
+      switch (mTestIndex++)
       {
         {{#chip_tests_items}}
         case {{index}}:
@@ -17,21 +27,18 @@ class {{asCamelCased filename false}}: public TestCommand
           break;
         {{/chip_tests_items}}
       }
-      mTestIndex++;
 
-      if (mTestCount == mTestIndex || CHIP_NO_ERROR != err)
+      if (CHIP_NO_ERROR != err)
       {
           ChipLogProgress(chipTool, "{{filename}}: %s", chip::ErrorStr(err));
-          SetCommandExitStatus(CHIP_NO_ERROR == err);
+          SetCommandExitStatus(err);
       }
-
-      return err;
     }
 
 
   private:
-    uint16_t mTestIndex = 0;
-    uint16_t mTestCount = {{totalTests}};
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = {{totalTests}};
 
     //
     // Tests methods
@@ -39,7 +46,7 @@ class {{asCamelCased filename false}}: public TestCommand
 
     {{#chip_tests_items}}
     // Test {{label}}
-    typedef void (*SuccessCallback_{{index}})(void * context{{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
+    typedef void (*SuccessCallback_{{index}})(void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
     chip::Callback::Callback<SuccessCallback_{{index}}> * mOnSuccessCallback_{{index}} = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_{{index}} = nullptr;
     bool mIsFailureExpected_{{index}} = {{response.error}};
@@ -57,11 +64,25 @@ class {{asCamelCased filename false}}: public TestCommand
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         {{#if isCommand}}
-        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel());
+        {{#chip_tests_item_parameters}}
+        {{#if (isString type)}}
+        {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"));
+        {{else}}
+        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
+        {{/if}}
+        {{/chip_tests_item_parameters}}
+        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(){{#chip_tests_item_parameters}}, {{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else if isReadAttribute}}
         err = cluster.ReadAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel());
         {{else if isWriteAttribute}}
-        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(), {{#chip_tests_item_parameters}}{{definedValue}}{{/chip_tests_item_parameters}});
+        {{#chip_tests_item_parameters}}
+        {{#if (isString type)}}
+        {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"));
+        {{else}}
+        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
+        {{/if}}
+        {{/chip_tests_item_parameters}}
+        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(), {{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else}}
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         {{/if}}
@@ -79,25 +100,32 @@ class {{asCamelCased filename false}}: public TestCommand
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Failure Response");
 
-        {{asCamelCased parent.filename false}} * runner = reinterpret_cast<{{asCamelCased parent.filename false}} *>(context);
+        {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
 
         delete runner->mOnFailureCallback_{{index}};
         delete runner->mOnSuccessCallback_{{index}};
 
+        {{#if optional}}
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
+            runner->NextTest();
+            return;
+        }
+        {{/if}}
+
         if (runner->mIsFailureExpected_{{index}} == false) {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         runner->NextTest();
     }
 
-    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}})
+    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}})
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Success Response");
 
-        {{asCamelCased parent.filename false}} * runner = reinterpret_cast<{{asCamelCased parent.filename false}} *>(context);
+        {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
 
         delete runner->mOnFailureCallback_{{index}};
         delete runner->mOnSuccessCallback_{{index}};
@@ -105,18 +133,59 @@ class {{asCamelCased filename false}}: public TestCommand
         if (runner->mIsFailureExpected_{{index}} == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
-        if ({{asCamelCased name true}} != {{expectedValue}})
+        {{#if isList}}
+        if (count != {{expectedValue.length}})
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
+        {{else}}
+        {{#if (isString type)}}
+        {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{expectedValue}}"), strlen("{{expectedValue}}"));
+        if (!{{asCamelCased name true}}.data_equal({{asCamelCased name true}}Argument))
+        {{else}}
+        if ({{asCamelCased name true}} != {{expectedValue}}{{asTypeLiteralSuffix chipType}})
+        {{/if}}
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+        {{/if}}
+        {{/if}}
+        {{#if hasExpectedConstraints}}
+        {{#if expectedConstraints.type}}
+        ChipLogError(chipTool, "Warning: {{asCamelCased name true}} type checking is not implemented yet. Expected type: '%s'", "{{expectedConstraints.type}}");
+        {{/if}}
+
+        {{#if expectedConstraints.format}}
+        ChipLogError(chipTool, "Warning: {{asCamelCased name true}} format checking is not implemented yet. Expected format: '%s'", "{{expectedConstraints.format}}");
+        {{/if}}
+
+        {{#if expectedConstraints.minLength}}
+          if ({{asCamelCased name true}}.size() < {{expectedConstraints.minLength}})
+          {
+            ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too short. Min size is {{expectedConstraints.minLength}} but got '%zu'", {{asCamelCased name true}}.size());
+            runner->SetCommandExitStatus(false);
+            return;
+          }
+        {{/if}}
+
+        {{#if expectedConstraints.maxLength}}
+          if ({{asCamelCased name true}}.size() > {{expectedConstraints.maxLength}})
+          {
+            ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too long. Max size is {{expectedConstraints.maxLength}} but got '%zu'", {{asCamelCased name true}}.size());
+            runner->SetCommandExitStatus(false);
+            return;
+          }
+        {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
 

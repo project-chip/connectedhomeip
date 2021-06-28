@@ -28,7 +28,6 @@
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 #endif
-constexpr size_t kMaxPayloadSize  = 1280;
 constexpr size_t kResponseTimeOut = 1000;
 
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;

@@ -49,8 +49,8 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint1
 // Cluster Specific Response Callbacks
 typedef void (*AccountLoginClusterGetSetupPINResponseCallback)(void * context, uint8_t * setupPIN);
 typedef void (*ApplicationLauncherClusterLaunchAppResponseCallback)(void * context, uint8_t * data);
-typedef void (*ContentLaunchClusterLaunchContentResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
-typedef void (*ContentLaunchClusterLaunchURLResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
+typedef void (*ContentLauncherClusterLaunchContentResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
+typedef void (*ContentLauncherClusterLaunchURLResponseCallback)(void * context, uint8_t * data, uint8_t contentLaunchStatus);
 typedef void (*DoorLockClusterClearAllPinsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearAllRfidsResponseCallback)(void * context);
 typedef void (*DoorLockClusterClearHolidayScheduleResponseCallback)(void * context);
@@ -117,6 +117,12 @@ typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(v
                                                                                uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                              uint8_t * debugText);
+typedef void (*OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
+                                                                                 uint32_t delayedActionTime);
+typedef void (*OtaSoftwareUpdateServerClusterQueryImageResponseCallback)(void * context, uint32_t delayedActionTime,
+                                                                         uint8_t * imageURI, uint32_t softwareVersion,
+                                                                         chip::ByteSpan updateToken, uint8_t userConsentNeeded,
+                                                                         chip::ByteSpan metadataForClient);
 typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
                                                                    chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
                                                                    chip::ByteSpan VendorReserved3, chip::ByteSpan Signature);
@@ -142,8 +148,8 @@ typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, u
 // List specific responses
 typedef void (*ApplicationLauncherApplicationLauncherListListAttributeCallback)(void * context, uint16_t count, uint16_t * entries);
 typedef void (*AudioOutputAudioOutputListListAttributeCallback)(void * context, uint16_t count, _AudioOutputInfo * entries);
-typedef void (*ContentLaunchAcceptsHeaderListListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
-typedef void (*ContentLaunchSupportedStreamingTypesListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
+typedef void (*ContentLauncherAcceptsHeaderListListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
+typedef void (*ContentLauncherSupportedStreamingTypesListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
 typedef void (*DescriptorDeviceListListAttributeCallback)(void * context, uint16_t count, _DeviceType * entries);
 typedef void (*DescriptorServerListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
 typedef void (*DescriptorClientListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
@@ -162,3 +168,12 @@ typedef void (*TestClusterListInt8uListAttributeCallback)(void * context, uint16
 typedef void (*TestClusterListOctetStringListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
 typedef void (*TestClusterListStructOctetStringListAttributeCallback)(void * context, uint16_t count,
                                                                       _TestListStructOctet * entries);
+typedef void (*ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback)(void * context, uint16_t count,
+                                                                               _NeighborTable * entries);
+typedef void (*ThreadNetworkDiagnosticsRouteTableListListAttributeCallback)(void * context, uint16_t count, _RouteTable * entries);
+typedef void (*ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback)(void * context, uint16_t count,
+                                                                            _SecurityPolicy * entries);
+typedef void (*ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback)(void * context, uint16_t count,
+                                                                                          _OperationalDatasetComponents * entries);
+typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback)(void * context, uint16_t count,
+                                                                                     uint8_t * entries);

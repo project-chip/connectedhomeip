@@ -38,11 +38,11 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
     }
 }
 
-// TODO: Remove this work around due to crashes when storage is accessed from multiple threads and passed around
-static PersistentStorage gStorage;
 int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Controller::CommissionerInitParams initParams;
+    Command * command = nullptr;
 
     err = chip::Platform::MemoryInit();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
@@ -52,19 +52,51 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
     SuccessOrExit(err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ 0, /* BLE central */ true));
 #endif
 
-    err = gStorage.Init();
+    err = mStorage.Init();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
 
-    chip::Logging::SetLogFilter(gStorage.GetLoggingLevel());
+    chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
-    err = RunCommand(gStorage, localId, remoteId, argc, argv);
+    initParams.storageDelegate = &mStorage;
+
+    err = mOpCredsIssuer.Initialize(mStorage);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", chip::ErrorStr(err)));
+
+    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
+
+    err = mController.SetUdpListenPort(mStorage.GetListenPort());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
+
+    err = mController.Init(localId, initParams);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
+
+    err = mController.ServiceEvents();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
+
+    err = RunCommand(localId, remoteId, argc, argv, &command);
     SuccessOrExit(err);
 
 exit:
+#if CONFIG_DEVICE_LAYER
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+#endif
+
+    if (command)
+    {
+        command->Shutdown();
+    }
+
+    //
+    // We can call DeviceController::Shutdown() safely without grabbing the stack lock
+    // since the CHIP thread and event queue have been stopped, preventing any thread
+    // races.
+    //
+    mController.Shutdown();
+
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(PersistentStorage & storage, NodeId localId, NodeId remoteId, int argc, char ** argv)
+CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv, Command ** ranCommand)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::map<std::string, CommandsVector>::iterator cluster;
@@ -126,15 +158,46 @@ CHIP_ERROR Commands::RunCommand(PersistentStorage & storage, NodeId localId, Nod
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    err = command->Run(storage, localId, remoteId);
-    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
-        ExitNow();
+        Command::ExecutionContext execContext;
+
+        execContext.commissioner  = &mController;
+        execContext.opCredsIssuer = &mOpCredsIssuer;
+        execContext.storage       = &mStorage;
+        execContext.localId       = localId;
+        execContext.remoteId      = remoteId;
+
+        command->SetExecutionContext(execContext);
+        *ranCommand = command;
+
+        //
+        // Set this to true first BEFORE we send commands to ensure we don't end
+        // up in a situation where the response comes back faster than we can
+        // set the variable to true, which will cause it to block indefinitely.
+        //
+        command->UpdateWaitForResponse(true);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(command));
+        command->WaitForResponse(command->GetWaitDurationInSeconds());
+        err = command->GetCommandExitStatus();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
+            ExitNow();
+        }
     }
 
 exit:
     return err;
+}
+
+void Commands::RunQueuedCommand(intptr_t commandArg)
+{
+    auto * command = reinterpret_cast<Command *>(commandArg);
+    CHIP_ERROR err = command->Run();
+    if (err != CHIP_NO_ERROR)
+    {
+        command->SetCommandExitStatus(err);
+    }
 }
 
 std::map<std::string, Commands::CommandsVector>::iterator Commands::GetCluster(std::string clusterName)

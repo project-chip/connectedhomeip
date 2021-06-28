@@ -34,7 +34,7 @@ enum SetupPayloadKey
     SetupPayloadKey_Version,
     SetupPayloadKey_VendorID,
     SetupPayloadKey_ProductID,
-    SetupPayloadKey_RequiresCustomFlowTrue,
+    SetupPayloadKey_CommissioningFlow,
     SetupPayloadKey_RendezVousInformation,
     SetupPayloadKey_Discriminator,
     SetupPayloadKey_SetupPINCode,
@@ -64,10 +64,9 @@ static CHIP_ERROR resolveSetupPayloadParameter(SetupPayloadParameter & parameter
     {
         parameter.key = SetupPayloadKey_ProductID;
     }
-    else if (key == "requiresCustomFlowTrue")
+    else if (key == "commissioningFlow")
     {
-        parameter.key   = SetupPayloadKey_RequiresCustomFlowTrue;
-        shouldHaveValue = false;
+        parameter.key = SetupPayloadKey_CommissioningFlow;
     }
     else if (key == "rendezVousInformation")
     {
@@ -119,9 +118,9 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadPa
         ChipLogDetail(SetupPayload, "Loaded productID: %u", (uint16_t) parameter.uintValue);
         setupPayload.productID = static_cast<uint16_t>(parameter.uintValue);
         break;
-    case SetupPayloadKey_RequiresCustomFlowTrue:
-        ChipLogDetail(SetupPayload, "Requires custom flow was set to true");
-        setupPayload.requiresCustomFlow = true;
+    case SetupPayloadKey_CommissioningFlow:
+        ChipLogDetail(SetupPayload, "Commissioning flow: %u", (uint8_t) parameter.uintValue);
+        setupPayload.commissioningFlow = static_cast<CommissioningFlow>(parameter.uintValue);
         break;
     case SetupPayloadKey_RendezVousInformation:
         ChipLogDetail(SetupPayload, "Loaded rendezvousInfo: %u", (uint16_t) parameter.uintValue);
@@ -144,9 +143,8 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadPa
 
 CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, const std::string & filePath)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     std::ifstream fileStream(filePath);
-    VerifyOrExit(!fileStream.fail(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!fileStream.fail(), CHIP_ERROR_INVALID_ARGUMENT);
 
     while (fileStream)
     {
@@ -162,14 +160,11 @@ CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, const std::string & 
         {
             continue;
         }
-        err = resolveSetupPayloadParameter(parameter, key, value);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(resolveSetupPayloadParameter(parameter, key, value));
 
-        err = addParameter(setupPayload, parameter);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(addParameter(setupPayload, parameter));
     }
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR generateQRCodeFromFilePath(std::string filePath, std::string & outCode)

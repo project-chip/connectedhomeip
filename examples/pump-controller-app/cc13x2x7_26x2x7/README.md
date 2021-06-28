@@ -192,7 +192,7 @@ This is done by scanning a QR code. A URL will be displayed on the lock-app's
 log ([UART terminal](#viewing-logging-output)). It will look like the following:
 
 ```
-SetupQRCode:  [CH:.81TM -00 0C9SS0]
+SetupQRCode:  [MT:.81TM -00 0C9SS0]
 Copy/paste the below URL in a browser to see the QR Code:
 https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3A.81TM%20-00%200C9SS0
 ```
@@ -200,7 +200,7 @@ https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3A.81TM%20-00%200C
 You can directly navigate to the webpage URL displayed (which has QR payload
 pre-loaded). Alternatively, you can navigate to [the QR code
 generator][qr_code_generator] and enter in the payload shown in `SetupQRCode`
-(in this case `CH:.81TM -00 0C9SS0`).
+(in this case `MT:.81TM -00 0C9SS0`).
 
 ### CHIP Remote Commands
 

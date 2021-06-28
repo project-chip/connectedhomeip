@@ -14,7 +14,7 @@ static void OnDefaultSuccessResponse(void * context)
     ChipLogProgress(chipTool, "Default Success Response");
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnDefaultFailureResponse(void * context, uint8_t status)
@@ -22,7 +22,7 @@ static void OnDefaultFailureResponse(void * context, uint8_t status)
     ChipLogProgress(chipTool, "Default Failure Response: 0x%02x", status);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(false);
+    command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
 
 static void OnBooleanAttributeResponse(void * context, bool value)
@@ -30,7 +30,7 @@ static void OnBooleanAttributeResponse(void * context, bool value)
     ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt8uAttributeResponse(void * context, uint8_t value)
@@ -38,7 +38,7 @@ static void OnInt8uAttributeResponse(void * context, uint8_t value)
     ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt16uAttributeResponse(void * context, uint16_t value)
@@ -46,7 +46,7 @@ static void OnInt16uAttributeResponse(void * context, uint16_t value)
     ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt32uAttributeResponse(void * context, uint32_t value)
@@ -54,7 +54,7 @@ static void OnInt32uAttributeResponse(void * context, uint32_t value)
     ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt64uAttributeResponse(void * context, uint64_t value)
@@ -62,7 +62,7 @@ static void OnInt64uAttributeResponse(void * context, uint64_t value)
     ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt8sAttributeResponse(void * context, int8_t value)
@@ -70,7 +70,7 @@ static void OnInt8sAttributeResponse(void * context, int8_t value)
     ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt16sAttributeResponse(void * context, int16_t value)
@@ -78,7 +78,7 @@ static void OnInt16sAttributeResponse(void * context, int16_t value)
     ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt32sAttributeResponse(void * context, int32_t value)
@@ -86,7 +86,7 @@ static void OnInt32sAttributeResponse(void * context, int32_t value)
     ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt64sAttributeResponse(void * context, int64_t value)
@@ -94,7 +94,7 @@ static void OnInt64sAttributeResponse(void * context, int64_t value)
     ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnStringAttributeResponse(void * context, const chip::ByteSpan value)
@@ -102,7 +102,7 @@ static void OnStringAttributeResponse(void * context, const chip::ByteSpan value
     ChipLogProgress(chipTool, "String attribute Response: %zu", value.size());
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 {{#chip_client_clusters}}
@@ -116,7 +116,7 @@ static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false
     ChipLogProgress(chipTool, "{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}");
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 {{/if}}
@@ -131,12 +131,12 @@ static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false
 {{#if isList}}
 static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse(void * context, uint16_t count, {{chipType}} * entries)
 {
-    ChipLogProgress(chipTool, "On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse: %lu entries", count);
+    ChipLogProgress(chipTool, "On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse: %" PRIu16 " entries", count);
 
     for (uint16_t i = 0; i < count; i++)
     {
         {{#if isStruct}}
-        ChipLogProgress(chipTool, "{{type}}[%lu]:", i);
+        ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]:", i);
         {{#chip_attribute_list_entryTypes}}
         {{#if (isOctetString type)}}
         ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entries[i].{{name}}.size());
@@ -153,13 +153,13 @@ static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListA
         {{else if (isCharString type)}}
         ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", entries[i].size(), entries[i].data());
         {{else}}
-        ChipLogProgress(chipTool, "{{type}}[%lu]: {{asPrintFormat type}}", i, entries[i]);
+        ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]: {{asPrintFormat type}}", i, entries[i]);
         {{/if}}
         {{/if}}
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 {{/if}}

@@ -2,6 +2,7 @@
     "version": "ZCL Test Data",
     "xmlRoot": [".", "./data-model/silabs/"],
     "xmlFile": [
+        "basic-information-cluster.xml",
         "test-cluster.xml",
         "account-login-cluster.xml",
         "application-launcher-cluster.xml",
@@ -27,7 +28,6 @@
         "types.xml",
         "general.xml",
         "operational-credentials-cluster.xml",
-        "trusted-root-certificates-cluster.xml",
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
         "group-key-mgmt-cluster.xml",
@@ -45,6 +45,7 @@
         "zll.xml",
         "zll-devices.xml",
         "temperature-measurement-cluster.xml",
+        "relative-humidity-measurement-cluster.xml",
         "ta.xml",
         "ta-devices.xml",
         "thread-network-diagnostics-cluster.xml",

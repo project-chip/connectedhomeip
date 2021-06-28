@@ -33,8 +33,8 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
 namespace chip {
 namespace app {
-void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                                  const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
@@ -47,23 +47,25 @@ void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const Pa
     err = ProcessCommandMessage(std::move(payload), CommandRoleId::HandlerId);
     SuccessOrExit(err);
 
-    SendCommandResponse();
+    err = SendCommandResponse();
 
 exit:
     ChipLogFunctError(err);
+    return err;
 }
 
 CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle commandPacket;
 
     VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = FinalizeCommandsMessage();
+    err = FinalizeCommandsMessage(commandPacket);
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(mCommandMessageBuf));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket));
     SuccessOrExit(err);
 
     MoveToState(CommandState::Sending);
@@ -121,28 +123,31 @@ exit:
             ChipLogDetail(DataManagement, "No Cluster 0x%" PRIx16 " on Endpoint 0x%" PRIx8, clusterId, endpointId);
         }
 
-        AddStatusCode(&returnStatusParam,
+        AddStatusCode(returnStatusParam,
                       err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
-                      Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                      Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
     }
     // We have handled the error status above and put the error status in response, now return success status so we can process
     // other commands in the invoke request.
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPathParams,
+CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathParams,
                                          const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                         const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+                                         const Protocols::Id aProtocolId,
+                                         const Protocols::InteractionModel::ProtocolCode aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
 
-    err = PrepareCommand(apCommandPathParams, true /* isStatus */);
+    err = PrepareCommand(aCommandPathParams, true /* isStatus */);
     SuccessOrExit(err);
 
     statusElementBuilder =
         mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
+    statusElementBuilder
+        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(),
+                             Protocols::InteractionModel::ToUint16(aProtocolCode))
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);

@@ -60,12 +60,33 @@ if (chip_device_platform != "none") {
     chip_stack_lock_tracking = "auto"
   }
 
+  if (chip_stack_lock_tracking == "auto") {
+    if (chip_device_platform == "linux") {
+      # TODO: should be fatal for development. Change once bugs are fixed
+      chip_stack_lock_tracking = "log"
+    } else {
+      # TODO: may want to enable at least logging for embedded to find bugs
+      # this needs tuning depending on how many resources various platforms have
+      # available (mainly flash size)
+      chip_stack_lock_tracking = "none"
+    }
+  } else {
+    assert(
+        chip_stack_lock_tracking == "none" ||
+            chip_stack_lock_tracking == "log" ||
+            chip_stack_lock_tracking == "fatal",
+        "Please select a valid value for chip_stack_lock_tracking: auto, none, log, fatal")
+  }
+
   buildconfig_header("platform_buildconfig") {
     header = "CHIPDeviceBuildConfig.h"
     header_dir = "platform"
 
     chip_with_gio = chip_enable_wifi
     chip_device_config_enable_wpa = chip_enable_wifi
+    chip_device_config_enable_mdns = chip_mdns != "none"
+    chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
+    chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
 
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
@@ -73,42 +94,20 @@ if (chip_device_platform != "none") {
       "CHIP_WITH_GIO=${chip_with_gio}",
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
       "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=${chip_use_clusters_for_ip_commissioning}",
+      "CHIP_DEVICE_CONFIG_ENABLE_MDNS=${chip_device_config_enable_mdns}",
+      "CHIP_BYPASS_RENDEZVOUS=${chip_bypass_rendezvous}",
+      "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
+      "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
+      "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
+      "CHIP_ENABLE_ROTATING_DEVICE_ID=${chip_enable_rotating_device_id}",
     ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
-    stack_log_tracking = chip_stack_lock_tracking
-    if (stack_log_tracking == "auto") {
-      if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
-        # TODO: should be fatal for development. Change once bugs are fixed
-        stack_log_tracking = "log"
-      } else {
-        # TODO: may want to enable at least logging for embedded to find bugs
-        # this needs tuning depending on how many resources various platforms have
-        # available (mainly flash size)
-        stack_log_tracking = "none"
-      }
-    }
-
-    if (stack_log_tracking == "fatal") {
-      defines += [
-        "CHIP_STACK_LOCK_TRACKING_ENABLED=1",
-        "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=1",
-      ]
-    } else if (stack_log_tracking == "log") {
-      defines += [ "CHIP_STACK_LOCK_TRACKING_ENABLED=1" ]
-    } else {
-      assert(stack_log_tracking == "none")
-    }
-
     if (chip_enable_nfc) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NFC=1" ]
-    }
-
-    if (chip_mdns != "none") {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MDNS=1" ]
     }
 
     if (chip_device_project_config_include != "") {
@@ -123,22 +122,6 @@ if (chip_device_platform != "none") {
     }
     if (chip_device_config_firmware_build_time != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
-    }
-
-    if (chip_bypass_rendezvous) {
-      defines += [ "CHIP_BYPASS_RENDEZVOUS=1" ]
-    }
-
-    if (chip_enable_additional_data_advertising) {
-      defines += [ "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=1" ]
-    } else {
-      defines += [ "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=0" ]
-    }
-
-    if (chip_enable_rotating_device_id) {
-      defines += [ "CHIP_ENABLE_ROTATING_DEVICE_ID=1" ]
-    } else {
-      defines += [ "CHIP_ENABLE_ROTATING_DEVICE_ID=0" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {
@@ -180,6 +163,11 @@ if (chip_device_platform != "none") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_K32W=1",
         "CHIP_DEVICE_LAYER_TARGET=K32W",
+      ]
+    } else if (chip_device_platform == "telink") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_TELINK=1",
+        "CHIP_DEVICE_LAYER_TARGET=telink",
       ]
     }
   }
@@ -362,6 +350,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/PosixConfig.cpp",
         "Darwin/PosixConfig.h",
         "Darwin/SystemPlatformConfig.h",
+        "DeviceSafeQueue.cpp",
+        "DeviceSafeQueue.h",
       ]
 
       if (chip_enable_ble) {
@@ -499,6 +489,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       public_deps += [ "${chip_root}/src/crypto" ]
     } else if (chip_device_platform == "linux") {
       sources += [
+        "DeviceSafeQueue.cpp",
+        "DeviceSafeQueue.h",
         "Linux/BLEManagerImpl.cpp",
         "Linux/BLEManagerImpl.h",
         "Linux/BlePlatformConfig.h",
@@ -640,6 +632,39 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "OpenThread/OpenThreadUtils.cpp",
           "qpg6100/ThreadStackManagerImpl.cpp",
           "qpg6100/ThreadStackManagerImpl.h",
+        ]
+      }
+    } else if (chip_device_platform == "telink") {
+      sources += [
+        "Zephyr/BLEManagerImpl.cpp",
+        "Zephyr/ConfigurationManagerImpl.cpp",
+        "Zephyr/KeyValueStoreManagerImpl.cpp",
+        "Zephyr/Logging.cpp",
+        "Zephyr/PlatformManagerImpl.cpp",
+        "Zephyr/SystemTimeSupport.cpp",
+        "Zephyr/ZephyrConfig.cpp",
+        "Zephyr/ZephyrConfig.h",
+        "telink/BLEManagerImpl.h",
+        "telink/BlePlatformConfig.h",
+        "telink/CHIPDevicePlatformConfig.h",
+        "telink/CHIPDevicePlatformEvent.h",
+        "telink/CHIPPlatformConfig.h",
+        "telink/ConfigurationManagerImpl.h",
+        "telink/ConnectivityManagerImpl.cpp",
+        "telink/ConnectivityManagerImpl.h",
+        "telink/DeviceNetworkProvisioningDelegateImpl.cpp",
+        "telink/DeviceNetworkProvisioningDelegateImpl.h",
+        "telink/InetPlatformConfig.h",
+        "telink/KeyValueStoreManagerImpl.h",
+        "telink/PlatformManagerImpl.h",
+        "telink/SystemPlatformConfig.h",
+      ]
+
+      if (chip_enable_openthread) {
+        sources += [
+          "OpenThread/OpenThreadUtils.cpp",
+          "Zephyr/ThreadStackManagerImpl.cpp",
+          "telink/ThreadStackManagerImpl.h",
         ]
       }
     }

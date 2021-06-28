@@ -24,6 +24,11 @@ include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
 # Load NCS/Zephyr build system
 set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
+
+if (EXISTS boards/${BOARD}.conf)
+  list(APPEND CONF_FILE boards/${BOARD}.conf)
+endif()
+
 # TODO: temporary fix to remove after solving static addressing problem on nrf5340
 if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
     list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
@@ -62,7 +67,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/af-main-common.cpp
                ${CHIP_ROOT}/src/app/util/attribute-list-byte-span.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-size.cpp
+               ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
                ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
                ${CHIP_ROOT}/src/app/util/attribute-table.cpp
                ${CHIP_ROOT}/src/app/util/binding-table.cpp
@@ -88,7 +93,6 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               ${CHIP_ROOT}/src/app/clusters/trusted-root-certificates-server/trusted-root-certificates-server.cpp
                )
 
 if (CONFIG_CHIP_PW_RPC)
@@ -147,7 +151,6 @@ target_sources(app PRIVATE
 )
 
 target_include_directories(app PRIVATE
-  ${ZEPHYR_BASE}/subsys // required to get access to `log_output_std.h`
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
@@ -163,5 +166,7 @@ target_link_libraries(app PRIVATE
   pw_log
   pw_rpc.server
 )
+
+target_link_libraries(pw_build INTERFACE zephyr_interface)
 
 endif(CONFIG_CHIP_PW_RPC)

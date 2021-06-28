@@ -576,6 +576,10 @@ CHIP_ERROR TLVReader::ReadElement()
     if (err != CHIP_NO_ERROR)
         return err;
 
+    if (mReadPoint == nullptr)
+    {
+        return CHIP_ERROR_INVALID_TLV_ELEMENT;
+    }
     // Get the element's control byte.
     mControlByte = *mReadPoint;
 

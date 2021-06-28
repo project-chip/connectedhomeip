@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 
@@ -132,32 +133,8 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
 
         if (aAttributePathParamsListSize != 0 && apAttributePathParamsList != nullptr)
         {
-            AttributePathList::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
-            SuccessOrExit(err = attributePathListBuilder.GetError());
-            for (size_t index = 0; index < aAttributePathParamsListSize; index++)
-            {
-                AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
-                attributePathBuilder.NodeId(apAttributePathParamsList[index].mNodeId)
-                    .EndpointId(apAttributePathParamsList[index].mEndpointId)
-                    .ClusterId(apAttributePathParamsList[index].mClusterId);
-                if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kFieldIdValid)
-                {
-                    attributePathBuilder.FieldId(apAttributePathParamsList[index].mFieldId);
-                }
-                else if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kListIndexValid)
-                {
-                    attributePathBuilder.ListIndex(apAttributePathParamsList[index].mListIndex);
-                }
-                else
-                {
-                    err = CHIP_ERROR_INVALID_ARGUMENT;
-                    ExitNow();
-                }
-                attributePathBuilder.EndOfAttributePath();
-                SuccessOrExit(err = attributePathBuilder.GetError());
-            }
-            attributePathListBuilder.EndOfAttributePathList();
-            SuccessOrExit(err = attributePathListBuilder.GetError());
+            err = GenerateAttributePathList(request, apAttributePathParamsList, aAttributePathParamsListSize);
+            SuccessOrExit(err);
         }
 
         request.EndOfReadRequest();
@@ -187,8 +164,38 @@ exit:
     return err;
 }
 
-void ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                   const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadClient::GenerateAttributePathList(ReadRequest::Builder & aRequest, AttributePathParams * apAttributePathParamsList,
+                                                 size_t aAttributePathParamsListSize)
+{
+    AttributePathList::Builder attributePathListBuilder = aRequest.CreateAttributePathListBuilder();
+    ReturnErrorOnFailure(attributePathListBuilder.GetError());
+    for (size_t index = 0; index < aAttributePathParamsListSize; index++)
+    {
+        AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+        attributePathBuilder.NodeId(apAttributePathParamsList[index].mNodeId)
+            .EndpointId(apAttributePathParamsList[index].mEndpointId)
+            .ClusterId(apAttributePathParamsList[index].mClusterId);
+        if (apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kFieldIdValid))
+        {
+            attributePathBuilder.FieldId(apAttributePathParamsList[index].mFieldId);
+        }
+
+        if (apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kListIndexValid))
+        {
+            VerifyOrReturnError(apAttributePathParamsList[index].mFlags.Has(AttributePathParams::Flags::kFieldIdValid),
+                                CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            attributePathBuilder.ListIndex(apAttributePathParamsList[index].mListIndex);
+        }
+
+        attributePathBuilder.EndOfAttributePath();
+        ReturnErrorOnFailure(attributePathBuilder.GetError());
+    }
+    attributePathListBuilder.EndOfAttributePathList();
+    return attributePathListBuilder.GetError();
+}
+
+CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                         const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -217,7 +224,7 @@ exit:
         }
     }
 
-    return;
+    return err;
 }
 
 CHIP_ERROR ReadClient::AbortExistingExchangeContext()
@@ -351,19 +358,27 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         err = attributePathParser.GetFieldId(&(clusterInfo.mFieldId));
         if (CHIP_NO_ERROR == err)
         {
-            clusterInfo.mType = ClusterInfo::Type::kFieldIdValid;
+            clusterInfo.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
         }
         else if (CHIP_END_OF_TLV == err)
         {
-            err = attributePathParser.GetListIndex(&(clusterInfo.mListIndex));
-            SuccessOrExit(err);
-            clusterInfo.mType = ClusterInfo::Type::kListIndexValid;
+            err = CHIP_NO_ERROR;
+        }
+        SuccessOrExit(err);
+
+        err = attributePathParser.GetListIndex(&(clusterInfo.mListIndex));
+        if (CHIP_NO_ERROR == err)
+        {
+            VerifyOrExit(clusterInfo.mFlags.Has(ClusterInfo::Flags::kFieldIdValid), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            clusterInfo.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+        }
+        else if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
-        SuccessOrExit(err);
-        err = WriteSingleClusterData(clusterInfo, dataReader);
         SuccessOrExit(err);
     }
 

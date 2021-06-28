@@ -96,6 +96,13 @@ public:
     AttributeStatusList::Builder & CreateAttributeStatusListBuilder();
 
     /**
+     *  @brief Get reference to AttributeStatusList::Builder
+     *
+     *  @return A reference to AttributeStatusList::Builder
+     */
+    AttributeStatusList::Builder & GetAttributeStatusListBuilder();
+
+    /**
      *  @brief Mark the end of this WriteResponse
      *
      *  @return A reference to *this

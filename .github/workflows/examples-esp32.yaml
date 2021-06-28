@@ -18,6 +18,10 @@ on:
     push:
     pull_request:
 
+concurrency:
+    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+  
 jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
@@ -47,6 +51,17 @@ jobs:
 #               uses: github/codeql-action/init@v1
 #               with:
 #                   languages: "cpp, python"
+            - name: Bootstrap
+              timeout-minutes: 15
+              run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                   .environment/gn_out/.ninja_log
+                   .environment/pigweed-venv/*.log
             - name: Build example All Clusters App
               timeout-minutes: 15
               run: scripts/examples/esp_example.sh all-clusters-app

@@ -179,9 +179,34 @@ class ChipDeviceController(object):
         )
 
         return (address.value.decode(), port.value) if error == 0 else None
-    def DiscoverCommissioningLongDiscriminator(self, long_discriminator):
+    def DiscoverCommissionableNodesLongDiscriminator(self, long_discriminator):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator(self.devCtrl, long_discriminator)
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(self.devCtrl, long_discriminator)
+        )
+
+    def DiscoverCommissionableNodesShortDiscriminator(self, short_discriminator):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(self.devCtrl, short_discriminator)
+        )
+        
+    def DiscoverCommissionableNodesVendor(self, vendor):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor(self.devCtrl, vendor)
+        )
+
+    def DiscoverCommissionableNodesDeviceType(self, device_type):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType(self.devCtrl, device_type)
+        )
+
+    def DiscoverCommissionableNodesCommissioningEnabled(self, enabled):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(self.devCtrl, enabled)
+        )
+
+    def DiscoverCommissionableNodesCommissioningEnabledFromCommand(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(self.devCtrl)
         )
 
     def PrintDiscoveredDevices(self):
@@ -202,8 +227,21 @@ class ChipDeviceController(object):
 
     def DiscoverAllCommissioning(self):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverAllCommissioning(self.devCtrl)
+            lambda: self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes(self.devCtrl)
         )
+
+    def GetFabricId(self):
+        fabricid = c_uint64(0)
+
+        error = self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetFabricId(
+                self.devCtrl, pointer(fabricid))
+        )
+
+        if error == 0:
+            return fabricid.value
+        else:
+            return 0
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = c_void_p(None)
@@ -229,6 +267,17 @@ class ChipDeviceController(object):
         # We are not using IM for Attributes.
         res = self._Cluster.ReadAttribute(
             device, cluster, attribute, endpoint, groupid, False)
+
+    def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
+        device = c_void_p(None)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
+            self.devCtrl, nodeid, pointer(device)))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
+        # We are not using IM for Attributes.
+        res = self._Cluster.WriteAttribute(
+            device, cluster, attribute, endpoint, groupid, value, False)
 
     def ZCLConfigureAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, change, blocking=True):
         device = c_void_p(None)
@@ -286,11 +335,26 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64]
-            self._dmLib.pychip_DeviceController_DiscoverAllCommissioning.argtypes = [c_void_p]
-            self._dmLib.pychip_DeviceController_DiscoverAllCommissioning.restype = c_uint32
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.restype = c_uint32
 
-            self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.argtypes = [c_void_p, c_uint16]
-            self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.restype = c_uint32
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [c_void_p]
 
@@ -325,3 +389,6 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
             self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
+
+            self._dmLib.pychip_DeviceController_GetFabricId.argtypes = [c_void_p, POINTER(c_uint64)]
+            self._dmLib.pychip_DeviceController_GetFabricId.restype = c_uint32
