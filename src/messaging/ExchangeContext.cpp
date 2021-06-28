@@ -370,7 +370,8 @@ void ExchangeContext::NotifyResponseTimeout()
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                          const Transport::PeerAddress & peerAddress, PacketBufferHandle && msgBuf)
+                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+                                          PacketBufferHandle && msgBuf)
 {
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference
@@ -378,12 +379,18 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
-    CHIP_ERROR err =
-        mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
+    CHIP_ERROR err = mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, msgFlags,
+                                                  GetReliableMessageContext());
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+    {
+        ExitNow(err = CHIP_NO_ERROR);
+    }
+
+    // Since the message is duplicate, let's not forward it up the stack
+    if (msgFlags.Has(MessageFlagValues::kDuplicateMessage))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }
