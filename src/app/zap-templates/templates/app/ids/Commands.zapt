@@ -1,0 +1,40 @@
+{{> header}}
+
+#pragma once
+
+#include <app/util/basic-types.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+namespace Globals {
+namespace Commands {
+namespace Ids {
+{{#zcl_global_commands}}
+static constexpr CommandId {{asUpperCamelCase label}} = {{asHex code 2}};
+{{/zcl_global_commands}}
+} // namespace Ids
+} // namespace Commands
+} // namespace Globals
+
+{{#zcl_clusters}}
+
+{{#zcl_commands}}
+{{#first}}
+namespace {{asCamelCased parent.label false}} {
+namespace Commands {
+namespace Ids {
+{{/first}}
+static constexpr CommandId {{asUpperCamelCase label}} = {{asHex code 2}};
+{{#last}}
+} // namespace Ids
+} // namespace Commands
+} // namespace {{asCamelCased parent.label false}}
+{{/last}}
+{{/zcl_commands}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
