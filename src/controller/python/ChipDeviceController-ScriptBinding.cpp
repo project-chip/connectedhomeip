@@ -66,7 +66,7 @@ using namespace chip::Controller;
 extern "C" {
 typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataLen);
 typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
-typedef void (*DeviceAvailableFunc)(Device* device, CHIP_ERROR err);
+typedef void (*DeviceAvailableFunc)(Device * device, CHIP_ERROR err);
 }
 
 namespace {
@@ -122,8 +122,8 @@ pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::Devi
                                                           chip::Controller::DevicePairingDelegate_OnPairingCompleteFunct callback);
 
 CHIP_ERROR
-pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                    chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback);
+pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
+    chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback);
 
 void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
     chip::Controller::DeviceAddressUpdateDelegate_OnUpdateComplete callback);
@@ -144,7 +144,7 @@ void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 CHIP_ERROR pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                     chip::Controller::Device ** device);
 CHIP_ERROR pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                    DeviceAvailableFunc callback);
+                                             DeviceAvailableFunc callback);
 uint64_t pychip_GetCommandSenderHandle(chip::Controller::Device * device);
 // CHIP Stack objects
 CHIP_ERROR pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
@@ -363,8 +363,8 @@ pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::Devi
 }
 
 CHIP_ERROR
-pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                    chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback)
+pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
+    chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnCommissioningCompleteFunct callback)
 {
     sPairingDelegate.SetCommissioningCompleteCallback(callback);
     return CHIP_NO_ERROR;
@@ -427,17 +427,22 @@ CHIP_ERROR pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCt
 }
 
 namespace {
-struct GetDeviceCallbacks {
-    GetDeviceCallbacks(DeviceAvailableFunc callback) : mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mCallback(callback) {}
+struct GetDeviceCallbacks
+{
+    GetDeviceCallbacks(DeviceAvailableFunc callback) :
+        mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mCallback(callback)
+    {}
 
-    static void OnDeviceConnectedFn(void * context, Device * device) {
-        auto * self = static_cast<GetDeviceCallbacks*>(context);
+    static void OnDeviceConnectedFn(void * context, Device * device)
+    {
+        auto * self = static_cast<GetDeviceCallbacks *>(context);
         self->mCallback(device, CHIP_NO_ERROR);
         delete self;
     }
 
-    static void OnConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error) {
-        auto * self = static_cast<GetDeviceCallbacks*>(context);
+    static void OnConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+    {
+        auto * self = static_cast<GetDeviceCallbacks *>(context);
         self->mCallback(nullptr, error);
         delete self;
     }

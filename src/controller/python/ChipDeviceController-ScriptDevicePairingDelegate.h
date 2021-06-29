@@ -45,7 +45,7 @@ public:
     void OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err) override;
 
 private:
-    DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback = nullptr;
+    DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback             = nullptr;
     DevicePairingDelegate_OnCommissioningCompleteFunct mOnCommissioningCompleteCallback = nullptr;
 };
 
