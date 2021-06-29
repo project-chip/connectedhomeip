@@ -10587,21 +10587,6 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeType(Callback::Cancelable * onSuc
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeType(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                         uint16_t maxInterval)
-{
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterConfigureTypeAttribute(seqNum, mEndpoint, minInterval, maxInterval);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(0x0000, onReportCallback);
-}
-
 CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
 {
@@ -10612,21 +10597,6 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLift(Callback::Can
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval, uint16_t change)
-{
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterConfigureCurrentPositionLiftAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionLift(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(0x0003, onReportCallback);
 }
 
 CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback,
@@ -10641,21 +10611,6 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTilt(Callback::Can
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval, uint16_t change)
-{
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterConfigureCurrentPositionTiltAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionTilt(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(0x0004, onReportCallback);
-}
-
 CHIP_ERROR WindowCoveringCluster::ReadAttributeConfigStatus(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback)
 {
@@ -10668,19 +10623,211 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeConfigStatus(Callback::Cancelable
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeConfigStatus(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterConfigureConfigStatusAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0008;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onSuccessCallback,
+                                                                                  Callback::Cancelable * onFailureCallback,
+                                                                                  uint16_t minInterval, uint16_t maxInterval,
+                                                                                  uint8_t change)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureCurrentPositionLiftPercentageAttribute(
+        seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReportAttributeConfigStatus(Callback::Cancelable * onReportCallback)
+CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onReportCallback)
 {
-    return RequestAttributeReporting(0x0007, onReportCallback);
+    return RequestAttributeReporting(0x0008, onReportCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0009;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onSuccessCallback,
+                                                                                  Callback::Cancelable * onFailureCallback,
+                                                                                  uint16_t minInterval, uint16_t maxInterval,
+                                                                                  uint8_t change)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureCurrentPositionTiltPercentageAttribute(
+        seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0009, onReportCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReadAttributeOperationalStatus(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x000A;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeOperationalStatus(Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback,
+                                                                      uint16_t minInterval, uint16_t maxInterval)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeWindowCoveringClusterConfigureOperationalStatusAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReportAttributeOperationalStatus(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x000A, onReportCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReadAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x000B;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                                    Callback::Cancelable * onFailureCallback,
+                                                                                    uint16_t minInterval, uint16_t maxInterval,
+                                                                                    uint16_t change)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureTargetPositionLiftPercent100thsAttribute(
+        seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReportAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x000B, onReportCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReadAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x000C;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                                    Callback::Cancelable * onFailureCallback,
+                                                                                    uint16_t minInterval, uint16_t maxInterval,
+                                                                                    uint16_t change)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureTargetPositionTiltPercent100thsAttribute(
+        seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReportAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x000C, onReportCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReadAttributeEndProductType(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x000D;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                                Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x000E;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                                     Callback::Cancelable * onFailureCallback,
+                                                                                     uint16_t minInterval, uint16_t maxInterval,
+                                                                                     uint16_t change)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureCurrentPositionLiftPercent100thsAttribute(
+        seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x000E, onReportCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                                Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x000F;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                                     Callback::Cancelable * onFailureCallback,
+                                                                                     uint16_t minInterval, uint16_t maxInterval,
+                                                                                     uint16_t change)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureCurrentPositionTiltPercent100thsAttribute(
+        seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x000F, onReportCallback);
 }
 
 CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledOpenLimitLift(Callback::Cancelable * onSuccessCallback,
@@ -10749,6 +10896,33 @@ CHIP_ERROR WindowCoveringCluster::WriteAttributeMode(Callback::Cancelable * onSu
     uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterWriteModeAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReadAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x001A;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                 uint16_t maxInterval)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeWindowCoveringClusterConfigureSafetyStatusAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WindowCoveringCluster::ReportAttributeSafetyStatus(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x001A, onReportCallback);
 }
 
 CHIP_ERROR WindowCoveringCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

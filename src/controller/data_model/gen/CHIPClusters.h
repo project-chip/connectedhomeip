@@ -1495,6 +1495,20 @@ public:
     CHIP_ERROR ReadAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeConfigStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOperationalStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeEndProductType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeInstalledOpenLimitLift(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeInstalledClosedLimitLift(Callback::Cancelable * onSuccessCallback,
@@ -1504,23 +1518,41 @@ public:
     CHIP_ERROR ReadAttributeInstalledClosedLimitTilt(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                   uint8_t value);
-    CHIP_ERROR ConfigureAttributeType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeType(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ConfigureAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                     uint16_t maxInterval, uint16_t change);
-    CHIP_ERROR ReportAttributeCurrentPositionLift(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ConfigureAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                     uint16_t maxInterval, uint16_t change);
-    CHIP_ERROR ReportAttributeCurrentPositionTilt(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ConfigureAttributeConfigStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+    CHIP_ERROR ConfigureAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                               uint16_t maxInterval, uint8_t change);
+    CHIP_ERROR ReportAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                               uint16_t maxInterval, uint8_t change);
+    CHIP_ERROR ReportAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeOperationalStatus(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                   uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeOperationalStatus(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                 uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                 uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                  uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                  uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeConfigStatus(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ReportAttributeSafetyStatus(Callback::Cancelable * onReportCallback);
 
 private:
     static constexpr CommandId kDownOrCloseCommandId        = 0x01;
