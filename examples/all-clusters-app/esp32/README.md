@@ -219,12 +219,12 @@ commissioning and cluster control.
 
 -   Follow these steps to use `${app_name}.flash.py`.
 
-    - First set IDF target, run set-target with one of the commands.
+    -   First set IDF target, run set-target with one of the commands.
 
-          $ idf.py set-target esp32
-          $ idf.py set-target esp32c3
+            $ idf.py set-target esp32
+            $ idf.py set-target esp32c3
 
-    - Execute below sequence of commands
+    -   Execute below sequence of commands
 
 ```
         $ export ESPPORT=/dev/tty.SLAB_USBtoUART
