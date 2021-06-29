@@ -255,7 +255,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdm
     ClearExistingExchangeContext();
 
     // Create a new exchange context.
-    // TODO: we temprarily create a SecureSessionHandle from node id, this will be fixed in PR 3602
+    // TODO: we temporarily create a SecureSessionHandle from node id, this will be fixed in PR 3602
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     if (apSecureSession == nullptr)
     {
