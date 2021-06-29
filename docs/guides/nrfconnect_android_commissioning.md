@@ -136,8 +136,8 @@ To prepare the accessory device for commissioning, complete the following steps:
 
 1.  Use a terminal emulator to connect to the UART console of the accessory
     device. For details, see the
-    [Using CLI in nRF Connect SDK examples](nrfconnect_examples_cli.md) guide.
-    This will grant you access to the application logs.
+    [Using CLI in nRF Connect examples](nrfconnect_examples_cli.md) guide. This
+    will grant you access to the application logs.
 2.  Hold **Button 1** on the accessory device for more than 6 s to trigger the
     factory reset of the device.
 3.  Find a message similar to the following one in the application logs:

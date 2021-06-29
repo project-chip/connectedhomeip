@@ -642,6 +642,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG:
         desc = "Outbound message too big";
         break;
+    case CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED:
+        desc = "Duplicate message received";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

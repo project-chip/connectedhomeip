@@ -19,6 +19,7 @@
 
 #include <cstdint>
 
+#include "lib/support/logging/CHIPLogging.h"
 #include <core/CHIPError.h>
 #include <core/PeerId.h>
 #include <inet/IPAddress.h>
@@ -30,6 +31,18 @@ namespace Mdns {
 
 struct ResolvedNodeData
 {
+    void LogNodeIdResolved()
+    {
+#if CHIP_PROGRESS_LOGGING
+        char addrBuffer[Inet::kMaxIPAddressStringLength + 1];
+        mAddress.ToString(addrBuffer);
+        // Would be nice to log the interface id, but sorting out how to do so
+        // across our differnet InterfaceId implementations is a pain.
+        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64 " to [%s]:%" PRIu16,
+                        ChipLogValueX64(mPeerId.GetNodeId()), addrBuffer, mPort);
+#endif // CHIP_PROGRESS_LOGGING
+    }
+
     PeerId mPeerId;
     Inet::InterfaceId mInterfaceId;
     Inet::IPAddress mAddress;

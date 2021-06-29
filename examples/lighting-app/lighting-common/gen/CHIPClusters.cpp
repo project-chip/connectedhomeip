@@ -21,6 +21,7 @@
 #include <cstdint>
 
 #include "chip-zcl-zpro-codec-api.h"
+#include <gen/CHIPClientCallbacks.h>
 #include <lib/support/Span.h>
 
 namespace chip {

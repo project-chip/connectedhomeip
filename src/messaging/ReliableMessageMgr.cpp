@@ -116,7 +116,6 @@ void ReliableMessageMgr::ExecuteActions()
 #endif
                 // Send the Ack in a SecureChannel::StandaloneAck message
                 rc->SendStandaloneAckMessage();
-                rc->SetAckPending(false);
             }
         }
     });

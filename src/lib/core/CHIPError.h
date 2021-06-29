@@ -1826,6 +1826,14 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG                    CHIP_CORE_ERROR(195)
 
 /**
+ * @def CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED
+ *
+ * @brief
+ *   The received message is a duplicate of a previously received message.
+ */
+#define CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED                  CHIP_CORE_ERROR(196)
+
+/**
  *  @}
  */
 

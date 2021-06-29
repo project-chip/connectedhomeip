@@ -921,6 +921,9 @@ exit:
 CHIP_ERROR P256Keypair::Initialize()
 {
     ERR_clear_error();
+
+    Clear();
+
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     EC_KEY * ec_key  = nullptr;
@@ -988,6 +991,8 @@ exit:
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
     Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
+
+    Clear();
 
     BIGNUM * pvt_key     = nullptr;
     EC_GROUP * group     = nullptr;
@@ -1064,13 +1069,19 @@ exit:
     return error;
 }
 
-P256Keypair::~P256Keypair()
+void P256Keypair::Clear()
 {
     if (mInitialized)
     {
         EC_KEY * ec_key = to_EC_KEY(&mKeypair);
         EC_KEY_free(ec_key);
+        mInitialized = false;
     }
+}
+
+P256Keypair::~P256Keypair()
+{
+    Clear();
 }
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)

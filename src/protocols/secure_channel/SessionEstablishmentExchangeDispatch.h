@@ -48,7 +48,7 @@ public:
     CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override;
 
     CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
-                                 const Transport::PeerAddress & peerAddress,
+                                 const Transport::PeerAddress & peerAddress, Messaging::MessageFlags msgFlags,
                                  Messaging::ReliableMessageContext * reliableMessageContext) override;
 
     const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }

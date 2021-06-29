@@ -101,7 +101,7 @@ public:
             }
             if (mSynced.mWindow.test(offset))
             {
-                return CHIP_ERROR_INVALID_ARGUMENT; // duplicated, in window
+                return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
             }
         }
 

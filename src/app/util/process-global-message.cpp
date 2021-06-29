@@ -155,82 +155,6 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
     switch (zclCmd)
     {
-    // The format of the read attributes cmd is:
-    // ([attr ID:2]) * N
-    // The format of the read attributes response is:
-    // ([attr ID:2] [status:1] [data type:0/1] [data:0/N]) * N
-    case ZCL_READ_ATTRIBUTES_COMMAND_ID: {
-        emberAfAttributesPrintln("%p: clus %2x", "READ_ATTR", clusterId);
-        // Set the cmd byte - this is byte 3 index 2, but since we have
-        // already incremented past the 3 byte ZCL header (our index is at 3),
-        // this gets written to "-1" since 3 - 1 = 2.
-        emberAfPutInt8uInResp(ZCL_READ_ATTRIBUTES_RESPONSE_COMMAND_ID);
-
-        // This message contains N 2-byte attr IDs after the 3 byte ZCL header,
-        // for each one we need to look it up and make a response
-        while (msgIndex + 2 <= msgLen)
-        {
-            // Get the attribute ID and store it in the response buffer
-            // least significant byte is first OTA
-            attrId = emberAfGetInt16u(message, msgIndex, msgLen);
-
-#ifdef EMBER_AF_GBCS_COMPATIBLE
-            // GBCS explicitly lists some commands that need to be sent with "disable
-            // default response" flag set, including some ReadAttributes responses.
-            // We make it conditional on GBCS so it does not affect standard SE apps.
-            {
-                static const struct
-                {
-                    ClusterId clusterId;
-                    AttributeId attrId;
-                } noDefaultResponseSet[] = {
-                    { ZCL_PRICE_CLUSTER_ID, ZCL_THRESHOLD_MULTIPLIER_ATTRIBUTE_ID },
-                    { ZCL_PRICE_CLUSTER_ID, ZCL_THRESHOLD_DIVISOR_ATTRIBUTE_ID },
-                    { ZCL_PRICE_CLUSTER_ID, ZCL_STANDING_CHARGE_ATTRIBUTE_ID },
-                    { ZCL_PRICE_CLUSTER_ID, ZCL_TARIFF_UNIT_OF_MEASURE_ATTRIBUTE_ID },
-                    { ZCL_SIMPLE_METERING_CLUSTER_ID, ZCL_UNIT_OF_MEASURE_ATTRIBUTE_ID },
-                    { ZCL_SIMPLE_METERING_CLUSTER_ID, ZCL_MULTIPLIER_ATTRIBUTE_ID },
-                    { ZCL_SIMPLE_METERING_CLUSTER_ID, ZCL_DIVISOR_ATTRIBUTE_ID },
-                };
-                uint8_t i;
-                uint8_t foundMatchingAttrIdsCount = 0;
-
-                for (i = 0; i < sizeof noDefaultResponseSet / sizeof noDefaultResponseSet[0]; ++i)
-                {
-                    if (noDefaultResponseSet[i].clusterId == clusterId && noDefaultResponseSet[i].attrId == attrId)
-                    {
-                        if (++foundMatchingAttrIdsCount >= MIN_MATCHING_ATTR_IDS_TO_DISABLE_DEFAULT_RESPONSE)
-                        {
-                            emberAfSetDisableDefaultResponse(EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT);
-                            break;
-                        }
-                    }
-                }
-            }
-
-#ifdef EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_SUB_GHZ
-            // This plugin sets channel change notification flags and needs to know
-            // when those flags have been read.
-            if (clientServerMask == CLUSTER_MASK_SERVER)
-            {
-                emAfCommsHubFunctionSubGhzReadAttributeNotification(cmd->source, clusterId, attrId);
-            }
-#endif
-#endif
-
-            // This function reads the attribute and creates the correct response
-            // in the response buffer
-            emberAfRetrieveAttributeAndCraftResponse(cmd->apsFrame->destinationEndpoint, clusterId, attrId, clientServerMask,
-                                                     cmd->mfgCode,
-                                                     static_cast<uint16_t>(EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength));
-            // Go to next attrID
-            msgIndex = static_cast<uint16_t>(msgIndex + 2);
-        }
-    }
-
-        emberAfSendResponse();
-        return true;
-
     // Write undivided means all attributes must be written in order to write
     // any of them. So first do a check. If the check fails, send back a fail
     // response. If it works, fall through to the normal write attr code.
@@ -549,10 +473,6 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
                                                                          static_cast<uint16_t>(msgLen - msgIndex));
 #endif
 
-        if (!emberAfReadAttributesResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
-        {
-            emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
-        }
         return true;
 
     // ([status:1] [attribute id:2])+
