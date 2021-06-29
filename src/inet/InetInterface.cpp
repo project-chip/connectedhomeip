@@ -923,8 +923,14 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
         if (mCurAddr->ifa_addr->sa_family == AF_INET6)
         {
+#if !__MBED__
             struct sockaddr_in6 & netmask = *reinterpret_cast<struct sockaddr_in6 *>(mCurAddr->ifa_netmask);
             return NetmaskToPrefixLength(netmask.sin6_addr.s6_addr, 16);
+#else  // __MBED__
+       // netmask is not available through an API for IPv6 interface in Mbed.
+       // Default prefix length to 64.
+            return 64;
+#endif // !__MBED__
         }
         if (mCurAddr->ifa_addr->sa_family == AF_INET)
         {

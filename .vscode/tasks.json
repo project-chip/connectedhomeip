@@ -289,6 +289,73 @@
                     "${workspaceFolder}/examples/lighting-app/telink/build/tlsr9518adk80d"
                 ]
             }
+        },
+        {
+            "label": "Run Mbed Application",
+            "type": "shell",
+            "command": "scripts/examples/mbed_example.sh",
+            "args": [
+                "-c=${input:mbedCommand}",
+                "-a=${input:mbedApp}",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/${input:mbedApp}/mbed/build"
+                ]
+            }
+        },
+        {
+            "label": "Run Mbed Unit Tests",
+            "type": "shell",
+            "command": "scripts/tests/mbed_tests.sh",
+            "args": [
+                "-c=${input:mbedCommand}",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/src/test_driver/mbed/build"
+                ]
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "mbedCommand",
+            "description": "What do you want to do?",
+            "options": ["build", "flash", "build-flash"],
+            "default": "build"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedApp",
+            "description": "What mbed application do you want to use?",
+            "options": ["lock-app"],
+            "default": "shell"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedTarget",
+            "description": "What mbed target do you want to use?",
+            "options": ["CY8CPROTO_062_4343W"],
+            "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedProfile",
+            "description": "What mbed profile do you want to use?",
+            "options": ["develop", "release", "debug"],
+            "default": "develop"
         }
     ]
 }
