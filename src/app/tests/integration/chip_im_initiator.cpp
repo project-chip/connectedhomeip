@@ -213,7 +213,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SendWriteRequest(chip::app::WriteClient * apWriteClient)
+CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVWriter * writer;
@@ -235,7 +235,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClient * apWriteClient)
 
     SuccessOrExit(err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(err = apWriteClient->SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr));
+    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr));
 
     gWriteCount++;
 
@@ -400,8 +400,8 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
 
     if (gWriteRespCount < kMaxWriteMessageCount)
     {
-        chip::app::WriteClient * writeClient;
-        err = chip::app::InteractionModelEngine::GetInstance()->NewWriteClient(&writeClient);
+        chip::app::WriteClientHandle writeClient;
+        err = chip::app::InteractionModelEngine::GetInstance()->NewWriteClient(writeClient);
         SuccessOrExit(err);
 
         err = SendWriteRequest(writeClient);
@@ -528,7 +528,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
                          chip::to_underlying(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
 }
 
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader)
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler *)
 {
     if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
     {

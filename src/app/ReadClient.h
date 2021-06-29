@@ -77,7 +77,7 @@ public:
                                AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
                                EventNumber aEventNumber);
 
-    intptr_t GetAppIdentifier() const { return mAppIdentifier; }
+    uint64_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
 private:
@@ -105,7 +105,7 @@ private:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, intptr_t aAppIdentifier);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, uint64_t aAppIdentifier);
 
     virtual ~ReadClient() = default;
 
@@ -140,7 +140,7 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
-    intptr_t mAppIdentifier                    = 0;
+    uint64_t mAppIdentifier                    = 0;
 };
 
 }; // namespace app

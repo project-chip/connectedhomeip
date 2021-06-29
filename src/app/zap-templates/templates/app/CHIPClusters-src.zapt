@@ -15,6 +15,9 @@
 #include <app/util/basic-types.h>
 
 #include <gen/CHIPClientCallbacks.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/CodeUtils.h>
+#include <app/InteractionModelEngine.h>
 
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
     const char * kName = name;                                                                                                     \
@@ -140,31 +143,20 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelC
 }
 
 {{#if isWritableAttribute}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} {{asLowerCamelCase name}})
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
 {
-    COMMAND_HEADER("Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}", {{asUpperCamelCase parent.name}}::Id);
-    {{#if (isString type)}}
-    size_t {{asLowerCamelCase name}}StrLen = {{asLowerCamelCase name}}.size();
-    if (!CanCastTo<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asLowerCamelCase name}}StrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, {{asLowerCamelCase name}}StrLen);
-        return CHIP_ERROR_INTERNAL;
-    }
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId         = mDevice->GetDeviceId();
+    attributePath.mEndpointId     = mEndpoint;
+    attributePath.mClusterId      = mClusterId;
+    attributePath.mFieldId        = {{ asHex code 8 }};
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
-    {{/if}}
-    buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::WriteAttributes)
-       .Put32({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}})
-       .Put8({{atomicTypeId}})
-    {{#if (isString type)}}
-       .Put{{#if (isLongString type)}}16{{/if}}(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asLowerCamelCase name}}StrLen))
-       .Put({{asLowerCamelCase name}}.data(), {{asLowerCamelCase name}}StrLen)
-    {{else}}
-       .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asLowerCamelCase name}}))
-    {{/if}}
-       ;
-    COMMAND_FOOTER();
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 {{/if}}
