@@ -50,8 +50,15 @@ function isSigned(type)
   return signedTypes.includes(type);
 }
 
+// ZAP emits BOOLEAN type as uint8_t, which will break some code that want to use BOOLEAN as bool in C++
+function isBoolean(type)
+{
+  return type.toUpperCase() == 'BOOLEAN';
+}
+
 //
 // Module exports
 //
 exports.asBasicType = asBasicType;
 exports.isSigned    = isSigned;
+exports.isBoolean   = isBoolean;

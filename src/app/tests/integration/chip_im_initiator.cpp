@@ -202,7 +202,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SendWriteRequest(chip::app::WriteClient * apWriteClient)
+CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle apWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVWriter * writer;
@@ -224,7 +224,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClient * apWriteClient)
 
     SuccessOrExit(err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(err = apWriteClient->SendWriteRequest(chip::kTestDeviceNodeId, gAdminId, nullptr));
+    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gAdminId, nullptr));
 
     gWriteCount++;
 
@@ -389,7 +389,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
                          Protocols::InteractionModel::ToUint16(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
 }
 
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader)
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler *)
 {
     if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
     {
@@ -514,10 +514,10 @@ int main(int argc, char * argv[])
     // Connection has been established. Now send the ReadRequests.
     for (unsigned int i = 0; i < kMaxWriteMessageCount; i++)
     {
-        chip::app::WriteClient * writeClient;
-        err = chip::app::InteractionModelEngine::GetInstance()->NewWriteClient(&writeClient);
+        chip::app::WriteClientHandle writeClient;
+        err = chip::app::InteractionModelEngine::GetInstance()->NewWriteClient(writeClient);
         SuccessOrExit(err);
-        err = SendWriteRequest(writeClient);
+        err = SendWriteRequest(std::move(writeClient));
 
         if (err != CHIP_NO_ERROR)
         {

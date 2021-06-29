@@ -56,8 +56,8 @@
 #define CHIP_MAX_NUM_READ_HANDLER 4
 #define CHIP_MAX_REPORTS_IN_FLIGHT 1
 #define IM_SERVER_MAX_NUM_PATH_GROUPS 8
-#define CHIP_MAX_NUM_WRITE_CLIENT 1
-#define CHIP_MAX_NUM_WRITE_HANDLER 1
+#define CHIP_MAX_NUM_WRITE_CLIENT 4
+#define CHIP_MAX_NUM_WRITE_HANDLER 4
 
 namespace chip {
 namespace app {
@@ -136,7 +136,7 @@ public:
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no WriteClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewWriteClient(WriteClient ** const apWriteClient);
+    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier = 0);
 
     /**
      *  Get read client index in mReadClients

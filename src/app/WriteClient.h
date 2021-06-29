@@ -36,6 +36,10 @@
 
 namespace chip {
 namespace app {
+
+class WriteClientHandle;
+class InteractionModelEngine;
+
 /**
  *  @brief The read client represents the initiator side of a Write Interaction, and is responsible
  *  for generating one Write Request for a particular set of attributes, and handling the Write response.
@@ -50,6 +54,30 @@ public:
      */
     void Shutdown();
 
+    CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
+    CHIP_ERROR FinishAttribute();
+    TLV::TLVWriter * GetAttributeDataElementTLVWriter();
+
+    uint64_t GetApplicationIdentifier() const { return mAppIdentifier; }
+    void SetApplicationIdentifier(uint64_t aAppIdentifier) { mAppIdentifier = aAppIdentifier; }
+    NodeId GetSourceNodeId() const
+    {
+        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSecureSession().GetPeerNodeId() : kAnyNodeId;
+    }
+
+private:
+    friend class TestWriteInteraction;
+    friend class InteractionModelEngine;
+    friend class WriteClientHandle;
+
+    enum class State
+    {
+        Uninitialized = 0, // The client has not been initialized
+        Initialized,       // The client has been initialized
+        AddAttribute,      // The client has added attribute and ready for a SendWriteRequest
+        AwaitingResponse,  // The client has sent out the write request message
+    };
+
     /**
      * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
      */
@@ -63,22 +91,6 @@ public:
      */
     CHIP_ERROR SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession);
 
-    CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
-    CHIP_ERROR FinishAttribute();
-    TLV::TLVWriter * GetAttributeDataElementTLVWriter();
-
-private:
-    friend class TestWriteInteraction;
-    friend class InteractionModelEngine;
-
-    enum class State
-    {
-        Uninitialized = 0, // The client has not been initialized
-        Initialized,       // The client has been initialized
-        AddAttribute,      // The client has added attribute and ready for a SendWriteRequest
-        AwaitingResponse,  // The client has sent out the write request message
-    };
-
     /**
      *  Initialize the client object. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -90,7 +102,8 @@ private:
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                    uint64_t aApplicationIdentifier);
 
     virtual ~WriteClient() = default;
 
@@ -119,7 +132,62 @@ private:
     System::PacketBufferTLVWriter mMessageWriter;
     WriteRequest::Builder mWriteRequestBuilder;
     uint8_t mAttributeStatusIndex = 0;
-    intptr_t mAppIdentifier       = 0;
+    uint64_t mAppIdentifier       = 0;
+};
+
+class WriteClientHandle
+{
+public:
+    /**
+     * Construct an empty PacketBufferHandle.
+     */
+    WriteClientHandle() : mpWriteClient(nullptr) {}
+    WriteClientHandle(decltype(nullptr)) : mpWriteClient(nullptr) {}
+
+    /**
+     * Construct a PacketBufferHandle that takes ownership of a PacketBuffer from another.
+     */
+    WriteClientHandle(WriteClientHandle && aOther)
+    {
+        mpWriteClient        = aOther.mpWriteClient;
+        aOther.mpWriteClient = nullptr;
+    }
+
+    ~WriteClientHandle()
+    {
+        if (mpWriteClient != nullptr)
+        {
+            mpWriteClient->Shutdown();
+        }
+    }
+
+    /**
+     * Access a PackerBuffer's public methods.
+     */
+    WriteClient * operator->() const { return mpWriteClient; }
+
+    /**
+     *  Finilize the message and send it to the desired node. The underlying write object will always be released, and the user
+     * should not use this object after calling this function.
+     */
+    CHIP_ERROR SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession);
+
+private:
+    friend InteractionModelEngine;
+
+    void SetWriteClient(WriteClient * apWriteClient)
+    {
+        if (mpWriteClient != nullptr)
+        {
+            mpWriteClient->Shutdown();
+        }
+        mpWriteClient = apWriteClient;
+    }
+    WriteClientHandle(const WriteClientHandle &) = delete;
+    WriteClientHandle & operator=(const WriteClientHandle &) = delete;
+    WriteClientHandle & operator=(const WriteClientHandle &&) = delete;
+
+    WriteClient * mpWriteClient = nullptr;
 };
 
 } // namespace app

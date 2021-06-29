@@ -177,6 +177,29 @@ public:
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::ProtocolCode status) override;
     CHIP_ERROR ReportError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
+
+    /**
+     * Notification that a WriteClient has received an Write Response containing a status code.
+     */
+    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient,
+                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
+                                   const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
+                                   uint8_t aCommandIndex) override;
+
+    /**
+     * Notification that a Write Client has received an Write Response and fails to process a attribute data element in that
+     * write response
+     */
+    CHIP_ERROR WriteResponseProtocolError(const app::WriteClient * apWriteClient, uint8_t aAttributeIndex) override;
+
+    /**
+     * Notification that a write client encountered an asynchronous failure.
+     * @param[in]  aCWriteClient write interactions
+     * @param[in]  aError         A error that could be CHIP_ERROR_TIMEOUT when write client fails to receive, or other error when
+     *                            fail to process write response.
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    CHIP_ERROR WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override;
 };
 
 /**

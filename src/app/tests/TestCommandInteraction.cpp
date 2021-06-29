@@ -96,6 +96,11 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
                          static_cast<uint16_t>(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
 }
 
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+{
+    return CHIP_NO_ERROR;
+}
+
 class TestCommandInteraction
 {
 public:

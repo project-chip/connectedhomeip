@@ -204,7 +204,7 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
 
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = writeClient.Init(&gExchangeManager, &delegate);
+    err                            = writeClient.Init(&gExchangeManager, &delegate, 0);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataElement(apSuite, apContext, writeClient);
 

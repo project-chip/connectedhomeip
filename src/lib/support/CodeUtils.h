@@ -526,6 +526,45 @@ inline void chipDie(void)
 #define FALLTHROUGH (void) 0
 #endif
 
+#include <utility>
+
+namespace chip {
+
+/**
+ * @def StopOnFirstError(Functors...)
+ *
+ * @brief
+ *   Execute a batch of functions, stop on first error and return. This template won't increase codesize if optimize turned on.
+ *
+ * Example Usage:
+ *
+ * @code
+ *   StopOnFirstError([&](){ return SomeFunction() }, [&](){ return SomeFunction2(); }, [&](){ return SomeFunction3(); });
+ * @endcode
+ *
+ * @return      The size of an array in number of elements.
+ *
+ * @note Clever template-based solutions seem to fail when ArraySize is used
+ *       with a variable-length array argument, so we just do the C-compatible
+ *       thing in C++ as well.
+ */
+template <typename T0>
+CHIP_ERROR StopOnFirstError(T0 F)
+{
+    return F();
+}
+
+template <typename T0, typename... T>
+CHIP_ERROR StopOnFirstError(T0 F, T &&... args)
+{
+    ReturnErrorOnFailure(F());
+    return StopOnFirstError(std::forward<T>(args)...);
+}
+
+#define WrapLambda(x) [&]() { return x; }
+
+} // namespace chip
+
 #endif // __cplusplus
 
 /**
