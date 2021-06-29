@@ -661,7 +661,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "ChipEchoClient failed: %s\n", chip::ErrorStr(err));
+        ChipLogError(AppServer, "UDC Send failed: %s\n", chip::ErrorStr(err));
     }
 
     return err;

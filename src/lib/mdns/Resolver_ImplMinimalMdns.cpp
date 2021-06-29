@@ -449,7 +449,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
         }
         else if (filter.type == DiscoveryFilterType::kInstanceName)
         {
-            qname = CheckAndAllocateQName(filter.instanceName, "_chipc", "_udp", "local");
+            qname = CheckAndAllocateQName(filter.instanceName, kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
         }
         else
         {
