@@ -787,5 +787,3 @@ const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {\
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (0)
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS { \
 }
-
-

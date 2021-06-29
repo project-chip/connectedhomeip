@@ -45,10 +45,10 @@ CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable &
 
     err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipClusterException", clusterExceptionCls);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-    
+
     exceptionConstructor = env->GetMethodID(clusterExceptionCls, "<init>", "(I)V");
     VerifyOrReturnError(exceptionConstructor != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-    
+
     outEx = (jthrowable) env->NewObject(clusterExceptionCls, exceptionConstructor, errorCode);
     VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
@@ -63,10 +63,10 @@ CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], jint 
 
     err = JniReferences::GetInstance().GetClassRef(env, "java/lang/IllegalStateException", exceptionClass);
     SuccessOrExit(err);
-    
+
     exceptionConstructor = env->GetMethodID(exceptionClass, "<init>", "(Ljava/lang/String;)V");
     VerifyOrExit(exceptionConstructor != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-    
+
     char buf[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     snprintf(buf, sizeof(buf), "%s: %d", message, errorCode);
     errStr = env->NewStringUTF(buf);
@@ -123,7 +123,7 @@ class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallb
 
             err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
             SuccessOrExit(err);
-        
+
             env->ExceptionClear();
             env->CallVoidMethod(javaCallbackRef, javaMethod);
 
@@ -136,7 +136,7 @@ class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallb
                 delete cppCallback;
             }
         }
-    
+
     private:
         jobject javaCallbackRef;
 };
@@ -190,7 +190,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
 
             err = CreateChipClusterException(env, status, exception);
             SuccessOrExit(err);
-        
+
             env->ExceptionClear();
             env->CallVoidMethod(javaCallbackRef, javaMethod, exception);
         exit:
@@ -202,7 +202,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
                 delete cppCallback;
             }
         }
-    
+
     private:
         jobject javaCallbackRef;
 };
@@ -245,7 +245,7 @@ class CHIPAccountLoginClusterGetSetupPINResponseCallback : public Callback::Call
             CHIPAccountLoginClusterGetSetupPINResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString setupPINStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPAccountLoginClusterGetSetupPINResponseCallback *>(context);
@@ -272,7 +272,7 @@ class CHIPAccountLoginClusterGetSetupPINResponseCallback : public Callback::Call
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -313,7 +313,7 @@ class CHIPApplicationLauncherClusterLaunchAppResponseCallback : public Callback:
             CHIPApplicationLauncherClusterLaunchAppResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString dataStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPApplicationLauncherClusterLaunchAppResponseCallback *>(context);
@@ -340,7 +340,7 @@ class CHIPApplicationLauncherClusterLaunchAppResponseCallback : public Callback:
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -381,7 +381,7 @@ class CHIPContentLauncherClusterLaunchContentResponseCallback : public Callback:
             CHIPContentLauncherClusterLaunchContentResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString dataStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPContentLauncherClusterLaunchContentResponseCallback *>(context);
@@ -409,7 +409,7 @@ class CHIPContentLauncherClusterLaunchContentResponseCallback : public Callback:
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -450,7 +450,7 @@ class CHIPContentLauncherClusterLaunchURLResponseCallback : public Callback::Cal
             CHIPContentLauncherClusterLaunchURLResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString dataStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPContentLauncherClusterLaunchURLResponseCallback *>(context);
@@ -478,7 +478,7 @@ class CHIPContentLauncherClusterLaunchURLResponseCallback : public Callback::Cal
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -543,7 +543,7 @@ class CHIPDoorLockClusterClearAllPinsResponseCallback : public Callback::Callbac
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -608,7 +608,7 @@ class CHIPDoorLockClusterClearAllRfidsResponseCallback : public Callback::Callba
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -673,7 +673,7 @@ class CHIPDoorLockClusterClearHolidayScheduleResponseCallback : public Callback:
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -738,7 +738,7 @@ class CHIPDoorLockClusterClearPinResponseCallback : public Callback::Callback<Do
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -803,7 +803,7 @@ class CHIPDoorLockClusterClearRfidResponseCallback : public Callback::Callback<D
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -868,7 +868,7 @@ class CHIPDoorLockClusterClearWeekdayScheduleResponseCallback : public Callback:
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -933,7 +933,7 @@ class CHIPDoorLockClusterClearYeardayScheduleResponseCallback : public Callback:
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1002,7 +1002,7 @@ class CHIPDoorLockClusterGetHolidayScheduleResponseCallback : public Callback::C
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1043,7 +1043,7 @@ class CHIPDoorLockClusterGetLogRecordResponseCallback : public Callback::Callbac
             CHIPDoorLockClusterGetLogRecordResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString pinStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPDoorLockClusterGetLogRecordResponseCallback *>(context);
@@ -1076,7 +1076,7 @@ class CHIPDoorLockClusterGetLogRecordResponseCallback : public Callback::Callbac
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1117,7 +1117,7 @@ class CHIPDoorLockClusterGetPinResponseCallback : public Callback::Callback<Door
             CHIPDoorLockClusterGetPinResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString pinStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPDoorLockClusterGetPinResponseCallback *>(context);
@@ -1147,7 +1147,7 @@ class CHIPDoorLockClusterGetPinResponseCallback : public Callback::Callback<Door
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1188,7 +1188,7 @@ class CHIPDoorLockClusterGetRfidResponseCallback : public Callback::Callback<Doo
             CHIPDoorLockClusterGetRfidResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString rfidStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPDoorLockClusterGetRfidResponseCallback *>(context);
@@ -1218,7 +1218,7 @@ class CHIPDoorLockClusterGetRfidResponseCallback : public Callback::Callback<Doo
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1285,7 +1285,7 @@ class CHIPDoorLockClusterGetUserTypeResponseCallback : public Callback::Callback
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1357,7 +1357,7 @@ class CHIPDoorLockClusterGetWeekdayScheduleResponseCallback : public Callback::C
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1426,7 +1426,7 @@ class CHIPDoorLockClusterGetYeardayScheduleResponseCallback : public Callback::C
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1491,7 +1491,7 @@ class CHIPDoorLockClusterLockDoorResponseCallback : public Callback::Callback<Do
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1556,7 +1556,7 @@ class CHIPDoorLockClusterSetHolidayScheduleResponseCallback : public Callback::C
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1621,7 +1621,7 @@ class CHIPDoorLockClusterSetPinResponseCallback : public Callback::Callback<Door
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1686,7 +1686,7 @@ class CHIPDoorLockClusterSetRfidResponseCallback : public Callback::Callback<Doo
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1751,7 +1751,7 @@ class CHIPDoorLockClusterSetUserTypeResponseCallback : public Callback::Callback
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1816,7 +1816,7 @@ class CHIPDoorLockClusterSetWeekdayScheduleResponseCallback : public Callback::C
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1881,7 +1881,7 @@ class CHIPDoorLockClusterSetYeardayScheduleResponseCallback : public Callback::C
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -1946,7 +1946,7 @@ class CHIPDoorLockClusterUnlockDoorResponseCallback : public Callback::Callback<
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2011,7 +2011,7 @@ class CHIPDoorLockClusterUnlockWithTimeoutResponseCallback : public Callback::Ca
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2052,7 +2052,7 @@ class CHIPGeneralCommissioningClusterArmFailSafeResponseCallback : public Callba
             CHIPGeneralCommissioningClusterArmFailSafeResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPGeneralCommissioningClusterArmFailSafeResponseCallback *>(context);
@@ -2080,7 +2080,7 @@ class CHIPGeneralCommissioningClusterArmFailSafeResponseCallback : public Callba
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2121,7 +2121,7 @@ class CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback : pub
             CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback *>(context);
@@ -2149,7 +2149,7 @@ class CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback : pub
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2190,7 +2190,7 @@ class CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback : publi
             CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback *>(context);
@@ -2218,7 +2218,7 @@ class CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback : publi
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2284,7 +2284,7 @@ class CHIPGroupsClusterAddGroupResponseCallback : public Callback::Callback<Grou
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2339,7 +2339,7 @@ class CHIPGroupsClusterGetGroupMembershipResponseCallback : public Callback::Cal
             env->CallVoidMethod(javaCallbackRef, javaMethod
                 , static_cast<jint>(capacity)
                                 , static_cast<jint>(groupCount)
-                                // groupList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                                // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
                 // Conversion from this type to Java is not properly implemented yet
             );
 
@@ -2353,7 +2353,7 @@ class CHIPGroupsClusterGetGroupMembershipResponseCallback : public Callback::Cal
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2419,7 +2419,7 @@ class CHIPGroupsClusterRemoveGroupResponseCallback : public Callback::Callback<G
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2460,7 +2460,7 @@ class CHIPGroupsClusterViewGroupResponseCallback : public Callback::Callback<Gro
             CHIPGroupsClusterViewGroupResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString groupNameStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPGroupsClusterViewGroupResponseCallback *>(context);
@@ -2488,7 +2488,7 @@ class CHIPGroupsClusterViewGroupResponseCallback : public Callback::Callback<Gro
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2554,7 +2554,7 @@ class CHIPIdentifyClusterIdentifyQueryResponseCallback : public Callback::Callba
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2619,7 +2619,7 @@ class CHIPKeypadInputClusterSendKeyResponseCallback : public Callback::Callback<
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2685,7 +2685,7 @@ class CHIPMediaPlaybackClusterMediaFastForwardResponseCallback : public Callback
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2751,7 +2751,7 @@ class CHIPMediaPlaybackClusterMediaNextResponseCallback : public Callback::Callb
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2817,7 +2817,7 @@ class CHIPMediaPlaybackClusterMediaPauseResponseCallback : public Callback::Call
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2883,7 +2883,7 @@ class CHIPMediaPlaybackClusterMediaPlayResponseCallback : public Callback::Callb
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -2949,7 +2949,7 @@ class CHIPMediaPlaybackClusterMediaPreviousResponseCallback : public Callback::C
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3015,7 +3015,7 @@ class CHIPMediaPlaybackClusterMediaRewindResponseCallback : public Callback::Cal
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3081,7 +3081,7 @@ class CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback : public Callbac
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3147,7 +3147,7 @@ class CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback : public Callback
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3213,7 +3213,7 @@ class CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback : public Callback::C
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3279,7 +3279,7 @@ class CHIPMediaPlaybackClusterMediaStartOverResponseCallback : public Callback::
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3345,7 +3345,7 @@ class CHIPMediaPlaybackClusterMediaStopResponseCallback : public Callback::Callb
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3386,7 +3386,7 @@ class CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback : public C
             CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback *>(context);
@@ -3414,7 +3414,7 @@ class CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback : public C
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3455,7 +3455,7 @@ class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback : public Cal
             CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback *>(context);
@@ -3483,7 +3483,7 @@ class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback : public Cal
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3524,7 +3524,7 @@ class CHIPNetworkCommissioningClusterDisableNetworkResponseCallback : public Cal
             CHIPNetworkCommissioningClusterDisableNetworkResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPNetworkCommissioningClusterDisableNetworkResponseCallback *>(context);
@@ -3552,7 +3552,7 @@ class CHIPNetworkCommissioningClusterDisableNetworkResponseCallback : public Cal
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3593,7 +3593,7 @@ class CHIPNetworkCommissioningClusterEnableNetworkResponseCallback : public Call
             CHIPNetworkCommissioningClusterEnableNetworkResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPNetworkCommissioningClusterEnableNetworkResponseCallback *>(context);
@@ -3621,7 +3621,7 @@ class CHIPNetworkCommissioningClusterEnableNetworkResponseCallback : public Call
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3662,7 +3662,7 @@ class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback : public Call
             CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback *>(context);
@@ -3690,7 +3690,7 @@ class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback : public Call
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3731,7 +3731,7 @@ class CHIPNetworkCommissioningClusterScanNetworksResponseCallback : public Callb
             CHIPNetworkCommissioningClusterScanNetworksResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPNetworkCommissioningClusterScanNetworksResponseCallback *>(context);
@@ -3747,9 +3747,9 @@ class CHIPNetworkCommissioningClusterScanNetworksResponseCallback : public Callb
             env->CallVoidMethod(javaCallbackRef, javaMethod
                 , static_cast<jint>(errorCode)
                                 , debugTextStr.jniValue()
-                // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
                 // Conversion from this type to Java is not properly implemented yet
-                // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
                 // Conversion from this type to Java is not properly implemented yet
             );
 
@@ -3763,7 +3763,7 @@ class CHIPNetworkCommissioningClusterScanNetworksResponseCallback : public Callb
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3804,7 +3804,7 @@ class CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback : publi
             CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback *>(context);
@@ -3832,7 +3832,7 @@ class CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback : publi
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3873,7 +3873,7 @@ class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback : public 
             CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString debugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback *>(context);
@@ -3901,7 +3901,7 @@ class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback : public 
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -3968,7 +3968,7 @@ class CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback : pub
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4055,7 +4055,7 @@ class CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallback : public Call
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4168,7 +4168,7 @@ class CHIPOperationalCredentialsClusterOpCSRResponseCallback : public Callback::
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4209,7 +4209,7 @@ class CHIPOperationalCredentialsClusterOpCertResponseCallback : public Callback:
             CHIPOperationalCredentialsClusterOpCertResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString DebugTextStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPOperationalCredentialsClusterOpCertResponseCallback *>(context);
@@ -4238,7 +4238,7 @@ class CHIPOperationalCredentialsClusterOpCertResponseCallback : public Callback:
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4304,7 +4304,7 @@ class CHIPOperationalCredentialsClusterSetFabricResponseCallback : public Callba
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4371,7 +4371,7 @@ class CHIPScenesClusterAddSceneResponseCallback : public Callback::Callback<Scen
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4427,7 +4427,7 @@ class CHIPScenesClusterGetSceneMembershipResponseCallback : public Callback::Cal
                 , static_cast<jint>(capacity)
                                 , static_cast<jint>(groupId)
                                 , static_cast<jint>(sceneCount)
-                                // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                                // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
                 // Conversion from this type to Java is not properly implemented yet
             );
 
@@ -4441,7 +4441,7 @@ class CHIPScenesClusterGetSceneMembershipResponseCallback : public Callback::Cal
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4507,7 +4507,7 @@ class CHIPScenesClusterRemoveAllScenesResponseCallback : public Callback::Callba
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4574,7 +4574,7 @@ class CHIPScenesClusterRemoveSceneResponseCallback : public Callback::Callback<S
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4641,7 +4641,7 @@ class CHIPScenesClusterStoreSceneResponseCallback : public Callback::Callback<Sc
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4682,7 +4682,7 @@ class CHIPScenesClusterViewSceneResponseCallback : public Callback::Callback<Sce
             CHIPScenesClusterViewSceneResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString sceneNameStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPScenesClusterViewSceneResponseCallback *>(context);
@@ -4700,7 +4700,7 @@ class CHIPScenesClusterViewSceneResponseCallback : public Callback::Callback<Sce
                                 , static_cast<jint>(sceneId)
                                 , static_cast<jint>(transitionTime)
                                 , sceneNameStr.jniValue()
-                // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
                 // Conversion from this type to Java is not properly implemented yet
             );
 
@@ -4714,7 +4714,7 @@ class CHIPScenesClusterViewSceneResponseCallback : public Callback::Callback<Sce
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4767,7 +4767,7 @@ class CHIPTvChannelClusterChangeChannelResponseCallback : public Callback::Callb
 
 
             env->CallVoidMethod(javaCallbackRef, javaMethod
-                // ChannelMatch: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                // ChannelMatch: /* TYPE WARNING: array array defaults to */ uint8_t *
                 // Conversion from this type to Java is not properly implemented yet
                 , static_cast<jint>(ErrorType)
                             );
@@ -4782,7 +4782,7 @@ class CHIPTvChannelClusterChangeChannelResponseCallback : public Callback::Callb
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4823,7 +4823,7 @@ class CHIPTargetNavigatorClusterNavigateTargetResponseCallback : public Callback
             CHIPTargetNavigatorClusterNavigateTargetResponseCallback * cppCallback = nullptr;
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString dataStr(env, "");
-            
+
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
             cppCallback = reinterpret_cast<CHIPTargetNavigatorClusterNavigateTargetResponseCallback *>(context);
@@ -4850,7 +4850,7 @@ class CHIPTargetNavigatorClusterNavigateTargetResponseCallback : public Callback
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4916,7 +4916,7 @@ class CHIPTestClusterClusterTestSpecificResponseCallback : public Callback::Call
                 delete cppCallback;
             }
         }
-        
+
     private:
         jobject javaCallbackRef;
 };
@@ -4944,7 +4944,7 @@ JNI_METHOD(void, AccountLoginCluster, getSetupPIN)(JNIEnv * env, jobject self, j
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
-    
+
     JniUtfString tempAccountIdentifierStr(env, tempAccountIdentifier);
         CHIPAccountLoginClusterGetSetupPINResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -4960,7 +4960,7 @@ JNI_METHOD(void, AccountLoginCluster, getSetupPIN)(JNIEnv * env, jobject self, j
     err = cppCluster->GetSetupPIN(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) tempAccountIdentifier, strlen(tempAccountIdentifierStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4987,7 +4987,7 @@ JNI_METHOD(void, AccountLoginCluster, login)(JNIEnv * env, jobject self, jlong c
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
-    
+
     JniUtfString tempAccountIdentifierStr(env, tempAccountIdentifier);
         JniUtfString setupPINStr(env, setupPIN);
         CHIPDefaultSuccessCallback * onSuccess;
@@ -5004,7 +5004,7 @@ JNI_METHOD(void, AccountLoginCluster, login)(JNIEnv * env, jobject self, jlong c
     err = cppCluster->Login(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) tempAccountIdentifier, strlen(tempAccountIdentifierStr.c_str())), chip::ByteSpan((const uint8_t*) setupPIN, strlen(setupPINStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5040,7 +5040,7 @@ JNI_METHOD(void, ApplicationBasicCluster, changeStatus)(JNIEnv * env, jobject se
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationBasicCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5055,7 +5055,7 @@ JNI_METHOD(void, ApplicationBasicCluster, changeStatus)(JNIEnv * env, jobject se
     err = cppCluster->ChangeStatus(onSuccess->Cancel(), onFailure->Cancel(), status);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5091,7 +5091,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchApp)(JNIEnv * env, jobject se
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationLauncherCluster * cppCluster;
-    
+
     JniUtfString dataStr(env, data);
         JniUtfString applicationIdStr(env, applicationId);
         CHIPApplicationLauncherClusterLaunchAppResponseCallback * onSuccess;
@@ -5108,7 +5108,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchApp)(JNIEnv * env, jobject se
     err = cppCluster->LaunchApp(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) data, strlen(dataStr.c_str())), catalogVendorId, chip::ByteSpan((const uint8_t*) applicationId, strlen(applicationIdStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5144,7 +5144,7 @@ JNI_METHOD(void, AudioOutputCluster, renameOutput)(JNIEnv * env, jobject self, j
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
-    
+
     JniUtfString nameStr(env, name);
         CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -5160,7 +5160,7 @@ JNI_METHOD(void, AudioOutputCluster, renameOutput)(JNIEnv * env, jobject self, j
     err = cppCluster->RenameOutput(onSuccess->Cancel(), onFailure->Cancel(), index, chip::ByteSpan((const uint8_t*) name, strlen(nameStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5187,7 +5187,7 @@ JNI_METHOD(void, AudioOutputCluster, selectOutput)(JNIEnv * env, jobject self, j
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5202,7 +5202,7 @@ JNI_METHOD(void, AudioOutputCluster, selectOutput)(JNIEnv * env, jobject self, j
     err = cppCluster->SelectOutput(onSuccess->Cancel(), onFailure->Cancel(), index);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5238,7 +5238,7 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlGoToPercent)(JNIEnv * env,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BarrierControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5253,7 +5253,7 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlGoToPercent)(JNIEnv * env,
     err = cppCluster->BarrierControlGoToPercent(onSuccess->Cancel(), onFailure->Cancel(), percentOpen);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5280,7 +5280,7 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlStop)(JNIEnv * env, jobjec
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BarrierControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5295,7 +5295,7 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlStop)(JNIEnv * env, jobjec
     err = cppCluster->BarrierControlStop(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5331,7 +5331,7 @@ JNI_METHOD(void, BasicCluster, mfgSpecificPing)(JNIEnv * env, jobject self, jlon
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5346,7 +5346,7 @@ JNI_METHOD(void, BasicCluster, mfgSpecificPing)(JNIEnv * env, jobject self, jlon
     err = cppCluster->MfgSpecificPing(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5391,7 +5391,7 @@ JNI_METHOD(void, BindingCluster, bind)(JNIEnv * env, jobject self, jlong cluster
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BindingCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5406,7 +5406,7 @@ JNI_METHOD(void, BindingCluster, bind)(JNIEnv * env, jobject self, jlong cluster
     err = cppCluster->Bind(onSuccess->Cancel(), onFailure->Cancel(), nodeId, groupId, endpointId, clusterId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5433,7 +5433,7 @@ JNI_METHOD(void, BindingCluster, unbind)(JNIEnv * env, jobject self, jlong clust
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BindingCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5448,7 +5448,7 @@ JNI_METHOD(void, BindingCluster, unbind)(JNIEnv * env, jobject self, jlong clust
     err = cppCluster->Unbind(onSuccess->Cancel(), onFailure->Cancel(), nodeId, groupId, endpointId, clusterId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5493,7 +5493,7 @@ JNI_METHOD(void, ColorControlCluster, moveColor)(JNIEnv * env, jobject self, jlo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5508,7 +5508,7 @@ JNI_METHOD(void, ColorControlCluster, moveColor)(JNIEnv * env, jobject self, jlo
     err = cppCluster->MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5535,7 +5535,7 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)(JNIEnv * env, jobjec
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5550,7 +5550,7 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)(JNIEnv * env, jobjec
     err = cppCluster->MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5577,7 +5577,7 @@ JNI_METHOD(void, ColorControlCluster, moveHue)(JNIEnv * env, jobject self, jlong
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5592,7 +5592,7 @@ JNI_METHOD(void, ColorControlCluster, moveHue)(JNIEnv * env, jobject self, jlong
     err = cppCluster->MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5619,7 +5619,7 @@ JNI_METHOD(void, ColorControlCluster, moveSaturation)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5634,7 +5634,7 @@ JNI_METHOD(void, ColorControlCluster, moveSaturation)(JNIEnv * env, jobject self
     err = cppCluster->MoveSaturation(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5661,7 +5661,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColor)(JNIEnv * env, jobject self, j
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5676,7 +5676,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColor)(JNIEnv * env, jobject self, j
     err = cppCluster->MoveToColor(onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5703,7 +5703,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColorTemperature)(JNIEnv * env, jobj
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5718,7 +5718,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColorTemperature)(JNIEnv * env, jobj
     err = cppCluster->MoveToColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5745,7 +5745,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)(JNIEnv * env, jobject self, jlo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5760,7 +5760,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)(JNIEnv * env, jobject self, jlo
     err = cppCluster->MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5787,7 +5787,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHueAndSaturation)(JNIEnv * env, jobj
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5802,7 +5802,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHueAndSaturation)(JNIEnv * env, jobj
     err = cppCluster->MoveToHueAndSaturation(onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5829,7 +5829,7 @@ JNI_METHOD(void, ColorControlCluster, moveToSaturation)(JNIEnv * env, jobject se
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5844,7 +5844,7 @@ JNI_METHOD(void, ColorControlCluster, moveToSaturation)(JNIEnv * env, jobject se
     err = cppCluster->MoveToSaturation(onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5871,7 +5871,7 @@ JNI_METHOD(void, ColorControlCluster, stepColor)(JNIEnv * env, jobject self, jlo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5886,7 +5886,7 @@ JNI_METHOD(void, ColorControlCluster, stepColor)(JNIEnv * env, jobject self, jlo
     err = cppCluster->StepColor(onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5913,7 +5913,7 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)(JNIEnv * env, jobjec
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5928,7 +5928,7 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)(JNIEnv * env, jobjec
     err = cppCluster->StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5955,7 +5955,7 @@ JNI_METHOD(void, ColorControlCluster, stepHue)(JNIEnv * env, jobject self, jlong
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -5970,7 +5970,7 @@ JNI_METHOD(void, ColorControlCluster, stepHue)(JNIEnv * env, jobject self, jlong
     err = cppCluster->StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5997,7 +5997,7 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6012,7 +6012,7 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)(JNIEnv * env, jobject self
     err = cppCluster->StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6039,7 +6039,7 @@ JNI_METHOD(void, ColorControlCluster, stopMoveStep)(JNIEnv * env, jobject self, 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6054,7 +6054,7 @@ JNI_METHOD(void, ColorControlCluster, stopMoveStep)(JNIEnv * env, jobject self, 
     err = cppCluster->StopMoveStep(onSuccess->Cancel(), onFailure->Cancel(), optionsMask, optionsOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6090,7 +6090,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchContent)(JNIEnv * env, jobject se
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
-    
+
     JniUtfString dataStr(env, data);
         CHIPContentLauncherClusterLaunchContentResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -6106,7 +6106,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchContent)(JNIEnv * env, jobject se
     err = cppCluster->LaunchContent(onSuccess->Cancel(), onFailure->Cancel(), autoPlay, chip::ByteSpan((const uint8_t*) data, strlen(dataStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6133,7 +6133,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchURL)(JNIEnv * env, jobject self, 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
-    
+
     JniUtfString contentURLStr(env, contentURL);
         JniUtfString displayStringStr(env, displayString);
         CHIPContentLauncherClusterLaunchURLResponseCallback * onSuccess;
@@ -6150,7 +6150,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchURL)(JNIEnv * env, jobject self, 
     err = cppCluster->LaunchURL(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) contentURL, strlen(contentURLStr.c_str())), chip::ByteSpan((const uint8_t*) displayString, strlen(displayStringStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6195,7 +6195,7 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)(JNIEnv * env, jobje
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DiagnosticLogsCluster * cppCluster;
-    
+
     JniByteArray transferFileDesignatorArr(env, transferFileDesignator);
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -6211,7 +6211,7 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)(JNIEnv * env, jobje
     err = cppCluster->RetrieveLogsRequest(onSuccess->Cancel(), onFailure->Cancel(), intent, requestedProtocol, chip::ByteSpan((const uint8_t*) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6247,7 +6247,7 @@ JNI_METHOD(void, DoorLockCluster, clearAllPins)(JNIEnv * env, jobject self, jlon
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterClearAllPinsResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6262,7 +6262,7 @@ JNI_METHOD(void, DoorLockCluster, clearAllPins)(JNIEnv * env, jobject self, jlon
     err = cppCluster->ClearAllPins(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6289,7 +6289,7 @@ JNI_METHOD(void, DoorLockCluster, clearAllRfids)(JNIEnv * env, jobject self, jlo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterClearAllRfidsResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6304,7 +6304,7 @@ JNI_METHOD(void, DoorLockCluster, clearAllRfids)(JNIEnv * env, jobject self, jlo
     err = cppCluster->ClearAllRfids(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6331,7 +6331,7 @@ JNI_METHOD(void, DoorLockCluster, clearHolidaySchedule)(JNIEnv * env, jobject se
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterClearHolidayScheduleResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6346,7 +6346,7 @@ JNI_METHOD(void, DoorLockCluster, clearHolidaySchedule)(JNIEnv * env, jobject se
     err = cppCluster->ClearHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6373,7 +6373,7 @@ JNI_METHOD(void, DoorLockCluster, clearPin)(JNIEnv * env, jobject self, jlong cl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterClearPinResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6388,7 +6388,7 @@ JNI_METHOD(void, DoorLockCluster, clearPin)(JNIEnv * env, jobject self, jlong cl
     err = cppCluster->ClearPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6415,7 +6415,7 @@ JNI_METHOD(void, DoorLockCluster, clearRfid)(JNIEnv * env, jobject self, jlong c
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterClearRfidResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6430,7 +6430,7 @@ JNI_METHOD(void, DoorLockCluster, clearRfid)(JNIEnv * env, jobject self, jlong c
     err = cppCluster->ClearRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6457,7 +6457,7 @@ JNI_METHOD(void, DoorLockCluster, clearWeekdaySchedule)(JNIEnv * env, jobject se
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterClearWeekdayScheduleResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6472,7 +6472,7 @@ JNI_METHOD(void, DoorLockCluster, clearWeekdaySchedule)(JNIEnv * env, jobject se
     err = cppCluster->ClearWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6499,7 +6499,7 @@ JNI_METHOD(void, DoorLockCluster, clearYeardaySchedule)(JNIEnv * env, jobject se
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterClearYeardayScheduleResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6514,7 +6514,7 @@ JNI_METHOD(void, DoorLockCluster, clearYeardaySchedule)(JNIEnv * env, jobject se
     err = cppCluster->ClearYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6541,7 +6541,7 @@ JNI_METHOD(void, DoorLockCluster, getHolidaySchedule)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterGetHolidayScheduleResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6556,7 +6556,7 @@ JNI_METHOD(void, DoorLockCluster, getHolidaySchedule)(JNIEnv * env, jobject self
     err = cppCluster->GetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6583,7 +6583,7 @@ JNI_METHOD(void, DoorLockCluster, getLogRecord)(JNIEnv * env, jobject self, jlon
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterGetLogRecordResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6598,7 +6598,7 @@ JNI_METHOD(void, DoorLockCluster, getLogRecord)(JNIEnv * env, jobject self, jlon
     err = cppCluster->GetLogRecord(onSuccess->Cancel(), onFailure->Cancel(), logIndex);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6625,7 +6625,7 @@ JNI_METHOD(void, DoorLockCluster, getPin)(JNIEnv * env, jobject self, jlong clus
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterGetPinResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6640,7 +6640,7 @@ JNI_METHOD(void, DoorLockCluster, getPin)(JNIEnv * env, jobject self, jlong clus
     err = cppCluster->GetPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6667,7 +6667,7 @@ JNI_METHOD(void, DoorLockCluster, getRfid)(JNIEnv * env, jobject self, jlong clu
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterGetRfidResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6682,7 +6682,7 @@ JNI_METHOD(void, DoorLockCluster, getRfid)(JNIEnv * env, jobject self, jlong clu
     err = cppCluster->GetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6709,7 +6709,7 @@ JNI_METHOD(void, DoorLockCluster, getUserType)(JNIEnv * env, jobject self, jlong
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterGetUserTypeResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6724,7 +6724,7 @@ JNI_METHOD(void, DoorLockCluster, getUserType)(JNIEnv * env, jobject self, jlong
     err = cppCluster->GetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6751,7 +6751,7 @@ JNI_METHOD(void, DoorLockCluster, getWeekdaySchedule)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterGetWeekdayScheduleResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6766,7 +6766,7 @@ JNI_METHOD(void, DoorLockCluster, getWeekdaySchedule)(JNIEnv * env, jobject self
     err = cppCluster->GetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6793,7 +6793,7 @@ JNI_METHOD(void, DoorLockCluster, getYeardaySchedule)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterGetYeardayScheduleResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6808,7 +6808,7 @@ JNI_METHOD(void, DoorLockCluster, getYeardaySchedule)(JNIEnv * env, jobject self
     err = cppCluster->GetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6835,7 +6835,7 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong cl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     JniUtfString pinStr(env, pin);
         CHIPDoorLockClusterLockDoorResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -6851,7 +6851,7 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong cl
     err = cppCluster->LockDoor(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) pin, strlen(pinStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6878,7 +6878,7 @@ JNI_METHOD(void, DoorLockCluster, setHolidaySchedule)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterSetHolidayScheduleResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -6893,7 +6893,7 @@ JNI_METHOD(void, DoorLockCluster, setHolidaySchedule)(JNIEnv * env, jobject self
     err = cppCluster->SetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6920,7 +6920,7 @@ JNI_METHOD(void, DoorLockCluster, setPin)(JNIEnv * env, jobject self, jlong clus
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     JniUtfString pinStr(env, pin);
         CHIPDoorLockClusterSetPinResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -6936,7 +6936,7 @@ JNI_METHOD(void, DoorLockCluster, setPin)(JNIEnv * env, jobject self, jlong clus
     err = cppCluster->SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*) pin, strlen(pinStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6963,7 +6963,7 @@ JNI_METHOD(void, DoorLockCluster, setRfid)(JNIEnv * env, jobject self, jlong clu
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     JniUtfString idStr(env, id);
         CHIPDoorLockClusterSetRfidResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -6979,7 +6979,7 @@ JNI_METHOD(void, DoorLockCluster, setRfid)(JNIEnv * env, jobject self, jlong clu
     err = cppCluster->SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*) id, strlen(idStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7006,7 +7006,7 @@ JNI_METHOD(void, DoorLockCluster, setUserType)(JNIEnv * env, jobject self, jlong
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterSetUserTypeResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7021,7 +7021,7 @@ JNI_METHOD(void, DoorLockCluster, setUserType)(JNIEnv * env, jobject self, jlong
     err = cppCluster->SetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId, userType);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7048,7 +7048,7 @@ JNI_METHOD(void, DoorLockCluster, setWeekdaySchedule)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterSetWeekdayScheduleResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7063,7 +7063,7 @@ JNI_METHOD(void, DoorLockCluster, setWeekdaySchedule)(JNIEnv * env, jobject self
     err = cppCluster->SetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7090,7 +7090,7 @@ JNI_METHOD(void, DoorLockCluster, setYeardaySchedule)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     CHIPDoorLockClusterSetYeardayScheduleResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7105,7 +7105,7 @@ JNI_METHOD(void, DoorLockCluster, setYeardaySchedule)(JNIEnv * env, jobject self
     err = cppCluster->SetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7132,7 +7132,7 @@ JNI_METHOD(void, DoorLockCluster, unlockDoor)(JNIEnv * env, jobject self, jlong 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     JniUtfString pinStr(env, pin);
         CHIPDoorLockClusterUnlockDoorResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -7148,7 +7148,7 @@ JNI_METHOD(void, DoorLockCluster, unlockDoor)(JNIEnv * env, jobject self, jlong 
     err = cppCluster->UnlockDoor(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) pin, strlen(pinStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7175,7 +7175,7 @@ JNI_METHOD(void, DoorLockCluster, unlockWithTimeout)(JNIEnv * env, jobject self,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
-    
+
     JniUtfString pinStr(env, pin);
         CHIPDoorLockClusterUnlockWithTimeoutResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -7191,7 +7191,7 @@ JNI_METHOD(void, DoorLockCluster, unlockWithTimeout)(JNIEnv * env, jobject self,
     err = cppCluster->UnlockWithTimeout(onSuccess->Cancel(), onFailure->Cancel(), timeoutInSeconds, chip::ByteSpan((const uint8_t*) pin, strlen(pinStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7227,7 +7227,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, j
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     EthernetNetworkDiagnosticsCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7242,7 +7242,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, j
     err = cppCluster->ResetCounts(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7287,7 +7287,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, armFailSafe)(JNIEnv * env, jobject
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
-    
+
     CHIPGeneralCommissioningClusterArmFailSafeResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7302,7 +7302,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, armFailSafe)(JNIEnv * env, jobject
     err = cppCluster->ArmFailSafe(onSuccess->Cancel(), onFailure->Cancel(), expiryLengthSeconds, breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7329,7 +7329,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)(JNIEnv * en
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
-    
+
     CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7344,7 +7344,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)(JNIEnv * en
     err = cppCluster->CommissioningComplete(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7371,7 +7371,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)(JNIEnv * env,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
-    
+
     JniUtfString countryCodeStr(env, countryCode);
         CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -7387,7 +7387,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)(JNIEnv * env,
     err = cppCluster->SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), location, chip::ByteSpan((const uint8_t*) countryCode, strlen(countryCodeStr.c_str())), breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7441,7 +7441,7 @@ JNI_METHOD(void, GroupsCluster, addGroup)(JNIEnv * env, jobject self, jlong clus
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
-    
+
     JniUtfString groupNameStr(env, groupName);
         CHIPGroupsClusterAddGroupResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -7457,7 +7457,7 @@ JNI_METHOD(void, GroupsCluster, addGroup)(JNIEnv * env, jobject self, jlong clus
     err = cppCluster->AddGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId, chip::ByteSpan((const uint8_t*) groupName, strlen(groupNameStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7484,7 +7484,7 @@ JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)(JNIEnv * env, jobject sel
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
-    
+
     JniUtfString groupNameStr(env, groupName);
         CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -7500,7 +7500,7 @@ JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)(JNIEnv * env, jobject sel
     err = cppCluster->AddGroupIfIdentifying(onSuccess->Cancel(), onFailure->Cancel(), groupId, chip::ByteSpan((const uint8_t*) groupName, strlen(groupNameStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7527,7 +7527,7 @@ JNI_METHOD(void, GroupsCluster, getGroupMembership)(JNIEnv * env, jobject self, 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
-    
+
     CHIPGroupsClusterGetGroupMembershipResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7542,7 +7542,7 @@ JNI_METHOD(void, GroupsCluster, getGroupMembership)(JNIEnv * env, jobject self, 
     err = cppCluster->GetGroupMembership(onSuccess->Cancel(), onFailure->Cancel(), groupCount, groupList);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7569,7 +7569,7 @@ JNI_METHOD(void, GroupsCluster, removeAllGroups)(JNIEnv * env, jobject self, jlo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7584,7 +7584,7 @@ JNI_METHOD(void, GroupsCluster, removeAllGroups)(JNIEnv * env, jobject self, jlo
     err = cppCluster->RemoveAllGroups(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7611,7 +7611,7 @@ JNI_METHOD(void, GroupsCluster, removeGroup)(JNIEnv * env, jobject self, jlong c
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
-    
+
     CHIPGroupsClusterRemoveGroupResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7626,7 +7626,7 @@ JNI_METHOD(void, GroupsCluster, removeGroup)(JNIEnv * env, jobject self, jlong c
     err = cppCluster->RemoveGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7653,7 +7653,7 @@ JNI_METHOD(void, GroupsCluster, viewGroup)(JNIEnv * env, jobject self, jlong clu
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
-    
+
     CHIPGroupsClusterViewGroupResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7668,7 +7668,7 @@ JNI_METHOD(void, GroupsCluster, viewGroup)(JNIEnv * env, jobject self, jlong clu
     err = cppCluster->ViewGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7704,7 +7704,7 @@ JNI_METHOD(void, IdentifyCluster, identify)(JNIEnv * env, jobject self, jlong cl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     IdentifyCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7719,7 +7719,7 @@ JNI_METHOD(void, IdentifyCluster, identify)(JNIEnv * env, jobject self, jlong cl
     err = cppCluster->Identify(onSuccess->Cancel(), onFailure->Cancel(), identifyTime);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7746,7 +7746,7 @@ JNI_METHOD(void, IdentifyCluster, identifyQuery)(JNIEnv * env, jobject self, jlo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     IdentifyCluster * cppCluster;
-    
+
     CHIPIdentifyClusterIdentifyQueryResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7761,7 +7761,7 @@ JNI_METHOD(void, IdentifyCluster, identifyQuery)(JNIEnv * env, jobject self, jlo
     err = cppCluster->IdentifyQuery(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7797,7 +7797,7 @@ JNI_METHOD(void, KeypadInputCluster, sendKey)(JNIEnv * env, jobject self, jlong 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     KeypadInputCluster * cppCluster;
-    
+
     CHIPKeypadInputClusterSendKeyResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7812,7 +7812,7 @@ JNI_METHOD(void, KeypadInputCluster, sendKey)(JNIEnv * env, jobject self, jlong 
     err = cppCluster->SendKey(onSuccess->Cancel(), onFailure->Cancel(), keyCode);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7848,7 +7848,7 @@ JNI_METHOD(void, LevelControlCluster, move)(JNIEnv * env, jobject self, jlong cl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7863,7 +7863,7 @@ JNI_METHOD(void, LevelControlCluster, move)(JNIEnv * env, jobject self, jlong cl
     err = cppCluster->Move(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionMask, optionOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7890,7 +7890,7 @@ JNI_METHOD(void, LevelControlCluster, moveToLevel)(JNIEnv * env, jobject self, j
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7905,7 +7905,7 @@ JNI_METHOD(void, LevelControlCluster, moveToLevel)(JNIEnv * env, jobject self, j
     err = cppCluster->MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7932,7 +7932,7 @@ JNI_METHOD(void, LevelControlCluster, moveToLevelWithOnOff)(JNIEnv * env, jobjec
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7947,7 +7947,7 @@ JNI_METHOD(void, LevelControlCluster, moveToLevelWithOnOff)(JNIEnv * env, jobjec
     err = cppCluster->MoveToLevelWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7974,7 +7974,7 @@ JNI_METHOD(void, LevelControlCluster, moveWithOnOff)(JNIEnv * env, jobject self,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -7989,7 +7989,7 @@ JNI_METHOD(void, LevelControlCluster, moveWithOnOff)(JNIEnv * env, jobject self,
     err = cppCluster->MoveWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8016,7 +8016,7 @@ JNI_METHOD(void, LevelControlCluster, step)(JNIEnv * env, jobject self, jlong cl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8031,7 +8031,7 @@ JNI_METHOD(void, LevelControlCluster, step)(JNIEnv * env, jobject self, jlong cl
     err = cppCluster->Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8058,7 +8058,7 @@ JNI_METHOD(void, LevelControlCluster, stepWithOnOff)(JNIEnv * env, jobject self,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8073,7 +8073,7 @@ JNI_METHOD(void, LevelControlCluster, stepWithOnOff)(JNIEnv * env, jobject self,
     err = cppCluster->StepWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8100,7 +8100,7 @@ JNI_METHOD(void, LevelControlCluster, stop)(JNIEnv * env, jobject self, jlong cl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8115,7 +8115,7 @@ JNI_METHOD(void, LevelControlCluster, stop)(JNIEnv * env, jobject self, jlong cl
     err = cppCluster->Stop(onSuccess->Cancel(), onFailure->Cancel(), optionMask, optionOverride);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8142,7 +8142,7 @@ JNI_METHOD(void, LevelControlCluster, stopWithOnOff)(JNIEnv * env, jobject self,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8157,7 +8157,7 @@ JNI_METHOD(void, LevelControlCluster, stopWithOnOff)(JNIEnv * env, jobject self,
     err = cppCluster->StopWithOnOff(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8193,7 +8193,7 @@ JNI_METHOD(void, LowPowerCluster, sleep)(JNIEnv * env, jobject self, jlong clust
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LowPowerCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8208,7 +8208,7 @@ JNI_METHOD(void, LowPowerCluster, sleep)(JNIEnv * env, jobject self, jlong clust
     err = cppCluster->Sleep(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8244,7 +8244,7 @@ JNI_METHOD(void, MediaInputCluster, hideInputStatus)(JNIEnv * env, jobject self,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8259,7 +8259,7 @@ JNI_METHOD(void, MediaInputCluster, hideInputStatus)(JNIEnv * env, jobject self,
     err = cppCluster->HideInputStatus(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8286,7 +8286,7 @@ JNI_METHOD(void, MediaInputCluster, renameInput)(JNIEnv * env, jobject self, jlo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
-    
+
     JniUtfString nameStr(env, name);
         CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -8302,7 +8302,7 @@ JNI_METHOD(void, MediaInputCluster, renameInput)(JNIEnv * env, jobject self, jlo
     err = cppCluster->RenameInput(onSuccess->Cancel(), onFailure->Cancel(), index, chip::ByteSpan((const uint8_t*) name, strlen(nameStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8329,7 +8329,7 @@ JNI_METHOD(void, MediaInputCluster, selectInput)(JNIEnv * env, jobject self, jlo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8344,7 +8344,7 @@ JNI_METHOD(void, MediaInputCluster, selectInput)(JNIEnv * env, jobject self, jlo
     err = cppCluster->SelectInput(onSuccess->Cancel(), onFailure->Cancel(), index);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8371,7 +8371,7 @@ JNI_METHOD(void, MediaInputCluster, showInputStatus)(JNIEnv * env, jobject self,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8386,7 +8386,7 @@ JNI_METHOD(void, MediaInputCluster, showInputStatus)(JNIEnv * env, jobject self,
     err = cppCluster->ShowInputStatus(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8422,7 +8422,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaFastForward)(JNIEnv * env, jobject s
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaFastForwardResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8437,7 +8437,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaFastForward)(JNIEnv * env, jobject s
     err = cppCluster->MediaFastForward(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8464,7 +8464,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaNext)(JNIEnv * env, jobject self, jl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaNextResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8479,7 +8479,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaNext)(JNIEnv * env, jobject self, jl
     err = cppCluster->MediaNext(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8506,7 +8506,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPause)(JNIEnv * env, jobject self, j
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaPauseResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8521,7 +8521,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPause)(JNIEnv * env, jobject self, j
     err = cppCluster->MediaPause(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8548,7 +8548,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPlay)(JNIEnv * env, jobject self, jl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaPlayResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8563,7 +8563,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPlay)(JNIEnv * env, jobject self, jl
     err = cppCluster->MediaPlay(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8590,7 +8590,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPrevious)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaPreviousResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8605,7 +8605,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPrevious)(JNIEnv * env, jobject self
     err = cppCluster->MediaPrevious(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8632,7 +8632,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaRewind)(JNIEnv * env, jobject self, 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaRewindResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8647,7 +8647,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaRewind)(JNIEnv * env, jobject self, 
     err = cppCluster->MediaRewind(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8674,7 +8674,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipBackward)(JNIEnv * env, jobject 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8689,7 +8689,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipBackward)(JNIEnv * env, jobject 
     err = cppCluster->MediaSkipBackward(onSuccess->Cancel(), onFailure->Cancel(), deltaPositionMilliseconds);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8716,7 +8716,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipForward)(JNIEnv * env, jobject s
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8731,7 +8731,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipForward)(JNIEnv * env, jobject s
     err = cppCluster->MediaSkipForward(onSuccess->Cancel(), onFailure->Cancel(), deltaPositionMilliseconds);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8758,7 +8758,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipSeek)(JNIEnv * env, jobject self
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8773,7 +8773,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipSeek)(JNIEnv * env, jobject self
     err = cppCluster->MediaSkipSeek(onSuccess->Cancel(), onFailure->Cancel(), position);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8800,7 +8800,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaStartOver)(JNIEnv * env, jobject sel
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaStartOverResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8815,7 +8815,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaStartOver)(JNIEnv * env, jobject sel
     err = cppCluster->MediaStartOver(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8842,7 +8842,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaStop)(JNIEnv * env, jobject self, jl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
-    
+
     CHIPMediaPlaybackClusterMediaStopResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -8857,7 +8857,7 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaStop)(JNIEnv * env, jobject self, jl
     err = cppCluster->MediaStop(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8893,7 +8893,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, addThreadNetwork)(JNIEnv * env, jo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
-    
+
     JniByteArray operationalDatasetArr(env, operationalDataset);
     CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -8909,7 +8909,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, addThreadNetwork)(JNIEnv * env, jo
     err = cppCluster->AddThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) operationalDatasetArr.data(), operationalDatasetArr.size()), breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8936,7 +8936,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, addWiFiNetwork)(JNIEnv * env, jobj
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
-    
+
     JniByteArray ssidArr(env, ssid);
     JniByteArray credentialsArr(env, credentials);
     CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback * onSuccess;
@@ -8953,7 +8953,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, addWiFiNetwork)(JNIEnv * env, jobj
     err = cppCluster->AddWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) ssidArr.data(), ssidArr.size()), chip::ByteSpan((const uint8_t*) credentialsArr.data(), credentialsArr.size()), breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -8980,7 +8980,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, disableNetwork)(JNIEnv * env, jobj
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
-    
+
     JniByteArray networkIDArr(env, networkID);
     CHIPNetworkCommissioningClusterDisableNetworkResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -8996,7 +8996,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, disableNetwork)(JNIEnv * env, jobj
     err = cppCluster->DisableNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) networkIDArr.data(), networkIDArr.size()), breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9023,7 +9023,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, enableNetwork)(JNIEnv * env, jobje
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
-    
+
     JniByteArray networkIDArr(env, networkID);
     CHIPNetworkCommissioningClusterEnableNetworkResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9039,7 +9039,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, enableNetwork)(JNIEnv * env, jobje
     err = cppCluster->EnableNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) networkIDArr.data(), networkIDArr.size()), breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9066,7 +9066,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, getLastNetworkCommissioningResult)
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -9081,7 +9081,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, getLastNetworkCommissioningResult)
     err = cppCluster->GetLastNetworkCommissioningResult(onSuccess->Cancel(), onFailure->Cancel(), timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9108,7 +9108,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)(JNIEnv * env, jobje
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
-    
+
     JniByteArray networkIDArr(env, networkID);
     CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9124,7 +9124,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)(JNIEnv * env, jobje
     err = cppCluster->RemoveNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) networkIDArr.data(), networkIDArr.size()), breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9151,7 +9151,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)(JNIEnv * env, jobjec
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
-    
+
     JniByteArray ssidArr(env, ssid);
     CHIPNetworkCommissioningClusterScanNetworksResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9167,7 +9167,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)(JNIEnv * env, jobjec
     err = cppCluster->ScanNetworks(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) ssidArr.data(), ssidArr.size()), breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9194,7 +9194,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, updateThreadNetwork)(JNIEnv * env,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
-    
+
     JniByteArray operationalDatasetArr(env, operationalDataset);
     CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9210,7 +9210,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, updateThreadNetwork)(JNIEnv * env,
     err = cppCluster->UpdateThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) operationalDatasetArr.data(), operationalDatasetArr.size()), breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9237,7 +9237,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, updateWiFiNetwork)(JNIEnv * env, j
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
-    
+
     JniByteArray ssidArr(env, ssid);
     JniByteArray credentialsArr(env, credentials);
     CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback * onSuccess;
@@ -9254,7 +9254,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, updateWiFiNetwork)(JNIEnv * env, j
     err = cppCluster->UpdateWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) ssidArr.data(), ssidArr.size()), chip::ByteSpan((const uint8_t*) credentialsArr.data(), credentialsArr.size()), breadcrumb, timeoutMs);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9290,7 +9290,7 @@ JNI_METHOD(void, OtaSoftwareUpdateServerCluster, applyUpdateRequest)(JNIEnv * en
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateServerCluster * cppCluster;
-    
+
     JniByteArray updateTokenArr(env, updateToken);
     CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9306,7 +9306,7 @@ JNI_METHOD(void, OtaSoftwareUpdateServerCluster, applyUpdateRequest)(JNIEnv * en
     err = cppCluster->ApplyUpdateRequest(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) updateTokenArr.data(), updateTokenArr.size()), newVersion);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9333,7 +9333,7 @@ JNI_METHOD(void, OtaSoftwareUpdateServerCluster, notifyUpdateApplied)(JNIEnv * e
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateServerCluster * cppCluster;
-    
+
     JniByteArray updateTokenArr(env, updateToken);
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9349,7 +9349,7 @@ JNI_METHOD(void, OtaSoftwareUpdateServerCluster, notifyUpdateApplied)(JNIEnv * e
     err = cppCluster->NotifyUpdateApplied(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) updateTokenArr.data(), updateTokenArr.size()), currentVersion);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9376,7 +9376,7 @@ JNI_METHOD(void, OtaSoftwareUpdateServerCluster, queryImage)(JNIEnv * env, jobje
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateServerCluster * cppCluster;
-    
+
     JniUtfString locationStr(env, location);
         JniByteArray metadataForServerArr(env, metadataForServer);
     CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallback * onSuccess;
@@ -9393,7 +9393,7 @@ JNI_METHOD(void, OtaSoftwareUpdateServerCluster, queryImage)(JNIEnv * env, jobje
     err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, chip::ByteSpan((const uint8_t*) location, strlen(locationStr.c_str())), clientCanConsent, chip::ByteSpan((const uint8_t*) metadataForServerArr.data(), metadataForServerArr.size()));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9429,7 +9429,7 @@ JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -9444,7 +9444,7 @@ JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr
     err = cppCluster->Off(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9471,7 +9471,7 @@ JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -9486,7 +9486,7 @@ JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr,
     err = cppCluster->On(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9513,7 +9513,7 @@ JNI_METHOD(void, OnOffCluster, toggle)(JNIEnv * env, jobject self, jlong cluster
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -9528,7 +9528,7 @@ JNI_METHOD(void, OnOffCluster, toggle)(JNIEnv * env, jobject self, jlong cluster
     err = cppCluster->Toggle(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9564,7 +9564,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, addOpCert)(JNIEnv * env, jobject
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
-    
+
     JniByteArray operationalCertArr(env, operationalCert);
     JniByteArray iPKValueArr(env, iPKValue);
     CHIPOperationalCredentialsClusterOpCertResponseCallback * onSuccess;
@@ -9581,7 +9581,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, addOpCert)(JNIEnv * env, jobject
     err = cppCluster->AddOpCert(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) operationalCertArr.data(), operationalCertArr.size()), chip::ByteSpan((const uint8_t*) iPKValueArr.data(), iPKValueArr.size()), caseAdminNode, adminVendorId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9608,7 +9608,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)(JNIEn
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
-    
+
     JniByteArray rootCertificateArr(env, rootCertificate);
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9624,7 +9624,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)(JNIEn
     err = cppCluster->AddTrustedRootCertificate(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) rootCertificateArr.data(), rootCertificateArr.size()));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9651,7 +9651,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)(JNIEnv * env, jobj
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
-    
+
     JniByteArray cSRNonceArr(env, cSRNonce);
     CHIPOperationalCredentialsClusterOpCSRResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9667,7 +9667,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)(JNIEnv * env, jobj
     err = cppCluster->OpCSRRequest(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) cSRNonceArr.data(), cSRNonceArr.size()));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9694,7 +9694,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeAllFabrics)(JNIEnv * env, 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -9709,7 +9709,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeAllFabrics)(JNIEnv * env, 
     err = cppCluster->RemoveAllFabrics(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9736,7 +9736,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeFabric)(JNIEnv * env, jobj
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
-    
+
     CHIPOperationalCredentialsClusterOpCertResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -9751,7 +9751,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeFabric)(JNIEnv * env, jobj
     err = cppCluster->RemoveFabric(onSuccess->Cancel(), onFailure->Cancel(), fabricId, nodeId, vendorId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9778,7 +9778,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeTrustedRootCertificate)(JN
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
-    
+
     JniByteArray trustedRootIdentifierArr(env, trustedRootIdentifier);
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9794,7 +9794,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeTrustedRootCertificate)(JN
     err = cppCluster->RemoveTrustedRootCertificate(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) trustedRootIdentifierArr.data(), trustedRootIdentifierArr.size()));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9821,7 +9821,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, setFabric)(JNIEnv * env, jobject
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
-    
+
     CHIPOperationalCredentialsClusterSetFabricResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -9836,7 +9836,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, setFabric)(JNIEnv * env, jobject
     err = cppCluster->SetFabric(onSuccess->Cancel(), onFailure->Cancel(), vendorId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9863,7 +9863,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)(JNIEnv * env,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
-    
+
     JniUtfString labelStr(env, label);
         CHIPOperationalCredentialsClusterOpCertResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9879,7 +9879,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)(JNIEnv * env,
     err = cppCluster->UpdateFabricLabel(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) label, strlen(labelStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9933,7 +9933,7 @@ JNI_METHOD(void, ScenesCluster, addScene)(JNIEnv * env, jobject self, jlong clus
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
-    
+
     JniUtfString sceneNameStr(env, sceneName);
         CHIPScenesClusterAddSceneResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -9949,7 +9949,7 @@ JNI_METHOD(void, ScenesCluster, addScene)(JNIEnv * env, jobject self, jlong clus
     err = cppCluster->AddScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime, chip::ByteSpan((const uint8_t*) sceneName, strlen(sceneNameStr.c_str())), clusterId, length, value);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -9976,7 +9976,7 @@ JNI_METHOD(void, ScenesCluster, getSceneMembership)(JNIEnv * env, jobject self, 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
-    
+
     CHIPScenesClusterGetSceneMembershipResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -9991,7 +9991,7 @@ JNI_METHOD(void, ScenesCluster, getSceneMembership)(JNIEnv * env, jobject self, 
     err = cppCluster->GetSceneMembership(onSuccess->Cancel(), onFailure->Cancel(), groupId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10018,7 +10018,7 @@ JNI_METHOD(void, ScenesCluster, recallScene)(JNIEnv * env, jobject self, jlong c
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10033,7 +10033,7 @@ JNI_METHOD(void, ScenesCluster, recallScene)(JNIEnv * env, jobject self, jlong c
     err = cppCluster->RecallScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10060,7 +10060,7 @@ JNI_METHOD(void, ScenesCluster, removeAllScenes)(JNIEnv * env, jobject self, jlo
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
-    
+
     CHIPScenesClusterRemoveAllScenesResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10075,7 +10075,7 @@ JNI_METHOD(void, ScenesCluster, removeAllScenes)(JNIEnv * env, jobject self, jlo
     err = cppCluster->RemoveAllScenes(onSuccess->Cancel(), onFailure->Cancel(), groupId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10102,7 +10102,7 @@ JNI_METHOD(void, ScenesCluster, removeScene)(JNIEnv * env, jobject self, jlong c
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
-    
+
     CHIPScenesClusterRemoveSceneResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10117,7 +10117,7 @@ JNI_METHOD(void, ScenesCluster, removeScene)(JNIEnv * env, jobject self, jlong c
     err = cppCluster->RemoveScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10144,7 +10144,7 @@ JNI_METHOD(void, ScenesCluster, storeScene)(JNIEnv * env, jobject self, jlong cl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
-    
+
     CHIPScenesClusterStoreSceneResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10159,7 +10159,7 @@ JNI_METHOD(void, ScenesCluster, storeScene)(JNIEnv * env, jobject self, jlong cl
     err = cppCluster->StoreScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10186,7 +10186,7 @@ JNI_METHOD(void, ScenesCluster, viewScene)(JNIEnv * env, jobject self, jlong clu
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
-    
+
     CHIPScenesClusterViewSceneResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10201,7 +10201,7 @@ JNI_METHOD(void, ScenesCluster, viewScene)(JNIEnv * env, jobject self, jlong clu
     err = cppCluster->ViewScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10237,7 +10237,7 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, resetWatermarks)(JNIEnv * env, jobj
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     SoftwareDiagnosticsCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10252,7 +10252,7 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, resetWatermarks)(JNIEnv * env, jobj
     err = cppCluster->ResetWatermarks(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10297,7 +10297,7 @@ JNI_METHOD(void, TvChannelCluster, changeChannel)(JNIEnv * env, jobject self, jl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TvChannelCluster * cppCluster;
-    
+
     JniUtfString matchStr(env, match);
         CHIPTvChannelClusterChangeChannelResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -10313,7 +10313,7 @@ JNI_METHOD(void, TvChannelCluster, changeChannel)(JNIEnv * env, jobject self, jl
     err = cppCluster->ChangeChannel(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) match, strlen(matchStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10340,7 +10340,7 @@ JNI_METHOD(void, TvChannelCluster, changeChannelByNumber)(JNIEnv * env, jobject 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TvChannelCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10355,7 +10355,7 @@ JNI_METHOD(void, TvChannelCluster, changeChannelByNumber)(JNIEnv * env, jobject 
     err = cppCluster->ChangeChannelByNumber(onSuccess->Cancel(), onFailure->Cancel(), majorNumber, minorNumber);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10382,7 +10382,7 @@ JNI_METHOD(void, TvChannelCluster, skipChannel)(JNIEnv * env, jobject self, jlon
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TvChannelCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10397,7 +10397,7 @@ JNI_METHOD(void, TvChannelCluster, skipChannel)(JNIEnv * env, jobject self, jlon
     err = cppCluster->SkipChannel(onSuccess->Cancel(), onFailure->Cancel(), count);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10433,7 +10433,7 @@ JNI_METHOD(void, TargetNavigatorCluster, navigateTarget)(JNIEnv * env, jobject s
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TargetNavigatorCluster * cppCluster;
-    
+
     JniUtfString dataStr(env, data);
         CHIPTargetNavigatorClusterNavigateTargetResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -10449,7 +10449,7 @@ JNI_METHOD(void, TargetNavigatorCluster, navigateTarget)(JNIEnv * env, jobject s
     err = cppCluster->NavigateTarget(onSuccess->Cancel(), onFailure->Cancel(), target, chip::ByteSpan((const uint8_t*) data, strlen(dataStr.c_str())));
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10494,7 +10494,7 @@ JNI_METHOD(void, TestClusterCluster, test)(JNIEnv * env, jobject self, jlong clu
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10509,7 +10509,7 @@ JNI_METHOD(void, TestClusterCluster, test)(JNIEnv * env, jobject self, jlong clu
     err = cppCluster->Test(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10536,7 +10536,7 @@ JNI_METHOD(void, TestClusterCluster, testNotHandled)(JNIEnv * env, jobject self,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10551,7 +10551,7 @@ JNI_METHOD(void, TestClusterCluster, testNotHandled)(JNIEnv * env, jobject self,
     err = cppCluster->TestNotHandled(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10578,7 +10578,7 @@ JNI_METHOD(void, TestClusterCluster, testSpecific)(JNIEnv * env, jobject self, j
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
-    
+
     CHIPTestClusterClusterTestSpecificResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10593,7 +10593,7 @@ JNI_METHOD(void, TestClusterCluster, testSpecific)(JNIEnv * env, jobject self, j
     err = cppCluster->TestSpecific(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10620,7 +10620,7 @@ JNI_METHOD(void, TestClusterCluster, testUnknownCommand)(JNIEnv * env, jobject s
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10635,7 +10635,7 @@ JNI_METHOD(void, TestClusterCluster, testUnknownCommand)(JNIEnv * env, jobject s
     err = cppCluster->TestUnknownCommand(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10671,7 +10671,7 @@ JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)(JNIEnv * env, jobject s
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10686,7 +10686,7 @@ JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)(JNIEnv * env, jobject s
     err = cppCluster->ClearWeeklySchedule(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10713,7 +10713,7 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject sel
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10728,7 +10728,7 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject sel
     err = cppCluster->GetRelayStatusLog(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10755,7 +10755,7 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)(JNIEnv * env, jobject sel
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10770,7 +10770,7 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)(JNIEnv * env, jobject sel
     err = cppCluster->GetWeeklySchedule(onSuccess->Cancel(), onFailure->Cancel(), daysToReturn, modeToReturn);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10797,7 +10797,7 @@ JNI_METHOD(void, ThermostatCluster, setWeeklySchedule)(JNIEnv * env, jobject sel
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10812,7 +10812,7 @@ JNI_METHOD(void, ThermostatCluster, setWeeklySchedule)(JNIEnv * env, jobject sel
     err = cppCluster->SetWeeklySchedule(onSuccess->Cancel(), onFailure->Cancel(), numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10839,7 +10839,7 @@ JNI_METHOD(void, ThermostatCluster, setpointRaiseLower)(JNIEnv * env, jobject se
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10854,7 +10854,7 @@ JNI_METHOD(void, ThermostatCluster, setpointRaiseLower)(JNIEnv * env, jobject se
     err = cppCluster->SetpointRaiseLower(onSuccess->Cancel(), onFailure->Cancel(), mode, amount);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10890,7 +10890,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, job
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThreadNetworkDiagnosticsCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10905,7 +10905,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, job
     err = cppCluster->ResetCounts(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -10959,7 +10959,7 @@ JNI_METHOD(void, WindowCoveringCluster, downOrClose)(JNIEnv * env, jobject self,
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -10974,7 +10974,7 @@ JNI_METHOD(void, WindowCoveringCluster, downOrClose)(JNIEnv * env, jobject self,
     err = cppCluster->DownOrClose(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -11001,7 +11001,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)(JNIEnv * env, jobjec
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -11016,7 +11016,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)(JNIEnv * env, jobjec
     err = cppCluster->GoToLiftPercentage(onSuccess->Cancel(), onFailure->Cancel(), liftPercentageValue, liftPercent100thsValue);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -11043,7 +11043,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)(JNIEnv * env, jobject sel
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -11058,7 +11058,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)(JNIEnv * env, jobject sel
     err = cppCluster->GoToLiftValue(onSuccess->Cancel(), onFailure->Cancel(), liftValue);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -11085,7 +11085,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)(JNIEnv * env, jobjec
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -11100,7 +11100,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)(JNIEnv * env, jobjec
     err = cppCluster->GoToTiltPercentage(onSuccess->Cancel(), onFailure->Cancel(), tiltPercentageValue, tiltPercent100thsValue);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -11127,7 +11127,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)(JNIEnv * env, jobject sel
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -11142,7 +11142,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)(JNIEnv * env, jobject sel
     err = cppCluster->GoToTiltValue(onSuccess->Cancel(), onFailure->Cancel(), tiltValue);
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -11169,7 +11169,7 @@ JNI_METHOD(void, WindowCoveringCluster, stopMotion)(JNIEnv * env, jobject self, 
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -11184,7 +11184,7 @@ JNI_METHOD(void, WindowCoveringCluster, stopMotion)(JNIEnv * env, jobject self, 
     err = cppCluster->StopMotion(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -11211,7 +11211,7 @@ JNI_METHOD(void, WindowCoveringCluster, upOrOpen)(JNIEnv * env, jobject self, jl
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
-    
+
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -11226,7 +11226,7 @@ JNI_METHOD(void, WindowCoveringCluster, upOrOpen)(JNIEnv * env, jobject self, jl
     err = cppCluster->UpOrOpen(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
-exit: 
+exit:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
