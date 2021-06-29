@@ -337,7 +337,7 @@ void TestReadInteraction::TestReadClientGenerateOneEventPathList(nlTestSuite * a
     System::PacketBufferTLVWriter writer;
     ReadRequest::Builder request;
     chip::EventNumber eventNumber = 0;
-    msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    msgBuf                        = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     writer.Init(std::move(msgBuf));
     err = request.Init(&writer);
@@ -346,10 +346,10 @@ void TestReadInteraction::TestReadClientGenerateOneEventPathList(nlTestSuite * a
     err = readClient.Init(&gExchangeManager, &delegate);
 
     chip::app::EventPathParams eventPathParams[2];
-    eventPathParams[0].mNodeId = 1;
+    eventPathParams[0].mNodeId     = 1;
     eventPathParams[0].mEndpointId = 2;
-    eventPathParams[0].mClusterId = 3;
-    eventPathParams[0].mEventId = 4;
+    eventPathParams[0].mClusterId  = 3;
+    eventPathParams[0].mEventId    = 4;
 
     err = readClient.GenerateEventPathList(request, eventPathParams, 1 /*aEventPathParamsListSize*/, eventNumber);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -364,7 +364,7 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPathList(nlTestSuite * a
     System::PacketBufferTLVWriter writer;
     ReadRequest::Builder request;
     chip::EventNumber eventNumber = 0;
-    msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    msgBuf                        = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     writer.Init(std::move(msgBuf));
     err = request.Init(&writer);
@@ -373,15 +373,15 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPathList(nlTestSuite * a
     err = readClient.Init(&gExchangeManager, &delegate);
 
     chip::app::EventPathParams eventPathParams[2];
-    eventPathParams[0].mNodeId = 1;
+    eventPathParams[0].mNodeId     = 1;
     eventPathParams[0].mEndpointId = 2;
-    eventPathParams[0].mClusterId = 3;
-    eventPathParams[0].mEventId = 4;
+    eventPathParams[0].mClusterId  = 3;
+    eventPathParams[0].mEventId    = 4;
 
-    eventPathParams[1].mNodeId = 1;
+    eventPathParams[1].mNodeId     = 1;
     eventPathParams[1].mEndpointId = 2;
-    eventPathParams[1].mClusterId = 3;
-    eventPathParams[1].mEventId = 5;
+    eventPathParams[1].mClusterId  = 3;
+    eventPathParams[1].mEventId    = 5;
     err = readClient.GenerateEventPathList(request, eventPathParams, 2 /*aEventPathParamsListSize*/, eventNumber);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }

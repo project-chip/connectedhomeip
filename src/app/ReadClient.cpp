@@ -146,19 +146,19 @@ exit:
 }
 
 CHIP_ERROR ReadClient::GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
-                                                 size_t aEventPathParamsListSize, EventNumber & aEventNumber)
+                                             size_t aEventPathParamsListSize, EventNumber & aEventNumber)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
     EventPathList::Builder & eventPathListBuilder = aRequest.CreateEventPathListBuilder();
     for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
     {
-        EventPath::Builder eventPathBuilder           = eventPathListBuilder.CreateEventPathBuilder();
-        EventPathParams eventPath = apEventPathParamsList[eventIndex];
+        EventPath::Builder eventPathBuilder = eventPathListBuilder.CreateEventPathBuilder();
+        EventPathParams eventPath           = apEventPathParamsList[eventIndex];
         eventPathBuilder.NodeId(eventPath.mNodeId)
-                .EventId(eventPath.mEventId)
-                .EndpointId(eventPath.mEndpointId)
-                .ClusterId(eventPath.mClusterId)
-                .EndOfEventPath();
+            .EventId(eventPath.mEventId)
+            .EndpointId(eventPath.mEndpointId)
+            .ClusterId(eventPath.mClusterId)
+            .EndOfEventPath();
         SuccessOrExit(err = eventPathBuilder.GetError());
     }
 
