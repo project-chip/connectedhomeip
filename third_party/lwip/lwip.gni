@@ -60,6 +60,7 @@ template("lwip_target") {
       "-Wno-type-limits",
       "-Wno-unused-variable",
       "-Wno-maybe-uninitialized",
+      "-Wno-format-type-confusion",
     ]
   }
 
