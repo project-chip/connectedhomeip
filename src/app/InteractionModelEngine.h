@@ -49,15 +49,15 @@
 #include <app/reporting/Engine.h>
 #include <app/util/basic-types.h>
 
-// TODO: Make number of command handler and command sender configurable
+// TODO: Make number of command/read/write client/handler configurable
 #define CHIP_MAX_NUM_COMMAND_HANDLER 4
 #define CHIP_MAX_NUM_COMMAND_SENDER 4
 #define CHIP_MAX_NUM_READ_CLIENT 4
 #define CHIP_MAX_NUM_READ_HANDLER 4
-#define CHIP_MAX_REPORTS_IN_FLIGHT 1
+#define CHIP_MAX_REPORTS_IN_FLIGHT 4
 #define IM_SERVER_MAX_NUM_PATH_GROUPS 8
-#define CHIP_MAX_NUM_WRITE_CLIENT 1
-#define CHIP_MAX_NUM_WRITE_HANDLER 1
+#define CHIP_MAX_NUM_WRITE_CLIENT 4
+#define CHIP_MAX_NUM_WRITE_HANDLER 4
 
 namespace chip {
 namespace app {
