@@ -36,7 +36,7 @@ public:
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
     {{#if isWritableAttribute}}
-    CHIP_ERROR WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value);
+    CHIP_ERROR WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{#if (isBoolean type)}}/* TODO: chipType should be able to emit bool values. */ bool{{else}}{{chipType}}{{/if}} value);
     {{/if}}
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}

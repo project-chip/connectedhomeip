@@ -31,6 +31,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -177,6 +178,11 @@ void ResetEmberAfObjects()
 
 } // namespace Compatibility
 
+namespace {
+// Common buffer for ReadSingleClusterData & WriteSingleClusterData
+uint8_t attributeData[kAttributeReadBufferSize];
+} // namespace
+
 bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
 {
     // TODO: Currently, we are using cluster catalog from the ember library, this should be modified or replaced after several
@@ -186,8 +192,6 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
 
 CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
-    static uint8_t data[kAttributeReadBufferSize];
-
     ChipLogDetail(DataManagement,
                   "Received Cluster Command: Cluster=%" PRIx32 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
                   " FieldId=%" PRIx32 " ListIndex=%" PRIx16,
@@ -197,7 +201,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     EmberAfAttributeType attributeType;
     EmberAfStatus status;
     status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER,
-                                  data, sizeof(data), &attributeType);
+                                  attributeData, sizeof(attributeData), &attributeType);
 
     if (apDataExists != nullptr)
     {
@@ -218,64 +222,64 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         ReturnErrorOnFailure(apWriter->PutNull(TLV::ContextTag(AttributeDataElement::kCsTag_Data)));
         break;
     case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
-        ReturnErrorOnFailure(apWriter->PutBoolean(TLV::ContextTag(AttributeDataElement::kCsTag_Data), !!data[0]));
+        ReturnErrorOnFailure(apWriter->PutBoolean(TLV::ContextTag(AttributeDataElement::kCsTag_Data), !!attributeData[0]));
         break;
     case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), data[0]));
+        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), attributeData[0]));
         break;
     case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
     {
         uint16_t uint16_data;
-        memcpy(&uint16_data, data, sizeof(uint16_data));
+        memcpy(&uint16_data, attributeData, sizeof(uint16_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint16_data));
         break;
     }
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
     {
         uint32_t uint32_data;
-        memcpy(&uint32_data, data, sizeof(uint32_data));
+        memcpy(&uint32_data, attributeData, sizeof(uint32_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint32_data));
         break;
     }
     case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
     {
         uint64_t uint64_data;
-        memcpy(&uint64_data, data, sizeof(uint64_data));
+        memcpy(&uint64_data, attributeData, sizeof(uint64_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint64_data));
         break;
     }
     case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
     {
         int8_t int8_data;
-        memcpy(&int8_data, data, sizeof(int8_data));
+        memcpy(&int8_data, attributeData, sizeof(int8_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int8_data));
         break;
     }
     case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
     {
         int16_t int16_data;
-        memcpy(&int16_data, data, sizeof(int16_data));
+        memcpy(&int16_data, attributeData, sizeof(int16_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int16_data));
         break;
     }
     case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
     {
         int32_t int32_data;
-        memcpy(&int32_data, data, sizeof(int32_data));
+        memcpy(&int32_data, attributeData, sizeof(int32_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int32_data));
         break;
     }
     case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
     {
         int64_t int64_data;
-        memcpy(&int64_data, data, sizeof(int64_data));
+        memcpy(&int64_data, attributeData, sizeof(int64_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int64_data));
         break;
     }
     case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
     {
-        char * actualData  = reinterpret_cast<char *>(data + 1);
-        uint8_t dataLength = data[0];
+        char * actualData  = reinterpret_cast<char *>(attributeData + 1);
+        uint8_t dataLength = attributeData[0];
         if (dataLength == 0xFF /* invalid data, put empty value instead */)
         {
             dataLength = 0;
@@ -284,9 +288,9 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         break;
     }
     case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
-        char * actualData = reinterpret_cast<char *>(data + 2); // The pascal string contains 2 bytes length
+        char * actualData = reinterpret_cast<char *>(attributeData + 2); // The pascal string contains 2 bytes length
         uint16_t dataLength;
-        memcpy(&dataLength, data, sizeof(dataLength));
+        memcpy(&dataLength, attributeData, sizeof(dataLength));
         if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
         {
             dataLength = 0;
@@ -296,8 +300,8 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     }
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
     {
-        uint8_t * actualData = data + 1;
-        uint8_t dataLength   = data[0];
+        uint8_t * actualData = attributeData + 1;
+        uint8_t dataLength   = attributeData[0];
         if (dataLength == 0xFF /* invalid data, put empty value instead */)
         {
             dataLength = 0;
@@ -307,9 +311,9 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         break;
     }
     case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE: {
-        uint8_t * actualData = data + 2; // The pascal string contains 2 bytes length
+        uint8_t * actualData = attributeData + 2; // The pascal string contains 2 bytes length
         uint16_t dataLength;
-        memcpy(&dataLength, data, sizeof(dataLength));
+        memcpy(&dataLength, attributeData, sizeof(dataLength));
         if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
         {
             dataLength = 0;
@@ -323,9 +327,9 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         ReturnErrorOnFailure(
             apWriter->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_List, containerType));
         // TODO: Encode data in TLV, now raw buffers
-        ReturnErrorOnFailure(
-            apWriter->PutBytes(TLV::AnonymousTag, data,
-                               emberAfAttributeValueSize(aClusterInfo.mClusterId, aClusterInfo.mFieldId, attributeType, data)));
+        ReturnErrorOnFailure(apWriter->PutBytes(
+            TLV::AnonymousTag, attributeData,
+            emberAfAttributeValueSize(aClusterInfo.mClusterId, aClusterInfo.mFieldId, attributeType, attributeData)));
         ReturnErrorOnFailure(apWriter->EndContainer(containerType));
         break;
     }
@@ -338,6 +342,115 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     // TODO: Add DataVersion support
     ReturnErrorOnFailure(apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), kTemporaryDataVersion));
     return CHIP_NO_ERROR;
+}
+
+namespace {
+template <typename T>
+CHIP_ERROR numericTlvDataToAttributeBuffer(TLV::TLVReader & aReader, uint16_t & dataLen)
+{
+    T value;
+    static_assert(sizeof(value) <= sizeof(attributeData), "Value cannot fit into attribute data");
+    ReturnErrorOnFailure(aReader.Get(value));
+    dataLen = sizeof(value);
+    memcpy(attributeData, &value, sizeof(value));
+    return CHIP_NO_ERROR;
+}
+template <typename T>
+CHIP_ERROR stringTlvDataToAttributeBuffer(TLV::TLVReader & aReader, uint16_t & dataLen)
+{
+    const uint8_t * data = nullptr;
+    T len;
+    VerifyOrReturnError(aReader.GetType() == TLV::TLVType::kTLVType_ByteString ||
+                            aReader.GetType() == TLV::TLVType::kTLVType_UTF8String,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CanCastTo<T>(aReader.GetLength()), CHIP_ERROR_MESSAGE_TOO_LONG);
+    ReturnErrorOnFailure(aReader.GetDataPtr(data));
+    len = static_cast<T>(aReader.GetLength());
+    VerifyOrReturnError(len + sizeof(len) /* length at the beginning of data */ <= sizeof(attributeData),
+                        CHIP_ERROR_MESSAGE_TOO_LONG);
+    memcpy(&attributeData[0], &len, sizeof(len));
+    memcpy(&attributeData[sizeof(len)], data, len);
+    dataLen = static_cast<uint16_t>(len + sizeof(len));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR prepareWriteData(EmberAfAttributeType expectedType, TLV::TLVReader & aReader, uint16_t & dataLen)
+{
+    switch (BaseType(expectedType))
+    {
+    case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
+        return numericTlvDataToAttributeBuffer<bool>(aReader, dataLen);
+    case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
+        return numericTlvDataToAttributeBuffer<uint8_t>(aReader, dataLen);
+    case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
+        return numericTlvDataToAttributeBuffer<uint16_t>(aReader, dataLen);
+    case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
+        return numericTlvDataToAttributeBuffer<uint32_t>(aReader, dataLen);
+    case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
+        return numericTlvDataToAttributeBuffer<uint64_t>(aReader, dataLen);
+    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
+        return numericTlvDataToAttributeBuffer<int8_t>(aReader, dataLen);
+    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
+        return numericTlvDataToAttributeBuffer<int16_t>(aReader, dataLen);
+    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
+        return numericTlvDataToAttributeBuffer<int32_t>(aReader, dataLen);
+    case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
+        return numericTlvDataToAttributeBuffer<int64_t>(aReader, dataLen);
+    case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
+    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:  // Char string
+        return stringTlvDataToAttributeBuffer<uint8_t>(aReader, dataLen);
+    case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE: // Long octet string
+    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:  // Long char string
+        return stringTlvDataToAttributeBuffer<uint16_t>(aReader, dataLen);
+    default:
+        ChipLogError(DataManagement, "Attribute type %x not handled", static_cast<int>(expectedType));
+        return CHIP_ERROR_INVALID_DATA_LIST;
+    }
+}
+} // namespace
+
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+{
+    AttributePathParams attributePathParams;
+    attributePathParams.mNodeId     = aClusterInfo.mNodeId;
+    attributePathParams.mEndpointId = aClusterInfo.mEndpointId;
+    attributePathParams.mClusterId  = aClusterInfo.mClusterId;
+    attributePathParams.mFieldId    = aClusterInfo.mFieldId;
+    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+
+    EmberAfAttributeType attributeType = ZCL_UNKNOWN_ATTRIBUTE_TYPE;
+
+    EmberAfStatus status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId,
+                                                CLUSTER_MASK_SERVER, nullptr, 0, &attributeType); // write?
+    Protocols::InteractionModel::ProtocolCode imCode = Protocols::InteractionModel::ProtocolCode::Success;
+
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        return apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kFailure,
+                                                      Protocols::SecureChannel::Id,
+                                                      Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute);
+    }
+
+    CHIP_ERROR preparationError = CHIP_NO_ERROR;
+    uint16_t dataLen            = 0;
+    if ((preparationError = prepareWriteData(attributeType, aReader, dataLen)) == CHIP_NO_ERROR)
+    {
+        // TODO: Currently, all errors are considered as attribute not exists, should be fixed by mapping ember error code to IM
+        // error codes.
+        imCode = ToInteractionModelProtocolCode(emberAfWriteServerAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
+                                                                            aClusterInfo.mFieldId, attributeData, attributeType));
+    }
+    else
+    {
+        ChipLogError(Zcl, "Failed to preapre data to write: %s", ErrorStr(preparationError));
+        imCode = Protocols::InteractionModel::ProtocolCode::InvalidValue;
+    }
+
+    return apWriteHandler->AddAttributeStatusCode(attributePathParams,
+                                                  imCode == Protocols::InteractionModel::ProtocolCode::Success
+                                                      ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
+                                                      : Protocols::SecureChannel::GeneralStatusCode::kFailure,
+                                                  Protocols::SecureChannel::Id, imCode);
 }
 
 } // namespace app

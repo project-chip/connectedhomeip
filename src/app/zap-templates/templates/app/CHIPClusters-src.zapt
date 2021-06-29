@@ -1,11 +1,15 @@
 {{> header}}
 #include "CHIPClusters.h"
 
+{{#if (chip_has_client_clusters)}}
 #include <cstdint>
 
 #include "chip-zcl-zpro-codec-api.h"
 #include <lib/support/Span.h>
 #include <gen/CHIPClientCallbacks.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/CodeUtils.h>
+#include <app/InteractionModelEngine.h>
 
 namespace chip {
 namespace Controller {
@@ -13,6 +17,22 @@ namespace Controller {
 // TODO(#4502): onCompletion is not used by IM for now.
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
+
+namespace {
+
+// The helper function to encode a single scalar (numeric / string / bytearray) attributes.
+template <class T>
+CHIP_ERROR EncodeScalarAttributeWritePayload(app::WriteClientHandle & handle, const chip::app::AttributePathParams & attributePath, T value)
+{
+    chip::TLV::TLVWriter * writer = nullptr;
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle->PrepareAttribute(attributePath));
+    VerifyOrReturnError((writer = handle->GetAttributeDataElementTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(writer->Put(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
+    ReturnErrorOnFailure(handle->FinishAttribute());
+    return CHIP_NO_ERROR;
+}
+}
 
 {{#chip_client_clusters}}
 
@@ -78,7 +98,7 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCase
     chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = {{asHex code 4}};
+    attributePath.mFieldId    = {{asHex code 8}};
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
 {{#if isList}}
@@ -90,11 +110,18 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCase
 }
 
 {{#if isWritableAttribute}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{#if (isBoolean type)}}/* TODO: chipType should be able to emit bool values. */ bool{{else}}{{chipType}}{{/if}} value)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(seqNum, mEndpoint, value);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId         = mDevice->GetDeviceId();
+    attributePath.mEndpointId     = mEndpoint;
+    attributePath.mClusterId      = mClusterId;
+    attributePath.mFieldId        = {{ asHex code 8 }};
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    ReturnErrorOnFailure(EncodeScalarAttributeWritePayload(handle, attributePath, value));
+    ReturnErrorOnFailure(mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback));
+    return CHIP_NO_ERROR;
 }
 
 {{/if}}
@@ -117,3 +144,4 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReportAttribute{{asCamelCa
 
 } // namespace Controller
 } // namespace chip
+{{/if}}
