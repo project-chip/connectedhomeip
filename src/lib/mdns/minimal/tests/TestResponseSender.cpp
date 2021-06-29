@@ -19,11 +19,11 @@
 #include <string>
 #include <vector>
 
+#include <mdns/minimal/RecordData.h>
 #include <mdns/minimal/core/FlatAllocatedQName.h>
 #include <mdns/minimal/responders/Ptr.h>
 #include <mdns/minimal/responders/Srv.h>
 #include <mdns/minimal/responders/Txt.h>
-#include <mdns/minimal/RecordData.h>
 
 #include <support/CHIPMem.h>
 #include <support/UnitTestRegistration.h>
@@ -62,18 +62,21 @@ public:
             // For now, types and names are sufficient for checking that the response sender is sending out the correct records.
             if (data.GetType() == expectedRecord[i]->GetType() && data.GetName() == expectedRecord[i]->GetName())
             {
-                if (data.GetType() == QType::PTR) {
+                if (data.GetType() == QType::PTR)
+                {
                     // Check that the internal values are the same
                     SerializedQNameIterator dataTarget;
                     ParsePtrRecord(data.GetData(), data.GetData(), &dataTarget);
-                    const PtrResourceRecord* expectedPtr = static_cast<const PtrResourceRecord*>(expectedRecord[i]);
-                    if (dataTarget == expectedPtr->GetPtr()) {
-                        foundRecord[i] = true;
+                    const PtrResourceRecord * expectedPtr = static_cast<const PtrResourceRecord *>(expectedRecord[i]);
+                    if (dataTarget == expectedPtr->GetPtr())
+                    {
+                        foundRecord[i]   = true;
                         recordIsExpected = true;
                         break;
                     }
                 }
-                else {
+                else
+                {
                     foundRecord[i]   = true;
                     recordIsExpected = true;
                     break;
@@ -103,7 +106,7 @@ public:
             if (expectedRecord[i] == nullptr)
             {
                 expectedRecord[i] = record;
-                foundRecord[i] = false;
+                foundRecord[i]    = false;
                 return;
             }
         }
