@@ -90,7 +90,8 @@ class LivenessEventGenerator : public EventGenerator
 public:
     LivenessEventGenerator(void);
     void Generate(void);
-    chip::EventNumber LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId, LivenessDeviceStatus aStatus);
+    chip::EventNumber LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId, LivenessDeviceStatus aStatus,
+                                  chip::EventId aEventId, chip::app::PriorityLevel aPriorityLevel);
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter);
 
 private:
