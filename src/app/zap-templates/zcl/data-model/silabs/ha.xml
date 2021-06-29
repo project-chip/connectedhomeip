@@ -452,29 +452,6 @@ limitations under the License.
     <attribute side="server" code="0x0010" define="ILLUMINANCE_TARGET_LEVEL" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="false">illuminance level target</attribute>
   </cluster>
   <cluster>
-    <name>Pressure Measurement</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements.</description>
-    <code>0x0403</code>
-    <define>PRESSURE_MEASUREMENT_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="PRESSURE_MEASURED_VALUE" type="INT16S" writable="false" reportable="true" default="0x0000" optional="false">measured value</attribute>
-    <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="PRESSURE_MIN_MEASURED_VALUE" type="INT16S" min="0x8001" max="0x7FFE" writable="false" optional="false">min measured value</attribute>
-    <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="PRESSURE_MAX_MEASURED_VALUE" type="INT16S" min="0x8002" max="0x7FFF" writable="false" optional="false">max measured value</attribute>
-    <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="PRESSURE_TOLERANCE" type="INT16U" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true">tolerance</attribute>
-    <!-- TOLERANCE -->
-    <attribute side="server" code="0x0010" define="PRESSURE_SCALED_VALUE" type="INT16S" writable="false" reportable="true" default="0x0000" optional="true">scaled value</attribute>
-    <attribute side="server" code="0x0011" define="PRESSURE_MIN_SCALED_VALUE" type="INT16S" min="0x8001" max="0x7FFE" writable="false" optional="true">min scaled value</attribute>
-    <attribute side="server" code="0x0012" define="PRESSURE_MAX_SCALED_VALUE" type="INT16S" min="0x8002" max="0x7FFF" writable="false" optional="true">max scaled value</attribute>
-    <attribute side="server" code="0x0013" define="PRESSURE_SCALED_TOLERANCE" type="INT16S" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true">scaled tolerance</attribute>
-    <attribute side="server" code="0x0014" define="PRESSURE_SCALE" type="INT8S" min="0x81" max="0x7F" writable="false" optional="true">scale</attribute>
-  </cluster>
-  <cluster>
     <name>Occupancy Sensing</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring occupancy sensing, and reporting occupancy status.</description>
