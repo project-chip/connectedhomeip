@@ -268,9 +268,8 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdm
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    err = mpExchangeCtx->SendMessage(
-        Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
-        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(State::AwaitingResponse);
 
