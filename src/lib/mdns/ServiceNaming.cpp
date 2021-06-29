@@ -174,6 +174,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         break;
     case DiscoveryFilterType::kInstanceName:
         requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);
+        // printf("MakeServiceSubtype buffer=%s\n", buffer);
         break;
     case DiscoveryFilterType::kNone:
         requiredSize = 0;

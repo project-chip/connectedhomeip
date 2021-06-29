@@ -48,10 +48,10 @@
 namespace {
 
 // Max value for the number of EchoRequests sent.
-constexpr size_t kMaxEchoCount = 3;
+constexpr size_t kMaxEchoCount = 5;
 
 // The CHIP Echo interval time in milliseconds.
-constexpr int32_t gEchoInterval = 1000;
+constexpr int32_t gEchoInterval = 100;
 
 constexpr chip::Transport::AdminId gAdminId = 0;
 

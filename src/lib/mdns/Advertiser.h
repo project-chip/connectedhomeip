@@ -24,7 +24,6 @@
 #include <core/Optional.h>
 #include <core/PeerId.h>
 #include <inet/InetLayer.h>
-#include <lib/support/ChipMemString.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -180,55 +179,37 @@ public:
     {
         if (deviceName.HasValue())
         {
-            chip::Platform::CopyString(mDeviceName, sizeof(mDeviceName), deviceName.Value());
+            strncpy(mDeviceName, deviceName.Value(), min(strlen(deviceName.Value()) + 1, sizeof(mDeviceName)));
             mDeviceNameHasValue = true;
-        }
-        else
-        {
-            mDeviceNameHasValue = false;
         }
         return *this;
     }
-    Optional<const char *> GetDeviceName() const
-    {
-        return mDeviceNameHasValue ? Optional<const char *>::Value(mDeviceName) : Optional<const char *>::Missing();
-    }
+    bool HasValueDeviceName() const { return mDeviceNameHasValue; }
+    const char * GetDeviceName() const { return mDeviceName; }
 
     CommissionAdvertisingParameters & SetRotatingId(Optional<const char *> rotatingId)
     {
         if (rotatingId.HasValue())
         {
-            chip::Platform::CopyString(mRotatingId, sizeof(mRotatingId), rotatingId.Value());
+            strncpy(mRotatingId, rotatingId.Value(), min(strlen(rotatingId.Value()) + 1, sizeof(mRotatingId)));
             mRotatingIdHasValue = true;
-        }
-        else
-        {
-            mRotatingIdHasValue = false;
         }
         return *this;
     }
-    Optional<const char *> GetRotatingId() const
-    {
-        return mRotatingIdHasValue ? Optional<const char *>::Value(mRotatingId) : Optional<const char *>::Missing();
-    }
+    bool HasValueRotatingId() const { return mRotatingIdHasValue; }
+    const char * GetRotatingId() const { return mRotatingId; }
 
     CommissionAdvertisingParameters & SetPairingInstr(Optional<const char *> pairingInstr)
     {
         if (pairingInstr.HasValue())
         {
-            chip::Platform::CopyString(mPairingInstr, sizeof(mPairingInstr), pairingInstr.Value());
+            strncpy(mPairingInstr, pairingInstr.Value(), min(strlen(pairingInstr.Value()) + 1, sizeof(mPairingInstr)));
             mPairingInstrHasValue = true;
-        }
-        else
-        {
-            mPairingInstrHasValue = false;
         }
         return *this;
     }
-    Optional<const char *> GetPairingInstr() const
-    {
-        return mPairingInstrHasValue ? Optional<const char *>::Value(mPairingInstr) : Optional<const char *>::Missing();
-    }
+    bool HasValuePairingInstr() const { return mPairingInstrHasValue; }
+    const char * GetPairingInstr() const { return mPairingInstr; }
 
     CommissionAdvertisingParameters & SetPairingHint(Optional<uint16_t> pairingHint)
     {

@@ -152,6 +152,7 @@ static int CommissioningHandler(int argc, char ** argv)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     else if (strcmp(argv[0], "sendudc") == 0)
     {
+        printf("sendudc ip=%s\n", argv[1]);
         chip::Inet::IPAddress commissioner;
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
         return error = SendUDC(true, commissioner);
@@ -160,18 +161,22 @@ static int CommissioningHandler(int argc, char ** argv)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     else if (strcmp(argv[0], "resetudc") == 0)
     {
+        printf("resetudc\n");
         return error = ResetUDC(true);
     }
     else if (strcmp(argv[0], "discover") == 0)
     {
+        printf("discover\n");
         return error = discover(true);
     }
     else if (strcmp(argv[0], "discover-instance") == 0)
     {
+        printf("discover instance=%s\n", argv[1]);
         return error = discover(true, argv[1]);
     }
     else if (strcmp(argv[0], "display") == 0)
     {
+        printf("display\n");
         return error = display(true);
     }
 #endif
@@ -179,7 +184,6 @@ static int CommissioningHandler(int argc, char ** argv)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return error;
 }
 
 void RegisterCommissioningCommands()
