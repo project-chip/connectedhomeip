@@ -12465,17 +12465,6 @@ class OtaSoftwareUpdateProviderQueryImage : public ModelCommand
 public:
     OtaSoftwareUpdateProviderQueryImage() : ModelCommand("query-image")
     {
-<<<<<<< HEAD
-        AddArgument("vendorId", 0, UINT16_MAX, &mVendorId);
-        AddArgument("productId", 0, UINT16_MAX, &mProductId);
-        AddArgument("imageType", 0, UINT16_MAX, &mImageType);
-        AddArgument("hardwareVersion", 0, UINT16_MAX, &mHardwareVersion);
-        AddArgument("currentVersion", 0, UINT32_MAX, &mCurrentVersion);
-        AddArgument("protocolsSupported", 0, UINT8_MAX, &mProtocolsSupported);
-        AddArgument("location", &mLocation);
-        AddArgument("requestorCanConsent", 0, UINT8_MAX, &mRequestorCanConsent);
-        AddArgument("metadataForProvider", &mMetadataForProvider);
-=======
         AddArgument("VendorId", 0, UINT16_MAX, &mVendorId);
         AddArgument("ProductId", 0, UINT16_MAX, &mProductId);
         AddArgument("ImageType", 0, UINT16_MAX, &mImageType);
@@ -12483,9 +12472,8 @@ public:
         AddArgument("CurrentVersion", 0, UINT32_MAX, &mCurrentVersion);
         AddArgument("ProtocolsSupported", 0, UINT8_MAX, &mProtocolsSupported);
         AddArgument("Location", &mLocation);
-        AddArgument("ClientCanConsent", 0, UINT8_MAX, &mClientCanConsent);
-        AddArgument("MetadataForServer", &mMetadataForServer);
->>>>>>> master
+        AddArgument("RequestorCanConsent", 0, UINT8_MAX, &mRequestorCanConsent);
+        AddArgument("MetadataForProvider", &mMetadataForProvider);
         ModelCommand::AddArguments();
     }
     ~OtaSoftwareUpdateProviderQueryImage()
