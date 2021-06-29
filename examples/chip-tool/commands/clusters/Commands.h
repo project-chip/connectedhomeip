@@ -570,19 +570,19 @@ static void OnNetworkCommissioningClusterUpdateWiFiNetworkResponse(void * contex
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOtaSoftwareUpdateServerClusterApplyUpdateRequestResponse(void * context, uint8_t action, uint32_t delayedActionTime)
+static void OnOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponse(void * context, uint8_t action, uint32_t delayedActionTime)
 {
-    ChipLogProgress(chipTool, "OtaSoftwareUpdateServerClusterApplyUpdateRequestResponse");
+    ChipLogProgress(chipTool, "OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponse");
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOtaSoftwareUpdateServerClusterQueryImageResponse(void * context, uint32_t delayedActionTime, uint8_t * imageURI,
-                                                               uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                               uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
+static void OnOtaSoftwareUpdateProviderClusterQueryImageResponse(void * context, uint32_t delayedActionTime, uint8_t * imageURI,
+                                                                 uint32_t softwareVersion, chip::ByteSpan updateToken,
+                                                                 uint8_t userConsentNeeded, chip::ByteSpan metadataForRequestor)
 {
-    ChipLogProgress(chipTool, "OtaSoftwareUpdateServerClusterQueryImageResponse");
+    ChipLogProgress(chipTool, "OtaSoftwareUpdateProviderClusterQueryImageResponse");
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -768,7 +768,7 @@ static void OnDescriptorServerListListAttributeResponse(void * context, uint16_t
 
     for (uint16_t i = 0; i < count; i++)
     {
-        ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu16 "", i, entries[i]);
+        ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu32 "", i, entries[i]);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -781,7 +781,7 @@ static void OnDescriptorClientListListAttributeResponse(void * context, uint16_t
 
     for (uint16_t i = 0; i < count; i++)
     {
-        ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu16 "", i, entries[i]);
+        ChipLogProgress(chipTool, "CLUSTER_ID[%" PRIu16 "]: %" PRIu32 "", i, entries[i]);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -794,7 +794,7 @@ static void OnDescriptorPartsListListAttributeResponse(void * context, uint16_t 
 
     for (uint16_t i = 0; i < count; i++)
     {
-        ChipLogProgress(chipTool, "ENDPOINT_ID[%" PRIu16 "]: %" PRIu8 "", i, entries[i]);
+        ChipLogProgress(chipTool, "ENDPOINT_NO[%" PRIu16 "]: %" PRIu16 "", i, entries[i]);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -1118,7 +1118,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
-| OtaSoftwareUpdateServer                                             | 0x0029 |
+| OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
@@ -1168,7 +1168,7 @@ constexpr chip::ClusterId kLowPowerClusterId                    = 0x0508;
 constexpr chip::ClusterId kMediaInputClusterId                  = 0x0507;
 constexpr chip::ClusterId kMediaPlaybackClusterId               = 0x0506;
 constexpr chip::ClusterId kNetworkCommissioningClusterId        = 0x0031;
-constexpr chip::ClusterId kOtaSoftwareUpdateServerClusterId     = 0x0029;
+constexpr chip::ClusterId kOtaSoftwareUpdateProviderClusterId   = 0x0029;
 constexpr chip::ClusterId kOccupancySensingClusterId            = 0x0406;
 constexpr chip::ClusterId kOnOffClusterId                       = 0x0006;
 constexpr chip::ClusterId kOperationalCredentialsClusterId      = 0x003E;
@@ -3492,8 +3492,8 @@ public:
     {
         AddArgument("NodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("GroupId", 0, UINT16_MAX, &mGroupId);
-        AddArgument("EndpointId", 0, UINT8_MAX, &mEndpointId);
-        AddArgument("ClusterId", 0, UINT16_MAX, &mClusterId);
+        AddArgument("EndpointId", 0, UINT16_MAX, &mEndpointId);
+        AddArgument("ClusterId", 0, UINT32_MAX, &mClusterId);
         ModelCommand::AddArguments();
     }
     ~BindingBind()
@@ -3532,8 +3532,8 @@ public:
     {
         AddArgument("NodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("GroupId", 0, UINT16_MAX, &mGroupId);
-        AddArgument("EndpointId", 0, UINT8_MAX, &mEndpointId);
-        AddArgument("ClusterId", 0, UINT16_MAX, &mClusterId);
+        AddArgument("EndpointId", 0, UINT16_MAX, &mEndpointId);
+        AddArgument("ClusterId", 0, UINT32_MAX, &mClusterId);
         ModelCommand::AddArguments();
     }
     ~BindingUnbind()
@@ -4326,7 +4326,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x44) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x44) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4370,7 +4370,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x41) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x41) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4412,7 +4412,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x40) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x40) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4455,7 +4455,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x43) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x43) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -4498,7 +4498,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x42) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x42) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13056,7 +13056,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
+| Cluster OtaSoftwareUpdateProvider                                   | 0x0029 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ApplyUpdateRequest                                                |   0x01 |
@@ -13070,16 +13070,16 @@ private:
 /*
  * Command ApplyUpdateRequest
  */
-class OtaSoftwareUpdateServerApplyUpdateRequest : public ModelCommand
+class OtaSoftwareUpdateProviderApplyUpdateRequest : public ModelCommand
 {
 public:
-    OtaSoftwareUpdateServerApplyUpdateRequest() : ModelCommand("apply-update-request")
+    OtaSoftwareUpdateProviderApplyUpdateRequest() : ModelCommand("apply-update-request")
     {
         AddArgument("UpdateToken", &mUpdateToken);
         AddArgument("NewVersion", 0, UINT32_MAX, &mNewVersion);
         ModelCommand::AddArguments();
     }
-    ~OtaSoftwareUpdateServerApplyUpdateRequest()
+    ~OtaSoftwareUpdateProviderApplyUpdateRequest()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -13089,15 +13089,15 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0029) command (0x01) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OtaSoftwareUpdateServerCluster cluster;
+        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ApplyUpdateRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUpdateToken, mNewVersion);
     }
 
 private:
-    chip::Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>(
-            OnOtaSoftwareUpdateServerClusterApplyUpdateRequestResponse, this);
+    chip::Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>(
+            OnOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::ByteSpan mUpdateToken;
@@ -13107,16 +13107,16 @@ private:
 /*
  * Command NotifyUpdateApplied
  */
-class OtaSoftwareUpdateServerNotifyUpdateApplied : public ModelCommand
+class OtaSoftwareUpdateProviderNotifyUpdateApplied : public ModelCommand
 {
 public:
-    OtaSoftwareUpdateServerNotifyUpdateApplied() : ModelCommand("notify-update-applied")
+    OtaSoftwareUpdateProviderNotifyUpdateApplied() : ModelCommand("notify-update-applied")
     {
         AddArgument("UpdateToken", &mUpdateToken);
         AddArgument("CurrentVersion", 0, UINT32_MAX, &mCurrentVersion);
         ModelCommand::AddArguments();
     }
-    ~OtaSoftwareUpdateServerNotifyUpdateApplied()
+    ~OtaSoftwareUpdateProviderNotifyUpdateApplied()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -13126,7 +13126,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0029) command (0x02) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OtaSoftwareUpdateServerCluster cluster;
+        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.NotifyUpdateApplied(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUpdateToken, mCurrentVersion);
     }
@@ -13143,10 +13143,10 @@ private:
 /*
  * Command QueryImage
  */
-class OtaSoftwareUpdateServerQueryImage : public ModelCommand
+class OtaSoftwareUpdateProviderQueryImage : public ModelCommand
 {
 public:
-    OtaSoftwareUpdateServerQueryImage() : ModelCommand("query-image")
+    OtaSoftwareUpdateProviderQueryImage() : ModelCommand("query-image")
     {
         AddArgument("VendorId", 0, UINT16_MAX, &mVendorId);
         AddArgument("ProductId", 0, UINT16_MAX, &mProductId);
@@ -13155,11 +13155,11 @@ public:
         AddArgument("CurrentVersion", 0, UINT32_MAX, &mCurrentVersion);
         AddArgument("ProtocolsSupported", 0, UINT8_MAX, &mProtocolsSupported);
         AddArgument("Location", &mLocation);
-        AddArgument("ClientCanConsent", 0, UINT8_MAX, &mClientCanConsent);
-        AddArgument("MetadataForServer", &mMetadataForServer);
+        AddArgument("RequestorCanConsent", 0, UINT8_MAX, &mRequestorCanConsent);
+        AddArgument("MetadataForProvider", &mMetadataForProvider);
         ModelCommand::AddArguments();
     }
-    ~OtaSoftwareUpdateServerQueryImage()
+    ~OtaSoftwareUpdateProviderQueryImage()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -13169,18 +13169,18 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0029) command (0x00) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OtaSoftwareUpdateServerCluster cluster;
+        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.QueryImage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mVendorId, mProductId, mImageType,
                                   mHardwareVersion, mCurrentVersion, mProtocolsSupported,
-                                  chip::ByteSpan(chip::Uint8::from_char(mLocation), strlen(mLocation)), mClientCanConsent,
-                                  mMetadataForServer);
+                                  chip::ByteSpan(chip::Uint8::from_char(mLocation), strlen(mLocation)), mRequestorCanConsent,
+                                  mMetadataForProvider);
     }
 
 private:
-    chip::Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>(
-            OnOtaSoftwareUpdateServerClusterQueryImageResponse, this);
+    chip::Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>(
+            OnOtaSoftwareUpdateProviderClusterQueryImageResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint16_t mVendorId;
@@ -13190,19 +13190,19 @@ private:
     uint32_t mCurrentVersion;
     uint8_t mProtocolsSupported;
     char * mLocation;
-    uint8_t mClientCanConsent;
-    chip::ByteSpan mMetadataForServer;
+    uint8_t mRequestorCanConsent;
+    chip::ByteSpan mMetadataForProvider;
 };
 
 /*
  * Discover Attributes
  */
-class DiscoverOtaSoftwareUpdateServerAttributes : public ModelCommand
+class DiscoverOtaSoftwareUpdateProviderAttributes : public ModelCommand
 {
 public:
-    DiscoverOtaSoftwareUpdateServerAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+    DiscoverOtaSoftwareUpdateProviderAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
 
-    ~DiscoverOtaSoftwareUpdateServerAttributes()
+    ~DiscoverOtaSoftwareUpdateProviderAttributes()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -13212,7 +13212,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OtaSoftwareUpdateServerCluster cluster;
+        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -13227,16 +13227,16 @@ private:
 /*
  * Attribute ClusterRevision
  */
-class ReadOtaSoftwareUpdateServerClusterRevision : public ModelCommand
+class ReadOtaSoftwareUpdateProviderClusterRevision : public ModelCommand
 {
 public:
-    ReadOtaSoftwareUpdateServerClusterRevision() : ModelCommand("read")
+    ReadOtaSoftwareUpdateProviderClusterRevision() : ModelCommand("read")
     {
         AddArgument("attr-name", "cluster-revision");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOtaSoftwareUpdateServerClusterRevision()
+    ~ReadOtaSoftwareUpdateProviderClusterRevision()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -13246,7 +13246,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0029) command (0x00) on endpoint %" PRIu8, endpointId);
 
-        chip::Controller::OtaSoftwareUpdateServerCluster cluster;
+        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -13286,7 +13286,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13320,7 +13320,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13354,7 +13354,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x06) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x06) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13400,7 +13400,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13434,7 +13434,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -13468,7 +13468,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -15286,7 +15286,7 @@ public:
         AddArgument("SceneId", 0, UINT8_MAX, &mSceneId);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("SceneName", &mSceneName);
-        AddArgument("ClusterId", 0, UINT16_MAX, &mClusterId);
+        AddArgument("ClusterId", 0, UINT32_MAX, &mClusterId);
         AddArgument("Length", 0, UINT8_MAX, &mLength);
         AddArgument("Value", 0, UINT8_MAX, &mValue);
         ModelCommand::AddArguments();
@@ -23342,14 +23342,14 @@ void registerClusterNetworkCommissioning(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterOtaSoftwareUpdateServer(Commands & commands)
+void registerClusterOtaSoftwareUpdateProvider(Commands & commands)
 {
-    const char * clusterName = "OtaSoftwareUpdateServer";
+    const char * clusterName = "OtaSoftwareUpdateProvider";
 
     commands_list clusterCommands = {
-        make_unique<OtaSoftwareUpdateServerApplyUpdateRequest>(),  make_unique<OtaSoftwareUpdateServerNotifyUpdateApplied>(),
-        make_unique<OtaSoftwareUpdateServerQueryImage>(),          make_unique<DiscoverOtaSoftwareUpdateServerAttributes>(),
-        make_unique<ReadOtaSoftwareUpdateServerClusterRevision>(),
+        make_unique<OtaSoftwareUpdateProviderApplyUpdateRequest>(),  make_unique<OtaSoftwareUpdateProviderNotifyUpdateApplied>(),
+        make_unique<OtaSoftwareUpdateProviderQueryImage>(),          make_unique<DiscoverOtaSoftwareUpdateProviderAttributes>(),
+        make_unique<ReadOtaSoftwareUpdateProviderClusterRevision>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23786,7 +23786,7 @@ void registerClusters(Commands & commands)
     registerClusterMediaInput(commands);
     registerClusterMediaPlayback(commands);
     registerClusterNetworkCommissioning(commands);
-    registerClusterOtaSoftwareUpdateServer(commands);
+    registerClusterOtaSoftwareUpdateProvider(commands);
     registerClusterOccupancySensing(commands);
     registerClusterOnOff(commands);
     registerClusterOperationalCredentials(commands);
