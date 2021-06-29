@@ -26,6 +26,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSError * _Nullable error);
+
 @protocol CHIPDevicePairingDelegate;
 @protocol CHIPPersistentStorageDelegate;
 
@@ -61,6 +63,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId;
 
+- (BOOL)isDevicePaired:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (BOOL)getConnectedDevice:(uint64_t)deviceID
+         completionHandler:(CHIPDeviceConnectionCallback)completionHandler
+                     queue:(dispatch_queue_t)queue
+                     error:(NSError * __autoreleasing *)error;
 - (nullable CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 
 - (instancetype)init NS_UNAVAILABLE;
