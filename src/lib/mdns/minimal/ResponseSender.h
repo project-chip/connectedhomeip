@@ -89,7 +89,8 @@ private:
 class ResponseSender : public ResponderDelegate
 {
 public:
-    static constexpr size_t kMaxQueryResponders = 3;
+    // TODO(cecille): Template this and set appropriately. Please see issue #8000.
+    static constexpr size_t kMaxQueryResponders = 7;
     ResponseSender(ServerBase * server) : mServer(server) {}
 
     CHIP_ERROR AddQueryResponder(QueryResponderBase * queryResponder);
