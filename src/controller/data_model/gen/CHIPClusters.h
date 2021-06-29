@@ -70,6 +70,7 @@ constexpr ClusterId kTestClusterClusterId                 = 0x050F;
 constexpr ClusterId kThermostatClusterId                  = 0x0201;
 constexpr ClusterId kThreadNetworkDiagnosticsClusterId    = 0x0035;
 constexpr ClusterId kWakeOnLanClusterId                   = 0x0503;
+constexpr ClusterId kWiFiNetworkDiagnosticsClusterId      = 0x0036;
 constexpr ClusterId kWindowCoveringClusterId              = 0x0102;
 
 class DLL_EXPORT AccountLoginCluster : public ClusterBase
@@ -1450,6 +1451,22 @@ public:
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
+class DLL_EXPORT WiFiNetworkDiagnosticsCluster : public ClusterBase
+{
+public:
+    WiFiNetworkDiagnosticsCluster() : ClusterBase(kWiFiNetworkDiagnosticsClusterId) {}
+    ~WiFiNetworkDiagnosticsCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBssid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSecurityType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeWiFiVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeChannelNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRssi(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 

@@ -1132,6 +1132,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | Thermostat                                                          | 0x0201 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
 | WakeOnLan                                                           | 0x0503 |
+| WiFiNetworkDiagnostics                                              | 0x0036 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
 
@@ -1178,6 +1179,7 @@ constexpr chip::ClusterId kTestClusterClusterId                 = 0x050F;
 constexpr chip::ClusterId kThermostatClusterId                  = 0x0201;
 constexpr chip::ClusterId kThreadNetworkDiagnosticsClusterId    = 0x0035;
 constexpr chip::ClusterId kWakeOnLanClusterId                   = 0x0503;
+constexpr chip::ClusterId kWiFiNetworkDiagnosticsClusterId      = 0x0036;
 constexpr chip::ClusterId kWindowCoveringClusterId              = 0x0102;
 
 /*----------------------------------------------------------------------------*\
@@ -20118,6 +20120,254 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster WiFiNetworkDiagnostics                                      | 0x0036 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Bssid                                                             | 0x0000 |
+| * SecurityType                                                      | 0x0001 |
+| * WiFiVersion                                                       | 0x0002 |
+| * ChannelNumber                                                     | 0x0003 |
+| * Rssi                                                              | 0x0004 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverWiFiNetworkDiagnosticsAttributes : public ModelCommand
+{
+public:
+    DiscoverWiFiNetworkDiagnosticsAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverWiFiNetworkDiagnosticsAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Bssid
+ */
+class ReadWiFiNetworkDiagnosticsBssid : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsBssid() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "bssid");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsBssid()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBssid(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<StringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<StringAttributeCallback>(OnStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute SecurityType
+ */
+class ReadWiFiNetworkDiagnosticsSecurityType : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsSecurityType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "security-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsSecurityType()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSecurityType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute WiFiVersion
+ */
+class ReadWiFiNetworkDiagnosticsWiFiVersion : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsWiFiVersion() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wi-fi-version");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsWiFiVersion()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeWiFiVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ChannelNumber
+ */
+class ReadWiFiNetworkDiagnosticsChannelNumber : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsChannelNumber() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "channel-number");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsChannelNumber()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeChannelNumber(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Rssi
+ */
+class ReadWiFiNetworkDiagnosticsRssi : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsRssi() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "rssi");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsRssi()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeRssi(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadWiFiNetworkDiagnosticsClusterRevision : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster WindowCovering                                              | 0x0102 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -21803,6 +22053,19 @@ void registerClusterWakeOnLan(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterWiFiNetworkDiagnostics(Commands & commands)
+{
+    const char * clusterName = "WiFiNetworkDiagnostics";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverWiFiNetworkDiagnosticsAttributes>(),  make_unique<ReadWiFiNetworkDiagnosticsBssid>(),
+        make_unique<ReadWiFiNetworkDiagnosticsSecurityType>(),    make_unique<ReadWiFiNetworkDiagnosticsWiFiVersion>(),
+        make_unique<ReadWiFiNetworkDiagnosticsChannelNumber>(),   make_unique<ReadWiFiNetworkDiagnosticsRssi>(),
+        make_unique<ReadWiFiNetworkDiagnosticsClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterWindowCovering(Commands & commands)
 {
     const char * clusterName = "WindowCovering";
@@ -21881,5 +22144,6 @@ void registerClusters(Commands & commands)
     registerClusterThermostat(commands);
     registerClusterThreadNetworkDiagnostics(commands);
     registerClusterWakeOnLan(commands);
+    registerClusterWiFiNetworkDiagnostics(commands);
     registerClusterWindowCovering(commands);
 }

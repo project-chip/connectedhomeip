@@ -71,6 +71,7 @@
 | Thermostat                                                          | 0x0201 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
 | WakeOnLan                                                           | 0x0503 |
+| WiFiNetworkDiagnostics                                              | 0x0036 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
 
@@ -3614,6 +3615,69 @@ chip::System::PacketBufferHandle encodeWakeOnLanClusterReadWakeOnLanMacAddressAt
  */
 chip::System::PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                     chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster WiFiNetworkDiagnostics                                      | 0x0036 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Bssid                                                             | 0x0000 |
+| * SecurityType                                                      | 0x0001 |
+| * WiFiVersion                                                       | 0x0002 |
+| * ChannelNumber                                                     | 0x0003 |
+| * Rssi                                                              | 0x0004 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a WiFi Network Diagnostics server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a WiFi Network Diagnostics server read command for the bssid attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadBssidAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a WiFi Network Diagnostics server read command for the SecurityType attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadSecurityTypeAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a WiFi Network Diagnostics server read command for the WiFiVersion attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadWiFiVersionAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a WiFi Network Diagnostics server read command for the ChannelNumber attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeWiFiNetworkDiagnosticsClusterReadChannelNumberAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a WiFi Network Diagnostics server read command for the Rssi attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadRssiAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a WiFi Network Diagnostics server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeWiFiNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster WindowCovering                                              | 0x0102 |

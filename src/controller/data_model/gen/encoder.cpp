@@ -97,6 +97,7 @@ using namespace chip::Encoding::LittleEndian;
 | Thermostat                                                          | 0x0201 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
 | WakeOnLan                                                           | 0x0503 |
+| WiFiNetworkDiagnostics                                              | 0x0036 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
 
@@ -344,6 +345,8 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
 #define WAKE_ON_LAN_CLUSTER_ID 0x0503
+
+#define WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID 0x0036
 
 #define WINDOW_COVERING_CLUSTER_ID 0x0102
 #define ZCL_DOWN_OR_CLOSE_COMMAND_ID (0x01)
@@ -5233,6 +5236,87 @@ PacketBufferHandle encodeWakeOnLanClusterReadWakeOnLanMacAddressAttribute(uint8_
 PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadWakeOnLanClusterRevision", WAKE_ON_LAN_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster WiFiNetworkDiagnostics                                      | 0x0036 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Bssid                                                             | 0x0000 |
+| * SecurityType                                                      | 0x0001 |
+| * WiFiVersion                                                       | 0x0002 |
+| * ChannelNumber                                                     | 0x0003 |
+| * Rssi                                                              | 0x0004 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverWiFiNetworkDiagnosticsAttributes", WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Bssid
+ */
+PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadBssidAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWiFiNetworkDiagnosticsBssid", WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute SecurityType
+ */
+PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadSecurityTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWiFiNetworkDiagnosticsSecurityType", WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute WiFiVersion
+ */
+PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadWiFiVersionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWiFiNetworkDiagnosticsWiFiVersion", WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ChannelNumber
+ */
+PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadChannelNumberAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWiFiNetworkDiagnosticsChannelNumber", WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Rssi
+ */
+PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadRssiAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWiFiNetworkDiagnosticsRssi", WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeWiFiNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWiFiNetworkDiagnosticsClusterRevision", WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

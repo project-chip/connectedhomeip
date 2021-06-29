@@ -2337,6 +2337,15 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
   }
 
+  public static class WiFiNetworkDiagnosticsCluster extends BaseChipCluster {
+    public WiFiNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  }
+
   public static class WindowCoveringCluster extends BaseChipCluster {
     public WindowCoveringCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
