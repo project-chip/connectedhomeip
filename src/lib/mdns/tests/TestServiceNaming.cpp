@@ -244,9 +244,9 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionerNode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_matterd") == 0);
 
-    // Test buffer exactly the right size - "_matterc" = 8 + nullchar = 9
+    // Test buffer just under the right size - "_matterc" = 8 + nullchar = 9
     filter.type = DiscoveryFilterType::kNone;
-    NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 9, filter, DiscoveryType::kCommissionableNode) == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 8, filter, DiscoveryType::kCommissionableNode) == CHIP_ERROR_NO_MEMORY);
 
     // Test buffer exactly the right size - "_matterc" = 8 + nullchar = 9
     filter.type = DiscoveryFilterType::kNone;
