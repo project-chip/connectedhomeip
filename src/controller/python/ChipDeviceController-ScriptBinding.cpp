@@ -310,7 +310,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
         Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
 
-        ChipLogProgress(Discovery, "Device %d", i);
+        ChipLogProgress(Discovery, "Commissionable Node %d", i);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
         ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
         ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);

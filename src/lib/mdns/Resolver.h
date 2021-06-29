@@ -116,6 +116,13 @@ struct DiscoveryFilter
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
     DiscoveryFilter(DiscoveryFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
 };
+enum class DiscoveryType
+{
+    kUnknown,
+    kOperational,
+    kCommissionableNode,
+    kCommissionerNode
+};
 /// Groups callbacks for CHIP service resolution requests
 class ResolverDelegate
 {

@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
+          csrNonce:(nullable NSData *)csrNonce
              error:(NSError * __autoreleasing *)error;
 
 - (BOOL)pairDevice:(uint64_t)deviceID

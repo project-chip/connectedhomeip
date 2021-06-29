@@ -56,7 +56,7 @@ public:
 
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
 
-    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
     static DiscoveryImplPlatform & GetInstance();
 
@@ -72,8 +72,8 @@ private:
     static void HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error);
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
-    static void HandleCommissionableNodeBrowse(void * context, MdnsService * services, size_t servicesSize, CHIP_ERROR error);
-    static void HandleCommissionableNodeResolve(void * context, MdnsService * result, CHIP_ERROR error);
+    static void HandleNodeBrowse(void * context, MdnsService * services, size_t servicesSize, CHIP_ERROR error);
+    static void HandleNodeResolve(void * context, MdnsService * result, CHIP_ERROR error);
     static CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
 #ifdef DETAIL_LOGGING
     static void PrintEntries(const MdnsService * service);

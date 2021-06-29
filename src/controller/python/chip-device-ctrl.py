@@ -26,6 +26,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
+from chip import ChipCommissionableNodeCtrl
 from chip import exceptions
 import argparse
 import ctypes
@@ -156,6 +157,8 @@ class DeviceMgrCmd(Cmd):
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
             controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
 
+        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController()
+            
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
             try:
@@ -584,16 +587,19 @@ class DeviceMgrCmd(Cmd):
                 return
             parser = argparse.ArgumentParser()
             group = parser.add_mutually_exclusive_group()
-            group.add_argument('-all', help='discover all commissionable nodes', action='store_true')
-            group.add_argument('-qr', help='discover devices matching provided QR code', type=str)
-            group.add_argument('-l', help='discover devices with given long discriminator', type=int)
-            group.add_argument('-s', help='discover devices with given short discriminator', type=int)
-            group.add_argument('-v', help='discover devices wtih given vendor ID', type=int)
-            group.add_argument('-t', help='discover devices with given device type', type=int)
-            group.add_argument('-c', help='discover devices with given commissioning mode', type=int)
-            group.add_argument('-a', help='discover devices put in commissioning mode from command', action='store_true')
+            group.add_argument('-all', help='discover all commissionable nodes and commissioners', action='store_true')
+            group.add_argument('-qr', help='discover commissionable nodes matching provided QR code', type=str)
+            group.add_argument('-l', help='discover commissionable nodes with given long discriminator', type=int)
+            group.add_argument('-s', help='discover commissionable nodes with given short discriminator', type=int)
+            group.add_argument('-v', help='discover commissionable nodes wtih given vendor ID', type=int)
+            group.add_argument('-t', help='discover commissionable nodes with given device type', type=int)
+            group.add_argument('-c', help='discover commissionable nodes with given commissioning mode', type=int)
+            group.add_argument('-a', help='discover commissionable nodes put in commissioning mode from command', action='store_true')
             args=parser.parse_args(arglist)
             if args.all:
+                self.commissionableNodeCtrl.DiscoverCommissioners()
+                self.wait_for_many_discovered_devices()
+                self.commissionableNodeCtrl.PrintDiscoveredCommissioners()
                 self.devCtrl.DiscoverAllCommissioning()
                 self.wait_for_many_discovered_devices()
             elif args.qr is not None:

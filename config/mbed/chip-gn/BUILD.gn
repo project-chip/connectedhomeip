@@ -1,0 +1,64 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("//${chip_root}/build/chip/tests.gni")
+
+assert(current_os == "mbed")
+
+declare_args() {
+  chip_custom_build_cflags = []
+}
+
+config("chip_custom_cflags_config") {
+  cflags = chip_custom_build_cflags
+}
+
+group("mbed") {
+  deps = [ "${chip_root}/src/lib" ]
+
+  if (chip_build_tests) {
+    # TODO: Enable all the tests. Use the src:tests target.
+    # deps += [ "${chip_root}/src:tests" ]
+    deps += [
+      "${chip_root}/src/app/tests",
+      "${chip_root}/src/ble/tests",
+      "${chip_root}/src/credentials/tests",
+      "${chip_root}/src/crypto/tests",
+      "${chip_root}/src/inet/tests",
+      "${chip_root}/src/lib/asn1/tests",
+      "${chip_root}/src/lib/core/tests",
+      "${chip_root}/src/lib/mdns/minimal/core/tests",
+      "${chip_root}/src/lib/mdns/minimal/records/tests",
+      "${chip_root}/src/lib/mdns/minimal/responders/tests",
+      "${chip_root}/src/lib/mdns/minimal/tests",
+
+      # "${chip_root}/src/lib/support/tests",
+      "${chip_root}/src/messaging/tests",
+      "${chip_root}/src/platform/tests",
+      "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/setup_payload/tests",
+      "${chip_root}/src/system/tests",
+
+      # "${chip_root}/src/transport/raw/tests",
+      "${chip_root}/src/transport/retransmit/tests",
+      "${chip_root}/src/transport/tests",
+    ]
+  }
+}
+
+group("default") {
+  deps = [ ":mbed" ]
+}
