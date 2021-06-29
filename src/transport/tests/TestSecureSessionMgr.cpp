@@ -94,8 +94,8 @@ class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
-                           SecureSessionMgr * mgr) override
+                           const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
+                           System::PacketBufferHandle && msgBuf) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
@@ -117,7 +117,7 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
+    void OnNewConnection(SecureSessionHandle session) override
     {
         // Preset the MessageCounter
         if (NewConnectionHandlerCallCount == 0)
@@ -126,7 +126,7 @@ public:
             mLocalToRemoteSession = session;
         NewConnectionHandlerCallCount++;
     }
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override {}
+    void OnConnectionExpired(SecureSessionHandle session) override {}
 
     nlTestSuite * mSuite = nullptr;
     SecureSessionHandle mRemoteToLocalSession;

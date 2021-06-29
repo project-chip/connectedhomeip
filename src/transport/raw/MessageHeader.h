@@ -47,9 +47,8 @@ namespace Header {
 
 enum class EncryptionType
 {
-    kAESCCMTagLen8  = 0,
-    kAESCCMTagLen12 = 1,
-    kAESCCMTagLen16 = 2,
+    kEncryptionTypeNone = 0,
+    kAESCCMTagLen16     = 1,
 };
 
 /**
@@ -74,16 +73,19 @@ enum class ExFlagValues : uint8_t
 enum class FlagValues : uint16_t
 {
     /// Header flag specifying that a destination node id is included in the header.
-    kDestinationNodeIdPresent = 0x0100,
+    kDestinationNodeIdPresent = 0x0001,
+
+    /// Header flag specifying that a destination group id is included in the header.
+    kDestinationGroupIdPresent = 0x0002,
 
     /// Header flag specifying that a source node id is included in the header.
-    kSourceNodeIdPresent = 0x0200,
+    kSourceNodeIdPresent = 0x0004,
 
     /// Header flag specifying that it is a control message for secure session.
-    kSecureSessionControlMessage = 0x0800,
+    kSecureSessionControlMessage = 0x4000,
 
     /// Header flag specifying that it is a encrypted message.
-    kSecure = 0x0001,
+    kEncryptedMessage = 0x0100,
 
 };
 
@@ -97,7 +99,6 @@ using ExFlags = BitFlags<ExFlagValues>;
 //                      |   |            +---Encrypted
 //                      |   +----------------Control message (TODO: Implement this)
 //                      +--------------------Privacy enhancements (TODO: Implement this)
-static constexpr uint16_t kFlagsMask = 0x0F01;
 
 } // namespace Header
 

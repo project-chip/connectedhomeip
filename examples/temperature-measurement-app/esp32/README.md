@@ -58,13 +58,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Configuration Options
 
-        To choose from the different configuration options, run menuconfig
-
-          $ idf.py menuconfig
-
-        Select ESP32 based `Device Type` through `Demo`->`Device Type`.
-        The device types that are currently supported include `ESP32-DevKitC` (default),
-        and `M5Stack`
+    This application uses `ESP32-DevKitC` as a default device type. To use other
+    ESP32 based device types, please refer
+    [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
 
 -   To build the demo application.
 

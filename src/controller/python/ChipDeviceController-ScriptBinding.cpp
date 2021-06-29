@@ -165,7 +165,6 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
 
     (*outDevCtrl)->SetUdpListenPort(CHIP_PORT + 1);
     ReturnErrorOnFailure((*outDevCtrl)->Init(localDeviceId, initParams));
-    ReturnErrorOnFailure((*outDevCtrl)->ServiceEvents());
 
     return CHIP_NO_ERROR;
 }

@@ -80,7 +80,6 @@ static void HandleNewConnection(void * appState, const uint16_t discriminator);
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * cbName);
 static void * IOThreadMain(void * arg);
-static CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 
 namespace {
@@ -782,13 +781,13 @@ bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svc
     ChipLogProgress(Controller, "Received SendCharacteristic");
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    err = N2J_ByteArray(env, svcId, 16, svcIdObj);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, svcId, 16, svcIdObj);
     SuccessOrExit(err);
 
-    err = N2J_ByteArray(env, charId, 16, charIdObj);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, charId, 16, charIdObj);
     SuccessOrExit(err);
 
-    err = N2J_ByteArray(env, characteristicData, characteristicDataLen, characteristicDataObj);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, characteristicData, characteristicDataLen, characteristicDataObj);
     SuccessOrExit(err);
 
     method = env->GetStaticMethodID(sAndroidChipStackCls, "onSendCharacteristic", "(I[B[B[B)Z");
@@ -829,10 +828,10 @@ bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t 
     ChipLogProgress(Controller, "Received SubscribeCharacteristic");
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    err = N2J_ByteArray(env, svcId, 16, svcIdObj);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, svcId, 16, svcIdObj);
     SuccessOrExit(err);
 
-    err = N2J_ByteArray(env, charId, 16, charIdObj);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, charId, 16, charIdObj);
     SuccessOrExit(err);
 
     {
@@ -872,10 +871,10 @@ bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_
     ChipLogProgress(Controller, "Received UnsubscribeCharacteristic");
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    err = N2J_ByteArray(env, svcId, 16, svcIdObj);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, svcId, 16, svcIdObj);
     SuccessOrExit(err);
 
-    err = N2J_ByteArray(env, charId, 16, charIdObj);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, charId, 16, charIdObj);
     SuccessOrExit(err);
 
     method = env->GetStaticMethodID(sAndroidChipStackCls, "onUnsubscribeCharacteristic", "(I[B[B)Z");
@@ -1100,18 +1099,6 @@ void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)
     {
         env->Throw(ex);
     }
-}
-
-CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)
-{
-    outArray = env->NewByteArray((int) inArrayLen);
-    VerifyOrReturnError(outArray != NULL, CHIP_ERROR_NO_MEMORY);
-
-    env->ExceptionClear();
-    env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
-    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)

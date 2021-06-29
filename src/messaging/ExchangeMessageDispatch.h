@@ -24,6 +24,7 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
+#include <messaging/Flags.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -59,7 +60,7 @@ public:
                                            const EncryptedPacketBufferHandle & preparedMessage) const                       = 0;
 
     virtual CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
-                                         const Transport::PeerAddress & peerAddress,
+                                         const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                                          ReliableMessageContext * reliableMessageContext);
 
 protected:

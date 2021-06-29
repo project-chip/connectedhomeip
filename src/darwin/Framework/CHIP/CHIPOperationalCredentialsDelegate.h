@@ -33,11 +33,14 @@ public:
 
     CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage);
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr, int64_t serialNumber,
-        uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::Optional<chip::NodeId> & nodeId, chip::FabricId fabricId,
+        const chip::ByteSpan & csr, const chip::ByteSpan & DAC,
+        chip::Callback::Callback<chip::Controller::NOCGenerated> * onNOCGenerated) override;
 
-    CHIP_ERROR GetRootCACertificate(
-        chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, chip::MutableByteSpan & outCert) override;
+
+    void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
+    void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 
 private:
     CHIP_ERROR GenerateKeys();
@@ -61,6 +64,8 @@ private:
     id mKeySize = @256;
 
     CHIPPersistentStorageDelegateBridge * mStorage;
+
+    chip::NodeId mDeviceBeingPaired = chip::kUndefinedNodeId;
 };
 
 NS_ASSUME_NONNULL_END
