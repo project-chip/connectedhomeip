@@ -44,6 +44,7 @@
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
+| FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -1588,6 +1589,53 @@ chip::System::PacketBufferHandle encodeFixedLabelClusterReadLabelListAttribute(u
  */
 chip::System::PacketBufferHandle encodeFixedLabelClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                      chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster FlowMeasurement                                             | 0x0404 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server read command for the measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server read command for the min measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server read command for the max measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster GeneralCommissioning                                        | 0x0030 |

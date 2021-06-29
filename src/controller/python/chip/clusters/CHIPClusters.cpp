@@ -2268,6 +2268,45 @@ CHIP_ERROR chip_ime_ReadAttribute_FixedLabel_ClusterRevision(chip::Controller::D
 }
 
 // End of Cluster FixedLabel
+// Cluster FlowMeasurement
+
+CHIP_ERROR chip_ime_ReadAttribute_FlowMeasurement_MeasuredValue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::FlowMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_FlowMeasurement_MinMeasuredValue(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::FlowMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMinMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::FlowMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMaxMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::FlowMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster FlowMeasurement
 // Cluster GeneralCommissioning
 
 CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe(chip::Controller::Device * device,

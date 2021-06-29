@@ -1041,6 +1041,15 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
   }
 
+  public static class FlowMeasurementCluster extends BaseChipCluster {
+    public FlowMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  }
+
   public static class GeneralCommissioningCluster extends BaseChipCluster {
     public GeneralCommissioningCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

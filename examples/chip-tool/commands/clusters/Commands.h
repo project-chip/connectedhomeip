@@ -1105,6 +1105,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
+| FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -1152,6 +1153,7 @@ constexpr chip::ClusterId kDiagnosticLogsClusterId              = 0x0032;
 constexpr chip::ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr chip::ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
 constexpr chip::ClusterId kFixedLabelClusterId                  = 0x0040;
+constexpr chip::ClusterId kFlowMeasurementClusterId             = 0x0404;
 constexpr chip::ClusterId kGeneralCommissioningClusterId        = 0x0030;
 constexpr chip::ClusterId kGeneralDiagnosticsClusterId          = 0x0033;
 constexpr chip::ClusterId kGroupKeyManagementClusterId          = 0xF004;
@@ -9291,6 +9293,184 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0040) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::FixedLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster FlowMeasurement                                             | 0x0404 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverFlowMeasurementAttributes : public ModelCommand
+{
+public:
+    DiscoverFlowMeasurementAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverFlowMeasurementAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FlowMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute MeasuredValue
+ */
+class ReadFlowMeasurementMeasuredValue : public ModelCommand
+{
+public:
+    ReadFlowMeasurementMeasuredValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "measured-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFlowMeasurementMeasuredValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0404) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FlowMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute MinMeasuredValue
+ */
+class ReadFlowMeasurementMinMeasuredValue : public ModelCommand
+{
+public:
+    ReadFlowMeasurementMinMeasuredValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "min-measured-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFlowMeasurementMinMeasuredValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0404) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FlowMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMinMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute MaxMeasuredValue
+ */
+class ReadFlowMeasurementMaxMeasuredValue : public ModelCommand
+{
+public:
+    ReadFlowMeasurementMaxMeasuredValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-measured-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFlowMeasurementMaxMeasuredValue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0404) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FlowMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMaxMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadFlowMeasurementClusterRevision : public ModelCommand
+{
+public:
+    ReadFlowMeasurementClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFlowMeasurementClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0404) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -22059,6 +22239,18 @@ void registerClusterFixedLabel(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterFlowMeasurement(Commands & commands)
+{
+    const char * clusterName = "FlowMeasurement";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverFlowMeasurementAttributes>(),   make_unique<ReadFlowMeasurementMeasuredValue>(),
+        make_unique<ReadFlowMeasurementMinMeasuredValue>(), make_unique<ReadFlowMeasurementMaxMeasuredValue>(),
+        make_unique<ReadFlowMeasurementClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterGeneralCommissioning(Commands & commands)
 {
     const char * clusterName = "GeneralCommissioning";
@@ -22638,6 +22830,7 @@ void registerClusters(Commands & commands)
     registerClusterDoorLock(commands);
     registerClusterEthernetNetworkDiagnostics(commands);
     registerClusterFixedLabel(commands);
+    registerClusterFlowMeasurement(commands);
     registerClusterGeneralCommissioning(commands);
     registerClusterGeneralDiagnostics(commands);
     registerClusterGroupKeyManagement(commands);

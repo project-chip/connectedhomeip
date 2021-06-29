@@ -310,6 +310,8 @@ class ChipClusters:
             },
             "FixedLabel": {
             },
+            "FlowMeasurement": {
+            },
             "GeneralCommissioning": {
                 "ArmFailSafe": {
                     "expiryLengthSeconds": "int",
@@ -1248,6 +1250,24 @@ class ChipClusters:
                 "LabelList": {
                     "attributeId": 0x0000,
                     "type": "",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "FlowMeasurement": {
+                "MeasuredValue": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "MinMeasuredValue": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "MaxMeasuredValue": {
+                    "attributeId": 0x0002,
+                    "type": "int",
                 },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
@@ -3026,6 +3046,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_FixedLabel_LabelList(device, ZCLendpoint, ZCLgroupid)
     def ClusterFixedLabel_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_FixedLabel_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterFlowMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterFlowMeasurement_ReadAttributeMinMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MinMeasuredValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterFlowMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterFlowMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeFabricId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeBreadcrumb(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4131,6 +4159,19 @@ class ChipClusters:
         # Cluster FixedLabel ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_FixedLabel_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_FixedLabel_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster FlowMeasurement
+        # Cluster FlowMeasurement ReadAttribute MeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MeasuredValue.restype = ctypes.c_uint32
+        # Cluster FlowMeasurement ReadAttribute MinMeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MinMeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MinMeasuredValue.restype = ctypes.c_uint32
+        # Cluster FlowMeasurement ReadAttribute MaxMeasuredValue
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue.restype = ctypes.c_uint32
+        # Cluster FlowMeasurement ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning
         # Cluster GeneralCommissioning Command ArmFailSafe
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint32]
