@@ -168,13 +168,7 @@ bool emberAfGroupsClusterAddGroupCallback(chip::app::Command * commandObj, Group
     {
         return true;
     }
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
-                                  ZCL_ADD_GROUP_RESPONSE_COMMAND_ID, "uv", status, groupId);
-        emberAfSendResponse();
-    }
-    else
+
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
                                              ZCL_ADD_GROUP_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -196,7 +190,6 @@ exit:
 bool emberAfGroupsClusterViewGroupCallback(chip::app::Command * commandObj, GroupId groupId)
 {
     EmberAfStatus status                                          = EMBER_ZCL_STATUS_NOT_FOUND;
-    EmberStatus sendStatus                                        = EMBER_SUCCESS;
     CHIP_ERROR err                                                = CHIP_NO_ERROR;
     uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
 
@@ -216,13 +209,7 @@ bool emberAfGroupsClusterViewGroupCallback(chip::app::Command * commandObj, Grou
     {
         status = EMBER_ZCL_STATUS_SUCCESS;
     }
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
-                                  ZCL_VIEW_GROUP_RESPONSE_COMMAND_ID, "uvs", status, groupId, groupName);
-        sendStatus = emberAfSendResponse();
-    }
-    else
+
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
                                              ZCL_VIEW_GROUP_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -233,10 +220,6 @@ bool emberAfGroupsClusterViewGroupCallback(chip::app::Command * commandObj, Grou
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
         SuccessOrExit(err = writer->PutString(TLV::ContextTag(2), reinterpret_cast<char *>(&groupName[1]), groupName[0]));
         SuccessOrExit(err = commandObj->FinishCommand());
-    }
-    if (EMBER_SUCCESS != sendStatus)
-    {
-        emberAfGroupsClusterPrintln("Groups: failed to send %s response: 0x%x", "view_group", sendStatus);
     }
 exit:
     if (err != CHIP_NO_ERROR)
@@ -313,13 +296,6 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::Command * command
         // added.  Each group requires a binding and, because the binding table is
         // used for other purposes besides groups, we can't be sure what the
         // capacity will be in the future.
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
-                                      ZCL_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND_ID, "uub", 0xFF, count, list, listLen);
-            status = emberAfSendResponse();
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
                                                  ZCL_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND_ID,
@@ -353,8 +329,7 @@ exit:
 bool emberAfGroupsClusterRemoveGroupCallback(chip::app::Command * commandObj, GroupId groupId)
 {
     EmberAfStatus status;
-    EmberStatus sendStatus = EMBER_SUCCESS;
-    CHIP_ERROR err         = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     emberAfGroupsClusterPrintln("RX: RemoveGroup 0x%2x", groupId);
 
@@ -371,13 +346,6 @@ bool emberAfGroupsClusterRemoveGroupCallback(chip::app::Command * commandObj, Gr
     // associated with it. ZCL6: 3.6.2.3.5: "Note that if a group is
     // removed the scenes associated with that group SHOULD be removed."
     emberAfScenesClusterRemoveScenesInGroupCallback(emberAfCurrentEndpoint(), groupId);
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
-                                  ZCL_REMOVE_GROUP_RESPONSE_COMMAND_ID, "uv", status, groupId);
-        sendStatus = emberAfSendResponse();
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
                                              ZCL_REMOVE_GROUP_RESPONSE_COMMAND_ID,
@@ -388,10 +356,6 @@ bool emberAfGroupsClusterRemoveGroupCallback(chip::app::Command * commandObj, Gr
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
         SuccessOrExit(err = commandObj->FinishCommand());
-    }
-    if (EMBER_SUCCESS != sendStatus)
-    {
-        emberAfGroupsClusterPrintln("Groups: failed to send %s response: 0x%x", "remove_group", sendStatus);
     }
 exit:
     if (err != CHIP_NO_ERROR)

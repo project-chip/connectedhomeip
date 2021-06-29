@@ -906,28 +906,19 @@ CHIP_ERROR ConvertIntegerRawToDER(const uint8_t * rawInt, uint16_t rawIntLen, ui
 CHIP_ERROR ConvertECDSASignatureRawToDER(const uint8_t * rawSig, uint16_t rawSigLen, uint8_t * derSig, const uint16_t derSigBufSize,
                                          uint16_t & derSigLen)
 {
-    static constexpr size_t kMaxBytesForDeferredLenList = sizeof(uint8_t *) + // size of a single pointer in the deferred list
-        4 + // extra memory allocated for the deferred length field (kLengthFieldReserveSize - 1)
-        3;  // the deferred length list is alligned to 32bit boundary
-
-    uint8_t localDERSigBuf[kMax_ECDSA_Signature_Length + kMaxBytesForDeferredLenList];
     ASN1Writer writer;
 
     VerifyOrReturnError(rawSig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(rawSigLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(derSig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    writer.Init(localDERSigBuf, sizeof(localDERSigBuf));
+    writer.Init(derSig, derSigBufSize);
 
     ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(rawSig, rawSigLen, writer));
 
     ReturnErrorOnFailure(writer.Finalize());
 
     derSigLen = writer.GetLengthWritten();
-
-    VerifyOrReturnError(derSigLen <= derSigBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    memcpy(derSig, localDERSigBuf, derSigLen);
 
     return CHIP_NO_ERROR;
 }

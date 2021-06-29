@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 
-enum EmberAfStatus : uint32_t
+enum EmberAfStatus : uint8_t
 {
     EMBER_ZCL_STATUS_SUCCESS                     = 0x00,
     EMBER_ZCL_STATUS_FAILURE                     = 0x01,

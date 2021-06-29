@@ -34,6 +34,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
@@ -87,6 +88,14 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
     return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestCommandId);
 }
 
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+{
+    // We do not really care about the value, just return a not found status code.
+    VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
+    return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
+                         static_cast<uint16_t>(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
+}
+
 class TestCommandInteraction
 {
 public:
@@ -112,9 +121,11 @@ private:
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override
-    {}
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override
+    {
+        return CHIP_NO_ERROR;
+    }
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };

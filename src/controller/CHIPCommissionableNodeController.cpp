@@ -19,26 +19,42 @@
 // module header, comes first
 #include <controller/CHIPCommissionableNodeController.h>
 
+#include <app/server/Mdns.h>
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+#include <mdns/Advertiser.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR CommissionableNodeController::DiscoverCommissioners()
+CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return chip::Mdns::Resolver::Instance().FindCommissioners();
-}
-
-CHIP_ERROR CommissionableNodeController::DiscoverCommissionersLongDiscriminator(uint16_t long_discriminator)
-{
-    ReturnErrorOnFailure(SetUpNodeDiscoveryLongDiscriminator(long_discriminator));
-    return chip::Mdns::Resolver::Instance().FindCommissioners(filter);
+    return chip::Mdns::Resolver::Instance().FindCommissioners(discoveryFilter);
 }
 
 const Mdns::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
 {
     return GetDiscoveredNode(idx);
+}
+
+CHIP_ERROR CommissionableNodeController::AdvertiseCommissionableNode()
+{
+#if CONFIG_DEVICE_LAYER
+    ReturnErrorOnFailure(chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort));
+    return app::Mdns::AdvertiseCommissionableNode();
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
+CHIP_ERROR CommissionableNodeController::SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port)
+{
+    // TODO: integrate with Server:SendUserDirectedCommissioningRequest()
+    ChipLogError(Controller, "Unsupported operation CommissionableNodeController::SendUserDirectedCommissioningRequest");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Controller

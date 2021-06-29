@@ -1097,7 +1097,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "1",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1202,7 +1202,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "0x00",
+              "defaultValue": "0",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1232,7 +1232,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "0x00",
+              "defaultValue": "0",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1337,7 +1337,22 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "0x00",
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "Reachable",
+              "code": 17,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "1",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1775,6 +1790,25 @@
               "reportableChange": 0
             }
           ]
+        },
+        {
+          "name": "Diagnostic Logs",
+          "code": 50,
+          "mfgCode": null,
+          "define": "DIAGNOSTIC_LOGS_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "RetrieveLogsRequest",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            }
+          ],
+          "attributes": []
         },
         {
           "name": "General Diagnostics",
@@ -2873,6 +2907,133 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "WiFi Network Diagnostics",
+          "code": 54,
+          "mfgCode": null,
+          "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "WiFi Network Diagnostics",
+          "code": 54,
+          "mfgCode": null,
+          "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
+          "side": "server",
+          "enabled": 0,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "bssid",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "SecurityType",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "WiFiVersion",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "ChannelNumber",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "Rssi",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x00",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -4514,7 +4675,7 @@
           "enabled": 1,
           "commands": [
             {
-              "name": "WindowCoveringUpOpen",
+              "name": "UpOrOpen",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -4522,7 +4683,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringDownClose",
+              "name": "DownOrClose",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -4530,7 +4691,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringStop",
+              "name": "StopMotion",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -4538,7 +4699,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringGoToLiftValue",
+              "name": "GoToLiftValue",
               "code": 4,
               "mfgCode": null,
               "source": "client",
@@ -4546,7 +4707,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringGoToLiftPercentage",
+              "name": "GoToLiftPercentage",
               "code": 5,
               "mfgCode": null,
               "source": "client",
@@ -4554,7 +4715,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringGoToTiltValue",
+              "name": "GoToTiltValue",
               "code": 7,
               "mfgCode": null,
               "source": "client",
@@ -4562,7 +4723,7 @@
               "outgoing": 1
             },
             {
-              "name": "WindowCoveringGoToTiltPercentage",
+              "name": "GoToTiltPercentage",
               "code": 8,
               "mfgCode": null,
               "source": "client",
@@ -4598,7 +4759,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "window covering type",
+              "name": "Type",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -4613,7 +4774,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current position - lift",
+              "name": "CurrentPositionLift",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -4628,7 +4789,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current position - tilt",
+              "name": "CurrentPositionTilt",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -4643,7 +4804,7 @@
               "reportableChange": 0
             },
             {
-              "name": "config status",
+              "name": "ConfigStatus",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -4658,7 +4819,7 @@
               "reportableChange": 0
             },
             {
-              "name": "installed open limit - lift",
+              "name": "InstalledOpenLimitLift",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -4673,7 +4834,7 @@
               "reportableChange": 0
             },
             {
-              "name": "installed closed limit - lift",
+              "name": "InstalledClosedLimitLift",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -4688,7 +4849,7 @@
               "reportableChange": 0
             },
             {
-              "name": "installed open limit - tilt",
+              "name": "InstalledOpenLimitTilt",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -4703,7 +4864,7 @@
               "reportableChange": 0
             },
             {
-              "name": "installed closed limit - tilt",
+              "name": "InstalledClosedLimitTilt",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -4718,7 +4879,7 @@
               "reportableChange": 0
             },
             {
-              "name": "mode",
+              "name": "Mode",
               "code": 23,
               "mfgCode": null,
               "side": "server",
@@ -6285,6 +6446,148 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "3",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Pressure Measurement",
+          "code": 1027,
+          "mfgCode": null,
+          "define": "PRESSURE_MEASUREMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Pressure Measurement",
+          "code": 1027,
+          "mfgCode": null,
+          "define": "PRESSURE_MEASUREMENT_CLUSTER",
+          "side": "server",
+          "enabled": 0,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "measured value",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "min measured value",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "max measured value",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "tolerance",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "scaled value",
+              "code": 16,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "scaled tolerance",
+              "code": 19,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,

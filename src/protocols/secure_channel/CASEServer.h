@@ -20,6 +20,7 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
+#include <protocols/secure_channel/SessionIDAllocator.h>
 
 namespace chip {
 
@@ -38,15 +39,16 @@ public:
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins);
+                                             SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins,
+                                             SessionIDAllocator * idAllocator);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
     //// ExchangeDelegate Implementation ////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
                                                             SecureSessionMgr * sessionMgr) override
@@ -54,11 +56,13 @@ public:
         return mPairingSession.GetMessageDispatch(reliableMessageManager, sessionMgr);
     }
 
+    CASESession & GetSession() { return mPairingSession; }
+
 private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
     CASESession mPairingSession;
-    uint16_t mNextKeyId            = 0;
+    uint16_t mSessionKeyId         = 0;
     SecureSessionMgr * mSessionMgr = nullptr;
 
     Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
@@ -69,6 +73,8 @@ private:
     Credentials::CertificateKeyId mRootKeyId;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
+
+    SessionIDAllocator * mIDAllocator = nullptr;
 
     void Cleanup();
 };

@@ -149,6 +149,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeLocalConfigDisabledWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLocalConfigDisabledWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -424,6 +425,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeClientListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributePartsListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Diagnostic Logs
+ *
+ */
+@interface CHIPDiagnosticLogs : CHIPCluster
+
+- (void)retrieveLogsRequest:(uint8_t)intent
+          requestedProtocol:(uint8_t)requestedProtocol
+     transferFileDesignator:(NSData *)transferFileDesignator
+            responseHandler:(ResponseHandler)responseHandler;
 
 @end
 
@@ -844,6 +858,24 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Pressure Measurement
+ *
+ */
+@interface CHIPPressureMeasurement : CHIPCluster
+
+- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                                change:(int16_t)change
+                                       responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Pump Configuration and Control
  *
  */
@@ -1169,24 +1201,43 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster WiFi Network Diagnostics
+ *
+ */
+@interface CHIPWiFiNetworkDiagnostics : CHIPCluster
+
+- (void)readAttributeBssidWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSecurityTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWiFiVersionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeChannelNumberWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRssiWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Window Covering
  *
  */
 @interface CHIPWindowCovering : CHIPCluster
 
-- (void)windowCoveringDownClose:(ResponseHandler)responseHandler;
-- (void)windowCoveringGoToLiftPercentage:(uint8_t)percentageLiftValue responseHandler:(ResponseHandler)responseHandler;
-- (void)windowCoveringGoToLiftValue:(uint16_t)liftValue responseHandler:(ResponseHandler)responseHandler;
-- (void)windowCoveringGoToTiltPercentage:(uint8_t)percentageTiltValue responseHandler:(ResponseHandler)responseHandler;
-- (void)windowCoveringGoToTiltValue:(uint16_t)tiltValue responseHandler:(ResponseHandler)responseHandler;
-- (void)windowCoveringStop:(ResponseHandler)responseHandler;
-- (void)windowCoveringUpOpen:(ResponseHandler)responseHandler;
+- (void)downOrClose:(ResponseHandler)responseHandler;
+- (void)goToLiftPercentage:(uint8_t)liftPercentageValue
+    liftPercent100thsValue:(uint16_t)liftPercent100thsValue
+           responseHandler:(ResponseHandler)responseHandler;
+- (void)goToLiftValue:(uint16_t)liftValue responseHandler:(ResponseHandler)responseHandler;
+- (void)goToTiltPercentage:(uint8_t)tiltPercentageValue
+    tiltPercent100thsValue:(uint16_t)tiltPercent100thsValue
+           responseHandler:(ResponseHandler)responseHandler;
+- (void)goToTiltValue:(uint16_t)tiltValue responseHandler:(ResponseHandler)responseHandler;
+- (void)stopMotion:(ResponseHandler)responseHandler;
+- (void)upOrOpen:(ResponseHandler)responseHandler;
 
-- (void)readAttributeWindowCoveringTypeWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)configureAttributeWindowCoveringTypeWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
-                                            responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeWindowCoveringTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeTypeWithMinInterval:(uint16_t)minInterval
+                                  maxInterval:(uint16_t)maxInterval
+                              responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeTypeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeCurrentPositionLiftWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCurrentPositionLiftWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval

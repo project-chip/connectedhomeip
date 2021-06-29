@@ -40,10 +40,6 @@ for sdkconfig in "$root"/sdkconfig*.defaults; do
     (
         cd "$root"
         idf.py -D SDKCONFIG_DEFAULTS="$sdkconfig_name" build
-    )
-    (
-        cd "$root"
-        idf.py build "$@"
     ) || {
         echo "build $sdkconfig_name failed"
         exit 1

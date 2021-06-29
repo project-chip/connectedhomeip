@@ -40,12 +40,13 @@ public:
         delete onReportDoorLockLockStateCallback;
         delete onReportLevelControlCurrentLevelCallback;
         delete onReportOnOffOnOffCallback;
+        delete onReportPressureMeasurementMeasuredValueCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
         delete onReportRelativeHumidityMeasurementMeasuredValueCallback;
         delete onReportSwitchCurrentPositionCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
         delete onReportThermostatLocalTemperatureCallback;
-        delete onReportWindowCoveringWindowCoveringTypeCallback;
+        delete onReportWindowCoveringTypeCallback;
         delete onReportWindowCoveringCurrentPositionLiftCallback;
         delete onReportWindowCoveringCurrentPositionTiltCallback;
         delete onReportWindowCoveringConfigStatusCallback;
@@ -73,6 +74,8 @@ public:
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0008, 0x0000,
                                        onReportLevelControlCurrentLevelCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0403, 0x0000,
+                                       onReportPressureMeasurementMeasuredValueCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0200, 0x0013,
                                        onReportPumpConfigurationAndControlCapacityCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0405, 0x0000,
@@ -84,7 +87,7 @@ public:
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0201, 0x0000,
                                        onReportThermostatLocalTemperatureCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0000,
-                                       onReportWindowCoveringWindowCoveringTypeCallback->Cancel());
+                                       onReportWindowCoveringTypeCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0003,
                                        onReportWindowCoveringCurrentPositionLiftCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0004,
@@ -146,6 +149,8 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMeasuredValueCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlCapacityCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMeasuredValueCallback =
@@ -156,7 +161,7 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatLocalTemperatureCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringWindowCoveringTypeCallback =
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringTypeCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);

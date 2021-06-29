@@ -18,31 +18,30 @@
 
 #include "TestCommand.h"
 
-constexpr uint16_t kWaitDurationInSeconds = 30;
-
-CHIP_ERROR TestCommand::Run(NodeId localId, NodeId remoteId)
+CHIP_ERROR TestCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    //
-    // Set this to true first BEFORE we send commands to ensure we don't
-    // end up in a situation where the response comes back faster than we can
-    // set the variable to true, which will cause it to block indefinitely.
-    //
-    UpdateWaitForResponse(true);
+    auto * ctx = GetExecContext();
 
-    {
-        chip::DeviceLayer::StackLock lock;
+    err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    ReturnErrorOnFailure(err);
 
-        err = GetExecContext()->commissioner->GetDevice(remoteId, &mDevice);
-        ReturnErrorOnFailure(err);
-
-        err = NextTest();
-        ReturnErrorOnFailure(err);
-    }
-
-    WaitForResponse(kWaitDurationInSeconds);
-
-    VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
+}
+
+void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+{
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
+    command->mDevice = device;
+    command->NextTest();
+}
+
+void TestCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+{
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
+    command->SetCommandExitStatus(error);
 }

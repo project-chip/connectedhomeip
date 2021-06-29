@@ -138,7 +138,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         {
         case 0x0000: // accepts header list
         {
-            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, index - 1);
+            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
             if (entryOffset == 0)
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -155,7 +155,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
 
-            entryLength = acceptsHeaderListSpan->size();
+            if (!CanCastTo<uint16_t>(acceptsHeaderListSpan->size()))
+            {
+                ChipLogError(Zcl, "Span size %zu is too large", acceptsHeaderListSpan->size());
+                return 0;
+            }
+            entryLength = static_cast<uint16_t>(acceptsHeaderListSpan->size());
             break;
         }
         case 0x0001: // supported streaming types
@@ -278,7 +283,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         {
         case 0x0000: // NetworkInterfaces
         {
-            entryLength = 46;
+            entryLength = 48;
             if (((index - 1) * entryLength) > (am->size - entryLength))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -303,8 +308,15 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv6,
                            write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv6 : src, write, &entryOffset,
                            sizeof(entry->OffPremiseServicesReachableIPv6)); // BOOLEAN
-            copyListMember(write ? dest : (uint8_t *) &entry->HardwareAddress, write ? (uint8_t *) &entry->HardwareAddress : src,
-                           write, &entryOffset, sizeof(entry->HardwareAddress)); // IEEE_ADDRESS
+            chip::ByteSpan * HardwareAddressSpan = &entry->HardwareAddress; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 10, HardwareAddressSpan)
+                       : ReadByteSpan(src + entryOffset, 10, HardwareAddressSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 10);
             copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
                            sizeof(entry->Type)); // ENUM8
             break;
@@ -548,7 +560,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         case 0x001B: // list_octet_string
         {
-            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, index - 1);
+            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
             if (entryOffset == 0)
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -565,7 +577,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
 
-            entryLength = listOctetStringSpan->size();
+            if (!CanCastTo<uint16_t>(listOctetStringSpan->size()))
+            {
+                ChipLogError(Zcl, "Span size %zu is too large", listOctetStringSpan->size());
+                return 0;
+            }
+            entryLength = static_cast<uint16_t>(listOctetStringSpan->size());
             break;
         }
         case 0x001C: // list_struct_octet_string
@@ -835,7 +852,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         {
         case 0x0000: // NetworkInterfaces
             // Struct _NetworkInterfaceType
-            entryLength = 46;
+            entryLength = 48;
             break;
         }
         break;

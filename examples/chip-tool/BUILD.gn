@@ -19,6 +19,11 @@ import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
+declare_args() {
+  # Use a separate eventloop for CHIP tasks
+  config_use_separate_eventloop = true
+}
+
 executable("chip-tool") {
   sources = [
     "commands/clusters/ModelCommand.cpp",
@@ -27,6 +32,7 @@ executable("chip-tool") {
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
+    "commands/pairing/RequestCommissioningCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/reporting/ReportingCommand.cpp",
@@ -34,6 +40,8 @@ executable("chip-tool") {
     "config/PersistentStorage.cpp",
     "main.cpp",
   ]
+
+  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
 
   deps = [
     "${chip_root}/src/controller/data_model",

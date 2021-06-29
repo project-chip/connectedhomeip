@@ -18,7 +18,9 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
-    "${chip_root}/src/app/util/CHIPDeviceCallbacksMgr.cpp",
+    "${chip_root}/src/app/server/Mdns.cpp",
+    "${chip_root}/src/app/server/Mdns.h",
+    "${chip_root}/src/app/server/Server.h",
     "AbstractMdnsDiscoveryController.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
@@ -38,6 +40,7 @@ static_library("controller") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",

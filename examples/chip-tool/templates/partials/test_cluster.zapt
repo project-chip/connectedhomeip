@@ -5,14 +5,14 @@ class {{filename}}: public TestCommand
     {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
       CHIP_ERROR err = CHIP_NO_ERROR;
 
       if (mTestCount == mTestIndex)
       {
           ChipLogProgress(chipTool, "{{filename}}: Test complete");
-          SetCommandExitStatus(true);
+          SetCommandExitStatus(CHIP_NO_ERROR);
       }
 
       // Ensure we increment mTestIndex before we start running the relevant
@@ -31,10 +31,8 @@ class {{filename}}: public TestCommand
       if (CHIP_NO_ERROR != err)
       {
           ChipLogProgress(chipTool, "{{filename}}: %s", chip::ErrorStr(err));
-          SetCommandExitStatus(false);
+          SetCommandExitStatus(err);
       }
-
-      return err;
     }
 
 
@@ -107,9 +105,16 @@ class {{filename}}: public TestCommand
         delete runner->mOnFailureCallback_{{index}};
         delete runner->mOnSuccessCallback_{{index}};
 
+        {{#if optional}}
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
+            runner->NextTest();
+            return;
+        }
+        {{/if}}
+
         if (runner->mIsFailureExpected_{{index}} == false) {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -128,7 +133,7 @@ class {{filename}}: public TestCommand
         if (runner->mIsFailureExpected_{{index}} == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -138,7 +143,7 @@ class {{filename}}: public TestCommand
         if (count != {{expectedValue.length}})
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
         {{else}}
@@ -150,9 +155,36 @@ class {{filename}}: public TestCommand
         {{/if}}
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
+        {{/if}}
+        {{/if}}
+        {{#if hasExpectedConstraints}}
+        {{#if expectedConstraints.type}}
+        ChipLogError(chipTool, "Warning: {{asCamelCased name true}} type checking is not implemented yet. Expected type: '%s'", "{{expectedConstraints.type}}");
+        {{/if}}
+
+        {{#if expectedConstraints.format}}
+        ChipLogError(chipTool, "Warning: {{asCamelCased name true}} format checking is not implemented yet. Expected format: '%s'", "{{expectedConstraints.format}}");
+        {{/if}}
+
+        {{#if expectedConstraints.minLength}}
+          if ({{asCamelCased name true}}.size() < {{expectedConstraints.minLength}})
+          {
+            ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too short. Min size is {{expectedConstraints.minLength}} but got '%zu'", {{asCamelCased name true}}.size());
+            runner->SetCommandExitStatus(false);
+            return;
+          }
+        {{/if}}
+
+        {{#if expectedConstraints.maxLength}}
+          if ({{asCamelCased name true}}.size() > {{expectedConstraints.maxLength}})
+          {
+            ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too long. Max size is {{expectedConstraints.maxLength}} but got '%zu'", {{asCamelCased name true}}.size());
+            runner->SetCommandExitStatus(false);
+            return;
+          }
         {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}

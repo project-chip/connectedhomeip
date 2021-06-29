@@ -26,7 +26,11 @@ source_set("commands") {
   ]
 
   if (chip_device_platform != "none") {
-    sources += [ "Config.cpp" ]
+    sources += [
+      "Config.cpp",
+      "Device.cpp",
+      "OnboardingCodes.cpp",
+    ]
   }
 
   if (chip_enable_wifi) {
@@ -37,5 +41,13 @@ source_set("commands") {
     sources += [ "BLE.cpp" ]
   }
 
+  if (chip_enable_nfc && chip_device_platform != "none") {
+    sources += [ "NFC.cpp" ]
+  }
+
   public_deps = [ "${chip_root}/src/lib/shell:shell_core" ]
+
+  if (chip_device_platform != "none") {
+    public_deps += [ "${chip_root}/src/app/server" ]
+  }
 }

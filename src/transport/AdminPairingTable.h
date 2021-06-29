@@ -43,8 +43,6 @@ static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
 constexpr char kAdminTableCountKey[]  = "CHIPAdminNextId";
 
-constexpr uint16_t kMaxChipCertSize = 600;
-
 struct AccessControlList
 {
     uint32_t placeholder;
@@ -193,9 +191,9 @@ private:
         uint16_t mOpCertLen;   /* This field is serialized in LittleEndian byte order */
 
         Crypto::P256SerializedKeypair mOperationalKey;
-        uint8_t mRootCert[kMaxChipCertSize];
+        uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
         // The operationa credentials set can have up to two certs -> ICAC and NOC
-        uint8_t mOperationalCert[kMaxChipCertSize * 2];
+        uint8_t mOperationalCert[Credentials::kMaxCHIPCertLength * 2];
         char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
     };
 };

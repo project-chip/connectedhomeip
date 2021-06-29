@@ -21,19 +21,6 @@
 menu "Demo"
 
     choice
-        prompt "Device Type"
-        default DEVICE_TYPE_ESP32_DEVKITC
-        help
-            Specifies the type of ESP32 device.
-
-            Note that the "ESP32-DevKitC" choice is compatible with a number of clone devices
-            available from third-party manufacturers.
-
-        config DEVICE_TYPE_ESP32_DEVKITC
-            bool "ESP32-DevKitC"
-    endchoice
-
-    choice
       prompt "Rendezvous Mode"
       default RENDEZVOUS_MODE_BLE
       help
@@ -65,15 +52,6 @@ menu "Demo"
         help
             The IPV4 Address of the ECHO Server.
 
-    # NOTE: This config is not displayed as a input in the Kconfig menu, as its value is
-    # entirely derived from the Device Type choice.  However the CONFIG_EXAMPLE_DISPLAY_TYPE
-    # define that is produced is needed to configure the TFT library correctly.
-    config TFT_PREDEFINED_DISPLAY_TYPE
-        int
-        range 0 5
-        default 3 if DEVICE_TYPE_M5STACK
-        default 0 if DEVICE_TYPE_ESP32_DEVKITC
-
     config RENDEZVOUS_MODE
        int
        range 0 8
@@ -83,12 +61,38 @@ menu "Demo"
        default 4 if RENDEZVOUS_MODE_THREAD
        default 8 if RENDEZVOUS_MODE_ETHERNET
 
-    config DISPLAY_AUTO_OFF
-        bool "Automatically turn off the M5Stack's Display after a few seconds"
-        default "y"
-        depends on DEVICE_TYPE_M5STACK
-        help
-            To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
+endmenu
 
+menu "PW RPC Debug channel"
+    config EXAMPLE_UART_PORT_NUM
+        int "UART port number"
+        range 0 2 if IDF_TARGET_ESP32
+        default 0 if IDF_TARGET_ESP32
+        help
+            UART communication port number for the example.
+            See UART documentation for available port numbers.
+
+    config EXAMPLE_UART_BAUD_RATE
+        int "UART communication speed"
+        range 1200 115200
+        default 115200
+        help
+            UART communication speed for Modbus example.
+
+    config EXAMPLE_UART_RXD
+        int "UART RXD pin number"
+        range 0 34 if IDF_TARGET_ESP32
+        default 3
+        help
+            GPIO number for UART RX pin. See UART documentation for more information
+            about available pin numbers for UART.
+
+    config EXAMPLE_UART_TXD
+        int "UART TXD pin number"
+        range 0 34 if IDF_TARGET_ESP32
+        default 1
+        help
+            GPIO number for UART TX pin. See UART documentation for more information
+            about available pin numbers for UART.
 
 endmenu

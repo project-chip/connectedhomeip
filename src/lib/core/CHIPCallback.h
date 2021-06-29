@@ -49,9 +49,7 @@ public:
      */
     Cancelable * mNext;
     Cancelable * mPrev;
-
-    void * mInfoPtr;
-    uint64_t mInfoScalar;
+    alignas(uint64_t) char mInfo[16];
 
     /**
      * @brief when non-null, indicates the Callback is registered with

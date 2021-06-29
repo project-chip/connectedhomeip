@@ -62,11 +62,6 @@ bool ReliableMessageContext::IsAckPending() const
     return mFlags.Has(Flags::kFlagAckPending);
 }
 
-bool ReliableMessageContext::HasPeerRequestedAck() const
-{
-    return mFlags.Has(Flags::kFlagPeerRequestedAck);
-}
-
 bool ReliableMessageContext::HasRcvdMsgFromPeer() const
 {
     return mFlags.Has(Flags::kFlagMsgRcvdFromPeer);
@@ -85,11 +80,6 @@ void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
 void ReliableMessageContext::SetAckPending(bool inAckPending)
 {
     mFlags.Set(Flags::kFlagAckPending, inAckPending);
-}
-
-void ReliableMessageContext::SetPeerRequestedAck(bool inPeerRequestedAck)
-{
-    mFlags.Set(Flags::kFlagPeerRequestedAck, inPeerRequestedAck);
 }
 
 void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
@@ -200,7 +190,8 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<M
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
     GetReliableMessageMgr()->ExpireTicks();
 
-    // If the message IS a duplicate.
+    // If the message IS a duplicate there will never be a response to it, so we
+    // should not wait for one and just immediately send a standalone ack.
     if (MsgFlags.Has(MessageFlagValues::kDuplicateMessage))
     {
 #if !defined(NDEBUG)
@@ -213,7 +204,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<M
         uint32_t tempAckId = mPendingPeerAckId;
 
         // Set the pending ack id.
-        mPendingPeerAckId = MessageId;
+        SetPendingPeerAckId(MessageId);
 
         // Send the Ack for the duplication message in a SecureChannel::StandaloneAck message.
         err = SendStandaloneAckMessage();
@@ -222,8 +213,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<M
         if (wasAckPending)
         {
             // Restore previously pending ack id.
-            mPendingPeerAckId = tempAckId;
-            SetAckPending(true);
+            SetPendingPeerAckId(tempAckId);
         }
 
         SuccessOrExit(err);
@@ -243,11 +233,10 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<M
         }
 
         // Replace the Pending ack id.
-        mPendingPeerAckId = MessageId;
+        SetPendingPeerAckId(MessageId);
         mNextAckTimeTick =
             static_cast<uint16_t>(CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK +
                                   GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
-        SetAckPending(true);
     }
 
 exit:
@@ -284,6 +273,12 @@ exit:
     }
 
     return err;
+}
+
+void ReliableMessageContext::SetPendingPeerAckId(uint32_t aPeerAckId)
+{
+    mPendingPeerAckId = aPeerAckId;
+    SetAckPending(true);
 }
 
 } // namespace Messaging

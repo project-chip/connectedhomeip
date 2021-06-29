@@ -26,7 +26,6 @@
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
-#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include "support/CHIPMemString.h"
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
@@ -513,12 +512,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
 
-#if CHIP_PROGRESS_LOGGING
-    char addrBuffer[Inet::kMaxIPAddressStringLength + 1];
-    nodeData.mAddress.ToString(addrBuffer);
-#endif // CHIP_PROGRESS_LOGGING
-    ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64 " to %s", ChipLogValueX64(nodeData.mPeerId.GetNodeId()),
-                    addrBuffer);
+    nodeData.LogNodeIdResolved();
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 

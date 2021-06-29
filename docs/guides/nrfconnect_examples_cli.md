@@ -1,4 +1,4 @@
-# Using CLI in nRF Connect SDK examples
+# Using CLI in nRF Connect examples
 
 The following examples for the development kits from Nordic Semiconductor
 include a command-line interface that allows access to application logs and
@@ -88,116 +88,222 @@ Done
 
 ## Using CHIP-specific commands
 
-The nRF Connect SDK examples let you use several CHIP-specific CLI commands.
+The nRF Connect examples let you use several CHIP-specific CLI commands.
 
-These commands are not available in the standard Zephyr shell.
+These commands are not available by default and to enable using them, set the
+`CONFIG_CHIP_LIB_SHELL=y` Kconfig option in the `prj.conf` file of the given
+example.
 
-They are currently used for testing purposes and allow only to get some
-information about CHIP stack state, but not to modify it.
-
-To enable using CHIP commands, set the `CONFIG_CHIP_ZEPHYR_SHELL=y` Kconfig
-option in the `prj.conf` file of the given example.
-
-### Listing CHIP-specific commands
-
-To list all available CHIP-specific commands, enter `chip` in the command line
-and press the Tab key. This will list the available commands:
-
-```shell
-uart:~$ chip
-  qrcode             qrcodeurl          setuppincode       discriminator
-  vendorid           productid          manualpairingcode  bleadvertising
-  nfcemulation
-```
+Every invoked command must be preceded by the `matter` prefix.
 
 See the following subsections for the description of each CHIP-specific command.
 
-#### `qrcode`
+### device
+
+Handles a group of commands that are used to manage the device. You must use
+this command together with one of the additional subcommands listed below.
+
+#### factoryreset
+
+Performs device factory reset that is hardware reset preceded by erasing of the
+whole CHIP settings stored in a non-volatile memory.
+
+```shell
+uart:~$ matter factoryreset
+Performing factory reset ...
+```
+
+### onboardingcodes
+
+Handles a group of commands that are used to view information about device
+onboarding codes. You can use this command without any subcommand to print all
+available onboarding codes or to add a specific subcommand.
+
+```shell
+uart:~$ matter onboardingcodes
+QRCode:             MT:W0GU2OTB00KA0648G00
+QRCodeUrl:          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
+ManualPairingCode:  34970112332
+```
+
+The `onboardingcodes` command can also take the subcommands listed below.
+
+#### qrcode
 
 Prints the device
 [onboarding QR code payload](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/nrfconnect_android_commissioning.md#preparing-accessory-device).
 Takes no arguments.
 
 ```shell
-uart:~$ chip qrcode
+uart:~$ matter onboardingcodes qrcode
 MT:W0GU2OTB00KA0648G00
 ```
 
-#### `qrcodeurl`
+#### qrcodeurl
 
 Prints the URL to view the
 [device onboarding QR code](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/nrfconnect_android_commissioning.md#preparing-accessory-device)
 in a web browser. Takes no arguments.
 
 ```shell
-uart:~$ chip qrcodeurl
-https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3AH34.GHY00%200C9SS0
+uart:~$ matter onboardingcodes qrcodeurl
+https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 ```
 
-#### `setuppincode`
-
-Prints the PIN code for device setup. Takes no arguments.
-
-```shell
-uart:~$ chip setuppincode
-12345678
-```
-
-#### `discriminator`
-
-Prints the device setup discriminator. Takes no arguments.
-
-```shell
-uart:~$ chip discriminator
-3840
-```
-
-#### `vendorid`
-
-Prints the vendor ID of the device. Takes no arguments.
-
-```shell
-uart:~$ chip vendorid
-9050
-```
-
-#### `productid`
-
-Prints the product ID of the device. Takes no arguments.
-
-```shell
-uart:~$ chip productid
-20043
-```
-
-#### `manualpairingcode`
+#### manualpairingcode
 
 Prints the pairing code for the manual onboarding of a device. Takes no
 arguments.
 
 ```shell
-uart:~$ chip manualpairingcode
-35767807533
+uart:~$ matter onboardingcodes manualpairingcode
+34970112332
 ```
 
-#### `bleadvertising`
+### config
 
-Prints the information about the Bluetooth LE advertising status, either `0` if
-the advertising is disabled on the device or `1` if it is enabled. Takes no
-arguments.
+Handles a group of commands that are used to view device configuration
+information. You can use this command without any subcommand to print all
+available configuration data or to add a specific subcommand.
 
 ```shell
-uart:~$ chip bleadvertising
-0
+VendorId:        9050 (0x235A)
+ProductId:       20043 (0x4E4B)
+ProductRevision: 1 (0x1)
+FabricId:
+PinCode:         020202021
+Discriminator:   f00
+DeviceId:
 ```
 
-#### `nfcemulation`
+The `config` command can also take the subcommands listed below.
 
-Prints the information about the NFC tag emulation status, either `0` if the
-emulation is disabled on the device or `1` if it is enabled (1). Takes no
-arguments.
+#### pincode
+
+Prints the PIN code for device setup. Takes no arguments.
 
 ```shell
-uart:~$ chip nfcemulation
-0
+uart:~$ matter config pincode
+020202021
+```
+
+#### discriminator
+
+Prints the device setup discriminator. Takes no arguments.
+
+```shell
+uart:~$ matter config discriminator
+f00
+```
+
+#### vendorid
+
+Prints the vendor ID of the device. Takes no arguments.
+
+```shell
+uart:~$ matter config vendorid
+9050 (0x235A)
+```
+
+#### productid
+
+Prints the product ID of the device. Takes no arguments.
+
+```shell
+uart:~$ matter config productid
+20043 (0x4E4B)
+```
+
+#### productrev
+
+Prints the product revision of the device. Takes no arguments.
+
+```shell
+uart:~$ matter config productrev
+1 (0x1)
+```
+
+#### deviceid
+
+Prints the device identifier. Takes no arguments.
+
+#### fabricid
+
+Prints the fabric identifier. Takes no arguments.
+
+### ble
+
+Handles a group of commands that are used to control the device Bluetooth LE
+transport state. You must use this command together with one of the additional
+subcommands listed below.
+
+#### help
+
+Prints help information about `ble` commands group.
+
+```shell
+uart:~$ matter ble help
+  help            Usage: ble <subcommand>
+  adv             Enable or disable advertisement. Usage: ble adv <start|stop|state>
+```
+
+#### adv start
+
+Enables Bluetooth LE advertising.
+
+```shell
+uart:~$ matter ble adv start
+Starting BLE advertising
+```
+
+#### adv stop
+
+Disables Bluetooth LE advertising.
+
+```shell
+uart:~$ matter ble adv stop
+Stopping BLE advertising
+```
+
+#### adv status
+
+Prints the information about the current Bluetooth LE advertising status.
+
+```shell
+uart:~$ matter ble adv state
+BLE advertising is disabled
+
+```
+
+### nfc
+
+Handles a group of commands that are used to control the device NFC tag
+emulation state. You must use this command together with one of the additional
+subcommands listed below.
+
+#### start
+
+Starts the NFC tag emulation.
+
+```shell
+uart:~$ matter nfc start
+NFC tag emulation started
+```
+
+#### stop
+
+Stops the NFC tag emulation.
+
+```shell
+uart:~$ matter nfc stop
+NFC tag emulation stopped
+```
+
+#### state
+
+Prints the information about the NFC tag emulation status.
+
+```shell
+uart:~$ matter nfc state
+NFC tag emulation is disabled
 ```
