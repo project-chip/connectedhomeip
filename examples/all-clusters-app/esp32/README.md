@@ -219,7 +219,7 @@ commissioning and cluster control.
 
 -   Follow these steps to use `${app_name}.flash.py`.
 
-``` 
+```
         $ export ESPPORT=/dev/tty.SLAB_USBtoUART
         $ export ESPBAUD=${baud_value}
         $ idf.py build
