@@ -72,9 +72,10 @@ public:
 private:
     Crypto::P256Keypair mIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
-    bool mInitialized  = false;
-    uint32_t mIssuerId = 0;
-    uint32_t mNow      = 0;
+    bool mInitialized              = false;
+    uint32_t mIssuerId             = 0;
+    uint32_t mIntermediateIssuerId = 1;
+    uint32_t mNow                  = 0;
 
     // By default, let's set validity to 10 years
     uint32_t mValidity = 365 * 24 * 60 * 60 * 10;

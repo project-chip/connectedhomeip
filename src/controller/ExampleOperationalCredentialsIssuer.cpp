@@ -98,7 +98,7 @@ ExampleOperationalCredentialsIssuer::GenerateNodeOperationalCertificate(const Op
         assignedId = mNextAvailableNodeId++;
     }
 
-    X509CertRequestParams request = { 1, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
+    X509CertRequestParams request = { 1, mIntermediateIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
@@ -122,7 +122,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GetIntermediateCACertificate(Fab
 
     size_t outCertSize  = (outCert.size() > UINT32_MAX) ? UINT32_MAX : outCert.size();
     uint32_t outCertLen = 0;
-    ReturnErrorOnFailure(NewICAX509Cert(request, request.Issuer, mIntermediateIssuer.Pubkey(), mIssuer, outCert.data(),
+    ReturnErrorOnFailure(NewICAX509Cert(request, mIntermediateIssuerId, mIntermediateIssuer.Pubkey(), mIssuer, outCert.data(),
                                         static_cast<uint32_t>(outCertSize), outCertLen));
     outCert.reduce_size(outCertLen);
 

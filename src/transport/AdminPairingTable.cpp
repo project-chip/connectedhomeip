@@ -360,7 +360,7 @@ CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentia
     }
 
     credentials.Release();
-    ReturnErrorOnFailure(credentials.Init(&certificates, certificates.GetCertCount()));
+    ReturnErrorOnFailure(credentials.Init(&certificates, 1));
 
     const CertificateKeyId * id = credentials.GetTrustedRootId(0);
     rootKeyId.mId               = id->mId;
