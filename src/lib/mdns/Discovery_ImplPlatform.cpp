@@ -192,9 +192,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
                                          strnlen(deviceTypeBuf, sizeof(deviceTypeBuf)) };
     }
 
-    if (params.HasValueDeviceName())
+    if (params.GetDeviceName().HasValue())
     {
-        snprintf(deviceNameBuf, sizeof(deviceNameBuf), "%s", params.GetDeviceName());
+        snprintf(deviceNameBuf, sizeof(deviceNameBuf), "%s", params.GetDeviceName().Value());
         textEntries[textEntrySize++] = { "DN", reinterpret_cast<const uint8_t *>(deviceNameBuf),
                                          strnlen(deviceNameBuf, sizeof(deviceNameBuf)) };
     }
@@ -217,9 +217,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
                                              strnlen(additionalPairingBuf, sizeof(additionalPairingBuf)) };
         }
 
-        if (params.HasValueRotatingId())
+        if (params.GetRotatingId().HasValue())
         {
-            snprintf(rotatingIdBuf, sizeof(rotatingIdBuf), "%s", params.GetRotatingId());
+            snprintf(rotatingIdBuf, sizeof(rotatingIdBuf), "%s", params.GetRotatingId().Value());
             textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingIdBuf),
                                              strnlen(rotatingIdBuf, sizeof(rotatingIdBuf)) };
         }
@@ -231,9 +231,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
                                              strnlen(pairingHintBuf, sizeof(pairingHintBuf)) };
         }
 
-        if (params.HasValuePairingInstr())
+        if (params.GetPairingInstr().HasValue())
         {
-            snprintf(pairingInstrBuf, sizeof(pairingInstrBuf), "%s", params.GetPairingInstr());
+            snprintf(pairingInstrBuf, sizeof(pairingInstrBuf), "%s", params.GetPairingInstr().Value());
             textEntries[textEntrySize++] = { "PI", reinterpret_cast<const uint8_t *>(pairingInstrBuf),
                                              strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
         }
