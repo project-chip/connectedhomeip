@@ -39,7 +39,7 @@ struct ClusterInfo
     NodeId mNodeId         = 0;
     ClusterId mClusterId   = 0;
     ListIndex mListIndex   = 0;
-    FieldId mFieldId       = 0;
+    AttributeId mFieldId   = 0;
     EndpointId mEndpointId = 0;
     bool mDirty            = false;
     BitFlags<Flags> mFlags;

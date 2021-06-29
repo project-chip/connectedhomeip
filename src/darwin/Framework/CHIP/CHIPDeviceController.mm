@@ -212,6 +212,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
+          csrNonce:(nullable NSData *)csrNonce
              error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
@@ -224,7 +225,12 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         chip::RendezvousParameters params
             = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
 
+        if (csrNonce != nil) {
+            params = params.SetCSRNonce(chip::ByteSpan((const uint8_t *) csrNonce.bytes, csrNonce.length));
+        }
+
         if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = self.cppCommissioner->PairDevice(deviceID, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
@@ -256,6 +262,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
                                                 .SetDiscriminator(discriminator)
                                                 .SetPeerAddress(peerAddress);
         if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = self.cppCommissioner->PairDevice(deviceID, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
@@ -281,6 +288,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
 
         if ([self isRunning]) {
+            _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = _cppCommissioner->PairTestDeviceWithoutSecurity(
                 deviceID, chip::Transport::PeerAddress::UDP(addr, port), serializedTestDevice);
         }
@@ -302,7 +310,8 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     if (setupPayload) {
         uint16_t discriminator = setupPayload.discriminator.unsignedShortValue;
         uint32_t setupPINCode = setupPayload.setUpPINCode.unsignedIntValue;
-        didSucceed = [self pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:error];
+        _operationalCredentialsDelegate->SetDeviceID(deviceID);
+        didSucceed = [self pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode csrNonce:nil error:error];
     } else {
         CHIP_LOG_ERROR("Failed to create CHIPSetupPayload for pairing with error %@", *error);
     }
@@ -337,6 +346,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     }
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
+            _operationalCredentialsDelegate->ResetDeviceID();
             errorCode = self.cppCommissioner->StopPairing(deviceID);
         }
         success = ![self checkForError:errorCode logMsg:kErrorStopPairing error:error];

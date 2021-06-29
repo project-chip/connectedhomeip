@@ -211,7 +211,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_GENERAL_COMMISSIONING_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_GENERAL_COMMISSIONING_CLUSTER_ID);
             return;
         }
         }
@@ -900,7 +900,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID);
             return;
         }
         }
@@ -942,7 +942,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         {
         case ZCL_ADD_OP_CERT_COMMAND_ID: {
             expectArgumentCount = 4;
-            chip::ByteSpan OperationalCert;
+            chip::ByteSpan NOCArray;
             chip::ByteSpan IPKValue;
             chip::NodeId CaseAdminNode;
             uint16_t AdminVendorId;
@@ -978,7 +978,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 case 0: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    OperationalCert      = chip::ByteSpan(data, aDataTlv.GetLength());
+                    NOCArray             = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
                 case 1: {
@@ -1013,8 +1013,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOperationalCredentialsClusterAddOpCertCallback(apCommandObj, OperationalCert, IPKValue,
-                                                                                   CaseAdminNode, AdminVendorId);
+                wasHandled = emberAfOperationalCredentialsClusterAddOpCertCallback(apCommandObj, NOCArray, IPKValue, CaseAdminNode,
+                                                                                   AdminVendorId);
             }
             break;
         }
@@ -1407,7 +1407,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId,
+            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId,
                          ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID);
             return;
         }
@@ -1721,7 +1721,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_WINDOW_COVERING_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_WINDOW_COVERING_CLUSTER_ID);
             return;
         }
         }

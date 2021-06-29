@@ -1160,867 +1160,6 @@
                                                                                                                                    \
                               ZCL_RESET_ALARM_LOG_COMMAND_ID, "", );
 
-/** @brief Command description for SetAbsoluteLocation
- *
- * Command: SetAbsoluteLocation
- * @param coordinate1 INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetAbsoluteLocation(coordinate1)                                                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_ABSOLUTE_LOCATION_COMMAND_ID, "u", coordinate1);
-
-/** @brief Command description for DeviceConfigurationResponse
- *
- * Command: DeviceConfigurationResponse
- * @param status Status
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterDeviceConfigurationResponse(status)                                                                             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEVICE_CONFIGURATION_RESPONSE_COMMAND_ID, "u", status);
-
-/** @brief Command description for SetAbsoluteLocation
- *
- * Command: SetAbsoluteLocation
- * @param coordinate2 INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetAbsoluteLocation(coordinate2)                                                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_ABSOLUTE_LOCATION_COMMAND_ID, "u", coordinate2);
-
-/** @brief Command description for DeviceConfigurationResponse
- *
- * Command: DeviceConfigurationResponse
- * @param power INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterDeviceConfigurationResponse(power)                                                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEVICE_CONFIGURATION_RESPONSE_COMMAND_ID, "u", power);
-
-/** @brief Command description for SetAbsoluteLocation
- *
- * Command: SetAbsoluteLocation
- * @param coordinate3 INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetAbsoluteLocation(coordinate3)                                                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_ABSOLUTE_LOCATION_COMMAND_ID, "u", coordinate3);
-
-/** @brief Command description for DeviceConfigurationResponse
- *
- * Command: DeviceConfigurationResponse
- * @param pathLossExponent INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterDeviceConfigurationResponse(pathLossExponent)                                                                   \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEVICE_CONFIGURATION_RESPONSE_COMMAND_ID, "u", pathLossExponent);
-
-/** @brief Command description for SetAbsoluteLocation
- *
- * Command: SetAbsoluteLocation
- * @param power INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetAbsoluteLocation(power) emberAfFillExternalBuffer(mask,                                                      \
-                                                                                                                                   \
-                                                                        ZCL_SET_ABSOLUTE_LOCATION_COMMAND_ID, "u", power);
-
-/** @brief Command description for DeviceConfigurationResponse
- *
- * Command: DeviceConfigurationResponse
- * @param calculationPeriod INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterDeviceConfigurationResponse(calculationPeriod)                                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEVICE_CONFIGURATION_RESPONSE_COMMAND_ID, "u", calculationPeriod);
-
-/** @brief Command description for SetAbsoluteLocation
- *
- * Command: SetAbsoluteLocation
- * @param pathLossExponent INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetAbsoluteLocation(pathLossExponent)                                                                           \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_ABSOLUTE_LOCATION_COMMAND_ID, "u", pathLossExponent);
-
-/** @brief Command description for DeviceConfigurationResponse
- *
- * Command: DeviceConfigurationResponse
- * @param numberRssiMeasurements INT8U
- * @param reportingPeriod INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterDeviceConfigurationResponse(numberRssiMeasurements, reportingPeriod)                                            \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEVICE_CONFIGURATION_RESPONSE_COMMAND_ID, "uu", numberRssiMeasurements, reportingPeriod);
-
-/** @brief Command description for SetDeviceConfiguration
- *
- * Command: SetDeviceConfiguration
- * @param power INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetDeviceConfiguration(power) emberAfFillExternalBuffer(mask,                                                   \
-                                                                                                                                   \
-                                                                           ZCL_SET_DEVICE_CONFIGURATION_COMMAND_ID, "u", power);
-
-/** @brief Command description for LocationDataResponse
- *
- * Command: LocationDataResponse
- * @param status Status
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterLocationDataResponse(status) emberAfFillExternalBuffer(mask,                                                    \
-                                                                                                                                   \
-                                                                          ZCL_LOCATION_DATA_RESPONSE_COMMAND_ID, "u", status);
-
-/** @brief Command description for SetDeviceConfiguration
- *
- * Command: SetDeviceConfiguration
- * @param pathLossExponent INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetDeviceConfiguration(pathLossExponent)                                                                        \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_DEVICE_CONFIGURATION_COMMAND_ID, "u", pathLossExponent);
-
-/** @brief Command description for LocationDataResponse
- *
- * Command: LocationDataResponse
- * @param locationType LocationType
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterLocationDataResponse(locationType)                                                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_LOCATION_DATA_RESPONSE_COMMAND_ID, "u", locationType);
-
-/** @brief Command description for SetDeviceConfiguration
- *
- * Command: SetDeviceConfiguration
- * @param calculationPeriod INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetDeviceConfiguration(calculationPeriod)                                                                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_DEVICE_CONFIGURATION_COMMAND_ID, "u", calculationPeriod);
-
-/** @brief Command description for LocationDataResponse
- *
- * Command: LocationDataResponse
- * @param coordinate1 INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterLocationDataResponse(coordinate1)                                                                               \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_LOCATION_DATA_RESPONSE_COMMAND_ID, "u", coordinate1);
-
-/** @brief Command description for SetDeviceConfiguration
- *
- * Command: SetDeviceConfiguration
- * @param numberRssiMeasurements INT8U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetDeviceConfiguration(numberRssiMeasurements)                                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_DEVICE_CONFIGURATION_COMMAND_ID, "u", numberRssiMeasurements);
-
-/** @brief Command description for LocationDataResponse
- *
- * Command: LocationDataResponse
- * @param coordinate2 INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterLocationDataResponse(coordinate2)                                                                               \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_LOCATION_DATA_RESPONSE_COMMAND_ID, "u", coordinate2);
-
-/** @brief Command description for SetDeviceConfiguration
- *
- * Command: SetDeviceConfiguration
- * @param reportingPeriod INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSetDeviceConfiguration(reportingPeriod)                                                                         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_DEVICE_CONFIGURATION_COMMAND_ID, "u", reportingPeriod);
-
-/** @brief Command description for LocationDataResponse
- *
- * Command: LocationDataResponse
- * @param coordinate3 INT16S
- * @param power INT16S
- * @param pathLossExponent INT16U
- * @param locationMethod LocationMethod
- * @param qualityMeasure INT8U
- * @param locationAge INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterLocationDataResponse(coordinate3, power, pathLossExponent, locationMethod, qualityMeasure, locationAge)         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_LOCATION_DATA_RESPONSE_COMMAND_ID, "uuuuuu", coordinate3, power, pathLossExponent,           \
-                                  locationMethod, qualityMeasure, locationAge);
-
-/** @brief Command description for GetDeviceConfiguration
- *
- * Command: GetDeviceConfiguration
- * @param targetAddress IEEE_ADDRESS
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterGetDeviceConfiguration(targetAddress)                                                                           \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_GET_DEVICE_CONFIGURATION_COMMAND_ID, "u", targetAddress);
-
-/** @brief Command description for LocationDataNotification
- *
- * Command: LocationDataNotification
- * @param locationType LocationType
- * @param coordinate1 INT16S
- * @param coordinate2 INT16S
- * @param coordinate3 INT16S
- * @param power INT16S
- * @param pathLossExponent INT16U
- * @param locationMethod LocationMethod
- * @param qualityMeasure INT8U
- * @param locationAge INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterLocationDataNotification(locationType, coordinate1, coordinate2, coordinate3, power, pathLossExponent,          \
-                                            locationMethod, qualityMeasure, locationAge)                                           \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_LOCATION_DATA_NOTIFICATION_COMMAND_ID, "uuuuuuuuu", locationType, coordinate1, coordinate2,  \
-                                  coordinate3, power, pathLossExponent, locationMethod, qualityMeasure, locationAge);
-
-/** @brief Command description for GetLocationData
- *
- * Command: GetLocationData
- * @param flags GetLocationDataFlags
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterGetLocationData(flags) emberAfFillExternalBuffer(mask,                                                          \
-                                                                                                                                   \
-                                                                    ZCL_GET_LOCATION_DATA_COMMAND_ID, "u", flags);
-
-/** @brief Command description for CompactLocationDataNotification
- *
- * Command: CompactLocationDataNotification
- * @param locationType LocationType
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterCompactLocationDataNotification(locationType)                                                                   \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_COMPACT_LOCATION_DATA_NOTIFICATION_COMMAND_ID, "u", locationType);
-
-/** @brief Command description for GetLocationData
- *
- * Command: GetLocationData
- * @param numberResponses INT8U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterGetLocationData(numberResponses)                                                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_GET_LOCATION_DATA_COMMAND_ID, "u", numberResponses);
-
-/** @brief Command description for CompactLocationDataNotification
- *
- * Command: CompactLocationDataNotification
- * @param coordinate1 INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterCompactLocationDataNotification(coordinate1)                                                                    \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_COMPACT_LOCATION_DATA_NOTIFICATION_COMMAND_ID, "u", coordinate1);
-
-/** @brief Command description for GetLocationData
- *
- * Command: GetLocationData
- * @param targetAddress IEEE_ADDRESS
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterGetLocationData(targetAddress) emberAfFillExternalBuffer(mask,                                                  \
-                                                                                                                                   \
-                                                                            ZCL_GET_LOCATION_DATA_COMMAND_ID, "u", targetAddress);
-
-/** @brief Command description for CompactLocationDataNotification
- *
- * Command: CompactLocationDataNotification
- * @param coordinate2 INT16S
- * @param coordinate3 INT16S
- * @param qualityMeasure INT8U
- * @param locationAge INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterCompactLocationDataNotification(coordinate2, coordinate3, qualityMeasure, locationAge)                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_COMPACT_LOCATION_DATA_NOTIFICATION_COMMAND_ID, "uuuu", coordinate2, coordinate3,             \
-                                  qualityMeasure, locationAge);
-
-/** @brief Command description for RssiResponse
- *
- * Command: RssiResponse
- * @param replyingDevice IEEE_ADDRESS
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterRssiResponse(replyingDevice) emberAfFillExternalBuffer(mask,                                                    \
-                                                                                                                                   \
-                                                                          ZCL_RSSI_RESPONSE_COMMAND_ID, "u", replyingDevice);
-
-/** @brief Command description for RssiPing
- *
- * Command: RssiPing
- * @param locationType LocationType
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterRssiPing(locationType) emberAfFillExternalBuffer(mask,                                                          \
-                                                                                                                                   \
-                                                                    ZCL_RSSI_PING_COMMAND_ID, "u", locationType);
-
-/** @brief Command description for RssiResponse
- *
- * Command: RssiResponse
- * @param coordinate1 INT16S
- * @param coordinate2 INT16S
- * @param coordinate3 INT16S
- * @param rssi INT8S
- * @param numberRssiMeasurements INT8U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterRssiResponse(coordinate1, coordinate2, coordinate3, rssi, numberRssiMeasurements) emberAfFillExternalBuffer(    \
-        mask,                                                                                                                      \
-                                                                                                                                   \
-        ZCL_RSSI_RESPONSE_COMMAND_ID, "uuuuu", coordinate1, coordinate2, coordinate3, rssi, numberRssiMeasurements);
-
-/** @brief Command description for RssiRequest
- *
- * Command: RssiRequest
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterRssiRequest() emberAfFillExternalBuffer(mask,                                                                   \
-                                                                                                                                   \
-                                                           ZCL_RSSI_REQUEST_COMMAND_ID, "", );
-
-/** @brief Command description for SendPings
- *
- * Command: SendPings
- * @param targetAddress IEEE_ADDRESS
- * @param numberRssiMeasurements INT8U
- * @param calculationPeriod INT16U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterSendPings(targetAddress, numberRssiMeasurements, calculationPeriod)                                             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SEND_PINGS_COMMAND_ID, "uuu", targetAddress, numberRssiMeasurements, calculationPeriod);
-
-/** @brief Command description for AnchorNodeAnnounce
- *
- * Command: AnchorNodeAnnounce
- * @param anchorNodeIeeeAddress IEEE_ADDRESS
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterAnchorNodeAnnounce(anchorNodeIeeeAddress)                                                                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ANCHOR_NODE_ANNOUNCE_COMMAND_ID, "u", anchorNodeIeeeAddress);
-
-/** @brief Command description for ReportRssiMeasurements
- *
- * Command: ReportRssiMeasurements
- * @param measuringDevice IEEE_ADDRESS
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterReportRssiMeasurements(measuringDevice)                                                                         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_REPORT_RSSI_MEASUREMENTS_COMMAND_ID, "u", measuringDevice);
-
-/** @brief Command description for AnchorNodeAnnounce
- *
- * Command: AnchorNodeAnnounce
- * @param coordinate1 INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterAnchorNodeAnnounce(coordinate1)                                                                                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ANCHOR_NODE_ANNOUNCE_COMMAND_ID, "u", coordinate1);
-
-/** @brief Command description for ReportRssiMeasurements
- *
- * Command: ReportRssiMeasurements
- * @param neighbors INT8U
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterReportRssiMeasurements(neighbors)                                                                               \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_REPORT_RSSI_MEASUREMENTS_COMMAND_ID, "u", neighbors);
-
-/** @brief Command description for AnchorNodeAnnounce
- *
- * Command: AnchorNodeAnnounce
- * @param coordinate2 INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterAnchorNodeAnnounce(coordinate2)                                                                                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ANCHOR_NODE_ANNOUNCE_COMMAND_ID, "u", coordinate2);
-
-/** @brief Command description for ReportRssiMeasurements
- *
- * Command: ReportRssiMeasurements
- * @param neighborsInfo NeighborInfo []
- * @param neighborsInfoLen int
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterReportRssiMeasurements(neighborsInfo, neighborsInfoLen)                                                         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_REPORT_RSSI_MEASUREMENTS_COMMAND_ID, "b", neighborsInfo, neighborsInfoLen);
-
-/** @brief Command description for AnchorNodeAnnounce
- *
- * Command: AnchorNodeAnnounce
- * @param coordinate3 INT16S
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterAnchorNodeAnnounce(coordinate3)                                                                                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ANCHOR_NODE_ANNOUNCE_COMMAND_ID, "u", coordinate3);
-
-/** @brief Command description for RequestOwnLocation
- *
- * Command: RequestOwnLocation
- * @param blindNode IEEE_ADDRESS
- */
-#define emberAfFillCommandRSSI                                                                                                     \
-    LocationClusterRequestOwnLocation(blindNode) emberAfFillExternalBuffer(mask,                                                   \
-                                                                                                                                   \
-                                                                           ZCL_REQUEST_OWN_LOCATION_COMMAND_ID, "u", blindNode);
-
-/** @brief Command description for RestartDevice
- *
- * Command: RestartDevice
- * @param options RestartOptions
- */
-#define emberAfFillCommandCommissioningClusterRestartDevice(options)                                                               \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESTART_DEVICE_COMMAND_ID, "u", options);
-
-/** @brief Command description for RestartDeviceResponse
- *
- * Command: RestartDeviceResponse
- * @param status ENUM8
- */
-#define emberAfFillCommandCommissioningClusterRestartDeviceResponse(status)                                                        \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESTART_DEVICE_RESPONSE_COMMAND_ID, "u", status);
-
-/** @brief Command description for RestartDevice
- *
- * Command: RestartDevice
- * @param delay INT8U
- * @param jitter INT8U
- */
-#define emberAfFillCommandCommissioningClusterRestartDevice(delay, jitter)                                                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESTART_DEVICE_COMMAND_ID, "uu", delay, jitter);
-
-/** @brief Command description for SaveStartupParameters
- *
- * Command: SaveStartupParameters
- * @param options BITMAP8
- */
-#define emberAfFillCommandCommissioningClusterSaveStartupParameters(options)                                                       \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SAVE_STARTUP_PARAMETERS_COMMAND_ID, "u", options);
-
-/** @brief Command description for SaveStartupParametersResponse
- *
- * Command: SaveStartupParametersResponse
- * @param status ENUM8
- */
-#define emberAfFillCommandCommissioningClusterSaveStartupParametersResponse(status)                                                \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SAVE_STARTUP_PARAMETERS_RESPONSE_COMMAND_ID, "u", status);
-
-/** @brief Command description for SaveStartupParameters
- *
- * Command: SaveStartupParameters
- * @param index INT8U
- */
-#define emberAfFillCommandCommissioningClusterSaveStartupParameters(index)                                                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SAVE_STARTUP_PARAMETERS_COMMAND_ID, "u", index);
-
-/** @brief Command description for RestoreStartupParameters
- *
- * Command: RestoreStartupParameters
- * @param options BITMAP8
- */
-#define emberAfFillCommandCommissioningClusterRestoreStartupParameters(options)                                                    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESTORE_STARTUP_PARAMETERS_COMMAND_ID, "u", options);
-
-/** @brief Command description for RestoreStartupParametersResponse
- *
- * Command: RestoreStartupParametersResponse
- * @param status ENUM8
- */
-#define emberAfFillCommandCommissioningClusterRestoreStartupParametersResponse(status)                                             \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESTORE_STARTUP_PARAMETERS_RESPONSE_COMMAND_ID, "u", status);
-
-/** @brief Command description for RestoreStartupParameters
- *
- * Command: RestoreStartupParameters
- * @param index INT8U
- */
-#define emberAfFillCommandCommissioningClusterRestoreStartupParameters(index)                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESTORE_STARTUP_PARAMETERS_COMMAND_ID, "u", index);
-
-/** @brief Command description for ResetStartupParameters
- *
- * Command: ResetStartupParameters
- * @param options ResetOptions
- */
-#define emberAfFillCommandCommissioningClusterResetStartupParameters(options)                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESET_STARTUP_PARAMETERS_COMMAND_ID, "u", options);
-
-/** @brief Command description for ResetStartupParametersResponse
- *
- * Command: ResetStartupParametersResponse
- * @param status ENUM8
- */
-#define emberAfFillCommandCommissioningClusterResetStartupParametersResponse(status)                                               \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESET_STARTUP_PARAMETERS_RESPONSE_COMMAND_ID, "u", status);
-
-/** @brief Command description for ResetStartupParameters
- *
- * Command: ResetStartupParameters
- * @param index INT8U
- */
-#define emberAfFillCommandCommissioningClusterResetStartupParameters(index)                                                        \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESET_STARTUP_PARAMETERS_COMMAND_ID, "u", index);
-
-/** @brief Command description for TransferPartitionedFrame
- *
- * Command: TransferPartitionedFrame
- * @param fragmentationOptions BITMAP8
- */
-#define emberAfFillCommandPartitionClusterTransferPartitionedFrame(fragmentationOptions)                                           \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_TRANSFER_PARTITIONED_FRAME_COMMAND_ID, "u", fragmentationOptions);
-
-/** @brief Command description for MultipleAck
- *
- * Command: MultipleAck
- * @param ackOptions BITMAP8
- */
-#define emberAfFillCommandPartitionClusterMultipleAck(ackOptions)                                                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_MULTIPLE_ACK_COMMAND_ID, "u", ackOptions);
-
-/** @brief Command description for TransferPartitionedFrame
- *
- * Command: TransferPartitionedFrame
- * @param partitionedIndicatorAndFrame INT8U []
- * @param partitionedIndicatorAndFrameLen int
- */
-#define emberAfFillCommandPartitionClusterTransferPartitionedFrame(partitionedIndicatorAndFrame, partitionedIndicatorAndFrameLen)  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_TRANSFER_PARTITIONED_FRAME_COMMAND_ID, "b", partitionedIndicatorAndFrame,                        \
-                              partitionedIndicatorAndFrameLen);
-
-/** @brief Command description for MultipleAck
- *
- * Command: MultipleAck
- * @param firstFrameIdAndNackList INT8U []
- * @param firstFrameIdAndNackListLen int
- */
-#define emberAfFillCommandPartitionClusterMultipleAck(firstFrameIdAndNackList, firstFrameIdAndNackListLen)                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_MULTIPLE_ACK_COMMAND_ID, "b", firstFrameIdAndNackList, firstFrameIdAndNackListLen);
-
-/** @brief Command description for ReadHandshakeParam
- *
- * Command: ReadHandshakeParam
- * @param partitionedClusterId CLUSTER_ID
- */
-#define emberAfFillCommandPartitionClusterReadHandshakeParam(partitionedClusterId)                                                 \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_READ_HANDSHAKE_PARAM_COMMAND_ID, "u", partitionedClusterId);
-
-/** @brief Command description for ReadHandshakeParamResponse
- *
- * Command: ReadHandshakeParamResponse
- * @param partitionedClusterId CLUSTER_ID
- */
-#define emberAfFillCommandPartitionClusterReadHandshakeParamResponse(partitionedClusterId)                                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_READ_HANDSHAKE_PARAM_RESPONSE_COMMAND_ID, "u", partitionedClusterId);
-
-/** @brief Command description for ReadHandshakeParam
- *
- * Command: ReadHandshakeParam
- * @param attributeList ATTRIBUTE_ID []
- * @param attributeListLen int
- */
-#define emberAfFillCommandPartitionClusterReadHandshakeParam(attributeList, attributeListLen)                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_READ_HANDSHAKE_PARAM_COMMAND_ID, "b", attributeList, attributeListLen);
-
-/** @brief Command description for ReadHandshakeParamResponse
- *
- * Command: ReadHandshakeParamResponse
- * @param readAttributeStatusRecords ReadAttributeStatusRecord []
- * @param readAttributeStatusRecordsLen int
- */
-#define emberAfFillCommandPartitionClusterReadHandshakeParamResponse(readAttributeStatusRecords, readAttributeStatusRecordsLen)    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_READ_HANDSHAKE_PARAM_RESPONSE_COMMAND_ID, "b", readAttributeStatusRecords,                       \
-                              readAttributeStatusRecordsLen);
-
-/** @brief Command description for WriteHandshakeParam
- *
- * Command: WriteHandshakeParam
- * @param partitionedClusterId CLUSTER_ID
- * @param writeAttributeRecords WriteAttributeRecord []
- * @param writeAttributeRecordsLen int
- */
-#define emberAfFillCommandPartitionClusterWriteHandshakeParam(partitionedClusterId, writeAttributeRecords,                         \
-                                                              writeAttributeRecordsLen)                                            \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_WRITE_HANDSHAKE_PARAM_COMMAND_ID, "ub", partitionedClusterId, writeAttributeRecords,             \
-                              writeAttributeRecordsLen);
-
-/** @brief Command description for ImageNotify
- *
- * Command: ImageNotify
- * @param payloadType ENUM8
- * @param queryJitter INT8U
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param newFileVersion INT32U
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterImageNotify(payloadType, queryJitter, manufacturerId, imageType, newFileVersion)                     \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_IMAGE_NOTIFY_COMMAND_ID, "uuuuu", payloadType, queryJitter, manufacturerId, imageType,       \
-                                  newFileVersion);
-
-/** @brief Command description for QueryNextImageRequest
- *
- * Command: QueryNextImageRequest
- * @param fieldControl INT8U
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param currentFileVersion INT32U
- * @param hardwareVersion INT16U
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterQueryNextImageRequest(fieldControl, manufacturerId, imageType, currentFileVersion, hardwareVersion)  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_QUERY_NEXT_IMAGE_REQUEST_COMMAND_ID, "uuuuu", fieldControl, manufacturerId, imageType,       \
-                                  currentFileVersion, hardwareVersion);
-
-/** @brief Command description for QueryNextImageResponse
- *
- * Command: QueryNextImageResponse
- * @param status Status
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param fileVersion INT32U
- * @param imageSize INT32U
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterQueryNextImageResponse(status, manufacturerId, imageType, fileVersion, imageSize)                    \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_QUERY_NEXT_IMAGE_RESPONSE_COMMAND_ID, "uuuuu", status, manufacturerId, imageType,            \
-                                  fileVersion, imageSize);
-
-/** @brief Command description for ImageBlockRequest
- *
- * Command: ImageBlockRequest
- * @param fieldControl INT8U
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param fileVersion INT32U
- * @param fileOffset INT32U
- * @param maxDataSize INT8U
- * @param requestNodeAddress IEEE_ADDRESS
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterImageBlockRequest(fieldControl, manufacturerId, imageType, fileVersion, fileOffset, maxDataSize,     \
-                                                requestNodeAddress)                                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_IMAGE_BLOCK_REQUEST_COMMAND_ID, "uuuuuuu", fieldControl, manufacturerId, imageType,          \
-                                  fileVersion, fileOffset, maxDataSize, requestNodeAddress);
-
-/** @brief Command description for ImagePageRequest
- *
- * Command: ImagePageRequest
- * @param fieldControl INT8U
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param fileVersion INT32U
- * @param fileOffset INT32U
- * @param maxDataSize INT8U
- * @param pageSize INT16U
- * @param responseSpacing INT16U
- * @param requestNodeAddress IEEE_ADDRESS
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterImagePageRequest(fieldControl, manufacturerId, imageType, fileVersion, fileOffset, maxDataSize,      \
-                                               pageSize, responseSpacing, requestNodeAddress)                                      \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_IMAGE_PAGE_REQUEST_COMMAND_ID, "uuuuuuuuu", fieldControl, manufacturerId, imageType,         \
-                                  fileVersion, fileOffset, maxDataSize, pageSize, responseSpacing, requestNodeAddress);
-
-/** @brief Command description for ImageBlockResponse
- *
- * Command: ImageBlockResponse
- * @param status Status
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param fileVersion INT32U
- * @param fileOffset INT32U
- * @param dataSize INT8U
- * @param imageData INT8U []
- * @param imageDataLen int
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterImageBlockResponse(status, manufacturerId, imageType, fileVersion, fileOffset, dataSize, imageData,  \
-                                                 imageDataLen)                                                                     \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_IMAGE_BLOCK_RESPONSE_COMMAND_ID, "uuuuuub", status, manufacturerId, imageType, fileVersion,  \
-                                  fileOffset, dataSize, imageData, imageDataLen);
-
-/** @brief Command description for UpgradeEndRequest
- *
- * Command: UpgradeEndRequest
- * @param status Status
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param fileVersion INT32U
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterUpgradeEndRequest(status, manufacturerId, imageType, fileVersion)                                    \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_UPGRADE_END_REQUEST_COMMAND_ID, "uuuu", status, manufacturerId, imageType, fileVersion);
-
-/** @brief Command description for UpgradeEndResponse
- *
- * Command: UpgradeEndResponse
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param fileVersion INT32U
- * @param currentTime UTC_TIME
- * @param upgradeTime UTC_TIME
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterUpgradeEndResponse(manufacturerId, imageType, fileVersion, currentTime, upgradeTime)                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_UPGRADE_END_RESPONSE_COMMAND_ID, "uuuuu", manufacturerId, imageType, fileVersion,            \
-                                  currentTime, upgradeTime);
-
-/** @brief Command description for QuerySpecificFileRequest
- *
- * Command: QuerySpecificFileRequest
- * @param requestNodeAddress IEEE_ADDRESS
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param fileVersion INT32U
- * @param currentZigbeeStackVersion INT16U
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterQuerySpecificFileRequest(requestNodeAddress, manufacturerId, imageType, fileVersion,                 \
-                                                       currentZigbeeStackVersion)                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_QUERY_SPECIFIC_FILE_REQUEST_COMMAND_ID, "uuuuu", requestNodeAddress, manufacturerId,         \
-                                  imageType, fileVersion, currentZigbeeStackVersion);
-
-/** @brief Command description for QuerySpecificFileResponse
- *
- * Command: QuerySpecificFileResponse
- * @param status Status
- * @param manufacturerId INT16U
- * @param imageType INT16U
- * @param fileVersion INT32U
- * @param imageSize INT32U
- */
-#define emberAfFillCommandOver                                                                                                     \
-    the Air BootloadingClusterQuerySpecificFileResponse(status, manufacturerId, imageType, fileVersion, imageSize)                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_QUERY_SPECIFIC_FILE_RESPONSE_COMMAND_ID, "uuuuu", status, manufacturerId, imageType,         \
-                                  fileVersion, imageSize);
-
 /** @brief Command description for PowerProfileRequest
  *
  * Command: PowerProfileRequest
@@ -2160,6 +1299,869 @@
  * @param price INT32U
  * @param priceTrailingDigit INT8U
  */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterGetOverallSchedulePriceResponse(price, priceTrailingDigit)                                                       \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_OVERALL_SCHEDULE_PRICE_RESPONSE_COMMAND_ID, "uu", price, priceTrailingDigit);
+
+/** @brief Command description for EnergyPhasesScheduleNotification
+ *
+ * Command: EnergyPhasesScheduleNotification
+ * @param powerProfileId INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleNotification(powerProfileId)                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENERGY_PHASES_SCHEDULE_NOTIFICATION_COMMAND_ID, "u", powerProfileId);
+
+/** @brief Command description for PowerProfilesStateNotification
+ *
+ * Command: PowerProfilesStateNotification
+ * @param powerProfileCount INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterPowerProfilesStateNotification(powerProfileCount)                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_POWER_PROFILES_STATE_NOTIFICATION_COMMAND_ID, "u", powerProfileCount);
+
+/** @brief Command description for EnergyPhasesScheduleNotification
+ *
+ * Command: EnergyPhasesScheduleNotification
+ * @param numOfScheduledPhases INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleNotification(numOfScheduledPhases)                                                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENERGY_PHASES_SCHEDULE_NOTIFICATION_COMMAND_ID, "u", numOfScheduledPhases);
+
+/** @brief Command description for PowerProfilesStateNotification
+ *
+ * Command: PowerProfilesStateNotification
+ * @param powerProfileRecords PowerProfileRecord []
+ * @param powerProfileRecordsLen int
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterPowerProfilesStateNotification(powerProfileRecords, powerProfileRecordsLen) emberAfFillExternalBuffer(           \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_POWER_PROFILES_STATE_NOTIFICATION_COMMAND_ID, "b", powerProfileRecords, powerProfileRecordsLen);
+
+/** @brief Command description for EnergyPhasesScheduleNotification
+ *
+ * Command: EnergyPhasesScheduleNotification
+ * @param scheduledPhases ScheduledPhase []
+ * @param scheduledPhasesLen int
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleNotification(scheduledPhases, scheduledPhasesLen)                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENERGY_PHASES_SCHEDULE_NOTIFICATION_COMMAND_ID, "b", scheduledPhases, scheduledPhasesLen);
+
+/** @brief Command description for GetOverallSchedulePrice
+ *
+ * Command: GetOverallSchedulePrice
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterGetOverallSchedulePrice() emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_GET_OVERALL_SCHEDULE_PRICE_COMMAND_ID, "", );
+
+/** @brief Command description for EnergyPhasesScheduleResponse
+ *
+ * Command: EnergyPhasesScheduleResponse
+ * @param powerProfileId INT8U
+ * @param numOfScheduledPhases INT8U
+ * @param scheduledPhases ScheduledPhase []
+ * @param scheduledPhasesLen int
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleResponse(powerProfileId, numOfScheduledPhases, scheduledPhases, scheduledPhasesLen)          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENERGY_PHASES_SCHEDULE_RESPONSE_COMMAND_ID, "uub", powerProfileId, numOfScheduledPhases,     \
+                                  scheduledPhases, scheduledPhasesLen);
+
+/** @brief Command description for PowerProfileScheduleConstraintsRequest
+ *
+ * Command: PowerProfileScheduleConstraintsRequest
+ * @param powerProfileId INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterPowerProfileScheduleConstraintsRequest(powerProfileId)                                                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_POWER_PROFILE_SCHEDULE_CONSTRAINTS_REQUEST_COMMAND_ID, "u", powerProfileId);
+
+/** @brief Command description for EnergyPhasesScheduleRequest
+ *
+ * Command: EnergyPhasesScheduleRequest
+ * @param powerProfileId INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleRequest(powerProfileId)                                                                      \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENERGY_PHASES_SCHEDULE_REQUEST_COMMAND_ID, "u", powerProfileId);
+
+/** @brief Command description for EnergyPhasesScheduleStateRequest
+ *
+ * Command: EnergyPhasesScheduleStateRequest
+ * @param powerProfileId INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleStateRequest(powerProfileId)                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENERGY_PHASES_SCHEDULE_STATE_REQUEST_COMMAND_ID, "u", powerProfileId);
+
+/** @brief Command description for EnergyPhasesScheduleStateResponse
+ *
+ * Command: EnergyPhasesScheduleStateResponse
+ * @param powerProfileId INT8U
+ * @param numOfScheduledPhases INT8U
+ * @param scheduledPhases ScheduledPhase []
+ * @param scheduledPhasesLen int
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleStateResponse(powerProfileId, numOfScheduledPhases, scheduledPhases, scheduledPhasesLen)     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENERGY_PHASES_SCHEDULE_STATE_RESPONSE_COMMAND_ID, "uub", powerProfileId,                     \
+                                  numOfScheduledPhases, scheduledPhases, scheduledPhasesLen);
+
+/** @brief Command description for GetPowerProfilePriceExtendedResponse
+ *
+ * Command: GetPowerProfilePriceExtendedResponse
+ * @param powerProfileId INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterGetPowerProfilePriceExtendedResponse(powerProfileId)                                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_POWER_PROFILE_PRICE_EXTENDED_RESPONSE_COMMAND_ID, "u", powerProfileId);
+
+/** @brief Command description for EnergyPhasesScheduleStateNotification
+ *
+ * Command: EnergyPhasesScheduleStateNotification
+ * @param powerProfileId INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleStateNotification(powerProfileId)                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENERGY_PHASES_SCHEDULE_STATE_NOTIFICATION_COMMAND_ID, "u", powerProfileId);
+
+/** @brief Command description for GetPowerProfilePriceExtendedResponse
+ *
+ * Command: GetPowerProfilePriceExtendedResponse
+ * @param currency INT16U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterGetPowerProfilePriceExtendedResponse(currency)                                                                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_POWER_PROFILE_PRICE_EXTENDED_RESPONSE_COMMAND_ID, "u", currency);
+
+/** @brief Command description for EnergyPhasesScheduleStateNotification
+ *
+ * Command: EnergyPhasesScheduleStateNotification
+ * @param numOfScheduledPhases INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleStateNotification(numOfScheduledPhases)                                                      \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENERGY_PHASES_SCHEDULE_STATE_NOTIFICATION_COMMAND_ID, "u", numOfScheduledPhases);
+
+/** @brief Command description for GetPowerProfilePriceExtendedResponse
+ *
+ * Command: GetPowerProfilePriceExtendedResponse
+ * @param price INT32U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterGetPowerProfilePriceExtendedResponse(price)                                                                      \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_POWER_PROFILE_PRICE_EXTENDED_RESPONSE_COMMAND_ID, "u", price);
+
+/** @brief Command description for EnergyPhasesScheduleStateNotification
+ *
+ * Command: EnergyPhasesScheduleStateNotification
+ * @param scheduledPhases ScheduledPhase []
+ * @param scheduledPhasesLen int
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterEnergyPhasesScheduleStateNotification(scheduledPhases, scheduledPhasesLen) emberAfFillExternalBuffer(            \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_ENERGY_PHASES_SCHEDULE_STATE_NOTIFICATION_COMMAND_ID, "b", scheduledPhases, scheduledPhasesLen);
+
+/** @brief Command description for GetPowerProfilePriceExtendedResponse
+ *
+ * Command: GetPowerProfilePriceExtendedResponse
+ * @param priceTrailingDigit INT8U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterGetPowerProfilePriceExtendedResponse(priceTrailingDigit)                                                         \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_POWER_PROFILE_PRICE_EXTENDED_RESPONSE_COMMAND_ID, "u", priceTrailingDigit);
+
+/** @brief Command description for PowerProfileScheduleConstraintsNotification
+ *
+ * Command: PowerProfileScheduleConstraintsNotification
+ * @param powerProfileId INT8U
+ * @param startAfter INT16U
+ * @param stopBefore INT16U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterPowerProfileScheduleConstraintsNotification(powerProfileId, startAfter, stopBefore) emberAfFillExternalBuffer(   \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_POWER_PROFILE_SCHEDULE_CONSTRAINTS_NOTIFICATION_COMMAND_ID, "uuu", powerProfileId, startAfter, stopBefore);
+
+/** @brief Command description for PowerProfileScheduleConstraintsResponse
+ *
+ * Command: PowerProfileScheduleConstraintsResponse
+ * @param powerProfileId INT8U
+ * @param startAfter INT16U
+ * @param stopBefore INT16U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterPowerProfileScheduleConstraintsResponse(powerProfileId, startAfter, stopBefore) emberAfFillExternalBuffer(       \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_POWER_PROFILE_SCHEDULE_CONSTRAINTS_RESPONSE_COMMAND_ID, "uuu", powerProfileId, startAfter, stopBefore);
+
+/** @brief Command description for GetPowerProfilePriceExtended
+ *
+ * Command: GetPowerProfilePriceExtended
+ * @param options BITMAP8
+ * @param powerProfileId INT8U
+ * @param powerProfileStartTime INT16U
+ */
+#define emberAfFillCommandPower                                                                                                    \
+    ProfileClusterGetPowerProfilePriceExtended(options, powerProfileId, powerProfileStartTime) emberAfFillExternalBuffer(          \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_GET_POWER_PROFILE_PRICE_EXTENDED_COMMAND_ID, "uuu", options, powerProfileId, powerProfileStartTime);
+
+/** @brief Command description for ExecutionOfACommand
+ *
+ * Command: ExecutionOfACommand
+ * @param commandId CommandIdentification
+ */
+#define emberAfFillCommandAppliance                                                                                                \
+    ControlClusterExecutionOfACommand(commandId) emberAfFillExternalBuffer(mask,                                                   \
+                                                                                                                                   \
+                                                                           ZCL_EXECUTION_OF_A_COMMAND_COMMAND_ID, "u", commandId);
+
+/** @brief Command description for SignalStateResponse
+ *
+ * Command: SignalStateResponse
+ * @param applianceStatus ApplianceStatus
+ * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2
+ * @param applianceStatus2 INT24U
+ */
+#define emberAfFillCommandAppliance                                                                                                \
+    ControlClusterSignalStateResponse(applianceStatus, remoteEnableFlagsAndDeviceStatus2, applianceStatus2)                        \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SIGNAL_STATE_RESPONSE_COMMAND_ID, "uuu", applianceStatus, remoteEnableFlagsAndDeviceStatus2, \
+                                  applianceStatus2);
+
+/** @brief Command description for SignalState
+ *
+ * Command: SignalState
+ */
+#define emberAfFillCommandAppliance                                                                                                \
+    ControlClusterSignalState() emberAfFillExternalBuffer(mask,                                                                    \
+                                                                                                                                   \
+                                                          ZCL_SIGNAL_STATE_COMMAND_ID, "", );
+
+/** @brief Command description for SignalStateNotification
+ *
+ * Command: SignalStateNotification
+ * @param applianceStatus ApplianceStatus
+ * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2
+ * @param applianceStatus2 INT24U
+ */
+#define emberAfFillCommandAppliance                                                                                                \
+    ControlClusterSignalStateNotification(applianceStatus, remoteEnableFlagsAndDeviceStatus2, applianceStatus2)                    \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SIGNAL_STATE_NOTIFICATION_COMMAND_ID, "uuu", applianceStatus,                                \
+                                  remoteEnableFlagsAndDeviceStatus2, applianceStatus2);
+
+/** @brief Command description for WriteFunctions
+ *
+ * Command: WriteFunctions
+ * @param functionId INT16U
+ * @param functionDataType ENUM8
+ * @param functionData INT8U []
+ * @param functionDataLen int
+ */
+#define emberAfFillCommandAppliance                                                                                                \
+    ControlClusterWriteFunctions(functionId, functionDataType, functionData, functionDataLen) emberAfFillExternalBuffer(           \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_WRITE_FUNCTIONS_COMMAND_ID, "uub", functionId, functionDataType, functionData, functionDataLen);
+
+/** @brief Command description for OverloadPauseResume
+ *
+ * Command: OverloadPauseResume
+ */
+#define emberAfFillCommandAppliance                                                                                                \
+    ControlClusterOverloadPauseResume() emberAfFillExternalBuffer(mask,                                                            \
+                                                                                                                                   \
+                                                                  ZCL_OVERLOAD_PAUSE_RESUME_COMMAND_ID, "", );
+
+/** @brief Command description for OverloadPause
+ *
+ * Command: OverloadPause
+ */
+#define emberAfFillCommandAppliance                                                                                                \
+    ControlClusterOverloadPause() emberAfFillExternalBuffer(mask,                                                                  \
+                                                                                                                                   \
+                                                            ZCL_OVERLOAD_PAUSE_COMMAND_ID, "", );
+
+/** @brief Command description for OverloadWarning
+ *
+ * Command: OverloadWarning
+ * @param warningEvent WarningEvent
+ */
+#define emberAfFillCommandAppliance                                                                                                \
+    ControlClusterOverloadWarning(warningEvent) emberAfFillExternalBuffer(mask,                                                    \
+                                                                                                                                   \
+                                                                          ZCL_OVERLOAD_WARNING_COMMAND_ID, "u", warningEvent);
+
+/** @brief Command description for CheckIn
+ *
+ * Command: CheckIn
+ */
+#define emberAfFillCommandPoll                                                                                                     \
+    ControlClusterCheckIn() emberAfFillExternalBuffer(mask,                                                                        \
+                                                                                                                                   \
+                                                      ZCL_CHECK_IN_COMMAND_ID, "", );
+
+/** @brief Command description for CheckInResponse
+ *
+ * Command: CheckInResponse
+ * @param startFastPolling BOOLEAN
+ * @param fastPollTimeout INT16U
+ */
+#define emberAfFillCommandPoll                                                                                                     \
+    ControlClusterCheckInResponse(startFastPolling, fastPollTimeout)                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CHECK_IN_RESPONSE_COMMAND_ID, "uu", startFastPolling, fastPollTimeout);
+
+/** @brief Command description for FastPollStop
+ *
+ * Command: FastPollStop
+ */
+#define emberAfFillCommandPoll                                                                                                     \
+    ControlClusterFastPollStop() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_FAST_POLL_STOP_COMMAND_ID, "", );
+
+/** @brief Command description for SetLongPollInterval
+ *
+ * Command: SetLongPollInterval
+ * @param newLongPollInterval INT32U
+ */
+#define emberAfFillCommandPoll                                                                                                     \
+    ControlClusterSetLongPollInterval(newLongPollInterval)                                                                         \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_LONG_POLL_INTERVAL_COMMAND_ID, "u", newLongPollInterval);
+
+/** @brief Command description for SetShortPollInterval
+ *
+ * Command: SetShortPollInterval
+ * @param newShortPollInterval INT16U
+ */
+#define emberAfFillCommandPoll                                                                                                     \
+    ControlClusterSetShortPollInterval(newShortPollInterval)                                                                       \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_SHORT_POLL_INTERVAL_COMMAND_ID, "u", newShortPollInterval);
+
+/** @brief Command description for StartUp
+ *
+ * Command: StartUp
+ */
+#define emberAfFillCommandBasicClusterStartUp()                                                                                    \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_START_UP_COMMAND_ID, "", );
+
+/** @brief Command description for MfgSpecificPing
+ *
+ * Command: MfgSpecificPing
+ */
+#define emberAfFillCommandBasicClusterMfgSpecificPing()                                                                            \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_MFG_SPECIFIC_PING_COMMAND_ID, "", );
+
+/** @brief Command description for ShutDown
+ *
+ * Command: ShutDown
+ */
+#define emberAfFillCommandBasicClusterShutDown()                                                                                   \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_SHUT_DOWN_COMMAND_ID, "", );
+
+/** @brief Command description for Leave
+ *
+ * Command: Leave
+ */
+#define emberAfFillCommandBasicClusterLeave()                                                                                      \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_LEAVE_COMMAND_ID, "", );
+
+/** @brief Command description for QueryImage
+ *
+ * Command: QueryImage
+ * @param vendorId INT16U
+ * @param productId INT16U
+ * @param imageType INT16U
+ * @param hardwareVersion INT16U
+ * @param currentVersion INT32U
+ * @param protocolsSupported OTADownloadProtocol []
+ * @param protocolsSupportedLen int
+ * @param location CHAR_STRING
+ * @param clientCanConsent BOOLEAN
+ * @param metadataForServer OCTET_STRING
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,   \
+                                            protocolsSupportedLen, location, clientCanConsent, metadataForServer)                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuubuuu", vendorId, productId, imageType, hardwareVersion,        \
+                                  currentVersion, protocolsSupported, protocolsSupportedLen, location, clientCanConsent,           \
+                                  metadataForServer);
+
+/** @brief Command description for ApplyUpdateRequest
+ *
+ * Command: ApplyUpdateRequest
+ * @param updateToken OCTET_STRING
+ * @param newVersion INT32U
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterApplyUpdateRequest(updateToken, newVersion)                                                       \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID, "uu", updateToken, newVersion);
+
+/** @brief Command description for NotifyUpdateApplied
+ *
+ * Command: NotifyUpdateApplied
+ * @param updateToken OCTET_STRING
+ * @param currentVersion INT32U
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterNotifyUpdateApplied(updateToken, currentVersion)                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID, "uu", updateToken, currentVersion);
+
+/** @brief Command description for QueryImageResponse
+ *
+ * Command: QueryImageResponse
+ * @param status OTAQueryStatus
+ * @param delayedActionTime INT32U
+ * @param imageURI CHAR_STRING
+ * @param softwareVersion INT32U
+ * @param updateToken OCTET_STRING
+ * @param userConsentNeeded BOOLEAN
+ * @param metadataForClient OCTET_STRING
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterQueryImageResponse(status, delayedActionTime, imageURI, softwareVersion, updateToken,             \
+                                                    userConsentNeeded, metadataForClient)                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID, "uuuuuuu", status, delayedActionTime, imageURI,             \
+                                  softwareVersion, updateToken, userConsentNeeded, metadataForClient);
+
+/** @brief Command description for ApplyUpdateRequestResponse
+ *
+ * Command: ApplyUpdateRequestResponse
+ * @param action OTAApplyUpdateAction
+ * @param delayedActionTime INT32U
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterApplyUpdateRequestResponse(action, delayedActionTime)                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_APPLY_UPDATE_REQUEST_RESPONSE_COMMAND_ID, "uu", action, delayedActionTime);
+
+/** @brief Command description for AnnounceOtaServer
+ *
+ * Command: AnnounceOtaServer
+ * @param serverLocation OCTET_STRING
+ * @param vendorId INT16U
+ * @param announcementReason OTAAnnouncementReason
+ * @param metadataForNode OCTET_STRING
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ClientClusterAnnounceOtaServer(serverLocation, vendorId, announcementReason, metadataForNode)                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ANNOUNCE_OTA_SERVER_COMMAND_ID, "uuuu", serverLocation, vendorId, announcementReason,        \
+                                  metadataForNode);
+
+/** @brief Command description for ArmFailSafe
+ *
+ * Command: ArmFailSafe
+ * @param expiryLengthSeconds INT16U
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterArmFailSafe(expiryLengthSeconds, breadcrumb, timeoutMs)                                                    \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ARM_FAIL_SAFE_COMMAND_ID, "uuu", expiryLengthSeconds, breadcrumb, timeoutMs);
+
+/** @brief Command description for ArmFailSafeResponse
+ *
+ * Command: ArmFailSafeResponse
+ * @param errorCode GeneralCommissioningError
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterArmFailSafeResponse(errorCode, debugText)                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ARM_FAIL_SAFE_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for SetRegulatoryConfig
+ *
+ * Command: SetRegulatoryConfig
+ * @param location RegulatoryLocationType
+ * @param countryCode CHAR_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterSetRegulatoryConfig(location, countryCode, breadcrumb, timeoutMs)                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_REGULATORY_CONFIG_COMMAND_ID, "uuuu", location, countryCode, breadcrumb, timeoutMs);
+
+/** @brief Command description for SetRegulatoryConfigResponse
+ *
+ * Command: SetRegulatoryConfigResponse
+ * @param errorCode GeneralCommissioningError
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterSetRegulatoryConfigResponse(errorCode, debugText)                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_REGULATORY_CONFIG_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for CommissioningComplete
+ *
+ * Command: CommissioningComplete
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterCommissioningComplete() emberAfFillExternalBuffer(mask,                                                    \
+                                                                                                                                   \
+                                                                          ZCL_COMMISSIONING_COMPLETE_COMMAND_ID, "", );
+
+/** @brief Command description for CommissioningCompleteResponse
+ *
+ * Command: CommissioningCompleteResponse
+ * @param errorCode GeneralCommissioningError
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandGeneral                                                                                                  \
+    CommissioningClusterCommissioningCompleteResponse(errorCode, debugText)                                                        \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_COMMISSIONING_COMPLETE_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for ScanNetworks
+ *
+ * Command: ScanNetworks
+ * @param ssid OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterScanNetworks(ssid, breadcrumb, timeoutMs)                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SCAN_NETWORKS_COMMAND_ID, "uuu", ssid, breadcrumb, timeoutMs);
+
+/** @brief Command description for ScanNetworksResponse
+ *
+ * Command: ScanNetworksResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ * @param wifiScanResults WiFiInterfaceScanResult []
+ * @param wifiScanResultsLen int
+ * @param threadScanResults ThreadInterfaceScanResult []
+ * @param threadScanResultsLen int
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterScanNetworksResponse(errorCode, debugText, wifiScanResults, wifiScanResultsLen, threadScanResults,         \
+                                             threadScanResultsLen)                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SCAN_NETWORKS_RESPONSE_COMMAND_ID, "uubb", errorCode, debugText, wifiScanResults,            \
+                                  wifiScanResultsLen, threadScanResults, threadScanResultsLen);
+
+/** @brief Command description for AddWiFiNetwork
+ *
+ * Command: AddWiFiNetwork
+ * @param ssid OCTET_STRING
+ * @param credentials OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterAddWiFiNetwork(ssid, credentials, breadcrumb, timeoutMs)                                                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ADD_WI_FI_NETWORK_COMMAND_ID, "uuuu", ssid, credentials, breadcrumb, timeoutMs);
+
+/** @brief Command description for AddWiFiNetworkResponse
+ *
+ * Command: AddWiFiNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterAddWiFiNetworkResponse(errorCode, debugText)                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ADD_WI_FI_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for UpdateWiFiNetwork
+ *
+ * Command: UpdateWiFiNetwork
+ * @param ssid OCTET_STRING
+ * @param credentials OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterUpdateWiFiNetwork(ssid, credentials, breadcrumb, timeoutMs)                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID, "uuuu", ssid, credentials, breadcrumb, timeoutMs);
+
+/** @brief Command description for UpdateWiFiNetworkResponse
+ *
+ * Command: UpdateWiFiNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterUpdateWiFiNetworkResponse(errorCode, debugText)                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_UPDATE_WI_FI_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for AddThreadNetwork
+ *
+ * Command: AddThreadNetwork
+ * @param operationalDataset OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterAddThreadNetwork(operationalDataset, breadcrumb, timeoutMs)                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ADD_THREAD_NETWORK_COMMAND_ID, "uuu", operationalDataset, breadcrumb, timeoutMs);
+
+/** @brief Command description for AddThreadNetworkResponse
+ *
+ * Command: AddThreadNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterAddThreadNetworkResponse(errorCode, debugText)                                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ADD_THREAD_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for UpdateThreadNetwork
+ *
+ * Command: UpdateThreadNetwork
+ * @param operationalDataset OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterUpdateThreadNetwork(operationalDataset, breadcrumb, timeoutMs)                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID, "uuu", operationalDataset, breadcrumb, timeoutMs);
+
+/** @brief Command description for UpdateThreadNetworkResponse
+ *
+ * Command: UpdateThreadNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterUpdateThreadNetworkResponse(errorCode, debugText)                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_UPDATE_THREAD_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for RemoveNetwork
+ *
+ * Command: RemoveNetwork
+ * @param NetworkID OCTET_STRING
+ * @param Breadcrumb INT64U
+ * @param TimeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterRemoveNetwork(NetworkID, Breadcrumb, TimeoutMs)                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_REMOVE_NETWORK_COMMAND_ID, "uuu", NetworkID, Breadcrumb, TimeoutMs);
+
+/** @brief Command description for RemoveNetworkResponse
+ *
+ * Command: RemoveNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterRemoveNetworkResponse(errorCode, debugText)                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_REMOVE_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for EnableNetwork
+ *
+ * Command: EnableNetwork
+ * @param networkID OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterEnableNetwork(networkID, breadcrumb, timeoutMs)                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENABLE_NETWORK_COMMAND_ID, "uuu", networkID, breadcrumb, timeoutMs);
+
+/** @brief Command description for EnableNetworkResponse
+ *
+ * Command: EnableNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterEnableNetworkResponse(errorCode, debugText)                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for DisableNetwork
+ *
+ * Command: DisableNetwork
+ * @param networkID OCTET_STRING
+ * @param breadcrumb INT64U
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterDisableNetwork(networkID, breadcrumb, timeoutMs)                                                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_DISABLE_NETWORK_COMMAND_ID, "uuu", networkID, breadcrumb, timeoutMs);
+
+/** @brief Command description for DisableNetworkResponse
+ *
+ * Command: DisableNetworkResponse
+ * @param errorCode INT8U
+ * @param debugText CHAR_STRING
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterDisableNetworkResponse(errorCode, debugText)                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
+
+/** @brief Command description for GetLastNetworkCommissioningResult
+ *
+ * Command: GetLastNetworkCommissioningResult
+ * @param timeoutMs INT32U
+ */
+#define emberAfFillCommandNetwork                                                                                                  \
+    CommissioningClusterGetLastNetworkCommissioningResult(timeoutMs)                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID, "u", timeoutMs);
+
+/** @brief Command description for RetrieveLogsRequest
+ *
+ * Command: RetrieveLogsRequest
+ * @param intent LogsIntent
+ * @param requestedProtocol LogsTransferProtocol
+ * @param transferFileDesignator OCTET_STRING
+ */
+#define emberAfFillCommandDiagnostic                                                                                               \
+    LogsClusterRetrieveLogsRequest(intent, requestedProtocol, transferFileDesignator)                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID, "uuu", intent, requestedProtocol, transferFileDesignator);
+
+/** @brief Command description for RetrieveLogsResponse
+ *
+ * Command: RetrieveLogsResponse
+ * @param status LogsStatus
+ * @param content OCTET_STRING
+ * @param timeStamp UTC_TIME
+ * @param timeSinceBoot INT32U
+ */
+#define emberAfFillCommandDiagnostic                                                                                               \
+    LogsClusterRetrieveLogsResponse(status, content, timeStamp, timeSinceBoot)                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_RETRIEVE_LOGS_RESPONSE_COMMAND_ID, "uuuu", status, content, timeStamp, timeSinceBoot);
+
+/** @brief Command description for ResetWatermarks
+ *
+ * Command: ResetWatermarks
+ */
+#define emberAfFillCommandSoftware                                                                                                 \
+    DiagnosticsClusterResetWatermarks() emberAfFillExternalBuffer(mask,                                                            \
+                                                                                                                                   \
+                                                                  ZCL_RESET_WATERMARKS_COMMAND_ID, "", );
+
+/** @brief Command description for ResetCounts
+ *
+ * Command: ResetCounts
+ */
+#define emberAfFillCommandThread                                                                                                   \
+    Network DiagnosticsClusterResetCounts() emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_RESET_COUNTS_COMMAND_ID, "", );
+
+/** @brief Command description for ResetCounts
+ *
+ * Command: ResetCounts
+ */
+<<<<<<< HEAD
 #define emberAfFillCommandPower                                                                                                    \
     ProfileClusterGetOverallSchedulePriceResponse(price, priceTrailingDigit)                                                       \
         emberAfFillExternalBuffer(mask,                                                                                            \
@@ -10314,1613 +10316,2601 @@
 #define emberAfFillCommandKey                                                                                                      \
     EstablishmentClusterInitiateKeyEstablishmentRequest(keyEstablishmentSuite)                                                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
+=======
+#define emberAfFillCommandWiFi                                                                                                     \
+    Network DiagnosticsClusterResetCounts() emberAfFillExternalBuffer(mask,                                                        \
+>>>>>>> master
                                                                                                                                    \
-                                  ZCL_INITIATE_KEY_ESTABLISHMENT_REQUEST_COMMAND_ID, "u", keyEstablishmentSuite);
+                                                                      ZCL_RESET_COUNTS_COMMAND_ID, "", );
 
-/** @brief Command description for InitiateKeyEstablishmentResponse
+/** @brief Command description for ResetCounts
  *
- * Command: InitiateKeyEstablishmentResponse
- * @param requestedKeyEstablishmentSuite BITMAP16
+ * Command: ResetCounts
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterInitiateKeyEstablishmentResponse(requestedKeyEstablishmentSuite)                                           \
+#define emberAfFillCommandEthernet                                                                                                 \
+    Network DiagnosticsClusterResetCounts() emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_RESET_COUNTS_COMMAND_ID, "", );
+
+/** @brief Command description for StartUp
+ *
+ * Command: StartUp
+ */
+#define emberAfFillCommandBridged                                                                                                  \
+    Device BasicClusterStartUp() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_START_UP_COMMAND_ID, "", );
+
+/** @brief Command description for ShutDown
+ *
+ * Command: ShutDown
+ */
+#define emberAfFillCommandBridged                                                                                                  \
+    Device BasicClusterShutDown() emberAfFillExternalBuffer(mask,                                                                  \
+                                                                                                                                   \
+                                                            ZCL_SHUT_DOWN_COMMAND_ID, "", );
+
+/** @brief Command description for Leave
+ *
+ * Command: Leave
+ */
+#define emberAfFillCommandBridged                                                                                                  \
+    Device BasicClusterLeave() emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_LEAVE_COMMAND_ID, "", );
+
+/** @brief Command description for ReachableChanged
+ *
+ * Command: ReachableChanged
+ */
+#define emberAfFillCommandBridged                                                                                                  \
+    Device BasicClusterReachableChanged() emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_REACHABLE_CHANGED_COMMAND_ID, "", );
+
+/** @brief Command description for SetFabric
+ *
+ * Command: SetFabric
+ * @param VendorId INT16U
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterSetFabric(VendorId) emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_SET_FABRIC_COMMAND_ID, "u", VendorId);
+
+/** @brief Command description for SetFabricResponse
+ *
+ * Command: SetFabricResponse
+ * @param FabricId FABRIC_ID
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterSetFabricResponse(FabricId) emberAfFillExternalBuffer(mask,                                                  \
+                                                                                                                                   \
+                                                                            ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "u", FabricId);
+
+/** @brief Command description for OpCSRRequest
+ *
+ * Command: OpCSRRequest
+ * @param CSRNonce OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterOpCSRRequest(CSRNonce) emberAfFillExternalBuffer(mask,                                                       \
+                                                                                                                                   \
+                                                                       ZCL_OP_CSR_REQUEST_COMMAND_ID, "u", CSRNonce);
+
+/** @brief Command description for OpCSRResponse
+ *
+ * Command: OpCSRResponse
+ * @param CSR OCTET_STRING
+ * @param CSRNonce OCTET_STRING
+ * @param VendorReserved1 OCTET_STRING
+ * @param VendorReserved2 OCTET_STRING
+ * @param VendorReserved3 OCTET_STRING
+ * @param Signature OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterOpCSRResponse(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature)                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_INITIATE_KEY_ESTABLISHMENT_RESPONSE_COMMAND_ID, "u", requestedKeyEstablishmentSuite);
+                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uuuuuu", CSR, CSRNonce, VendorReserved1, VendorReserved2,       \
+                                  VendorReserved3, Signature);
 
-/** @brief Command description for InitiateKeyEstablishmentRequest
+/** @brief Command description for AddOpCert
  *
- * Command: InitiateKeyEstablishmentRequest
- * @param ephemeralDataGenerateTime INT8U
+ * Command: AddOpCert
+ * @param NOCArray OCTET_STRING
+ * @param IPKValue OCTET_STRING
+ * @param CaseAdminNode NODE_ID
+ * @param AdminVendorId INT16U
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterInitiateKeyEstablishmentRequest(ephemeralDataGenerateTime)                                                 \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAddOpCert(NOCArray, IPKValue, CaseAdminNode, AdminVendorId)                                                  \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_INITIATE_KEY_ESTABLISHMENT_REQUEST_COMMAND_ID, "u", ephemeralDataGenerateTime);
+                                  ZCL_ADD_OP_CERT_COMMAND_ID, "uuuu", NOCArray, IPKValue, CaseAdminNode, AdminVendorId);
 
-/** @brief Command description for InitiateKeyEstablishmentResponse
+/** @brief Command description for OpCertResponse
  *
- * Command: InitiateKeyEstablishmentResponse
- * @param ephemeralDataGenerateTime INT8U
+ * Command: OpCertResponse
+ * @param StatusCode INT8U
+ * @param FabricIndex INT64U
+ * @param DebugText CHAR_STRING
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterInitiateKeyEstablishmentResponse(ephemeralDataGenerateTime)                                                \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterOpCertResponse(StatusCode, FabricIndex, DebugText)                                                           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_INITIATE_KEY_ESTABLISHMENT_RESPONSE_COMMAND_ID, "u", ephemeralDataGenerateTime);
+                                  ZCL_OP_CERT_RESPONSE_COMMAND_ID, "uuu", StatusCode, FabricIndex, DebugText);
 
-/** @brief Command description for InitiateKeyEstablishmentRequest
+/** @brief Command description for UpdateFabricLabel
  *
- * Command: InitiateKeyEstablishmentRequest
- * @param confirmKeyGenerateTime INT8U
+ * Command: UpdateFabricLabel
+ * @param Label CHAR_STRING
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterInitiateKeyEstablishmentRequest(confirmKeyGenerateTime)                                                    \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterUpdateFabricLabel(Label) emberAfFillExternalBuffer(mask,                                                     \
+                                                                                                                                   \
+                                                                         ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID, "u", Label);
+
+/** @brief Command description for RemoveFabric
+ *
+ * Command: RemoveFabric
+ * @param FabricId FABRIC_ID
+ * @param NodeId NODE_ID
+ * @param VendorId INT16U
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveFabric(FabricId, NodeId, VendorId)                                                                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_INITIATE_KEY_ESTABLISHMENT_REQUEST_COMMAND_ID, "u", confirmKeyGenerateTime);
+                                  ZCL_REMOVE_FABRIC_COMMAND_ID, "uuu", FabricId, NodeId, VendorId);
 
-/** @brief Command description for InitiateKeyEstablishmentResponse
+/** @brief Command description for RemoveAllFabrics
  *
- * Command: InitiateKeyEstablishmentResponse
- * @param confirmKeyGenerateTime INT8U
+ * Command: RemoveAllFabrics
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterInitiateKeyEstablishmentResponse(confirmKeyGenerateTime)                                                   \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveAllFabrics() emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_REMOVE_ALL_FABRICS_COMMAND_ID, "", );
+
+/** @brief Command description for AddTrustedRootCertificate
+ *
+ * Command: AddTrustedRootCertificate
+ * @param RootCertificate OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAddTrustedRootCertificate(RootCertificate)                                                                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_INITIATE_KEY_ESTABLISHMENT_RESPONSE_COMMAND_ID, "u", confirmKeyGenerateTime);
+                                  ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", RootCertificate);
 
-/** @brief Command description for InitiateKeyEstablishmentRequest
+/** @brief Command description for RemoveTrustedRootCertificate
  *
- * Command: InitiateKeyEstablishmentRequest
- * @param identity Identity
+ * Command: RemoveTrustedRootCertificate
+ * @param TrustedRootIdentifier OCTET_STRING
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterInitiateKeyEstablishmentRequest(identity)                                                                  \
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveTrustedRootCertificate(TrustedRootIdentifier)                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_INITIATE_KEY_ESTABLISHMENT_REQUEST_COMMAND_ID, "u", identity);
+                                  ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", TrustedRootIdentifier);
 
-/** @brief Command description for InitiateKeyEstablishmentResponse
+/** @brief Command description for LockDoor
  *
- * Command: InitiateKeyEstablishmentResponse
- * @param identity Identity
+ * Command: LockDoor
+ * @param PIN CHAR_STRING
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterInitiateKeyEstablishmentResponse(identity)                                                                 \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterLockDoor(PIN) emberAfFillExternalBuffer(mask,                                                                       \
+                                                                                                                                   \
+                                                       ZCL_LOCK_DOOR_COMMAND_ID, "u", PIN);
+
+/** @brief Command description for LockDoorResponse
+ *
+ * Command: LockDoorResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterLockDoorResponse(status) emberAfFillExternalBuffer(mask,                                                            \
+                                                                                                                                   \
+                                                                  ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for UnlockDoor
+ *
+ * Command: UnlockDoor
+ * @param PIN CHAR_STRING
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterUnlockDoor(PIN) emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_UNLOCK_DOOR_COMMAND_ID, "u", PIN);
+
+/** @brief Command description for UnlockDoorResponse
+ *
+ * Command: UnlockDoorResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterUnlockDoorResponse(status) emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_UNLOCK_DOOR_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for Toggle
+ *
+ * Command: Toggle
+ * @param pin CHAR_STRING
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterToggle(pin) emberAfFillExternalBuffer(mask,                                                                         \
+                                                                                                                                   \
+                                                     ZCL_TOGGLE_COMMAND_ID, "u", pin);
+
+/** @brief Command description for ToggleResponse
+ *
+ * Command: ToggleResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterToggleResponse(status) emberAfFillExternalBuffer(mask,                                                              \
+                                                                                                                                   \
+                                                                ZCL_TOGGLE_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for UnlockWithTimeout
+ *
+ * Command: UnlockWithTimeout
+ * @param timeoutInSeconds INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterUnlockWithTimeout(timeoutInSeconds)                                                                                 \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_INITIATE_KEY_ESTABLISHMENT_RESPONSE_COMMAND_ID, "u", identity);
+                                  ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID, "u", timeoutInSeconds);
 
-/** @brief Command description for EphemeralDataRequest
+/** @brief Command description for UnlockWithTimeoutResponse
  *
- * Command: EphemeralDataRequest
- * @param ephemeralData EphemeralData
+ * Command: UnlockWithTimeoutResponse
+ * @param status INT8U
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterEphemeralDataRequest(ephemeralData)                                                                        \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterUnlockWithTimeoutResponse(status)                                                                                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_EPHEMERAL_DATA_REQUEST_COMMAND_ID, "u", ephemeralData);
+                                  ZCL_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND_ID, "u", status);
 
-/** @brief Command description for EphemeralDataResponse
+/** @brief Command description for UnlockWithTimeout
  *
- * Command: EphemeralDataResponse
- * @param ephemeralData EphemeralData
+ * Command: UnlockWithTimeout
+ * @param pin CHAR_STRING
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterEphemeralDataResponse(ephemeralData)                                                                       \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterUnlockWithTimeout(pin) emberAfFillExternalBuffer(mask,                                                              \
+                                                                                                                                   \
+                                                                ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID, "u", pin);
+
+/** @brief Command description for GetLogRecord
+ *
+ * Command: GetLogRecord
+ * @param logIndex INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetLogRecord(logIndex) emberAfFillExternalBuffer(mask,                                                              \
+                                                                                                                                   \
+                                                                ZCL_GET_LOG_RECORD_COMMAND_ID, "u", logIndex);
+
+/** @brief Command description for GetLogRecordResponse
+ *
+ * Command: GetLogRecordResponse
+ * @param logEntryId INT16U
+ * @param timestamp INT32U
+ * @param eventType ENUM8
+ * @param source INT8U
+ * @param eventIdOrAlarmCode INT8U
+ * @param userId INT16U
+ * @param pin CHAR_STRING
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetLogRecordResponse(logEntryId, timestamp, eventType, source, eventIdOrAlarmCode, userId, pin)                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_EPHEMERAL_DATA_RESPONSE_COMMAND_ID, "u", ephemeralData);
+                                  ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID, "uuuuuuu", logEntryId, timestamp, eventType, source,     \
+                                  eventIdOrAlarmCode, userId, pin);
 
-/** @brief Command description for ConfirmKeyDataRequest
+/** @brief Command description for SetPin
  *
- * Command: ConfirmKeyDataRequest
- * @param secureMessageAuthenticationCode Smac
+ * Command: SetPin
+ * @param userId INT16U
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterConfirmKeyDataRequest(secureMessageAuthenticationCode)                                                     \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetPin(userId) emberAfFillExternalBuffer(mask,                                                                      \
+                                                                                                                                   \
+                                                        ZCL_SET_PIN_COMMAND_ID, "u", userId);
+
+/** @brief Command description for SetPinResponse
+ *
+ * Command: SetPinResponse
+ * @param status DoorLockSetPinOrIdStatus
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetPinResponse(status) emberAfFillExternalBuffer(mask,                                                              \
+                                                                                                                                   \
+                                                                ZCL_SET_PIN_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for SetPin
+ *
+ * Command: SetPin
+ * @param userStatus DoorLockUserStatus
+ * @param userType DoorLockUserType
+ * @param pin CHAR_STRING
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetPin(userStatus, userType, pin)                                                                                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_CONFIRM_KEY_DATA_REQUEST_COMMAND_ID, "u", secureMessageAuthenticationCode);
+                                  ZCL_SET_PIN_COMMAND_ID, "uuu", userStatus, userType, pin);
 
-/** @brief Command description for ConfirmKeyDataResponse
+/** @brief Command description for GetPin
  *
- * Command: ConfirmKeyDataResponse
- * @param secureMessageAuthenticationCode Smac
+ * Command: GetPin
+ * @param userId INT16U
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterConfirmKeyDataResponse(secureMessageAuthenticationCode)                                                    \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetPin(userId) emberAfFillExternalBuffer(mask,                                                                      \
+                                                                                                                                   \
+                                                        ZCL_GET_PIN_COMMAND_ID, "u", userId);
+
+/** @brief Command description for GetPinResponse
+ *
+ * Command: GetPinResponse
+ * @param userId INT16U
+ * @param userStatus DoorLockUserStatus
+ * @param userType DoorLockUserType
+ * @param pin CHAR_STRING
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetPinResponse(userId, userStatus, userType, pin)                                                                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_CONFIRM_KEY_DATA_RESPONSE_COMMAND_ID, "u", secureMessageAuthenticationCode);
+                                  ZCL_GET_PIN_RESPONSE_COMMAND_ID, "uuuu", userId, userStatus, userType, pin);
 
-/** @brief Command description for TerminateKeyEstablishment
+/** @brief Command description for ClearPin
  *
- * Command: TerminateKeyEstablishment
- * @param statusCode AmiKeyEstablishmentStatus
- * @param waitTime INT8U
- * @param keyEstablishmentSuite BITMAP16
+ * Command: ClearPin
+ * @param userId INT16U
  */
-#define emberAfFillCommandKey                                                                                                      \
-    EstablishmentClusterTerminateKeyEstablishment(statusCode, waitTime, keyEstablishmentSuite)                                     \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearPin(userId) emberAfFillExternalBuffer(mask,                                                                    \
+                                                                                                                                   \
+                                                          ZCL_CLEAR_PIN_COMMAND_ID, "u", userId);
+
+/** @brief Command description for ClearPinResponse
+ *
+ * Command: ClearPinResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearPinResponse(status) emberAfFillExternalBuffer(mask,                                                            \
+                                                                                                                                   \
+                                                                  ZCL_CLEAR_PIN_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for ClearAllPins
+ *
+ * Command: ClearAllPins
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearAllPins() emberAfFillExternalBuffer(mask,                                                                      \
+                                                                                                                                   \
+                                                        ZCL_CLEAR_ALL_PINS_COMMAND_ID, "", );
+
+/** @brief Command description for ClearAllPinsResponse
+ *
+ * Command: ClearAllPinsResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearAllPinsResponse(status) emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_CLEAR_ALL_PINS_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for SetUserStatus
+ *
+ * Command: SetUserStatus
+ * @param userId INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetUserStatus(userId) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_SET_USER_STATUS_COMMAND_ID, "u", userId);
+
+/** @brief Command description for SetUserStatusResponse
+ *
+ * Command: SetUserStatusResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetUserStatusResponse(status) emberAfFillExternalBuffer(mask,                                                       \
+                                                                                                                                   \
+                                                                       ZCL_SET_USER_STATUS_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for SetUserStatus
+ *
+ * Command: SetUserStatus
+ * @param userStatus INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetUserStatus(userStatus) emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_SET_USER_STATUS_COMMAND_ID, "u", userStatus);
+
+/** @brief Command description for GetUserStatus
+ *
+ * Command: GetUserStatus
+ * @param userId INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetUserStatus(userId) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_GET_USER_STATUS_COMMAND_ID, "u", userId);
+
+/** @brief Command description for GetUserStatusResponse
+ *
+ * Command: GetUserStatusResponse
+ * @param userId INT16U
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetUserStatusResponse(userId, status)                                                                               \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_TERMINATE_KEY_ESTABLISHMENT_COMMAND_ID, "uuu", statusCode, waitTime, keyEstablishmentSuite);
+                                  ZCL_GET_USER_STATUS_RESPONSE_COMMAND_ID, "uu", userId, status);
 
-/** @brief Command description for RequestInformation
+/** @brief Command description for SetWeekdaySchedule
  *
- * Command: RequestInformation
- * @param inquiryId ENUM8
+ * Command: SetWeekdaySchedule
+ * @param scheduleId INT8U
  */
-#define emberAfFillCommandInformationClusterRequestInformation(inquiryId)                                                          \
-    emberAfFillExternalBuffer(mask,                                                                                                \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetWeekdaySchedule(scheduleId) emberAfFillExternalBuffer(mask,                                                      \
                                                                                                                                    \
-                              ZCL_REQUEST_INFORMATION_COMMAND_ID, "u", inquiryId);
+                                                                        ZCL_SET_WEEKDAY_SCHEDULE_COMMAND_ID, "u", scheduleId);
 
-/** @brief Command description for RequestInformationResponse
+/** @brief Command description for SetWeekdayScheduleResponse
  *
- * Command: RequestInformationResponse
- * @param number INT8U
+ * Command: SetWeekdayScheduleResponse
+ * @param status INT8U
  */
-#define emberAfFillCommandInformationClusterRequestInformationResponse(number)                                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_REQUEST_INFORMATION_RESPONSE_COMMAND_ID, "u", number);
-
-/** @brief Command description for RequestInformation
- *
- * Command: RequestInformation
- * @param dataTypeId BITMAP8
- */
-#define emberAfFillCommandInformationClusterRequestInformation(dataTypeId)                                                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_REQUEST_INFORMATION_COMMAND_ID, "u", dataTypeId);
-
-/** @brief Command description for RequestInformationResponse
- *
- * Command: RequestInformationResponse
- * @param buffer INT8U []
- * @param bufferLen int
- */
-#define emberAfFillCommandInformationClusterRequestInformationResponse(buffer, bufferLen)                                          \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_REQUEST_INFORMATION_RESPONSE_COMMAND_ID, "b", buffer, bufferLen);
-
-/** @brief Command description for RequestInformation
- *
- * Command: RequestInformation
- * @param requestInformationPayload INT8U []
- * @param requestInformationPayloadLen int
- */
-#define emberAfFillCommandInformationClusterRequestInformation(requestInformationPayload, requestInformationPayloadLen)            \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_REQUEST_INFORMATION_COMMAND_ID, "b", requestInformationPayload, requestInformationPayloadLen);
-
-/** @brief Command description for PushInformationResponse
- *
- * Command: PushInformationResponse
- * @param notificationList Notification []
- * @param notificationListLen int
- */
-#define emberAfFillCommandInformationClusterPushInformationResponse(notificationList, notificationListLen)                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_PUSH_INFORMATION_RESPONSE_COMMAND_ID, "b", notificationList, notificationListLen);
-
-/** @brief Command description for PushInformation
- *
- * Command: PushInformation
- * @param contents INT8U []
- * @param contentsLen int
- */
-#define emberAfFillCommandInformationClusterPushInformation(contents, contentsLen)                                                 \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_PUSH_INFORMATION_COMMAND_ID, "b", contents, contentsLen);
-
-/** @brief Command description for SendPreference
- *
- * Command: SendPreference
- * @param preferenceType INT16U
- */
-#define emberAfFillCommandInformationClusterSendPreference(preferenceType)                                                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SEND_PREFERENCE_COMMAND_ID, "u", preferenceType);
-
-/** @brief Command description for SendPreferenceResponse
- *
- * Command: SendPreferenceResponse
- * @param statusFeedbackList Status []
- * @param statusFeedbackListLen int
- */
-#define emberAfFillCommandInformationClusterSendPreferenceResponse(statusFeedbackList, statusFeedbackListLen)                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SEND_PREFERENCE_RESPONSE_COMMAND_ID, "b", statusFeedbackList, statusFeedbackListLen);
-
-/** @brief Command description for SendPreference
- *
- * Command: SendPreference
- * @param preferencePayload INT8U []
- * @param preferencePayloadLen int
- */
-#define emberAfFillCommandInformationClusterSendPreference(preferencePayload, preferencePayloadLen)                                \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SEND_PREFERENCE_COMMAND_ID, "b", preferencePayload, preferencePayloadLen);
-
-/** @brief Command description for ServerRequestPreference
- *
- * Command: ServerRequestPreference
- */
-#define emberAfFillCommandInformationClusterServerRequestPreference()                                                              \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SERVER_REQUEST_PREFERENCE_COMMAND_ID, "", );
-
-/** @brief Command description for RequestPreferenceResponse
- *
- * Command: RequestPreferenceResponse
- * @param statusFeedback Status
- * @param preferenceType INT16U
- * @param preferencePayload INT8U []
- * @param preferencePayloadLen int
- */
-#define emberAfFillCommandInformationClusterRequestPreferenceResponse(statusFeedback, preferenceType, preferencePayload,           \
-                                                                      preferencePayloadLen)                                        \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_REQUEST_PREFERENCE_RESPONSE_COMMAND_ID, "uub", statusFeedback, preferenceType,                   \
-                              preferencePayload, preferencePayloadLen);
-
-/** @brief Command description for Update
- *
- * Command: Update
- * @param accessControl ENUM8
- */
-#define emberAfFillCommandInformationClusterUpdate(accessControl)                                                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_UPDATE_COMMAND_ID, "u", accessControl);
-
-/** @brief Command description for RequestPreferenceConfirmation
- *
- * Command: RequestPreferenceConfirmation
- * @param statusFeedbackList Status []
- * @param statusFeedbackListLen int
- */
-#define emberAfFillCommandInformationClusterRequestPreferenceConfirmation(statusFeedbackList, statusFeedbackListLen)               \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_REQUEST_PREFERENCE_CONFIRMATION_COMMAND_ID, "b", statusFeedbackList, statusFeedbackListLen);
-
-/** @brief Command description for Update
- *
- * Command: Update
- * @param option BITMAP8
- * @param contents INT8U []
- * @param contentsLen int
- */
-#define emberAfFillCommandInformationClusterUpdate(option, contents, contentsLen)                                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_UPDATE_COMMAND_ID, "ub", option, contents, contentsLen);
-
-/** @brief Command description for Delete
- *
- * Command: Delete
- * @param deletionOptions BITMAP8
- */
-#define emberAfFillCommandInformationClusterDelete(deletionOptions)                                                                \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_DELETE_COMMAND_ID, "u", deletionOptions);
-
-/** @brief Command description for UpdateResponse
- *
- * Command: UpdateResponse
- * @param notificationList Notification []
- * @param notificationListLen int
- */
-#define emberAfFillCommandInformationClusterUpdateResponse(notificationList, notificationListLen)                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_UPDATE_RESPONSE_COMMAND_ID, "b", notificationList, notificationListLen);
-
-/** @brief Command description for Delete
- *
- * Command: Delete
- * @param contentIds INT16U []
- * @param contentIdsLen int
- */
-#define emberAfFillCommandInformationClusterDelete(contentIds, contentIdsLen)                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_DELETE_COMMAND_ID, "b", contentIds, contentIdsLen);
-
-/** @brief Command description for ConfigureNodeDescription
- *
- * Command: ConfigureNodeDescription
- * @param description CHAR_STRING
- */
-#define emberAfFillCommandInformationClusterConfigureNodeDescription(description)                                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_CONFIGURE_NODE_DESCRIPTION_COMMAND_ID, "u", description);
-
-/** @brief Command description for DeleteResponse
- *
- * Command: DeleteResponse
- * @param notificationList Notification []
- * @param notificationListLen int
- */
-#define emberAfFillCommandInformationClusterDeleteResponse(notificationList, notificationListLen)                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_DELETE_RESPONSE_COMMAND_ID, "b", notificationList, notificationListLen);
-
-/** @brief Command description for ConfigureDeliveryEnable
- *
- * Command: ConfigureDeliveryEnable
- * @param enable BOOLEAN
- */
-#define emberAfFillCommandInformationClusterConfigureDeliveryEnable(enable)                                                        \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_CONFIGURE_DELIVERY_ENABLE_COMMAND_ID, "u", enable);
-
-/** @brief Command description for ConfigurePushInformationTimer
- *
- * Command: ConfigurePushInformationTimer
- * @param timer INT32U
- */
-#define emberAfFillCommandInformationClusterConfigurePushInformationTimer(timer)                                                   \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_CONFIGURE_PUSH_INFORMATION_TIMER_COMMAND_ID, "u", timer);
-
-/** @brief Command description for ConfigureSetRootId
- *
- * Command: ConfigureSetRootId
- * @param rootId INT16U
- */
-#define emberAfFillCommandInformationClusterConfigureSetRootId(rootId)                                                             \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_CONFIGURE_SET_ROOT_ID_COMMAND_ID, "u", rootId);
-
-/** @brief Command description for ReadFileRequest
- *
- * Command: ReadFileRequest
- * @param fileIndex INT16U
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterReadFileRequest(fileIndex) emberAfFillExternalBuffer(mask,                                                       \
-                                                                                                                                   \
-                                                                       ZCL_READ_FILE_REQUEST_COMMAND_ID, "u", fileIndex);
-
-/** @brief Command description for WriteFileRequest
- *
- * Command: WriteFileRequest
- * @param writeOptions BITMAP8
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterWriteFileRequest(writeOptions) emberAfFillExternalBuffer(mask,                                                   \
-                                                                                                                                   \
-                                                                           ZCL_WRITE_FILE_REQUEST_COMMAND_ID, "u", writeOptions);
-
-/** @brief Command description for ReadFileRequest
- *
- * Command: ReadFileRequest
- * @param fileStartPositionAndRequestedOctetCount INT8U []
- * @param fileStartPositionAndRequestedOctetCountLen int
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterReadFileRequest(fileStartPositionAndRequestedOctetCount, fileStartPositionAndRequestedOctetCountLen)             \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetWeekdayScheduleResponse(status)                                                                                  \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_READ_FILE_REQUEST_COMMAND_ID, "b", fileStartPositionAndRequestedOctetCount,                  \
-                                  fileStartPositionAndRequestedOctetCountLen);
+                                  ZCL_SET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", status);
 
-/** @brief Command description for WriteFileRequest
+/** @brief Command description for SetWeekdaySchedule
  *
- * Command: WriteFileRequest
- * @param fileSize INT8U []
- * @param fileSizeLen int
+ * Command: SetWeekdaySchedule
+ * @param userId INT16U
+ * @param daysMask DoorLockDayOfWeek
+ * @param startHour INT8U
+ * @param startMinute INT8U
+ * @param endHour INT8U
+ * @param endMinute INT8U
  */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterWriteFileRequest(fileSize, fileSizeLen)                                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_WRITE_FILE_REQUEST_COMMAND_ID, "b", fileSize, fileSizeLen);
-
-/** @brief Command description for ReadRecordRequest
- *
- * Command: ReadRecordRequest
- * @param fileIndex INT16U
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterReadRecordRequest(fileIndex) emberAfFillExternalBuffer(mask,                                                     \
-                                                                                                                                   \
-                                                                         ZCL_READ_RECORD_REQUEST_COMMAND_ID, "u", fileIndex);
-
-/** @brief Command description for ModifyFileRequest
- *
- * Command: ModifyFileRequest
- * @param fileIndex INT16U
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterModifyFileRequest(fileIndex) emberAfFillExternalBuffer(mask,                                                     \
-                                                                                                                                   \
-                                                                         ZCL_MODIFY_FILE_REQUEST_COMMAND_ID, "u", fileIndex);
-
-/** @brief Command description for ReadRecordRequest
- *
- * Command: ReadRecordRequest
- * @param fileStartRecordAndRequestedRecordCount INT8U []
- * @param fileStartRecordAndRequestedRecordCountLen int
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterReadRecordRequest(fileStartRecordAndRequestedRecordCount, fileStartRecordAndRequestedRecordCountLen)             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_READ_RECORD_REQUEST_COMMAND_ID, "b", fileStartRecordAndRequestedRecordCount,                 \
-                                  fileStartRecordAndRequestedRecordCountLen);
-
-/** @brief Command description for ModifyFileRequest
- *
- * Command: ModifyFileRequest
- * @param fileStartPosition INT32U
- * @param octetCount INT32U
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterModifyFileRequest(fileStartPosition, octetCount)                                                                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_MODIFY_FILE_REQUEST_COMMAND_ID, "uu", fileStartPosition, octetCount);
-
-/** @brief Command description for WriteFileResponse
- *
- * Command: WriteFileResponse
- * @param status ENUM8
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterWriteFileResponse(status) emberAfFillExternalBuffer(mask,                                                        \
-                                                                                                                                   \
-                                                                      ZCL_WRITE_FILE_RESPONSE_COMMAND_ID, "u", status);
-
-/** @brief Command description for ModifyRecordRequest
- *
- * Command: ModifyRecordRequest
- * @param fileIndex INT16U
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterModifyRecordRequest(fileIndex) emberAfFillExternalBuffer(mask,                                                   \
-                                                                                                                                   \
-                                                                           ZCL_MODIFY_RECORD_REQUEST_COMMAND_ID, "u", fileIndex);
-
-/** @brief Command description for WriteFileResponse
- *
- * Command: WriteFileResponse
- * @param fileIndex INT8U []
- * @param fileIndexLen int
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterWriteFileResponse(fileIndex, fileIndexLen)                                                                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_WRITE_FILE_RESPONSE_COMMAND_ID, "b", fileIndex, fileIndexLen);
-
-/** @brief Command description for ModifyRecordRequest
- *
- * Command: ModifyRecordRequest
- * @param fileStartRecord INT16U
- * @param recordCount INT16U
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterModifyRecordRequest(fileStartRecord, recordCount)                                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_MODIFY_RECORD_REQUEST_COMMAND_ID, "uu", fileStartRecord, recordCount);
-
-/** @brief Command description for FileTransmission
- *
- * Command: FileTransmission
- * @param transmitOptions BITMAP8
- * @param buffer INT8U []
- * @param bufferLen int
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterFileTransmission(transmitOptions, buffer, bufferLen)                                                             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_FILE_TRANSMISSION_COMMAND_ID, "ub", transmitOptions, buffer, bufferLen);
-
-/** @brief Command description for RecordTransmission
- *
- * Command: RecordTransmission
- * @param transmitOptions BITMAP8
- * @param buffer INT8U []
- * @param bufferLen int
- */
-#define emberAfFillCommandData                                                                                                     \
-    SharingClusterRecordTransmission(transmitOptions, buffer, bufferLen)                                                           \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_RECORD_TRANSMISSION_COMMAND_ID, "ub", transmitOptions, buffer, bufferLen);
-
-/** @brief Command description for SearchGame
- *
- * Command: SearchGame
- * @param specificGame ENUM8
- */
-#define emberAfFillCommandGamingClusterSearchGame(specificGame)                                                                    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SEARCH_GAME_COMMAND_ID, "u", specificGame);
-
-/** @brief Command description for GameAnnouncement
- *
- * Command: GameAnnouncement
- * @param gameId INT16U
- */
-#define emberAfFillCommandGamingClusterGameAnnouncement(gameId)                                                                    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_GAME_ANNOUNCEMENT_COMMAND_ID, "u", gameId);
-
-/** @brief Command description for SearchGame
- *
- * Command: SearchGame
- * @param gameId INT16U
- */
-#define emberAfFillCommandGamingClusterSearchGame(gameId)                                                                          \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SEARCH_GAME_COMMAND_ID, "u", gameId);
-
-/** @brief Command description for GameAnnouncement
- *
- * Command: GameAnnouncement
- * @param gameMaster BOOLEAN
- * @param listOfGame CHAR_STRING
- */
-#define emberAfFillCommandGamingClusterGameAnnouncement(gameMaster, listOfGame)                                                    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_GAME_ANNOUNCEMENT_COMMAND_ID, "uu", gameMaster, listOfGame);
-
-/** @brief Command description for JoinGame
- *
- * Command: JoinGame
- * @param gameId INT16U
- */
-#define emberAfFillCommandGamingClusterJoinGame(gameId)                                                                            \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_JOIN_GAME_COMMAND_ID, "u", gameId);
-
-/** @brief Command description for GeneralResponse
- *
- * Command: GeneralResponse
- * @param commandId INT8U
- */
-#define emberAfFillCommandGamingClusterGeneralResponse(commandId)                                                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_GENERAL_RESPONSE_COMMAND_ID, "u", commandId);
-
-/** @brief Command description for JoinGame
- *
- * Command: JoinGame
- * @param joinAsMaster BOOLEAN
- */
-#define emberAfFillCommandGamingClusterJoinGame(joinAsMaster)                                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_JOIN_GAME_COMMAND_ID, "u", joinAsMaster);
-
-/** @brief Command description for GeneralResponse
- *
- * Command: GeneralResponse
- * @param status BITMAP8
- */
-#define emberAfFillCommandGamingClusterGeneralResponse(status)                                                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_GENERAL_RESPONSE_COMMAND_ID, "u", status);
-
-/** @brief Command description for JoinGame
- *
- * Command: JoinGame
- * @param nameOfGame CHAR_STRING
- */
-#define emberAfFillCommandGamingClusterJoinGame(nameOfGame)                                                                        \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_JOIN_GAME_COMMAND_ID, "u", nameOfGame);
-
-/** @brief Command description for GeneralResponse
- *
- * Command: GeneralResponse
- * @param message CHAR_STRING
- */
-#define emberAfFillCommandGamingClusterGeneralResponse(message)                                                                    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_GENERAL_RESPONSE_COMMAND_ID, "u", message);
-
-/** @brief Command description for StartGame
- *
- * Command: StartGame
- */
-#define emberAfFillCommandGamingClusterStartGame()                                                                                 \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_START_GAME_COMMAND_ID, "", );
-
-/** @brief Command description for PauseGame
- *
- * Command: PauseGame
- */
-#define emberAfFillCommandGamingClusterPauseGame()                                                                                 \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_PAUSE_GAME_COMMAND_ID, "", );
-
-/** @brief Command description for ResumeGame
- *
- * Command: ResumeGame
- */
-#define emberAfFillCommandGamingClusterResumeGame()                                                                                \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RESUME_GAME_COMMAND_ID, "", );
-
-/** @brief Command description for QuitGame
- *
- * Command: QuitGame
- */
-#define emberAfFillCommandGamingClusterQuitGame()                                                                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_QUIT_GAME_COMMAND_ID, "", );
-
-/** @brief Command description for EndGame
- *
- * Command: EndGame
- */
-#define emberAfFillCommandGamingClusterEndGame()                                                                                   \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_END_GAME_COMMAND_ID, "", );
-
-/** @brief Command description for StartOver
- *
- * Command: StartOver
- */
-#define emberAfFillCommandGamingClusterStartOver()                                                                                 \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_START_OVER_COMMAND_ID, "", );
-
-/** @brief Command description for ActionControl
- *
- * Command: ActionControl
- * @param actions BITMAP32
- */
-#define emberAfFillCommandGamingClusterActionControl(actions)                                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_ACTION_CONTROL_COMMAND_ID, "u", actions);
-
-/** @brief Command description for DownloadGame
- *
- * Command: DownloadGame
- */
-#define emberAfFillCommandGamingClusterDownloadGame()                                                                              \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_DOWNLOAD_GAME_COMMAND_ID, "", );
-
-/** @brief Command description for PathCreation
- *
- * Command: PathCreation
- * @param originatorAddress DATA16
- */
-#define emberAfFillCommandData                                                                                                     \
-    Rate ControlClusterPathCreation(originatorAddress)                                                                             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_PATH_CREATION_COMMAND_ID, "u", originatorAddress);
-
-/** @brief Command description for DataRateControl
- *
- * Command: DataRateControl
- * @param originatorAddress DATA16
- */
-#define emberAfFillCommandData                                                                                                     \
-    Rate ControlClusterDataRateControl(originatorAddress)                                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DATA_RATE_CONTROL_COMMAND_ID, "u", originatorAddress);
-
-/** @brief Command description for PathCreation
- *
- * Command: PathCreation
- * @param destinationAddress DATA16
- */
-#define emberAfFillCommandData                                                                                                     \
-    Rate ControlClusterPathCreation(destinationAddress)                                                                            \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_PATH_CREATION_COMMAND_ID, "u", destinationAddress);
-
-/** @brief Command description for DataRateControl
- *
- * Command: DataRateControl
- * @param destinationAddress DATA16
- */
-#define emberAfFillCommandData                                                                                                     \
-    Rate ControlClusterDataRateControl(destinationAddress)                                                                         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DATA_RATE_CONTROL_COMMAND_ID, "u", destinationAddress);
-
-/** @brief Command description for PathCreation
- *
- * Command: PathCreation
- * @param dataRate INT8U
- */
-#define emberAfFillCommandData                                                                                                     \
-    Rate ControlClusterPathCreation(dataRate) emberAfFillExternalBuffer(mask,                                                      \
-                                                                                                                                   \
-                                                                        ZCL_PATH_CREATION_COMMAND_ID, "u", dataRate);
-
-/** @brief Command description for DataRateControl
- *
- * Command: DataRateControl
- * @param dataRate INT8U
- */
-#define emberAfFillCommandData                                                                                                     \
-    Rate ControlClusterDataRateControl(dataRate) emberAfFillExternalBuffer(mask,                                                   \
-                                                                                                                                   \
-                                                                           ZCL_DATA_RATE_CONTROL_COMMAND_ID, "u", dataRate);
-
-/** @brief Command description for DataRateNotification
- *
- * Command: DataRateNotification
- * @param originatorAddress DATA16
- * @param destinationAddress DATA16
- * @param dataRate INT8U
- */
-#define emberAfFillCommandData                                                                                                     \
-    Rate ControlClusterDataRateNotification(originatorAddress, destinationAddress, dataRate)                                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DATA_RATE_NOTIFICATION_COMMAND_ID, "uuu", originatorAddress, destinationAddress, dataRate);
-
-/** @brief Command description for PathDeletion
- *
- * Command: PathDeletion
- * @param originatorAddress DATA16
- * @param destinationAddress DATA16
- */
-#define emberAfFillCommandData                                                                                                     \
-    Rate ControlClusterPathDeletion(originatorAddress, destinationAddress)                                                         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_PATH_DELETION_COMMAND_ID, "uu", originatorAddress, destinationAddress);
-
-/** @brief Command description for EstablishmentRequest
- *
- * Command: EstablishmentRequest
- * @param flag BITMAP8
- */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterEstablishmentRequest(flag) emberAfFillExternalBuffer(mask,                                                   \
-                                                                                                                                   \
-                                                                           ZCL_ESTABLISHMENT_REQUEST_COMMAND_ID, "u", flag);
-
-/** @brief Command description for EstablishmentResponse
- *
- * Command: EstablishmentResponse
- * @param ackNack ENUM8
- */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterEstablishmentResponse(ackNack)                                                                               \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ESTABLISHMENT_RESPONSE_COMMAND_ID, "u", ackNack);
-
-/** @brief Command description for EstablishmentRequest
- *
- * Command: EstablishmentRequest
- * @param codecType ENUM8
- */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterEstablishmentRequest(codecType)                                                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ESTABLISHMENT_REQUEST_COMMAND_ID, "u", codecType);
-
-/** @brief Command description for EstablishmentResponse
- *
- * Command: EstablishmentResponse
- * @param codecType ENUM8
- */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterEstablishmentResponse(codecType)                                                                             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ESTABLISHMENT_RESPONSE_COMMAND_ID, "u", codecType);
-
-/** @brief Command description for EstablishmentRequest
- *
- * Command: EstablishmentRequest
- * @param sampFreq ENUM8
- * @param codecRate ENUM8
- * @param serviceType ENUM8
- * @param buffer INT8U []
- * @param bufferLen int
- */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterEstablishmentRequest(sampFreq, codecRate, serviceType, buffer, bufferLen) emberAfFillExternalBuffer(         \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetWeekdaySchedule(userId, daysMask, startHour, startMinute, endHour, endMinute) emberAfFillExternalBuffer(         \
         mask,                                                                                                                      \
                                                                                                                                    \
-        ZCL_ESTABLISHMENT_REQUEST_COMMAND_ID, "uuub", sampFreq, codecRate, serviceType, buffer, bufferLen);
+        ZCL_SET_WEEKDAY_SCHEDULE_COMMAND_ID, "uuuuuu", userId, daysMask, startHour, startMinute, endHour, endMinute);
 
-/** @brief Command description for VoiceTransmission
+/** @brief Command description for GetWeekdaySchedule
  *
- * Command: VoiceTransmission
- * @param voiceData INT8U []
- * @param voiceDataLen int
+ * Command: GetWeekdaySchedule
+ * @param scheduleId INT8U
  */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterVoiceTransmission(voiceData, voiceDataLen)                                                                   \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetWeekdaySchedule(scheduleId) emberAfFillExternalBuffer(mask,                                                      \
+                                                                                                                                   \
+                                                                        ZCL_GET_WEEKDAY_SCHEDULE_COMMAND_ID, "u", scheduleId);
+
+/** @brief Command description for GetWeekdayScheduleResponse
+ *
+ * Command: GetWeekdayScheduleResponse
+ * @param scheduleId INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetWeekdayScheduleResponse(scheduleId)                                                                              \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_VOICE_TRANSMISSION_COMMAND_ID, "b", voiceData, voiceDataLen);
+                                  ZCL_GET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", scheduleId);
 
-/** @brief Command description for VoiceTransmissionResponse
+/** @brief Command description for GetWeekdaySchedule
  *
- * Command: VoiceTransmissionResponse
- * @param sequenceNumber INT8U
- * @param errorFlag ENUM8
+ * Command: GetWeekdaySchedule
+ * @param userId INT16U
  */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterVoiceTransmissionResponse(sequenceNumber, errorFlag)                                                         \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetWeekdaySchedule(userId) emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_GET_WEEKDAY_SCHEDULE_COMMAND_ID, "u", userId);
+
+/** @brief Command description for GetWeekdayScheduleResponse
+ *
+ * Command: GetWeekdayScheduleResponse
+ * @param userId INT16U
+ * @param status INT8U
+ * @param daysMask INT8U
+ * @param startHour INT8U
+ * @param startMinute INT8U
+ * @param endHour INT8U
+ * @param endMinute INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetWeekdayScheduleResponse(userId, status, daysMask, startHour, startMinute, endHour, endMinute)                    \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_VOICE_TRANSMISSION_RESPONSE_COMMAND_ID, "uu", sequenceNumber, errorFlag);
+                                  ZCL_GET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID, "uuuuuuu", userId, status, daysMask, startHour,    \
+                                  startMinute, endHour, endMinute);
 
-/** @brief Command description for VoiceTransmissionCompletion
+/** @brief Command description for ClearWeekdaySchedule
  *
- * Command: VoiceTransmissionCompletion
+ * Command: ClearWeekdaySchedule
+ * @param scheduleId INT8U
  */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterVoiceTransmissionCompletion() emberAfFillExternalBuffer(mask,                                                \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearWeekdaySchedule(scheduleId) emberAfFillExternalBuffer(mask,                                                    \
                                                                                                                                    \
-                                                                              ZCL_VOICE_TRANSMISSION_COMPLETION_COMMAND_ID, "", );
+                                                                          ZCL_CLEAR_WEEKDAY_SCHEDULE_COMMAND_ID, "u", scheduleId);
 
-/** @brief Command description for Control
+/** @brief Command description for ClearWeekdayScheduleResponse
  *
- * Command: Control
- * @param controlType ENUM8
+ * Command: ClearWeekdayScheduleResponse
+ * @param status INT8U
  */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterControl(controlType) emberAfFillExternalBuffer(mask,                                                         \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearWeekdayScheduleResponse(status)                                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                     ZCL_CONTROL_COMMAND_ID, "u", controlType);
+                                  ZCL_CLEAR_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", status);
 
-/** @brief Command description for ControlResponse
+/** @brief Command description for ClearWeekdaySchedule
  *
- * Command: ControlResponse
- * @param ackNack ENUM8
+ * Command: ClearWeekdaySchedule
+ * @param userId INT16U
  */
-#define emberAfFillCommandVoice                                                                                                    \
-    over ZigBeeClusterControlResponse(ackNack) emberAfFillExternalBuffer(mask,                                                     \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearWeekdaySchedule(userId) emberAfFillExternalBuffer(mask,                                                        \
                                                                                                                                    \
-                                                                         ZCL_CONTROL_RESPONSE_COMMAND_ID, "u", ackNack);
+                                                                      ZCL_CLEAR_WEEKDAY_SCHEDULE_COMMAND_ID, "u", userId);
 
-/** @brief Command description for JoinChatRequest
+/** @brief Command description for SetYeardaySchedule
  *
- * Command: JoinChatRequest
- * @param uid INT16U
+ * Command: SetYeardaySchedule
+ * @param scheduleId INT8U
  */
-#define emberAfFillCommandChattingClusterJoinChatRequest(uid)                                                                      \
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetYeardaySchedule(scheduleId) emberAfFillExternalBuffer(mask,                                                      \
+                                                                                                                                   \
+                                                                        ZCL_SET_YEARDAY_SCHEDULE_COMMAND_ID, "u", scheduleId);
+
+/** @brief Command description for SetYeardayScheduleResponse
+ *
+ * Command: SetYeardayScheduleResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetYeardayScheduleResponse(status)                                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for SetYeardaySchedule
+ *
+ * Command: SetYeardaySchedule
+ * @param userId INT16U
+ * @param localStartTime INT32U
+ * @param localEndTime INT32U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetYeardaySchedule(userId, localStartTime, localEndTime)                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_YEARDAY_SCHEDULE_COMMAND_ID, "uuu", userId, localStartTime, localEndTime);
+
+/** @brief Command description for GetYeardaySchedule
+ *
+ * Command: GetYeardaySchedule
+ * @param scheduleId INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetYeardaySchedule(scheduleId) emberAfFillExternalBuffer(mask,                                                      \
+                                                                                                                                   \
+                                                                        ZCL_GET_YEARDAY_SCHEDULE_COMMAND_ID, "u", scheduleId);
+
+/** @brief Command description for GetYeardayScheduleResponse
+ *
+ * Command: GetYeardayScheduleResponse
+ * @param scheduleId INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetYeardayScheduleResponse(scheduleId)                                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", scheduleId);
+
+/** @brief Command description for GetYeardaySchedule
+ *
+ * Command: GetYeardaySchedule
+ * @param userId INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetYeardaySchedule(userId) emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_GET_YEARDAY_SCHEDULE_COMMAND_ID, "u", userId);
+
+/** @brief Command description for GetYeardayScheduleResponse
+ *
+ * Command: GetYeardayScheduleResponse
+ * @param userId INT16U
+ * @param status INT8U
+ * @param localStartTime INT32U
+ * @param localEndTime INT32U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetYeardayScheduleResponse(userId, status, localStartTime, localEndTime) emberAfFillExternalBuffer(                 \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_GET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID, "uuuu", userId, status, localStartTime, localEndTime);
+
+/** @brief Command description for ClearYeardaySchedule
+ *
+ * Command: ClearYeardaySchedule
+ * @param scheduleId INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearYeardaySchedule(scheduleId) emberAfFillExternalBuffer(mask,                                                    \
+                                                                                                                                   \
+                                                                          ZCL_CLEAR_YEARDAY_SCHEDULE_COMMAND_ID, "u", scheduleId);
+
+/** @brief Command description for ClearYeardayScheduleResponse
+ *
+ * Command: ClearYeardayScheduleResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearYeardayScheduleResponse(status)                                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CLEAR_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for ClearYeardaySchedule
+ *
+ * Command: ClearYeardaySchedule
+ * @param userId INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearYeardaySchedule(userId) emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_CLEAR_YEARDAY_SCHEDULE_COMMAND_ID, "u", userId);
+
+/** @brief Command description for SetHolidaySchedule
+ *
+ * Command: SetHolidaySchedule
+ * @param scheduleId INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetHolidaySchedule(scheduleId) emberAfFillExternalBuffer(mask,                                                      \
+                                                                                                                                   \
+                                                                        ZCL_SET_HOLIDAY_SCHEDULE_COMMAND_ID, "u", scheduleId);
+
+/** @brief Command description for SetHolidayScheduleResponse
+ *
+ * Command: SetHolidayScheduleResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetHolidayScheduleResponse(status)                                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for SetHolidaySchedule
+ *
+ * Command: SetHolidaySchedule
+ * @param localStartTime INT32U
+ * @param localEndTime INT32U
+ * @param operatingModeDuringHoliday ENUM8
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetHolidaySchedule(localStartTime, localEndTime, operatingModeDuringHoliday) emberAfFillExternalBuffer(             \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_SET_HOLIDAY_SCHEDULE_COMMAND_ID, "uuu", localStartTime, localEndTime, operatingModeDuringHoliday);
+
+/** @brief Command description for GetHolidaySchedule
+ *
+ * Command: GetHolidaySchedule
+ * @param scheduleId INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetHolidaySchedule(scheduleId) emberAfFillExternalBuffer(mask,                                                      \
+                                                                                                                                   \
+                                                                        ZCL_GET_HOLIDAY_SCHEDULE_COMMAND_ID, "u", scheduleId);
+
+/** @brief Command description for GetHolidayScheduleResponse
+ *
+ * Command: GetHolidayScheduleResponse
+ * @param scheduleId INT8U
+ * @param status INT8U
+ * @param localStartTime INT32U
+ * @param localEndTime INT32U
+ * @param operatingModeDuringHoliday ENUM8
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetHolidayScheduleResponse(scheduleId, status, localStartTime, localEndTime, operatingModeDuringHoliday)            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID, "uuuuu", scheduleId, status, localStartTime,       \
+                                  localEndTime, operatingModeDuringHoliday);
+
+/** @brief Command description for ClearHolidaySchedule
+ *
+ * Command: ClearHolidaySchedule
+ * @param scheduleId INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearHolidaySchedule(scheduleId) emberAfFillExternalBuffer(mask,                                                    \
+                                                                                                                                   \
+                                                                          ZCL_CLEAR_HOLIDAY_SCHEDULE_COMMAND_ID, "u", scheduleId);
+
+/** @brief Command description for ClearHolidayScheduleResponse
+ *
+ * Command: ClearHolidayScheduleResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearHolidayScheduleResponse(status)                                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CLEAR_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for SetUserType
+ *
+ * Command: SetUserType
+ * @param userId INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetUserType(userId) emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_SET_USER_TYPE_COMMAND_ID, "u", userId);
+
+/** @brief Command description for SetUserTypeResponse
+ *
+ * Command: SetUserTypeResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetUserTypeResponse(status) emberAfFillExternalBuffer(mask,                                                         \
+                                                                                                                                   \
+                                                                     ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for SetUserType
+ *
+ * Command: SetUserType
+ * @param userType DoorLockUserType
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetUserType(userType) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_SET_USER_TYPE_COMMAND_ID, "u", userType);
+
+/** @brief Command description for GetUserType
+ *
+ * Command: GetUserType
+ * @param userId INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetUserType(userId) emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_GET_USER_TYPE_COMMAND_ID, "u", userId);
+
+/** @brief Command description for GetUserTypeResponse
+ *
+ * Command: GetUserTypeResponse
+ * @param userId INT16U
+ * @param userType DoorLockUserType
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetUserTypeResponse(userId, userType)                                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_USER_TYPE_RESPONSE_COMMAND_ID, "uu", userId, userType);
+
+/** @brief Command description for SetRfid
+ *
+ * Command: SetRfid
+ * @param userId INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetRfid(userId) emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_SET_RFID_COMMAND_ID, "u", userId);
+
+/** @brief Command description for SetRfidResponse
+ *
+ * Command: SetRfidResponse
+ * @param status DoorLockSetPinOrIdStatus
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetRfidResponse(status) emberAfFillExternalBuffer(mask,                                                             \
+                                                                                                                                   \
+                                                                 ZCL_SET_RFID_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for SetRfid
+ *
+ * Command: SetRfid
+ * @param userStatus DoorLockUserStatus
+ * @param userType DoorLockUserType
+ * @param id CHAR_STRING
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterSetRfid(userStatus, userType, id)                                                                                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_RFID_COMMAND_ID, "uuu", userStatus, userType, id);
+
+/** @brief Command description for GetRfid
+ *
+ * Command: GetRfid
+ * @param userId INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetRfid(userId) emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_GET_RFID_COMMAND_ID, "u", userId);
+
+/** @brief Command description for GetRfidResponse
+ *
+ * Command: GetRfidResponse
+ * @param userId INT16U
+ * @param userStatus DoorLockUserStatus
+ * @param userType DoorLockUserType
+ * @param rfid CHAR_STRING
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterGetRfidResponse(userId, userStatus, userType, rfid)                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_RFID_RESPONSE_COMMAND_ID, "uuuu", userId, userStatus, userType, rfid);
+
+/** @brief Command description for ClearRfid
+ *
+ * Command: ClearRfid
+ * @param userId INT16U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearRfid(userId) emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_CLEAR_RFID_COMMAND_ID, "u", userId);
+
+/** @brief Command description for ClearRfidResponse
+ *
+ * Command: ClearRfidResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearRfidResponse(status) emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_CLEAR_RFID_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for ClearAllRfids
+ *
+ * Command: ClearAllRfids
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearAllRfids() emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_CLEAR_ALL_RFIDS_COMMAND_ID, "", );
+
+/** @brief Command description for ClearAllRfidsResponse
+ *
+ * Command: ClearAllRfidsResponse
+ * @param status INT8U
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterClearAllRfidsResponse(status) emberAfFillExternalBuffer(mask,                                                       \
+                                                                                                                                   \
+                                                                       ZCL_CLEAR_ALL_RFIDS_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for OperationEventNotification
+ *
+ * Command: OperationEventNotification
+ * @param source INT8U
+ * @param eventCode DoorLockOperationEventCode
+ * @param userId INT16U
+ * @param pin CHAR_STRING
+ * @param timeStamp INT32U
+ * @param data CHAR_STRING
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterOperationEventNotification(source, eventCode, userId, pin, timeStamp, data) emberAfFillExternalBuffer(              \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_OPERATION_EVENT_NOTIFICATION_COMMAND_ID, "uuuuuu", source, eventCode, userId, pin, timeStamp, data);
+
+/** @brief Command description for ProgrammingEventNotification
+ *
+ * Command: ProgrammingEventNotification
+ * @param source INT8U
+ * @param eventCode DoorLockProgrammingEventCode
+ * @param userId INT16U
+ * @param pin CHAR_STRING
+ * @param userType DoorLockUserType
+ * @param userStatus DoorLockUserStatus
+ * @param timeStamp INT32U
+ * @param data CHAR_STRING
+ */
+#define emberAfFillCommandDoor                                                                                                     \
+    LockClusterProgrammingEventNotification(source, eventCode, userId, pin, userType, userStatus, timeStamp, data)                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_PROGRAMMING_EVENT_NOTIFICATION_COMMAND_ID, "uuuuuuuu", source, eventCode, userId, pin,       \
+                                  userType, userStatus, timeStamp, data);
+
+/** @brief Command description for UpOrOpen
+ *
+ * Command: UpOrOpen
+ */
+#define emberAfFillCommandWindow                                                                                                   \
+    CoveringClusterUpOrOpen() emberAfFillExternalBuffer(mask,                                                                      \
+                                                                                                                                   \
+                                                        ZCL_UP_OR_OPEN_COMMAND_ID, "", );
+
+/** @brief Command description for DownOrClose
+ *
+ * Command: DownOrClose
+ */
+#define emberAfFillCommandWindow                                                                                                   \
+    CoveringClusterDownOrClose() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_DOWN_OR_CLOSE_COMMAND_ID, "", );
+
+/** @brief Command description for StopMotion
+ *
+ * Command: StopMotion
+ */
+#define emberAfFillCommandWindow                                                                                                   \
+    CoveringClusterStopMotion() emberAfFillExternalBuffer(mask,                                                                    \
+                                                                                                                                   \
+                                                          ZCL_STOP_MOTION_COMMAND_ID, "", );
+
+/** @brief Command description for GoToLiftValue
+ *
+ * Command: GoToLiftValue
+ * @param liftValue INT16U
+ */
+#define emberAfFillCommandWindow                                                                                                   \
+    CoveringClusterGoToLiftValue(liftValue) emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_GO_TO_LIFT_VALUE_COMMAND_ID, "u", liftValue);
+
+/** @brief Command description for GoToLiftPercentage
+ *
+ * Command: GoToLiftPercentage
+ * @param liftPercentageValue INT8U
+ * @param liftPercent100thsValue INT16U
+ */
+#define emberAfFillCommandWindow                                                                                                   \
+    CoveringClusterGoToLiftPercentage(liftPercentageValue, liftPercent100thsValue)                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GO_TO_LIFT_PERCENTAGE_COMMAND_ID, "uu", liftPercentageValue, liftPercent100thsValue);
+
+/** @brief Command description for GoToTiltValue
+ *
+ * Command: GoToTiltValue
+ * @param tiltValue INT16U
+ */
+#define emberAfFillCommandWindow                                                                                                   \
+    CoveringClusterGoToTiltValue(tiltValue) emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_GO_TO_TILT_VALUE_COMMAND_ID, "u", tiltValue);
+
+/** @brief Command description for GoToTiltPercentage
+ *
+ * Command: GoToTiltPercentage
+ * @param tiltPercentageValue INT8U
+ * @param tiltPercent100thsValue INT16U
+ */
+#define emberAfFillCommandWindow                                                                                                   \
+    CoveringClusterGoToTiltPercentage(tiltPercentageValue, tiltPercent100thsValue)                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GO_TO_TILT_PERCENTAGE_COMMAND_ID, "uu", tiltPercentageValue, tiltPercent100thsValue);
+
+/** @brief Command description for BarrierControlGoToPercent
+ *
+ * Command: BarrierControlGoToPercent
+ * @param percentOpen INT8U
+ */
+#define emberAfFillCommandBarrier                                                                                                  \
+    ControlClusterBarrierControlGoToPercent(percentOpen)                                                                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND_ID, "u", percentOpen);
+
+/** @brief Command description for BarrierControlStop
+ *
+ * Command: BarrierControlStop
+ */
+#define emberAfFillCommandBarrier                                                                                                  \
+    ControlClusterBarrierControlStop() emberAfFillExternalBuffer(mask,                                                             \
+                                                                                                                                   \
+                                                                 ZCL_BARRIER_CONTROL_STOP_COMMAND_ID, "", );
+
+/** @brief Command description for SetpointRaiseLower
+ *
+ * Command: SetpointRaiseLower
+ * @param mode SetpointAdjustMode
+ */
+#define emberAfFillCommandThermostatClusterSetpointRaiseLower(mode)                                                                \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_JOIN_CHAT_REQUEST_COMMAND_ID, "u", uid);
+                              ZCL_SETPOINT_RAISE_LOWER_COMMAND_ID, "u", mode);
 
-/** @brief Command description for StartChatResponse
+/** @brief Command description for CurrentWeeklySchedule
  *
- * Command: StartChatResponse
- * @param status ENUM8
+ * Command: CurrentWeeklySchedule
+ * @param numberOfTransitionsForSequence ENUM8
  */
-#define emberAfFillCommandChattingClusterStartChatResponse(status)                                                                 \
+#define emberAfFillCommandThermostatClusterCurrentWeeklySchedule(numberOfTransitionsForSequence)                                   \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_START_CHAT_RESPONSE_COMMAND_ID, "u", status);
+                              ZCL_CURRENT_WEEKLY_SCHEDULE_COMMAND_ID, "u", numberOfTransitionsForSequence);
 
-/** @brief Command description for JoinChatRequest
+/** @brief Command description for SetpointRaiseLower
  *
- * Command: JoinChatRequest
- * @param nickname CHAR_STRING
+ * Command: SetpointRaiseLower
+ * @param amount INT8S
  */
-#define emberAfFillCommandChattingClusterJoinChatRequest(nickname)                                                                 \
+#define emberAfFillCommandThermostatClusterSetpointRaiseLower(amount)                                                              \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_JOIN_CHAT_REQUEST_COMMAND_ID, "u", nickname);
+                              ZCL_SETPOINT_RAISE_LOWER_COMMAND_ID, "u", amount);
 
-/** @brief Command description for StartChatResponse
+/** @brief Command description for CurrentWeeklySchedule
  *
- * Command: StartChatResponse
- * @param cid INT16U
+ * Command: CurrentWeeklySchedule
+ * @param dayOfWeekForSequence DayOfWeek
+ * @param modeForSequence ModeForSequence
+ * @param payload INT8U []
+ * @param payloadLen int
  */
-#define emberAfFillCommandChattingClusterStartChatResponse(cid)                                                                    \
+#define emberAfFillCommandThermostatClusterCurrentWeeklySchedule(dayOfWeekForSequence, modeForSequence, payload, payloadLen)       \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_START_CHAT_RESPONSE_COMMAND_ID, "u", cid);
+                              ZCL_CURRENT_WEEKLY_SCHEDULE_COMMAND_ID, "uub", dayOfWeekForSequence, modeForSequence, payload,       \
+                              payloadLen);
 
-/** @brief Command description for JoinChatRequest
+/** @brief Command description for SetWeeklySchedule
  *
- * Command: JoinChatRequest
- * @param cid INT16U
+ * Command: SetWeeklySchedule
+ * @param numberOfTransitionsForSequence ENUM8
  */
-#define emberAfFillCommandChattingClusterJoinChatRequest(cid)                                                                      \
+#define emberAfFillCommandThermostatClusterSetWeeklySchedule(numberOfTransitionsForSequence)                                       \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_JOIN_CHAT_REQUEST_COMMAND_ID, "u", cid);
+                              ZCL_SET_WEEKLY_SCHEDULE_COMMAND_ID, "u", numberOfTransitionsForSequence);
 
-/** @brief Command description for LeaveChatRequest
+/** @brief Command description for RelayStatusLog
  *
- * Command: LeaveChatRequest
- * @param cid INT16U
+ * Command: RelayStatusLog
+ * @param timeOfDay INT16U
  */
-#define emberAfFillCommandChattingClusterLeaveChatRequest(cid)                                                                     \
+#define emberAfFillCommandThermostatClusterRelayStatusLog(timeOfDay)                                                               \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_LEAVE_CHAT_REQUEST_COMMAND_ID, "u", cid);
+                              ZCL_RELAY_STATUS_LOG_COMMAND_ID, "u", timeOfDay);
 
-/** @brief Command description for JoinChatResponse
+/** @brief Command description for SetWeeklySchedule
  *
- * Command: JoinChatResponse
- * @param status ENUM8
+ * Command: SetWeeklySchedule
+ * @param dayOfWeekForSequence DayOfWeek
  */
-#define emberAfFillCommandChattingClusterJoinChatResponse(status)                                                                  \
+#define emberAfFillCommandThermostatClusterSetWeeklySchedule(dayOfWeekForSequence)                                                 \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_JOIN_CHAT_RESPONSE_COMMAND_ID, "u", status);
+                              ZCL_SET_WEEKLY_SCHEDULE_COMMAND_ID, "u", dayOfWeekForSequence);
 
-/** @brief Command description for LeaveChatRequest
+/** @brief Command description for RelayStatusLog
  *
- * Command: LeaveChatRequest
- * @param uid INT16U
+ * Command: RelayStatusLog
+ * @param relayStatus BITMAP16
  */
-#define emberAfFillCommandChattingClusterLeaveChatRequest(uid)                                                                     \
+#define emberAfFillCommandThermostatClusterRelayStatusLog(relayStatus)                                                             \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_LEAVE_CHAT_REQUEST_COMMAND_ID, "u", uid);
+                              ZCL_RELAY_STATUS_LOG_COMMAND_ID, "u", relayStatus);
 
-/** @brief Command description for JoinChatResponse
+/** @brief Command description for SetWeeklySchedule
  *
- * Command: JoinChatResponse
- * @param cid INT16U
- * @param chatParticipantList ChatParticipant []
- * @param chatParticipantListLen int
+ * Command: SetWeeklySchedule
+ * @param modeForSequence ModeForSequence
  */
-#define emberAfFillCommandChattingClusterJoinChatResponse(cid, chatParticipantList, chatParticipantListLen)                        \
+#define emberAfFillCommandThermostatClusterSetWeeklySchedule(modeForSequence)                                                      \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_JOIN_CHAT_RESPONSE_COMMAND_ID, "ub", cid, chatParticipantList, chatParticipantListLen);
+                              ZCL_SET_WEEKLY_SCHEDULE_COMMAND_ID, "u", modeForSequence);
 
-/** @brief Command description for SearchChatRequest
+/** @brief Command description for RelayStatusLog
  *
- * Command: SearchChatRequest
+ * Command: RelayStatusLog
+ * @param localTemperature INT16S
  */
-#define emberAfFillCommandChattingClusterSearchChatRequest()                                                                       \
+#define emberAfFillCommandThermostatClusterRelayStatusLog(localTemperature)                                                        \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_SEARCH_CHAT_REQUEST_COMMAND_ID, "", );
+                              ZCL_RELAY_STATUS_LOG_COMMAND_ID, "u", localTemperature);
 
-/** @brief Command description for UserLeft
+/** @brief Command description for SetWeeklySchedule
  *
- * Command: UserLeft
- * @param cid INT16U
- * @param uid INT16U
- * @param nickname CHAR_STRING
+ * Command: SetWeeklySchedule
+ * @param payload INT8U []
+ * @param payloadLen int
  */
-#define emberAfFillCommandChattingClusterUserLeft(cid, uid, nickname)                                                              \
+#define emberAfFillCommandThermostatClusterSetWeeklySchedule(payload, payloadLen)                                                  \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_USER_LEFT_COMMAND_ID, "uuu", cid, uid, nickname);
+                              ZCL_SET_WEEKLY_SCHEDULE_COMMAND_ID, "b", payload, payloadLen);
 
-/** @brief Command description for SwitchChairmanResponse
+/** @brief Command description for RelayStatusLog
  *
- * Command: SwitchChairmanResponse
- * @param cid INT16U
+ * Command: RelayStatusLog
+ * @param humidityInPercentage INT8U
+ * @param setpoint INT16S
+ * @param unreadEntries INT16U
  */
-#define emberAfFillCommandChattingClusterSwitchChairmanResponse(cid)                                                               \
+#define emberAfFillCommandThermostatClusterRelayStatusLog(humidityInPercentage, setpoint, unreadEntries)                           \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_SWITCH_CHAIRMAN_RESPONSE_COMMAND_ID, "u", cid);
+                              ZCL_RELAY_STATUS_LOG_COMMAND_ID, "uuu", humidityInPercentage, setpoint, unreadEntries);
 
-/** @brief Command description for UserJoined
+/** @brief Command description for GetWeeklySchedule
  *
- * Command: UserJoined
- * @param cid INT16U
+ * Command: GetWeeklySchedule
+ * @param daysToReturn DayOfWeek
+ * @param modeToReturn ModeForSequence
  */
-#define emberAfFillCommandChattingClusterUserJoined(cid)                                                                           \
+#define emberAfFillCommandThermostatClusterGetWeeklySchedule(daysToReturn, modeToReturn)                                           \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_USER_JOINED_COMMAND_ID, "u", cid);
+                              ZCL_GET_WEEKLY_SCHEDULE_COMMAND_ID, "uu", daysToReturn, modeToReturn);
 
-/** @brief Command description for SwitchChairmanResponse
+/** @brief Command description for ClearWeeklySchedule
  *
- * Command: SwitchChairmanResponse
- * @param uid INT16U
+ * Command: ClearWeeklySchedule
  */
-#define emberAfFillCommandChattingClusterSwitchChairmanResponse(uid)                                                               \
+#define emberAfFillCommandThermostatClusterClearWeeklySchedule()                                                                   \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_SWITCH_CHAIRMAN_RESPONSE_COMMAND_ID, "u", uid);
+                              ZCL_CLEAR_WEEKLY_SCHEDULE_COMMAND_ID, "", );
 
-/** @brief Command description for UserJoined
+/** @brief Command description for GetRelayStatusLog
  *
- * Command: UserJoined
- * @param uid INT16U
- * @param nickname CHAR_STRING
+ * Command: GetRelayStatusLog
  */
-#define emberAfFillCommandChattingClusterUserJoined(uid, nickname)                                                                 \
+#define emberAfFillCommandThermostatClusterGetRelayStatusLog()                                                                     \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_USER_JOINED_COMMAND_ID, "uu", uid, nickname);
+                              ZCL_GET_RELAY_STATUS_LOG_COMMAND_ID, "", );
 
-/** @brief Command description for StartChatRequest
+/** @brief Command description for MoveToHue
  *
- * Command: StartChatRequest
+ * Command: MoveToHue
+ * @param hue INT8U
+ * @param direction HueDirection
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveToHue(hue, direction, transitionTime, optionsMask, optionsOverride) emberAfFillExternalBuffer(               \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_MOVE_TO_HUE_COMMAND_ID, "uuuuu", hue, direction, transitionTime, optionsMask, optionsOverride);
+
+/** @brief Command description for MoveHue
+ *
+ * Command: MoveHue
+ * @param moveMode HueMoveMode
+ * @param rate INT8U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveHue(moveMode, rate, optionsMask, optionsOverride)                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MOVE_HUE_COMMAND_ID, "uuuu", moveMode, rate, optionsMask, optionsOverride);
+
+/** @brief Command description for StepHue
+ *
+ * Command: StepHue
+ * @param stepMode HueStepMode
+ * @param stepSize INT8U
+ * @param transitionTime INT8U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterStepHue(stepMode, stepSize, transitionTime, optionsMask, optionsOverride) emberAfFillExternalBuffer(             \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_STEP_HUE_COMMAND_ID, "uuuuu", stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+
+/** @brief Command description for MoveToSaturation
+ *
+ * Command: MoveToSaturation
+ * @param saturation INT8U
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveToSaturation(saturation, transitionTime, optionsMask, optionsOverride) emberAfFillExternalBuffer(            \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_MOVE_TO_SATURATION_COMMAND_ID, "uuuu", saturation, transitionTime, optionsMask, optionsOverride);
+
+/** @brief Command description for MoveSaturation
+ *
+ * Command: MoveSaturation
+ * @param moveMode SaturationMoveMode
+ * @param rate INT8U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveSaturation(moveMode, rate, optionsMask, optionsOverride)                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MOVE_SATURATION_COMMAND_ID, "uuuu", moveMode, rate, optionsMask, optionsOverride);
+
+/** @brief Command description for StepSaturation
+ *
+ * Command: StepSaturation
+ * @param stepMode SaturationStepMode
+ * @param stepSize INT8U
+ * @param transitionTime INT8U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterStepSaturation(stepMode, stepSize, transitionTime, optionsMask, optionsOverride) emberAfFillExternalBuffer(      \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_STEP_SATURATION_COMMAND_ID, "uuuuu", stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+
+/** @brief Command description for MoveToHueAndSaturation
+ *
+ * Command: MoveToHueAndSaturation
+ * @param hue INT8U
+ * @param saturation INT8U
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveToHueAndSaturation(hue, saturation, transitionTime, optionsMask, optionsOverride) emberAfFillExternalBuffer( \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID, "uuuuu", hue, saturation, transitionTime, optionsMask, optionsOverride);
+
+/** @brief Command description for MoveToColor
+ *
+ * Command: MoveToColor
+ * @param colorX INT16U
+ * @param colorY INT16U
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveToColor(colorX, colorY, transitionTime, optionsMask, optionsOverride) emberAfFillExternalBuffer(             \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_MOVE_TO_COLOR_COMMAND_ID, "uuuuu", colorX, colorY, transitionTime, optionsMask, optionsOverride);
+
+/** @brief Command description for MoveColor
+ *
+ * Command: MoveColor
+ * @param rateX INT16S
+ * @param rateY INT16S
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveColor(rateX, rateY, optionsMask, optionsOverride)                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MOVE_COLOR_COMMAND_ID, "uuuu", rateX, rateY, optionsMask, optionsOverride);
+
+/** @brief Command description for StepColor
+ *
+ * Command: StepColor
+ * @param stepX INT16S
+ * @param stepY INT16S
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterStepColor(stepX, stepY, transitionTime, optionsMask, optionsOverride)                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_STEP_COLOR_COMMAND_ID, "uuuuu", stepX, stepY, transitionTime, optionsMask, optionsOverride);
+
+/** @brief Command description for MoveToColorTemperature
+ *
+ * Command: MoveToColorTemperature
+ * @param colorTemperature INT16U
+ * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveToColorTemperature(colorTemperature, transitionTime, optionsMask, optionsOverride)                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MOVE_TO_COLOR_TEMPERATURE_COMMAND_ID, "uuuu", colorTemperature, transitionTime, optionsMask, \
+                                  optionsOverride);
+
+/** @brief Command description for EnhancedMoveToHue
+ *
+ * Command: EnhancedMoveToHue
+ * @param enhancedHue INT16U
+ * @param direction HueDirection
+ * @param transitionTime INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterEnhancedMoveToHue(enhancedHue, direction, transitionTime)                                                        \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENHANCED_MOVE_TO_HUE_COMMAND_ID, "uuu", enhancedHue, direction, transitionTime);
+
+/** @brief Command description for EnhancedMoveHue
+ *
+ * Command: EnhancedMoveHue
+ * @param moveMode HueMoveMode
+ * @param rate INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterEnhancedMoveHue(moveMode, rate)                                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENHANCED_MOVE_HUE_COMMAND_ID, "uu", moveMode, rate);
+
+/** @brief Command description for EnhancedStepHue
+ *
+ * Command: EnhancedStepHue
+ * @param stepMode HueStepMode
+ * @param stepSize INT16U
+ * @param transitionTime INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterEnhancedStepHue(stepMode, stepSize, transitionTime)                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ENHANCED_STEP_HUE_COMMAND_ID, "uuu", stepMode, stepSize, transitionTime);
+
+/** @brief Command description for EnhancedMoveToHueAndSaturation
+ *
+ * Command: EnhancedMoveToHueAndSaturation
+ * @param enhancedHue INT16U
+ * @param saturation INT8U
+ * @param transitionTime INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterEnhancedMoveToHueAndSaturation(enhancedHue, saturation, transitionTime) emberAfFillExternalBuffer(               \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_ENHANCED_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID, "uuu", enhancedHue, saturation, transitionTime);
+
+/** @brief Command description for ColorLoopSet
+ *
+ * Command: ColorLoopSet
+ * @param updateFlags ColorLoopUpdateFlags
+ * @param action ColorLoopAction
+ * @param direction ColorLoopDirection
+ * @param time INT16U
+ * @param startHue INT16U
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterColorLoopSet(updateFlags, action, direction, time, startHue)                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_COLOR_LOOP_SET_COMMAND_ID, "uuuuu", updateFlags, action, direction, time, startHue);
+
+/** @brief Command description for StopMoveStep
+ *
+ * Command: StopMoveStep
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterStopMoveStep(optionsMask, optionsOverride)                                                                       \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_STOP_MOVE_STEP_COMMAND_ID, "uu", optionsMask, optionsOverride);
+
+/** @brief Command description for MoveColorTemperature
+ *
+ * Command: MoveColorTemperature
+ * @param moveMode HueMoveMode
+ * @param rate INT16U
+ * @param colorTemperatureMinimum INT16U
+ * @param colorTemperatureMaximum INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterMoveColorTemperature(moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask,              \
+                                       optionsOverride)                                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MOVE_COLOR_TEMPERATURE_COMMAND_ID, "uuuuuu", moveMode, rate, colorTemperatureMinimum,        \
+                                  colorTemperatureMaximum, optionsMask, optionsOverride);
+
+/** @brief Command description for StepColorTemperature
+ *
+ * Command: StepColorTemperature
+ * @param stepMode HueStepMode
+ * @param stepSize INT16U
+ * @param transitionTime INT16U
+ * @param colorTemperatureMinimum INT16U
+ * @param colorTemperatureMaximum INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
+ */
+#define emberAfFillCommandColor                                                                                                    \
+    ControlClusterStepColorTemperature(stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum,       \
+                                       optionsMask, optionsOverride)                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_STEP_COLOR_TEMPERATURE_COMMAND_ID, "uuuuuuu", stepMode, stepSize, transitionTime,            \
+                                  colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+
+/** @brief Command description for ZoneEnrollResponse
+ *
+ * Command: ZoneEnrollResponse
+ * @param enrollResponseCode IasEnrollResponseCode
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ZoneClusterZoneEnrollResponse(enrollResponseCode)                                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID, "u", enrollResponseCode);
+
+/** @brief Command description for ZoneStatusChangeNotification
+ *
+ * Command: ZoneStatusChangeNotification
+ * @param zoneStatus IasZoneStatus
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ZoneClusterZoneStatusChangeNotification(zoneStatus)                                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ZONE_STATUS_CHANGE_NOTIFICATION_COMMAND_ID, "u", zoneStatus);
+
+/** @brief Command description for ZoneEnrollResponse
+ *
+ * Command: ZoneEnrollResponse
+ * @param zoneId INT8U
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ZoneClusterZoneEnrollResponse(zoneId) emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID, "u", zoneId);
+
+/** @brief Command description for ZoneStatusChangeNotification
+ *
+ * Command: ZoneStatusChangeNotification
+ * @param extendedStatus BITMAP8
+ * @param zoneId INT8U
+ * @param delay INT16U
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ZoneClusterZoneStatusChangeNotification(extendedStatus, zoneId, delay)                                                         \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ZONE_STATUS_CHANGE_NOTIFICATION_COMMAND_ID, "uuu", extendedStatus, zoneId, delay);
+
+/** @brief Command description for InitiateNormalOperationMode
+ *
+ * Command: InitiateNormalOperationMode
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ZoneClusterInitiateNormalOperationMode() emberAfFillExternalBuffer(mask,                                                       \
+                                                                                                                                   \
+                                                                       ZCL_INITIATE_NORMAL_OPERATION_MODE_COMMAND_ID, "", );
+
+/** @brief Command description for ZoneEnrollRequest
+ *
+ * Command: ZoneEnrollRequest
+ * @param zoneType IasZoneType
+ * @param manufacturerCode INT16U
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ZoneClusterZoneEnrollRequest(zoneType, manufacturerCode)                                                                       \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ZONE_ENROLL_REQUEST_COMMAND_ID, "uu", zoneType, manufacturerCode);
+
+/** @brief Command description for InitiateNormalOperationModeResponse
+ *
+ * Command: InitiateNormalOperationModeResponse
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ZoneClusterInitiateNormalOperationModeResponse()                                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_INITIATE_NORMAL_OPERATION_MODE_RESPONSE_COMMAND_ID, "", );
+
+/** @brief Command description for InitiateTestMode
+ *
+ * Command: InitiateTestMode
+ * @param testModeDuration INT8U
+ * @param currentZoneSensitivityLevel INT8U
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ZoneClusterInitiateTestMode(testModeDuration, currentZoneSensitivityLevel)                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_INITIATE_TEST_MODE_COMMAND_ID, "uu", testModeDuration, currentZoneSensitivityLevel);
+
+/** @brief Command description for InitiateTestModeResponse
+ *
+ * Command: InitiateTestModeResponse
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ZoneClusterInitiateTestModeResponse() emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_INITIATE_TEST_MODE_RESPONSE_COMMAND_ID, "", );
+
+/** @brief Command description for Arm
+ *
+ * Command: Arm
+ * @param armMode IasAceArmMode
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterArm(armMode) emberAfFillExternalBuffer(mask,                                                                         \
+                                                                                                                                   \
+                                                     ZCL_ARM_COMMAND_ID, "u", armMode);
+
+/** @brief Command description for ArmResponse
+ *
+ * Command: ArmResponse
+ * @param armNotification IasAceArmNotification
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterArmResponse(armNotification) emberAfFillExternalBuffer(mask,                                                         \
+                                                                                                                                   \
+                                                                     ZCL_ARM_RESPONSE_COMMAND_ID, "u", armNotification);
+
+/** @brief Command description for Arm
+ *
+ * Command: Arm
+ * @param armDisarmCode CHAR_STRING
+ * @param zoneId INT8U
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterArm(armDisarmCode, zoneId) emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_ARM_COMMAND_ID, "uu", armDisarmCode, zoneId);
+
+/** @brief Command description for Bypass
+ *
+ * Command: Bypass
+ * @param numberOfZones INT8U
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterBypass(numberOfZones) emberAfFillExternalBuffer(mask,                                                                \
+                                                                                                                                   \
+                                                              ZCL_BYPASS_COMMAND_ID, "u", numberOfZones);
+
+/** @brief Command description for GetZoneIdMapResponse
+ *
+ * Command: GetZoneIdMapResponse
+ * @param section0 BITMAP16
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetZoneIdMapResponse(section0) emberAfFillExternalBuffer(mask,                                                       \
+                                                                                                                                   \
+                                                                       ZCL_GET_ZONE_ID_MAP_RESPONSE_COMMAND_ID, "u", section0);
+
+/** @brief Command description for Bypass
+ *
+ * Command: Bypass
+ * @param zoneIds INT8U []
+ * @param zoneIdsLen int
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterBypass(zoneIds, zoneIdsLen) emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_BYPASS_COMMAND_ID, "b", zoneIds, zoneIdsLen);
+
+/** @brief Command description for GetZoneIdMapResponse
+ *
+ * Command: GetZoneIdMapResponse
+ * @param section1 BITMAP16
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetZoneIdMapResponse(section1) emberAfFillExternalBuffer(mask,                                                       \
+                                                                                                                                   \
+                                                                       ZCL_GET_ZONE_ID_MAP_RESPONSE_COMMAND_ID, "u", section1);
+
+/** @brief Command description for Bypass
+ *
+ * Command: Bypass
+ * @param armDisarmCode CHAR_STRING
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterBypass(armDisarmCode) emberAfFillExternalBuffer(mask,                                                                \
+                                                                                                                                   \
+                                                              ZCL_BYPASS_COMMAND_ID, "u", armDisarmCode);
+
+/** @brief Command description for GetZoneIdMapResponse
+ *
+ * Command: GetZoneIdMapResponse
+ * @param section2 BITMAP16
+ * @param section3 BITMAP16
+ * @param section4 BITMAP16
+ * @param section5 BITMAP16
+ * @param section6 BITMAP16
+ * @param section7 BITMAP16
+ * @param section8 BITMAP16
+ * @param section9 BITMAP16
+ * @param section10 BITMAP16
+ * @param section11 BITMAP16
+ * @param section12 BITMAP16
+ * @param section13 BITMAP16
+ * @param section14 BITMAP16
+ * @param section15 BITMAP16
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetZoneIdMapResponse(section2, section3, section4, section5, section6, section7, section8, section9, section10,      \
+                                   section11, section12, section13, section14, section15)                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_ZONE_ID_MAP_RESPONSE_COMMAND_ID, "uuuuuuuuuuuuuu", section2, section3, section4,         \
+                                  section5, section6, section7, section8, section9, section10, section11, section12, section13,    \
+                                  section14, section15);
+
+/** @brief Command description for Emergency
+ *
+ * Command: Emergency
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterEmergency() emberAfFillExternalBuffer(mask,                                                                          \
+                                                                                                                                   \
+                                                    ZCL_EMERGENCY_COMMAND_ID, "", );
+
+/** @brief Command description for GetZoneInformationResponse
+ *
+ * Command: GetZoneInformationResponse
+ * @param zoneId INT8U
+ * @param zoneType IasZoneType
+ * @param ieeeAddress node_id
+ * @param zoneLabel CHAR_STRING
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetZoneInformationResponse(zoneId, zoneType, ieeeAddress, zoneLabel)                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_ZONE_INFORMATION_RESPONSE_COMMAND_ID, "uuuu", zoneId, zoneType, ieeeAddress, zoneLabel);
+
+/** @brief Command description for Fire
+ *
+ * Command: Fire
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterFire() emberAfFillExternalBuffer(mask,                                                                               \
+                                                                                                                                   \
+                                               ZCL_FIRE_COMMAND_ID, "", );
+
+/** @brief Command description for ZoneStatusChanged
+ *
+ * Command: ZoneStatusChanged
+ * @param zoneId INT8U
+ * @param zoneStatus ENUM16
+ * @param audibleNotification IasAceAudibleNotification
+ * @param zoneLabel CHAR_STRING
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterZoneStatusChanged(zoneId, zoneStatus, audibleNotification, zoneLabel)                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ZONE_STATUS_CHANGED_COMMAND_ID, "uuuu", zoneId, zoneStatus, audibleNotification, zoneLabel);
+
+/** @brief Command description for Panic
+ *
+ * Command: Panic
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterPanic() emberAfFillExternalBuffer(mask,                                                                              \
+                                                                                                                                   \
+                                                ZCL_PANIC_COMMAND_ID, "", );
+
+/** @brief Command description for PanelStatusChanged
+ *
+ * Command: PanelStatusChanged
+ * @param panelStatus IasAcePanelStatus
+ * @param secondsRemaining INT8U
+ * @param audibleNotification IasAceAudibleNotification
+ * @param alarmStatus IasAceAlarmStatus
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterPanelStatusChanged(panelStatus, secondsRemaining, audibleNotification, alarmStatus) emberAfFillExternalBuffer(       \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_PANEL_STATUS_CHANGED_COMMAND_ID, "uuuu", panelStatus, secondsRemaining, audibleNotification, alarmStatus);
+
+/** @brief Command description for GetZoneIdMap
+ *
+ * Command: GetZoneIdMap
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetZoneIdMap() emberAfFillExternalBuffer(mask,                                                                       \
+                                                                                                                                   \
+                                                       ZCL_GET_ZONE_ID_MAP_COMMAND_ID, "", );
+
+/** @brief Command description for GetPanelStatusResponse
+ *
+ * Command: GetPanelStatusResponse
+ * @param panelStatus IasAcePanelStatus
+ * @param secondsRemaining INT8U
+ * @param audibleNotification IasAceAudibleNotification
+ * @param alarmStatus IasAceAlarmStatus
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetPanelStatusResponse(panelStatus, secondsRemaining, audibleNotification, alarmStatus) emberAfFillExternalBuffer(   \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_GET_PANEL_STATUS_RESPONSE_COMMAND_ID, "uuuu", panelStatus, secondsRemaining, audibleNotification, alarmStatus);
+
+/** @brief Command description for GetZoneInformation
+ *
+ * Command: GetZoneInformation
+ * @param zoneId INT8U
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetZoneInformation(zoneId) emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_GET_ZONE_INFORMATION_COMMAND_ID, "u", zoneId);
+
+/** @brief Command description for SetBypassedZoneList
+ *
+ * Command: SetBypassedZoneList
+ * @param numberOfZones INT8U
+ * @param zoneIds INT8U []
+ * @param zoneIdsLen int
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterSetBypassedZoneList(numberOfZones, zoneIds, zoneIdsLen)                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_SET_BYPASSED_ZONE_LIST_COMMAND_ID, "ub", numberOfZones, zoneIds, zoneIdsLen);
+
+/** @brief Command description for GetPanelStatus
+ *
+ * Command: GetPanelStatus
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetPanelStatus() emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_GET_PANEL_STATUS_COMMAND_ID, "", );
+
+/** @brief Command description for BypassResponse
+ *
+ * Command: BypassResponse
+ * @param numberOfZones INT8U
+ * @param bypassResult IasAceBypassResult []
+ * @param bypassResultLen int
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterBypassResponse(numberOfZones, bypassResult, bypassResultLen)                                                         \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_BYPASS_RESPONSE_COMMAND_ID, "ub", numberOfZones, bypassResult, bypassResultLen);
+
+/** @brief Command description for GetBypassedZoneList
+ *
+ * Command: GetBypassedZoneList
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetBypassedZoneList() emberAfFillExternalBuffer(mask,                                                                \
+                                                                                                                                   \
+                                                              ZCL_GET_BYPASSED_ZONE_LIST_COMMAND_ID, "", );
+
+/** @brief Command description for GetZoneStatusResponse
+ *
+ * Command: GetZoneStatusResponse
+ * @param zoneStatusComplete BOOLEAN
+ * @param numberOfZones INT8U
+ * @param zoneStatusResult IasAceZoneStatusResult []
+ * @param zoneStatusResultLen int
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetZoneStatusResponse(zoneStatusComplete, numberOfZones, zoneStatusResult, zoneStatusResultLen)                      \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_ZONE_STATUS_RESPONSE_COMMAND_ID, "uub", zoneStatusComplete, numberOfZones,               \
+                                  zoneStatusResult, zoneStatusResultLen);
+
+/** @brief Command description for GetZoneStatus
+ *
+ * Command: GetZoneStatus
+ * @param startingZoneId INT8U
+ * @param maxNumberOfZoneIds INT8U
+ * @param zoneStatusMaskFlag BOOLEAN
+ * @param zoneStatusMask BITMAP16
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    ACEClusterGetZoneStatus(startingZoneId, maxNumberOfZoneIds, zoneStatusMaskFlag, zoneStatusMask) emberAfFillExternalBuffer(     \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_GET_ZONE_STATUS_COMMAND_ID, "uuuu", startingZoneId, maxNumberOfZoneIds, zoneStatusMaskFlag, zoneStatusMask);
+
+/** @brief Command description for StartWarning
+ *
+ * Command: StartWarning
+ * @param warningInfo WarningInfo
+ * @param warningDuration INT16U
+ * @param strobeDutyCycle INT8U
+ * @param strobeLevel ENUM8
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    WDClusterStartWarning(warningInfo, warningDuration, strobeDutyCycle, strobeLevel) emberAfFillExternalBuffer(                   \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_START_WARNING_COMMAND_ID, "uuuu", warningInfo, warningDuration, strobeDutyCycle, strobeLevel);
+
+/** @brief Command description for Squawk
+ *
+ * Command: Squawk
+ * @param squawkInfo SquawkInfo
+ */
+#define emberAfFillCommandIAS                                                                                                      \
+    WDClusterSquawk(squawkInfo) emberAfFillExternalBuffer(mask,                                                                    \
+                                                                                                                                   \
+                                                          ZCL_SQUAWK_COMMAND_ID, "u", squawkInfo);
+
+/** @brief Command description for ChangeChannel
+ *
+ * Command: ChangeChannel
+ * @param match CHAR_STRING
+ */
+#define emberAfFillCommandTV                                                                                                       \
+    ChannelClusterChangeChannel(match) emberAfFillExternalBuffer(mask,                                                             \
+                                                                                                                                   \
+                                                                 ZCL_CHANGE_CHANNEL_COMMAND_ID, "u", match);
+
+/** @brief Command description for ChangeChannelResponse
+ *
+ * Command: ChangeChannelResponse
+ * @param ChannelMatch TvChannelInfo []
+ * @param ChannelMatchLen int
+ * @param ErrorType TvChannelErrorType
+ */
+#define emberAfFillCommandTV                                                                                                       \
+    ChannelClusterChangeChannelResponse(ChannelMatch, ChannelMatchLen, ErrorType)                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CHANGE_CHANNEL_RESPONSE_COMMAND_ID, "bu", ChannelMatch, ChannelMatchLen, ErrorType);
+
+/** @brief Command description for ChangeChannelByNumber
+ *
+ * Command: ChangeChannelByNumber
+ * @param majorNumber INT16U
+ * @param minorNumber INT16U
+ */
+#define emberAfFillCommandTV                                                                                                       \
+    ChannelClusterChangeChannelByNumber(majorNumber, minorNumber)                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CHANGE_CHANNEL_BY_NUMBER_COMMAND_ID, "uu", majorNumber, minorNumber);
+
+/** @brief Command description for SkipChannel
+ *
+ * Command: SkipChannel
+ * @param Count INT16U
+ */
+#define emberAfFillCommandTV                                                                                                       \
+    ChannelClusterSkipChannel(Count) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_SKIP_CHANNEL_COMMAND_ID, "u", Count);
+
+/** @brief Command description for NavigateTarget
+ *
+ * Command: NavigateTarget
+ * @param target INT8U
+ */
+#define emberAfFillCommandTarget                                                                                                   \
+    NavigatorClusterNavigateTarget(target) emberAfFillExternalBuffer(mask,                                                         \
+                                                                                                                                   \
+                                                                     ZCL_NAVIGATE_TARGET_COMMAND_ID, "u", target);
+
+/** @brief Command description for NavigateTargetResponse
+ *
+ * Command: NavigateTargetResponse
+ * @param status NavigateTargetStatus
+ */
+#define emberAfFillCommandTarget                                                                                                   \
+    NavigatorClusterNavigateTargetResponse(status)                                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_NAVIGATE_TARGET_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for NavigateTarget
+ *
+ * Command: NavigateTarget
+ * @param data CHAR_STRING
+ */
+#define emberAfFillCommandTarget                                                                                                   \
+    NavigatorClusterNavigateTarget(data) emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_NAVIGATE_TARGET_COMMAND_ID, "u", data);
+
+/** @brief Command description for NavigateTargetResponse
+ *
+ * Command: NavigateTargetResponse
+ * @param data CHAR_STRING
+ */
+#define emberAfFillCommandTarget                                                                                                   \
+    NavigatorClusterNavigateTargetResponse(data) emberAfFillExternalBuffer(mask,                                                   \
+                                                                                                                                   \
+                                                                           ZCL_NAVIGATE_TARGET_RESPONSE_COMMAND_ID, "u", data);
+
+/** @brief Command description for MediaPlay
+ *
+ * Command: MediaPlay
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaPlay() emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_MEDIA_PLAY_COMMAND_ID, "", );
+
+/** @brief Command description for MediaPlayResponse
+ *
+ * Command: MediaPlayResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaPlayResponse(mediaPlaybackStatus)                                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_PLAY_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaPause
+ *
+ * Command: MediaPause
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaPause() emberAfFillExternalBuffer(mask,                                                                    \
+                                                                                                                                   \
+                                                          ZCL_MEDIA_PAUSE_COMMAND_ID, "", );
+
+/** @brief Command description for MediaPauseResponse
+ *
+ * Command: MediaPauseResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaPauseResponse(mediaPlaybackStatus)                                                                         \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_PAUSE_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaStop
+ *
+ * Command: MediaStop
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaStop() emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_MEDIA_STOP_COMMAND_ID, "", );
+
+/** @brief Command description for MediaStopResponse
+ *
+ * Command: MediaStopResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaStopResponse(mediaPlaybackStatus)                                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_STOP_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaStartOver
+ *
+ * Command: MediaStartOver
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaStartOver() emberAfFillExternalBuffer(mask,                                                                \
+                                                                                                                                   \
+                                                              ZCL_MEDIA_START_OVER_COMMAND_ID, "", );
+
+/** @brief Command description for MediaStartOverResponse
+ *
+ * Command: MediaStartOverResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaStartOverResponse(mediaPlaybackStatus)                                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_START_OVER_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaPrevious
+ *
+ * Command: MediaPrevious
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaPrevious() emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_MEDIA_PREVIOUS_COMMAND_ID, "", );
+
+/** @brief Command description for MediaPreviousResponse
+ *
+ * Command: MediaPreviousResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaPreviousResponse(mediaPlaybackStatus)                                                                      \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_PREVIOUS_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaNext
+ *
+ * Command: MediaNext
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaNext() emberAfFillExternalBuffer(mask,                                                                     \
+                                                                                                                                   \
+                                                         ZCL_MEDIA_NEXT_COMMAND_ID, "", );
+
+/** @brief Command description for MediaNextResponse
+ *
+ * Command: MediaNextResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaNextResponse(mediaPlaybackStatus)                                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_NEXT_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaRewind
+ *
+ * Command: MediaRewind
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaRewind() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_MEDIA_REWIND_COMMAND_ID, "", );
+
+/** @brief Command description for MediaRewindResponse
+ *
+ * Command: MediaRewindResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaRewindResponse(mediaPlaybackStatus)                                                                        \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_REWIND_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaFastForward
+ *
+ * Command: MediaFastForward
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaFastForward() emberAfFillExternalBuffer(mask,                                                              \
+                                                                                                                                   \
+                                                                ZCL_MEDIA_FAST_FORWARD_COMMAND_ID, "", );
+
+/** @brief Command description for MediaFastForwardResponse
+ *
+ * Command: MediaFastForwardResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaFastForwardResponse(mediaPlaybackStatus)                                                                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_FAST_FORWARD_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaSkipForward
+ *
+ * Command: MediaSkipForward
+ * @param deltaPositionMilliseconds INT64U
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaSkipForward(deltaPositionMilliseconds)                                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_SKIP_FORWARD_COMMAND_ID, "u", deltaPositionMilliseconds);
+
+/** @brief Command description for MediaSkipForwardResponse
+ *
+ * Command: MediaSkipForwardResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaSkipForwardResponse(mediaPlaybackStatus)                                                                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_SKIP_FORWARD_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaSkipBackward
+ *
+ * Command: MediaSkipBackward
+ * @param deltaPositionMilliseconds INT64U
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaSkipBackward(deltaPositionMilliseconds)                                                                    \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_SKIP_BACKWARD_COMMAND_ID, "u", deltaPositionMilliseconds);
+
+/** @brief Command description for MediaSkipBackwardResponse
+ *
+ * Command: MediaSkipBackwardResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaSkipBackwardResponse(mediaPlaybackStatus)                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_SKIP_BACKWARD_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for MediaSkipSeek
+ *
+ * Command: MediaSkipSeek
+ * @param position INT64U
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaSkipSeek(position) emberAfFillExternalBuffer(mask,                                                         \
+                                                                                                                                   \
+                                                                     ZCL_MEDIA_SKIP_SEEK_COMMAND_ID, "u", position);
+
+/** @brief Command description for MediaSkipSeekResponse
+ *
+ * Command: MediaSkipSeekResponse
+ * @param mediaPlaybackStatus MediaPlaybackStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    PlaybackClusterMediaSkipSeekResponse(mediaPlaybackStatus)                                                                      \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_MEDIA_SKIP_SEEK_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+
+/** @brief Command description for SelectInput
+ *
+ * Command: SelectInput
+ * @param index INT8U
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    InputClusterSelectInput(index) emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_SELECT_INPUT_COMMAND_ID, "u", index);
+
+/** @brief Command description for ShowInputStatus
+ *
+ * Command: ShowInputStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    InputClusterShowInputStatus() emberAfFillExternalBuffer(mask,                                                                  \
+                                                                                                                                   \
+                                                            ZCL_SHOW_INPUT_STATUS_COMMAND_ID, "", );
+
+/** @brief Command description for HideInputStatus
+ *
+ * Command: HideInputStatus
+ */
+#define emberAfFillCommandMedia                                                                                                    \
+    InputClusterHideInputStatus() emberAfFillExternalBuffer(mask,                                                                  \
+                                                                                                                                   \
+                                                            ZCL_HIDE_INPUT_STATUS_COMMAND_ID, "", );
+
+/** @brief Command description for RenameInput
+ *
+ * Command: RenameInput
+ * @param index INT8U
  * @param name CHAR_STRING
  */
-#define emberAfFillCommandChattingClusterStartChatRequest(name)                                                                    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
+#define emberAfFillCommandMedia                                                                                                    \
+    InputClusterRenameInput(index, name) emberAfFillExternalBuffer(mask,                                                           \
                                                                                                                                    \
-                              ZCL_START_CHAT_REQUEST_COMMAND_ID, "u", name);
+                                                                   ZCL_RENAME_INPUT_COMMAND_ID, "uu", index, name);
 
-/** @brief Command description for SearchChatResponse
+/** @brief Command description for Sleep
  *
- * Command: SearchChatResponse
- * @param options BITMAP8
+ * Command: Sleep
  */
-#define emberAfFillCommandChattingClusterSearchChatResponse(options)                                                               \
-    emberAfFillExternalBuffer(mask,                                                                                                \
+#define emberAfFillCommandLow                                                                                                      \
+    PowerClusterSleep() emberAfFillExternalBuffer(mask,                                                                            \
                                                                                                                                    \
-                              ZCL_SEARCH_CHAT_RESPONSE_COMMAND_ID, "u", options);
+                                                  ZCL_SLEEP_COMMAND_ID, "", );
 
-/** @brief Command description for StartChatRequest
+/** @brief Command description for SendKey
  *
- * Command: StartChatRequest
- * @param uid INT16U
+ * Command: SendKey
+ * @param keyCode KeypadInputCecKeyCode
  */
-#define emberAfFillCommandChattingClusterStartChatRequest(uid)                                                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
+#define emberAfFillCommandKeypad                                                                                                   \
+    InputClusterSendKey(keyCode) emberAfFillExternalBuffer(mask,                                                                   \
                                                                                                                                    \
-                              ZCL_START_CHAT_REQUEST_COMMAND_ID, "u", uid);
+                                                           ZCL_SEND_KEY_COMMAND_ID, "u", keyCode);
 
-/** @brief Command description for SearchChatResponse
+/** @brief Command description for SendKeyResponse
  *
- * Command: SearchChatResponse
- * @param chatRoomList ChatRoom []
- * @param chatRoomListLen int
+ * Command: SendKeyResponse
+ * @param status KeypadInputStatus
  */
-#define emberAfFillCommandChattingClusterSearchChatResponse(chatRoomList, chatRoomListLen)                                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
+#define emberAfFillCommandKeypad                                                                                                   \
+    InputClusterSendKeyResponse(status) emberAfFillExternalBuffer(mask,                                                            \
                                                                                                                                    \
-                              ZCL_SEARCH_CHAT_RESPONSE_COMMAND_ID, "b", chatRoomList, chatRoomListLen);
+                                                                  ZCL_SEND_KEY_RESPONSE_COMMAND_ID, "u", status);
 
-/** @brief Command description for StartChatRequest
+/** @brief Command description for LaunchContent
  *
- * Command: StartChatRequest
- * @param nickname CHAR_STRING
+ * Command: LaunchContent
+ * @param autoPlay BOOLEAN
  */
-#define emberAfFillCommandChattingClusterStartChatRequest(nickname)                                                                \
-    emberAfFillExternalBuffer(mask,                                                                                                \
+#define emberAfFillCommandContent                                                                                                  \
+    LauncherClusterLaunchContent(autoPlay) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
-                              ZCL_START_CHAT_REQUEST_COMMAND_ID, "u", nickname);
+                                                                     ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", autoPlay);
 
-/** @brief Command description for ChatMessage
+/** @brief Command description for LaunchContentResponse
  *
- * Command: ChatMessage
- * @param destinationUid INT16U
+ * Command: LaunchContentResponse
+ * @param data CHAR_STRING
  */
-#define emberAfFillCommandChattingClusterChatMessage(destinationUid)                                                               \
-    emberAfFillExternalBuffer(mask,                                                                                                \
+#define emberAfFillCommandContent                                                                                                  \
+    LauncherClusterLaunchContentResponse(data) emberAfFillExternalBuffer(mask,                                                     \
                                                                                                                                    \
-                              ZCL_CHAT_MESSAGE_COMMAND_ID, "u", destinationUid);
+                                                                         ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID, "u", data);
 
-/** @brief Command description for SwitchChairmanRequest
+/** @brief Command description for LaunchContent
  *
- * Command: SwitchChairmanRequest
- * @param cid INT16U
+ * Command: LaunchContent
+ * @param data CHAR_STRING
  */
-#define emberAfFillCommandChattingClusterSwitchChairmanRequest(cid)                                                                \
+#define emberAfFillCommandContent                                                                                                  \
+    LauncherClusterLaunchContent(data) emberAfFillExternalBuffer(mask,                                                             \
+                                                                                                                                   \
+                                                                 ZCL_LAUNCH_CONTENT_COMMAND_ID, "u", data);
+
+/** @brief Command description for LaunchContentResponse
+ *
+ * Command: LaunchContentResponse
+ * @param contentLaunchStatus ContentLaunchStatus
+ */
+#define emberAfFillCommandContent                                                                                                  \
+    LauncherClusterLaunchContentResponse(contentLaunchStatus)                                                                      \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID, "u", contentLaunchStatus);
+
+/** @brief Command description for LaunchURL
+ *
+ * Command: LaunchURL
+ * @param contentURL CHAR_STRING
+ */
+#define emberAfFillCommandContent                                                                                                  \
+    LauncherClusterLaunchURL(contentURL) emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_LAUNCH_URL_COMMAND_ID, "u", contentURL);
+
+/** @brief Command description for LaunchURLResponse
+ *
+ * Command: LaunchURLResponse
+ * @param data CHAR_STRING
+ */
+#define emberAfFillCommandContent                                                                                                  \
+    LauncherClusterLaunchURLResponse(data) emberAfFillExternalBuffer(mask,                                                         \
+                                                                                                                                   \
+                                                                     ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID, "u", data);
+
+/** @brief Command description for LaunchURL
+ *
+ * Command: LaunchURL
+ * @param displayString CHAR_STRING
+ */
+#define emberAfFillCommandContent                                                                                                  \
+    LauncherClusterLaunchURL(displayString) emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_LAUNCH_URL_COMMAND_ID, "u", displayString);
+
+/** @brief Command description for LaunchURLResponse
+ *
+ * Command: LaunchURLResponse
+ * @param contentLaunchStatus ContentLaunchStatus
+ */
+#define emberAfFillCommandContent                                                                                                  \
+    LauncherClusterLaunchURLResponse(contentLaunchStatus)                                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID, "u", contentLaunchStatus);
+
+/** @brief Command description for SelectOutput
+ *
+ * Command: SelectOutput
+ * @param index INT8U
+ */
+#define emberAfFillCommandAudio                                                                                                    \
+    OutputClusterSelectOutput(index) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_SELECT_OUTPUT_COMMAND_ID, "u", index);
+
+/** @brief Command description for RenameOutput
+ *
+ * Command: RenameOutput
+ * @param index INT8U
+ * @param name CHAR_STRING
+ */
+#define emberAfFillCommandAudio                                                                                                    \
+    OutputClusterRenameOutput(index, name) emberAfFillExternalBuffer(mask,                                                         \
+                                                                                                                                   \
+                                                                     ZCL_RENAME_OUTPUT_COMMAND_ID, "uu", index, name);
+
+/** @brief Command description for LaunchApp
+ *
+ * Command: LaunchApp
+ * @param data CHAR_STRING
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    LauncherClusterLaunchApp(data) emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_LAUNCH_APP_COMMAND_ID, "u", data);
+
+/** @brief Command description for LaunchAppResponse
+ *
+ * Command: LaunchAppResponse
+ * @param status ApplicationLauncherStatus
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    LauncherClusterLaunchAppResponse(status) emberAfFillExternalBuffer(mask,                                                       \
+                                                                                                                                   \
+                                                                       ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, "u", status);
+
+/** @brief Command description for LaunchApp
+ *
+ * Command: LaunchApp
+ * @param application ApplicationLauncherApp []
+ * @param applicationLen int
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    LauncherClusterLaunchApp(application, applicationLen)                                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_LAUNCH_APP_COMMAND_ID, "b", application, applicationLen);
+
+/** @brief Command description for LaunchAppResponse
+ *
+ * Command: LaunchAppResponse
+ * @param data CHAR_STRING
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    LauncherClusterLaunchAppResponse(data) emberAfFillExternalBuffer(mask,                                                         \
+                                                                                                                                   \
+                                                                     ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, "u", data);
+
+/** @brief Command description for ChangeStatus
+ *
+ * Command: ChangeStatus
+ * @param status ApplicationBasicStatus
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    BasicClusterChangeStatus(status) emberAfFillExternalBuffer(mask,                                                               \
+                                                                                                                                   \
+                                                               ZCL_CHANGE_STATUS_COMMAND_ID, "u", status);
+
+/** @brief Command description for GetSetupPIN
+ *
+ * Command: GetSetupPIN
+ * @param tempAccountIdentifier CHAR_STRING
+ */
+#define emberAfFillCommandAccount                                                                                                  \
+    LoginClusterGetSetupPIN(tempAccountIdentifier)                                                                                 \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_SETUP_PIN_COMMAND_ID, "u", tempAccountIdentifier);
+
+/** @brief Command description for GetSetupPINResponse
+ *
+ * Command: GetSetupPINResponse
+ * @param setupPIN CHAR_STRING
+ */
+#define emberAfFillCommandAccount                                                                                                  \
+    LoginClusterGetSetupPINResponse(setupPIN) emberAfFillExternalBuffer(mask,                                                      \
+                                                                                                                                   \
+                                                                        ZCL_GET_SETUP_PIN_RESPONSE_COMMAND_ID, "u", setupPIN);
+
+/** @brief Command description for Login
+ *
+ * Command: Login
+ * @param tempAccountIdentifier CHAR_STRING
+ * @param setupPIN CHAR_STRING
+ */
+#define emberAfFillCommandAccount                                                                                                  \
+    LoginClusterLogin(tempAccountIdentifier, setupPIN)                                                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_LOGIN_COMMAND_ID, "uu", tempAccountIdentifier, setupPIN);
+
+/** @brief Command description for Test
+ *
+ * Command: Test
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTest() emberAfFillExternalBuffer(mask,                                                                           \
+                                                                                                                                   \
+                                                   ZCL_TEST_COMMAND_ID, "", );
+
+/** @brief Command description for TestSpecificResponse
+ *
+ * Command: TestSpecificResponse
+ * @param returnValue INT8U
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestSpecificResponse(returnValue)                                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID, "u", returnValue);
+
+/** @brief Command description for TestNotHandled
+ *
+ * Command: TestNotHandled
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestNotHandled() emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_TEST_NOT_HANDLED_COMMAND_ID, "", );
+
+/** @brief Command description for TestSpecific
+ *
+ * Command: TestSpecific
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestSpecific() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_TEST_SPECIFIC_COMMAND_ID, "", );
+
+/** @brief Command description for TestUnknownCommand
+ *
+ * Command: TestUnknownCommand
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestUnknownCommand() emberAfFillExternalBuffer(mask,                                                             \
+                                                                                                                                   \
+                                                                 ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID, "", );
+
+/** @brief Command description for GetLastMessage
+ *
+ * Command: GetLastMessage
+ */
+#define emberAfFillCommandMessagingClusterGetLastMessage()                                                                         \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_SWITCH_CHAIRMAN_REQUEST_COMMAND_ID, "u", cid);
+                              ZCL_GET_LAST_MESSAGE_COMMAND_ID, "", );
 
-/** @brief Command description for ChatMessage
+/** @brief Command description for DisplayMessage
  *
- * Command: ChatMessage
- * @param sourceUid INT16U
- * @param cid INT16U
- * @param nickname CHAR_STRING
+ * Command: DisplayMessage
+ * @param messageId INT32U
+ * @param messageControl MessagingControlMask
+ * @param startTime UTC_TIME
+ * @param durationInMinutes INT16U
  * @param message CHAR_STRING
+ * @param optionalExtendedMessageControl MessagingExtendedControlMask
  */
-#define emberAfFillCommandChattingClusterChatMessage(sourceUid, cid, nickname, message)                                            \
+#define emberAfFillCommandMessagingClusterDisplayMessage(messageId, messageControl, startTime, durationInMinutes, message,         \
+                                                         optionalExtendedMessageControl)                                           \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_CHAT_MESSAGE_COMMAND_ID, "uuuu", sourceUid, cid, nickname, message);
+                              ZCL_DISPLAY_MESSAGE_COMMAND_ID, "uuuuuu", messageId, messageControl, startTime, durationInMinutes,   \
+                              message, optionalExtendedMessageControl);
 
-/** @brief Command description for GetNodeInformationRequest
+/** @brief Command description for CancelMessage
  *
- * Command: GetNodeInformationRequest
- * @param cid INT16U
+ * Command: CancelMessage
+ * @param messageId INT32U
  */
-#define emberAfFillCommandChattingClusterGetNodeInformationRequest(cid)                                                            \
+#define emberAfFillCommandMessagingClusterCancelMessage(messageId)                                                                 \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_GET_NODE_INFORMATION_REQUEST_COMMAND_ID, "u", cid);
+                              ZCL_CANCEL_MESSAGE_COMMAND_ID, "u", messageId);
 
-/** @brief Command description for SwitchChairmanConfirm
+/** @brief Command description for MessageConfirmation
  *
- * Command: SwitchChairmanConfirm
- * @param cid INT16U
+ * Command: MessageConfirmation
+ * @param messageId INT32U
  */
-#define emberAfFillCommandChattingClusterSwitchChairmanConfirm(cid)                                                                \
+#define emberAfFillCommandMessagingClusterMessageConfirmation(messageId)                                                           \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_SWITCH_CHAIRMAN_CONFIRM_COMMAND_ID, "u", cid);
+                              ZCL_MESSAGE_CONFIRMATION_COMMAND_ID, "u", messageId);
 
-/** @brief Command description for GetNodeInformationRequest
+/** @brief Command description for CancelMessage
  *
- * Command: GetNodeInformationRequest
- * @param uid INT16U
+ * Command: CancelMessage
+ * @param messageControl MessagingControlMask
  */
-#define emberAfFillCommandChattingClusterGetNodeInformationRequest(uid)                                                            \
+#define emberAfFillCommandMessagingClusterCancelMessage(messageControl)                                                            \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_GET_NODE_INFORMATION_REQUEST_COMMAND_ID, "u", uid);
+                              ZCL_CANCEL_MESSAGE_COMMAND_ID, "u", messageControl);
 
-/** @brief Command description for SwitchChairmanConfirm
+/** @brief Command description for MessageConfirmation
  *
- * Command: SwitchChairmanConfirm
- * @param nodeInformationList NodeInformation []
- * @param nodeInformationListLen int
+ * Command: MessageConfirmation
+ * @param confirmationTime UTC_TIME
+ * @param messageConfirmationControl BITMAP8
+ * @param messageResponse OCTET_STRING
  */
-#define emberAfFillCommandChattingClusterSwitchChairmanConfirm(nodeInformationList, nodeInformationListLen)                        \
+#define emberAfFillCommandMessagingClusterMessageConfirmation(confirmationTime, messageConfirmationControl, messageResponse)       \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_SWITCH_CHAIRMAN_CONFIRM_COMMAND_ID, "b", nodeInformationList, nodeInformationListLen);
+                              ZCL_MESSAGE_CONFIRMATION_COMMAND_ID, "uuu", confirmationTime, messageConfirmationControl,            \
+                              messageResponse);
 
-/** @brief Command description for SwitchChairmanNotification
+/** @brief Command description for DisplayProtectedMessage
  *
- * Command: SwitchChairmanNotification
- * @param cid INT16U
- * @param uid INT16U
- * @param address DATA16
- * @param endpoint INT8U
+ * Command: DisplayProtectedMessage
+ * @param messageId INT32U
  */
-#define emberAfFillCommandChattingClusterSwitchChairmanNotification(cid, uid, address, endpoint)                                   \
+#define emberAfFillCommandMessagingClusterDisplayProtectedMessage(messageId)                                                       \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_SWITCH_CHAIRMAN_NOTIFICATION_COMMAND_ID, "uuuu", cid, uid, address, endpoint);
+                              ZCL_DISPLAY_PROTECTED_MESSAGE_COMMAND_ID, "u", messageId);
 
-/** @brief Command description for GetNodeInformationResponse
+/** @brief Command description for GetMessageCancellation
  *
- * Command: GetNodeInformationResponse
- * @param status ENUM8
- * @param cid INT16U
- * @param uid INT16U
- * @param addressEndpointAndNickname INT8U []
- * @param addressEndpointAndNicknameLen int
+ * Command: GetMessageCancellation
+ * @param earliestImplementationTime UTC_TIME
  */
-#define emberAfFillCommandChattingClusterGetNodeInformationResponse(status, cid, uid, addressEndpointAndNickname,                  \
-                                                                    addressEndpointAndNicknameLen)                                 \
+#define emberAfFillCommandMessagingClusterGetMessageCancellation(earliestImplementationTime)                                       \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_GET_NODE_INFORMATION_RESPONSE_COMMAND_ID, "uuub", status, cid, uid, addressEndpointAndNickname,  \
-                              addressEndpointAndNicknameLen);
+                              ZCL_GET_MESSAGE_CANCELLATION_COMMAND_ID, "u", earliestImplementationTime);
 
-/** @brief Command description for BuyRequest
+/** @brief Command description for DisplayProtectedMessage
  *
- * Command: BuyRequest
- * @param userId OCTET_STRING
+ * Command: DisplayProtectedMessage
+ * @param messageControl MessagingControlMask
+ * @param startTime UTC_TIME
+ * @param durationInMinutes INT16U
+ * @param message CHAR_STRING
+ * @param optionalExtendedMessageControl MessagingExtendedControlMask
  */
-#define emberAfFillCommandPaymentClusterBuyRequest(userId)                                                                         \
+#define emberAfFillCommandMessagingClusterDisplayProtectedMessage(messageControl, startTime, durationInMinutes, message,           \
+                                                                  optionalExtendedMessageControl)                                  \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_BUY_REQUEST_COMMAND_ID, "u", userId);
+                              ZCL_DISPLAY_PROTECTED_MESSAGE_COMMAND_ID, "uuuuu", messageControl, startTime, durationInMinutes,     \
+                              message, optionalExtendedMessageControl);
 
-/** @brief Command description for BuyConfirm
+/** @brief Command description for CancelAllMessages
  *
- * Command: BuyConfirm
- * @param serialNumber OCTET_STRING
+ * Command: CancelAllMessages
+ * @param implementationDateTime UTC_TIME
  */
-#define emberAfFillCommandPaymentClusterBuyConfirm(serialNumber)                                                                   \
+#define emberAfFillCommandMessagingClusterCancelAllMessages(implementationDateTime)                                                \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_BUY_CONFIRM_COMMAND_ID, "u", serialNumber);
-
-/** @brief Command description for BuyRequest
- *
- * Command: BuyRequest
- * @param userType INT16U
- */
-#define emberAfFillCommandPaymentClusterBuyRequest(userType)                                                                       \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_BUY_REQUEST_COMMAND_ID, "u", userType);
-
-/** @brief Command description for BuyConfirm
- *
- * Command: BuyConfirm
- * @param currency INT32U
- */
-#define emberAfFillCommandPaymentClusterBuyConfirm(currency)                                                                       \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_BUY_CONFIRM_COMMAND_ID, "u", currency);
-
-/** @brief Command description for BuyRequest
- *
- * Command: BuyRequest
- * @param serviceId INT16U
- */
-#define emberAfFillCommandPaymentClusterBuyRequest(serviceId)                                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_BUY_REQUEST_COMMAND_ID, "u", serviceId);
-
-/** @brief Command description for BuyConfirm
- *
- * Command: BuyConfirm
- * @param priceTrailingDigit INT8U
- */
-#define emberAfFillCommandPaymentClusterBuyConfirm(priceTrailingDigit)                                                             \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_BUY_CONFIRM_COMMAND_ID, "u", priceTrailingDigit);
-
-/** @brief Command description for BuyRequest
- *
- * Command: BuyRequest
- * @param goodId OCTET_STRING
- */
-#define emberAfFillCommandPaymentClusterBuyRequest(goodId)                                                                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_BUY_REQUEST_COMMAND_ID, "u", goodId);
-
-/** @brief Command description for BuyConfirm
- *
- * Command: BuyConfirm
- * @param price INT32U
- * @param timestamp OCTET_STRING
- * @param transId INT16U
- * @param transStatus ENUM8
- */
-#define emberAfFillCommandPaymentClusterBuyConfirm(price, timestamp, transId, transStatus)                                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_BUY_CONFIRM_COMMAND_ID, "uuuu", price, timestamp, transId, transStatus);
-
-/** @brief Command description for AcceptPayment
- *
- * Command: AcceptPayment
- * @param userId OCTET_STRING
- */
-#define emberAfFillCommandPaymentClusterAcceptPayment(userId)                                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_ACCEPT_PAYMENT_COMMAND_ID, "u", userId);
-
-/** @brief Command description for ReceiptDelivery
- *
- * Command: ReceiptDelivery
- * @param serialNumber OCTET_STRING
- */
-#define emberAfFillCommandPaymentClusterReceiptDelivery(serialNumber)                                                              \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RECEIPT_DELIVERY_COMMAND_ID, "u", serialNumber);
-
-/** @brief Command description for AcceptPayment
- *
- * Command: AcceptPayment
- * @param userType INT16U
- */
-#define emberAfFillCommandPaymentClusterAcceptPayment(userType)                                                                    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_ACCEPT_PAYMENT_COMMAND_ID, "u", userType);
-
-/** @brief Command description for ReceiptDelivery
- *
- * Command: ReceiptDelivery
- * @param currency INT32U
- */
-#define emberAfFillCommandPaymentClusterReceiptDelivery(currency)                                                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RECEIPT_DELIVERY_COMMAND_ID, "u", currency);
-
-/** @brief Command description for AcceptPayment
- *
- * Command: AcceptPayment
- * @param serviceId INT16U
- */
-#define emberAfFillCommandPaymentClusterAcceptPayment(serviceId)                                                                   \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_ACCEPT_PAYMENT_COMMAND_ID, "u", serviceId);
-
-/** @brief Command description for ReceiptDelivery
- *
- * Command: ReceiptDelivery
- * @param priceTrailingDigit INT8U
- */
-#define emberAfFillCommandPaymentClusterReceiptDelivery(priceTrailingDigit)                                                        \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RECEIPT_DELIVERY_COMMAND_ID, "u", priceTrailingDigit);
-
-/** @brief Command description for AcceptPayment
- *
- * Command: AcceptPayment
- * @param goodId OCTET_STRING
- */
-#define emberAfFillCommandPaymentClusterAcceptPayment(goodId)                                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_ACCEPT_PAYMENT_COMMAND_ID, "u", goodId);
-
-/** @brief Command description for ReceiptDelivery
- *
- * Command: ReceiptDelivery
- * @param price INT32U
- * @param timestamp OCTET_STRING
- */
-#define emberAfFillCommandPaymentClusterReceiptDelivery(price, timestamp)                                                          \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_RECEIPT_DELIVERY_COMMAND_ID, "uu", price, timestamp);
-
-/** @brief Command description for PaymentConfirm
- *
- * Command: PaymentConfirm
- * @param serialNumber OCTET_STRING
- */
-#define emberAfFillCommandPaymentClusterPaymentConfirm(serialNumber)                                                               \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_PAYMENT_CONFIRM_COMMAND_ID, "u", serialNumber);
-
-/** @brief Command description for TransactionEnd
- *
- * Command: TransactionEnd
- * @param serialNumber OCTET_STRING
- */
-#define emberAfFillCommandPaymentClusterTransactionEnd(serialNumber)                                                               \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_TRANSACTION_END_COMMAND_ID, "u", serialNumber);
-
-/** @brief Command description for PaymentConfirm
- *
- * Command: PaymentConfirm
- * @param transId INT16U
- */
-#define emberAfFillCommandPaymentClusterPaymentConfirm(transId)                                                                    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_PAYMENT_CONFIRM_COMMAND_ID, "u", transId);
-
-/** @brief Command description for TransactionEnd
- *
- * Command: TransactionEnd
- * @param status ENUM8
- */
-#define emberAfFillCommandPaymentClusterTransactionEnd(status)                                                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_TRANSACTION_END_COMMAND_ID, "u", status);
-
-/** @brief Command description for PaymentConfirm
- *
- * Command: PaymentConfirm
- * @param transStatus ENUM8
- */
-#define emberAfFillCommandPaymentClusterPaymentConfirm(transStatus)                                                                \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_PAYMENT_CONFIRM_COMMAND_ID, "u", transStatus);
-
-/** @brief Command description for Subscribe
- *
- * Command: Subscribe
- * @param userId OCTET_STRING
- */
-#define emberAfFillCommandBillingClusterSubscribe(userId)                                                                          \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SUBSCRIBE_COMMAND_ID, "u", userId);
-
-/** @brief Command description for CheckBillStatus
- *
- * Command: CheckBillStatus
- * @param userId OCTET_STRING
- */
-#define emberAfFillCommandBillingClusterCheckBillStatus(userId)                                                                    \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_CHECK_BILL_STATUS_COMMAND_ID, "u", userId);
-
-/** @brief Command description for Subscribe
- *
- * Command: Subscribe
- * @param serviceId INT16U
- */
-#define emberAfFillCommandBillingClusterSubscribe(serviceId)                                                                       \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SUBSCRIBE_COMMAND_ID, "u", serviceId);
-
-/** @brief Command description for CheckBillStatus
- *
- * Command: CheckBillStatus
- * @param serviceId INT16U
- */
-#define emberAfFillCommandBillingClusterCheckBillStatus(serviceId)                                                                 \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_CHECK_BILL_STATUS_COMMAND_ID, "u", serviceId);
-
-/** @brief Command description for Subscribe
- *
- * Command: Subscribe
- * @param serviceProviderId INT16U
- */
-#define emberAfFillCommandBillingClusterSubscribe(serviceProviderId)                                                               \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SUBSCRIBE_COMMAND_ID, "u", serviceProviderId);
-
-/** @brief Command description for CheckBillStatus
- *
- * Command: CheckBillStatus
- * @param serviceProviderId INT16U
- */
-#define emberAfFillCommandBillingClusterCheckBillStatus(serviceProviderId)                                                         \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_CHECK_BILL_STATUS_COMMAND_ID, "u", serviceProviderId);
-
-/** @brief Command description for Unsubscribe
- *
- * Command: Unsubscribe
- * @param userId OCTET_STRING
- */
-#define emberAfFillCommandBillingClusterUnsubscribe(userId)                                                                        \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_UNSUBSCRIBE_COMMAND_ID, "u", userId);
-
-/** @brief Command description for SendBillRecord
- *
- * Command: SendBillRecord
- * @param userId OCTET_STRING
- */
-#define emberAfFillCommandBillingClusterSendBillRecord(userId)                                                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SEND_BILL_RECORD_COMMAND_ID, "u", userId);
-
-/** @brief Command description for Unsubscribe
- *
- * Command: Unsubscribe
- * @param serviceId INT16U
- */
-#define emberAfFillCommandBillingClusterUnsubscribe(serviceId)                                                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_UNSUBSCRIBE_COMMAND_ID, "u", serviceId);
-
-/** @brief Command description for SendBillRecord
- *
- * Command: SendBillRecord
- * @param serviceId INT16U
- */
-#define emberAfFillCommandBillingClusterSendBillRecord(serviceId)                                                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SEND_BILL_RECORD_COMMAND_ID, "u", serviceId);
-
-/** @brief Command description for Unsubscribe
- *
- * Command: Unsubscribe
- * @param serviceProviderId INT16U
- */
-#define emberAfFillCommandBillingClusterUnsubscribe(serviceProviderId)                                                             \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_UNSUBSCRIBE_COMMAND_ID, "u", serviceProviderId);
-
-/** @brief Command description for SendBillRecord
- *
- * Command: SendBillRecord
- * @param serviceProviderId INT16U
- * @param timestamp OCTET_STRING
- * @param duration INT16U
- */
-#define emberAfFillCommandBillingClusterSendBillRecord(serviceProviderId, timestamp, duration)                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SEND_BILL_RECORD_COMMAND_ID, "uuu", serviceProviderId, timestamp, duration);
-
-/** @brief Command description for StartBillingSession
- *
- * Command: StartBillingSession
- * @param userId OCTET_STRING
- * @param serviceId INT16U
- * @param serviceProviderId INT16U
- */
-#define emberAfFillCommandBillingClusterStartBillingSession(userId, serviceId, serviceProviderId)                                  \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_START_BILLING_SESSION_COMMAND_ID, "uuu", userId, serviceId, serviceProviderId);
-
-/** @brief Command description for StopBillingSession
- *
- * Command: StopBillingSession
- * @param userId OCTET_STRING
- * @param serviceId INT16U
- * @param serviceProviderId INT16U
- */
-#define emberAfFillCommandBillingClusterStopBillingSession(userId, serviceId, serviceProviderId)                                   \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_STOP_BILLING_SESSION_COMMAND_ID, "uuu", userId, serviceId, serviceProviderId);
-
-/** @brief Command description for BillStatusNotification
- *
- * Command: BillStatusNotification
- * @param userId OCTET_STRING
- * @param status ENUM8
- */
-#define emberAfFillCommandBillingClusterBillStatusNotification(userId, status)                                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_BILL_STATUS_NOTIFICATION_COMMAND_ID, "uu", userId, status);
-
-/** @brief Command description for SessionKeepAlive
- *
- * Command: SessionKeepAlive
- * @param userId OCTET_STRING
- * @param serviceId INT16U
- * @param serviceProviderId INT16U
- */
-#define emberAfFillCommandBillingClusterSessionKeepAlive(userId, serviceId, serviceProviderId)                                     \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_SESSION_KEEP_ALIVE_COMMAND_ID, "uuu", userId, serviceId, serviceProviderId);
+                              ZCL_CANCEL_ALL_MESSAGES_COMMAND_ID, "u", implementationDateTime);
 
 /** @brief Command description for GetAlerts
  *
@@ -12160,329 +13150,6 @@
                                   ZCL_GET_MEASUREMENT_PROFILE_RESPONSE_COMMAND_COMMAND_ID, "uub", numberOfIntervalsDelivered,      \
                                   attributeId, intervals, intervalsLen);
 
-/** @brief Command description for ScanRequest
- *
- * Command: ScanRequest
- * @param transaction INT32U
- * @param zigbeeInformation ZigbeeInformation
- * @param zllInformation ZllInformation
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterScanRequest(transaction, zigbeeInformation, zllInformation)                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SCAN_REQUEST_COMMAND_ID, "uuu", transaction, zigbeeInformation, zllInformation);
-
-/** @brief Command description for ScanResponse
- *
- * Command: ScanResponse
- * @param transaction INT32U
- * @param rssiCorrection INT8U
- * @param zigbeeInformation ZigbeeInformation
- * @param zllInformation ZllInformation
- * @param keyBitmask KeyBitmask
- * @param responseId INT32U
- * @param extendedPanId IEEE_ADDRESS
- * @param networkUpdateId INT8U
- * @param logicalChannel INT8U
- * @param panId INT16U
- * @param networkAddress INT16U
- * @param numberOfSubDevices INT8U
- * @param totalGroupIds INT8U
- * @param endpointId INT8U
- * @param profileId INT16U
- * @param deviceId INT16U
- * @param version INT8U
- * @param groupIdCount INT8U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterScanResponse(transaction, rssiCorrection, zigbeeInformation, zllInformation, keyBitmask, responseId,       \
-                                     extendedPanId, networkUpdateId, logicalChannel, panId, networkAddress, numberOfSubDevices,    \
-                                     totalGroupIds, endpointId, profileId, deviceId, version, groupIdCount)                        \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SCAN_RESPONSE_COMMAND_ID, "uuuuuuuuuuuuuuuuuu", transaction, rssiCorrection,                 \
-                                  zigbeeInformation, zllInformation, keyBitmask, responseId, extendedPanId, networkUpdateId,       \
-                                  logicalChannel, panId, networkAddress, numberOfSubDevices, totalGroupIds, endpointId, profileId, \
-                                  deviceId, version, groupIdCount);
-
-/** @brief Command description for DeviceInformationRequest
- *
- * Command: DeviceInformationRequest
- * @param transaction INT32U
- * @param startIndex INT8U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterDeviceInformationRequest(transaction, startIndex)                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEVICE_INFORMATION_REQUEST_COMMAND_ID, "uu", transaction, startIndex);
-
-/** @brief Command description for DeviceInformationResponse
- *
- * Command: DeviceInformationResponse
- * @param transaction INT32U
- * @param numberOfSubDevices INT8U
- * @param startIndex INT8U
- * @param deviceInformationRecordCount INT8U
- * @param deviceInformationRecordList DeviceInformationRecord []
- * @param deviceInformationRecordListLen int
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterDeviceInformationResponse(transaction, numberOfSubDevices, startIndex, deviceInformationRecordCount,       \
-                                                  deviceInformationRecordList, deviceInformationRecordListLen)                     \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEVICE_INFORMATION_RESPONSE_COMMAND_ID, "uuuub", transaction, numberOfSubDevices,            \
-                                  startIndex, deviceInformationRecordCount, deviceInformationRecordList,                           \
-                                  deviceInformationRecordListLen);
-
-/** @brief Command description for IdentifyRequest
- *
- * Command: IdentifyRequest
- * @param transaction INT32U
- * @param identifyDuration INT16U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterIdentifyRequest(transaction, identifyDuration)                                                             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_IDENTIFY_REQUEST_COMMAND_ID, "uu", transaction, identifyDuration);
-
-/** @brief Command description for ResetToFactoryNewRequest
- *
- * Command: ResetToFactoryNewRequest
- * @param transaction INT32U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterResetToFactoryNewRequest(transaction)                                                                      \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_RESET_TO_FACTORY_NEW_REQUEST_COMMAND_ID, "u", transaction);
-
-/** @brief Command description for NetworkStartRequest
- *
- * Command: NetworkStartRequest
- * @param transaction INT32U
- * @param extendedPanId IEEE_ADDRESS
- * @param keyIndex KeyIndex
- * @param encryptedNetworkKey SECURITY_KEY
- * @param logicalChannel INT8U
- * @param panId INT16U
- * @param networkAddress INT16U
- * @param groupIdentifiersBegin INT16U
- * @param groupIdentifiersEnd INT16U
- * @param freeNetworkAddressRangeBegin INT16U
- * @param freeNetworkAddressRangeEnd INT16U
- * @param freeGroupIdentifierRangeBegin INT16U
- * @param freeGroupIdentifierRangeEnd INT16U
- * @param initiatorIeeeAddress IEEE_ADDRESS
- * @param initiatorNetworkAddress INT16U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterNetworkStartRequest(                                                                                       \
-        transaction, extendedPanId, keyIndex, encryptedNetworkKey, logicalChannel, panId, networkAddress, groupIdentifiersBegin,   \
-        groupIdentifiersEnd, freeNetworkAddressRangeBegin, freeNetworkAddressRangeEnd, freeGroupIdentifierRangeBegin,              \
-        freeGroupIdentifierRangeEnd, initiatorIeeeAddress, initiatorNetworkAddress)                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_NETWORK_START_REQUEST_COMMAND_ID, "uuuuuuuuuuuuuuu", transaction, extendedPanId, keyIndex,   \
-                                  encryptedNetworkKey, logicalChannel, panId, networkAddress, groupIdentifiersBegin,               \
-                                  groupIdentifiersEnd, freeNetworkAddressRangeBegin, freeNetworkAddressRangeEnd,                   \
-                                  freeGroupIdentifierRangeBegin, freeGroupIdentifierRangeEnd, initiatorIeeeAddress,                \
-                                  initiatorNetworkAddress);
-
-/** @brief Command description for NetworkStartResponse
- *
- * Command: NetworkStartResponse
- * @param transaction INT32U
- * @param status ZllStatus
- * @param extendedPanId IEEE_ADDRESS
- * @param networkUpdateId INT8U
- * @param logicalChannel INT8U
- * @param panId INT16U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterNetworkStartResponse(transaction, status, extendedPanId, networkUpdateId, logicalChannel, panId)           \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_NETWORK_START_RESPONSE_COMMAND_ID, "uuuuuu", transaction, status, extendedPanId,             \
-                                  networkUpdateId, logicalChannel, panId);
-
-/** @brief Command description for NetworkJoinRouterRequest
- *
- * Command: NetworkJoinRouterRequest
- * @param transaction INT32U
- * @param extendedPanId IEEE_ADDRESS
- * @param keyIndex KeyIndex
- * @param encryptedNetworkKey SECURITY_KEY
- * @param networkUpdateId INT8U
- * @param logicalChannel INT8U
- * @param panId INT16U
- * @param networkAddress INT16U
- * @param groupIdentifiersBegin INT16U
- * @param groupIdentifiersEnd INT16U
- * @param freeNetworkAddressRangeBegin INT16U
- * @param freeNetworkAddressRangeEnd INT16U
- * @param freeGroupIdentifierRangeBegin INT16U
- * @param freeGroupIdentifierRangeEnd INT16U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterNetworkJoinRouterRequest(transaction, extendedPanId, keyIndex, encryptedNetworkKey, networkUpdateId,       \
-                                                 logicalChannel, panId, networkAddress, groupIdentifiersBegin,                     \
-                                                 groupIdentifiersEnd, freeNetworkAddressRangeBegin, freeNetworkAddressRangeEnd,    \
-                                                 freeGroupIdentifierRangeBegin, freeGroupIdentifierRangeEnd)                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_NETWORK_JOIN_ROUTER_REQUEST_COMMAND_ID, "uuuuuuuuuuuuuu", transaction, extendedPanId,        \
-                                  keyIndex, encryptedNetworkKey, networkUpdateId, logicalChannel, panId, networkAddress,           \
-                                  groupIdentifiersBegin, groupIdentifiersEnd, freeNetworkAddressRangeBegin,                        \
-                                  freeNetworkAddressRangeEnd, freeGroupIdentifierRangeBegin, freeGroupIdentifierRangeEnd);
-
-/** @brief Command description for NetworkJoinRouterResponse
- *
- * Command: NetworkJoinRouterResponse
- * @param transaction INT32U
- * @param status ZllStatus
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterNetworkJoinRouterResponse(transaction, status)                                                             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_NETWORK_JOIN_ROUTER_RESPONSE_COMMAND_ID, "uu", transaction, status);
-
-/** @brief Command description for NetworkJoinEndDeviceRequest
- *
- * Command: NetworkJoinEndDeviceRequest
- * @param transaction INT32U
- * @param extendedPanId IEEE_ADDRESS
- * @param keyIndex KeyIndex
- * @param encryptedNetworkKey SECURITY_KEY
- * @param networkUpdateId INT8U
- * @param logicalChannel INT8U
- * @param panId INT16U
- * @param networkAddress INT16U
- * @param groupIdentifiersBegin INT16U
- * @param groupIdentifiersEnd INT16U
- * @param freeNetworkAddressRangeBegin INT16U
- * @param freeNetworkAddressRangeEnd INT16U
- * @param freeGroupIdentifierRangeBegin INT16U
- * @param freeGroupIdentifierRangeEnd INT16U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterNetworkJoinEndDeviceRequest(transaction, extendedPanId, keyIndex, encryptedNetworkKey, networkUpdateId,    \
-                                                    logicalChannel, panId, networkAddress, groupIdentifiersBegin,                  \
-                                                    groupIdentifiersEnd, freeNetworkAddressRangeBegin, freeNetworkAddressRangeEnd, \
-                                                    freeGroupIdentifierRangeBegin, freeGroupIdentifierRangeEnd)                    \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_NETWORK_JOIN_END_DEVICE_REQUEST_COMMAND_ID, "uuuuuuuuuuuuuu", transaction, extendedPanId,    \
-                                  keyIndex, encryptedNetworkKey, networkUpdateId, logicalChannel, panId, networkAddress,           \
-                                  groupIdentifiersBegin, groupIdentifiersEnd, freeNetworkAddressRangeBegin,                        \
-                                  freeNetworkAddressRangeEnd, freeGroupIdentifierRangeBegin, freeGroupIdentifierRangeEnd);
-
-/** @brief Command description for NetworkJoinEndDeviceResponse
- *
- * Command: NetworkJoinEndDeviceResponse
- * @param transaction INT32U
- * @param status ZllStatus
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterNetworkJoinEndDeviceResponse(transaction, status)                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_NETWORK_JOIN_END_DEVICE_RESPONSE_COMMAND_ID, "uu", transaction, status);
-
-/** @brief Command description for NetworkUpdateRequest
- *
- * Command: NetworkUpdateRequest
- * @param transaction INT32U
- * @param extendedPanId IEEE_ADDRESS
- * @param networkUpdateId INT8U
- * @param logicalChannel INT8U
- * @param panId INT16U
- * @param networkAddress INT16U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterNetworkUpdateRequest(transaction, extendedPanId, networkUpdateId, logicalChannel, panId, networkAddress)   \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_NETWORK_UPDATE_REQUEST_COMMAND_ID, "uuuuuu", transaction, extendedPanId, networkUpdateId,    \
-                                  logicalChannel, panId, networkAddress);
-
-/** @brief Command description for EndpointInformation
- *
- * Command: EndpointInformation
- * @param ieeeAddress IEEE_ADDRESS
- * @param networkAddress INT16U
- * @param endpointId INT8U
- * @param profileId INT16U
- * @param deviceId INT16U
- * @param version INT8U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterEndpointInformation(ieeeAddress, networkAddress, endpointId, profileId, deviceId, version)                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENDPOINT_INFORMATION_COMMAND_ID, "uuuuuu", ieeeAddress, networkAddress, endpointId,          \
-                                  profileId, deviceId, version);
-
-/** @brief Command description for GetGroupIdentifiersRequest
- *
- * Command: GetGroupIdentifiersRequest
- * @param startIndex INT8U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterGetGroupIdentifiersRequest(startIndex)                                                                     \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_GET_GROUP_IDENTIFIERS_REQUEST_COMMAND_ID, "u", startIndex);
-
-/** @brief Command description for GetGroupIdentifiersResponse
- *
- * Command: GetGroupIdentifiersResponse
- * @param total INT8U
- * @param startIndex INT8U
- * @param count INT8U
- * @param groupInformationRecordList GroupInformationRecord []
- * @param groupInformationRecordListLen int
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterGetGroupIdentifiersResponse(total, startIndex, count, groupInformationRecordList,                          \
-                                                    groupInformationRecordListLen)                                                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_GET_GROUP_IDENTIFIERS_RESPONSE_COMMAND_ID, "uuub", total, startIndex, count,                 \
-                                  groupInformationRecordList, groupInformationRecordListLen);
-
-/** @brief Command description for GetEndpointListRequest
- *
- * Command: GetEndpointListRequest
- * @param startIndex INT8U
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterGetEndpointListRequest(startIndex)                                                                         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_GET_ENDPOINT_LIST_REQUEST_COMMAND_ID, "u", startIndex);
-
-/** @brief Command description for GetEndpointListResponse
- *
- * Command: GetEndpointListResponse
- * @param total INT8U
- * @param startIndex INT8U
- * @param count INT8U
- * @param endpointInformationRecordList EndpointInformationRecord []
- * @param endpointInformationRecordListLen int
- */
-#define emberAfFillCommandZLL                                                                                                      \
-    CommissioningClusterGetEndpointListResponse(total, startIndex, count, endpointInformationRecordList,                           \
-                                                endpointInformationRecordListLen)                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_GET_ENDPOINT_LIST_RESPONSE_COMMAND_ID, "uuub", total, startIndex, count,                     \
-                                  endpointInformationRecordList, endpointInformationRecordListLen);
-
 /** @brief Command description for Bind
  *
  * Command: Bind
@@ -12520,708 +13187,3 @@
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_COMMAND_ONE_COMMAND_ID, "uu", argOne, argOne);
-
-/** @brief Command description for SetToken
- *
- * Command: SetToken
- * @param token INT16U
- */
-#define emberAfFillCommandConfiguration                                                                                            \
-    ClusterClusterSetToken(token) emberAfFillExternalBuffer(mask,                                                                  \
-                                                                                                                                   \
-                                                            ZCL_SET_TOKEN_COMMAND_ID, "u", token);
-
-/** @brief Command description for ReturnToken
- *
- * Command: ReturnToken
- * @param token INT16U
- */
-#define emberAfFillCommandConfiguration                                                                                            \
-    ClusterClusterReturnToken(token) emberAfFillExternalBuffer(mask,                                                               \
-                                                                                                                                   \
-                                                               ZCL_RETURN_TOKEN_COMMAND_ID, "u", token);
-
-/** @brief Command description for SetToken
- *
- * Command: SetToken
- * @param data OCTET_STRING
- */
-#define emberAfFillCommandConfiguration                                                                                            \
-    ClusterClusterSetToken(data) emberAfFillExternalBuffer(mask,                                                                   \
-                                                                                                                                   \
-                                                           ZCL_SET_TOKEN_COMMAND_ID, "u", data);
-
-/** @brief Command description for ReturnToken
- *
- * Command: ReturnToken
- * @param data OCTET_STRING
- */
-#define emberAfFillCommandConfiguration                                                                                            \
-    ClusterClusterReturnToken(data) emberAfFillExternalBuffer(mask,                                                                \
-                                                                                                                                   \
-                                                              ZCL_RETURN_TOKEN_COMMAND_ID, "u", data);
-
-/** @brief Command description for LockTokens
- *
- * Command: LockTokens
- */
-#define emberAfFillCommandConfiguration                                                                                            \
-    ClusterClusterLockTokens() emberAfFillExternalBuffer(mask,                                                                     \
-                                                                                                                                   \
-                                                         ZCL_LOCK_TOKENS_COMMAND_ID, "", );
-
-/** @brief Command description for ReadTokens
- *
- * Command: ReadTokens
- * @param token INT16U
- */
-#define emberAfFillCommandConfiguration                                                                                            \
-    ClusterClusterReadTokens(token) emberAfFillExternalBuffer(mask,                                                                \
-                                                                                                                                   \
-                                                              ZCL_READ_TOKENS_COMMAND_ID, "u", token);
-
-/** @brief Command description for UnlockTokens
- *
- * Command: UnlockTokens
- * @param data OCTET_STRING
- */
-#define emberAfFillCommandConfiguration                                                                                            \
-    ClusterClusterUnlockTokens(data) emberAfFillExternalBuffer(mask,                                                               \
-                                                                                                                                   \
-                                                               ZCL_UNLOCK_TOKENS_COMMAND_ID, "u", data);
-
-/** @brief Command description for stream
- *
- * Command: stream
- * @param channel INT8U
- * @param power INT8S
- * @param time INT16U
- */
-#define emberAfFillCommandMFGLIB                                                                                                   \
-    ClusterClusterstream(channel, power, time) emberAfFillExternalBuffer(mask,                                                     \
-                                                                                                                                   \
-                                                                         ZCL_STREAM_COMMAND_ID, "uuu", channel, power, time);
-
-/** @brief Command description for tone
- *
- * Command: tone
- * @param channel INT8U
- * @param power INT8S
- * @param time INT16U
- */
-#define emberAfFillCommandMFGLIB                                                                                                   \
-    ClusterClustertone(channel, power, time) emberAfFillExternalBuffer(mask,                                                       \
-                                                                                                                                   \
-                                                                       ZCL_TONE_COMMAND_ID, "uuu", channel, power, time);
-
-/** @brief Command description for rxMode
- *
- * Command: rxMode
- * @param channel INT8U
- * @param power INT8S
- * @param time INT16U
- */
-#define emberAfFillCommandMFGLIB                                                                                                   \
-    ClusterClusterrxMode(channel, power, time) emberAfFillExternalBuffer(mask,                                                     \
-                                                                                                                                   \
-                                                                         ZCL_RX_MODE_COMMAND_ID, "uuu", channel, power, time);
-
-/** @brief Command description for EnableApsLinkKeyAuthorization
- *
- * Command: EnableApsLinkKeyAuthorization
- * @param numberExemptClusters INT8U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableApsLinkKeyAuthorization(numberExemptClusters)                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_APS_LINK_KEY_AUTHORIZATION_COMMAND_ID, "u", numberExemptClusters);
-
-/** @brief Command description for ApsLinkKeyAuthorizationQueryResponse
- *
- * Command: ApsLinkKeyAuthorizationQueryResponse
- * @param clusterId CLUSTER_ID
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterApsLinkKeyAuthorizationQueryResponse(clusterId)                                                      \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_APS_LINK_KEY_AUTHORIZATION_QUERY_RESPONSE_COMMAND_ID, "u", clusterId);
-
-/** @brief Command description for EnableApsLinkKeyAuthorization
- *
- * Command: EnableApsLinkKeyAuthorization
- * @param clusterId CLUSTER_ID []
- * @param clusterIdLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableApsLinkKeyAuthorization(clusterId, clusterIdLen)                                               \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_APS_LINK_KEY_AUTHORIZATION_COMMAND_ID, "b", clusterId, clusterIdLen);
-
-/** @brief Command description for ApsLinkKeyAuthorizationQueryResponse
- *
- * Command: ApsLinkKeyAuthorizationQueryResponse
- * @param apsLinkKeyAuthStatus BOOLEAN
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterApsLinkKeyAuthorizationQueryResponse(apsLinkKeyAuthStatus)                                           \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_APS_LINK_KEY_AUTHORIZATION_QUERY_RESPONSE_COMMAND_ID, "u", apsLinkKeyAuthStatus);
-
-/** @brief Command description for DisableApsLinkKeyAuthorization
- *
- * Command: DisableApsLinkKeyAuthorization
- * @param numberExemptClusters INT8U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableApsLinkKeyAuthorization(numberExemptClusters)                                                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_APS_LINK_KEY_AUTHORIZATION_COMMAND_ID, "u", numberExemptClusters);
-
-/** @brief Command description for PoweringOffNotification
- *
- * Command: PoweringOffNotification
- * @param powerNotificationReason WwahPowerNotificationReason
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterPoweringOffNotification(powerNotificationReason)                                                     \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_POWERING_OFF_NOTIFICATION_COMMAND_ID, "u", powerNotificationReason);
-
-/** @brief Command description for DisableApsLinkKeyAuthorization
- *
- * Command: DisableApsLinkKeyAuthorization
- * @param clusterId CLUSTER_ID []
- * @param clusterIdLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableApsLinkKeyAuthorization(clusterId, clusterIdLen)                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_APS_LINK_KEY_AUTHORIZATION_COMMAND_ID, "b", clusterId, clusterIdLen);
-
-/** @brief Command description for PoweringOffNotification
- *
- * Command: PoweringOffNotification
- * @param manufacturerId INT16U
- * @param manufacturerReasonLength INT8U
- * @param manufacturerReason INT8U []
- * @param manufacturerReasonLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterPoweringOffNotification(manufacturerId, manufacturerReasonLength, manufacturerReason,                \
-                                                      manufacturerReasonLen)                                                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_POWERING_OFF_NOTIFICATION_COMMAND_ID, "uub", manufacturerId, manufacturerReasonLength,       \
-                                  manufacturerReason, manufacturerReasonLen);
-
-/** @brief Command description for ApsLinkKeyAuthorizationQuery
- *
- * Command: ApsLinkKeyAuthorizationQuery
- * @param clusterId CLUSTER_ID
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterApsLinkKeyAuthorizationQuery(clusterId)                                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_APS_LINK_KEY_AUTHORIZATION_QUERY_COMMAND_ID, "u", clusterId);
-
-/** @brief Command description for PoweringOnNotification
- *
- * Command: PoweringOnNotification
- * @param powerNotificationReason WwahPowerNotificationReason
- * @param manufacturerId INT16U
- * @param manufacturerReasonLength INT8U
- * @param manufacturerReason INT8U []
- * @param manufacturerReasonLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterPoweringOnNotification(powerNotificationReason, manufacturerId, manufacturerReasonLength,            \
-                                                     manufacturerReason, manufacturerReasonLen)                                    \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_POWERING_ON_NOTIFICATION_COMMAND_ID, "uuub", powerNotificationReason, manufacturerId,        \
-                                  manufacturerReasonLength, manufacturerReason, manufacturerReasonLen);
-
-/** @brief Command description for RequestNewApsLinkKey
- *
- * Command: RequestNewApsLinkKey
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterRequestNewApsLinkKey() emberAfFillExternalBuffer(mask,                                               \
-                                                                                                                                   \
-                                                                               ZCL_REQUEST_NEW_APS_LINK_KEY_COMMAND_ID, "", );
-
-/** @brief Command description for ShortAddressChange
- *
- * Command: ShortAddressChange
- * @param deviceEui64 IEEE_ADDRESS
- * @param deviceShort INT16U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterShortAddressChange(deviceEui64, deviceShort)                                                         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SHORT_ADDRESS_CHANGE_COMMAND_ID, "uu", deviceEui64, deviceShort);
-
-/** @brief Command description for EnableWwahAppEventRetryAlgorithm
- *
- * Command: EnableWwahAppEventRetryAlgorithm
- * @param firstBackoffTimeSeconds INT8U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableWwahAppEventRetryAlgorithm(firstBackoffTimeSeconds)                                            \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_WWAH_APP_EVENT_RETRY_ALGORITHM_COMMAND_ID, "u", firstBackoffTimeSeconds);
-
-/** @brief Command description for ApsAckEnablementQueryResponse
- *
- * Command: ApsAckEnablementQueryResponse
- * @param numberExemptClusters INT8U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterApsAckEnablementQueryResponse(numberExemptClusters)                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_APS_ACK_ENABLEMENT_QUERY_RESPONSE_COMMAND_ID, "u", numberExemptClusters);
-
-/** @brief Command description for EnableWwahAppEventRetryAlgorithm
- *
- * Command: EnableWwahAppEventRetryAlgorithm
- * @param backoffSeqCommonRatio INT8U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableWwahAppEventRetryAlgorithm(backoffSeqCommonRatio)                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_WWAH_APP_EVENT_RETRY_ALGORITHM_COMMAND_ID, "u", backoffSeqCommonRatio);
-
-/** @brief Command description for ApsAckEnablementQueryResponse
- *
- * Command: ApsAckEnablementQueryResponse
- * @param clusterId CLUSTER_ID []
- * @param clusterIdLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterApsAckEnablementQueryResponse(clusterId, clusterIdLen)                                               \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_APS_ACK_ENABLEMENT_QUERY_RESPONSE_COMMAND_ID, "b", clusterId, clusterIdLen);
-
-/** @brief Command description for EnableWwahAppEventRetryAlgorithm
- *
- * Command: EnableWwahAppEventRetryAlgorithm
- * @param maxBackoffTimeSeconds INT32U
- * @param maxRedeliveryAttempts INT8U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableWwahAppEventRetryAlgorithm(maxBackoffTimeSeconds, maxRedeliveryAttempts)                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_WWAH_APP_EVENT_RETRY_ALGORITHM_COMMAND_ID, "uu", maxBackoffTimeSeconds,               \
-                                  maxRedeliveryAttempts);
-
-/** @brief Command description for DisableWwahAppEventRetryAlgorithm
- *
- * Command: DisableWwahAppEventRetryAlgorithm
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableWwahAppEventRetryAlgorithm()                                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_WWAH_APP_EVENT_RETRY_ALGORITHM_COMMAND_ID, "", );
-
-/** @brief Command description for PowerDescriptorChange
- *
- * Command: PowerDescriptorChange
- * @param currentPowerMode INT32U
- * @param availablePowerSources INT32U
- * @param currentPowerSource INT32U
- * @param currentPowerSourceLevel INT32U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterPowerDescriptorChange(currentPowerMode, availablePowerSources, currentPowerSource,                   \
-                                                    currentPowerSourceLevel)                                                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_POWER_DESCRIPTOR_CHANGE_COMMAND_ID, "uuuu", currentPowerMode, availablePowerSources,         \
-                                  currentPowerSource, currentPowerSourceLevel);
-
-/** @brief Command description for RequestTime
- *
- * Command: RequestTime
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterRequestTime() emberAfFillExternalBuffer(mask,                                                        \
-                                                                                                                                   \
-                                                                      ZCL_REQUEST_TIME_COMMAND_ID, "", );
-
-/** @brief Command description for NewDebugReportNotification
- *
- * Command: NewDebugReportNotification
- * @param debugReportId INT8U
- * @param debugReportSize INT32U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterNewDebugReportNotification(debugReportId, debugReportSize)                                           \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_NEW_DEBUG_REPORT_NOTIFICATION_COMMAND_ID, "uu", debugReportId, debugReportSize);
-
-/** @brief Command description for EnableWwahRejoinAlgorithm
- *
- * Command: EnableWwahRejoinAlgorithm
- * @param fastRejoinTimeoutSeconds INT16U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableWwahRejoinAlgorithm(fastRejoinTimeoutSeconds)                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_WWAH_REJOIN_ALGORITHM_COMMAND_ID, "u", fastRejoinTimeoutSeconds);
-
-/** @brief Command description for DebugReportQueryResponse
- *
- * Command: DebugReportQueryResponse
- * @param debugReportId INT8U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDebugReportQueryResponse(debugReportId)                                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEBUG_REPORT_QUERY_RESPONSE_COMMAND_ID, "u", debugReportId);
-
-/** @brief Command description for EnableWwahRejoinAlgorithm
- *
- * Command: EnableWwahRejoinAlgorithm
- * @param durationBetweenRejoinsSeconds INT16U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableWwahRejoinAlgorithm(durationBetweenRejoinsSeconds)                                             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_WWAH_REJOIN_ALGORITHM_COMMAND_ID, "u", durationBetweenRejoinsSeconds);
-
-/** @brief Command description for DebugReportQueryResponse
- *
- * Command: DebugReportQueryResponse
- * @param debugReportData INT8U []
- * @param debugReportDataLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDebugReportQueryResponse(debugReportData, debugReportDataLen)                                        \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEBUG_REPORT_QUERY_RESPONSE_COMMAND_ID, "b", debugReportData, debugReportDataLen);
-
-/** @brief Command description for EnableWwahRejoinAlgorithm
- *
- * Command: EnableWwahRejoinAlgorithm
- * @param fastRejoinFirstBackoffSeconds INT16U
- * @param maxBackoffTimeSeconds INT16U
- * @param maxBackoffIterations INT16U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableWwahRejoinAlgorithm(fastRejoinFirstBackoffSeconds, maxBackoffTimeSeconds,                      \
-                                                        maxBackoffIterations)                                                      \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_WWAH_REJOIN_ALGORITHM_COMMAND_ID, "uuu", fastRejoinFirstBackoffSeconds,               \
-                                  maxBackoffTimeSeconds, maxBackoffIterations);
-
-/** @brief Command description for DisableWwahRejoinAlgorithm
- *
- * Command: DisableWwahRejoinAlgorithm
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableWwahRejoinAlgorithm()                                                                         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_WWAH_REJOIN_ALGORITHM_COMMAND_ID, "", );
-
-/** @brief Command description for TrustCenterForClusterServerQueryResponse
- *
- * Command: TrustCenterForClusterServerQueryResponse
- * @param numberOfClusters INT8U
- * @param clusterId CLUSTER_ID []
- * @param clusterIdLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterTrustCenterForClusterServerQueryResponse(numberOfClusters, clusterId, clusterIdLen)                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_TRUST_CENTER_FOR_CLUSTER_SERVER_QUERY_RESPONSE_COMMAND_ID, "ub", numberOfClusters,           \
-                                  clusterId, clusterIdLen);
-
-/** @brief Command description for SetIasZoneEnrollmentMethod
- *
- * Command: SetIasZoneEnrollmentMethod
- * @param enrollmentMode WwahIasZoneEnrollmentMode
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterSetIasZoneEnrollmentMethod(enrollmentMode)                                                           \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_IAS_ZONE_ENROLLMENT_METHOD_COMMAND_ID, "u", enrollmentMode);
-
-/** @brief Command description for SurveyBeaconsResponse
- *
- * Command: SurveyBeaconsResponse
- * @param numberOfBeacons INT8U
- * @param beacon WwahBeaconSurvey []
- * @param beaconLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterSurveyBeaconsResponse(numberOfBeacons, beacon, beaconLen)                                            \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SURVEY_BEACONS_RESPONSE_COMMAND_ID, "ub", numberOfBeacons, beacon, beaconLen);
-
-/** @brief Command description for ClearBindingTable
- *
- * Command: ClearBindingTable
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterClearBindingTable() emberAfFillExternalBuffer(mask,                                                  \
-                                                                                                                                   \
-                                                                            ZCL_CLEAR_BINDING_TABLE_COMMAND_ID, "", );
-
-/** @brief Command description for EnablePeriodicRouterCheckIns
- *
- * Command: EnablePeriodicRouterCheckIns
- * @param checkInInterval INT16U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnablePeriodicRouterCheckIns(checkInInterval)                                                        \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_PERIODIC_ROUTER_CHECK_INS_COMMAND_ID, "u", checkInInterval);
-
-/** @brief Command description for DisablePeriodicRouterCheckIns
- *
- * Command: DisablePeriodicRouterCheckIns
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisablePeriodicRouterCheckIns()                                                                      \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_PERIODIC_ROUTER_CHECK_INS_COMMAND_ID, "", );
-
-/** @brief Command description for SetMacPollFailureWaitTime
- *
- * Command: SetMacPollFailureWaitTime
- * @param waitTime INT8U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterSetMacPollFailureWaitTime(waitTime)                                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_MAC_POLL_FAILURE_WAIT_TIME_COMMAND_ID, "u", waitTime);
-
-/** @brief Command description for SetPendingNetworkUpdate
- *
- * Command: SetPendingNetworkUpdate
- * @param channel INT8U
- * @param panId INT16U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterSetPendingNetworkUpdate(channel, panId)                                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_PENDING_NETWORK_UPDATE_COMMAND_ID, "uu", channel, panId);
-
-/** @brief Command description for RequireApsAcksOnUnicasts
- *
- * Command: RequireApsAcksOnUnicasts
- * @param numberExemptClusters INT8U
- * @param clusterId CLUSTER_ID []
- * @param clusterIdLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterRequireApsAcksOnUnicasts(numberExemptClusters, clusterId, clusterIdLen) emberAfFillExternalBuffer(   \
-        mask,                                                                                                                      \
-                                                                                                                                   \
-        ZCL_REQUIRE_APS_ACKS_ON_UNICASTS_COMMAND_ID, "ub", numberExemptClusters, clusterId, clusterIdLen);
-
-/** @brief Command description for RemoveApsAcksOnUnicastsRequirement
- *
- * Command: RemoveApsAcksOnUnicastsRequirement
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterRemoveApsAcksOnUnicastsRequirement()                                                                 \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_REMOVE_APS_ACKS_ON_UNICASTS_REQUIREMENT_COMMAND_ID, "", );
-
-/** @brief Command description for ApsAckRequirementQuery
- *
- * Command: ApsAckRequirementQuery
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterApsAckRequirementQuery() emberAfFillExternalBuffer(mask,                                             \
-                                                                                                                                   \
-                                                                                 ZCL_APS_ACK_REQUIREMENT_QUERY_COMMAND_ID, "", );
-
-/** @brief Command description for DebugReportQuery
- *
- * Command: DebugReportQuery
- * @param debugReportId INT8U
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDebugReportQuery(debugReportId)                                                                      \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DEBUG_REPORT_QUERY_COMMAND_ID, "u", debugReportId);
-
-/** @brief Command description for SurveyBeacons
- *
- * Command: SurveyBeacons
- * @param standardBeacons BOOLEAN
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterSurveyBeacons(standardBeacons)                                                                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SURVEY_BEACONS_COMMAND_ID, "u", standardBeacons);
-
-/** @brief Command description for DisableOtaDowngrades
- *
- * Command: DisableOtaDowngrades
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableOtaDowngrades() emberAfFillExternalBuffer(mask,                                               \
-                                                                                                                                   \
-                                                                               ZCL_DISABLE_OTA_DOWNGRADES_COMMAND_ID, "", );
-
-/** @brief Command description for DisableMgmtLeaveWithoutRejoin
- *
- * Command: DisableMgmtLeaveWithoutRejoin
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableMgmtLeaveWithoutRejoin()                                                                      \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_MGMT_LEAVE_WITHOUT_REJOIN_COMMAND_ID, "", );
-
-/** @brief Command description for DisableTouchlinkInterpanMessageSupport
- *
- * Command: DisableTouchlinkInterpanMessageSupport
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableTouchlinkInterpanMessageSupport()                                                             \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_TOUCHLINK_INTERPAN_MESSAGE_SUPPORT_COMMAND_ID, "", );
-
-/** @brief Command description for EnableWwahParentClassification
- *
- * Command: EnableWwahParentClassification
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableWwahParentClassification()                                                                     \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_WWAH_PARENT_CLASSIFICATION_COMMAND_ID, "", );
-
-/** @brief Command description for DisableWwahParentClassification
- *
- * Command: DisableWwahParentClassification
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableWwahParentClassification()                                                                    \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_WWAH_PARENT_CLASSIFICATION_COMMAND_ID, "", );
-
-/** @brief Command description for EnableTcSecurityOnNtwkKeyRotation
- *
- * Command: EnableTcSecurityOnNtwkKeyRotation
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableTcSecurityOnNtwkKeyRotation()                                                                  \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_TC_SECURITY_ON_NTWK_KEY_ROTATION_COMMAND_ID, "", );
-
-/** @brief Command description for EnableWwahBadParentRecovery
- *
- * Command: EnableWwahBadParentRecovery
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableWwahBadParentRecovery()                                                                        \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_ENABLE_WWAH_BAD_PARENT_RECOVERY_COMMAND_ID, "", );
-
-/** @brief Command description for DisableWwahBadParentRecovery
- *
- * Command: DisableWwahBadParentRecovery
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableWwahBadParentRecovery()                                                                       \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_WWAH_BAD_PARENT_RECOVERY_COMMAND_ID, "", );
-
-/** @brief Command description for EnableConfigurationMode
- *
- * Command: EnableConfigurationMode
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterEnableConfigurationMode() emberAfFillExternalBuffer(mask,                                            \
-                                                                                                                                   \
-                                                                                  ZCL_ENABLE_CONFIGURATION_MODE_COMMAND_ID, "", );
-
-/** @brief Command description for DisableConfigurationMode
- *
- * Command: DisableConfigurationMode
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterDisableConfigurationMode()                                                                           \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_DISABLE_CONFIGURATION_MODE_COMMAND_ID, "", );
-
-/** @brief Command description for UseTrustCenterForClusterServer
- *
- * Command: UseTrustCenterForClusterServer
- * @param numberOfClusters INT8U
- * @param clusterId CLUSTER_ID []
- * @param clusterIdLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterUseTrustCenterForClusterServer(numberOfClusters, clusterId, clusterIdLen) emberAfFillExternalBuffer( \
-        mask,                                                                                                                      \
-                                                                                                                                   \
-        ZCL_USE_TRUST_CENTER_FOR_CLUSTER_SERVER_COMMAND_ID, "ub", numberOfClusters, clusterId, clusterIdLen);
-
-/** @brief Command description for TrustCenterForClusterServerQuery
- *
- * Command: TrustCenterForClusterServerQuery
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterTrustCenterForClusterServerQuery()                                                                   \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_TRUST_CENTER_FOR_CLUSTER_SERVER_QUERY_COMMAND_ID, "", );
-
-/** @brief Command description for UseTrustCenterForClusterServerResponse
- *
- * Command: UseTrustCenterForClusterServerResponse
- * @param status Status
- * @param clusterStatusLength INT8U
- * @param clusterStatus WwahClusterStatusToUseTC []
- * @param clusterStatusLen int
- */
-#define emberAfFillCommandSL                                                                                                       \
-    Works With All HubsClusterUseTrustCenterForClusterServerResponse(status, clusterStatusLength, clusterStatus, clusterStatusLen) \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_USE_TRUST_CENTER_FOR_CLUSTER_SERVER_RESPONSE_COMMAND_ID, "uub", status, clusterStatusLength, \
-                                  clusterStatus, clusterStatusLen);

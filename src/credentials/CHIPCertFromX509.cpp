@@ -35,6 +35,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPSafeCasts.h>
 #include <core/CHIPTLV.h>
+#include <core/Optional.h>
 #include <credentials/CHIPCert.h>
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
@@ -83,7 +84,7 @@ exit:
 }
 
 static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & subjectOrIssuer,
-                                           uint64_t & fabric)
+                                           Optional<uint64_t> & fabric)
 {
     CHIP_ERROR err;
     TLVType outerContainer;
@@ -163,7 +164,7 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                         }
                         else if (attrOID == chip::ASN1::kOID_AttributeType_ChipFabricId)
                         {
-                            fabric = chipAttr;
+                            fabric.SetValue(chipAttr);
                         }
                     }
 
@@ -575,7 +576,7 @@ exit:
 }
 
 static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, uint64_t tag, uint64_t & issuer, uint64_t & subject,
-                                     uint64_t & fabric)
+                                     Optional<uint64_t> & fabric)
 {
     CHIP_ERROR err;
     int64_t version;
@@ -709,7 +710,8 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32
     ASN1Reader reader;
     TLVWriter writer;
 
-    uint64_t issuer, subject, fabric;
+    uint64_t issuer, subject;
+    Optional<uint64_t> fabric;
 
     reader.Init(x509Cert, x509CertLen);
 
@@ -746,18 +748,25 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
     ASN1Reader reader;
     VerifyOrReturnError(CanCastTo<uint32_t>(x509NOC.size()), CHIP_ERROR_INVALID_ARGUMENT);
     reader.Init(x509NOC.data(), static_cast<uint32_t>(x509NOC.size()));
-    uint64_t nocIssuer, nocSubject, nocFabric;
+    uint64_t nocIssuer, nocSubject;
+    Optional<uint64_t> nocFabric;
     ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, nocIssuer, nocSubject, nocFabric));
+    VerifyOrReturnError(nocFabric.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // ICAC is optional
     if (x509ICAC.size() > 0)
     {
         VerifyOrReturnError(CanCastTo<uint32_t>(x509ICAC.size()), CHIP_ERROR_INVALID_ARGUMENT);
         reader.Init(x509ICAC.data(), static_cast<uint32_t>(x509ICAC.size()));
-        uint64_t icaIssuer, icaSubject, icaFabric;
+        uint64_t icaIssuer, icaSubject;
+        Optional<uint64_t> icaFabric;
         ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, icaIssuer, icaSubject, icaFabric));
         VerifyOrReturnError(icaSubject == nocIssuer, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(icaFabric == nocFabric, CHIP_ERROR_INVALID_ARGUMENT);
+        if (icaFabric.HasValue())
+        {
+            // Match ICA's fabric ID if the ICA certificate has provided it
+            VerifyOrReturnError(icaFabric == nocFabric, CHIP_ERROR_INVALID_ARGUMENT);
+        }
     }
 
     ReturnErrorOnFailure(writer.EndContainer(outerContainer));
@@ -765,6 +774,68 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
 
     ReturnErrorCodeIf(writer.GetLengthWritten() > chipCertBufLen, CHIP_ERROR_INTERNAL);
     chipCertArray.reduce_size(writer.GetLengthWritten());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & noc, ByteSpan & icac)
+{
+    TLVType outerContainerType;
+    TLVReader reader;
+    reader.Init(opCertArray.data(), static_cast<uint32_t>(opCertArray.size()));
+
+    if (reader.GetType() == kTLVType_NotSpecified)
+    {
+        ReturnErrorOnFailure(reader.Next());
+    }
+    VerifyOrReturnError(reader.GetType() == kTLVType_Array, CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outerContainerType));
+
+    {
+        TLVType nocContainerType;
+        const uint8_t * nocBegin = reader.GetReadPoint();
+
+        if (reader.GetType() == kTLVType_NotSpecified)
+        {
+            ReturnErrorOnFailure(reader.Next());
+        }
+        VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+        uint64_t tag = reader.GetTag();
+        VerifyOrReturnError(tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) ||
+                                tag == AnonymousTag,
+                            CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+        ReturnErrorOnFailure(reader.EnterContainer(nocContainerType));
+        ReturnErrorOnFailure(reader.ExitContainer(nocContainerType));
+        noc = ByteSpan(nocBegin, static_cast<size_t>(reader.GetReadPoint() - nocBegin));
+    }
+
+    {
+        TLVType icacContainerType;
+        const uint8_t * icacBegin = reader.GetReadPoint();
+
+        if (reader.GetType() == kTLVType_NotSpecified)
+        {
+            CHIP_ERROR err = reader.Next();
+            if (err == CHIP_END_OF_TLV)
+            {
+                icac = ByteSpan(nullptr, 0);
+                return CHIP_NO_ERROR;
+            }
+            ReturnErrorOnFailure(err);
+        }
+        VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+        uint64_t tag = reader.GetTag();
+        VerifyOrReturnError(tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) ||
+                                tag == AnonymousTag,
+                            CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+        ReturnErrorOnFailure(reader.EnterContainer(icacContainerType));
+        ReturnErrorOnFailure(reader.ExitContainer(icacContainerType));
+        icac = ByteSpan(icacBegin, static_cast<size_t>(reader.GetReadPoint() - icacBegin));
+    }
+
+    ReturnErrorOnFailure(reader.ExitContainer(outerContainerType));
 
     return CHIP_NO_ERROR;
 }

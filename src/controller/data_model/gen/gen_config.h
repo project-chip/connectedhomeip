@@ -45,6 +45,7 @@
 #define EMBER_AF_DOOR_LOCK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_FIXED_LABEL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_FLOW_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_GENERAL_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_GENERAL_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUP_KEY_MANAGEMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -72,6 +73,7 @@
 #define EMBER_AF_THERMOSTAT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WAKE_ON_LAN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WINDOW_COVERING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
@@ -139,6 +141,10 @@
 // Use this macro to check if the client side of the Fixed Label cluster is included
 #define ZCL_USING_FIXED_LABEL_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_FIXED_LABEL_CLIENT
+
+// Use this macro to check if the client side of the Flow Measurement cluster is included
+#define ZCL_USING_FLOW_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_FLOW_MEASUREMENT_CLIENT
 
 // Use this macro to check if the client side of the General Commissioning cluster is included
 #define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_CLIENT
@@ -247,6 +253,10 @@
 // Use this macro to check if the client side of the Wake on LAN cluster is included
 #define ZCL_USING_WAKE_ON_LAN_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_WAKE_ON_LAN_CLIENT
+
+// Use this macro to check if the client side of the WiFi Network Diagnostics cluster is included
+#define ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS_CLIENT
 
 // Use this macro to check if the client side of the Window Covering cluster is included
 #define ZCL_USING_WINDOW_COVERING_CLUSTER_CLIENT

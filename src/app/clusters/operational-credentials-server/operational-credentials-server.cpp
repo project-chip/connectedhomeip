@@ -108,7 +108,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Loop through admins
-    uint32_t fabricIndex = 0;
+    int32_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
     {
         NodeId nodeId               = pairing.GetNodeId();
@@ -330,7 +330,7 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Com
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan OperationalCert,
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOCArray,
                                                            chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
                                                            uint16_t AdminVendorId)
 {
@@ -341,14 +341,14 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * 
     AdminPairingInfo * admin = retrieveCurrentAdmin();
     VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
-    VerifyOrExit(admin->SetOperationalCert(OperationalCert) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(admin->SetOperationalCertsFromCertArray(NOCArray) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
     // We have a new operational identity and should start advertising it.  We
     // can't just wait until we get network configuration commands, because we
     // might be on the operational network already, in which case we are
     // expected to be live with our new identity at this point.
-    chip::app::Mdns::StartServer();
+    chip::app::Mdns::AdvertiseOperational();
 
 exit:
     emberAfSendImmediateDefaultResponse(status);

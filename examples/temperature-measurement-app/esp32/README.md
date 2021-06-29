@@ -10,6 +10,7 @@ This example is meant to represent a minimal-sized application.
         -   [Setting up Python Controller](#setting-up-python-controller)
         -   [Commissioning over BLE](#commissioning-over-ble)
         -   [Cluster control](#cluster-control)
+    -   [Flashing app using script](#flashing-app-using-script)
     -   [Optimization](#optimization)
 
 ---
@@ -58,13 +59,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Configuration Options
 
-        To choose from the different configuration options, run menuconfig
-
-          $ idf.py menuconfig
-
-        Select ESP32 based `Device Type` through `Demo`->`Device Type`.
-        The device types that are currently supported include `ESP32-DevKitC` (default),
-        and `M5Stack`
+    This application uses `ESP32-DevKitC` as a default device type. To use other
+    ESP32 based device types, please refer
+    [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
 
 -   To build the demo application.
 
@@ -188,6 +185,25 @@ commissioning and cluster control.
 -   The demo application supports TemperatureMeasurement and Basic cluster.
 
     `chip-device-ctrl > zcl Basic MfgSpecificPing 135246 1 0`
+
+### Flashing app using script
+
+-   Follow these steps to use `${app_name}.flash.py`.
+
+    -   First set IDF target, run set-target with one of the commands.
+
+            $ idf.py set-target esp32
+            $ idf.py set-target esp32c3
+
+    -   Execute below sequence of commands
+
+```
+        $ export ESPPORT=/dev/tty.SLAB_USBtoUART
+        $ export ESPBAUD=${baud_value}
+        $ idf.py build
+        $ idf.py flashing_script
+        $ python ${app_name}.flash.py
+```
 
 ## Optimization
 

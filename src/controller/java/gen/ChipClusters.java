@@ -1041,6 +1041,15 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
   }
 
+  public static class FlowMeasurementCluster extends BaseChipCluster {
+    public FlowMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  }
+
   public static class GeneralCommissioningCluster extends BaseChipCluster {
     public GeneralCommissioningCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -1869,11 +1878,11 @@ public class ChipClusters {
 
     public void addOpCert(
         OpCertResponseCallback callback,
-        byte[] operationalCert,
+        byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId) {
-      addOpCert(chipClusterPtr, callback, operationalCert, iPKValue, caseAdminNode, adminVendorId);
+      addOpCert(chipClusterPtr, callback, nOCArray, iPKValue, caseAdminNode, adminVendorId);
     }
 
     public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
@@ -1909,7 +1918,7 @@ public class ChipClusters {
     private native void addOpCert(
         long chipClusterPtr,
         OpCertResponseCallback callback,
-        byte[] operationalCert,
+        byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId);
@@ -2330,6 +2339,15 @@ public class ChipClusters {
 
   public static class WakeOnLanCluster extends BaseChipCluster {
     public WakeOnLanCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  }
+
+  public static class WiFiNetworkDiagnosticsCluster extends BaseChipCluster {
+    public WiFiNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 

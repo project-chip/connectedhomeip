@@ -309,6 +309,8 @@ private:
     P256PublicKey mPublicKey;
     P256KeypairContext mKeypair;
     bool mInitialized = false;
+
+    void Clear();
 };
 
 /**

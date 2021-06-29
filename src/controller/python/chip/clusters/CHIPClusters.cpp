@@ -55,14 +55,39 @@ void OnDefaultFailureResponse(void * /* context */, uint8_t status)
 }
 
 template <class AttributeType>
-void OnAttributeResponse(void * /* context */, AttributeType)
+void OnAttributeResponse(void * /* context */, AttributeType value)
 {
+    std::string strValue = std::to_string(value);
+    ChipLogProgress(Zcl, "  attributeValue: %s", strValue.c_str());
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <>
+void OnAttributeResponse<chip::ByteSpan>(void * /* context */, chip::ByteSpan value)
+{
+    std::string strValue = "";
+    for (size_t i = 0; i < value.size(); i++)
+    {
+        strValue += ' ';
+        strValue += std::to_string(value.data()[i]);
+    }
+    ChipLogProgress(Zcl, "  attributeValue: (span of length %zd) %s", value.size(), strValue.c_str());
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <>
+void OnAttributeResponse<bool>(void * /* context */, bool value)
+{
+    ChipLogProgress(Zcl, "  attributeValue: %s", value ? "true" : "false");
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
 
 static void OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context, uint16_t count, uint16_t * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -72,6 +97,7 @@ chip::Callback::Callback<ApplicationLauncherApplicationLauncherListListAttribute
     };
 static void OnAudioOutputAudioOutputListListAttributeResponse(void * context, uint16_t count, _AudioOutputInfo * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -80,6 +106,7 @@ chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> gAudio
 };
 static void OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -87,6 +114,7 @@ chip::Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>
     gContentLauncherAcceptsHeaderListListAttributeCallback{ OnContentLauncherAcceptsHeaderListListAttributeResponse, nullptr };
 static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -95,6 +123,7 @@ chip::Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCall
                                                                   nullptr };
 static void OnDescriptorDeviceListListAttributeResponse(void * context, uint16_t count, _DeviceType * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -103,6 +132,7 @@ chip::Callback::Callback<DescriptorDeviceListListAttributeCallback> gDescriptorD
 };
 static void OnDescriptorServerListListAttributeResponse(void * context, uint16_t count, chip::ClusterId * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -111,6 +141,7 @@ chip::Callback::Callback<DescriptorServerListListAttributeCallback> gDescriptorS
 };
 static void OnDescriptorClientListListAttributeResponse(void * context, uint16_t count, chip::ClusterId * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -119,6 +150,7 @@ chip::Callback::Callback<DescriptorClientListListAttributeCallback> gDescriptorC
 };
 static void OnDescriptorPartsListListAttributeResponse(void * context, uint16_t count, chip::EndpointId * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -127,6 +159,7 @@ chip::Callback::Callback<DescriptorPartsListListAttributeCallback> gDescriptorPa
 };
 static void OnFixedLabelLabelListListAttributeResponse(void * context, uint16_t count, _LabelStruct * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -136,6 +169,7 @@ chip::Callback::Callback<FixedLabelLabelListListAttributeCallback> gFixedLabelLa
 static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(void * context, uint16_t count,
                                                                        _NetworkInterfaceType * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -144,6 +178,7 @@ chip::Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallbac
                                                                nullptr };
 static void OnGroupKeyManagementGroupsListAttributeResponse(void * context, uint16_t count, _GroupState * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -152,6 +187,7 @@ chip::Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> gGroupKe
 };
 static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, uint16_t count, _GroupKey * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -160,6 +196,7 @@ chip::Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> gGrou
 };
 static void OnMediaInputMediaInputListListAttributeResponse(void * context, uint16_t count, _MediaInputInfo * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -168,6 +205,7 @@ chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback> gMediaIn
 };
 static void OnOperationalCredentialsFabricsListListAttributeResponse(void * context, uint16_t count, _FabricDescriptor * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -175,6 +213,7 @@ chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>
     gOperationalCredentialsFabricsListListAttributeCallback{ OnOperationalCredentialsFabricsListListAttributeResponse, nullptr };
 static void OnTvChannelTvChannelListListAttributeResponse(void * context, uint16_t count, _TvChannelInfo * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -184,6 +223,7 @@ chip::Callback::Callback<TvChannelTvChannelListListAttributeCallback> gTvChannel
 static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(void * context, uint16_t count,
                                                                       _NavigateTargetTargetInfo * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -191,6 +231,7 @@ chip::Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback
     gTargetNavigatorTargetNavigatorListListAttributeCallback{ OnTargetNavigatorTargetNavigatorListListAttributeResponse, nullptr };
 static void OnTestClusterListInt8uListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -199,6 +240,7 @@ chip::Callback::Callback<TestClusterListInt8uListAttributeCallback> gTestCluster
 };
 static void OnTestClusterListOctetStringListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -207,6 +249,7 @@ chip::Callback::Callback<TestClusterListOctetStringListAttributeCallback> gTestC
 };
 static void OnTestClusterListStructOctetStringListAttributeResponse(void * context, uint16_t count, _TestListStructOctet * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -215,6 +258,7 @@ chip::Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>
 static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(void * context, uint16_t count,
                                                                              _NeighborTable * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -224,6 +268,7 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeC
     };
 static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(void * context, uint16_t count, _RouteTable * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -232,6 +277,7 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCall
                                                                   nullptr };
 static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(void * context, uint16_t count, _SecurityPolicy * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -241,6 +287,7 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCall
 static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeResponse(void * context, uint16_t count,
                                                                                         _OperationalDatasetComponents * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -251,6 +298,7 @@ chip::Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsLis
 static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse(void * context, uint16_t count,
                                                                                    uint8_t * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -2220,6 +2268,45 @@ CHIP_ERROR chip_ime_ReadAttribute_FixedLabel_ClusterRevision(chip::Controller::D
 }
 
 // End of Cluster FixedLabel
+// Cluster FlowMeasurement
+
+CHIP_ERROR chip_ime_ReadAttribute_FlowMeasurement_MeasuredValue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::FlowMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_FlowMeasurement_MinMeasuredValue(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::FlowMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMinMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::FlowMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMaxMeasuredValue(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::FlowMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster FlowMeasurement
 // Cluster GeneralCommissioning
 
 CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe(chip::Controller::Device * device,
@@ -3051,15 +3138,15 @@ CHIP_ERROR chip_ime_ReadAttribute_OnOff_ClusterRevision(chip::Controller::Device
 
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_AddOpCert(chip::Controller::Device * device,
                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                   const uint8_t * operationalCert, uint32_t operationalCert_Len,
+                                                                   const uint8_t * nOCArray, uint32_t nOCArray_Len,
                                                                    const uint8_t * iPKValue, uint32_t iPKValue_Len,
                                                                    chip::NodeId caseAdminNode, uint16_t adminVendorId)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.AddOpCert(nullptr, nullptr, chip::ByteSpan(operationalCert, operationalCert_Len),
-                             chip::ByteSpan(iPKValue, iPKValue_Len), caseAdminNode, adminVendorId);
+    return cluster.AddOpCert(nullptr, nullptr, chip::ByteSpan(nOCArray, nOCArray_Len), chip::ByteSpan(iPKValue, iPKValue_Len),
+                             caseAdminNode, adminVendorId);
 }
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate(chip::Controller::Device * device,
                                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
@@ -4875,6 +4962,66 @@ CHIP_ERROR chip_ime_ReadAttribute_WakeOnLan_ClusterRevision(chip::Controller::De
 }
 
 // End of Cluster WakeOnLan
+// Cluster WiFiNetworkDiagnostics
+
+CHIP_ERROR chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Bssid(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                               chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBssid(gStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WiFiNetworkDiagnostics_SecurityType(chip::Controller::Device * device,
+                                                                      chip::EndpointId ZCLendpointId,
+                                                                      chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeSecurityType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WiFiNetworkDiagnostics_WiFiVersion(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeWiFiVersion(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ChannelNumber(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId,
+                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeChannelNumber(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Rssi(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeRssi(gInt8sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ClusterRevision(chip::Controller::Device * device,
+                                                                         chip::EndpointId ZCLendpointId,
+                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster WiFiNetworkDiagnostics
 // Cluster WindowCovering
 
 CHIP_ERROR chip_ime_AppendCommand_WindowCovering_DownOrClose(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
@@ -4945,16 +5092,6 @@ CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_Type(chip::Controller::Device *
     return cluster.ReadAttributeType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
 }
 
-CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_Type(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::WindowCoveringCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ConfigureAttributeType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                          maxInterval);
-}
-
 CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift(chip::Controller::Device * device,
                                                                      chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
@@ -4962,17 +5099,6 @@ CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift(chip::Contr
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeCurrentPositionLift(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLift(chip::Controller::Device * device,
-                                                                          chip::EndpointId ZCLendpointId, uint16_t minInterval,
-                                                                          uint16_t maxInterval, uint16_t change)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::WindowCoveringCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ConfigureAttributeCurrentPositionLift(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                         minInterval, maxInterval, change);
 }
 
 CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_CurrentPositionTilt(chip::Controller::Device * device,
@@ -4984,17 +5110,6 @@ CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_CurrentPositionTilt(chip::Contr
     return cluster.ReadAttributeCurrentPositionTilt(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
 }
 
-CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTilt(chip::Controller::Device * device,
-                                                                          chip::EndpointId ZCLendpointId, uint16_t minInterval,
-                                                                          uint16_t maxInterval, uint16_t change)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::WindowCoveringCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ConfigureAttributeCurrentPositionTilt(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                         minInterval, maxInterval, change);
-}
-
 CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_ConfigStatus(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                               chip::GroupId /* ZCLgroupId */)
 {
@@ -5004,15 +5119,169 @@ CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_ConfigStatus(chip::Controller::
     return cluster.ReadAttributeConfigStatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
 }
 
-CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_ConfigStatus(chip::Controller::Device * device,
-                                                                   chip::EndpointId ZCLendpointId, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_CurrentPositionLiftPercentage(chip::Controller::Device * device,
+                                                                               chip::EndpointId ZCLendpointId,
+                                                                               chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::WindowCoveringCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ConfigureAttributeConfigStatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
-                                                  maxInterval);
+    return cluster.ReadAttributeCurrentPositionLiftPercentage(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLiftPercentage(chip::Controller::Device * device,
+                                                                                    chip::EndpointId ZCLendpointId,
+                                                                                    uint16_t minInterval, uint16_t maxInterval,
+                                                                                    uint8_t change)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeCurrentPositionLiftPercentage(
+        gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval, change);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_CurrentPositionTiltPercentage(chip::Controller::Device * device,
+                                                                               chip::EndpointId ZCLendpointId,
+                                                                               chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentPositionTiltPercentage(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTiltPercentage(chip::Controller::Device * device,
+                                                                                    chip::EndpointId ZCLendpointId,
+                                                                                    uint16_t minInterval, uint16_t maxInterval,
+                                                                                    uint8_t change)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeCurrentPositionTiltPercentage(
+        gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval, change);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_OperationalStatus(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOperationalStatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_OperationalStatus(chip::Controller::Device * device,
+                                                                        chip::EndpointId ZCLendpointId, uint16_t minInterval,
+                                                                        uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeOperationalStatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                                       minInterval, maxInterval);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_TargetPositionLiftPercent100ths(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId,
+                                                                                 chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTargetPositionLiftPercent100ths(gInt16uAttributeCallback.Cancel(),
+                                                                gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_TargetPositionLiftPercent100ths(chip::Controller::Device * device,
+                                                                                      chip::EndpointId ZCLendpointId,
+                                                                                      uint16_t minInterval, uint16_t maxInterval,
+                                                                                      uint16_t change)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeTargetPositionLiftPercent100ths(
+        gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval, change);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_TargetPositionTiltPercent100ths(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId,
+                                                                                 chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTargetPositionTiltPercent100ths(gInt16uAttributeCallback.Cancel(),
+                                                                gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_TargetPositionTiltPercent100ths(chip::Controller::Device * device,
+                                                                                      chip::EndpointId ZCLendpointId,
+                                                                                      uint16_t minInterval, uint16_t maxInterval,
+                                                                                      uint16_t change)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeTargetPositionTiltPercent100ths(
+        gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval, change);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_EndProductType(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeEndProductType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_CurrentPositionLiftPercent100ths(chip::Controller::Device * device,
+                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentPositionLiftPercent100ths(gInt16uAttributeCallback.Cancel(),
+                                                                 gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLiftPercent100ths(chip::Controller::Device * device,
+                                                                                       chip::EndpointId ZCLendpointId,
+                                                                                       uint16_t minInterval, uint16_t maxInterval,
+                                                                                       uint16_t change)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeCurrentPositionLiftPercent100ths(
+        gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval, change);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_CurrentPositionTiltPercent100ths(chip::Controller::Device * device,
+                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentPositionTiltPercent100ths(gInt16uAttributeCallback.Cancel(),
+                                                                 gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTiltPercent100ths(chip::Controller::Device * device,
+                                                                                       chip::EndpointId ZCLendpointId,
+                                                                                       uint16_t minInterval, uint16_t maxInterval,
+                                                                                       uint16_t change)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeCurrentPositionTiltPercent100ths(
+        gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval, change);
 }
 
 CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitLift(chip::Controller::Device * device,
@@ -5072,6 +5341,26 @@ CHIP_ERROR chip_ime_WriteAttribute_WindowCovering_Mode(chip::Controller::Device 
     cluster.Associate(device, ZCLendpointId);
     return cluster.WriteAttributeMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), value);
 }
+CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_SafetyStatus(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeSafetyStatus(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_WindowCovering_SafetyStatus(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, uint16_t minInterval,
+                                                                   uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::WindowCoveringCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeSafetyStatus(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                                  maxInterval);
+}
+
 CHIP_ERROR chip_ime_ReadAttribute_WindowCovering_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                  chip::GroupId /* ZCLgroupId */)
 {

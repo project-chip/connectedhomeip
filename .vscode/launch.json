@@ -83,6 +83,126 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+
+        {
+            "name": "Debug Mbed CY8CPROTO_062_4343W",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example",
+            "servertype": "openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH/scripts}"
+            ],
+            "configFiles": ["CY8CPROTO_062_4343W.tcl"],
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor program {./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex}",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "numberOfProcessors": 2,
+            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed CY8CPROTO_062_4343W [remote]",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example",
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor reset halt",
+                "load ./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Flash Mbed CY8CPROTO_062_4343W",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example",
+            "servertype": "openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH/scripts}"
+            ],
+            "configFiles": ["CY8CPROTO_062_4343W.tcl"],
+            "overrideLaunchCommands": [
+                "monitor reset halt",
+                "monitor program {./build-CY8CPROTO_062_4343W/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex}",
+                "monitor reset run",
+                "quit"
+            ],
+            "numberOfProcessors": 2,
+            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Flash Mbed CY8CPROTO_062_4343W [remote]",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex",
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
+            "overrideLaunchCommands": [
+                "monitor reset halt",
+                "load ./build-CY8CPROTO_062_4343W/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex",
+                "monitor reset run",
+                "quit"
+            ],
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "mbedDebugProfile",
+            "description": "What mbed profile do you want to debug?",
+            "options": ["debug", "develop"],
+            "default": "debug"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedFlashProfile",
+            "description": "What mbed profile do you want to flash?",
+            "options": ["release", "debug", "develop"],
+            "default": "release"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedApp",
+            "description": "What mbed application do you want to use?",
+            "options": ["lock-app"],
+            "default": "shell"
         }
     ]
 }
