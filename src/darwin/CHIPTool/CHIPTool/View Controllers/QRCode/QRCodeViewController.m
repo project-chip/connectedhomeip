@@ -714,7 +714,7 @@
 {
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
-    if ([self.chipController pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:&error]) {
+    if ([self.chipController pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode csrNonce:nil error:&error]) {
         deviceID++;
         CHIPSetNextAvailableDeviceID(deviceID);
     }
