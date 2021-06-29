@@ -20714,7 +20714,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20748,7 +20748,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20782,7 +20782,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20816,7 +20816,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20933,7 +20933,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20980,7 +20980,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21014,7 +21014,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21060,7 +21060,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21258,7 +21258,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21340,7 +21340,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21375,7 +21375,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21625,7 +21625,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
@@ -21659,7 +21659,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x06) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
