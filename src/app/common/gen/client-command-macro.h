@@ -2261,16 +2261,16 @@
 /** @brief Command description for AddOpCert
  *
  * Command: AddOpCert
- * @param OperationalCert OCTET_STRING
+ * @param NOCArray OCTET_STRING
  * @param IPKValue OCTET_STRING
  * @param CaseAdminNode NODE_ID
  * @param AdminVendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterAddOpCert(OperationalCert, IPKValue, CaseAdminNode, AdminVendorId)                                           \
+    CredentialsClusterAddOpCert(NOCArray, IPKValue, CaseAdminNode, AdminVendorId)                                                  \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ADD_OP_CERT_COMMAND_ID, "uuuu", OperationalCert, IPKValue, CaseAdminNode, AdminVendorId);
+                                  ZCL_ADD_OP_CERT_COMMAND_ID, "uuuu", NOCArray, IPKValue, CaseAdminNode, AdminVendorId);
 
 /** @brief Command description for OpCertResponse
  *

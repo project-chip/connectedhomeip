@@ -1878,11 +1878,11 @@ public class ChipClusters {
 
     public void addOpCert(
         OpCertResponseCallback callback,
-        byte[] operationalCert,
+        byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId) {
-      addOpCert(chipClusterPtr, callback, operationalCert, iPKValue, caseAdminNode, adminVendorId);
+      addOpCert(chipClusterPtr, callback, nOCArray, iPKValue, caseAdminNode, adminVendorId);
     }
 
     public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
@@ -1918,7 +1918,7 @@ public class ChipClusters {
     private native void addOpCert(
         long chipClusterPtr,
         OpCertResponseCallback callback,
-        byte[] operationalCert,
+        byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId);

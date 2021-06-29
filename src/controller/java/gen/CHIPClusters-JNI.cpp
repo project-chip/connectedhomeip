@@ -10211,14 +10211,14 @@ JNI_METHOD(jlong, OperationalCredentialsCluster, initWithDevice)(JNIEnv * env, j
 }
 
 JNI_METHOD(void, OperationalCredentialsCluster, addOpCert)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalCert, jbyteArray iPKValue,
- jlong caseAdminNode, jint adminVendorId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray nOCArray, jbyteArray iPKValue, jlong caseAdminNode,
+ jint adminVendorId)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
-    JniByteArray operationalCertArr(env, operationalCert);
+    JniByteArray nOCArrayArr(env, nOCArray);
     JniByteArray iPKValueArr(env, iPKValue);
     CHIPOperationalCredentialsClusterOpCertResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -10231,10 +10231,9 @@ JNI_METHOD(void, OperationalCredentialsCluster, addOpCert)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->AddOpCert(onSuccess->Cancel(), onFailure->Cancel(),
-                                chip::ByteSpan((const uint8_t *) operationalCertArr.data(), operationalCertArr.size()),
-                                chip::ByteSpan((const uint8_t *) iPKValueArr.data(), iPKValueArr.size()), caseAdminNode,
-                                adminVendorId);
+    err = cppCluster->AddOpCert(
+        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) nOCArrayArr.data(), nOCArrayArr.size()),
+        chip::ByteSpan((const uint8_t *) iPKValueArr.data(), iPKValueArr.size()), caseAdminNode, adminVendorId);
     SuccessOrExit(err);
 
 exit:
