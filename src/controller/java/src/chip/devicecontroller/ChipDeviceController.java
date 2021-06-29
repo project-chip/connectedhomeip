@@ -47,6 +47,19 @@ public class ChipDeviceController {
   }
 
   public void pairDevice(BluetoothGatt bleServer, long deviceId, long setupPincode) {
+    pairDevice(bleServer, deviceId, setupPincode, null);
+  }
+
+  /**
+   * Pair a device connected through BLE.
+   *
+   * <p>TODO(#7985): Annotate csrNonce as Nullable.
+   *
+   * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
+   *     generated CSR nonce.
+   */
+  public void pairDevice(
+      BluetoothGatt bleServer, long deviceId, long setupPincode, byte[] csrNonce) {
     if (connectionId == 0) {
       bleGatt = bleServer;
 
@@ -59,7 +72,7 @@ public class ChipDeviceController {
 
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
       Log.d(TAG, "Pairing device with ID: " + deviceId);
-      pairDevice(deviceControllerPtr, deviceId, connectionId, setupPincode);
+      pairDevice(deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce);
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
@@ -72,10 +85,6 @@ public class ChipDeviceController {
 
   public void pairTestDeviceWithoutSecurity(String ipAddress) {
     pairTestDeviceWithoutSecurity(deviceControllerPtr, ipAddress);
-  }
-
-  public void pairDevice(long deviceId, int connectionId, long pinCode) {
-    pairDevice(deviceControllerPtr, deviceId, connectionId, pinCode);
   }
 
   public long getDevicePointer(long deviceId) {
@@ -199,7 +208,7 @@ public class ChipDeviceController {
   private native long newDeviceController();
 
   private native void pairDevice(
-      long deviceControllerPtr, long deviceId, int connectionId, long pinCode);
+      long deviceControllerPtr, long deviceId, int connectionId, long pinCode, byte[] csrNonce);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
