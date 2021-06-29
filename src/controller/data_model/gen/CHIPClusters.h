@@ -55,7 +55,7 @@ constexpr ClusterId kLowPowerClusterId                    = 0x0508;
 constexpr ClusterId kMediaInputClusterId                  = 0x0507;
 constexpr ClusterId kMediaPlaybackClusterId               = 0x0506;
 constexpr ClusterId kNetworkCommissioningClusterId        = 0x0031;
-constexpr ClusterId kOtaSoftwareUpdateServerClusterId     = 0x0029;
+constexpr ClusterId kOtaSoftwareUpdateProviderClusterId   = 0x0029;
 constexpr ClusterId kOccupancySensingClusterId            = 0x0406;
 constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
@@ -956,11 +956,11 @@ private:
     static constexpr CommandId kUpdateWiFiNetworkCommandId                 = 0x04;
 };
 
-class DLL_EXPORT OtaSoftwareUpdateServerCluster : public ClusterBase
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    OtaSoftwareUpdateServerCluster() : ClusterBase(kOtaSoftwareUpdateServerClusterId) {}
-    ~OtaSoftwareUpdateServerCluster() {}
+    OtaSoftwareUpdateProviderCluster() : ClusterBase(kOtaSoftwareUpdateProviderClusterId) {}
+    ~OtaSoftwareUpdateProviderCluster() {}
 
     // Cluster Commands
     CHIP_ERROR ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -969,8 +969,8 @@ public:
                                    chip::ByteSpan updateToken, uint32_t currentVersion);
     CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t vendorId,
                           uint16_t productId, uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion,
-                          uint8_t protocolsSupported, chip::ByteSpan location, uint8_t clientCanConsent,
-                          chip::ByteSpan metadataForServer);
+                          uint8_t protocolsSupported, chip::ByteSpan location, uint8_t requestorCanConsent,
+                          chip::ByteSpan metadataForProvider);
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
