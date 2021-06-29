@@ -80,6 +80,14 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
                                     index + 1);
 }
 
+EmberAfStatus writeCommissionedFabricsAttribute(uint8_t numberCommissionedFabrics)
+{
+    
+    return emberAfWriteServerAttribute(0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID, (uint8_t *) &numberCommissionedFabrics,
+                                                     ZCL_INT8U_ATTRIBUTE_TYPE);
+
+}
+
 EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, int32_t index)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -108,7 +116,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Loop through admins
-    int32_t fabricIndex = 0;
+    uint8_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
     {
         NodeId nodeId               = pairing.GetNodeId();
@@ -140,7 +148,12 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu32 " admins in fabrics list attribute.", fabricIndex);
     if (writeFabricAttribute((uint8_t *) &fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin count %" PRIu32 " in fabrics list", fabricIndex);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin count %" PRIu8 " in fabrics list", fabricIndex);
+        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+    if (err == CHIP_NO_ERROR && writeCommissionedFabricsAttribute(fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fbrics", fabricIndex);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
