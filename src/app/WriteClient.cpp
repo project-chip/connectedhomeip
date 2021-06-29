@@ -29,7 +29,8 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                             uint64_t aApplicationIdentifier)
 {
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -50,6 +51,7 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mpExchangeMgr         = apExchangeMgr;
     mpDelegate            = apDelegate;
     mAttributeStatusIndex = 0;
+    mAppIdentifier        = aApplicationIdentifier;
     MoveToState(State::Initialized);
 
     return CHIP_NO_ERROR;
@@ -303,12 +305,12 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
         ExitNow();
     }
 
+    err = ProcessWriteResponseMessage(std::move(aPayload));
+
     // Close the current exchange after receiving the response since the response message marks the
     // end of conversation represented by the exchange. We should create an new exchange for a new
     // conversation defined in Interaction Model protocol.
     ClearExistingExchangeContext();
-
-    err = ProcessWriteResponseMessage(std::move(aPayload));
 
 exit:
     if (mpDelegate != nullptr)
@@ -395,6 +397,17 @@ exit:
     {
         mpDelegate->WriteResponseProtocolError(this, mAttributeStatusIndex);
     }
+    return err;
+}
+
+CHIP_ERROR WriteClientHandle::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession)
+{
+    CHIP_ERROR err = mpWriteClient->SendWriteRequest(aNodeId, aAdminId, apSecureSession);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpWriteClient->Shutdown();
+    }
+    mpWriteClient = nullptr;
     return err;
 }
 
