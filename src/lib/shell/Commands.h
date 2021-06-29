@@ -45,6 +45,18 @@ void RegisterMetaCommands();
 void RegisterConfigCommands();
 
 /**
+ * This function registers the device management commands.
+ *
+ */
+void RegisterDeviceCommands();
+
+/**
+ * This function registers the device onboarding codes commands.
+ *
+ */
+void RegisterOnboardingCodesCommands();
+
+/**
  * This function registers the wifi commands.
  *
  */
@@ -55,6 +67,12 @@ void RegisterWiFiCommands();
  *
  */
 void RegisterCommissioningCommands();
+
+/**
+ * This function registers the NFC commands.
+ *
+ */
+void RegisterNFCCommands();
 
 } // namespace Shell
 } // namespace chip

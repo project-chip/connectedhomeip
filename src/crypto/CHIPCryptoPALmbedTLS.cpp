@@ -559,7 +559,8 @@ exit:
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-#if defined(MBEDTLS_ECDH_C) && !defined(MBEDTLS_ECP_ALT)
+// TODO: Enable ECDH_derive_secret for Qorvo when their mbedTLS static libraries are updated
+#if defined(MBEDTLS_ECDH_C) && !defined(QORVO_CRYPTO_ENGINE)
     CHIP_ERROR error     = CHIP_NO_ERROR;
     int result           = 0;
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
@@ -614,6 +615,8 @@ CHIP_ERROR P256Keypair::Initialize()
     int result       = 0;
 
     size_t pubkey_size = 0;
+
+    Clear();
 
     mbedtls_ecp_group_id group = MapECPGroupId(mPublicKey.Type());
 
@@ -677,6 +680,8 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     int result       = 0;
     CHIP_ERROR error = CHIP_NO_ERROR;
 
+    Clear();
+
     mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
     mbedtls_ecp_keypair_init(keypair);
 
@@ -702,13 +707,19 @@ exit:
     return error;
 }
 
-P256Keypair::~P256Keypair()
+void P256Keypair::Clear()
 {
     if (mInitialized)
     {
         mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
         mbedtls_ecp_keypair_free(keypair);
+        mInitialized = false;
     }
+}
+
+P256Keypair::~P256Keypair()
+{
+    Clear();
 }
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)
@@ -937,8 +948,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_le
 
     result = mbedtls_md_hmac_finish(&hmac_ctx, Uint8::to_uchar(out));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    return error;
 
 exit:
     _log_mbedTLS_error(result);

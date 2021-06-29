@@ -42,8 +42,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             return;
         }
 
-        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, AppEvent::kEventType_Level,
-                                     size, value);
+        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, size, value);
     }
     else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
     {
@@ -53,10 +52,10 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             return;
         }
 
-        ChipLogProgress(Zcl, "Value: %u, length %u", *value, size);
         if (size == 1)
         {
-            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Level, size, value);
+            ChipLogProgress(Zcl, "New level: %u", *value);
+            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, size, value);
         }
         else
         {

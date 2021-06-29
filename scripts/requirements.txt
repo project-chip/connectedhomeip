@@ -4,6 +4,9 @@ virtualenv
 # esp-idf
 -r requirements.esp32.txt ; platform_machine != 'aarch64'
 
+# mbed-os
+-r requirements.mbed.txt ; platform_machine != 'aarch64'
+
 # cirque tests
 requests>=2.24.0
 

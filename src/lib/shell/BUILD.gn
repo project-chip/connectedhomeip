@@ -58,12 +58,18 @@ static_library("shell") {
       "MainLoopDefault.cpp",
       "streamer_k32w.cpp",
     ]
+  } else if (current_os == "zephyr") {
+    sources += [ "MainLoopZephyr.cpp" ]
   } else {
     sources += [ "MainLoopDefault.cpp" ]
   }
 
   if (current_os == "zephyr") {
     sources += [ "streamer_zephyr.cpp" ]
+  }
+
+  if (current_os == "mbed") {
+    sources += [ "streamer_mbed.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

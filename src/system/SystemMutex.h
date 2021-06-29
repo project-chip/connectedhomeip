@@ -50,6 +50,10 @@
 #endif
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_MBED_LOCKING
+#include <rtos/Mutex.h>
+#endif // CHIP_SYSTEM_CONFIG_MBED_LOCKING
+
 namespace chip {
 namespace System {
 
@@ -88,6 +92,10 @@ private:
     volatile int mInitialized                     = 0;
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_MBED_LOCKING
+    rtos::Mutex mMbedMutex;
+#endif // CHIP_SYSTEM_CONFIG_MBED_LOCKING
+
     Mutex(const Mutex &) = delete;
     Mutex & operator=(const Mutex &) = delete;
 };
@@ -112,6 +120,25 @@ inline void Mutex::Unlock()
 inline void Mutex::Unlock(void)
 {
     xSemaphoreGive(this->mFreeRTOSSemaphore);
+}
+#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_MBED_LOCKING
+inline Error Mutex::Init(Mutex & aMutex)
+{
+    // The mutex is initialized when constructed and generates
+    // a runtime error in case of failure.
+    return CHIP_SYSTEM_NO_ERROR;
+}
+
+inline void Mutex::Lock()
+{
+    return mMbedMutex.lock();
+}
+
+inline void Mutex::Unlock(void)
+{
+    return mMbedMutex.unlock();
 }
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 

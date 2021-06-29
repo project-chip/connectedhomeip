@@ -536,12 +536,14 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(EndpointId endpoint,
                                                   (uint8_t *) &entry.lockStateValue, sizeof(entry.lockStateValue));
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-    entry.hasCurrentPositionLiftPercentageValue = readServerAttribute(
-        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_LIFT_PERCENTAGE_ATTRIBUTE_ID, "current position lift percentage",
-        (uint8_t *) &entry.currentPositionLiftPercentageValue, sizeof(entry.currentPositionLiftPercentageValue));
-    entry.hasCurrentPositionTiltPercentageValue = readServerAttribute(
-        endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_TILT_PERCENTAGE_ATTRIBUTE_ID, "current position tilt percentage",
-        (uint8_t *) &entry.currentPositionTiltPercentageValue, sizeof(entry.currentPositionTiltPercentageValue));
+    entry.hasCurrentPositionLiftPercentageValue =
+        readServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
+                            "current position lift percentage", (uint8_t *) &entry.currentPositionLiftPercentageValue,
+                            sizeof(entry.currentPositionLiftPercentageValue));
+    entry.hasCurrentPositionTiltPercentageValue =
+        readServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
+                            "current position tilt percentage", (uint8_t *) &entry.currentPositionTiltPercentageValue,
+                            sizeof(entry.currentPositionTiltPercentageValue));
 #endif
 
     // When creating a new entry, the name is set to the null string (i.e., the
@@ -673,15 +675,15 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
                 if (entry.hasCurrentPositionLiftPercentageValue)
                 {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_LIFT_PERCENTAGE_ATTRIBUTE_ID,
-                                         "current position lift percentage", (uint8_t *) &entry.currentPositionLiftPercentageValue,
-                                         ZCL_INT8U_ATTRIBUTE_TYPE);
+                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
+                                         ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID, "current position lift percentage",
+                                         (uint8_t *) &entry.currentPositionLiftPercentageValue, ZCL_INT8U_ATTRIBUTE_TYPE);
                 }
                 if (entry.hasCurrentPositionTiltPercentageValue)
                 {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_CURRENT_TILT_PERCENTAGE_ATTRIBUTE_ID,
-                                         "current position tilt percentage", (uint8_t *) &entry.currentPositionTiltPercentageValue,
-                                         ZCL_INT8U_ATTRIBUTE_TYPE);
+                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
+                                         ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID, "current position tilt percentage",
+                                         (uint8_t *) &entry.currentPositionTiltPercentageValue, ZCL_INT8U_ATTRIBUTE_TYPE);
                 }
 #endif
                 emberAfScenesMakeValid(endpoint, sceneId, groupId);
@@ -855,8 +857,8 @@ bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, con
             entry.hasOccupiedCoolingSetpointValue = true;
             entry.occupiedCoolingSetpointValue =
                 (int16_t) emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-            extensionFieldSetsIndex += 2;
-            length -= 2;
+            extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+            length                  = static_cast<uint8_t>(length - 2);
             if (length < 2)
             {
                 break;
@@ -864,8 +866,8 @@ bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, con
             entry.hasOccupiedHeatingSetpointValue = true;
             entry.occupiedHeatingSetpointValue =
                 (int16_t) emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-            extensionFieldSetsIndex += 2;
-            length -= 2;
+            extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+            length                  = static_cast<uint8_t>(length - 2);
             if (length < 1)
             {
                 break;

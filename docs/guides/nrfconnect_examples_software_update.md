@@ -1,4 +1,4 @@
-# Performing Device Firmware Upgrade in the nRF Connect SDK examples
+# Performing Device Firmware Upgrade in the nRF Connect examples
 
 The following examples for the development kits from Nordic Semiconductor
 support over-the-air Device Firmware Upgrade:
@@ -7,7 +7,7 @@ support over-the-air Device Firmware Upgrade:
 -   [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
 
 Currently, the Bluetooth LE is the only available transport for performing the
-DFU operation and it uses
+DFU operation and it uses nRF Connect SDK's
 [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt).
 The upgrade can be done either using a smartphone application or a PC command
 line tool.
@@ -26,7 +26,7 @@ following steps:
 3. Push **Button 4** on the device to start the Bluetooth LE advertising.
 4. Follow the instructions about downloading the new image to a device on the
    [FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
-   page in the nRF Connect documentation.
+   page in the nRF Connect SDK documentation.
 
 ## Device Firmware Upgrade using PC command line tool
 

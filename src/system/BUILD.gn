@@ -47,6 +47,7 @@ buildconfig_header("system_buildconfig") {
   config_device_layer = chip_device_platform != "none"
   chip_system_config_posix_locking = chip_system_config_locking == "posix"
   chip_system_config_freertos_locking = chip_system_config_locking == "freertos"
+  chip_system_config_mbed_locking = chip_system_config_locking == "mbed"
   chip_system_config_no_locking = chip_system_config_locking == "none"
   have_clock_gettime = chip_system_config_clock == "clock_gettime"
   have_clock_settime = have_clock_gettime
@@ -62,6 +63,7 @@ buildconfig_header("system_buildconfig") {
     "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=false",
     "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",
     "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=${chip_system_config_freertos_locking}",
+    "CHIP_SYSTEM_CONFIG_MBED_LOCKING=${chip_system_config_mbed_locking}",
     "CHIP_SYSTEM_CONFIG_NO_LOCKING=${chip_system_config_no_locking}",
     "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=${chip_system_config_provide_statistics}",
     "HAVE_CLOCK_GETTIME=${have_clock_gettime}",

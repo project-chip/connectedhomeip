@@ -55,12 +55,7 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
             .SetMessageId(msgId)          //
             .SetEncryptionKeyID(state->GetPeerKeyID());
 
-        if (state->GetPeerNodeId() != kUndefinedNodeId)
-        {
-            packetHeader.SetDestinationNodeId(state->GetPeerNodeId());
-        }
-
-        packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
+        packetHeader.GetFlags().Set(Header::FlagValues::kEncryptedMessage);
     }
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
@@ -70,14 +65,14 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
 
     MessageAuthenticationCode mac;
     uint16_t taglen = 0;
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
     {
         ReturnErrorOnFailure(state->EncryptBeforeSend(data, totalLen, data, packetHeader, mac));
         ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], msgBuf->AvailableDataLength(), &taglen));
     }
     else
     {
-        packetHeader.SetEncryptionType(Header::EncryptionType::kAESCCMTagLen8);
+        packetHeader.SetEncryptionType(Header::EncryptionType::kEncryptionTypeNone);
     }
 
     ChipLogDetail(Inet, "SecureMessageCodec totalLen=%d taglen=%d", totalLen, taglen);

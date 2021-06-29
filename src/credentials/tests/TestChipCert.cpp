@@ -392,6 +392,7 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
         validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
+        validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kClientAuth);
         validContext.mValidateFlags.SetRaw(testCase.mValidateFlags);
         validContext.mRequiredCertType = testCase.mRequiredCertType;
 
@@ -432,6 +433,7 @@ static void TestChipCert_CertValidTime(nlTestSuite * inSuite, void * inContext)
     validContext.Reset();
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
+    validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kClientAuth);
 
     // Before certificate validity period.
     err = SetEffectiveTime(validContext, 2020, 1, 3);
@@ -517,7 +519,7 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
         // ----- Key Usages for leaf Certificate -----
         {  2,  sDS,          sNullKPFlag,     CHIP_NO_ERROR                        },
         {  2,  sNR,          sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
-        {  2,  sKE,          sNullKPFlag,     CHIP_NO_ERROR                        },
+        {  2,  sKE,          sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
         {  2,  sDE,          sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
         {  2,  sKA,          sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
         {  2,  sKC,          sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
@@ -525,7 +527,7 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
         {  2,  sEO,          sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
         {  2,  sDO,          sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
         {  2,  sDSandNR,     sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
-        {  2,  sDSandKE,     sNullKPFlag,     CHIP_NO_ERROR                        },
+        {  2,  sDSandKE,     sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
         {  2,  sDSandDE,     sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
         {  2,  sDSandKA,     sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
         {  2,  sDSandKC,     sNullKPFlag,     CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
@@ -576,8 +578,9 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
 
         // ----- Combinations -----
         {  2,  sDSandNR,     sSAandCA,        CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
-        {  2,  sDSandKE,     sSAandCS,        CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
-        {  2,  sDSandKE,     sSAandCA,        CHIP_NO_ERROR                        },
+        {  2,  sDS,          sSAandCS,        CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
+        {  2,  sDSandKE,     sSAandCA,        CHIP_ERROR_CERT_USAGE_NOT_ALLOWED    },
+        {  2,  sDS,          sSAandCA,        CHIP_NO_ERROR                        },
     };
     // clang-format on
     size_t sNumUsageTestCases = sizeof(sUsageTestCases) / sizeof(sUsageTestCases[0]);
@@ -646,6 +649,7 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, certType == testCase.ExpectedCertType);
+        certSet.Release();
     }
 }
 
@@ -692,6 +696,7 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, chipId == testCase.ExpectedCertId);
+        certSet.Release();
     }
 }
 
@@ -975,6 +980,7 @@ static void TestChipCert_VerifyGeneratedCerts(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, SetEffectiveTime(validContext, 2022, 1, 1) == CHIP_NO_ERROR);
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
+    validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kClientAuth);
 
     // Locate the subject DN and key id that will be used as input the FindValidCert() method.
     const ChipDN & subjectDN              = certSet.GetCertSet()[2].mSubjectDN;
@@ -1049,6 +1055,7 @@ static void TestChipCert_X509ToChipArray(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, SetEffectiveTime(validContext, 2022, 1, 1) == CHIP_NO_ERROR);
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
+    validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kClientAuth);
 
     // Locate the subject DN and key id that will be used as input the FindValidCert() method.
     const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;
@@ -1111,6 +1118,7 @@ static void TestChipCert_X509ToChipArrayNoICA(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, SetEffectiveTime(validContext, 2022, 1, 1) == CHIP_NO_ERROR);
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
+    validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kClientAuth);
 
     // Locate the subject DN and key id that will be used as input the FindValidCert() method.
     const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;

@@ -2337,6 +2337,15 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
   }
 
+  public static class WiFiNetworkDiagnosticsCluster extends BaseChipCluster {
+    public WiFiNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  }
+
   public static class WindowCoveringCluster extends BaseChipCluster {
     public WindowCoveringCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -2345,53 +2354,58 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void windowCoveringDownClose(DefaultClusterCallback callback) {
-      windowCoveringDownClose(chipClusterPtr, callback);
+    public void downOrClose(DefaultClusterCallback callback) {
+      downOrClose(chipClusterPtr, callback);
     }
 
-    public void windowCoveringGoToLiftPercentage(
-        DefaultClusterCallback callback, int percentageLiftValue) {
-      windowCoveringGoToLiftPercentage(chipClusterPtr, callback, percentageLiftValue);
+    public void goToLiftPercentage(
+        DefaultClusterCallback callback, int liftPercentageValue, int liftPercent100thsValue) {
+      goToLiftPercentage(chipClusterPtr, callback, liftPercentageValue, liftPercent100thsValue);
     }
 
-    public void windowCoveringGoToLiftValue(DefaultClusterCallback callback, int liftValue) {
-      windowCoveringGoToLiftValue(chipClusterPtr, callback, liftValue);
+    public void goToLiftValue(DefaultClusterCallback callback, int liftValue) {
+      goToLiftValue(chipClusterPtr, callback, liftValue);
     }
 
-    public void windowCoveringGoToTiltPercentage(
-        DefaultClusterCallback callback, int percentageTiltValue) {
-      windowCoveringGoToTiltPercentage(chipClusterPtr, callback, percentageTiltValue);
+    public void goToTiltPercentage(
+        DefaultClusterCallback callback, int tiltPercentageValue, int tiltPercent100thsValue) {
+      goToTiltPercentage(chipClusterPtr, callback, tiltPercentageValue, tiltPercent100thsValue);
     }
 
-    public void windowCoveringGoToTiltValue(DefaultClusterCallback callback, int tiltValue) {
-      windowCoveringGoToTiltValue(chipClusterPtr, callback, tiltValue);
+    public void goToTiltValue(DefaultClusterCallback callback, int tiltValue) {
+      goToTiltValue(chipClusterPtr, callback, tiltValue);
     }
 
-    public void windowCoveringStop(DefaultClusterCallback callback) {
-      windowCoveringStop(chipClusterPtr, callback);
+    public void stopMotion(DefaultClusterCallback callback) {
+      stopMotion(chipClusterPtr, callback);
     }
 
-    public void windowCoveringUpOpen(DefaultClusterCallback callback) {
-      windowCoveringUpOpen(chipClusterPtr, callback);
+    public void upOrOpen(DefaultClusterCallback callback) {
+      upOrOpen(chipClusterPtr, callback);
     }
 
-    private native void windowCoveringDownClose(
-        long chipClusterPtr, DefaultClusterCallback callback);
+    private native void downOrClose(long chipClusterPtr, DefaultClusterCallback callback);
 
-    private native void windowCoveringGoToLiftPercentage(
-        long chipClusterPtr, DefaultClusterCallback callback, int percentageLiftValue);
+    private native void goToLiftPercentage(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int liftPercentageValue,
+        int liftPercent100thsValue);
 
-    private native void windowCoveringGoToLiftValue(
+    private native void goToLiftValue(
         long chipClusterPtr, DefaultClusterCallback callback, int liftValue);
 
-    private native void windowCoveringGoToTiltPercentage(
-        long chipClusterPtr, DefaultClusterCallback callback, int percentageTiltValue);
+    private native void goToTiltPercentage(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int tiltPercentageValue,
+        int tiltPercent100thsValue);
 
-    private native void windowCoveringGoToTiltValue(
+    private native void goToTiltValue(
         long chipClusterPtr, DefaultClusterCallback callback, int tiltValue);
 
-    private native void windowCoveringStop(long chipClusterPtr, DefaultClusterCallback callback);
+    private native void stopMotion(long chipClusterPtr, DefaultClusterCallback callback);
 
-    private native void windowCoveringUpOpen(long chipClusterPtr, DefaultClusterCallback callback);
+    private native void upOrOpen(long chipClusterPtr, DefaultClusterCallback callback);
   }
 }

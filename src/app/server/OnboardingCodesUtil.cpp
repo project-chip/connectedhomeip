@@ -145,10 +145,11 @@ CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const std::string
                         CHIP_ERROR_BUFFER_TOO_SMALL);
 
     const int writtenDataSize = snprintf(aQRCodeUrl, aUrlMaxSize, "%s%s", kQrCodeBaseUrl, kUrlDataAssignmentPhrase);
-    VerifyOrReturnError((writtenDataSize > 0) && (writtenDataSize < static_cast<int>(aUrlMaxSize)),
+    VerifyOrReturnError((writtenDataSize > 0) && (static_cast<size_t>(writtenDataSize) < aUrlMaxSize),
                         CHIP_ERROR_INVALID_STRING_LENGTH);
 
-    return EncodeQRCodeToUrl(aQRCode.c_str(), aQRCode.size(), aQRCodeUrl + writtenDataSize, aUrlMaxSize - writtenDataSize);
+    return EncodeQRCodeToUrl(aQRCode.c_str(), aQRCode.size(), aQRCodeUrl + writtenDataSize,
+                             aUrlMaxSize - static_cast<size_t>(writtenDataSize));
 }
 
 CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags)
@@ -186,7 +187,7 @@ CHIP_ERROR EncodeQRCodeToUrl(const char * aQRCode, size_t aLen, char * aUrl, siz
 
     for (i = 0; i < aLen; ++i)
     {
-        unsigned char c = aQRCode[i];
+        char c = aQRCode[i];
         if (isCharUnreservedInRfc3986(c))
         {
 

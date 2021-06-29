@@ -26,6 +26,7 @@
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
+#include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -107,7 +108,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Loop through admins
-    uint32_t fabricIndex = 0;
+    int32_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
     {
         NodeId nodeId               = pairing.GetNodeId();
@@ -342,6 +343,12 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * 
 
     VerifyOrExit(admin->SetOperationalCert(OperationalCert) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+    // We have a new operational identity and should start advertising it.  We
+    // can't just wait until we get network configuration commands, because we
+    // might be on the operational network already, in which case we are
+    // expected to be live with our new identity at this point.
+    chip::app::Mdns::AdvertiseOperational();
 
 exit:
     emberAfSendImmediateDefaultResponse(status);

@@ -37,9 +37,34 @@ void OnDefaultFailureResponse(void * /* context */, uint8_t status)
         gFailureResponseDelegate(status);
 }
 
-template<class AttributeType>
-void OnAttributeResponse(void * /* context */, AttributeType)
+
+template <class AttributeType>
+void OnAttributeResponse(void * /* context */, AttributeType value)
 {
+    std::string strValue = std::to_string(value);
+    ChipLogProgress(Zcl, "  attributeValue: %s", strValue.c_str());
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <>
+void OnAttributeResponse<chip::ByteSpan>(void * /* context */, chip::ByteSpan value)
+{
+    std::string strValue = "";
+    for (size_t i = 0; i < value.size(); i++)
+    {
+        strValue += ' ';
+        strValue += std::to_string(value.data()[i]);
+    }
+    ChipLogProgress(Zcl, "  attributeValue: (span of length %zd) %s", value.size(), strValue.c_str());
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+template <>
+void OnAttributeResponse<bool>(void * /* context */, bool value)
+{
+    ChipLogProgress(Zcl, "  attributeValue: %s", value ? "true" : "false");
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
@@ -49,6 +74,7 @@ void OnAttributeResponse(void * /* context */, AttributeType)
 {{#if isList}}
 static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse(void * context, uint16_t count, {{chipType}} * entries)
 {
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }
