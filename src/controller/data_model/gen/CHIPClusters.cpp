@@ -7059,9 +7059,13 @@ CHIP_ERROR OccupancySensingCluster::DiscoverAttributes(Callback::Cancelable * on
 CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeOccupancySensingClusterReadOccupancyAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0000;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
 CHIP_ERROR OccupancySensingCluster::ConfigureAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
@@ -7082,26 +7086,37 @@ CHIP_ERROR OccupancySensingCluster::ReportAttributeOccupancy(Callback::Cancelabl
 CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancySensorType(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeOccupancySensingClusterReadOccupancySensorTypeAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0001;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
 CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancySensorTypeBitmap(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeOccupancySensingClusterReadOccupancySensorTypeBitmapAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0002;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
 CHIP_ERROR OccupancySensingCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeOccupancySensingClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0xFFFD;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // OnOff Cluster Commands
