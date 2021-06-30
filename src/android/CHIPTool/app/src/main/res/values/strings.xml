@@ -37,6 +37,7 @@
     <string name="send_command_on_btn_text">On</string>
     <string name="send_command_off_btn_text">Off</string>
     <string name="send_command_toggle_btn_text">Toggle</string>
+    <string name="read_on_off_attribute_btn_text">Read On/Off</string>
     <string name="send_command_type_label_text">%s/%d command sent!</string>
     <string name="rendezvous_over_ble_btn_text">Rendezvous over BLE</string>
     <string name="rendezvous_over_soft_ap_btn_text">Rendezvous over Soft AP</string>
