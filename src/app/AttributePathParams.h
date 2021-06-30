@@ -31,7 +31,7 @@ struct AttributePathParams
         kListIndexValid = 0x02,
     };
 
-    AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, FieldId aFieldId, ListIndex aListIndex,
+    AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, AttributeId aFieldId, ListIndex aListIndex,
                         const BitFlags<Flags> aFlags) :
         mNodeId(aNodeId),
         mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
@@ -40,7 +40,7 @@ struct AttributePathParams
     NodeId mNodeId         = 0;
     EndpointId mEndpointId = 0;
     ClusterId mClusterId   = 0;
-    FieldId mFieldId       = 0;
+    AttributeId mFieldId   = 0;
     ListIndex mListIndex   = 0;
     BitFlags<Flags> mFlags;
 };

@@ -80,14 +80,24 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
         memcpy(info->mRootCert, mRootCert, mRootCertLen);
     }
 
-    if (mOperationalCert == nullptr || mOpCertLen == 0)
+    if (mICACert == nullptr || mICACertLen == 0)
     {
-        info->mOpCertLen = 0;
+        info->mICACertLen = 0;
     }
     else
     {
-        info->mOpCertLen = Encoding::LittleEndian::HostSwap16(mOpCertLen);
-        memcpy(info->mOperationalCert, mOperationalCert, mOpCertLen);
+        info->mICACertLen = Encoding::LittleEndian::HostSwap16(mICACertLen);
+        memcpy(info->mICACert, mICACert, mICACertLen);
+    }
+
+    if (mNOCCert == nullptr || mNOCCertLen == 0)
+    {
+        info->mNOCCertLen = 0;
+    }
+    else
+    {
+        info->mNOCCertLen = Encoding::LittleEndian::HostSwap16(mNOCCertLen);
+        memcpy(info->mNOCCert, mNOCCert, mNOCCertLen);
     }
 
     err = kvs->SyncSetKeyValue(key, info, sizeof(StorableAdminPairingInfo));
@@ -116,7 +126,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     uint16_t infoSize = sizeof(StorableAdminPairingInfo);
 
     AdminId id;
-    uint16_t rootCertLen, opCertLen;
+    uint16_t rootCertLen, icaCertLen, nocCertLen;
     size_t stringLength;
 
     SuccessOrExit(err = kvs->SyncGetKeyValue(key, info, infoSize));
@@ -126,7 +136,8 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     mFabricId   = Encoding::LittleEndian::HostSwap64(info->mFabricId);
     mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
     rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
-    opCertLen   = Encoding::LittleEndian::HostSwap16(info->mOpCertLen);
+    icaCertLen  = Encoding::LittleEndian::HostSwap16(info->mICACertLen);
+    nocCertLen  = Encoding::LittleEndian::HostSwap16(info->mNOCCertLen);
 
     stringLength = strnlen(info->mFabricLabel, kFabricLabelMaxLengthInBytes);
     memcpy(mFabricLabel, info->mFabricLabel, stringLength);
@@ -143,7 +154,8 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 
     ChipLogProgress(Inet, "Loading certs from KVS");
     SuccessOrExit(SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
-    SuccessOrExit(SetOperationalCert(ByteSpan(info->mOperationalCert, opCertLen)));
+    SuccessOrExit(SetICACert(ByteSpan(info->mICACert, icaCertLen)));
+    SuccessOrExit(SetNOCCert(ByteSpan(info->mNOCCert, nocCertLen)));
 
 exit:
     if (info != nullptr)
@@ -213,7 +225,7 @@ CHIP_ERROR AdminPairingInfo::SetRootCert(const ByteSpan & cert)
         return CHIP_NO_ERROR;
     }
 
-    VerifyOrReturnError(cert.size() <= kMaxChipCertSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(cert.size() <= kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
     if (mRootCertLen != 0 && mRootCertAllocatedLen < cert.size())
     {
         ReleaseRootCert();
@@ -232,63 +244,129 @@ CHIP_ERROR AdminPairingInfo::SetRootCert(const ByteSpan & cert)
     return CHIP_NO_ERROR;
 }
 
-void AdminPairingInfo::ReleaseOperationalCert()
+void AdminPairingInfo::ReleaseICACert()
 {
-    if (mOperationalCert != nullptr)
+    if (mICACert != nullptr)
     {
-        chip::Platform::MemoryFree(mOperationalCert);
+        chip::Platform::MemoryFree(mICACert);
     }
-    mOpCertAllocatedLen = 0;
-    mOpCertLen          = 0;
-    mOperationalCert    = nullptr;
+    mICACertLen = 0;
+    mICACert    = nullptr;
 }
 
-CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
+CHIP_ERROR AdminPairingInfo::SetICACert(const ByteSpan & cert)
 {
     if (cert.size() == 0)
     {
-        ReleaseOperationalCert();
+        ReleaseICACert();
         return CHIP_NO_ERROR;
     }
 
-    // There could be two certs in the set -> ICA and NOC
-    VerifyOrReturnError(cert.size() <= kMaxChipCertSize * 2, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mOpCertLen != 0 && mOpCertAllocatedLen < cert.size())
+    VerifyOrReturnError(cert.size() <= kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mICACertLen != 0)
     {
-        ReleaseOperationalCert();
+        ReleaseICACert();
     }
 
-    if (mOperationalCert == nullptr)
-    {
-        mOperationalCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(cert.size()));
-    }
-    VerifyOrReturnError(mOperationalCert != nullptr, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    mOpCertLen          = static_cast<uint16_t>(cert.size());
-    mOpCertAllocatedLen = (mOpCertLen > mOpCertAllocatedLen) ? mOpCertLen : mOpCertAllocatedLen;
-    memcpy(mOperationalCert, cert.data(), mOpCertLen);
+    if (mICACert == nullptr)
+    {
+        mICACert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(cert.size()));
+    }
+    VerifyOrReturnError(mICACert != nullptr, CHIP_ERROR_NO_MEMORY);
+    mICACertLen = static_cast<uint16_t>(cert.size());
+    memcpy(mICACert, cert.data(), mICACertLen);
 
     return CHIP_NO_ERROR;
+}
+
+void AdminPairingInfo::ReleaseNOCCert()
+{
+    if (mNOCCert != nullptr)
+    {
+        chip::Platform::MemoryFree(mNOCCert);
+    }
+    mNOCCertLen = 0;
+    mNOCCert    = nullptr;
+}
+
+CHIP_ERROR AdminPairingInfo::SetNOCCert(const ByteSpan & cert)
+{
+    if (cert.size() == 0)
+    {
+        ReleaseNOCCert();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(cert.size() <= kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mNOCCertLen != 0)
+    {
+        ReleaseNOCCert();
+    }
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    if (mNOCCert == nullptr)
+    {
+        mNOCCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(cert.size()));
+    }
+    VerifyOrReturnError(mNOCCert != nullptr, CHIP_ERROR_NO_MEMORY);
+    mNOCCertLen = static_cast<uint16_t>(cert.size());
+    memcpy(mNOCCert, cert.data(), mNOCCertLen);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AdminPairingInfo::SetOperationalCertsFromCertArray(const ByteSpan & certArray)
+{
+    if (certArray.size() == 0)
+    {
+        ReleaseNOCCert();
+        ReleaseICACert();
+        return CHIP_NO_ERROR;
+    }
+
+    ByteSpan noc;
+    ByteSpan icac;
+    ExtractCertsFromCertArray(certArray, noc, icac);
+
+    if (icac.data() != nullptr && icac.size() != 0)
+    {
+        ReturnErrorOnFailure(SetICACert(icac));
+    }
+
+    CHIP_ERROR err = SetNOCCert(noc);
+    if (err != CHIP_NO_ERROR)
+    {
+        ReleaseICACert();
+    }
+
+    return err;
 }
 
 CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentials, ChipCertificateSet & certificates,
                                             CertificateKeyId & rootKeyId)
 {
     constexpr uint8_t kMaxNumCertsInOpCreds = 3;
-    ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds, kMaxChipCertSize * kMaxNumCertsInOpCreds));
+    ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds, kMaxCHIPCertLength * kMaxNumCertsInOpCreds));
 
     ReturnErrorOnFailure(
         certificates.LoadCert(mRootCert, mRootCertLen,
                               BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor).Set(CertDecodeFlags::kGenerateTBSHash)));
 
+    if (mICACert != nullptr && mICACertLen > 0)
+    {
+        ReturnErrorOnFailure(
+            certificates.LoadCert(mICACert, mICACertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+    }
+
     credentials.Release();
-    ReturnErrorOnFailure(credentials.Init(&certificates, certificates.GetCertCount()));
+    ReturnErrorOnFailure(credentials.Init(&certificates, 1));
 
     const CertificateKeyId * id = credentials.GetTrustedRootId(0);
     rootKeyId.mId               = id->mId;
     rootKeyId.mLen              = id->mLen;
 
-    ReturnErrorOnFailure(credentials.SetDevOpCred(rootKeyId, mOperationalCert, mOpCertLen));
+    ReturnErrorOnFailure(credentials.SetDevOpCred(rootKeyId, mNOCCert, mNOCCertLen));
     ReturnErrorOnFailure(credentials.SetDevOpCredKeypair(rootKeyId, mOperationalKey));
 
     return CHIP_NO_ERROR;

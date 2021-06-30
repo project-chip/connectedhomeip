@@ -30,65 +30,53 @@ const uint64_t tlvListTag = TLV::ProfileTag(7777, 8888);
 // Helper method for generating a complete TLV structure with a list containing a single tag and string
 CHIP_ERROR WriteChipTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uint32_t & written)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    written        = 0;
+    written = 0;
     TLV::TLVWriter writer;
     writer.Init(buf, bufLen);
 
     {
         TLV::TLVWriter listWriter;
-        err = writer.OpenContainer(tlvListTag, TLV::kTLVType_List, listWriter);
-        SuccessOrExit(err);
-        err = listWriter.PutString(tlvStrTag, data);
-        SuccessOrExit(err);
-        err = writer.CloseContainer(listWriter);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(writer.OpenContainer(tlvListTag, TLV::kTLVType_List, listWriter));
+        ReturnErrorOnFailure(listWriter.PutString(tlvStrTag, data));
+        ReturnErrorOnFailure(writer.CloseContainer(listWriter));
     }
 
-    err = writer.Finalize();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(writer.Finalize());
     written = writer.GetLengthWritten();
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 // Helper method: read a TLV structure with a single tag and string and verify it matches expected string.
 CHIP_ERROR ReadAndVerifyTLVString(nlTestSuite * inSuite, void * inContext, const uint8_t * dataStart, uint32_t len,
                                   const char * expected, uint16_t expectedLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     char tmp[64]        = { 0 };
     uint32_t readLength = 0;
-    VerifyOrExit(sizeof(tmp) > len, err = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(sizeof(tmp) > len, CHIP_ERROR_INTERNAL);
 
     reader.Init(dataStart, len);
-    err = reader.Next();
+    CHIP_ERROR err = reader.Next();
 
-    VerifyOrExit(reader.GetTag() == tlvListTag, err = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(reader.GetTag() == tlvListTag, CHIP_ERROR_INTERNAL);
 
     // Metadata must have a top-level list
     {
         TLV::TLVReader listReader;
-        err = reader.OpenContainer(listReader);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.OpenContainer(listReader));
 
-        err = listReader.Next();
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(listReader.Next());
 
-        VerifyOrExit(listReader.GetTag() == tlvStrTag, err = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(listReader.GetTag() == tlvStrTag, CHIP_ERROR_INTERNAL);
         readLength = listReader.GetLength();
-        VerifyOrExit(readLength == expectedLen, err = CHIP_ERROR_INTERNAL);
-        err = listReader.GetString(tmp, sizeof(tmp));
-        SuccessOrExit(err);
-        VerifyOrExit(!memcmp(expected, tmp, readLength), err = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(readLength == expectedLen, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(listReader.GetString(tmp, sizeof(tmp)));
+        VerifyOrReturnError(!memcmp(expected, tmp, readLength), CHIP_ERROR_INTERNAL);
 
-        err = reader.CloseContainer(listReader);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.CloseContainer(listReader));
     }
 
-exit:
     return err;
 }
 

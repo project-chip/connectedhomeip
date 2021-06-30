@@ -1786,6 +1786,14 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED                      _CHIP_ERROR(190)
 
 /**
+ * @def CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED
+ *
+ * @brief
+ *   The received message is a duplicate of a previously received message.
+ */
+#define CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED                      _CHIP_ERROR(191)
+
+/**
  *  @}
  */
 

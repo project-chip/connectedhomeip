@@ -26,7 +26,6 @@
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
-#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include "support/CHIPMemString.h"
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
@@ -415,7 +414,6 @@ CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
 
 CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegate)
 {
-    VerifyOrReturnError(delegate == nullptr || mResolverDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mResolverDelegate = delegate;
     return CHIP_NO_ERROR;
 }
@@ -433,16 +431,15 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
 }
 
-void DiscoveryImplPlatform::HandleCommissionableNodeBrowse(void * context, MdnsService * services, size_t servicesSize,
-                                                           CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleNodeBrowse(void * context, MdnsService * services, size_t servicesSize, CHIP_ERROR error)
 {
     for (size_t i = 0; i < servicesSize; ++i)
     {
-        ChipMdnsResolve(&services[i], INET_NULL_INTERFACEID, HandleCommissionableNodeResolve, context);
+        ChipMdnsResolve(&services[i], INET_NULL_INTERFACEID, HandleNodeResolve, context);
     }
 }
 
-void DiscoveryImplPlatform::HandleCommissionableNodeResolve(void * context, MdnsService * result, CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * result, CHIP_ERROR error)
 {
     if (error != CHIP_NO_ERROR)
     {
@@ -470,10 +467,20 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
 {
     ReturnErrorOnFailure(Init());
     char serviceName[kMaxCommisisonableServiceNameSize];
-    ReturnErrorOnFailure(MakeCommissionableNodeServiceTypeName(serviceName, sizeof(serviceName), filter));
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
     return ChipMdnsBrowse(serviceName, MdnsServiceProtocol::kMdnsProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
-                          HandleCommissionableNodeBrowse, this);
+                          HandleNodeBrowse, this);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
+{
+    ReturnErrorOnFailure(Init());
+    char serviceName[kMaxCommisisonerServiceNameSize];
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
+
+    return ChipMdnsBrowse(serviceName, MdnsServiceProtocol::kMdnsProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
+                          HandleNodeBrowse, this);
 }
 
 void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error)
@@ -513,12 +520,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
 
-#if CHIP_PROGRESS_LOGGING
-    char addrBuffer[Inet::kMaxIPAddressStringLength + 1];
-    nodeData.mAddress.ToString(addrBuffer);
-#endif // CHIP_PROGRESS_LOGGING
-    ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64 " to %s", ChipLogValueX64(nodeData.mPeerId.GetNodeId()),
-                    addrBuffer);
+    nodeData.LogNodeIdResolved();
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 

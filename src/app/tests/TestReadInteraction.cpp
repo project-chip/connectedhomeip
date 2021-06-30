@@ -150,12 +150,12 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
 
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, &delegate);
+    err                            = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
-                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/,
-                                     eventNumber /*aEventNumber*/);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /* apSecureSession */, nullptr /*apEventPathParamsList*/,
+                                     0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
+                                     0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 
     GenerateReportData(apSuite, apContext, buf);
@@ -225,7 +225,7 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
     err = request.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = readClient.Init(&gExchangeManager, &delegate);
+    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
 
     AttributePathParams attributePathParams[2];
     attributePathParams[0].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
@@ -246,7 +246,7 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     writer.Init(std::move(msgBuf));
-    err = readClient.Init(&gExchangeManager, &delegate);
+    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = request.Init(&writer);
@@ -268,12 +268,12 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     EventNumber eventNumber = 0;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, &delegate);
+    err                            = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
-                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/,
-                                     eventNumber /*aEventNumber*/);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /* apSecureSession */, nullptr /*apEventPathParamsList*/,
+                                     0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
+                                     0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);

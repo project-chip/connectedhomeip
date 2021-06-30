@@ -14,65 +14,6 @@
 
 import("//build_overrides/lwip.gni")
 
-declare_args() {
-  # Default enablement for lwIP library components.
-  # This has no effect on its own; it only changes between opt-out and opt-in.
-  lwip_default = current_os != "freertos"
-}
-
-declare_args() {
-  # Build IPv4 support in lwIP.
-  lwip_ipv4 = lwip_default
-
-  # Enable IPv6 support in lwIP.
-  lwip_ipv6 = lwip_default
-
-  # Enable sequential & socket API support in lwIP.
-  lwip_api = lwip_default
-
-  # Enable ethernet support in lwIP.
-  lwip_ethernet = lwip_default
-
-  # Enable SLIP interface support in lwIP.
-  lwip_slip = false
-
-  # Enable 6LoWPAN support in lwIP.
-  lwip_6lowpan = lwip_default
-
-  # Enable PPP support in lwIP.
-  lwip_ppp = lwip_default
-
-  # Default enablement for lwIP application components.
-  # This has no effect on its own; it only changes between opt-out and opt-in.
-  lwip_apps_default = false
-}
-
-declare_args() {
-  # Enable SNMPv2c agent application.
-  lwip_snmp = lwip_apps_default
-
-  # Enable HTTP server.
-  lwip_httpd = lwip_apps_default
-
-  # Enable IPERF server.
-  lwip_iperf = lwip_apps_default
-
-  # Enable SNTP client.
-  lwip_sntp = lwip_apps_default
-
-  # Enable MDNS responder.
-  lwip_mdns = lwip_apps_default
-
-  # Enable NetBIOS name server.
-  lwip_netbiosns = lwip_apps_default
-
-  # Enable TFTP server.
-  lwip_tftp = lwip_apps_default
-
-  # Enable MQTT client.
-  lwip_mqtt = lwip_apps_default
-}
-
 # Defines a lwIP build target.
 #
 # lwIP depends on external header files to compile. This template defines
@@ -82,6 +23,36 @@ template("lwip_target") {
 
   lwip_target_name = target_name
 
+  # Apply overrides for lwIP features.
+  forward_variables_from(invoker,
+                         [
+                           "lwip_ipv4",
+                           "lwip_ipv6",
+                           "lwip_api",
+                           "lwip_ethernet",
+                           "lwip_slip",
+                           "lwip_6lowpan",
+                         ])
+
+  if (!defined(lwip_ipv4)) {
+    lwip_ipv4 = true
+  }
+  if (!defined(lwip_ipv6)) {
+    lwip_ipv6 = true
+  }
+  if (!defined(lwip_api)) {
+    lwip_api = true
+  }
+  if (!defined(lwip_ethernet)) {
+    lwip_ethernet = true
+  }
+  if (!defined(lwip_slip)) {
+    lwip_slip = false
+  }
+  if (!defined(lwip_6lowpan)) {
+    lwip_6lowpan = false
+  }
+
   config("${lwip_target_name}_warnings") {
     cflags = [
       "-Wno-address",
@@ -89,59 +60,12 @@ template("lwip_target") {
       "-Wno-type-limits",
       "-Wno-unused-variable",
       "-Wno-maybe-uninitialized",
+      "-Wno-format-type-confusion",
     ]
   }
 
   config("${lwip_target_name}_base_config") {
     include_dirs = [ "${lwip_root}/repo/lwip/src/include" ]
-
-    # These options may have overlap with lwipopts.h, however this is harmless
-    # as long the options are the same and if they are not the same it's a
-    # compile error.
-    if (lwip_ipv4) {
-      enable_ipv4 = 1
-    } else {
-      enable_ipv4 = 0
-    }
-    if (lwip_ipv6) {
-      enable_ipv6 = 1
-    } else {
-      enable_ipv6 = 0
-    }
-    if (lwip_api) {
-      enable_api = 1
-    } else {
-      enable_api = 0
-    }
-    if (lwip_ethernet) {
-      enable_ethernet = 1
-    } else {
-      enable_ethernet = 0
-    }
-    if (lwip_slip) {
-      enable_slip = 1
-    } else {
-      enable_slip = 0
-    }
-    if (lwip_6lowpan) {
-      enable_6lowpan = 1
-    } else {
-      enable_6lowpan = 0
-    }
-    if (lwip_ppp) {
-      enable_ppp = 1
-    } else {
-      enable_ppp = 0
-    }
-    defines = [
-      "LWIP_IPV4=${enable_ipv4}",
-      "LWIP_IPV6=${enable_ipv6}",
-      "LWIP_API=${enable_api}",
-      "LWIP_ETHERNET=${enable_ethernet}",
-      "LWIP_SLIP=${enable_slip}",
-      "LWIP_6LOWPAN=${enable_6lowpan}",
-      "LWIP_PPP=${enable_ppp}",
-    ]
   }
 
   source_set(lwip_target_name) {
@@ -292,120 +216,5 @@ template("lwip_target") {
     configs += [ ":${lwip_target_name}_warnings" ]
 
     public_configs += [ ":${lwip_target_name}_base_config" ]
-  }
-
-  lwip_apps = []
-
-  template("lwip_app") {
-    app_name = target_name
-
-    static_library("${lwip_target_name}_${app_name}") {
-      forward_variables_from(invoker, [ "sources" ])
-
-      deps = [ ":lwip" ]
-
-      # Relax warnings for third_party code.
-      configs += [ ":${lwip_target_name}_warnings" ]
-    }
-  }
-
-  if (lwip_snmp) {
-    lwip_app("snmp") {
-      sources = [
-        "${_lwip_root}/src/apps/snmp/snmp_asn1.c",
-        "${_lwip_root}/src/apps/snmp/snmp_core.c",
-        "${_lwip_root}/src/apps/snmp/snmp_mib2.c",
-        "${_lwip_root}/src/apps/snmp/snmp_mib2_icmp.c",
-        "${_lwip_root}/src/apps/snmp/snmp_mib2_interfaces.c",
-        "${_lwip_root}/src/apps/snmp/snmp_mib2_ip.c",
-        "${_lwip_root}/src/apps/snmp/snmp_mib2_snmp.c",
-        "${_lwip_root}/src/apps/snmp/snmp_mib2_system.c",
-        "${_lwip_root}/src/apps/snmp/snmp_mib2_tcp.c",
-        "${_lwip_root}/src/apps/snmp/snmp_mib2_udp.c",
-        "${_lwip_root}/src/apps/snmp/snmp_msg.c",
-        "${_lwip_root}/src/apps/snmp/snmp_netconn.c",
-        "${_lwip_root}/src/apps/snmp/snmp_pbuf_stream.c",
-        "${_lwip_root}/src/apps/snmp/snmp_raw.c",
-        "${_lwip_root}/src/apps/snmp/snmp_scalar.c",
-        "${_lwip_root}/src/apps/snmp/snmp_table.c",
-        "${_lwip_root}/src/apps/snmp/snmp_threadsync.c",
-        "${_lwip_root}/src/apps/snmp/snmp_traps.c",
-        "${_lwip_root}/src/apps/snmp/snmpv3.c",
-        "${_lwip_root}/src/apps/snmp/snmpv3_dummy.c",
-        "${_lwip_root}/src/apps/snmp/snmpv3_mbedtls.c",
-      ]
-    }
-
-    lwip_apps += [ ":${lwip_target_name}_snmp" ]
-  }
-
-  if (lwip_httpd) {
-    lwip_app("httpd") {
-      sources = [
-        "${_lwip_root}/src/apps/httpd/fs.c",
-        "${_lwip_root}/src/apps/httpd/httpd.c",
-      ]
-    }
-
-    lwip_apps += [ ":${lwip_target_name}_httpd" ]
-  }
-
-  if (lwip_iperf) {
-    lwip_app("lwiperf") {
-      sources = [ "${_lwip_root}/src/apps/lwiperf/lwiperf.c" ]
-    }
-
-    lwip_apps += [ ":${lwip_target_name}_lwiperf" ]
-  }
-
-  if (lwip_sntp) {
-    lwip_app("sntp") {
-      sources = [ "${_lwip_root}/src/apps/sntp/sntp.c" ]
-    }
-
-    lwip_apps += [ ":${lwip_target_name}_sntp" ]
-  }
-
-  if (lwip_mdns) {
-    lwip_app("mdns") {
-      sources = [ "${_lwip_root}/src/apps/mdns/mdns.c" ]
-    }
-
-    lwip_apps += [ ":${lwip_target_name}_mdns" ]
-  }
-
-  if (lwip_netbiosns) {
-    lwip_app("netbiosns") {
-      sources = [ "${_lwip_root}/src/apps/netbiosns/netbiosns.c" ]
-    }
-
-    lwip_apps += [ ":${lwip_target_name}_netbiosns" ]
-  }
-
-  if (lwip_tftp) {
-    lwip_app("tftp") {
-      sources = [ "${_lwip_root}/src/apps/tftp/tftp_server.c" ]
-    }
-
-    lwip_apps += [ ":${lwip_target_name}_tftp" ]
-  }
-
-  if (lwip_mqtt) {
-    lwip_app("mqtt") {
-      sources = [ "${_lwip_root}/src/apps/mqtt/mqtt.c" ]
-    }
-
-    lwip_apps += [ ":${lwip_target_name}_mqtt" ]
-  }
-
-  group("${lwip_target_name}_apps") {
-    deps = lwip_apps
-  }
-
-  group("${lwip_target_name}_all") {
-    deps = [
-      ":${lwip_target_name}",
-      ":${lwip_target_name}_apps",
-    ]
   }
 }

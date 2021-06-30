@@ -1,0 +1,2 @@
+mbed-tools>=7.0.0
+prettytable==0.7.2

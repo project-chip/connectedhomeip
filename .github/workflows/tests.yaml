@@ -28,6 +28,14 @@ jobs:
         name: Test Suites - Linux
         timeout-minutes: 60
 
+        strategy:
+          matrix:
+            type: [debug, tsan]
+            eventloop: [eventloop_same, eventloop_separate]
+        env:
+            USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
+            USE_TSAN: ${{ matrix.type == 'tsan' }}
+
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
@@ -54,25 +62,25 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }}
               with:
-                  name: bootstrap-logs
+                  name: bootstrap-logs-linux-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Build all clusters app
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Tests
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   ifconfig -a
                   scripts/tests/test_suites.sh
@@ -80,7 +88,7 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-core-linux
+                  name: crash-core-linux-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -88,13 +96,21 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-objdir-linux
+                  name: crash-objdir-linux-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
         timeout-minutes: 60
+
+        strategy:
+          matrix:
+            type: [debug, tsan]
+            eventloop: [eventloop_same, eventloop_separate]
+        env:
+            USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
+            USE_TSAN: ${{ matrix.type == 'tsan' }}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -127,32 +143,32 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ always() }}
               with:
-                  name: bootstrap-logs
+                  name: bootstrap-logs-darwin-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Run Build Test Server
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Test Suites
-              timeout-minutes: 5
+              timeout-minutes: 15
               run: |
                   scripts/tests/test_suites.sh
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-core-darwin
+                  name: crash-core-darwin-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -160,13 +176,13 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-log-darwin
+                  name: crash-log-darwin-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
               with:
-                  name: crash-objdir-darwin
+                  name: crash-objdir-darwin-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5

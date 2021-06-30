@@ -43,9 +43,9 @@
 #include <lwip/raw.h>
 #include <lwip/tcpip.h>
 #if CHIP_HAVE_CONFIG_H
-#include <lwip/lwip_buildconfig.h>
-#endif // CHIP_HAVE_CONFIG_H
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/lwip_buildconfig.h> // nogncheck
+#endif                             // CHIP_HAVE_CONFIG_H
+#endif                             // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <system/SystemSockets.h>
@@ -424,7 +424,7 @@ INET_ERROR RawEndPoint::Listen(IPEndPointBasis::OnMessageReceivedFunct onMessage
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wait for ability to read on this endpoint.
-    mSocket.SetCallback(HandlePendingIO, this);
+    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
     mSocket.RequestCallbackOnPendingRead();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -1026,7 +1026,7 @@ INET_ERROR RawEndPoint::GetSocket(IPAddressType aAddressType)
 // static
 void RawEndPoint::HandlePendingIO(System::WatchableSocket & socket)
 {
-    static_cast<RawEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
+    reinterpret_cast<RawEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
 }
 
 void RawEndPoint::HandlePendingIO()

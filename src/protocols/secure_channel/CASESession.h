@@ -52,7 +52,7 @@ constexpr uint16_t kSigmaParamRandomNumberSize = 32;
 constexpr uint16_t kTrustedRootIdSize          = 20;
 constexpr uint16_t kMaxTrustedRootIds          = 5;
 
-constexpr uint16_t kIPKSize = 32;
+constexpr uint16_t kIPKSize = 16;
 
 using namespace Crypto;
 using namespace Credentials;
@@ -179,14 +179,18 @@ public:
     SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
 
     //// ExchangeDelegate Implementation ////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
     {
         return &mMessageDispatch;
     }
+
+    /** @brief This function zeroes out and resets the memory used by the object.
+     **/
+    void Clear();
 
 private:
     enum SigmaErrorType : uint8_t
@@ -213,13 +217,13 @@ private:
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR FindValidTrustedRoot(const uint8_t ** msgIterator, uint32_t nTrustedRoots);
-    CHIP_ERROR ConstructSaltSigmaR2(const System::PacketBufferHandle & rand, const P256PublicKey & pubkey, const uint8_t * ipk,
-                                    size_t ipkLen, System::PacketBufferHandle & salt);
+    CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const P256PublicKey & pubkey, const uint8_t * ipk, size_t ipkLen,
+                                    MutableByteSpan & salt);
     CHIP_ERROR Validate_and_RetrieveResponderID(const uint8_t ** msgIterator, P256PublicKey & responderID,
                                                 const uint8_t ** responderOpCert, uint16_t & responderOpCertLen);
-    CHIP_ERROR ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen, System::PacketBufferHandle & salt);
+    CHIP_ERROR ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen, MutableByteSpan & salt);
     CHIP_ERROR ConstructSignedCredentials(const uint8_t ** msgIterator, const uint8_t * responderOpCert,
-                                          uint16_t responderOpCertLen, System::PacketBufferHandle & signedCredentials,
+                                          uint16_t responderOpCertLen, MutableByteSpan & signedCredentials,
                                           P256ECDSASignature & signature, size_t sigLen);
     CHIP_ERROR ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen);
 
@@ -235,8 +239,6 @@ private:
     // TODO: Remove this and replace with system method to retrieve current time
     CHIP_ERROR SetEffectiveTime(void);
 
-    void Clear();
-
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                        const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg);
 
@@ -247,6 +249,8 @@ private:
     Hash_SHA256_stream mCommissioningHash;
     P256PublicKey mRemotePubKey;
     P256Keypair mEphemeralKey;
+    // TODO: Remove mFabricSecret later
+    P256ECDHDerivedSecret mFabricSecret;
     P256ECDHDerivedSecret mSharedSecret;
     OperationalCredentialSet * mOpCredSet;
     CertificateKeyId mTrustedRootId;

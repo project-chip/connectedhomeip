@@ -56,6 +56,14 @@ void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfDescriptorClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Diagnostic Logs Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Ethernet Network Diagnostics Cluster Init
  *
  * Cluster Init
@@ -282,6 +290,77 @@ EmberAfStatus emberAfDescriptorClusterServerPreAttributeChangedCallback(chip::En
  * @param endpoint  Endpoint that is being served
  */
 void emberAfDescriptorClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Diagnostic Logs Cluster server
+//
+
+/** @brief Diagnostic Logs Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDiagnosticLogsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Diagnostic Logs Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfDiagnosticLogsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief Diagnostic Logs Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfDiagnosticLogsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId,
+                                                                                    uint16_t manufacturerCode);
+
+/** @brief Diagnostic Logs Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param type               The type of message sent
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfDiagnosticLogsClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                           EmberStatus status);
+
+/** @brief Diagnostic Logs Cluster Server Pre Attribute Changed
+ *
+ * server Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfDiagnosticLogsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
+                                                                            EmberAfAttributeType attributeType, uint16_t size,
+                                                                            uint8_t * value);
+
+/** @brief Diagnostic Logs Cluster Server Tick
+ *
+ * server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDiagnosticLogsClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Ethernet Network Diagnostics Cluster server
@@ -1061,6 +1140,13 @@ void emberAfWiFiNetworkDiagnosticsClusterServerTickCallback(chip::EndpointId end
 // Cluster Commands Callback
 
 /**
+ * @brief Diagnostic Logs Cluster RetrieveLogsRequest Command callback
+ */
+
+bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::Command * commandObj, uint8_t intent,
+                                                             uint8_t requestedProtocol, chip::ByteSpan transferFileDesignator);
+
+/**
  * @brief General Commissioning Cluster ArmFailSafe Command callback
  */
 
@@ -1220,7 +1306,7 @@ bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj);
  * @brief Operational Credentials Cluster AddOpCert Command callback
  */
 
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan OperationalCert,
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOCArray,
                                                            chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
                                                            uint16_t AdminVendorId);
 
@@ -1557,19 +1643,6 @@ EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip:
  */
 void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                         uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
-
-/** @brief Read Attributes Response
- *
- * This function is called by the application framework when a Read Attributes
- * Response command is received from an external device.  The application should
- * return true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of read attribute status records.
- * Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfReadAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief External Attribute Read
  *

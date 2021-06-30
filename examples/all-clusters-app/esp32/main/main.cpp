@@ -85,6 +85,10 @@ using namespace ::chip::DeviceLayer;
 
 #define STATUS_LED_GPIO_NUM GPIO_NUM_2 // Use LED1 (blue LED) as status LED on DevKitC
 
+#elif CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+
+#define STATUS_LED_GPIO_NUM GPIO_NUM_2
+
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
 #error "Unsupported device type selected"
@@ -372,7 +376,7 @@ void SetupInitialLevelControlValues(chip::EndpointId endpointId)
     uint8_t level = UINT8_MAX;
 
     emberAfWriteAttribute(endpointId, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
-                          ZCL_DATA8_ATTRIBUTE_TYPE);
+                          ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 void SetupPretendDevices()

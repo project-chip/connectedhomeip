@@ -30,9 +30,6 @@
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_POSIX<> template inherits.
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-#include "lib/mdns/platform/Mdns.h"
-#endif
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
 
 #include <system/SystemError.h>
@@ -301,8 +298,6 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
     }
 
 exit:
-    pthread_mutex_destroy(&mStateLock);
-    pthread_cond_destroy(&mEventQueueStoppedCond);
     mHasValidChipTask = false;
     return System::MapErrorPOSIX(err);
 }
@@ -310,6 +305,9 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
 {
+    pthread_mutex_destroy(&mStateLock);
+    pthread_cond_destroy(&mEventQueueStoppedCond);
+
     //
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up

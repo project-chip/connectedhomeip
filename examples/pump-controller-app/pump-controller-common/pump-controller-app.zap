@@ -1,5 +1,5 @@
 {
-  "featureLevel": 35,
+  "featureLevel": 39,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1305,6 +1305,32 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Diagnostic Logs",
+          "code": 50,
+          "mfgCode": null,
+          "define": "DIAGNOSTIC_LOGS_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "RetrieveLogsRequest",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "RetrieveLogsResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
             }
           ]
         },
@@ -4547,7 +4573,7 @@
           "mfgCode": null,
           "define": "TEMP_MEASUREMENT_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [],
           "attributes": [
             {
@@ -4633,7 +4659,7 @@
           "mfgCode": null,
           "define": "PRESSURE_MEASUREMENT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -4775,7 +4801,7 @@
           "mfgCode": null,
           "define": "FLOW_MEASUREMENT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {

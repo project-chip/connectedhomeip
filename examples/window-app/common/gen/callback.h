@@ -921,7 +921,7 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Comm
  * @brief Operational Credentials Cluster AddOpCert Command callback
  */
 
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan OperationalCert,
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOCArray,
                                                            chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
                                                            uint16_t AdminVendorId);
 
@@ -971,48 +971,48 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label);
 
 /**
- * @brief Window Covering Cluster WindowCoveringDownClose Command callback
+ * @brief Window Covering Cluster DownOrClose Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(chip::app::Command * commandObj);
+bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::app::Command * commandObj);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToLiftPercentage Command callback
+ * @brief Window Covering Cluster GoToLiftPercentage Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(chip::app::Command * commandObj,
-                                                                          uint8_t percentageLiftValue);
+bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::Command * commandObj, uint8_t liftPercentageValue,
+                                                            uint16_t liftPercent100thsValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToLiftValue Command callback
+ * @brief Window Covering Cluster GoToLiftValue Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(chip::app::Command * commandObj, uint16_t liftValue);
+bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::app::Command * commandObj, uint16_t liftValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToTiltPercentage Command callback
+ * @brief Window Covering Cluster GoToTiltPercentage Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(chip::app::Command * commandObj,
-                                                                          uint8_t percentageTiltValue);
+bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::Command * commandObj, uint8_t tiltPercentageValue,
+                                                            uint16_t tiltPercent100thsValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringGoToTiltValue Command callback
+ * @brief Window Covering Cluster GoToTiltValue Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(chip::app::Command * commandObj, uint16_t tiltValue);
+bool emberAfWindowCoveringClusterGoToTiltValueCallback(chip::app::Command * commandObj, uint16_t tiltValue);
 
 /**
- * @brief Window Covering Cluster WindowCoveringStop Command callback
+ * @brief Window Covering Cluster StopMotion Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringStopCallback(chip::app::Command * commandObj);
+bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::Command * commandObj);
 
 /**
- * @brief Window Covering Cluster WindowCoveringUpOpen Command callback
+ * @brief Window Covering Cluster UpOrOpen Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(chip::app::Command * commandObj);
+bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::app::Command * commandObj);
 
 //
 // Non-Cluster Related Callbacks
@@ -1302,19 +1302,6 @@ EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip:
  */
 void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                         uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
-
-/** @brief Read Attributes Response
- *
- * This function is called by the application framework when a Read Attributes
- * Response command is received from an external device.  The application should
- * return true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of read attribute status records.
- * Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfReadAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief External Attribute Read
  *

@@ -73,7 +73,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${chip_root}/src/lib",
       "${chip_root}/src/lib/asn1",
       "${chip_root}/src/lib/core",
-      "${chip_root}/src/lib/shell",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/messaging",
       "${chip_root}/src/protocols",
@@ -95,7 +94,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     if (chip_with_lwip) {
-      deps += [ "${chip_root}/src/lwip:all" ]
+      deps += [ "${chip_root}/src/lwip" ]
     }
 
     if (chip_build_tools) {

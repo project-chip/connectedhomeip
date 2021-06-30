@@ -123,6 +123,12 @@ private:
 class DLL_EXPORT SecureSessionMgrDelegate
 {
 public:
+    enum class DuplicateMessage : uint8_t
+    {
+        Yes,
+        No,
+    };
+
     /**
      * @brief
      *   Called when a new message is received. The function must internally release the
@@ -132,12 +138,12 @@ public:
      * @param payloadHeader The payload header
      * @param session       The handle to the secure session
      * @param source        The sender's address
+     * @param isDuplicate   The message is a duplicate of previously received message
      * @param msgBuf        The received message
-     * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, const Transport::PeerAddress & source,
-                                   System::PacketBufferHandle && msgBuf, SecureSessionMgr * mgr)
+                                   SecureSessionHandle session, const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
+                                   System::PacketBufferHandle && msgBuf)
     {}
 
     /**
@@ -146,27 +152,24 @@ public:
      *
      * @param error   error code
      * @param source  network entity that sent the message
-     * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) {}
+    virtual void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source) {}
 
     /**
      * @brief
      *   Called when a new pairing is being established
      *
      * @param session The handle to the secure session
-     * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) {}
+    virtual void OnNewConnection(SecureSessionHandle session) {}
 
     /**
      * @brief
      *   Called when a new connection is closing
      *
      * @param session The handle to the secure session
-     * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) {}
+    virtual void OnConnectionExpired(SecureSessionHandle session) {}
 
     virtual ~SecureSessionMgrDelegate() {}
 };
@@ -219,6 +222,9 @@ public:
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
                           SecureSession::SessionRole direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
+
+    void ExpirePairing(SecureSessionHandle session);
+    void ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin);
 
     /**
      * @brief

@@ -87,6 +87,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/server/StorablePeerConnection.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
+               ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
@@ -151,7 +152,6 @@ target_sources(app PRIVATE
 )
 
 target_include_directories(app PRIVATE
-  ${ZEPHYR_BASE}/subsys // required to get access to `log_output_std.h`
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
@@ -167,5 +167,7 @@ target_link_libraries(app PRIVATE
   pw_log
   pw_rpc.server
 )
+
+target_link_libraries(pw_build INTERFACE zephyr_interface)
 
 endif(CONFIG_CHIP_PW_RPC)

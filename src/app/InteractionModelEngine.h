@@ -49,15 +49,15 @@
 #include <app/reporting/Engine.h>
 #include <app/util/basic-types.h>
 
-// TODO: Make number of command handler and command sender configurable
+// TODO: Make number of command/read/write client/handler configurable
 #define CHIP_MAX_NUM_COMMAND_HANDLER 4
 #define CHIP_MAX_NUM_COMMAND_SENDER 4
-#define CHIP_MAX_NUM_READ_CLIENT 1
-#define CHIP_MAX_NUM_READ_HANDLER 1
-#define CHIP_MAX_REPORTS_IN_FLIGHT 1
+#define CHIP_MAX_NUM_READ_CLIENT 4
+#define CHIP_MAX_NUM_READ_HANDLER 4
+#define CHIP_MAX_REPORTS_IN_FLIGHT 4
 #define IM_SERVER_MAX_NUM_PATH_GROUPS 8
-#define CHIP_MAX_NUM_WRITE_CLIENT 1
-#define CHIP_MAX_NUM_WRITE_HANDLER 1
+#define CHIP_MAX_NUM_WRITE_CLIENT 4
+#define CHIP_MAX_NUM_WRITE_HANDLER 4
 
 namespace chip {
 namespace app {
@@ -116,15 +116,16 @@ public:
     CHIP_ERROR NewCommandSender(CommandSender ** const apCommandSender);
 
     /**
-     *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer
-     *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
+     *  Creates a new read client and send ReadRequest message to the node using the read client. User should use this method since
+     * it takes care of the life cycle of ReadClient.
      *
-     *  @param[out]    apReadClient    A pointer to the ReadClient object.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
+     *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient);
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession,
+                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
+                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
+                               EventNumber aEventNumber, intptr_t aAppIdentifier = 0);
 
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send do a write.  If the call succeeds, the consumer
@@ -155,27 +156,38 @@ public:
 
 private:
     friend class reporting::Engine;
-    void OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    void OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                           const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.
      */
-    void OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                             const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
      * the Write Request are handled entirely within this function.
      */
-    void OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+
+    /**
+     *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer
+     *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
+     *
+     *  @param[out]    apReadClient    A pointer to the ReadClient object.
+     *
+     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
+     *  @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, intptr_t aAppIdentifier);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
@@ -204,7 +216,26 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
  * otherwise.
  */
 bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId);
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter);
+
+/**
+ *  Fetch attribute value and version info and write to the TLVWriter provided.
+ *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
+ * error code will be put into the writer, and CHIP_NO_ERROR will be returned and apDataExists will be set to false.
+ *  If the data exists on the server, the data (with tag kCsTag_Data) and the data version (with tag kCsTag_DataVersion) will be put
+ * into the TLVWriter and apDataExists will be set to true. TLVWriter error will be returned if any error occurred during encoding
+ * these values.
+ *  This function is implemented by CHIP as a part of cluster data storage & management.
+ * The apWriter and apDataExists can be nullptr.
+ *
+ *  @param[in]    aClusterInfo      The cluster info object, for the path of cluster data.
+ *  @param[in]    apWriter          The TLVWriter for holding cluster data. Can be a nullptr if the caller does not care
+ *                                  the exact value of the attribute.
+ *  @param[out]   apDataExists      Tell whether the cluster data exist on server. Can be a nullptr if the caller does not care
+ *                                  whether the data exists.
+ *
+ *  @retval  CHIP_NO_ERROR on success
+ */
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists);
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip

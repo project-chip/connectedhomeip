@@ -96,9 +96,21 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                              uint32_t setupPINCode, chip::NodeId nodeid);
 
-CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                          uint16_t long_discriminator);
-CHIP_ERROR pychip_DeviceController_DiscoverAllCommissioning(chip::Controller::DeviceCommissioner * devCtrl);
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                uint16_t long_discriminator);
+CHIP_ERROR pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl);
+
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                 uint16_t short_discriminator);
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesVendor(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                     uint16_t vendor);
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                         uint16_t device_type);
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                   uint16_t enabled);
+CHIP_ERROR
+pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(chip::Controller::DeviceCommissioner * devCtrl);
+
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
@@ -134,11 +146,8 @@ CHIP_ERROR pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
                                                        chip::NodeId localDeviceId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    CommissionerInitParams initParams;
-
     *outDevCtrl = new chip::Controller::DeviceCommissioner();
-    VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(*outDevCtrl != NULL, CHIP_ERROR_NO_MEMORY);
 
     if (localDeviceId == chip::kUndefinedNodeId)
     {
@@ -147,17 +156,17 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
 
     ReturnErrorOnFailure(sOperationalCredentialsIssuer.Initialize(sStorageDelegate));
 
+    CommissionerInitParams initParams;
     initParams.storageDelegate                = &sStorageDelegate;
     initParams.mDeviceAddressUpdateDelegate   = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;
     initParams.imDelegate                     = &PythonInteractionModelDelegate::Instance();
 
-    SuccessOrExit(err = (*outDevCtrl)->Init(localDeviceId, initParams));
-    SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
+    (*outDevCtrl)->SetUdpListenPort(CHIP_PORT + 1);
+    ReturnErrorOnFailure((*outDevCtrl)->Init(localDeviceId, initParams));
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl)
@@ -241,15 +250,52 @@ CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissione
     return devCtrl->PairDevice(nodeid, params);
 }
 
-CHIP_ERROR pychip_DeviceController_DiscoverAllCommissioning(chip::Controller::DeviceCommissioner * devCtrl)
+CHIP_ERROR pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
 {
-    return devCtrl->DiscoverAllCommissioning();
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, 0);
+    return devCtrl->DiscoverCommissionableNodes(filter);
 }
 
-CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                          uint16_t long_discriminator)
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                uint16_t long_discriminator)
 {
-    return devCtrl->DiscoverCommissioningLongDiscriminator(long_discriminator);
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
+    return devCtrl->DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                 uint16_t short_discriminator)
+{
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kShort, short_discriminator);
+    return devCtrl->DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesVendor(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                     uint16_t vendor)
+{
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kVendor, vendor);
+    return devCtrl->DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                         uint16_t device_type)
+{
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kDeviceType, device_type);
+    return devCtrl->DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                   uint16_t enabled)
+{
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kCommissioningMode, enabled);
+    return devCtrl->DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR
+pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kCommissioningModeFromCommand, 1);
+    return devCtrl->DiscoverCommissionableNodes(filter);
 }
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl)
@@ -264,7 +310,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
         Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
 
-        ChipLogProgress(Discovery, "Device %d", i);
+        ChipLogProgress(Discovery, "Commissionable Node %d", i);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
         ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
         ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);

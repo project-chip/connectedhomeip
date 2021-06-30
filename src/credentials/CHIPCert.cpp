@@ -149,12 +149,24 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipC
 {
     CHIP_ERROR err;
     TLVReader reader;
+    TLVType type;
+    uint64_t tag;
 
     reader.Init(chipCert, chipCertLen);
     reader.ImplicitProfileId = Protocols::OpCredentials::Id.ToTLVProfileId();
 
-    err = reader.Next(kTLVType_Structure, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate));
+    err = reader.Next();
     SuccessOrExit(err);
+
+    type = reader.GetType();
+    tag  = reader.GetTag();
+
+    VerifyOrExit(
+        (type == kTLVType_Structure &&
+         (tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) || tag == AnonymousTag)) ||
+            (type == kTLVType_Array &&
+             (tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificateArray) || tag == AnonymousTag)),
+        err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     err = LoadCert(reader, decodeFlags, ByteSpan(chipCert, chipCertLen));
 
@@ -906,28 +918,19 @@ CHIP_ERROR ConvertIntegerRawToDER(const uint8_t * rawInt, uint16_t rawIntLen, ui
 CHIP_ERROR ConvertECDSASignatureRawToDER(const uint8_t * rawSig, uint16_t rawSigLen, uint8_t * derSig, const uint16_t derSigBufSize,
                                          uint16_t & derSigLen)
 {
-    static constexpr size_t kMaxBytesForDeferredLenList = sizeof(uint8_t *) + // size of a single pointer in the deferred list
-        4 + // extra memory allocated for the deferred length field (kLengthFieldReserveSize - 1)
-        3;  // the deferred length list is alligned to 32bit boundary
-
-    uint8_t localDERSigBuf[kMax_ECDSA_Signature_Length + kMaxBytesForDeferredLenList];
     ASN1Writer writer;
 
     VerifyOrReturnError(rawSig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(rawSigLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(derSig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    writer.Init(localDERSigBuf, sizeof(localDERSigBuf));
+    writer.Init(derSig, derSigBufSize);
 
     ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(rawSig, rawSigLen, writer));
 
     ReturnErrorOnFailure(writer.Finalize());
 
     derSigLen = writer.GetLengthWritten();
-
-    VerifyOrReturnError(derSigLen <= derSigBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    memcpy(derSig, localDERSigBuf, derSigLen);
 
     return CHIP_NO_ERROR;
 }

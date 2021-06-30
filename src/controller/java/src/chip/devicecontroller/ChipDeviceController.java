@@ -47,6 +47,22 @@ public class ChipDeviceController {
   }
 
   public void pairDevice(BluetoothGatt bleServer, long deviceId, long setupPincode) {
+    pairDevice(bleServer, deviceId, setupPincode, null);
+  }
+
+  /**
+   * Pair a device connected through BLE.
+   *
+   * <p>TODO(#7985): Annotate csrNonce as Nullable.
+   *
+   * @param bleServer the BluetoothGatt representing the BLE connection to the device
+   * @param deviceId the node ID to assign to the device
+   * @param setupPincode the pincode for the device
+   * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
+   *     generated CSR nonce.
+   */
+  public void pairDevice(
+      BluetoothGatt bleServer, long deviceId, long setupPincode, byte[] csrNonce) {
     if (connectionId == 0) {
       bleGatt = bleServer;
 
@@ -59,7 +75,7 @@ public class ChipDeviceController {
 
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
       Log.d(TAG, "Pairing device with ID: " + deviceId);
-      pairDevice(deviceControllerPtr, deviceId, connectionId, setupPincode);
+      pairDevice(deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce);
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
@@ -74,8 +90,8 @@ public class ChipDeviceController {
     pairTestDeviceWithoutSecurity(deviceControllerPtr, ipAddress);
   }
 
-  public void pairDevice(long deviceId, int connectionId, long pinCode) {
-    pairDevice(deviceControllerPtr, deviceId, connectionId, pinCode);
+  public long getDevicePointer(long deviceId) {
+    return getDevicePointer(deviceControllerPtr, deviceId);
   }
 
   public boolean disconnectDevice(long deviceId) {
@@ -99,6 +115,12 @@ public class ChipDeviceController {
   public void onPairingComplete(int errorCode) {
     if (completionListener != null) {
       completionListener.onPairingComplete(errorCode);
+    }
+  }
+
+  public void onOpCSRGenerationComplete(byte[] errorCode) {
+    if (completionListener != null) {
+      completionListener.onOpCSRGenerationComplete(errorCode);
     }
   }
 
@@ -189,9 +211,11 @@ public class ChipDeviceController {
   private native long newDeviceController();
 
   private native void pairDevice(
-      long deviceControllerPtr, long deviceId, int connectionId, long pinCode);
+      long deviceControllerPtr, long deviceId, int connectionId, long pinCode, byte[] csrNonce);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
+
+  private native long getDevicePointer(long deviceControllerPtr, long deviceId);
 
   private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
@@ -259,5 +283,8 @@ public class ChipDeviceController {
 
     /** Notifies the listener of the error. */
     void onError(Throwable error);
+
+    /** Notifies the Commissioner when the OpCSR for the Comissionee is generated. */
+    void onOpCSRGenerationComplete(byte[] errorCode);
   }
 }

@@ -38,25 +38,24 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     {
         if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
         {
-            ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
+            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
         }
 
-        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, AppEvent::kEventType_Level,
-                                     size, value);
+        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, size, value);
     }
     else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
     {
         if (attributeId != ZCL_CURRENT_LEVEL_ATTRIBUTE_ID)
         {
-            ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
+            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
         }
 
-        ChipLogProgress(Zcl, "Value: %u, length %u", *value, size);
         if (size == 1)
         {
-            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Level, size, value);
+            ChipLogProgress(Zcl, "New level: %u", *value);
+            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, size, value);
         }
         else
         {
@@ -65,7 +64,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
     else
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
+        ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
         return;
     }
 }

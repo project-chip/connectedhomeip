@@ -42,8 +42,8 @@ namespace app {
 class CommandHandler : public Command
 {
 public:
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && payload);
+    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                      const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload);
     CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
                              const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
                              const Protocols::InteractionModel::ProtocolCode aProtocolCode) override;

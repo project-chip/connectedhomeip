@@ -83,11 +83,9 @@ void MediaPlaybackManager::storeNewPlaybackState(chip::EndpointId endpoint, uint
 
 static void sendResponse(const char * responseName, chip::CommandId commandId, EmberAfMediaPlaybackStatus mediaPlaybackStatus)
 {
-    // TODO: Once our enums are sized properly, or once we stop depending on the
-    // value being a certain type, we can remove the static_cast.  For now the
-    // cast is safe because all EmberAfKeypadInputStatus values fit in uint32_t.
+    static_assert(std::is_same<std::underlying_type_t<EmberAfMediaPlaybackStatus>, uint8_t>::value, "Wrong enum size");
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_MEDIA_PLAYBACK_CLUSTER_ID,
-                              commandId, "u", static_cast<uint8_t>(mediaPlaybackStatus));
+                              commandId, "u", mediaPlaybackStatus);
 
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)

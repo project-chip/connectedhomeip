@@ -49,15 +49,15 @@ class DeviceProvisioningFragment : Fragment() {
 
   private val networkType: ProvisionNetworkType
     get() = requireNotNull(
-        ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
+      ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
     )
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
   override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
   ): View {
     deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
     return inflater.inflate(R.layout.single_fragment_container, container, false).apply {
@@ -83,8 +83,8 @@ class DeviceProvisioningFragment : Fragment() {
       val bluetoothManager = BluetoothManager()
 
       showMessage(
-          R.string.rendezvous_over_ble_scanning_text,
-          deviceInfo.discriminator.toString()
+        R.string.rendezvous_over_ble_scanning_text,
+        deviceInfo.discriminator.toString()
       )
       val device = bluetoothManager.getBluetoothDevice(deviceInfo.discriminator) ?: run {
         showMessage(R.string.rendezvous_over_ble_scanning_failed_text)
@@ -92,8 +92,8 @@ class DeviceProvisioningFragment : Fragment() {
       }
 
       showMessage(
-          R.string.rendezvous_over_ble_connecting_text,
-          device.name ?: device.address.toString()
+        R.string.rendezvous_over_ble_connecting_text,
+        device.name ?: device.address.toString()
       )
       gatt = bluetoothManager.connect(requireContext(), device)
 
@@ -110,7 +110,7 @@ class DeviceProvisioningFragment : Fragment() {
     requireActivity().runOnUiThread {
       val context = requireContext()
       Toast.makeText(context, context.getString(msgResId, stringArgs), Toast.LENGTH_SHORT)
-          .show()
+        .show()
     }
   }
 
@@ -120,19 +120,23 @@ class DeviceProvisioningFragment : Fragment() {
     }
 
     override fun onStatusUpdate(status: Int) {
-      Log.d(TAG, "Pairing status update: $status");
+      Log.d(TAG, "Pairing status update: $status")
     }
 
     override fun onPairingComplete(code: Int) {
       Log.d(TAG, "onPairingComplete: $code")
 
-      if (code == 0) {
+      if (code == STATUS_PAIRING_SUCCESS) {
         childFragmentManager.beginTransaction()
             .add(R.id.fragment_container, EnterNetworkFragment.newInstance(networkType))
             .commit()
       } else {
         showMessage(R.string.rendezvous_over_ble_pairing_failure_text)
       }
+    }
+
+    override fun onOpCSRGenerationComplete(errorCode: ByteArray) {
+      Log.d(TAG,String(errorCode))
     }
 
     override fun onPairingDeleted(code: Int) {
@@ -171,11 +175,11 @@ class DeviceProvisioningFragment : Fragment() {
     private const val TAG = "DeviceProvisioningFragment"
     private const val ARG_DEVICE_INFO = "device_info"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
-    private const val STATUS_NETWORK_PROVISIONING_SUCCESS = 2
+    private const val STATUS_PAIRING_SUCCESS = 0
 
     fun newInstance(
-        deviceInfo: CHIPDeviceInfo,
-        networkType: ProvisionNetworkType
+      deviceInfo: CHIPDeviceInfo,
+      networkType: ProvisionNetworkType
     ): DeviceProvisioningFragment {
       return DeviceProvisioningFragment().apply {
         arguments = Bundle(2).apply {

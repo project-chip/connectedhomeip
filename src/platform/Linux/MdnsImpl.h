@@ -34,12 +34,11 @@
 #include <avahi-common/watch.h>
 
 #include "lib/mdns/platform/Mdns.h"
+#include "system/SystemSockets.h"
 
 struct AvahiWatch
 {
-    int mFd;                      ///< The file descriptor to watch.
-    AvahiWatchEvent mWatchEvents; ///< The interested events.
-    int mHappenedEvents;          ///< The events happened.
+    chip::System::WatchableSocket mSocket;
     AvahiWatchCallback mCallback; ///< The function to be called when interested events happened on mFd.
     void * mContext;              ///< A pointer to application-specific context.
     void * mPoller;               ///< The poller created this watch.
@@ -62,9 +61,8 @@ class Poller
 public:
     Poller(void);
 
-    void UpdateFdSet(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout);
-
-    void Process(const fd_set & readFdSet, const fd_set & writeFdSet, const fd_set & errorFdSet);
+    void GetTimeout(timeval & timeout);
+    void HandleTimeout();
 
     const AvahiPoll * GetAvahiPoll(void) const { return &mAvahiPoller; }
 
@@ -92,6 +90,7 @@ private:
     std::vector<std::unique_ptr<AvahiWatch>> mWatches;
     std::vector<std::unique_ptr<AvahiTimeout>> mTimers;
     AvahiPoll mAvahiPoller;
+    System::WatchableEventManager * mWatchableEvents;
 };
 
 class MdnsAvahi

@@ -214,6 +214,34 @@ exit:
     return err;
 }
 
+void SecureSessionMgr::ExpirePairing(SecureSessionHandle session)
+{
+    PeerConnectionState * state = GetPeerConnectionState(session);
+    if (state != nullptr)
+    {
+        mPeerConnections.MarkConnectionExpired(
+            state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+    }
+}
+
+void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin)
+{
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+    while (state != nullptr)
+    {
+        if (admin == state->GetAdminId())
+        {
+            mPeerConnections.MarkConnectionExpired(
+                state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+            state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+        }
+        else
+        {
+            state = mPeerConnections.FindPeerConnectionState(peerNodeId, state);
+        }
+    }
+}
+
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                                         PairingSession * pairing, SecureSession::SessionRole direction, Transport::AdminId admin,
                                         Transport::Base * transport)
@@ -259,7 +287,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     if (mCB != nullptr)
     {
         state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(pairing->GetPeerCounter());
-        mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this);
+        mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin });
     }
 
     return CHIP_NO_ERROR;
@@ -287,7 +315,7 @@ void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System
 
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
     {
         SecureMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
@@ -304,7 +332,8 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
     {
         PayloadHeader payloadHeader;
         ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SecureSessionHandle(), peerAddress, std::move(msg), this);
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SecureSessionHandle(), peerAddress,
+                               SecureSessionMgrDelegate::DuplicateMessage::No, std::move(msg));
     }
 }
 
@@ -322,6 +351,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     bool modifiedAdmin = false;
     NodeId localNodeId;
     FabricId fabricId;
+
+    SecureSessionMgrDelegate::DuplicateMessage isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::No;
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
@@ -361,6 +392,12 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         }
 
         err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageId());
+        if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
+        {
+            ChipLogDetail(Inet, "Received a duplicate message");
+            isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::Yes;
+            err         = CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Inet, "Message counter verify failed, err = %" PRId32, err);
@@ -399,6 +436,13 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     // Decode the message
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
                  ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
+
+    if (isDuplicate == SecureSessionMgrDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
+    {
+        // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
+        // cycles on further message processing.
+        ExitNow(err = CHIP_NO_ERROR);
+    }
 
     if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
     {
@@ -463,13 +507,13 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     if (mCB != nullptr)
     {
         SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, std::move(msg), this);
+        mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
     }
 
 exit:
     if (err != CHIP_NO_ERROR && mCB != nullptr)
     {
-        mCB->OnReceiveError(err, peerAddress, this);
+        mCB->OnReceiveError(err, peerAddress);
     }
 }
 
@@ -482,7 +526,7 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
 
     if (mCB != nullptr)
     {
-        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID(), state.GetAdminId() }, this);
+        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID(), state.GetAdminId() });
     }
 
     mTransportMgr->Disconnect(state.GetPeerAddress());

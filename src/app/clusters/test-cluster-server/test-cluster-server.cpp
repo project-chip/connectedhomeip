@@ -37,7 +37,7 @@ using namespace chip;
 constexpr const char * kErrorStr = "Test Cluster: List Octet cluster (0x%02x) Error setting '%s' attribute: 0x%02x";
 
 namespace {
-EmberAfStatus writeAttribute(uint8_t endpoint, AttributeId attributeId, uint8_t * buffer, int32_t index = -1)
+EmberAfStatus writeAttribute(EndpointId endpoint, AttributeId attributeId, uint8_t * buffer, int32_t index = -1)
 {
     EmberAfAttributeSearchRecord record;
     record.endpoint         = endpoint;
@@ -57,7 +57,7 @@ EmberAfStatus writeAttribute(uint8_t endpoint, AttributeId attributeId, uint8_t 
     return emAfReadOrWriteAttribute(&record, NULL, buffer, 0, true, index + 1);
 }
 
-EmberAfStatus writeTestListInt8uAttribute(uint8_t endpoint)
+EmberAfStatus writeTestListInt8uAttribute(EndpointId endpoint)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
     AttributeId attributeId = ZCL_LIST_ATTRIBUTE_ID;
@@ -74,7 +74,7 @@ EmberAfStatus writeTestListInt8uAttribute(uint8_t endpoint)
     return status;
 }
 
-EmberAfStatus writeTestListOctetAttribute(uint8_t endpoint)
+EmberAfStatus writeTestListOctetAttribute(EndpointId endpoint)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
     AttributeId attributeId = ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID;
@@ -96,7 +96,7 @@ EmberAfStatus writeTestListOctetAttribute(uint8_t endpoint)
     return status;
 }
 
-EmberAfStatus writeTestListStructOctetAttribute(uint8_t endpoint)
+EmberAfStatus writeTestListStructOctetAttribute(EndpointId endpoint)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
     AttributeId attributeId = ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID;

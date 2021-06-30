@@ -43,6 +43,8 @@ static_library("server") {
 
   public_configs = [ ":server_config" ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/lib/mdns",

@@ -38,6 +38,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
@@ -80,10 +81,16 @@ struct ControllerDeviceInitParams
     Inet::InetLayer * inetLayer                         = nullptr;
     PersistentStorageDelegate * storageDelegate         = nullptr;
     Credentials::OperationalCredentialSet * credentials = nullptr;
+    SessionIDAllocator * idAllocator                    = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
 };
+
+class Device;
+
+typedef void (*OnDeviceConnected)(void * context, Device * device);
+typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
 
 class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
 {
@@ -133,6 +140,9 @@ public:
                            std::move(message));
     }
 
+    CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
+                                        Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
+
     /**
      * @brief
      *   Send the command in internal command sender.
@@ -175,6 +185,7 @@ public:
         mAdminId         = admin;
         mStorageDelegate = params.storageDelegate;
         mCredentials     = params.credentials;
+        mIDAllocator     = params.idAllocator;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -260,8 +271,8 @@ public:
      * @param[in] payloadHeader Reference to payload header in the message
      * @param[in] msgBuf        The message buffer
      */
-    void OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf) override;
 
     /**
      * @brief ExchangeDelegate implementation of OnResponseTimeout.
@@ -311,6 +322,8 @@ public:
 
     bool IsSecureConnected() const { return IsActive() && mState == ConnectionState::SecureConnected; }
 
+    bool IsSessionSetupInProgress() const { return IsActive() && mState == ConnectionState::Connecting; }
+
     void Reset();
 
     NodeId GetDeviceId() const { return mDeviceId; }
@@ -322,7 +335,8 @@ public:
     PASESessionSerializable & GetPairing() { return mPairing; }
 
     uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
-    void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                            app::TLVDataFilter tlvDataFilter = nullptr);
     void CancelResponseHandler(uint8_t seqNum);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
@@ -334,12 +348,14 @@ public:
                               Callback::Cancelable * onFailureCallback);
     void CancelIMResponseHandler(app::Command * commandObj);
 
-    void ProvisioningComplete(uint16_t caseKeyId)
+    void OperationalCertProvisioned();
+    bool IsOperationalCertProvisioned() const { return mDeviceOperationalCertProvisioned; }
+
+    CHIP_ERROR LoadSecureSessionParametersIfNeeded()
     {
-        mDeviceProvisioningComplete = true;
-        mCASESessionKeyId           = caseKeyId;
-    }
-    bool IsProvisioningComplete() const { return mDeviceProvisioningComplete; }
+        bool loadedSecureSession = false;
+        return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
+    };
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -347,9 +363,31 @@ public:
 
     CASESession & GetCASESession() { return mCASESession; }
 
-    CHIP_ERROR GenerateCSRNonce() { return Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce)); }
+    CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
+    {
+        VerifyOrReturnError(csrNonce.size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
+        return CHIP_NO_ERROR;
+    }
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
+
+    /*
+     * This function can be called to establish a secure session with the device.
+     *
+     * If the device doesn't have operational credentials, and is under commissioning process,
+     * PASE keys will be used for secure session.
+     *
+     * If the device has been commissioned and has operational credentials, CASE session
+     * setup will be triggered.
+     *
+     * On establishing the session, the callback function `onConnection` will be called. If the
+     * session setup fails, `onFailure` will be called.
+     *
+     * If the session already exists, `onConnection` will be called immediately.
+     */
+    CHIP_ERROR EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
+                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
 private:
     enum class ConnectionState
@@ -419,22 +457,31 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
-    CHIP_ERROR EstablishCASESession();
+    /**
+     *   This function triggers CASE session setup if the device has been provisioned with
+     *   operational credentials, and there is no currently active session.
+     */
+
+    CHIP_ERROR WarmupCASESession();
 
     uint16_t mListenPort;
 
     Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
 
-    bool mDeviceProvisioningComplete = false;
+    bool mDeviceOperationalCertProvisioned = false;
 
     CASESession mCASESession;
-    uint16_t mCASESessionKeyId = 0;
 
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
     uint8_t mCSRNonce[kOpCSRNonceLength];
+
+    SessionIDAllocator * mIDAllocator = nullptr;
+
+    Callback::CallbackDeque mConnectionSuccess;
+    Callback::CallbackDeque mConnectionFailure;
 };
 
 /**
@@ -483,11 +530,10 @@ typedef struct SerializableDevice
     PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort;       /* This field is serialized in LittleEndian byte order */
-    uint16_t mAdminId;          /* This field is serialized in LittleEndian byte order */
-    uint16_t mCASESessionKeyId; /* This field is serialized in LittleEndian byte order */
+    uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
+    uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceTransport;
-    uint8_t mDeviceProvisioningComplete;
+    uint8_t mDeviceOperationalCertProvisioned;
     uint8_t mInterfaceName[kMaxInterfaceName];
     uint32_t mLocalMessageCounter; /* This field is serialized in LittleEndian byte order */
     uint32_t mPeerMessageCounter;  /* This field is serialized in LittleEndian byte order */

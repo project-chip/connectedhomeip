@@ -181,28 +181,22 @@ exit:
 
 CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-
     // zero data length hash is supported.
 
-    VerifyOrExit(out_buffer != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_sha256_ret(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer), 0);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    const int result = mbedtls_sha256_ret(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer), 0);
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)
 {
-    int result = 0;
-
     // zero data length hash is supported.
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_sha1_ret(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer));
+    const int result = mbedtls_sha1_ret(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer));
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -219,44 +213,32 @@ static inline mbedtls_sha256_context * to_inner_hash_sha256_context(HashSHA256Op
 
 CHIP_ERROR Hash_SHA256_stream::Begin(void)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
-    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
+    const int result = mbedtls_sha256_starts_ret(context, 0);
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_sha256_starts_ret(context, 0);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Hash_SHA256_stream::AddData(const uint8_t * data, const size_t data_length)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
-    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
+    const int result = mbedtls_sha256_update_ret(context, Uint8::to_const_uchar(data), data_length);
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_sha256_update_ret(context, Uint8::to_const_uchar(data), data_length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Hash_SHA256_stream::Finish(uint8_t * out_buffer)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
-    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
+    const int result = mbedtls_sha256_finish_ret(context, Uint8::to_uchar(out_buffer));
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_sha256_finish_ret(context, Uint8::to_uchar(out_buffer));
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 void Hash_SHA256_stream::Clear(void)
@@ -267,34 +249,29 @@ void Hash_SHA256_stream::Clear(void)
 CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
                                  const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 1;
-    const mbedtls_md_info_t * md;
-
-    VerifyOrExit(secret != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(secret != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(secret_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Salt is optional
     if (salt_length > 0)
     {
-        VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(salt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(info != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_buffer != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(info_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-    VerifyOrExit(md != nullptr, error = CHIP_ERROR_INTERNAL);
+    const mbedtls_md_info_t * const md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    VerifyOrReturnError(md != nullptr, CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_hkdf(md, Uint8::to_const_uchar(salt), salt_length, Uint8::to_const_uchar(secret), secret_length,
-                          Uint8::to_const_uchar(info), info_length, Uint8::to_uchar(out_buffer), out_length);
+    const int result = mbedtls_hkdf(md, Uint8::to_const_uchar(salt), salt_length, Uint8::to_const_uchar(secret), secret_length,
+                                    Uint8::to_const_uchar(info), info_length, Uint8::to_uchar(out_buffer), out_length);
     _log_mbedTLS_error(result);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
@@ -356,59 +333,50 @@ static EntropyContext * get_entropy_context()
 
 static mbedtls_ctr_drbg_context * get_drbg_context()
 {
-    EntropyContext * context = get_entropy_context();
+    EntropyContext * const context = get_entropy_context();
 
-    mbedtls_ctr_drbg_context * drbgCtxt = &context->mDRBGCtxt;
+    mbedtls_ctr_drbg_context * const drbgCtxt = &context->mDRBGCtxt;
 
     if (!context->mDRBGSeeded)
     {
-        int status = mbedtls_ctr_drbg_seed(drbgCtxt, mbedtls_entropy_func, &context->mEntropy, nullptr, 0);
-        VerifyOrExit(status == 0, _log_mbedTLS_error(status));
+        const int status = mbedtls_ctr_drbg_seed(drbgCtxt, mbedtls_entropy_func, &context->mEntropy, nullptr, 0);
+        if (status != 0)
+        {
+            _log_mbedTLS_error(status);
+            return nullptr;
+        }
 
         context->mDRBGSeeded = true;
     }
 
     return drbgCtxt;
-
-exit:
-    return nullptr;
 }
 
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold)
 {
-    CHIP_ERROR error              = CHIP_NO_ERROR;
-    int result                    = 0;
-    EntropyContext * entropy_ctxt = nullptr;
+    VerifyOrReturnError(fn_source != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(fn_source != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    EntropyContext * const entropy_ctxt = get_entropy_context();
+    VerifyOrReturnError(entropy_ctxt != nullptr, CHIP_ERROR_INTERNAL);
 
-    entropy_ctxt = get_entropy_context();
-    VerifyOrExit(entropy_ctxt != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_entropy_add_source(&entropy_ctxt->mEntropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-exit:
-    return error;
+    const int result =
+        mbedtls_entropy_add_source(&entropy_ctxt->mEntropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mbedtls_ctr_drbg_context * drbg_ctxt = nullptr;
+    mbedtls_ctr_drbg_context * const drbg_ctxt = get_drbg_context();
+    VerifyOrReturnError(drbg_ctxt != nullptr, CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(out_buffer != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    const int result = mbedtls_ctr_drbg_random(drbg_ctxt, Uint8::to_uchar(out_buffer), out_length);
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
 
-    drbg_ctxt = get_drbg_context();
-    VerifyOrExit(drbg_ctxt != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_ctr_drbg_random(drbg_ctxt, Uint8::to_uchar(out_buffer), out_length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
@@ -591,7 +559,8 @@ exit:
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-#if defined(MBEDTLS_ECDH_C) && !defined(MBEDTLS_ECP_ALT)
+// TODO: Enable ECDH_derive_secret for Qorvo when their mbedTLS static libraries are updated
+#if defined(MBEDTLS_ECDH_C) && !defined(QORVO_CRYPTO_ENGINE)
     CHIP_ERROR error     = CHIP_NO_ERROR;
     int result           = 0;
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
@@ -646,6 +615,8 @@ CHIP_ERROR P256Keypair::Initialize()
     int result       = 0;
 
     size_t pubkey_size = 0;
+
+    Clear();
 
     mbedtls_ecp_group_id group = MapECPGroupId(mPublicKey.Type());
 
@@ -709,6 +680,8 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     int result       = 0;
     CHIP_ERROR error = CHIP_NO_ERROR;
 
+    Clear();
+
     mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
     mbedtls_ecp_keypair_init(keypair);
 
@@ -734,13 +707,19 @@ exit:
     return error;
 }
 
-P256Keypair::~P256Keypair()
+void P256Keypair::Clear()
 {
     if (mInitialized)
     {
         mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
         mbedtls_ecp_keypair_free(keypair);
+        mInitialized = false;
     }
+}
+
+P256Keypair::~P256Keypair()
+{
+    Clear();
 }
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)
@@ -969,8 +948,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_le
 
     result = mbedtls_md_hmac_finish(&hmac_ctx, Uint8::to_uchar(out));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    return error;
 
 exit:
     _log_mbedTLS_error(result);

@@ -20,14 +20,21 @@
  *      This file implements WatchableEvents using libevent.
  */
 
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <support/CodeUtils.h>
 #include <system/SystemLayer.h>
 #include <system/SystemSockets.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-// TODO(#5556): Convert MDNS to WatchableSocket.
-#error "POSIX platform with MDNS currently must use select()"
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
+namespace chip {
+namespace Mdns {
+void GetMdnsTimeout(timeval & timeout);
+void HandleMdnsTimeout();
+} // namespace Mdns
+} // namespace chip
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
 #ifndef CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
 #define CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS 1 // TODO(#5556): default to off
@@ -96,6 +103,10 @@ void WatchableEventManager::WaitForEvents()
 void WatchableEventManager::HandleEvents()
 {
     mSystemLayer->HandleTimeout();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+    chip::Mdns::HandleMdnsTimeout();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
     while (mActiveSockets != nullptr)
     {

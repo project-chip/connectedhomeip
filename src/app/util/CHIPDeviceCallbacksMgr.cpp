@@ -30,13 +30,6 @@
 #include <inttypes.h>
 
 namespace {
-struct ResponseCallbackInfo
-{
-    chip::NodeId nodeId;
-    uint8_t sequenceNumber;
-
-    bool operator==(ResponseCallbackInfo const & other) { return nodeId == other.nodeId && sequenceNumber == other.sequenceNumber; }
-};
 
 struct ReportCallbackInfo
 {
@@ -58,20 +51,26 @@ namespace app {
 
 CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseCallback(NodeId nodeId, uint8_t sequenceNumber,
                                                        Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+                                                       Callback::Cancelable * onFailureCallback, TLVDataFilter filter)
 {
     VerifyOrReturnError(onSuccessCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(onFailureCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ResponseCallbackInfo info = { nodeId, sequenceNumber };
-    memcpy(&onSuccessCallback->mInfoPtr, &info, sizeof(info));
-    memcpy(&onFailureCallback->mInfoPtr, &info, sizeof(info));
+    static_assert(sizeof(onSuccessCallback->mInfo) >= sizeof(info), "Callback info too large");
+    memcpy(&onSuccessCallback->mInfo, &info, sizeof(info));
+    memcpy(&onFailureCallback->mInfo, &info, sizeof(info));
 
     // If some callbacks have already been registered for the same ResponseCallbackInfo, it usually means that the response
     // has not been received for a previous command with the same sequenceNumber. Cancel the previously registered callbacks.
     CancelCallback(info, mResponsesSuccess);
     CancelCallback(info, mResponsesFailure);
+    PopResponseFilter(info, nullptr);
 
+    if (filter != nullptr)
+    {
+        ReturnErrorOnFailure(AddResponseFilter(info, filter));
+    }
     mResponsesSuccess.Enqueue(onSuccessCallback);
     mResponsesFailure.Enqueue(onFailureCallback);
     return CHIP_NO_ERROR;
@@ -82,12 +81,49 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::CancelResponseCallback(NodeId nodeId, uint8_t
     ResponseCallbackInfo info = { nodeId, sequenceNumber };
     CancelCallback(info, mResponsesSuccess);
     CancelCallback(info, mResponsesFailure);
+    PopResponseFilter(info, nullptr);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter filter)
+{
+    constexpr ResponseCallbackInfo kEmptyInfo{ kAnyNodeId, 0 };
+
+    for (size_t i = 0; i < kTLVFilterPoolSize; i++)
+    {
+        if (mTLVFilterPool[i].info == kEmptyInfo)
+        {
+            mTLVFilterPool[i].info   = info;
+            mTLVFilterPool[i].filter = filter;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_NO_MEMORY;
+}
+
+CHIP_ERROR CHIPDeviceCallbacksMgr::PopResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter * outFilter)
+{
+    for (size_t i = 0; i < kTLVFilterPoolSize; i++)
+    {
+        if (mTLVFilterPool[i].info == info)
+        {
+            if (outFilter != nullptr)
+            {
+                *outFilter = mTLVFilterPool[i].filter;
+            }
+            mTLVFilterPool[i].info   = ResponseCallbackInfo{ kAnyNodeId, 0 };
+            mTLVFilterPool[i].filter = nullptr;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
 CHIP_ERROR CHIPDeviceCallbacksMgr::GetResponseCallback(NodeId nodeId, uint8_t sequenceNumber,
                                                        Callback::Cancelable ** onSuccessCallback,
-                                                       Callback::Cancelable ** onFailureCallback)
+                                                       Callback::Cancelable ** onFailureCallback, TLVDataFilter * outFilter)
 {
     ResponseCallbackInfo info = { nodeId, sequenceNumber };
 
@@ -96,6 +132,15 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::GetResponseCallback(NodeId nodeId, uint8_t se
 
     ReturnErrorOnFailure(GetCallback(info, mResponsesFailure, onFailureCallback));
     (*onFailureCallback)->Cancel();
+
+    if (outFilter == nullptr)
+    {
+        PopResponseFilter(info, nullptr);
+    }
+    else
+    {
+        ReturnErrorOnFailure(PopResponseFilter(info, outFilter));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -106,7 +151,8 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::AddReportCallback(NodeId nodeId, EndpointId e
     VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReportCallbackInfo info = { nodeId, endpointId, clusterId, attributeId };
-    memmove(&onReportCallback->mInfoPtr, &info, sizeof(info));
+    static_assert(sizeof(onReportCallback->mInfo) >= sizeof(info), "Callback info too large");
+    memcpy(&onReportCallback->mInfo, &info, sizeof(info));
 
     // If a callback has already been registered for the same ReportCallbackInfo, let's cancel it.
     CancelCallback(info, mReports);

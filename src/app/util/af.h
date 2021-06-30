@@ -72,6 +72,8 @@
 #include <app/util/debug-printing.h>
 #include <app/util/ember-print.h>
 
+#include <lib/support/SafeInt.h>
+
 /** @name Attribute Storage */
 // @{
 
@@ -417,29 +419,29 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 /**
  * @brief Macro that takes index of endpoint, and returns Zigbee endpoint
  */
-chip::EndpointId emberAfEndpointFromIndex(uint8_t index);
+chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
 
 /**
  * Returns the index of a given endpoint
  */
-uint8_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
+uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
 
 /**
  * Returns the index of a given endpoint; Does not ignore disabled endpoints
  */
-uint8_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
+uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
 
 /**
  * Returns the endpoint index within a given cluster (Client-side),
  * looking only for standard clusters.
  */
-uint8_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
+uint16_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * Returns the endpoint index within a given cluster (Server-side),
  * looking only for standard clusters.
  */
-uint8_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
+uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * @brief Macro that takes index of endpoint, and returns device Id for it
@@ -464,12 +466,12 @@ uint8_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::C
 /**
  * @brief Returns the total number of endpoints (dynamic and pre-compiled).
  */
-uint8_t emberAfEndpointCount(void);
+uint16_t emberAfEndpointCount(void);
 
 /**
  * @brief Returns the number of pre-compiled endpoints.
  */
-uint8_t emberAfFixedEndpointCount(void);
+uint16_t emberAfFixedEndpointCount(void);
 
 /**
  * Data types are either analog or discrete. This makes a difference for
@@ -496,21 +498,26 @@ bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
  * @brief Function that extracts a 64-bit integer from the message buffer
  */
 uint64_t emberAfGetInt64u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt64s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt64u(message, currentIndex, msgLen))
 
 /**
  * @brief Function that extracts a 32-bit integer from the message buffer
  */
 uint32_t emberAfGetInt32u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt32s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt32u(message, currentIndex, msgLen))
 
 /**
  * @brief Function that extracts a 24-bit integer from the message buffer
  */
 uint32_t emberAfGetInt24u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt24s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt24u(message, currentIndex, msgLen))
 
 /**
  * @brief Function that extracts a 16-bit integer from the message buffer
  */
 uint16_t emberAfGetInt16u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+#define emberAfGetInt16s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt16u(message, currentIndex, msgLen))
+
 /**
  * @brief Function that extracts a ZCL string from the message buffer
  */
@@ -529,6 +536,7 @@ uint8_t emberAfGetDate(uint8_t * message, uint16_t currentIndex, uint16_t msgLen
  * @brief Macro for consistency, that extracts single byte out of the message
  */
 #define emberAfGetInt8u(message, currentIndex, msgLen) message[currentIndex]
+#define emberAfGetInt8s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt8u(message, currentIndex, msgLen))
 
 /**
  * @brief Macro for consistency that copies a uint8_t from variable into buffer.
@@ -659,7 +667,7 @@ bool emberAfEndpointEnableDisable(chip::EndpointId endpoint, bool enable);
 /**
  * @brief Determine if an endpoint at the specified index is enabled or disabled
  */
-bool emberAfEndpointIndexIsEnabled(uint8_t index);
+bool emberAfEndpointIndexIsEnabled(uint16_t index);
 
 /**
  * @brief Returns true if a given ZCL data type is a string type.

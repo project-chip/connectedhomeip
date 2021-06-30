@@ -169,6 +169,11 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_TELINK=1",
         "CHIP_DEVICE_LAYER_TARGET=telink",
       ]
+    } else if (chip_device_platform == "mbed") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_MBED=1",
+        "CHIP_DEVICE_LAYER_TARGET=mbed",
+      ]
     }
   }
 } else {
@@ -667,6 +672,24 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "telink/ThreadStackManagerImpl.h",
         ]
       }
+    } else if (chip_device_platform == "mbed") {
+      sources += [
+        "mbed/BLEManagerImpl.cpp",
+        "mbed/BLEManagerImpl.h",
+        "mbed/ConfigurationManagerImpl.cpp",
+        "mbed/ConnectivityManagerImpl.cpp",
+        "mbed/ConnectivityManagerImpl.h",
+        "mbed/DeviceNetworkProvisioningDelegateImpl.cpp",
+        "mbed/DeviceNetworkProvisioningDelegateImpl.h",
+        "mbed/KeyValueStoreManagerImpl.cpp",
+        "mbed/KeyValueStoreManagerImpl.h",
+        "mbed/Logging.cpp",
+        "mbed/MbedConfig.cpp",
+        "mbed/MbedEventTimeout.cpp",
+        "mbed/PlatformManagerImpl.cpp",
+        "mbed/SystemTimeSupport.cpp",
+        "mbed/arch.c",
+      ]
     }
 
     if (chip_enable_openthread && chip_mdns == "platform" &&

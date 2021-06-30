@@ -45,6 +45,8 @@ declare_args() {
 if (chip_system_config_locking == "") {
   if (current_os == "freertos") {
     chip_system_config_locking = "freertos"
+  } else if (current_os == "mbed") {
+    chip_system_config_locking = "mbed"
   } else if (chip_system_config_use_dispatch == false) {
     chip_system_config_locking = "posix"
   } else {
@@ -52,10 +54,12 @@ if (chip_system_config_locking == "") {
   }
 }
 
-assert(chip_system_config_locking == "posix" ||
-           chip_system_config_locking == "freertos" ||
-           chip_system_config_locking == "none",
-       "Please select a valid mutex implementation: posix, freertos, none")
+assert(
+    chip_system_config_locking == "posix" ||
+        chip_system_config_locking == "freertos" ||
+        chip_system_config_locking == "none" ||
+        chip_system_config_locking == "mbed",
+    "Please select a valid mutex implementation: posix, freertos, mbed, none")
 
 assert(
     chip_system_config_clock == "clock_gettime" ||

@@ -29,6 +29,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <app/AppBuildConfig.h>
+
 using namespace chip;
 using namespace chip::TLV;
 
@@ -196,48 +198,44 @@ CHIP_ERROR CommandPath::Builder::Init(chip::TLV::TLVWriter * const apWriter, con
 CommandPath::Builder & CommandPath::Builder::EndpointId(const chip::EndpointId aEndpointId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 CommandPath::Builder & CommandPath::Builder::GroupId(const chip::GroupId aGroupId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_GroupId), aGroupId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_GroupId), aGroupId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 CommandPath::Builder & CommandPath::Builder::ClusterId(const chip::ClusterId aClusterId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 
 CommandPath::Builder & CommandPath::Builder::CommandId(const chip::CommandId aCommandId)
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_CommandId), aCommandId);
-    ChipLogFunctError(mError);
-
-exit:
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_CommandId), aCommandId);
+        ChipLogFunctError(mError);
+    }
     return *this;
 }
 

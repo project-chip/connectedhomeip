@@ -20,7 +20,6 @@
 
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <mdns/Resolver.h>
-#include <platform/CHIPDeviceConfig.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -40,9 +39,7 @@ public:
     CommissionableNodeController(){};
     virtual ~CommissionableNodeController() {}
 
-    CHIP_ERROR DiscoverCommissionersLongDiscriminator(uint16_t long_discriminator);
-
-    CHIP_ERROR DiscoverCommissioners();
+    CHIP_ERROR DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter = Mdns::DiscoveryFilter());
 
     const Mdns::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
 
@@ -55,6 +52,10 @@ public:
     {
         ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
     }
+
+    CHIP_ERROR AdvertiseCommissionableNode();
+
+    CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port);
 
 protected:
     Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mDiscoveredCommissioners; }

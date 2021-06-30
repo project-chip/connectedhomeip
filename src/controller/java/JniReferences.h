@@ -17,17 +17,72 @@
 
 #pragma once
 
-#include <jni.h>
-
 #include <core/CHIPError.h>
+#include <jni.h>
+#include <pthread.h>
+#include <support/CodeUtils.h>
 
-namespace {
-JavaVM * sJvm = nullptr;
-} // namespace
+namespace chip {
+namespace Controller {
+class JniReferences
+{
+public:
+    // No copy, move or assignment.
+    JniReferences(const JniReferences &)  = delete;
+    JniReferences(const JniReferences &&) = delete;
+    JniReferences & operator=(const JniReferences &) = delete;
 
-void SetJavaVm(JavaVM * jvm);
-JNIEnv * GetEnvForCurrentThread();
+    static JniReferences & GetInstance()
+    {
+        static JniReferences jniReferences;
+        return jniReferences;
+    }
 
-CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
-CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId);
-void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);
+    /**
+     * Returns a stack lock to be shared by all controller JNI code.
+     */
+    pthread_mutex_t * GetStackLock();
+
+    /**
+     * Set the JavaVM.
+     *
+     * This must be called before GetEnvForCurrentThread() or GetClassRef().
+     */
+    void SetJavaVm(JavaVM * jvm);
+
+    /**
+     * Returns a JNIEnv for the current thread.
+     *
+     * This must be called after SetJavaVm(). If the current thread is not attached to the JVM, this method will attach the thread
+     * first, then retrieve the JNIEnv.
+     */
+    JNIEnv * GetEnvForCurrentThread();
+
+    /**
+     * @brief
+     *   Creates a jclass reference to the given class type.
+     *
+     *   This must be called after SetJavaVm().
+     *
+     * @param[in] env The JNIEnv for finding a Java class and creating a new Java reference.
+     * @param[in] clsType The fully-qualified Java class name to find, e.g. java/lang/IllegalStateException.
+     * @param[out] outCls A Java reference to the class matching clsType.
+     */
+    CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
+    CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature,
+                          jmethodID * methodId);
+    void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);
+
+    CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray);
+
+private:
+    JniReferences() {}
+
+    pthread_mutex_t mStackLock = PTHREAD_MUTEX_INITIALIZER;
+    JavaVM * mJvm              = nullptr;
+    jobject mClassLoader       = nullptr;
+    jmethodID mFindClassMethod = nullptr;
+};
+
+} // namespace Controller
+} // namespace chip

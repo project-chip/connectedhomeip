@@ -26,7 +26,9 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
+from chip import ChipCommissionableNodeCtrl
 from chip import exceptions
+import argparse
 import ctypes
 import sys
 import os
@@ -100,7 +102,6 @@ def DecodeHexIntOption(option, opt, value):
     except ValueError:
         raise OptionValueError("option %s: invalid value: %r" % (opt, value))
 
-
 def ParseEncodedString(value):
     if value.find(":") < 0:
         raise ParsingError(
@@ -113,6 +114,17 @@ def ParseEncodedString(value):
     raise ParsingError("only str and hex encoding is supported")
 
 
+def ParseValueWithType(value, type):
+    if type == 'int':
+        return int(value)
+    elif type == 'str':
+        return value
+    elif type == 'bytes':
+        return ParseEncodedString(value)
+    else:
+        raise ParsingError('cannot recognize type: {}'.format(type))
+
+
 def FormatZCLArguments(args, command):
     commandArgs = {}
     for kvPair in args:
@@ -120,12 +132,7 @@ def FormatZCLArguments(args, command):
             raise ParsingError("Argument should in key=value format")
         key, value = kvPair.split("=", 1)
         valueType = command.get(key, None)
-        if valueType == 'int':
-            commandArgs[key] = int(value)
-        elif valueType == 'str':
-            commandArgs[key] = value
-        elif valueType == 'bytes':
-            commandArgs[key] = ParseEncodedString(value)
+        commandArgs[key] = ParseValueWithType(value, valueType)
     return commandArgs
 
 
@@ -150,6 +157,8 @@ class DeviceMgrCmd(Cmd):
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
             controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
 
+        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController()
+            
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
             try:
@@ -314,20 +323,42 @@ class DeviceMgrCmd(Cmd):
 
     def do_setuppayload(self, line):
         """
+        setup-payload generate [options]
+
+        Options:
+          -v   Vendor ID
+          -p   Product ID
+          -cf  Custom Flow [Standard = 0, UserActionRequired = 1, Custom = 2]
+          -dc  Discovery Capabilities [SoftAP = 1 | BLE = 2 | OnNetwork = 4]
+          -dv  Discriminator Value
+          -ps  Passcode
+
         setup-payload parse-manual <manual-pairing-code>
         setup-payload parse-qr <qr-code-payload>
         """
         try:
-            args = shlex.split(line)
-            if (len(args) != 2) or (args[0] not in ("parse-manual", "parse-qr")):
+            arglist = shlex.split(line)
+            if arglist[0] not in ("generate", "parse-manual", "parse-qr"):
                 self.do_help("setup-payload")
                 return
 
-            if args[0] == "parse-manual":
-                SetupPayload().ParseManualPairingCode(args[1]).Print()
+            if arglist[0] == "generate":
+                parser = argparse.ArgumentParser()
+                parser.add_argument("-v", type=int, default=0, dest='vendorId')
+                parser.add_argument("-p", type=int, default=0, dest='productId')
+                parser.add_argument('-cf', type=int, default=0, dest='customFlow')
+                parser.add_argument("-dc", type=int, default=0, dest='capabilities')
+                parser.add_argument("-dv", type=int, default=0, dest='discriminator')
+                parser.add_argument("-ps", type=int, dest='passcode')                
+                args = parser.parse_args(arglist[1:])
 
-            if args[0] == "parse-qr":
-                SetupPayload().ParseQrCode(args[1]).Print()
+                SetupPayload().PrintOnboardingCodes(args.passcode, args.vendorId, args.productId, args.discriminator, args.customFlow, args.capabilities)
+
+            if arglist[0] == "parse-manual":
+                SetupPayload().ParseManualPairingCode(arglist[1]).Print()
+
+            if arglist[0] == "parse-qr":
+                SetupPayload().ParseQrCode(arglist[1]).Print()
 
         except exceptions.ChipStackException as ex:
             print(str(ex))
@@ -410,7 +441,7 @@ class DeviceMgrCmd(Cmd):
         if int(setupPayload.attributes["RendezvousInformation"]) & onnetwork:
             print("Attempting to find device on Network")
             longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
-            self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
+            self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(longDiscriminator)
             print("Waiting for device responses...")
             strlen = 100;
             addrStrStorage = ctypes.create_string_buffer(strlen)
@@ -518,49 +549,93 @@ class DeviceMgrCmd(Cmd):
             print(str(ex))
             return
 
+    def wait_for_one_discovered_device(self):
+        print("Waiting for device responses...")
+        strlen = 100;
+        addrStrStorage = ctypes.create_string_buffer(strlen)
+        count = 0
+        maxWaitTime = 2
+        while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
+            time.sleep(0.2)
+            count = count + 0.2
+
+    def wait_for_many_discovered_devices(self):
+        # Discovery happens through mdns, which means we need to wait for responses to come back.
+        # TODO(cecille): I suppose we could make this a command line arg. Or Add a callback when
+        # x number of responses are received. For now, just 2 seconds. We can all wait that long.
+        print("Waiting for device responses...")
+        time.sleep(2)
+
     def do_discover(self, line):
         """
         discover -qr qrcode
         discover -all
+        discover -l long_discriminator
+        discover -s short_discriminator
+        discover -v vendor_id
+        discover -t device_type
+        discover -c commissioning_enabled
+        discover -a
 
         discover command is used to discover available devices.
         """
         try:
-            args = shlex.split(line)
-            if len(args) < 1:
+            arglist = shlex.split(line)
+            if len(arglist) < 1:
                 print("Usage:")
                 self.do_help("discover")
                 return
-
-            if args[0] == "-qr" and len(args) >= 2:
-                setupPayload = SetupPayload().ParseQrCode(args[1])
-                longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
-                self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
-                print("Waiting for device responses...")
-                strlen = 100;
-                addrStrStorage = ctypes.create_string_buffer(strlen)
-                count = 0
-                maxWaitTime = 2
-                while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
-                    time.sleep(0.2)
-                    count = count + 0.2
-            elif args[0] == "-all":
+            parser = argparse.ArgumentParser()
+            group = parser.add_mutually_exclusive_group()
+            group.add_argument('-all', help='discover all commissionable nodes and commissioners', action='store_true')
+            group.add_argument('-qr', help='discover commissionable nodes matching provided QR code', type=str)
+            group.add_argument('-l', help='discover commissionable nodes with given long discriminator', type=int)
+            group.add_argument('-s', help='discover commissionable nodes with given short discriminator', type=int)
+            group.add_argument('-v', help='discover commissionable nodes wtih given vendor ID', type=int)
+            group.add_argument('-t', help='discover commissionable nodes with given device type', type=int)
+            group.add_argument('-c', help='discover commissionable nodes with given commissioning mode', type=int)
+            group.add_argument('-a', help='discover commissionable nodes put in commissioning mode from command', action='store_true')
+            args=parser.parse_args(arglist)
+            if args.all:
+                self.commissionableNodeCtrl.DiscoverCommissioners()
+                self.wait_for_many_discovered_devices()
+                self.commissionableNodeCtrl.PrintDiscoveredCommissioners()
                 self.devCtrl.DiscoverAllCommissioning()
-                # Discovery happens through mdns, which means we need to wait for responses to come back.
-                # TODO(cecille): I suppose we could make this a command line arg. Or Add a callback when
-                # x number of responses are received. For now, just 2 seconds. We can all wait that long.
-                print("Waiting for device responses...")
-                time.sleep(2)
+                self.wait_for_many_discovered_devices()
+            elif args.qr is not None:
+                setupPayload = SetupPayload().ParseQrCode(args.qr)
+                longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
+                self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(longDiscriminator)
+                self.wait_for_one_discovered_device()
+            elif args.l is not None:
+                self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(ctypes.c_uint16(args.l))
+                self.wait_for_one_discovered_device()
+            elif args.s is not None:
+                self.devCtrl.DiscoverCommissionableNodesShortDiscriminator(ctypes.c_uint16(args.s))
+                self.wait_for_one_discovered_device()
+            elif args.v is not None:
+                self.devCtrl.DiscoverCommissionableNodesVendor(ctypes.c_uint16(args.v))
+                self.wait_for_many_discovered_devices()
+            elif args.t is not None:
+                self.devCtrl.DiscoverCommissionableNodesDeviceType(ctypes.c_uint16(args.t))
+                self.wait_for_many_discovered_devices()
+            elif args.c is not None:
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled(ctypes.c_uint16(args.c))
+                self.wait_for_many_discovered_devices()
+            elif args.a is not None:
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabledFromCommand()
+                self.wait_for_many_discovered_devices()
             else:
-                print("Usage:")
                 self.do_help("discover")
                 return
+            self.devCtrl.PrintDiscoveredDevices()
         except exceptions.ChipStackException as ex:
             print('exception')
             print(str(ex))
             return
-
-        self.devCtrl.PrintDiscoveredDevices()
+        except:
+            self.do_help("discover")
+            return
 
     def do_zcl(self, line):
         """
@@ -662,8 +737,10 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
+                attribute_type = all_attrs.get(args[0], {}).get(
+                    args[1], {}).get("type", None)
                 self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), args[5])
+                    args[2]), int(args[3]), int(args[4]), ParseValueWithType(args[5], attribute_type))
             else:
                 self.do_help("zclwrite")
         except exceptions.ChipStackException as ex:

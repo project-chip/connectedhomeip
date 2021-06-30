@@ -40,15 +40,20 @@ public:
         delete onReportDoorLockLockStateCallback;
         delete onReportLevelControlCurrentLevelCallback;
         delete onReportOnOffOnOffCallback;
+        delete onReportPressureMeasurementMeasuredValueCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
         delete onReportRelativeHumidityMeasurementMeasuredValueCallback;
         delete onReportSwitchCurrentPositionCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
         delete onReportThermostatLocalTemperatureCallback;
-        delete onReportWindowCoveringWindowCoveringTypeCallback;
-        delete onReportWindowCoveringCurrentPositionLiftCallback;
-        delete onReportWindowCoveringCurrentPositionTiltCallback;
-        delete onReportWindowCoveringConfigStatusCallback;
+        delete onReportWindowCoveringCurrentPositionLiftPercentageCallback;
+        delete onReportWindowCoveringCurrentPositionTiltPercentageCallback;
+        delete onReportWindowCoveringOperationalStatusCallback;
+        delete onReportWindowCoveringTargetPositionLiftPercent100thsCallback;
+        delete onReportWindowCoveringTargetPositionTiltPercent100thsCallback;
+        delete onReportWindowCoveringCurrentPositionLiftPercent100thsCallback;
+        delete onReportWindowCoveringCurrentPositionTiltPercent100thsCallback;
+        delete onReportWindowCoveringSafetyStatusCallback;
     }
 
     void AddReportCallbacks(uint8_t endpointId) override
@@ -73,6 +78,8 @@ public:
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0008, 0x0000,
                                        onReportLevelControlCurrentLevelCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0403, 0x0000,
+                                       onReportPressureMeasurementMeasuredValueCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0200, 0x0013,
                                        onReportPumpConfigurationAndControlCapacityCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0405, 0x0000,
@@ -83,14 +90,22 @@ public:
                                        onReportTemperatureMeasurementMeasuredValueCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0201, 0x0000,
                                        onReportThermostatLocalTemperatureCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0000,
-                                       onReportWindowCoveringWindowCoveringTypeCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0003,
-                                       onReportWindowCoveringCurrentPositionLiftCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0004,
-                                       onReportWindowCoveringCurrentPositionTiltCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0007,
-                                       onReportWindowCoveringConfigStatusCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0008,
+                                       onReportWindowCoveringCurrentPositionLiftPercentageCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x0009,
+                                       onReportWindowCoveringCurrentPositionTiltPercentageCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x000A,
+                                       onReportWindowCoveringOperationalStatusCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x000B,
+                                       onReportWindowCoveringTargetPositionLiftPercent100thsCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x000C,
+                                       onReportWindowCoveringTargetPositionTiltPercent100thsCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x000E,
+                                       onReportWindowCoveringCurrentPositionLiftPercent100thsCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x000F,
+                                       onReportWindowCoveringCurrentPositionTiltPercent100thsCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0102, 0x001A,
+                                       onReportWindowCoveringSafetyStatusCallback->Cancel());
     }
 
     static void OnDefaultSuccessResponse(void * context) { ChipLogProgress(chipTool, "Default Success Response"); }
@@ -146,6 +161,8 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMeasuredValueCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlCapacityCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMeasuredValueCallback =
@@ -156,14 +173,22 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatLocalTemperatureCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringWindowCoveringTypeCallback =
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftPercentageCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionTiltCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringConfigStatusCallback =
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringCurrentPositionTiltPercentageCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringOperationalStatusCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringTargetPositionLiftPercent100thsCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringTargetPositionTiltPercent100thsCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftPercent100thsCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionTiltPercent100thsCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringSafetyStatusCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
 };
 
 void registerCommandsReporting(Commands & commands)

@@ -32,6 +32,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BASIC_CLUSTER_ID:
         emberAfBasicClusterInitCallback(endpoint);
         break;
+    case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
+        emberAfDiagnosticLogsClusterInitCallback(endpoint);
+        break;
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -63,6 +66,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 }
 
 void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfDiagnosticLogsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -439,22 +447,6 @@ void __attribute__((weak))
 emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                    uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {}
-
-/** @brief Read Attributes Response
- *
- * This function is called by the application framework when a Read Attributes
- * Response command is received from an external device.  The application should
- * return true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of read attribute status records.
- * Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool __attribute__((weak)) emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
 
 /** @brief External Attribute Read
  *

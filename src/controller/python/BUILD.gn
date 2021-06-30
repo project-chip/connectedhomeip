@@ -36,6 +36,7 @@ shared_library("ChipDeviceCtrl") {
   include_dirs = [ "." ]
 
   sources = [
+    "ChipCommissionableNodeController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
     "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
@@ -52,6 +53,7 @@ shared_library("ChipDeviceCtrl") {
     "chip/internal/CommissionerImpl.cpp",
     "chip/logging/LoggingRedirect.cpp",
     "chip/native/StackInit.cpp",
+    "chip/setup_payload/Generator.cpp",
     "chip/setup_payload/Parser.cpp",
   ]
 
@@ -71,6 +73,7 @@ shared_library("ChipDeviceCtrl") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
@@ -95,6 +98,7 @@ pw_python_action("python") {
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
+        "chip/ChipCommissionableNodeCtrl.py",
         "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipDeviceCtrl.py",
         "chip/ChipStack.py",

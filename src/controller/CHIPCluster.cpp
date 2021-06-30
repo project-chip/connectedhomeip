@@ -76,13 +76,10 @@ exit:
 
 CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(onReportCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller

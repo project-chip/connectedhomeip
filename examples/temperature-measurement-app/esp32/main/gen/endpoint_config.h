@@ -27,7 +27,7 @@
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 1, Cluster: Basic (server), big-endian */                                                                     \
+        /* Endpoint: 0, Cluster: Basic (server), big-endian */                                                                     \
                                                                                                                                    \
         /* 0 - VendorName, */                                                                                                      \
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
@@ -41,35 +41,32 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 96 - Location, */                                                                                                   \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
-                                                                                                                                   \
-            /* 112 - HardwareVersionString, */                                                                                     \
+            /* 96 - HardwareVersionString, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 176 - SoftwareVersion, */                                                                                           \
+            /* 160 - SoftwareVersion, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 180 - SoftwareVersionString, */                                                                                     \
+            /* 164 - SoftwareVersionString, */                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: General Commissioning (server), big-endian */                                                 \
+            /* Endpoint: 0, Cluster: General Commissioning (server), big-endian */                                                 \
                                                                                                                                    \
-            /* 244 - FabricId, */                                                                                                  \
+            /* 228 - FabricId, */                                                                                                  \
             1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                            \
                                                                                                                                    \
-            /* 252 - Breadcrumb, */                                                                                                \
+            /* 236 - Breadcrumb, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: General Diagnostics (server), big-endian */                                                   \
+            /* Endpoint: 0, Cluster: General Diagnostics (server), big-endian */                                                   \
                                                                                                                                    \
-            /* 260 - NetworkInterfaces, */                                                                                         \
+            /* 244 - NetworkInterfaces, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -85,36 +82,36 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Software Diagnostics (server), big-endian */                                                  \
+            /* Endpoint: 0, Cluster: Software Diagnostics (server), big-endian */                                                  \
                                                                                                                                    \
-            /* 514 - CurrentHeapHighWatermark, */                                                                                  \
+            /* 498 - CurrentHeapHighWatermark, */                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: WiFi Network Diagnostics (server), big-endian */                                              \
+            /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), big-endian */                                              \
                                                                                                                                    \
-            /* 522 - bssid, */                                                                                                     \
+            /* 506 - bssid, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (server), big-endian */                                          \
+            /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server), big-endian */                                          \
                                                                                                                                    \
-            /* 528 - PacketRxCount, */                                                                                             \
+            /* 512 - PacketRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 536 - PacketTxCount, */                                                                                             \
+            /* 520 - PacketTxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 544 - TxErrCount, */                                                                                                \
+            /* 528 - TxErrCount, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 552 - CollisionCount, */                                                                                            \
+            /* 536 - CollisionCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 560 - OverrunCount, */                                                                                              \
+            /* 544 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Operational Credentials (server), big-endian */                                               \
+            /* Endpoint: 0, Cluster: Operational Credentials (server), big-endian */                                               \
                                                                                                                                    \
-            /* 568 - fabrics list, */                                                                                              \
+            /* 552 - fabrics list, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -135,7 +132,7 @@
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 1, Cluster: Basic (server), little-endian */                                                                  \
+        /* Endpoint: 0, Cluster: Basic (server), little-endian */                                                                  \
                                                                                                                                    \
         /* 0 - VendorName, */                                                                                                      \
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
@@ -149,35 +146,32 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 96 - Location, */                                                                                                   \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
-                                                                                                                                   \
-            /* 112 - HardwareVersionString, */                                                                                     \
+            /* 96 - HardwareVersionString, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 176 - SoftwareVersion, */                                                                                           \
+            /* 160 - SoftwareVersion, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 180 - SoftwareVersionString, */                                                                                     \
+            /* 164 - SoftwareVersionString, */                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: General Commissioning (server), little-endian */                                              \
+            /* Endpoint: 0, Cluster: General Commissioning (server), little-endian */                                              \
                                                                                                                                    \
-            /* 244 - FabricId, */                                                                                                  \
+            /* 228 - FabricId, */                                                                                                  \
             1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                            \
                                                                                                                                    \
-            /* 252 - Breadcrumb, */                                                                                                \
+            /* 236 - Breadcrumb, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: General Diagnostics (server), little-endian */                                                \
+            /* Endpoint: 0, Cluster: General Diagnostics (server), little-endian */                                                \
                                                                                                                                    \
-            /* 260 - NetworkInterfaces, */                                                                                         \
+            /* 244 - NetworkInterfaces, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -193,36 +187,36 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Software Diagnostics (server), little-endian */                                               \
+            /* Endpoint: 0, Cluster: Software Diagnostics (server), little-endian */                                               \
                                                                                                                                    \
-            /* 514 - CurrentHeapHighWatermark, */                                                                                  \
+            /* 498 - CurrentHeapHighWatermark, */                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: WiFi Network Diagnostics (server), little-endian */                                           \
+            /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), little-endian */                                           \
                                                                                                                                    \
-            /* 522 - bssid, */                                                                                                     \
+            /* 506 - bssid, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (server), little-endian */                                       \
+            /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server), little-endian */                                       \
                                                                                                                                    \
-            /* 528 - PacketRxCount, */                                                                                             \
+            /* 512 - PacketRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 536 - PacketTxCount, */                                                                                             \
+            /* 520 - PacketTxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 544 - TxErrCount, */                                                                                                \
+            /* 528 - TxErrCount, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 552 - CollisionCount, */                                                                                            \
+            /* 536 - CollisionCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 560 - OverrunCount, */                                                                                              \
+            /* 544 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Operational Credentials (server), little-endian */                                            \
+            /* Endpoint: 0, Cluster: Operational Credentials (server), little-endian */                                            \
                                                                                                                                    \
-            /* 568 - fabrics list, */                                                                                              \
+            /* 552 - fabrics list, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -241,7 +235,7 @@
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (18)
+#define GENERATED_DEFAULTS_COUNT (17)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -273,7 +267,7 @@
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 1, Cluster: Basic (server) */                                                                                 \
+        /* Endpoint: 0, Cluster: Basic (server) */                                                                                 \
         { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* InteractionModelVersion */         \
             { 0x0001, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_LONG_DEFAULTS_INDEX(0) },  /* VendorName */    \
             { 0x0002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() },               /* VendorID */      \
@@ -281,51 +275,51 @@
             { 0x0004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() },               /* ProductID */     \
             { 0x0005, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
               ZAP_LONG_DEFAULTS_INDEX(64) }, /* UserLabel */                                                                       \
-            { 0x0006, ZAP_TYPE(CHAR_STRING), 16, ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
-              ZAP_LONG_DEFAULTS_INDEX(96) },                                                          /* Location */               \
+            { 0x0006, ZAP_TYPE(CHAR_STRING), 2, ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                      \
+              ZAP_EMPTY_DEFAULT() },                                                                  /* Location */               \
             { 0x0007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_SIMPLE_DEFAULT(0x00) }, /* HardwareVersion */        \
             { 0x0008, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(112) }, /* HardwareVersionString */                                                          \
-            { 0x0009, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_LONG_DEFAULTS_INDEX(176) }, /* SoftwareVersion */    \
+              ZAP_LONG_DEFAULTS_INDEX(96) }, /* HardwareVersionString */                                                           \
+            { 0x0009, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_LONG_DEFAULTS_INDEX(160) }, /* SoftwareVersion */    \
             { 0x000A, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(180) },                                                      /* SoftwareVersionString */     \
+              ZAP_LONG_DEFAULTS_INDEX(164) },                                                      /* SoftwareVersionString */     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_SIMPLE_DEFAULT(3) }, /* cluster revision */          \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: General Commissioning (server) */                                                             \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 8, 0, ZAP_LONG_DEFAULTS_INDEX(244) },                      /* FabricId */            \
-            { 0x0001, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(252) }, /* Breadcrumb */          \
+            /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 8, 0, ZAP_LONG_DEFAULTS_INDEX(228) },                      /* FabricId */            \
+            { 0x0001, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(236) }, /* Breadcrumb */          \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                              /* cluster revision */    \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                             \
+            /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                             \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: General Diagnostics (server) */                                                               \
-            { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(260) }, /* NetworkInterfaces */                             \
+            /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                               \
+            { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(244) }, /* NetworkInterfaces */                             \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },    /* RebootCount */                                   \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* cluster revision */                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Software Diagnostics (server) */                                                              \
-            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(514) }, /* CurrentHeapHighWatermark */                       \
+            /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                              \
+            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(498) }, /* CurrentHeapHighWatermark */                       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },   /* cluster revision */                               \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: WiFi Network Diagnostics (server) */                                                          \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 6, 0, ZAP_LONG_DEFAULTS_INDEX(522) }, /* bssid */                                    \
+            /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                          \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 6, 0, ZAP_LONG_DEFAULTS_INDEX(506) }, /* bssid */                                    \
             { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                 /* SecurityType */                             \
             { 0x0002, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                 /* WiFiVersion */                              \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },         /* ChannelNumber */                            \
             { 0x0004, ZAP_TYPE(INT8S), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },            /* Rssi */                                     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },         /* cluster revision */                         \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (server) */                                                      \
-            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(528) }, /* PacketRxCount */                                  \
-            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(536) }, /* PacketTxCount */                                  \
-            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(544) }, /* TxErrCount */                                     \
-            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(552) }, /* CollisionCount */                                 \
-            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(560) }, /* OverrunCount */                                   \
+            /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                      \
+            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(512) }, /* PacketRxCount */                                  \
+            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(520) }, /* PacketTxCount */                                  \
+            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(528) }, /* TxErrCount */                                     \
+            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(536) }, /* CollisionCount */                                 \
+            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(544) }, /* OverrunCount */                                   \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },   /* cluster revision */                               \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Operational Credentials (server) */                                                           \
-            { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(568) }, /* fabrics list */                                  \
+            /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
+            { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(552) }, /* fabrics list */                                  \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* cluster revision */                              \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                           \
@@ -345,36 +339,39 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 9
+#define GENERATED_CLUSTER_COUNT 10
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0028,                                                                                                                  \
           ZAP_ATTRIBUTE_INDEX(0),                                                                                                  \
           12,                                                                                                                      \
-          254,                                                                                                                     \
+          240,                                                                                                                     \
           ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                              \
-          chipFuncArrayBasicServer }, /* Endpoint: 1, Cluster: Basic (server) */                                                   \
+          chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                                   \
             {                                                                                                                      \
                 0x0030, ZAP_ATTRIBUTE_INDEX(12), 3, 18, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 1, Cluster: General Commissioning (server) */                                                          \
+            }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
             {                                                                                                                      \
                 0x0031, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                          \
+            }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x0032, ZAP_ATTRIBUTE_INDEX(16), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                \
             {                                                                                                                      \
                 0x0033, ZAP_ATTRIBUTE_INDEX(16), 3, 258, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
-            }, /* Endpoint: 1, Cluster: General Diagnostics (server) */                                                            \
+            }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                            \
             {                                                                                                                      \
                 0x0034, ZAP_ATTRIBUTE_INDEX(19), 2, 10, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 1, Cluster: Software Diagnostics (server) */                                                           \
+            }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                           \
             {                                                                                                                      \
                 0x0036, ZAP_ATTRIBUTE_INDEX(21), 6, 13, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 1, Cluster: WiFi Network Diagnostics (server) */                                                       \
+            }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                       \
             {                                                                                                                      \
                 0x0037, ZAP_ATTRIBUTE_INDEX(27), 6, 42, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (server) */                                                   \
+            }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                   \
             {                                                                                                                      \
                 0x003E, ZAP_ATTRIBUTE_INDEX(33), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
-            }, /* Endpoint: 1, Cluster: Operational Credentials (server) */                                                        \
+            }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
             {                                                                                                                      \
                 0x0402, ZAP_ATTRIBUTE_INDEX(35), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
@@ -385,70 +382,70 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 9, 861 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 9, 839 }, { ZAP_CLUSTER_INDEX(9), 1, 8 },                                                          \
     }
 
 // Largest attribute size is needed for various buffers
 #define ATTRIBUTE_LARGEST (255)
 
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE (254)
+#define ATTRIBUTE_SINGLETONS_SIZE (240)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (861)
+#define ATTRIBUTE_MAX_SIZE (847)
 
 // Number of fixed endpoints
-#define FIXED_ENDPOINT_COUNT (1)
+#define FIXED_ENDPOINT_COUNT (2)
 
 // Array of endpoints that are supported, the data inside
 // the array is the endpoint number.
 #define FIXED_ENDPOINT_ARRAY                                                                                                       \
     {                                                                                                                              \
-        0x0001                                                                                                                     \
+        0x0000, 0x0001                                                                                                             \
     }
 
 // Array of profile ids
 #define FIXED_PROFILE_IDS                                                                                                          \
     {                                                                                                                              \
-        0x0105                                                                                                                     \
+        0x0105, 0x0105                                                                                                             \
     }
 
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 0                                                                                                                       \
     }
 
 // Array of device versions
 #define FIXED_DEVICE_VERSIONS                                                                                                      \
     {                                                                                                                              \
-        1                                                                                                                          \
+        1, 1                                                                                                                       \
     }
 
 // Array of endpoint types supported on each endpoint
 #define FIXED_ENDPOINT_TYPES                                                                                                       \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 1                                                                                                                       \
     }
 
 // Array of networks supported on each endpoint
 #define FIXED_NETWORKS                                                                                                             \
     {                                                                                                                              \
-        0                                                                                                                          \
+        0, 0                                                                                                                       \
     }
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (39)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (36)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 1, Cluster: Basic (server) */                                                                                 \
+        /* Endpoint: 0, Cluster: Basic (server) */                                                                                 \
         { 0x0028, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) },     /* StartUp */                                                     \
             { 0x0028, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* ShutDown */                                                    \
             { 0x0028, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Leave */                                                       \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: General Commissioning (server) */                                                             \
+            /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
             { 0x0030, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ArmFailSafe */                                                 \
             { 0x0030, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* ArmFailSafeResponse */                                         \
             { 0x0030, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SetRegulatoryConfig */                                         \
@@ -456,17 +453,13 @@
             { 0x0030, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* CommissioningComplete */                                       \
             { 0x0030, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* CommissioningCompleteResponse */                               \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                             \
+            /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                             \
             { 0x0031, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ScanNetworks */                                                \
             { 0x0031, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* ScanNetworksResponse */                                        \
             { 0x0031, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddWiFiNetwork */                                              \
             { 0x0031, 0x03, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* AddWiFiNetworkResponse */                                      \
             { 0x0031, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateWiFiNetwork */                                           \
             { 0x0031, 0x05, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* UpdateWiFiNetworkResponse */                                   \
-            { 0x0031, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddThreadNetwork */                                            \
-            { 0x0031, 0x07, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* AddThreadNetworkResponse */                                    \
-            { 0x0031, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateThreadNetwork */                                         \
-            { 0x0031, 0x09, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* UpdateThreadNetworkResponse */                                 \
             { 0x0031, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveNetwork */                                               \
             { 0x0031, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* RemoveNetworkResponse */                                       \
             { 0x0031, 0x0C, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* EnableNetwork */                                               \
@@ -475,13 +468,16 @@
             { 0x0031, 0x0F, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* DisableNetworkResponse */                                      \
             { 0x0031, 0x10, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* GetLastNetworkCommissioningResult */                           \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Software Diagnostics (server) */                                                              \
+            /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                   \
+            { 0x0032, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RetrieveLogsRequest */                                         \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                              \
             { 0x0034, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetWatermarks */                                             \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (server) */                                                      \
+            /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                      \
             { 0x0037, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetCounts */                                                 \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Operational Credentials (server) */                                                           \
+            /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
             { 0x003E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SetFabric */                                                   \
             { 0x003E, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* SetFabricResponse */                                           \
             { 0x003E, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* OpCSRRequest */                                                \

@@ -23,6 +23,7 @@
  *
  */
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
 
@@ -55,7 +56,6 @@ CHIP_ERROR
 Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err                              = CHIP_NO_ERROR;
-    TLV::TLVType type                           = TLV::kTLVType_NotSpecified;
     AttributePath::Builder attributePathBuilder = aAttributeDataElementBuilder.CreateAttributePathBuilder();
     attributePathBuilder.NodeId(aClusterInfo.mNodeId)
         .EndpointId(aClusterInfo.mEndpointId)
@@ -65,21 +65,19 @@ Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElemen
     err = attributePathBuilder.GetError();
     SuccessOrExit(err);
 
-    aAttributeDataElementBuilder.GetWriter()->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data),
-                                                             TLV::kTLVType_Structure, type);
-    err = ReadSingleClusterData(aClusterInfo, *(aAttributeDataElementBuilder.GetWriter()));
+    err = ReadSingleClusterData(aClusterInfo, aAttributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
     SuccessOrExit(err);
-    aAttributeDataElementBuilder.GetWriter()->EndContainer(type);
-    aAttributeDataElementBuilder.DataVersion(0).MoreClusterData(false).EndOfAttributeDataElement();
+    aAttributeDataElementBuilder.MoreClusterData(false);
+    aAttributeDataElementBuilder.EndOfAttributeDataElement();
     err = aAttributeDataElementBuilder.GetError();
-    // TODO: Add DataVersion support
 
 exit:
     aClusterInfo.ClearDirty();
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving data from clusterId: %08x, err = %" PRId32, aClusterInfo.mClusterId, err);
+        ChipLogError(DataManagement, "Error retrieving data from clusterId: %" PRIx32 ", err = %" PRId32, aClusterInfo.mClusterId,
+                     err);
     }
 
     return err;
@@ -97,7 +95,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
         if (clusterInfo->IsDirty())
         {
             AttributeDataElement::Builder attributeDataElementBuilder = attributeDataList.CreateAttributeDataElementBuilder();
-            ChipLogDetail(DataManagement, "<RE:Run> Cluster %u, Field %u is dirty", clusterInfo->mClusterId, clusterInfo->mFieldId);
+            ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", clusterInfo->mClusterId,
+                          clusterInfo->mFieldId);
             // Retrieve data for this cluster instance and clear its dirty flag.
             err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,

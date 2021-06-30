@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/WriteClient.h>
 
@@ -267,9 +268,8 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdm
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    err = mpExchangeCtx->SendMessage(
-        Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
-        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(packet),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(State::AwaitingResponse);
 
@@ -283,8 +283,8 @@ exit:
     return err;
 }
 
-void WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
@@ -323,6 +323,7 @@ exit:
         }
     }
     Shutdown();
+    return err;
 }
 
 void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)

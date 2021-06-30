@@ -475,24 +475,6 @@ limitations under the License.
     <attribute side="server" code="0x0014" define="PRESSURE_SCALE" type="INT8S" min="0x81" max="0x7F" writable="false" optional="true">scale</attribute>
   </cluster>
   <cluster>
-    <name>Relative Humidity Measurement</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements.</description>
-    <code>0x0405</code>
-    <define>RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="RELATIVE_HUMIDITY_MEASURED_VALUE" type="INT16U" writable="false" reportable="true" optional="false">measured value</attribute>
-    <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="RELATIVE_HUMIDITY_MIN_MEASURED_VALUE" type="INT16U" min="0x0000" max="0x270F" writable="false" optional="false">min measured value</attribute>
-    <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="RELATIVE_HUMIDITY_MAX_MEASURED_VALUE" type="INT16U" min="0x0001" max="0x2710" writable="false" optional="false">max measured value</attribute>
-    <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="RELATIVE_HUMIDITY_TOLERANCE" type="INT16U" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true">tolerance</attribute>
-    <!-- TOLERANCE -->
-  </cluster>
-  <cluster>
     <name>Occupancy Sensing</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring occupancy sensing, and reporting occupancy status.</description>
@@ -1066,7 +1048,7 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="ZONE_STATE" type="ENUM8" writable="false" default="0x00" optional="false">zone state</attribute>
     <attribute side="server" code="0x0001" define="ZONE_TYPE" type="ENUM16" writable="false" optional="false">zone type</attribute>
     <attribute side="server" code="0x0002" define="ZONE_STATUS" type="BITMAP16" writable="false" default="0x0000" optional="false">zone status</attribute>
-    <attribute side="server" code="0x0010" define="IAS_CIE_ADDRESS" type="IEEE_ADDRESS" writable="true" optional="false">IAS CIE address</attribute>
+    <attribute side="server" code="0x0010" define="IAS_CIE_ADDRESS" type="node_id" writable="true" optional="false">IAS CIE address</attribute>
     <attribute side="server" code="0x0011" define="ZONE_ID" type="INT8U" writable="false" default="0xff" optional="false">Zone ID</attribute>
     <attribute side="server" code="0x0012" define="NUMBER_OF_ZONE_SENSITIVITY_LEVELS_SUPPORTED" type="INT8U" writable="false" default="0x02" optional="true">Number of Zone Sensitivity Levels Supported</attribute>
     <attribute side="server" code="0x0013" define="CURRENT_ZONE_SENSITIVITY_LEVEL" type="INT8U" writable="true" default="0x00" optional="true">Current Zone Sensitivity Level</attribute>
@@ -1218,7 +1200,7 @@ limitations under the License.
       </description>
       <arg name="zoneId" type="INT8U"/>
       <arg name="zoneType" type="IasZoneType"/>
-      <arg name="ieeeAddress" type="IEEE_ADDRESS"/>
+      <arg name="ieeeAddress" type="node_id"/>
       <arg name="zoneLabel" type="CHAR_STRING" introducedIn="ha-1.2.1-05-3520-30"/>
     </command>
     <command source="server" code="0x03" name="ZoneStatusChanged" optional="false">
@@ -1736,75 +1718,6 @@ limitations under the License.
       <arg name="userStatus" type="DoorLockUserStatus"/>
       <arg name="timeStamp" type="INT32U"/>
       <arg name="data" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
-    </command>
-  </cluster>
-  <cluster>
-    <name>Window Covering</name>
-    <domain>Closures</domain>
-    <description>Provides an interface for controlling and adjusting automatic window coverings. </description>
-    <code>0x0102</code>
-    <define>WINDOW_COVERING_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="COVERING_TYPE" type="ENUM8" min="0x00" max="0x09" writable="false" default="0x00" optional="false">window covering type</attribute>
-    <attribute side="server" code="0x0001" define="LIMIT_LIFT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">physical closed limit - lift</attribute>
-    <attribute side="server" code="0x0002" define="LIMIT_TILT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">physical closed limit - tilt</attribute>
-    <attribute side="server" code="0x0003" define="CURRENT_LIFT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">current position - lift</attribute>
-    <attribute side="server" code="0x0004" define="CURRENT_TILT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">current position - tilt</attribute>
-    <attribute side="server" code="0x0005" define="NUMBER_LIFT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">number of actuations - lift</attribute>
-    <attribute side="server" code="0x0006" define="NUMBER_TILT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">number of actuations - tilt</attribute>
-    <attribute side="server" code="0x0007" define="CONFIG_STATUS" type="BITMAP8" min="0x00" max="0x7F" writable="false" default="0x03" optional="false">config status</attribute>
-    <attribute side="server" code="0x0008" define="CURRENT_LIFT_PERCENTAGE" type="INT8U" min="0x00" max="0x64" writable="false" default="0xFF" optional="true">current position lift percentage</attribute>
-    <attribute side="server" code="0x0009" define="CURRENT_TILT_PERCENTAGE" type="INT8U" min="0x00" max="0x64" writable="false" default="0xFF" optional="true">current position tilt percentage</attribute>
-    <attribute side="server" code="0x0010" define="OPEN_LIMIT_LIFT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="false">installed open limit - lift</attribute>
-    <attribute side="server" code="0x0011" define="CLOSED_LIMIT_LIFT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0xFFFF" optional="false">installed closed limit - lift</attribute>
-    <attribute side="server" code="0x0012" define="OPEN_LIMIT_TILT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="false">installed open limit - tilt</attribute>
-    <attribute side="server" code="0x0013" define="CLOSED_LIMIT_TILT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0xFFFF" optional="false">installed closed limit - tilt</attribute>
-    <attribute side="server" code="0x0014" define="VELOCITY_LIFT" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">velocity - lift</attribute>
-    <attribute side="server" code="0x0015" define="ACCELERATION_LIFT" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">acceleration time - lift</attribute>
-    <attribute side="server" code="0x0016" define="DECELERATION_LIFT" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">deceleration time - lift</attribute>
-    <attribute side="server" code="0x0017" define="MODE" type="BITMAP8" min="0x00" max="0xE0" writable="true" default="0x14" optional="false">mode</attribute>
-    <attribute side="server" code="0x0018" define="SETPOINTS_LIFT" type="OCTET_STRING" length="254" writable="true" default="1,0x0000" optional="true">intermediate setpoints - lift</attribute>
-    <attribute side="server" code="0x0019" define="SETPOINTS_TILT" type="OCTET_STRING" length="254" writable="true" default="1,0x0000" optional="true">intermediate setpoints - tilt</attribute>
-    <command source="client" code="0x00" name="WindowCoveringUpOpen" optional="false" cli="zcl window-covering up">
-      <description>
-        Moves window covering to InstalledOpenLimit - Lift and InstalledOpenLimit - Tilt
-      </description>
-    </command>
-    <command source="client" code="0x01" name="WindowCoveringDownClose" optional="false" cli="zcl window-covering down">
-      <description>
-        Moves window covering to InstalledClosedLimit - Lift and InstalledCloseLimit - Tilt
-      </description>
-    </command>
-    <command source="client" code="0x02" name="WindowCoveringStop" optional="false" cli="zcl window-covering stop">
-      <description>
-        Stop any adjusting of window covering
-      </description>
-    </command>
-    <command source="client" code="0x04" name="WindowCoveringGoToLiftValue" optional="true" cli="zcl window-covering go-to-lift-value">
-      <description>
-        Goto lift value specified
-      </description>
-      <arg name="liftValue" type="INT16U"/>
-    </command>
-    <command source="client" code="0x05" name="WindowCoveringGoToLiftPercentage" optional="true" cli="zcl window-covering go-to-lift-percent">
-      <description>
-        Goto lift percentage specified
-      </description>
-      <arg name="percentageLiftValue" type="INT8U"/>
-    </command>
-    <command source="client" code="0x07" name="WindowCoveringGoToTiltValue" optional="true" cli="zcl window-covering go-to-tilt-value">
-      <description>
-        Goto tilt value specified
-      </description>
-      <arg name="tiltValue" type="INT16U"/>
-    </command>
-    <command source="client" code="0x08" name="WindowCoveringGoToTiltPercentage" optional="true" cli="zcl window-covering go-to-tilt-percentage">
-      <description>
-        Goto tilt percentage specified
-      </description>
-      <arg name="percentageTiltValue" type="INT8U"/>
     </command>
   </cluster>
   <cluster>
@@ -2421,47 +2334,5 @@ limitations under the License.
       <arg name="startTime" type="INT32U"/>
       <arg name="numberOfIntervals" type="ENUM8"/>
     </command>
-  </cluster>
-  <cluster introducedIn="ha-1.2-05-3520-29">
-    <name>Diagnostics</name>
-    <domain>Home Automation</domain>
-    <description>Attributes related to the gathering of diagnostic information from a stack.</description>
-    <code>0x0B05</code>
-    <define>DIAGNOSTICS_CLUSTER</define>
-    <client init="false" tick="false">true</client>
-    <server init="false" tick="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="NUMBER_OF_RESETS" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">number of resets</attribute>
-    <attribute side="server" code="0x0001" define="PERSISTENT_MEMORY_WRITES" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">persistent memory writes</attribute>
-    <attribute side="server" code="0x0100" define="MAC_RX_BCAST" type="INT32U" min="0x0000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">mac rx broadcast</attribute>
-    <attribute side="server" code="0x0101" define="MAC_TX_BCAST" type="INT32U" min="0x0000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">mac tx broadcast</attribute>
-    <attribute side="server" code="0x0102" define="MAC_RX_UCAST" type="INT32U" min="0x0000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">mac rx unicast</attribute>
-    <attribute side="server" code="0x0103" define="MAC_TX_UCAST" type="INT32U" min="0x0000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">mac tx unicast</attribute>
-    <attribute side="server" code="0x0104" define="MAC_TX_UCAST_RETRY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">mac tx unicast retry</attribute>
-    <attribute side="server" code="0x0105" define="MAC_TX_UCAST_FAIL" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">mac tx unicast fail</attribute>
-    <attribute side="server" code="0x0106" define="APS_RX_BCAST" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">aps rx broadcast</attribute>
-    <attribute side="server" code="0x0107" define="APS_TX_BCAST" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">aps tx broadcast</attribute>
-    <attribute side="server" code="0x0108" define="APS_RX_UCAST" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">aps rx unicast</attribute>
-    <attribute side="server" code="0x0109" define="APS_UCAST_SUCCESS" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">aps unicast success</attribute>
-    <attribute side="server" code="0x010A" define="APS_TX_UCAST_RETRY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">aps tx unicast retries</attribute>
-    <attribute side="server" code="0x010B" define="APS_TX_UCAST_FAIL" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">aps tx unicast failures</attribute>
-    <attribute side="server" code="0x010C" define="ROUTE_DISC_INITIATED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">route discovery initiated</attribute>
-    <attribute side="server" code="0x010D" define="NEIGHBOR_ADDED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">neighbor added</attribute>
-    <attribute side="server" code="0x010E" define="NEIGHBOR_REMOVED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">neighbor moved</attribute>
-    <attribute side="server" code="0x010F" define="NEIGHBOR_STALE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">neighbor stale</attribute>
-    <attribute side="server" code="0x0110" define="JOIN_INDICATION" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">join indication</attribute>
-    <attribute side="server" code="0x0111" define="CHILD_MOVED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">child moved</attribute>
-    <attribute side="server" code="0x0112" define="NWK_FC_FAILURE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">network frame control failure</attribute>
-    <attribute side="server" code="0x0113" define="APS_FC_FAILURE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">aps frame control failure</attribute>
-    <attribute side="server" code="0x0114" define="APS_UNAUTHORIZED_KEY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">aps unauthorized key</attribute>
-    <attribute side="server" code="0x0115" define="NWK_DECRYPT_FAILURE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">network decryption failure</attribute>
-    <attribute side="server" code="0x0116" define="APS_DECRYPT_FAILURE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">aps decryption failure</attribute>
-    <attribute side="server" code="0x0117" define="PACKET_BUFFER_ALLOC_FAILURES" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">packet buffer allocation failures</attribute>
-    <attribute side="server" code="0x0118" define="RELAYED_UNICAST" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">relayed unicasts</attribute>
-    <attribute side="server" code="0x0119" define="PHY_TO_MAC_QUEUE_LIMIT_REACHED" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">phy to mac queue limit reached</attribute>
-    <attribute side="server" code="0x011A" define="PACKET_VALIDATE_DROP_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">packet validate drop count</attribute>
-    <attribute side="server" code="0x011B" define="AVERAGE_MAC_RETRY_PER_APS_MSG_SENT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">average mac retry per aps message sent</attribute>
-    <attribute side="server" code="0x011C" define="LAST_MESSAGE_LQI" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x0000" optional="true">last message lqi</attribute>
-    <attribute side="server" code="0x011D" define="LAST_MESSAGE_RSSI" type="INT8S" min="0x00" max="0xFF" writable="false" default="0x0000" optional="true">last message rssi</attribute>
   </cluster>
 </configurator>

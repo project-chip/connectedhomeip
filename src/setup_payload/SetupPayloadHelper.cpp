@@ -143,9 +143,8 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadPa
 
 CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, const std::string & filePath)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     std::ifstream fileStream(filePath);
-    VerifyOrExit(!fileStream.fail(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!fileStream.fail(), CHIP_ERROR_INVALID_ARGUMENT);
 
     while (fileStream)
     {
@@ -161,14 +160,11 @@ CHIP_ERROR loadPayloadFromFile(SetupPayload & setupPayload, const std::string & 
         {
             continue;
         }
-        err = resolveSetupPayloadParameter(parameter, key, value);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(resolveSetupPayloadParameter(parameter, key, value));
 
-        err = addParameter(setupPayload, parameter);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(addParameter(setupPayload, parameter));
     }
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR generateQRCodeFromFilePath(std::string filePath, std::string & outCode)

@@ -37,7 +37,7 @@ using namespace ::chip::app::List;
 
 constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
 
-#define CHECK_STATUS(error)                                                                                                        \
+#define CHECK_STATUS_WITH_RETVAL(error, retval)                                                                                    \
     if (CHIP_NO_ERROR != error)                                                                                                    \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_STATUS %s", ErrorStr(error));                                                                     \
@@ -47,10 +47,13 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
             cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
         }                                                                                                                          \
-        return true;                                                                                                               \
+        return retval;                                                                                                             \
     }
 
-#define CHECK_MESSAGE_LENGTH(value)                                                                                                \
+#define CHECK_STATUS(error) CHECK_STATUS_WITH_RETVAL(error, true)
+#define CHECK_STATUS_VOID(error) CHECK_STATUS_WITH_RETVAL(error, )
+
+#define CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, retval)                                                                            \
     if (!chip::CanCastTo<uint16_t>(value))                                                                                         \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_MESSAGE_LENGTH expects a uint16_t value, got: %d", value);                                        \
@@ -60,7 +63,7 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
             cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
         }                                                                                                                          \
-        return true;                                                                                                               \
+        return retval;                                                                                                             \
     }                                                                                                                              \
                                                                                                                                    \
     if (messageLen < value)                                                                                                        \
@@ -72,10 +75,13 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
             cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
         }                                                                                                                          \
-        return true;                                                                                                               \
+        return retval;                                                                                                             \
     }                                                                                                                              \
                                                                                                                                    \
     messageLen = static_cast<uint16_t>(messageLen - static_cast<uint16_t>(value));
+
+#define CHECK_MESSAGE_LENGTH(value) CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, true)
+#define CHECK_MESSAGE_LENGTH_VOID(value) CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, )
 
 #define GET_RESPONSE_CALLBACKS(name)                                                                                               \
     Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
@@ -241,6 +247,139 @@ void LogStatus(uint8_t status)
     }
 }
 
+static void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
+{
+    switch (status)
+    {
+    case Protocols::InteractionModel::ProtocolCode::Success:
+        ChipLogProgress(Zcl, "  status: Success                (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Failure:
+        ChipLogProgress(Zcl, "  status: Failure                (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidSubscription:
+        ChipLogProgress(Zcl, "  status: InvalidSubscription    (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedAccess:
+        ChipLogProgress(Zcl, "  status: UnsupportedAccess      (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedEndpoint:
+        ChipLogProgress(Zcl, "  status: UnsupportedEndpoint    (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidAction:
+        ChipLogProgress(Zcl, "  status: InvalidAction          (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedCommand:
+        ChipLogProgress(Zcl, "  status: UnsupportedCommand     (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved82:
+        ChipLogProgress(Zcl, "  status: Reserved82             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved83:
+        ChipLogProgress(Zcl, "  status: Reserved83             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved84:
+        ChipLogProgress(Zcl, "  status: Reserved84             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidCommand:
+        ChipLogProgress(Zcl, "  status: InvalidCommand         (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute:
+        ChipLogProgress(Zcl, "  status: UnsupportedAttribute   (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidValue:
+        ChipLogProgress(Zcl, "  status: InvalidValue           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedWrite:
+        ChipLogProgress(Zcl, "  status: UnsupportedWrite       (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::ResourceExhausted:
+        ChipLogProgress(Zcl, "  status: ResourceExhausted      (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved8a:
+        ChipLogProgress(Zcl, "  status: Reserved8a             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::NotFound:
+        ChipLogProgress(Zcl, "  status: NotFound               (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnreportableAttribute:
+        ChipLogProgress(Zcl, "  status: UnreportableAttribute  (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidDataType:
+        ChipLogProgress(Zcl, "  status: InvalidDataType        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved8e:
+        ChipLogProgress(Zcl, "  status: Reserved8e             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedRead:
+        ChipLogProgress(Zcl, "  status: UnsupportedRead        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved90:
+        ChipLogProgress(Zcl, "  status: Reserved90             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved91:
+        ChipLogProgress(Zcl, "  status: Reserved91             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved92:
+        ChipLogProgress(Zcl, "  status: Reserved92             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved93:
+        ChipLogProgress(Zcl, "  status: Reserved93             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Timeout:
+        ChipLogProgress(Zcl, "  status: Timeout                (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved95:
+        ChipLogProgress(Zcl, "  status: Reserved95             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved96:
+        ChipLogProgress(Zcl, "  status: Reserved96             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved97:
+        ChipLogProgress(Zcl, "  status: Reserved97             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved98:
+        ChipLogProgress(Zcl, "  status: Reserved98             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved99:
+        ChipLogProgress(Zcl, "  status: Reserved99             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved9a:
+        ChipLogProgress(Zcl, "  status: Reserved9a             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::ConstraintError:
+        ChipLogProgress(Zcl, "  status: ConstraintError        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Busy:
+        ChipLogProgress(Zcl, "  status: Busy                   (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reservedc0:
+        ChipLogProgress(Zcl, "  status: Reservedc0             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reservedc1:
+        ChipLogProgress(Zcl, "  status: Reservedc1             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reservedc2:
+        ChipLogProgress(Zcl, "  status: Reservedc2             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedCluster:
+        ChipLogProgress(Zcl, "  status: UnsupportedCluster     (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reservedc4:
+        ChipLogProgress(Zcl, "  status: Reservedc4             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::NoUpstreamSubscription:
+        ChipLogProgress(Zcl, "  status: NoUpstreamSubscription (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidArgument:
+        ChipLogProgress(Zcl, "  status: InvalidArgument        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    default:
+        ChipLogError(Zcl, "Unknown status: 0x%04" PRIx16, Protocols::InteractionModel::ToUint16(status));
+        break;
+    }
+}
+
 void LogStringAttribute(const uint8_t * string, const uint16_t length, const bool isAscii)
 {
     if (isAscii)
@@ -268,8 +407,8 @@ app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInsta
 bool emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
 {
     ChipLogProgress(Zcl, "DefaultResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
-    ChipLogProgress(Zcl, "  CommandId: 0x%02x", commandId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
+    ChipLogProgress(Zcl, "  CommandId: 0x%08x", commandId);
     LogStatus(status);
 
     GET_RESPONSE_CALLBACKS("emberAfDefaultResponseCallback");
@@ -312,881 +451,87 @@ bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfSta
     return true;
 }
 
-bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
+template <>
+void BasicAttributeFilter<StringAttributeCallback>(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
+                                                   chip::Callback::Cancelable * onFailure)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    const uint8_t * val;
+    uint32_t len;
+
+    if (data->GetType() != chip::TLV::kTLVType_ByteString && data->GetType() != chip::TLV::kTLVType_UTF8String)
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else
+    {
+        err = data->GetDataPtr(val);
+        len = data->GetLength();
+    }
+
+    if (CHIP_NO_ERROR == err)
+    {
+        chip::Callback::Callback<StringAttributeCallback> * cb =
+            chip::Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccess);
+        cb->mCall(cb->mContext, chip::ByteSpan(val, len));
+    }
+    else
+    {
+        chip::Callback::Callback<DefaultFailureCallback> * cb =
+            chip::Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailure);
+        cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+    }
+}
+
+bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
+                                            TLV::TLVReader * apData, Protocols::InteractionModel::ProtocolCode status)
 {
     ChipLogProgress(Zcl, "ReadAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", aPath.mClusterId);
 
-    GET_RESPONSE_CALLBACKS("emberAfReadAttributesResponseCallback");
+    Callback::Cancelable * onSuccessCallback = nullptr;
+    Callback::Cancelable * onFailureCallback = nullptr;
+    app::TLVDataFilter tlvFilter             = nullptr;
+    NodeId sourceId                          = aPath.mNodeId;
+    // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
+    uint8_t sequenceNumber = static_cast<uint8_t>(apReadClient->GetAppIdentifier());
+    CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceId, sequenceNumber, &onSuccessCallback, &onFailureCallback, &tlvFilter);
 
-    // struct readAttributeResponseRecord[]
-    while (messageLen)
+    if (CHIP_NO_ERROR != err)
     {
-        CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
-
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t status = chip::Encoding::Read8(message); // zclStatus
-        LogStatus(status);
-
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
+        if (onSuccessCallback == nullptr)
         {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t attributeType = chip::Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
-
-            switch (attributeType)
-            {
-            case 0x00: // nodata / No data
-            case 0x0A: // data24 / 24-bit data
-            case 0x0C: // data40 / 40-bit data
-            case 0x0D: // data48 / 48-bit data
-            case 0x0E: // data56 / 56-bit data
-            case 0x1A: // map24 / 24-bit bitmap
-            case 0x1C: // map40 / 40-bit bitmap
-            case 0x1D: // map48 / 48-bit bitmap
-            case 0x1E: // map56 / 56-bit bitmap
-            case 0x22: // uint24 / Unsigned 24-bit integer
-            case 0x24: // uint40 / Unsigned 40-bit integer
-            case 0x25: // uint48 / Unsigned 48-bit integer
-            case 0x26: // uint56 / Unsigned 56-bit integer
-            case 0x2A: // int24 / Signed 24-bit integer
-            case 0x2C: // int40 / Signed 40-bit integer
-            case 0x2D: // int48 / Signed 48-bit integer
-            case 0x2E: // int56 / Signed 56-bit integer
-            case 0x38: // semi / Semi-precision
-            case 0x39: // single / Single precision
-            case 0x3A: // double / Double precision
-            case 0x49: // struct / Structure
-            case 0x50: // set / Set
-            case 0x51: // bag / Bag
-            case 0xE0: // ToD / Time of day
-            {
-                ChipLogError(Zcl, "attributeType 0x%02x is not supported", attributeType);
-                Callback::Callback<DefaultFailureCallback> * cb =
-                    Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-                cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-                return true;
-            }
-
-            case 0x41: // octstr / Octet string
-            case 0x42: // string / Character string
-            {
-                // Short Strings must contains at least one byte for the length
-                CHECK_MESSAGE_LENGTH(1);
-                uint8_t length = chip::Encoding::Read8(message);
-
-                // When the length is set to 0xFF, it represents a non-value. In this case the data field is zero length.
-                if (length == 0xFF)
-                {
-                    length = 0;
-                }
-
-                CHECK_MESSAGE_LENGTH(length);
-                LogStringAttribute(message, length, attributeType == 0x42);
-                Callback::Callback<StringAttributeCallback> * cb =
-                    Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
-                break;
-            }
-
-            case 0x43: // octstr16 / Long octet string
-            case 0x44: // string16 / Long character string
-            {
-                // Long Strings must contains at least two bytes for the length
-                CHECK_MESSAGE_LENGTH(2);
-                uint16_t length = chip::Encoding::LittleEndian::Read16(message);
-
-                // When the length is set to 0xFFFF, it represents a non-value. In this case the data field is zero length.
-                if (length == 0xFFFF)
-                {
-                    length = 0;
-                }
-
-                CHECK_MESSAGE_LENGTH(length);
-                LogStringAttribute(message, length, attributeType == 0x44);
-                Callback::Callback<StringAttributeCallback> * cb =
-                    Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
-                break;
-            }
-            case 0x48: // array / Array
-            {
-                CHECK_MESSAGE_LENGTH(2);
-                uint16_t count = chip::Encoding::LittleEndian::Read16(message);
-                ChipLogProgress(Zcl, "  count: %" PRIu16, count);
-
-                switch (clusterId)
-                {
-                case 0x050C:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // INT16U
-                    {
-                        uint16_t data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i] = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                        }
-
-                        Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback> * cb =
-                            Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x050B:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // AudioOutputInfo
-                    {
-                        _AudioOutputInfo data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].index = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].outputType = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
-                            messageLen -= 34;
-                            message += 34;
-                        }
-
-                        Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> * cb =
-                            Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x050A:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // OCTET_STRING
-                    {
-                        chip::ByteSpan data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_STATUS(ReadByteSpan(message, messageLen, &data[i]));
-                            uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
-                            messageLen -= entryLength;
-                            message += entryLength;
-                        }
-
-                        Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback> * cb =
-                            Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x0001: // ContentLaunchStreamingType
-                    {
-                        uint8_t data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i] = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback> * cb =
-                            Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x001D:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // DeviceType
-                    {
-                        _DeviceType data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(4);
-                            data[i].type = emberAfGetInt32u(message, 0, 4);
-                            message += 4;
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].revision = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                        }
-
-                        Callback::Callback<DescriptorDeviceListListAttributeCallback> * cb =
-                            Callback::Callback<DescriptorDeviceListListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x0001: // CLUSTER_ID
-                    {
-                        chip::ClusterId data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i] = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                        }
-
-                        Callback::Callback<DescriptorServerListListAttributeCallback> * cb =
-                            Callback::Callback<DescriptorServerListListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x0002: // CLUSTER_ID
-                    {
-                        chip::ClusterId data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i] = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                        }
-
-                        Callback::Callback<DescriptorClientListListAttributeCallback> * cb =
-                            Callback::Callback<DescriptorClientListListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x0003: // ENDPOINT_ID
-                    {
-                        chip::EndpointId data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i] = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<DescriptorPartsListListAttributeCallback> * cb =
-                            Callback::Callback<DescriptorPartsListListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x0040:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // LabelStruct
-                    {
-                        _LabelStruct data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_STATUS(ReadByteSpan(message, 18, &data[i].label));
-                            messageLen -= 18;
-                            message += 18;
-                            CHECK_STATUS(ReadByteSpan(message, 18, &data[i].value));
-                            messageLen -= 18;
-                            message += 18;
-                        }
-
-                        Callback::Callback<FixedLabelLabelListListAttributeCallback> * cb =
-                            Callback::Callback<FixedLabelLabelListListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x0033:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // NetworkInterfaceType
-                    {
-                        _NetworkInterfaceType data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].Name));
-                            messageLen -= 34;
-                            message += 34;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].FabricConnected = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].OffPremiseServicesReachableIPv4 = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].OffPremiseServicesReachableIPv6 = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(8);
-                            data[i].HardwareAddress = emberAfGetInt64u(message, 0, 8);
-                            message += 8;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].Type = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback> * cb =
-                            Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0xF004:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // GroupState
-                    {
-                        _GroupState data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].VendorId = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].VendorGroupId = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].GroupKeySetIndex = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                        }
-
-                        Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> * cb =
-                            Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x0001: // GroupKey
-                    {
-                        _GroupKey data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].VendorId = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].GroupKeyIndex = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_STATUS(ReadByteSpan(message, 18, &data[i].GroupKeyRoot));
-                            messageLen -= 18;
-                            message += 18;
-                            CHECK_MESSAGE_LENGTH(8);
-                            data[i].GroupKeyEpochStartTime = emberAfGetInt64u(message, 0, 8);
-                            message += 8;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].GroupKeySecurityPolicy = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> * cb =
-                            Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x0507:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // MediaInputInfo
-                    {
-                        _MediaInputInfo data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].index = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].inputType = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
-                            messageLen -= 34;
-                            message += 34;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].description));
-                            messageLen -= 34;
-                            message += 34;
-                        }
-
-                        Callback::Callback<MediaInputMediaInputListListAttributeCallback> * cb =
-                            Callback::Callback<MediaInputMediaInputListListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x003E:
-                    switch (attributeId)
-                    {
-                    case 0x0001: // FabricDescriptor
-                    {
-                        _FabricDescriptor data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(8);
-                            data[i].FabricId = emberAfGetInt64u(message, 0, 8);
-                            message += 8;
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].VendorId = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_MESSAGE_LENGTH(8);
-                            data[i].NodeId = emberAfGetInt64u(message, 0, 8);
-                            message += 8;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].Label));
-                            messageLen -= 34;
-                            message += 34;
-                        }
-
-                        Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
-                            Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x0504:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // TvChannelInfo
-                    {
-                        _TvChannelInfo data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].majorNumber = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].minorNumber = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
-                            messageLen -= 34;
-                            message += 34;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].callSign));
-                            messageLen -= 34;
-                            message += 34;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].affiliateCallSign));
-                            messageLen -= 34;
-                            message += 34;
-                        }
-
-                        Callback::Callback<TvChannelTvChannelListListAttributeCallback> * cb =
-                            Callback::Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x0505:
-                    switch (attributeId)
-                    {
-                    case 0x0000: // NavigateTargetTargetInfo
-                    {
-                        _NavigateTargetTargetInfo data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].identifier = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
-                            messageLen -= 34;
-                            message += 34;
-                        }
-
-                        Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback> * cb =
-                            Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x050F:
-                    switch (attributeId)
-                    {
-                    case 0x001A: // INT8U
-                    {
-                        uint8_t data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i] = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<TestClusterListInt8uListAttributeCallback> * cb =
-                            Callback::Callback<TestClusterListInt8uListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x001B: // OCTET_STRING
-                    {
-                        chip::ByteSpan data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_STATUS(ReadByteSpan(message, messageLen, &data[i]));
-                            uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
-                            messageLen -= entryLength;
-                            message += entryLength;
-                        }
-
-                        Callback::Callback<TestClusterListOctetStringListAttributeCallback> * cb =
-                            Callback::Callback<TestClusterListOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x001C: // TestListStructOctet
-                    {
-                        _TestListStructOctet data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(8);
-                            data[i].fabricIndex = emberAfGetInt64u(message, 0, 8);
-                            message += 8;
-                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].operationalCert));
-                            messageLen -= 34;
-                            message += 34;
-                        }
-
-                        Callback::Callback<TestClusterListStructOctetStringListAttributeCallback> * cb =
-                            Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                case 0x0035:
-                    switch (attributeId)
-                    {
-                    case 0x0007: // NeighborTable
-                    {
-                        _NeighborTable data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(8);
-                            data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
-                            message += 8;
-                            CHECK_MESSAGE_LENGTH(4);
-                            data[i].Age = emberAfGetInt32u(message, 0, 4);
-                            message += 4;
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_MESSAGE_LENGTH(4);
-                            data[i].LinkFrameCounter = emberAfGetInt32u(message, 0, 4);
-                            message += 4;
-                            CHECK_MESSAGE_LENGTH(4);
-                            data[i].MleFrameCounter = emberAfGetInt32u(message, 0, 4);
-                            message += 4;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].LQI = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].AverageRssi = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].LastRssi = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].FrameErrorRate = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].MessageErrorRate = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].RxOnWhenIdle = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].FullThreadDevice = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].FullNetworkData = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].IsChild = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback> * cb =
-                            Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x0008: // RouteTable
-                    {
-                        _RouteTable data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(8);
-                            data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
-                            message += 8;
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].RouterId = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].NextHop = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].PathCost = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].LQIIn = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].LQIOut = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].Age = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].Allocated = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].LinkEstablished = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback> * cb =
-                            Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x003B: // SecurityPolicy
-                    {
-                        _SecurityPolicy data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(2);
-                            data[i].RotationTime = emberAfGetInt16u(message, 0, 2);
-                            message += 2;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].Flags = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback> * cb =
-                            Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>::FromCancelable(
-                                onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x003D: // OperationalDatasetComponents
-                    {
-                        _OperationalDatasetComponents data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].ActiveTimestampPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].PendingTimestampPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].MasterKeyPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].NetworkNamePresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].ExtendedPanIdPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].MeshLocalPrefixPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].DelayPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].PanIdPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].ChannelPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].PskcPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].SecurityPolicyPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i].ChannelMaskPresent = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback> * cb =
-                            Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>::
-                                FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    case 0x003E: // NetworkFault
-                    {
-                        uint8_t data[count];
-                        for (size_t i = 0; i < count; i++)
-                        {
-                            CHECK_MESSAGE_LENGTH(1);
-                            data[i] = emberAfGetInt8u(message, 0, 1);
-                            message += 1;
-                        }
-
-                        Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback> * cb =
-                            Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>::
-                                FromCancelable(onSuccessCallback);
-                        cb->mCall(cb->mContext, count, data);
-                        break;
-                    }
-                    }
-                    break;
-                }
-                break;
-            }
-
-            case 0x08: // data8 / 8-bit data
-            case 0x18: // map8 / 8-bit bitmap
-            case 0x20: // uint8 / Unsigned  8-bit integer
-            case 0x30: // enum8 / 8-bit enumeration
-            {
-                CHECK_MESSAGE_LENGTH(1);
-                uint8_t value = chip::Encoding::Read8(message);
-                ChipLogProgress(Zcl, "  value: 0x%02x", value);
-
-                Callback::Callback<Int8uAttributeCallback> * cb =
-                    Callback::Callback<Int8uAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x09: // data16 / 16-bit data
-            case 0x19: // map16 / 16-bit bitmap
-            case 0x21: // uint16 / Unsigned 16-bit integer
-            case 0x31: // enum16 / 16-bit enumeration
-            case 0xE8: // clusterId / Cluster ID
-            case 0xE9: // attribId / Attribute ID
-            case 0xEA: // bacOID / BACnet OID
-            case 0xF1: // key128 / 128-bit security key
-            case 0xFF: // unk / Unknown
-            {
-                CHECK_MESSAGE_LENGTH(2);
-                uint16_t value = chip::Encoding::LittleEndian::Read16(message);
-                ChipLogProgress(Zcl, "  value: 0x%04x", value);
-
-                Callback::Callback<Int16uAttributeCallback> * cb =
-                    Callback::Callback<Int16uAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x0B: // data32 / 32-bit data
-            case 0x1B: // map32 / 32-bit bitmap
-            case 0x23: // uint32 / Unsigned 32-bit integer
-            case 0xE1: // date / Date
-            case 0xE2: // UTC / UTCTime
-            {
-                CHECK_MESSAGE_LENGTH(4);
-                uint32_t value = chip::Encoding::LittleEndian::Read32(message);
-                ChipLogProgress(Zcl, "  value: 0x%08x", value);
-
-                Callback::Callback<Int32uAttributeCallback> * cb =
-                    Callback::Callback<Int32uAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x0F: // data64 / 64-bit data
-            case 0x1F: // map64 / 64-bit bitmap
-            case 0x27: // uint64 / Unsigned 64-bit integer
-            case 0xF0: // EUI64 / IEEE address
-            {
-                CHECK_MESSAGE_LENGTH(8);
-                uint64_t value = chip::Encoding::LittleEndian::Read64(message);
-                ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
-
-                Callback::Callback<Int64uAttributeCallback> * cb =
-                    Callback::Callback<Int64uAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x10: // bool / Boolean
-            {
-                CHECK_MESSAGE_LENGTH(1);
-                uint8_t value = chip::Encoding::Read8(message);
-                ChipLogProgress(Zcl, "  value: %d", value);
-
-                Callback::Callback<BooleanAttributeCallback> * cb =
-                    Callback::Callback<BooleanAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x28: // int8 / Signed 8-bit integer
-            {
-                CHECK_MESSAGE_LENGTH(1);
-                int8_t value = chip::CastToSigned(chip::Encoding::Read8(message));
-                ChipLogProgress(Zcl, "  value: %" PRId8, value);
-
-                Callback::Callback<Int8sAttributeCallback> * cb =
-                    Callback::Callback<Int8sAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x29: // int16 / Signed 16-bit integer
-            {
-                CHECK_MESSAGE_LENGTH(2);
-                int16_t value = chip::CastToSigned(chip::Encoding::LittleEndian::Read16(message));
-                ChipLogProgress(Zcl, "  value: %" PRId16, value);
-
-                Callback::Callback<Int16sAttributeCallback> * cb =
-                    Callback::Callback<Int16sAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x2B: // int32 / Signed 32-bit integer
-            {
-                CHECK_MESSAGE_LENGTH(4);
-                int32_t value = chip::CastToSigned(chip::Encoding::LittleEndian::Read32(message));
-                ChipLogProgress(Zcl, "  value: %" PRId32, value);
-
-                Callback::Callback<Int32sAttributeCallback> * cb =
-                    Callback::Callback<Int32sAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x2F: // int64 / Signed 64-bit integer
-            {
-                CHECK_MESSAGE_LENGTH(8);
-                int64_t value = chip::CastToSigned(chip::Encoding::LittleEndian::Read64(message));
-                ChipLogProgress(Zcl, "  value: %" PRId64, value);
-
-                Callback::Callback<Int64sAttributeCallback> * cb =
-                    Callback::Callback<Int64sAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-            }
-        }
-        else
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, status);
+            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
         }
 
-        // The current code is written matching the current API where there is a single attribute read
-        // per read command. So if multiple attributes are read at the same time, something is wrong
-        // somewhere.
-        if (messageLen)
+        if (onFailureCallback == nullptr)
         {
-            ChipLogError(Zcl, "Multiple attributes read at the same time. Something went wrong.");
-            break;
+            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
         }
+
+        if (tlvFilter == nullptr)
+        {
+            ChipLogDetail(Zcl, "%s: Missing TLV Data Filter", __FUNCTION__);
+        }
+        return true;
+    }
+
+    chip::AttributeId attributeId = aPath.mFieldId; // attribId
+    ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+    LogIMStatus(status);
+
+    if (status == Protocols::InteractionModel::ProtocolCode::Success && apData != nullptr)
+    {
+        chip::TLV::TLVType attributeType = apData->GetType();
+        ChipLogProgress(Zcl, "  attribute TLV Type: 0x%02x", attributeType);
+        tlvFilter(apData, onSuccessCallback, onFailureCallback);
+    }
+    else
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        // TODO: Should change failure callbacks to accept uint16 status code.
+        cb->mCall(cb->mContext, static_cast<uint8_t>(Protocols::InteractionModel::ToUint16(status)));
     }
 
     return true;
@@ -1195,7 +540,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
 bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "WriteAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     GET_RESPONSE_CALLBACKS("emberAfWriteAttributesResponseCallback");
 
@@ -1214,9 +559,9 @@ bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * messa
         }
         else
         {
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-            ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+            CHECK_MESSAGE_LENGTH(4);
+            AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+            ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
@@ -1239,7 +584,7 @@ bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * messa
 bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "ConfigureReportingResponseCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     GET_RESPONSE_CALLBACKS("emberAfConfigureReportingResponseCallback");
 
@@ -1262,9 +607,9 @@ bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * me
             uint8_t direction = chip::Encoding::Read8(message); // reportingRole
             ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
 
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-            ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+            CHECK_MESSAGE_LENGTH(4);
+            AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+            ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
@@ -1287,7 +632,7 @@ bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * me
 bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "ReadReportingConfigurationResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     GET_RESPONSE_CALLBACKS("emberAfReadReportingConfigurationResponseCallback");
 
@@ -1298,9 +643,9 @@ bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId
         uint8_t direction = chip::Encoding::Read8(message); // reportingRole
         ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
 
-        CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+        CHECK_MESSAGE_LENGTH(4);
+        AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+        ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
         if (direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         {
@@ -1341,7 +686,7 @@ bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discove
                                                bool extended)
 {
     ChipLogProgress(Zcl, "DiscoverAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
     ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
     ChipLogProgress(Zcl, "  extended: %d", extended);
 
@@ -1350,9 +695,9 @@ bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discove
     // struct discoverAttributesResponseRecord[]
     while (messageLen)
     {
-        CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+        CHECK_MESSAGE_LENGTH(4);
+        AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+        ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
         CHECK_MESSAGE_LENGTH(1);
         uint8_t attributeType = chip::Encoding::Read8(message); // zclType
@@ -1368,14 +713,14 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint1
                                                       CommandId * commandIds, uint16_t commandIdCount)
 {
     ChipLogProgress(Zcl, "DiscoverCommandsGeneratedResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
     ChipLogProgress(Zcl, "  manufacturerCode: 0x%04x", manufacturerCode);
     ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
     ChipLogProgress(Zcl, "  commandIdCount: %" PRIu16, commandIdCount);
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%08x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -1388,20 +733,936 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
                                                      CommandId * commandIds, uint16_t commandIdCount)
 {
     ChipLogProgress(Zcl, "DiscoverCommandsReceivedResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
     ChipLogProgress(Zcl, "  manufacturerCode: 0x%04x", manufacturerCode);
     ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
     ChipLogProgress(Zcl, "  commandIdCount: %" PRIu16, commandIdCount);
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%08x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
     Callback::Callback<DefaultSuccessCallback> * cb = Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext);
     return true;
+}
+
+static EmberAfStatus PrepareListFromTLV(TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen)
+{
+    CHIP_ERROR tlvError = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    TLV::TLVType type;
+    reader.Init(*tlvData);
+    reader.EnterContainer(type);
+    tlvError = reader.Next();
+    if (tlvError != CHIP_NO_ERROR && tlvError != CHIP_END_OF_TLV && chip::CanCastTo<uint16_t>(reader.GetLength()))
+    {
+        return EMBER_ZCL_STATUS_INVALID_VALUE;
+    }
+    if (tlvError == CHIP_NO_ERROR)
+    {
+        tlvError   = reader.GetDataPtr(message);
+        messageLen = static_cast<uint16_t>(reader.GetLength());
+    }
+    if (tlvError != CHIP_NO_ERROR)
+    {
+        return EMBER_ZCL_STATUS_INVALID_VALUE;
+    }
+    reader.ExitContainer(type);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                          Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    uint16_t data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i] = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+    }
+    Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback> * cb =
+        Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _AudioOutputInfo data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].index = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].outputType = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].name));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+    }
+    Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> * cb =
+        Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    chip::ByteSpan data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
+        uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
+        messageLen           = static_cast<uint16_t>(messageLen - entryLength);
+        message += entryLength;
+    }
+    Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback> * cb =
+        Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void ContentLauncherClusterSupportedStreamingTypesListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                      Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    uint8_t data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i] = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback> * cb =
+        Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void DescriptorClusterDeviceListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _DeviceType data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i].type = emberAfGetInt32u(message, 0, 4);
+        message += 4;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].revision = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+    }
+    Callback::Callback<DescriptorDeviceListListAttributeCallback> * cb =
+        Callback::Callback<DescriptorDeviceListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    chip::ClusterId data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i] = emberAfGetInt32u(message, 0, 4);
+        message += 4;
+    }
+    Callback::Callback<DescriptorServerListListAttributeCallback> * cb =
+        Callback::Callback<DescriptorServerListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    chip::ClusterId data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i] = emberAfGetInt32u(message, 0, 4);
+        message += 4;
+    }
+    Callback::Callback<DescriptorClientListListAttributeCallback> * cb =
+        Callback::Callback<DescriptorClientListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    chip::EndpointId data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i] = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+    }
+    Callback::Callback<DescriptorPartsListListAttributeCallback> * cb =
+        Callback::Callback<DescriptorPartsListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _LabelStruct data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_STATUS_VOID(ReadByteSpan(message, 18, &data[i].label));
+        messageLen = static_cast<uint16_t>(messageLen - 18);
+        message += 18;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 18, &data[i].value));
+        messageLen = static_cast<uint16_t>(messageLen - 18);
+        message += 18;
+    }
+    Callback::Callback<FixedLabelLabelListListAttributeCallback> * cb =
+        Callback::Callback<FixedLabelLabelListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                   Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _NetworkInterfaceType data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].Name));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].FabricConnected = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].OffPremiseServicesReachableIPv4 = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].OffPremiseServicesReachableIPv6 = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 10, &data[i].HardwareAddress));
+        messageLen = static_cast<uint16_t>(messageLen - 10);
+        message += 10;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].Type = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback> * cb =
+        Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _GroupState data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].VendorId = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].VendorGroupId = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].GroupKeySetIndex = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+    }
+    Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> * cb =
+        Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _GroupKey data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].VendorId = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].GroupKeyIndex = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 18, &data[i].GroupKeyRoot));
+        messageLen = static_cast<uint16_t>(messageLen - 18);
+        message += 18;
+        CHECK_MESSAGE_LENGTH_VOID(8);
+        data[i].GroupKeyEpochStartTime = emberAfGetInt64u(message, 0, 8);
+        message += 8;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].GroupKeySecurityPolicy = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> * cb =
+        Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _MediaInputInfo data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].index = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].inputType = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].name));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].description));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+    }
+    Callback::Callback<MediaInputMediaInputListListAttributeCallback> * cb =
+        Callback::Callback<MediaInputMediaInputListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _FabricDescriptor data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(8);
+        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
+        message += 8;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].VendorId = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(8);
+        data[i].NodeId = emberAfGetInt64u(message, 0, 8);
+        message += 8;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].Label));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+    }
+    Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
+        Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _TvChannelInfo data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].majorNumber = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].minorNumber = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].name));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].callSign));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].affiliateCallSign));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+    }
+    Callback::Callback<TvChannelTvChannelListListAttributeCallback> * cb =
+        Callback::Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                  Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _NavigateTargetTargetInfo data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].identifier = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].name));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+    }
+    Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback> * cb =
+        Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void TestClusterClusterListInt8uListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    uint8_t data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i] = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<TestClusterListInt8uListAttributeCallback> * cb =
+        Callback::Callback<TestClusterListInt8uListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void TestClusterClusterListOctetStringListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    chip::ByteSpan data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
+        uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
+        messageLen           = static_cast<uint16_t>(messageLen - entryLength);
+        message += entryLength;
+    }
+    Callback::Callback<TestClusterListOctetStringListAttributeCallback> * cb =
+        Callback::Callback<TestClusterListOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _TestListStructOctet data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(8);
+        data[i].fabricIndex = emberAfGetInt64u(message, 0, 8);
+        message += 8;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].operationalCert));
+        messageLen = static_cast<uint16_t>(messageLen - 34);
+        message += 34;
+    }
+    Callback::Callback<TestClusterListStructOctetStringListAttributeCallback> * cb =
+        Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                         Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _NeighborTable data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(8);
+        data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
+        message += 8;
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i].Age = emberAfGetInt32u(message, 0, 4);
+        message += 4;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i].LinkFrameCounter = emberAfGetInt32u(message, 0, 4);
+        message += 4;
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i].MleFrameCounter = emberAfGetInt32u(message, 0, 4);
+        message += 4;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].LQI = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].AverageRssi = emberAfGetInt8s(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].LastRssi = emberAfGetInt8s(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].FrameErrorRate = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].MessageErrorRate = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].RxOnWhenIdle = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].FullThreadDevice = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].FullNetworkData = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].IsChild = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback> * cb =
+        Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                      Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _RouteTable data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(8);
+        data[i].ExtAddress = emberAfGetInt64u(message, 0, 8);
+        message += 8;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].Rloc16 = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].RouterId = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].NextHop = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].PathCost = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].LQIIn = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].LQIOut = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].Age = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].Allocated = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].LinkEstablished = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback> * cb =
+        Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                      Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _SecurityPolicy data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].RotationTime = emberAfGetInt16u(message, 0, 2);
+        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].Flags = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback> * cb =
+        Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                                    Callback::Cancelable * onSuccessCallback,
+                                                                                    Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    _OperationalDatasetComponents data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].ActiveTimestampPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].PendingTimestampPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].MasterKeyPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].NetworkNamePresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].ExtendedPanIdPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].MeshLocalPrefixPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].DelayPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].PanIdPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].ChannelPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].PskcPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].SecurityPolicyPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].ChannelMaskPresent = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback> * cb =
+        Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>::FromCancelable(
+            onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                               Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+    uint8_t data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i] = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback> * cb =
+        Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
 }
 
 bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::app::Command * commandObj, uint8_t * setupPIN)
@@ -2406,25 +2667,26 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(chip::app::Command * commandObj, uint8_t action,
-                                                                             uint32_t delayedActionTime)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(chip::app::Command * commandObj, uint8_t action,
+                                                                               uint32_t delayedActionTime)
 {
     ChipLogProgress(Zcl, "ApplyUpdateRequestResponse:");
     ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
     ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback");
 
-    Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback> * cb =
-        Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, action, delayedActionTime);
     return true;
 }
 
-bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
-                                                                     uint32_t delayedActionTime, uint8_t * imageURI,
-                                                                     uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                                     uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
+                                                                       uint32_t delayedActionTime, uint8_t * imageURI,
+                                                                       uint32_t softwareVersion, chip::ByteSpan updateToken,
+                                                                       uint8_t userConsentNeeded,
+                                                                       chip::ByteSpan metadataForRequestor)
 {
     ChipLogProgress(Zcl, "QueryImageResponse:");
     LogStatus(status);
@@ -2434,9 +2696,9 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::
     ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", softwareVersion);
     ChipLogProgress(Zcl, "  updateToken: %zu", updateToken.size());
     ChipLogProgress(Zcl, "  userConsentNeeded: %" PRIu8 "", userConsentNeeded);
-    ChipLogProgress(Zcl, "  metadataForClient: %zu", metadataForClient.size());
+    ChipLogProgress(Zcl, "  metadataForRequestor: %zu", metadataForRequestor.size());
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterQueryImageResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterQueryImageResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -2446,9 +2708,9 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::
         return true;
     }
 
-    Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback> * cb =
-        Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded, metadataForClient);
+    Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded, metadataForRequestor);
     return true;
 }
 
@@ -2708,13 +2970,13 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::app::Command * 
 bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     NodeId sourceId = emberAfCurrentCommand()->SourceNodeId();
     ChipLogProgress(Zcl, "  Source NodeId: %" PRIu64, sourceId);
 
     EndpointId endpointId = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
-    ChipLogProgress(Zcl, "  Source EndpointId: 0x%04x", endpointId);
+    ChipLogProgress(Zcl, "  Source EndpointId: 0x%08x", endpointId);
 
     // TODO onFailureCallback is just here because of the CHECK_MESSAGE_LENGTH macro. It needs to be removed.
     Callback::Cancelable * onFailureCallback = nullptr;
@@ -2722,8 +2984,8 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
     while (messageLen)
     {
         CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+        AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+        ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
         GET_REPORT_CALLBACK("emberAfReportAttributesCallback");
 

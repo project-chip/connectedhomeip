@@ -34,9 +34,8 @@
 
 namespace chip {
 namespace Mdns {
-// TODO(#5556): Convert MDNS to WatchableSocket.
-void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout);
-void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet);
+void GetMdnsTimeout(timeval & timeout);
+void HandleMdnsTimeout();
 } // namespace Mdns
 } // namespace chip
 
@@ -163,12 +162,11 @@ void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeou
     // TODO(#5556): Integrate timer platform details with WatchableEventManager.
     mSystemLayer->GetTimeout(nextTimeout);
 
-    mSelected = mRequest;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-    // TODO(#5556): Convert MDNS to WatchableSocket.
-    chip::Mdns::UpdateMdnsDataset(mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet, mMaxFd, nextTimeout);
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
+    chip::Mdns::GetMdnsTimeout(nextTimeout);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
+    mSelected = mRequest;
 }
 
 void WatchableEventManager::WaitForEvents()
@@ -202,9 +200,8 @@ void WatchableEventManager::HandleEvents()
         }
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-    // TODO(#5556): Convert MDNS to WatchableSocket.
-    chip::Mdns::ProcessMdns(mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet);
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
+    chip::Mdns::HandleMdnsTimeout();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 }
 

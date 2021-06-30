@@ -47,7 +47,8 @@ declare_args() {
 }
 
 if (chip_target_style == "") {
-  if (current_os != "freertos" && current_os != "zephyr") {
+  if (current_os != "freertos" && current_os != "zephyr" &&
+      current_os != "mbed") {
     chip_target_style = "unix"
   } else {
     chip_target_style = "embedded"
