@@ -57,8 +57,8 @@ tests:
               - name: "deltaPositionMilliseconds"
                 value: 100
 
-    - label: "Media Playback Skip Seek Command"
-      command: "MediaSkipSeek"
+    - label: "Media Playback Seek Command"
+      command: "MediaSeek"
       arguments:
           values:
               - name: "position"

@@ -7464,7 +7464,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaSkipSeek",
+              "name": "MediaSeek",
               "code": 10,
               "mfgCode": null,
               "source": "client",
@@ -7579,7 +7579,7 @@
               "outgoing": 0
             },
             {
-              "name": "MediaSkipSeekResponse",
+              "name": "MediaSeekResponse",
               "code": 11,
               "mfgCode": null,
               "source": "server",

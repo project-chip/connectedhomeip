@@ -1603,7 +1603,7 @@ public:
             err = TestSendClusterMediaPlaybackCommandMediaSkipBackward_9();
             break;
         case 10:
-            err = TestSendClusterMediaPlaybackCommandMediaSkipSeek_10();
+            err = TestSendClusterMediaPlaybackCommandMediaSeek_10();
             break;
         }
 
@@ -2317,20 +2317,20 @@ private:
         runner->NextTest();
     }
 
-    // Test Media Playback Skip Seek Command
+    // Test Media Playback Seek Command
     typedef void (*SuccessCallback_10)(void * context, uint8_t mediaPlaybackStatus);
     chip::Callback::Callback<SuccessCallback_10> * mOnSuccessCallback_10     = nullptr;
     chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_10 = nullptr;
     bool mIsFailureExpected_10                                               = 0;
 
-    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaSkipSeek_10()
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaSeek_10()
     {
-        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Seek Command: Sending command...");
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Seek Command: Sending command...");
 
         mOnFailureCallback_10 = new chip::Callback::Callback<DefaultFailureCallback>(
-            OnTestSendClusterMediaPlaybackCommandMediaSkipSeek_10_FailureResponse, this);
+            OnTestSendClusterMediaPlaybackCommandMediaSeek_10_FailureResponse, this);
         mOnSuccessCallback_10 = new chip::Callback::Callback<SuccessCallback_10>(
-            OnTestSendClusterMediaPlaybackCommandMediaSkipSeek_10_SuccessResponse, this);
+            OnTestSendClusterMediaPlaybackCommandMediaSeek_10_SuccessResponse, this);
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(mDevice, 3);
@@ -2338,7 +2338,7 @@ private:
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         uint64_t positionArgument = 100ULL;
-        err = cluster.MediaSkipSeek(mOnSuccessCallback_10->Cancel(), mOnFailureCallback_10->Cancel(), positionArgument);
+        err = cluster.MediaSeek(mOnSuccessCallback_10->Cancel(), mOnFailureCallback_10->Cancel(), positionArgument);
 
         if (CHIP_NO_ERROR != err)
         {
@@ -2349,9 +2349,9 @@ private:
         return err;
     }
 
-    static void OnTestSendClusterMediaPlaybackCommandMediaSkipSeek_10_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterMediaPlaybackCommandMediaSeek_10_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Seek Command: Failure Response");
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Seek Command: Failure Response");
 
         TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
@@ -2368,9 +2368,9 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterMediaPlaybackCommandMediaSkipSeek_10_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    static void OnTestSendClusterMediaPlaybackCommandMediaSeek_10_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
     {
-        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Seek Command: Success Response");
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Seek Command: Success Response");
 
         TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
