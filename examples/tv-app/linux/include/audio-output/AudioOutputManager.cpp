@@ -63,29 +63,13 @@ vector<EmberAfAudioOutputInfo> AudioOutputManager::proxyGetListOfAudioOutputInfo
     return audioOutputInfos;
 }
 
-bool AudioOutputManager::proxySelectOutputRequest(uint8_t index)
+bool audioOutputClusterSelectOutput(uint8_t index)
 {
     // TODO: Insert code here
     return true;
 }
-bool AudioOutputManager::proxyRenameOutputRequest(uint8_t index, uint8_t * name)
+bool audioOutputClusterRenameOutput(uint8_t index, uint8_t * name)
 {
     // TODO: Insert code here
-    return true;
-}
-
-bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * command, unsigned char index, uint8_t * name)
-{
-    bool success         = AudioOutputManager().proxyRenameOutputRequest(index, name);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-
-bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::Command * command, unsigned char index)
-{
-    bool success         = AudioOutputManager().proxySelectOutputRequest(index);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
     return true;
 }
