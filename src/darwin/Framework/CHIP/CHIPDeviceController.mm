@@ -378,24 +378,24 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
                      queue:(dispatch_queue_t)queue
                      error:(NSError * __autoreleasing *)error
 {
-    __block BOOL didSucceed = NO;
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     if (![self isRunning]) {
         [self checkForError:errorCode logMsg:kErrorNotRunning error:error];
-        return didSucceed;
+        return NO;
     }
 
-    dispatch_sync(_chipWorkQueue, ^{
+    dispatch_async(_chipWorkQueue, ^{
         CHIPDeviceConnectionBridge * connectionBridge = new CHIPDeviceConnectionBridge(completionHandler, queue);
         errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
 
         if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:error]) {
+            // Errors are propagated to the caller thru completionHandler.
+            // No extra error handling is needed here.
             return;
         }
-        didSucceed = YES;
     });
 
-    return didSucceed;
+    return YES;
 }
 
 - (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error

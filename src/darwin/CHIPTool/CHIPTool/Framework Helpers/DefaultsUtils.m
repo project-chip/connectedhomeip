@@ -105,14 +105,15 @@ BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallbac
                                     error:&error];
 }
 
-bool CHIPIsDevicePaired(uint64_t deviceId)
+BOOL CHIPIsDevicePaired(uint64_t deviceId)
 {
     CHIPDeviceController * controller = InitializeCHIP();
 
     NSError * error;
     bool paired = [controller isDevicePaired:deviceId error:&error];
     if (error.code != CHIPSuccess) {
-        NSLog(@"Got back error retrieve device info with deviceId %llu", deviceId);
+        NSLog(@"Error retrieving device info for deviceId %llu", deviceId);
+        paired = NO;
     }
     return paired;
 }
