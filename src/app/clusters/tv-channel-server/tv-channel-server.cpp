@@ -39,24 +39,57 @@
  ******************************************************************************/
 
 #include <app/Command.h>
+#include <app/common/gen/af-structs.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 
-bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * commandObj, unsigned char *)
+EmberAfTvChannelInfo tvChannelClusterChangeChannel(std::string match);
+bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumer, uint16_t minorNumber);
+bool tvChannelClusterSkipChannel(uint16_t count);
+
+void sendResponse(chip::app::Command * command, EmberAfTvChannelInfo channelInfo)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TV_CHANNEL_CLUSTER_ID,
+                                               ZCL_CHANGE_CHANNEL_RESPONSE_COMMAND_ID,
+                                               (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::TLV::TLVWriter * writer          = nullptr;
+    SuccessOrExit(err = command->PrepareCommand(cmdParams));
+    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // TODO: Struct as param is not supported. Getting an error
+    // SuccessOrExit(err = writer->Put(chip::TLV::ContextTag(0), channelInfo));
+    // EmberAfTvChannelErrorType. errorType
+    // SuccessOrExit(err = writer->Put(chip::TLV::ContextTag(1), errorType));
+    SuccessOrExit(err = command->FinishCommand());
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to send ChangeChannel. Error:%s", chip::ErrorStr(err));
+    }
+}
+
+bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * command, uint8_t * match)
+{
+    std::string matchString(reinterpret_cast<char *>(match));
+    EmberAfTvChannelInfo channelInfo = tvChannelClusterChangeChannel(matchString);
+    sendResponse(command, channelInfo);
+    return true;
+}
+
+bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * command, unsigned short majorNumber,
+                                                          unsigned short minorNumber)
+{
+    bool success         = tvChannelClusterChangeChannelByNumber(majorNumber, minorNumber);
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * commandObj, unsigned short, unsigned short)
+bool emberAfTvChannelClusterSkipChannelCallback(chip::app::Command * command, unsigned short count)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-bool emberAfTvChannelClusterSkipChannelCallback(chip::app::Command * commandObj, unsigned short)
-{
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    bool success         = tvChannelClusterSkipChannel(count);
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }

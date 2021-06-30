@@ -16,7 +16,7 @@
  */
 
 #include "TvChannelManager.h"
-
+#include <app/Command.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
@@ -47,24 +47,6 @@ exit:
     return err;
 }
 
-EmberAfTvChannelInfo TvChannelManager::proxyChangeChannelRequest(std::string match)
-{
-    // TODO: Insert code here
-    EmberAfTvChannelInfo channel = {};
-    return channel;
-}
-
-bool TvChannelManager::proxyChangeChannelByNumberRequest(uint16_t majorNumer, uint16_t minorNumber)
-{
-    // TODO: Insert code here
-    return true;
-}
-bool TvChannelManager::proxySkipChannelRequest(uint16_t count)
-{
-    // TODO: Insert code here
-    return true;
-}
-
 std::vector<EmberAfTvChannelInfo> TvChannelManager::proxyGetTvChannelList()
 {
     // TODO: Insert code here
@@ -88,38 +70,27 @@ std::vector<EmberAfTvChannelInfo> TvChannelManager::proxyGetTvChannelList()
     return tvChannels;
 }
 
-static void sendResponse(const char * responseName, EmberAfTvChannelInfo channelInfo)
+EmberAfTvChannelInfo tvChannelClusterChangeChannel(std::string match)
 {
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_TV_CHANNEL_CLUSTER_ID,
-                              ZCL_CHANGE_CHANNEL_RESPONSE_COMMAND_ID, "uusss", channelInfo.majorNumber, channelInfo.minorNumber,
-                              channelInfo.affiliateCallSign, channelInfo.callSign, channelInfo.name);
-
-    EmberStatus status = emberAfSendResponse();
-    if (status != EMBER_SUCCESS)
-    {
-        emberAfMediaPlaybackClusterPrintln("Failed to send %s: 0x%X", responseName, status);
-    }
+    // TODO: Insert code here
+    EmberAfTvChannelInfo channel = {};
+    char affiliateCallSign[]     = "exampleResponseASign";
+    char callSign[]              = "exampleResponseCSign";
+    char name[]                  = "exampleResponseName";
+    channel.affiliateCallSign    = ByteSpan(Uint8::from_char(affiliateCallSign), sizeof(affiliateCallSign));
+    channel.callSign             = ByteSpan(Uint8::from_char(callSign), sizeof(callSign));
+    channel.name                 = ByteSpan(Uint8::from_char(name), sizeof(name));
+    channel.majorNumber          = static_cast<uint8_t>(1);
+    channel.minorNumber          = static_cast<uint16_t>(2);
+    return channel;
 }
-
-bool emberAfTvChannelClusterChangeChannelCallback(char * match)
+bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
 {
-    EmberAfTvChannelInfo channelInfo = TvChannelManager().proxyChangeChannelRequest(match);
-    sendResponse("ChangeChannel", channelInfo);
+    // TODO: Insert code here
     return true;
 }
-
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(unsigned short majorNumber, unsigned short minorNumber)
+bool tvChannelClusterSkipChannel(uint16_t count)
 {
-    bool success         = TvChannelManager().proxyChangeChannelByNumberRequest(majorNumber, minorNumber);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-
-bool emberAfTvChannelClusterSkipChannelCallback(unsigned short count)
-{
-    bool success         = TvChannelManager().proxySkipChannelRequest(count);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
+    // TODO: Insert code here
     return true;
 }

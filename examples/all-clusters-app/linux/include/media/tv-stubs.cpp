@@ -33,29 +33,12 @@
  */
 /****************************************************************************
  * @file
- * @brief Routines for the Audio Output plugin, the
- *server implementation of the Audio Output cluster.
+ * @brief Routines for TV stubs
+ *server stub implementation of TV cluster code.
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
-#include <app/util/af.h>
-
-bool audioOutputClusterSelectOutput(uint8_t index);
-bool audioOutputClusterRenameOutput(uint8_t index, uint8_t * name);
-
-bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * command, unsigned char index, uint8_t * name)
+bool lowPowerClusterSleep()
 {
-    bool success         = audioOutputClusterRenameOutput(index, name);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-
-bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::Command * command, unsigned char index)
-{
-    bool success         = audioOutputClusterSelectOutput(index);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
     return true;
 }

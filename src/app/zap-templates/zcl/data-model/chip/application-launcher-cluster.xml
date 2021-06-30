@@ -33,7 +33,9 @@ limitations under the License.
     <command source="client" code="0x00" name="LaunchApp" optional="false">
       <description>Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response.</description>
       <arg name="data" type="CHAR_STRING"/>
-      <arg name="application" type="ApplicationLauncherApp" array="true"/>
+      <!-- TODO: Covert this to stuct one it is supported -->
+      <arg name="catalogVendorId" type="INT16U"/>
+      <arg name="applicationId" type="CHAR_STRING"/>
     </command>
 
     <command source="server" code="0x00" name="LaunchAppResponse" optional="false">
@@ -47,6 +49,11 @@ limitations under the License.
   <struct name="ApplicationLauncherApp">
     <item name="catalogVendorId" type="INT16U"/>
     <item name="applicationId" type="CHAR_STRING"/>
+  </struct>
+
+  <struct name="ApplicationLauncherResponse">
+    <item name="status" type="ApplicationLauncherStatus"/>
+    <item name="data" type="CHAR_STRING"/>
   </struct>
 
   <enum name="ApplicationLauncherStatus" type="ENUM8">
