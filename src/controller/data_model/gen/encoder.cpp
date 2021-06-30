@@ -264,9 +264,9 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_MEDIA_PLAY_COMMAND_ID (0x00)
 #define ZCL_MEDIA_PREVIOUS_COMMAND_ID (0x04)
 #define ZCL_MEDIA_REWIND_COMMAND_ID (0x06)
+#define ZCL_MEDIA_SEEK_COMMAND_ID (0x0A)
 #define ZCL_MEDIA_SKIP_BACKWARD_COMMAND_ID (0x09)
 #define ZCL_MEDIA_SKIP_FORWARD_COMMAND_ID (0x08)
-#define ZCL_MEDIA_SKIP_SEEK_COMMAND_ID (0x0A)
 #define ZCL_MEDIA_START_OVER_COMMAND_ID (0x03)
 #define ZCL_MEDIA_STOP_COMMAND_ID (0x02)
 
@@ -2956,9 +2956,9 @@ PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttribute(uint8_t s
 | * MediaPlay                                                         |   0x00 |
 | * MediaPrevious                                                     |   0x04 |
 | * MediaRewind                                                       |   0x06 |
+| * MediaSeek                                                         |   0x0A |
 | * MediaSkipBackward                                                 |   0x09 |
 | * MediaSkipForward                                                  |   0x08 |
-| * MediaSkipSeek                                                     |   0x0A |
 | * MediaStartOver                                                    |   0x03 |
 | * MediaStop                                                         |   0x02 |
 |------------------------------------------------------------------------------|

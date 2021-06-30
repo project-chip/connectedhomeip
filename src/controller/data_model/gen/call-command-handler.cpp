@@ -1,4 +1,4 @@
-/*
+
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *
@@ -1254,7 +1254,7 @@ EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterComman
             wasHandled = emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(nullptr, mediaPlaybackStatus);
             break;
         }
-        case ZCL_MEDIA_SKIP_SEEK_RESPONSE_COMMAND_ID: {
+        case ZCL_MEDIA_SEEK_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
             uint8_t mediaPlaybackStatus;
 
@@ -1264,7 +1264,7 @@ EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterComman
             }
             mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfMediaPlaybackClusterMediaSkipSeekResponseCallback(nullptr, mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaSeekResponseCallback(nullptr, mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_START_OVER_RESPONSE_COMMAND_ID: {
