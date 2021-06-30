@@ -64,6 +64,14 @@ async def create_container(docker_image_tag: str,  port: int) -> Container:
 
     return container
 
+def call_rpc(device_server,  method_name, *params):
+    method_list: List = device_server.system.listMethods()  # type: ignore
+    if method_name in method_list:
+        response_dict = getattr(device_server, method_name)(*params)
+        return response_dict['result']
+    else:
+        raise RuntimeError(f"RPC Method {method_name} is not available.");
+
 async def main():
     try: 
         container_1 = await create_container(docker_image_tag="chip-test", port=5050)
@@ -90,7 +98,9 @@ async def main():
     try: 
         print("Calling RPCs")
         print("echo_alive Response:" + server_1.echo_alive("Test"))
-        scan = server_1.ble_scan()
+        parameterList: List = []
+        print(server_1.system.listMethods())
+        scan = call_rpc(server_1, "ble_scan")
         print(f"scan: {scan}")
         connect = server_1.ble_connect(discriminator, pin_code, node_id)
         print(f"connect: {connect}")
