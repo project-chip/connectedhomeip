@@ -105,7 +105,7 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
 
 CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    if (max_length < (chip::Mdns::kMaxInstanceNameSize + 1))
+    if (maxLength < (chip::Mdns::kMaxInstanceNameSize + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
