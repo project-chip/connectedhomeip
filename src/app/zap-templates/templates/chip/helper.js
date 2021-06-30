@@ -271,6 +271,19 @@ function isManufacturerSpecificCommand()
   return !!this.mfgCode;
 }
 
+function valid_callback_attribute_types(options)
+{
+  // Valid types should match what can be returned in asCallbackAttributeType() below.
+  const validTypesList =
+      [ 'List', 'String', 'Boolean', 'Int8u', 'Int16u', 'Int32u', 'Int64u', 'Int8s', 'Int16s', 'Int32s', 'Int64s' ];
+  const validTypes = validTypesList.map(type => {
+    return {
+      'type': type
+    }
+  });
+  return asBlocks.call(this, Promise.resolve(validTypes), options);
+}
+
 function asCallbackAttributeType(attributeType)
 {
   switch (parseInt(attributeType)) {
@@ -374,4 +387,5 @@ exports.chip_client_has_list_attributes       = chip_client_has_list_attributes;
 exports.isWritableAttribute                   = isWritableAttribute;
 exports.isReportableAttribute                 = isReportableAttribute;
 exports.isManufacturerSpecificCommand         = isManufacturerSpecificCommand;
+exports.valid_callback_attribute_types        = valid_callback_attribute_types;
 exports.asCallbackAttributeType               = asCallbackAttributeType;
