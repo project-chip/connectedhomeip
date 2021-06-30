@@ -5615,7 +5615,7 @@ JNI_METHOD(jlong, BindingCluster, initWithDevice)(JNIEnv * env, jobject self, jl
 }
 
 JNI_METHOD(void, BindingCluster, bind)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jint clusterId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jlong clusterId)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5661,7 +5661,7 @@ exit:
     }
 }
 JNI_METHOD(void, BindingCluster, unbind)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jint clusterId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jlong clusterId)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10639,7 +10639,7 @@ JNI_METHOD(jlong, ScenesCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
 
 JNI_METHOD(void, ScenesCluster, addScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId, jint transitionTime, jstring sceneName,
- jint clusterId, jint length, jint value)
+ jlong clusterId, jint length, jint value)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;

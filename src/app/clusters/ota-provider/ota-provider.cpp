@@ -42,15 +42,15 @@ OTAProviderDelegate * gDelegateTable[EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOI
 
 OTAProviderDelegate * GetDelegate(chip::EndpointId endpoint)
 {
-    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_OTA_PROVIDER_CLUSTER_ID);
-    return (ep == 0xFF ? NULL : gDelegateTable[ep]);
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_OTA_PROVIDER_CLUSTER_ID);
+    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
 }
 
 bool SendStatusIfDelegateNull(chip::EndpointId endpointId)
 {
     if (GetDelegate(endpointId) == nullptr)
     {
-        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%" PRIu8, endpointId);
+        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%" PRIu16, endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
         return true;
     }
@@ -199,8 +199,8 @@ namespace clusters {
 
 void OTAProvider::SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate)
 {
-    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpointId, ZCL_OTA_PROVIDER_CLUSTER_ID);
-    if (ep != 0xFF)
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpointId, ZCL_OTA_PROVIDER_CLUSTER_ID);
+    if (ep != 0xFFFF)
     {
         gDelegateTable[ep] = delegate;
     }

@@ -38,7 +38,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     {
         if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
         {
-            ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
+            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
         }
 
@@ -48,7 +48,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     {
         if (attributeId != ZCL_CURRENT_LEVEL_ATTRIBUTE_ID)
         {
-            ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
+            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
         }
 
@@ -64,7 +64,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
     else
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
+        ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
         return;
     }
 }

@@ -206,7 +206,7 @@ static EmberStatus send(const MessageSendDestination & destination, EmberApsFram
                         uint8_t * message, bool broadcast, EmberNodeId alias, uint8_t sequence, EmberAfMessageSentFunction callback)
 {
     EmberStatus status;
-    uint8_t index;
+    uint16_t index;
     uint8_t messageSentIndex;
     uint8_t messageTag = INVALID_MESSAGE_TAG;
 
@@ -245,7 +245,7 @@ static EmberStatus send(const MessageSendDestination & destination, EmberApsFram
     else
     {
         index = emberAfIndexFromEndpoint(apsFrame->sourceEndpoint);
-        if (index == 0xFF)
+        if (index == 0xFFFF)
         {
             return EMBER_INVALID_ENDPOINT;
         }

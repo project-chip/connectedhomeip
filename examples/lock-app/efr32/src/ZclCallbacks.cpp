@@ -34,13 +34,13 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
-        EFR32_LOG("Unknown cluster ID: %d", clusterId);
+        EFR32_LOG("Unknown cluster ID: %" PRIx32, clusterId);
         return;
     }
 
     if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
     {
-        EFR32_LOG("Unknown attribute ID: %d", attributeId);
+        EFR32_LOG("Unknown attribute ID: %" PRIx32, attributeId);
         return;
     }
 
