@@ -36,6 +36,7 @@
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 
@@ -51,29 +52,9 @@ using namespace chip::Protocols;
 
 using TestContext = chip::Test::MessagingContext;
 
-class LoopbackTransport : public Transport::Base
-{
-public:
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
-    {
-        ReturnErrorOnFailure(mMessageSendError);
-        mSentMessageCount++;
-
-        System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-        HandleMessageReceived(address, std::move(receivedMessage));
-
-        return CHIP_NO_ERROR;
-    }
-
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-
-    uint32_t mSentMessageCount   = 0;
-    CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
-};
-
 namespace {
 TransportMgrBase gTransportMgr;
-LoopbackTransport gLoopback;
+Test::LoopbackTransport gLoopback;
 
 OperationalCredentialSet commissionerDevOpCred;
 OperationalCredentialSet accessoryDevOpCred;
