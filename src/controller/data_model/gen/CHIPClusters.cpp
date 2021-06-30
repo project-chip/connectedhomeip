@@ -6625,10 +6625,10 @@ CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::C
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-// OtaSoftwareUpdateServer Cluster Commands
-CHIP_ERROR OtaSoftwareUpdateServerCluster::ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, chip::ByteSpan updateToken,
-                                                              uint32_t newVersion)
+// OtaSoftwareUpdateProvider Cluster Commands
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback,
+                                                                chip::ByteSpan updateToken, uint32_t newVersion)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -6670,9 +6670,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR OtaSoftwareUpdateServerCluster::NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, chip::ByteSpan updateToken,
-                                                               uint32_t currentVersion)
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback,
+                                                                 chip::ByteSpan updateToken, uint32_t currentVersion)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -6714,11 +6714,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR OtaSoftwareUpdateServerCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint16_t vendorId,
-                                                      uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
-                                                      uint32_t currentVersion, uint8_t protocolsSupported, chip::ByteSpan location,
-                                                      uint8_t clientCanConsent, chip::ByteSpan metadataForServer)
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint16_t vendorId,
+                                                        uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
+                                                        uint32_t currentVersion, uint8_t protocolsSupported,
+                                                        chip::ByteSpan location, uint8_t requestorCanConsent,
+                                                        chip::ByteSpan metadataForProvider)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -6753,10 +6754,10 @@ CHIP_ERROR OtaSoftwareUpdateServerCluster::QueryImage(Callback::Cancelable * onS
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
     // location: charString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
-    // clientCanConsent: boolean
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clientCanConsent));
-    // metadataForServer: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), metadataForServer));
+    // requestorCanConsent: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
+    // metadataForProvider: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), metadataForProvider));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6774,16 +6775,16 @@ exit:
     return err;
 }
 
-// OtaSoftwareUpdateServer Cluster Attributes
-CHIP_ERROR OtaSoftwareUpdateServerCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
+// OtaSoftwareUpdateProvider Cluster Attributes
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodeOtaSoftwareUpdateProviderClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR OtaSoftwareUpdateServerCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback)
 {
     chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;

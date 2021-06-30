@@ -2547,7 +2547,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 } // namespace NetworkCommissioning
 
-namespace OtaSoftwareUpdateServer {
+namespace OtaSoftwareUpdateProvider {
 
 void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
@@ -2626,7 +2626,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(apCommandObj, updateToken, newVersion);
+                wasHandled =
+                    emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(apCommandObj, updateToken, newVersion);
             }
             break;
         }
@@ -2693,7 +2694,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 wasHandled =
-                    emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(apCommandObj, updateToken, currentVersion);
+                    emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(apCommandObj, updateToken, currentVersion);
             }
             break;
         }
@@ -2706,8 +2707,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             uint32_t currentVersion;
             /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported;
             const uint8_t * location;
-            uint8_t clientCanConsent;
-            chip::ByteSpan metadataForServer;
+            uint8_t requestorCanConsent;
+            chip::ByteSpan metadataForProvider;
             bool argExists[9];
 
             memset(argExists, 0, sizeof argExists);
@@ -2761,12 +2762,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     TLVUnpackError = aDataTlv.GetDataPtr(location);
                     break;
                 case 7:
-                    TLVUnpackError = aDataTlv.Get(clientCanConsent);
+                    TLVUnpackError = aDataTlv.Get(requestorCanConsent);
                     break;
                 case 8: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    metadataForServer    = chip::ByteSpan(data, aDataTlv.GetLength());
+                    metadataForProvider  = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
                 default:
@@ -2789,9 +2790,9 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 9 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
                     apCommandObj, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
-                    const_cast<uint8_t *>(location), clientCanConsent, metadataForServer);
+                    const_cast<uint8_t *>(location), requestorCanConsent, metadataForProvider);
             }
             break;
         }
@@ -2799,12 +2800,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               ZCL_OTA_SERVER_CLUSTER_ID, aCommandId,
+                                                               ZCL_OTA_PROVIDER_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_OTA_SERVER_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_OTA_PROVIDER_CLUSTER_ID);
             return;
         }
         }
@@ -2814,7 +2815,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           ZCL_OTA_SERVER_CLUSTER_ID, aCommandId,
+                                                           ZCL_OTA_PROVIDER_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -2825,7 +2826,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     }
 }
 
-} // namespace OtaSoftwareUpdateServer
+} // namespace OtaSoftwareUpdateProvider
 
 namespace OnOff {
 
@@ -3444,8 +3445,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case ZCL_OTA_SERVER_CLUSTER_ID:
-        clusters::OtaSoftwareUpdateServer::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+    case ZCL_OTA_PROVIDER_CLUSTER_ID:
+        clusters::OtaSoftwareUpdateProvider::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case ZCL_ON_OFF_CLUSTER_ID:
         clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
