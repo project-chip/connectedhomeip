@@ -257,8 +257,8 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
     }
 
-    ChipLogDetail(Inet, "New secure session created for device 0x%08" PRIx32 "%08" PRIx32 ", key %d!!",
-                  static_cast<uint32_t>(peerNodeId >> 32), static_cast<uint32_t>(peerNodeId), peerKeyId);
+    ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
+                  peerKeyId);
     state = nullptr;
     ReturnErrorOnFailure(
         mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state));
@@ -520,8 +520,7 @@ exit:
 void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state)
 {
     NodeId peerNodeId = state.GetPeerNodeId();
-    ChipLogDetail(Inet, "Marking old secure session for device 0x%08" PRIx32 "%08" PRIx32 " as expired",
-                  static_cast<uint32_t>(peerNodeId >> 32), static_cast<uint32_t>(peerNodeId));
+    ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired", ChipLogValueX64(peerNodeId));
 
     if (mCB != nullptr)
     {
