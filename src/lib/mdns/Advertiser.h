@@ -24,8 +24,8 @@
 #include <core/Optional.h>
 #include <core/PeerId.h>
 #include <inet/InetLayer.h>
-#include <lib/support/ChipMemString.h>
 #include <lib/support/Span.h>
+#include <support/ChipMemString.h>
 
 namespace chip {
 namespace Mdns {
