@@ -2804,6 +2804,14 @@ CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_MediaRewind(chip::Controller::De
     cluster.Associate(device, ZCLendpointId);
     return cluster.MediaRewind(nullptr, nullptr);
 }
+CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_MediaSeek(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                          chip::GroupId, uint64_t position)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::MediaPlaybackCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.MediaSeek(nullptr, nullptr, position);
+}
 CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                   chip::GroupId, uint64_t deltaPositionMilliseconds)
 {
@@ -2819,14 +2827,6 @@ CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_MediaSkipForward(chip::Controlle
     chip::Controller::MediaPlaybackCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.MediaSkipForward(nullptr, nullptr, deltaPositionMilliseconds);
-}
-CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                              chip::GroupId, uint64_t position)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::MediaPlaybackCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.MediaSkipSeek(nullptr, nullptr, position);
 }
 CHIP_ERROR chip_ime_AppendCommand_MediaPlayback_MediaStartOver(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                chip::GroupId)

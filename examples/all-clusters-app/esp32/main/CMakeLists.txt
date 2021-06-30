@@ -27,7 +27,6 @@ set(PRIV_INCLUDE_DIRS_LIST
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/linux/include/tv-callbacks"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"

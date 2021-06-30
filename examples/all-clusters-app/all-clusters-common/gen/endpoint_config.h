@@ -2567,7 +2567,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (200)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (201)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -2792,7 +2792,8 @@
             { 0x0506, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* MediaSkipForwardResponse */                                    \
             { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MediaSkipBackward */                                           \
             { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* MediaSkipBackwardResponse */                                   \
-            { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MediaSkipSeek */                                               \
+            { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MediaSeek */                                                   \
+            { 0x0506, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* MediaSeekResponse */                                           \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Media Input (server) */                                                                       \
             { 0x0507, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SelectInput */                                                 \

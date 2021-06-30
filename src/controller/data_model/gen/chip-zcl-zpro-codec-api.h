@@ -1976,9 +1976,9 @@ chip::System::PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttri
 | * MediaPlay                                                         |   0x00 |
 | * MediaPrevious                                                     |   0x04 |
 | * MediaRewind                                                       |   0x06 |
+| * MediaSeek                                                         |   0x0A |
 | * MediaSkipBackward                                                 |   0x09 |
 | * MediaSkipForward                                                  |   0x08 |
-| * MediaSkipSeek                                                     |   0x0A |
 | * MediaStartOver                                                    |   0x03 |
 | * MediaStop                                                         |   0x02 |
 |------------------------------------------------------------------------------|

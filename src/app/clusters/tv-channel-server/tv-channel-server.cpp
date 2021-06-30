@@ -57,7 +57,7 @@ void sendResponse(chip::app::Command * command, EmberAfTvChannelInfo channelInfo
     chip::TLV::TLVWriter * writer          = nullptr;
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
     VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // TODO: Struct as param is not supported. Getting an error
+    // TODO: Enable this once struct as param is supported
     // SuccessOrExit(err = writer->Put(chip::TLV::ContextTag(0), channelInfo));
     // EmberAfTvChannelErrorType. errorType
     // SuccessOrExit(err = writer->Put(chip::TLV::ContextTag(1), errorType));
@@ -72,8 +72,10 @@ exit:
 bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * command, uint8_t * match)
 {
     std::string matchString(reinterpret_cast<char *>(match));
-    EmberAfTvChannelInfo channelInfo = tvChannelClusterChangeChannel(matchString);
-    sendResponse(command, channelInfo);
+    // TODO: Enable this once struct as param is supported
+    // EmberAfTvChannelInfo channelInfo = tvChannelClusterChangeChannel(matchString);
+    // sendResponse(command, channelInfo);
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     return true;
 }
 

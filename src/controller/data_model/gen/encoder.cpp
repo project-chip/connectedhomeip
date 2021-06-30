@@ -258,8 +258,11 @@ PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uin
  */
 PacketBufferHandle encodeApplicationBasicClusterReadApplicationStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadApplicationBasicApplicationStatus", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0007);
+    COMMAND_HEADER("ReadApplicationBasicApplicationStatus", ApplicationBasic::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ApplicationBasic::Attributes::Ids::ApplicationStatus);
     COMMAND_FOOTER();
 }
 
@@ -3154,9 +3157,9 @@ PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttribute(uint8_t s
 | * MediaPlay                                                         |   0x00 |
 | * MediaPrevious                                                     |   0x04 |
 | * MediaRewind                                                       |   0x06 |
+| * MediaSeek                                                         |   0x0A |
 | * MediaSkipBackward                                                 |   0x09 |
 | * MediaSkipForward                                                  |   0x08 |
-| * MediaSkipSeek                                                     |   0x0A |
 | * MediaStartOver                                                    |   0x03 |
 | * MediaStop                                                         |   0x02 |
 |------------------------------------------------------------------------------|
