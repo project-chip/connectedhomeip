@@ -131,7 +131,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        requiredSize = snprintf(buffer, bufferLen, "_S%03u", subtype.code);
+        requiredSize = snprintf(buffer, bufferLen, "_S%u", subtype.code);
         break;
     case DiscoveryFilterType::kLong:
         // 12-bit number
@@ -139,16 +139,16 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        requiredSize = snprintf(buffer, bufferLen, "_L%04u", subtype.code);
+        requiredSize = snprintf(buffer, bufferLen, "_L%u", subtype.code);
         break;
     case DiscoveryFilterType::kVendor:
         // Vendor ID is 16-bit, so if it fits in the code, it's good.
         // NOTE: size here is wrong, will be changed in upcming PR to remove leading zeros.
-        requiredSize = snprintf(buffer, bufferLen, "_V%03u", subtype.code);
+        requiredSize = snprintf(buffer, bufferLen, "_V%u", subtype.code);
         break;
     case DiscoveryFilterType::kDeviceType:
         // TODO: Not totally clear the size required here: see spec issue #3226
-        requiredSize = snprintf(buffer, bufferLen, "_T%03u", subtype.code);
+        requiredSize = snprintf(buffer, bufferLen, "_T%u", subtype.code);
         break;
     case DiscoveryFilterType::kCommissioningMode:
         if (subtype.code > 1)
@@ -187,11 +187,11 @@ CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter 
     {
         if (type == DiscoveryType::kCommissionableNode)
         {
-            requiredSize = snprintf(buffer, bufferLen, "_chipc");
+            requiredSize = snprintf(buffer, bufferLen, kCommissionableServiceName);
         }
         else if (type == DiscoveryType::kCommissionerNode)
         {
-            requiredSize = snprintf(buffer, bufferLen, "_chipd");
+            requiredSize = snprintf(buffer, bufferLen, kCommissionerServiceName);
         }
         else
         {

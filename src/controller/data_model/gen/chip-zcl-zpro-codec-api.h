@@ -44,6 +44,7 @@
 | DoorLock                                                            | 0x0101 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
+| FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -55,7 +56,7 @@
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
-| OtaSoftwareUpdateServer                                             | 0x0029 |
+| OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
@@ -1590,6 +1591,53 @@ chip::System::PacketBufferHandle encodeFixedLabelClusterReadClusterRevisionAttri
                                                                                      chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
+| Cluster FlowMeasurement                                             | 0x0404 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server read command for the measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server read command for the min measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server read command for the max measured value attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Flow Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
 | Cluster GeneralCommissioning                                        | 0x0030 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -1984,7 +2032,7 @@ chip::System::PacketBufferHandle
 encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
+| Cluster OtaSoftwareUpdateProvider                                   | 0x0029 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ApplyUpdateRequest                                                |   0x01 |
@@ -1997,17 +2045,18 @@ encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, ch
 
 /**
  * @brief
- *    Encode a OTA Software Update Server server discover command into buffer including the APS frame
+ *    Encode a OTA Software Update Provider server discover command into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_t seqNum,
-                                                                                        chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeOtaSoftwareUpdateProviderClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a OTA Software Update Server server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a OTA Software Update Provider server read command for the cluster revision attribute into buffer including the APS
+ * frame
  */
 chip::System::PacketBufferHandle
-encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+encodeOtaSoftwareUpdateProviderClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |

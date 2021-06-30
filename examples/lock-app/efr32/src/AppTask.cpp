@@ -172,7 +172,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     EFR32_LOG("App Task started");
-    SetDeviceName("EFR32LockDemo._chip._udp.local.");
+    SetDeviceName("EFR32LockDemo._matter._udp.local.");
 
     while (true)
     {

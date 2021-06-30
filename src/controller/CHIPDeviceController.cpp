@@ -260,7 +260,7 @@ void DeviceController::OnLocalNOCGenerated(void * context, const ByteSpan & noc)
         err = controller->GenerateOperationalCertificates(noc, chipCertSpan);
         SuccessOrExit(err);
 
-        err = admin->SetOperationalCert(chipCertSpan);
+        err = admin->SetOperationalCertsFromCertArray(chipCertSpan);
         SuccessOrExit(err);
     }
 
@@ -1588,14 +1588,6 @@ void BasicFailure(void * context, uint8_t status)
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 void DeviceCommissioner::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
-    if (mDeviceBeingPaired < kNumMaxActiveDevices)
-    {
-        Device * device = &mActiveDevices[mDeviceBeingPaired];
-        if (device->GetDeviceId() == nodeData.mPeerId.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
-        {
-            AdvanceCommissioningStage(CHIP_NO_ERROR);
-        }
-    }
     DeviceController::OnNodeIdResolved(nodeData);
     OperationalDiscoveryComplete(nodeData.mPeerId.GetNodeId());
 }
@@ -1619,6 +1611,16 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
 {
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+
+    if (commissioner->mDeviceBeingPaired < kNumMaxActiveDevices)
+    {
+        Device * deviceBeingPaired = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
+        if (device == deviceBeingPaired && commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+        {
+            commissioner->AdvanceCommissioningStage(CHIP_NO_ERROR);
+        }
+    }
+
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
     commissioner->mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);

@@ -362,7 +362,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                    ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
                                                    ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len),
                                                    chipCertSpan) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, admin->SetOperationalCert(chipCertSpan) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, admin->SetOperationalCertsFromCertArray(chipCertSpan) == CHIP_NO_ERROR);
 
     adminTable.Store(0);
     adminTable.ReleaseAdminId(0);

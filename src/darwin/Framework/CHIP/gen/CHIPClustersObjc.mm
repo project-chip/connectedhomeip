@@ -2183,22 +2183,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge
-    : public Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback> {
+class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge
+    : public Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback> {
 public:
-    CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>(CallbackFn, this)
+    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge() {};
+    ~CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t action, uint32_t delayedActionTime)
     {
-        CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge *>(context);
+        CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -2216,23 +2216,23 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge
-    : public Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback> {
+class CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge
+    : public Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> {
 public:
-    CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>(CallbackFn, this)
+    CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge() {};
+    ~CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-        chip::ByteSpan updateToken, uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
+        chip::ByteSpan updateToken, uint8_t userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
-        CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge *>(context);
+        CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -2241,7 +2241,7 @@ public:
                     @"softwareVersion" : [NSNumber numberWithUnsignedLong:softwareVersion],
                     @"updateToken" : [NSData dataWithBytes:updateToken.data() length:updateToken.size()],
                     @"userConsentNeeded" : [NSNumber numberWithUnsignedChar:userConsentNeeded],
-                    @"metadataForClient" : [NSData dataWithBytes:metadataForClient.data() length:metadataForClient.size()],
+                    @"metadataForRequestor" : [NSData dataWithBytes:metadataForRequestor.data() length:metadataForRequestor.size()],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2859,7 +2859,7 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+                values[i] = [NSNumber numberWithUnsignedLong:entries[i]];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -2894,7 +2894,7 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+                values[i] = [NSNumber numberWithUnsignedLong:entries[i]];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -2929,7 +2929,7 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -5353,8 +5353,8 @@ private:
 
 - (void)bind:(uint64_t)nodeId
             groupId:(uint16_t)groupId
-         endpointId:(uint8_t)endpointId
-          clusterId:(uint16_t)clusterId
+         endpointId:(uint16_t)endpointId
+          clusterId:(uint32_t)clusterId
     responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -5383,8 +5383,8 @@ private:
 }
 - (void)unbind:(uint64_t)nodeId
             groupId:(uint16_t)groupId
-         endpointId:(uint8_t)endpointId
-          clusterId:(uint16_t)clusterId
+         endpointId:(uint16_t)endpointId
+          clusterId:(uint32_t)clusterId
     responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -9779,6 +9779,127 @@ private:
 
 @end
 
+@interface CHIPFlowMeasurement ()
+@property (readonly) Controller::FlowMeasurementCluster cppCluster;
+@end
+
+@implementation CHIPFlowMeasurement
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeMinMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeMaxMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+@end
+
 @interface CHIPGeneralCommissioning ()
 @property (readonly) Controller::GeneralCommissioningCluster cppCluster;
 @end
@@ -11875,11 +11996,11 @@ private:
 
 @end
 
-@interface CHIPOtaSoftwareUpdateServer ()
-@property (readonly) Controller::OtaSoftwareUpdateServerCluster cppCluster;
+@interface CHIPOtaSoftwareUpdateProvider ()
+@property (readonly) Controller::OtaSoftwareUpdateProviderCluster cppCluster;
 @end
 
-@implementation CHIPOtaSoftwareUpdateServer
+@implementation CHIPOtaSoftwareUpdateProvider
 
 - (Controller::ClusterBase *)getCluster
 {
@@ -11888,8 +12009,8 @@ private:
 
 - (void)applyUpdateRequest:(NSData *)updateToken newVersion:(uint32_t)newVersion responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge * onSuccess
-        = new CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge * onSuccess
+        = new CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -11944,18 +12065,18 @@ private:
     }
 }
 - (void)queryImage:(uint16_t)vendorId
-             productId:(uint16_t)productId
-             imageType:(uint16_t)imageType
-       hardwareVersion:(uint16_t)hardwareVersion
-        currentVersion:(uint32_t)currentVersion
-    protocolsSupported:(uint8_t)protocolsSupported
-              location:(NSString *)location
-      clientCanConsent:(uint8_t)clientCanConsent
-     metadataForServer:(NSData *)metadataForServer
-       responseHandler:(ResponseHandler)responseHandler
+              productId:(uint16_t)productId
+              imageType:(uint16_t)imageType
+        hardwareVersion:(uint16_t)hardwareVersion
+         currentVersion:(uint32_t)currentVersion
+     protocolsSupported:(uint8_t)protocolsSupported
+               location:(NSString *)location
+    requestorCanConsent:(uint8_t)requestorCanConsent
+    metadataForProvider:(NSData *)metadataForProvider
+        responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge * onSuccess
-        = new CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge * onSuccess
+        = new CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -11974,7 +12095,7 @@ private:
             currentVersion, protocolsSupported,
             chip::ByteSpan((const uint8_t *) [location dataUsingEncoding:NSUTF8StringEncoding].bytes,
                 [location lengthOfBytesUsingEncoding:NSUTF8StringEncoding]),
-            clientCanConsent, chip::ByteSpan((const uint8_t *) metadataForServer.bytes, metadataForServer.length));
+            requestorCanConsent, chip::ByteSpan((const uint8_t *) metadataForProvider.bytes, metadataForProvider.length));
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -12435,7 +12556,7 @@ private:
     return &_cppCluster;
 }
 
-- (void)addOpCert:(NSData *)operationalCert
+- (void)addOpCert:(NSData *)nOCArray
            iPKValue:(NSData *)iPKValue
       caseAdminNode:(uint64_t)caseAdminNode
       adminVendorId:(uint16_t)adminVendorId
@@ -12458,7 +12579,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.AddOpCert(onSuccess->Cancel(), onFailure->Cancel(),
-            chip::ByteSpan((const uint8_t *) operationalCert.bytes, operationalCert.length),
+            chip::ByteSpan((const uint8_t *) nOCArray.bytes, nOCArray.length),
             chip::ByteSpan((const uint8_t *) iPKValue.bytes, iPKValue.length), caseAdminNode, adminVendorId);
     });
 
@@ -13383,7 +13504,7 @@ private:
             sceneId:(uint8_t)sceneId
      transitionTime:(uint16_t)transitionTime
           sceneName:(NSString *)sceneName
-          clusterId:(uint16_t)clusterId
+          clusterId:(uint32_t)clusterId
              length:(uint8_t)length
               value:(uint8_t)value
     responseHandler:(ResponseHandler)responseHandler

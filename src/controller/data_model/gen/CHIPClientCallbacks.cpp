@@ -407,8 +407,8 @@ app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInsta
 bool emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
 {
     ChipLogProgress(Zcl, "DefaultResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
-    ChipLogProgress(Zcl, "  CommandId: 0x%02x", commandId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
+    ChipLogProgress(Zcl, "  CommandId: 0x%08x", commandId);
     LogStatus(status);
 
     GET_RESPONSE_CALLBACKS("emberAfDefaultResponseCallback");
@@ -516,7 +516,7 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
         return true;
     }
 
-    uint16_t attributeId = aPath.mFieldId; // attribId
+    chip::AttributeId attributeId = aPath.mFieldId; // attribId
     ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
     LogIMStatus(status);
 
@@ -540,7 +540,7 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
 bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "WriteAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     GET_RESPONSE_CALLBACKS("emberAfWriteAttributesResponseCallback");
 
@@ -559,9 +559,9 @@ bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * messa
         }
         else
         {
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-            ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+            CHECK_MESSAGE_LENGTH(4);
+            AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+            ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
@@ -584,7 +584,7 @@ bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * messa
 bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "ConfigureReportingResponseCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     GET_RESPONSE_CALLBACKS("emberAfConfigureReportingResponseCallback");
 
@@ -607,9 +607,9 @@ bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * me
             uint8_t direction = chip::Encoding::Read8(message); // reportingRole
             ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
 
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-            ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+            CHECK_MESSAGE_LENGTH(4);
+            AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+            ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
@@ -632,7 +632,7 @@ bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * me
 bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "ReadReportingConfigurationResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     GET_RESPONSE_CALLBACKS("emberAfReadReportingConfigurationResponseCallback");
 
@@ -643,9 +643,9 @@ bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId
         uint8_t direction = chip::Encoding::Read8(message); // reportingRole
         ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
 
-        CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+        CHECK_MESSAGE_LENGTH(4);
+        AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+        ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
         if (direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         {
@@ -686,7 +686,7 @@ bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discove
                                                bool extended)
 {
     ChipLogProgress(Zcl, "DiscoverAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
     ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
     ChipLogProgress(Zcl, "  extended: %d", extended);
 
@@ -695,9 +695,9 @@ bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discove
     // struct discoverAttributesResponseRecord[]
     while (messageLen)
     {
-        CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+        CHECK_MESSAGE_LENGTH(4);
+        AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+        ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
         CHECK_MESSAGE_LENGTH(1);
         uint8_t attributeType = chip::Encoding::Read8(message); // zclType
@@ -713,14 +713,14 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint1
                                                       CommandId * commandIds, uint16_t commandIdCount)
 {
     ChipLogProgress(Zcl, "DiscoverCommandsGeneratedResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
     ChipLogProgress(Zcl, "  manufacturerCode: 0x%04x", manufacturerCode);
     ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
     ChipLogProgress(Zcl, "  commandIdCount: %" PRIu16, commandIdCount);
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%08x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -733,14 +733,14 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
                                                      CommandId * commandIds, uint16_t commandIdCount)
 {
     ChipLogProgress(Zcl, "DiscoverCommandsReceivedResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
     ChipLogProgress(Zcl, "  manufacturerCode: 0x%04x", manufacturerCode);
     ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
     ChipLogProgress(Zcl, "  commandIdCount: %" PRIu16, commandIdCount);
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%08x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -951,9 +951,9 @@ void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     chip::ClusterId data[count];
     for (size_t i = 0; i < count; i++)
     {
-        CHECK_MESSAGE_LENGTH_VOID(2);
-        data[i] = emberAfGetInt16u(message, 0, 2);
-        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i] = emberAfGetInt32u(message, 0, 4);
+        message += 4;
     }
     Callback::Callback<DescriptorServerListListAttributeCallback> * cb =
         Callback::Callback<DescriptorServerListListAttributeCallback>::FromCancelable(onSuccessCallback);
@@ -980,9 +980,9 @@ void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     chip::ClusterId data[count];
     for (size_t i = 0; i < count; i++)
     {
-        CHECK_MESSAGE_LENGTH_VOID(2);
-        data[i] = emberAfGetInt16u(message, 0, 2);
-        message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i] = emberAfGetInt32u(message, 0, 4);
+        message += 4;
     }
     Callback::Callback<DescriptorClientListListAttributeCallback> * cb =
         Callback::Callback<DescriptorClientListListAttributeCallback>::FromCancelable(onSuccessCallback);
@@ -1009,9 +1009,9 @@ void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     chip::EndpointId data[count];
     for (size_t i = 0; i < count; i++)
     {
-        CHECK_MESSAGE_LENGTH_VOID(1);
-        data[i] = emberAfGetInt8u(message, 0, 1);
-        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i] = emberAfGetInt16u(message, 0, 2);
+        message += 2;
     }
     Callback::Callback<DescriptorPartsListListAttributeCallback> * cb =
         Callback::Callback<DescriptorPartsListListAttributeCallback>::FromCancelable(onSuccessCallback);
@@ -2667,25 +2667,26 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(chip::app::Command * commandObj, uint8_t action,
-                                                                             uint32_t delayedActionTime)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(chip::app::Command * commandObj, uint8_t action,
+                                                                               uint32_t delayedActionTime)
 {
     ChipLogProgress(Zcl, "ApplyUpdateRequestResponse:");
     ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
     ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback");
 
-    Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback> * cb =
-        Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, action, delayedActionTime);
     return true;
 }
 
-bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
-                                                                     uint32_t delayedActionTime, uint8_t * imageURI,
-                                                                     uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                                     uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
+                                                                       uint32_t delayedActionTime, uint8_t * imageURI,
+                                                                       uint32_t softwareVersion, chip::ByteSpan updateToken,
+                                                                       uint8_t userConsentNeeded,
+                                                                       chip::ByteSpan metadataForRequestor)
 {
     ChipLogProgress(Zcl, "QueryImageResponse:");
     LogStatus(status);
@@ -2695,9 +2696,9 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::
     ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", softwareVersion);
     ChipLogProgress(Zcl, "  updateToken: %zu", updateToken.size());
     ChipLogProgress(Zcl, "  userConsentNeeded: %" PRIu8 "", userConsentNeeded);
-    ChipLogProgress(Zcl, "  metadataForClient: %zu", metadataForClient.size());
+    ChipLogProgress(Zcl, "  metadataForRequestor: %zu", metadataForRequestor.size());
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateServerClusterQueryImageResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterQueryImageResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -2707,9 +2708,9 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(chip::app::
         return true;
     }
 
-    Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback> * cb =
-        Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded, metadataForClient);
+    Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded, metadataForRequestor);
     return true;
 }
 
@@ -2969,13 +2970,13 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::app::Command * 
 bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     NodeId sourceId = emberAfCurrentCommand()->SourceNodeId();
     ChipLogProgress(Zcl, "  Source NodeId: %" PRIu64, sourceId);
 
     EndpointId endpointId = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
-    ChipLogProgress(Zcl, "  Source EndpointId: 0x%04x", endpointId);
+    ChipLogProgress(Zcl, "  Source EndpointId: 0x%08x", endpointId);
 
     // TODO onFailureCallback is just here because of the CHECK_MESSAGE_LENGTH macro. It needs to be removed.
     Callback::Cancelable * onFailureCallback = nullptr;
@@ -2983,8 +2984,8 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
     while (messageLen)
     {
         CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+        AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+        ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
         GET_REPORT_CALLBACK("emberAfReportAttributesCallback");
 

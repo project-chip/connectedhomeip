@@ -654,6 +654,22 @@ CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509Cert
 CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteSpan & x509ICAC, MutableByteSpan & chipCertArray);
 
 /**
+ * @brief Extract NOC and ICA Certificates from a CHIP certificate array.
+ *        This function takes a CHIP certificate array and splits it into single
+ *        NOC and ICA CHIP certificates.
+ *
+ *        NOC certificate must be provided.
+ *        ICA certificate is optional. It will be omitted (nullptr, 0) if the CHIP certificate array contains only one entry.
+ *
+ * @param opCertArray Chip certificate array.
+ * @param noc[out]    Node operational credentials certificate in CHIP format.
+ * @param icac[out]   Intermediate CA certificate in CHIP format.
+ *
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & noc, ByteSpan & icac);
+
+/**
  * @brief Convert CHIP certificate to the standard X.509 DER encoded certificate.
  *
  * @param chipCert        Buffer containing CHIP certificate.

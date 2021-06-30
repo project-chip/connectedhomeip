@@ -32,13 +32,13 @@ using namespace chip;
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
-    ChipLogProgress(Zcl, "Cluster callback: %d", clusterId);
+    ChipLogProgress(Zcl, "Cluster callback: %" PRIx32, clusterId);
 
     if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
     {
         if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
         {
-            ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
+            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
         }
 
@@ -49,7 +49,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     {
         if (attributeId != ZCL_CURRENT_LEVEL_ATTRIBUTE_ID)
         {
-            ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
+            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
         }
 
@@ -65,7 +65,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
     else
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
+        ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
         return;
     }
 }

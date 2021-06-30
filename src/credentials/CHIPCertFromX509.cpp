@@ -778,5 +778,67 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & noc, ByteSpan & icac)
+{
+    TLVType outerContainerType;
+    TLVReader reader;
+    reader.Init(opCertArray.data(), static_cast<uint32_t>(opCertArray.size()));
+
+    if (reader.GetType() == kTLVType_NotSpecified)
+    {
+        ReturnErrorOnFailure(reader.Next());
+    }
+    VerifyOrReturnError(reader.GetType() == kTLVType_Array, CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outerContainerType));
+
+    {
+        TLVType nocContainerType;
+        const uint8_t * nocBegin = reader.GetReadPoint();
+
+        if (reader.GetType() == kTLVType_NotSpecified)
+        {
+            ReturnErrorOnFailure(reader.Next());
+        }
+        VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+        uint64_t tag = reader.GetTag();
+        VerifyOrReturnError(tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) ||
+                                tag == AnonymousTag,
+                            CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+        ReturnErrorOnFailure(reader.EnterContainer(nocContainerType));
+        ReturnErrorOnFailure(reader.ExitContainer(nocContainerType));
+        noc = ByteSpan(nocBegin, static_cast<size_t>(reader.GetReadPoint() - nocBegin));
+    }
+
+    {
+        TLVType icacContainerType;
+        const uint8_t * icacBegin = reader.GetReadPoint();
+
+        if (reader.GetType() == kTLVType_NotSpecified)
+        {
+            CHIP_ERROR err = reader.Next();
+            if (err == CHIP_END_OF_TLV)
+            {
+                icac = ByteSpan(nullptr, 0);
+                return CHIP_NO_ERROR;
+            }
+            ReturnErrorOnFailure(err);
+        }
+        VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+        uint64_t tag = reader.GetTag();
+        VerifyOrReturnError(tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) ||
+                                tag == AnonymousTag,
+                            CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+        ReturnErrorOnFailure(reader.EnterContainer(icacContainerType));
+        ReturnErrorOnFailure(reader.ExitContainer(icacContainerType));
+        icac = ByteSpan(icacBegin, static_cast<size_t>(reader.GetReadPoint() - icacBegin));
+    }
+
+    ReturnErrorOnFailure(reader.ExitContainer(outerContainerType));
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Credentials
 } // namespace chip

@@ -124,7 +124,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_ACCOUNT_LOGIN_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_ACCOUNT_LOGIN_CLUSTER_ID);
             return;
         }
         }
@@ -238,7 +238,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID);
             return;
         }
         }
@@ -417,7 +417,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_CONTENT_LAUNCH_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_CONTENT_LAUNCH_CLUSTER_ID);
             return;
         }
         }
@@ -1944,7 +1944,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_DOOR_LOCK_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_DOOR_LOCK_CLUSTER_ID);
             return;
         }
         }
@@ -2188,7 +2188,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_GENERAL_COMMISSIONING_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_GENERAL_COMMISSIONING_CLUSTER_ID);
             return;
         }
         }
@@ -2500,7 +2500,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_GROUPS_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_GROUPS_CLUSTER_ID);
             return;
         }
         }
@@ -2608,7 +2608,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_IDENTIFY_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_IDENTIFY_CLUSTER_ID);
             return;
         }
         }
@@ -2716,7 +2716,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_KEYPAD_INPUT_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_KEYPAD_INPUT_CLUSTER_ID);
             return;
         }
         }
@@ -3414,7 +3414,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_MEDIA_PLAYBACK_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_MEDIA_PLAYBACK_CLUSTER_ID);
             return;
         }
         }
@@ -3993,7 +3993,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID);
             return;
         }
         }
@@ -4016,7 +4016,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 } // namespace NetworkCommissioning
 
-namespace OtaSoftwareUpdateServer {
+namespace OtaSoftwareUpdateProvider {
 
 void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
@@ -4092,8 +4092,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(apCommandObj, action,
-                                                                                                     delayedActionTime);
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(apCommandObj, action,
+                                                                                                       delayedActionTime);
             }
             break;
         }
@@ -4105,7 +4105,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             uint32_t softwareVersion;
             chip::ByteSpan updateToken;
             uint8_t userConsentNeeded;
-            chip::ByteSpan metadataForClient;
+            chip::ByteSpan metadataForRequestor;
             bool argExists[7];
 
             memset(argExists, 0, sizeof argExists);
@@ -4160,7 +4160,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 case 6: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    metadataForClient    = chip::ByteSpan(data, aDataTlv.GetLength());
+                    metadataForRequestor = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
                 default:
@@ -4183,9 +4183,9 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 7 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
                     apCommandObj, status, delayedActionTime, const_cast<uint8_t *>(imageURI), softwareVersion, updateToken,
-                    userConsentNeeded, metadataForClient);
+                    userConsentNeeded, metadataForRequestor);
             }
             break;
         }
@@ -4193,12 +4193,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               ZCL_OTA_SERVER_CLUSTER_ID, aCommandId,
+                                                               ZCL_OTA_PROVIDER_CLUSTER_ID, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_OTA_SERVER_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_OTA_PROVIDER_CLUSTER_ID);
             return;
         }
         }
@@ -4208,7 +4208,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           ZCL_OTA_SERVER_CLUSTER_ID, aCommandId,
+                                                           ZCL_OTA_PROVIDER_CLUSTER_ID, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -4219,7 +4219,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
     }
 }
 
-} // namespace OtaSoftwareUpdateServer
+} // namespace OtaSoftwareUpdateProvider
 
 namespace OperationalCredentials {
 
@@ -4473,7 +4473,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId,
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId,
                          ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID);
             return;
         }
@@ -4946,7 +4946,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_SCENES_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_SCENES_CLUSTER_ID);
             return;
         }
         }
@@ -5059,7 +5059,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_TV_CHANNEL_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_TV_CHANNEL_CLUSTER_ID);
             return;
         }
         }
@@ -5173,7 +5173,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_TARGET_NAVIGATOR_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_TARGET_NAVIGATOR_CLUSTER_ID);
             return;
         }
         }
@@ -5281,7 +5281,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx8 " for cluster %" PRIx16, aCommandId, ZCL_TEST_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_TEST_CLUSTER_ID);
             return;
         }
         }
@@ -5309,8 +5309,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId, aCommandId,
-                  aEndPointId);
+    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
+                  aCommandId, aEndPointId);
     Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
     TLV::TLVType dataTlvType;
     SuccessOrExit(aReader.EnterContainer(dataTlvType));
@@ -5346,8 +5346,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         clusters::NetworkCommissioning::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case ZCL_OTA_SERVER_CLUSTER_ID:
-        clusters::OtaSoftwareUpdateServer::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+    case ZCL_OTA_PROVIDER_CLUSTER_ID:
+        clusters::OtaSoftwareUpdateProvider::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         clusters::OperationalCredentials::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
@@ -5372,7 +5372,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
-        ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
+        ChipLogError(Zcl, "Unknown cluster %" PRIx32, aClusterId);
         break;
     }
 exit:

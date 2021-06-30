@@ -649,10 +649,6 @@ CHIP_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
     SuccessOrExit(res);
 
     res = IPEndPointBasis::SendMsg(pktInfo, std::move(msg), sendFlags);
-
-    // Wait for ability to write on this endpoint.
-    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
-    mSocket.OnRequestCallbackOnPendingWrite();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
