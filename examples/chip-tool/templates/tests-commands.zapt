@@ -4,13 +4,23 @@
 
 #include "TestCommand.h"
 
-{{>test_cluster tests="TestCluster, Test_3_1_1, Test_3_2_1, Test_3_2_2, Test_10_1_1"}}
+{{>test_cluster tests="TargetNavigatorCluster, AudioOutputCluster, ApplicationLauncherCluster, KeypadInputCluster, AccountLoginCluster, ApplicationBasicCluster, MediaPlaybackCluster, TvChannelCluster, LowPowerCluster, MediaInputCluster, TestCluster, Test_3_1_1, Test_3_2_1, Test_3_2_2, Test_10_1_1"}}
 
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
+        make_unique<TargetNavigatorCluster>(),
+        make_unique<AudioOutputCluster>(),
+        make_unique<ApplicationLauncherCluster>(),
+        make_unique<KeypadInputCluster>(),
+        make_unique<AccountLoginCluster>(),
+        make_unique<ApplicationBasicCluster>(),
+        make_unique<MediaPlaybackCluster>(),
+        make_unique<TvChannelCluster>(),
+        make_unique<LowPowerCluster>(),
+        make_unique<MediaInputCluster>(),
         make_unique<TestCluster>(),
         make_unique<Test_3_1_1>(),
         make_unique<Test_3_2_1>(),
