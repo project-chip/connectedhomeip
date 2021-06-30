@@ -223,6 +223,9 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     writeClient.Shutdown();
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 }
 
 void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apContext)
@@ -250,6 +253,9 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     writeHandler.Shutdown();
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
@@ -282,6 +288,10 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
     RoundtripDelegate delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
@@ -301,6 +311,10 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, delegate.mGotResponse);
+
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
     engine->Shutdown();
 }
