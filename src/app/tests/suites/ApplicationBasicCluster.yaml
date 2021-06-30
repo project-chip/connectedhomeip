@@ -58,7 +58,7 @@ tests:
       # TODO: Support chars validation
       # response:
       #     value: "appId"
-    
+
     - label: "Read attribute catalog vendor id"
       command: "readAttribute"
       attribute: "catalog vendor id"
