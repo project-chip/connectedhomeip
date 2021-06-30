@@ -27,5 +27,4 @@ class KeypadInputManager
 {
 public:
     CHIP_ERROR Init();
-    EmberAfKeypadInputStatus proxyKeypadInputRequest(EmberAfKeypadInputCecKeyCode keyCode);
 };

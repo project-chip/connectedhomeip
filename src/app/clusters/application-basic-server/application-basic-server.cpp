@@ -33,28 +33,22 @@
  */
 /****************************************************************************
  * @file
- * @brief Routines for the Audio Output plugin, the
- *server implementation of the Audio Output cluster.
+ * @brief Routines for the Application Launcher plugin, the
+ *server implementation of the Application Launcher cluster.
  *******************************************************************************
  ******************************************************************************/
 
 #include <app/Command.h>
+#include <app/common/gen/enums.h>
 #include <app/util/af.h>
+#include <string>
 
-bool audioOutputClusterSelectOutput(uint8_t index);
-bool audioOutputClusterRenameOutput(uint8_t index, uint8_t * name);
+bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatus status, chip::EndpointId endpoint);
 
-bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * command, unsigned char index, uint8_t * name)
+bool emberAfApplicationBasicClusterChangeStatusCallback(chip::app::Command * commandObj, uint8_t newApplicationStatus)
 {
-    bool success         = audioOutputClusterRenameOutput(index, name);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-
-bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::Command * command, unsigned char index)
-{
-    bool success         = audioOutputClusterSelectOutput(index);
+    bool success = applicationBasicClusterChangeApplicationStatus(static_cast<EmberAfApplicationBasicStatus>(newApplicationStatus),
+                                                                  emberAfCurrentEndpoint());
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;

@@ -39,11 +39,59 @@
  ******************************************************************************/
 
 #include <app/Command.h>
+#include <app/common/gen/af-structs.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
+#include <app/common/gen/enums.h>
 #include <app/util/af.h>
+
+EmberAfApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
 
 bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, unsigned char *, unsigned char *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+void sendResponse(chip::app::Command * command, EmberAfApplicationLauncherResponse response)
+{
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID,
+                                               ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID,
+                                               (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::TLV::TLVWriter * writer          = nullptr;
+    SuccessOrExit(err = command->PrepareCommand(cmdParams));
+    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    SuccessOrExit(err = writer->Put(chip::TLV::ContextTag(0), response.status));
+    SuccessOrExit(err = writer->PutString(chip::TLV::ContextTag(1), reinterpret_cast<const char *>(response.data)));
+    SuccessOrExit(err = command->FinishCommand());
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to send LaunchAppResponse. Error:%s", chip::ErrorStr(err));
+    }
+}
+
+EmberAfApplicationLauncherApp getApplicationFromCommand(EmberAfClusterCommand * cmd, unsigned char * reqestData,
+                                                        unsigned short catalogVendorId, unsigned char * applicationId)
+{
+    std::string reqestDataString(reinterpret_cast<char *>(reqestData));
+
+    EmberAfApplicationLauncherApp application = {};
+    application.applicationId                 = applicationId;
+    application.catalogVendorId               = catalogVendorId;
+    return application;
+}
+
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * command, unsigned char * requestData,
+                                                        unsigned short requestApplicationCatalogVendorId,
+                                                        unsigned char * requestApplicationId)
+{
+    EmberAfApplicationLauncherApp application =
+        getApplicationFromCommand(emberAfCurrentCommand(), requestData, requestApplicationCatalogVendorId, requestApplicationId);
+    std::string reqestDataString(reinterpret_cast<char *>(requestData));
+    EmberAfApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
+    sendResponse(command, response);
     return true;
 }
