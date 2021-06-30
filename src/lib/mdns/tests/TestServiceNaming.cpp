@@ -83,7 +83,7 @@ void TestExtractIdFromInstanceName(nlTestSuite * inSuite, void * inContext)
 
 void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr size_t kSize = 16;
+    constexpr size_t kSize = 17;
     char buffer[kSize];
     DiscoveryFilter filter;
 
@@ -152,6 +152,12 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     filter.type = DiscoveryFilterType::kNone;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "") == 0);
+
+    // instance name - "1234567890123456._matterc"
+    filter.type         = DiscoveryFilterType::kInstanceName;
+    filter.instanceName = (char *) "1234567890123456";
+    NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "1234567890123456") == 0);
 }
 
 void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)

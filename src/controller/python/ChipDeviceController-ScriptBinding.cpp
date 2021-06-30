@@ -252,7 +252,7 @@ CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissione
 
 CHIP_ERROR pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
 {
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, 0);
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
     return devCtrl->DiscoverCommissionableNodes(filter);
 }
 
