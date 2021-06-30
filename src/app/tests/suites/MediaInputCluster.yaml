@@ -41,7 +41,7 @@ tests:
 
     - label: "Show Input Status Command"
       command: "ShowInputStatus"
-    
+
     - label: "Rename Input Command"
       command: "RenameInput"
       arguments:

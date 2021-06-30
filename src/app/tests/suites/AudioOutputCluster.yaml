@@ -36,7 +36,7 @@ tests:
           values:
               - name: "index"
                 value: 1
-    
+
     - label: "Rename Output Command"
       command: "RenameOutput"
       arguments:

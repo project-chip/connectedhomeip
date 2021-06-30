@@ -29,10 +29,10 @@ tests:
     - label: "Read attribute vendor name"
       command: "readAttribute"
       attribute: "vendor name"
+
       # TODO: Support chars validation
       # response:
       #     value: "exampleVendorName1"
-
     - label: "Read attribute vendor id"
       command: "readAttribute"
       attribute: "vendor id"
@@ -42,10 +42,10 @@ tests:
     - label: "Read attribute name"
       command: "readAttribute"
       attribute: "application name"
+
       # TODO: Support chars validation
       # response:
       #     value: "exampleName1"
-
     - label: "Read attribute product id"
       command: "readAttribute"
       attribute: "product id"
@@ -55,10 +55,10 @@ tests:
     - label: "Read attribute id"
       command: "readAttribute"
       attribute: "application id"
+
       # TODO: Support chars validation
       # response:
       #     value: "appId"
-    
     - label: "Read attribute catalog vendor id"
       command: "readAttribute"
       attribute: "catalog vendor id"
