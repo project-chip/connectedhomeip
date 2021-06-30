@@ -215,42 +215,6 @@ function chip_client_has_list_attributes(options)
 }
 
 /**
- * Returns if a given command argument chip type is signed.
- *
- * This function is meant to be used inside a {{#chip_*}} block.
- * It will throws otherwise.
- *
- * @param {*} options
- */
-function isSignedType()
-{
-  const type = checkIsChipType(this, 'isSignedType');
-  switch (type) {
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-    return true;
-  default:
-    return false;
-  }
-}
-
-/**
- * Returns if a given command argument chip type is discrete.
- *
- * This function is meant to be used inside a {{#chip_*}} block.
- * It will throws otherwise.
- *
- * @param {*} options
- */
-function isDiscreteType()
-{
-  checkIsChipType(this, 'isSignedType');
-  return this.discrete;
-}
-
-/**
  * Creates block iterator over the server side cluster attributes
  * for a given cluster.
  *
@@ -403,8 +367,6 @@ exports.chip_server_cluster_commands          = chip_server_cluster_commands;
 exports.chip_server_cluster_command_arguments = chip_server_cluster_command_arguments
 exports.chip_attribute_list_entryTypes        = chip_attribute_list_entryTypes;
 exports.asBasicType                           = ChipTypesHelper.asBasicType;
-exports.isSignedType                          = isSignedType;
-exports.isDiscreteType                        = isDiscreteType;
 exports.chip_server_cluster_attributes        = chip_server_cluster_attributes;
 exports.chip_has_list_attributes              = chip_has_list_attributes;
 exports.chip_server_has_list_attributes       = chip_server_has_list_attributes;

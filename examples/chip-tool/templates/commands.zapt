@@ -344,11 +344,9 @@ public:
         AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name false)}}");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        {{#unless (isDiscreteType)}}
-        {{#unless (isString type)}}
+        {{#if isAnalog}}
         AddArgument("change", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mChange);
-        {{/unless}}
-        {{/unless}}
+        {{/if}}
         ModelCommand::AddArguments();
     }
 
@@ -372,7 +370,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval{{#unless (isDiscreteType)}}, mChange{{/unless}});
+        return cluster.ConfigureAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval{{#if isAnalog}}, mChange{{/if}});
     }
 
 private:
@@ -381,11 +379,9 @@ private:
     chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    {{#unless (isDiscreteType)}}
-    {{#unless (isString type)}}
+    {{#if isAnalog}}
     {{chipType}} mChange;
-    {{/unless}}
-    {{/unless}}
+    {{/if}}
 };
 
 {{/if}}

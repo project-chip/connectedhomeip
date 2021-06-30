@@ -41,7 +41,7 @@ public:
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
     {{#if (isReportableAttribute)}}
-    CHIP_ERROR ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}});
+    CHIP_ERROR ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}});
     CHIP_ERROR ReportAttribute{{asCamelCased name false}}(Callback::Cancelable * onReportCallback);
     {{/if}}
     {{/chip_server_cluster_attributes}}
