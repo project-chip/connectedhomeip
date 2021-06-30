@@ -134,7 +134,7 @@ limitations under the License.
       <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
     </command>
 
-    <command source="server" code="0x0A" name="MediaSkipSeekResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x0B" name="MediaSkipSeekResponse" optional="false" disableDefaultResponse="true">
       <description>Upon receipt, this SHALL change the playback position in the media to the given position using data as follows:</description>
       <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
     </command>
@@ -160,19 +160,5 @@ limitations under the License.
     <item name="NotActive" value="0x03"/>
     <item name="SpeedOutOfRange" value="0x04"/>
     <item name="SeekOutOfRange" value="0x05"/>
-  </enum>
-
-  <enum name="MediaPlaybackRequest" type="ENUM8">
-    <item name="Play" value="0x00"/>
-    <item name="Pause" value="0x01"/>
-    <item name="Stop" value="0x02"/>
-    <item name="StartOver" value="0x03"/>
-    <item name="Previous" value="0x04"/>
-    <item name="Next" value="0x05"/>
-    <item name="Rewind" value="0x06"/>
-    <item name="FastForward" value="0x07"/>
-    <item name="SkipForward" value="0x08"/>
-    <item name="SkipBackward" value="0x09"/>
-    <item name="Seek" value="0x0A"/>
   </enum>
 </configurator>

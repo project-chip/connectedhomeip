@@ -655,7 +655,7 @@
             { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MediaSkipBackward */                                           \
             { 0x0506, 0x09, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* MediaSkipBackwardResponse */                                   \
             { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MediaSkipSeek */                                               \
-            { 0x0506, 0x0A, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* MediaSkipSeekResponse */                                       \
+            { 0x0506, 0x0B, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* MediaSkipSeekResponse */                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Media Input (client) */                                                                       \
             { 0x0507, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SelectInput */                                                 \

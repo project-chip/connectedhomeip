@@ -21,10 +21,10 @@
 
 #include "TestCommand.h"
 
-class TargetNavigatorCluster : public TestCommand
+class TV_TargetNavigatorCluster : public TestCommand
 {
 public:
-    TargetNavigatorCluster() : TestCommand("TargetNavigatorCluster"), mTestIndex(0) {}
+    TV_TargetNavigatorCluster() : TestCommand("TV_TargetNavigatorCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -33,7 +33,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "TargetNavigatorCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_TargetNavigatorCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -53,7 +53,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "TargetNavigatorCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_TargetNavigatorCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -101,7 +101,7 @@ private:
     {
         ChipLogProgress(chipTool, "Target Navigator - Read attribute Target Navigator list: Failure Response");
 
-        TargetNavigatorCluster * runner = reinterpret_cast<TargetNavigatorCluster *>(context);
+        TV_TargetNavigatorCluster * runner = reinterpret_cast<TV_TargetNavigatorCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -122,7 +122,7 @@ private:
     {
         ChipLogProgress(chipTool, "Target Navigator - Read attribute Target Navigator list: Success Response");
 
-        TargetNavigatorCluster * runner = reinterpret_cast<TargetNavigatorCluster *>(context);
+        TV_TargetNavigatorCluster * runner = reinterpret_cast<TV_TargetNavigatorCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -181,7 +181,7 @@ private:
     {
         ChipLogProgress(chipTool, "Target Navigator - Navigate Target Command: Failure Response");
 
-        TargetNavigatorCluster * runner = reinterpret_cast<TargetNavigatorCluster *>(context);
+        TV_TargetNavigatorCluster * runner = reinterpret_cast<TV_TargetNavigatorCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -201,7 +201,7 @@ private:
     {
         ChipLogProgress(chipTool, "Target Navigator - Navigate Target Command: Success Response");
 
-        TargetNavigatorCluster * runner = reinterpret_cast<TargetNavigatorCluster *>(context);
+        TV_TargetNavigatorCluster * runner = reinterpret_cast<TV_TargetNavigatorCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -217,10 +217,10 @@ private:
     }
 };
 
-class AudioOutputCluster : public TestCommand
+class TV_AudioOutputCluster : public TestCommand
 {
 public:
-    AudioOutputCluster() : TestCommand("AudioOutputCluster"), mTestIndex(0) {}
+    TV_AudioOutputCluster() : TestCommand("TV_AudioOutputCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -229,7 +229,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "AudioOutputCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_AudioOutputCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -252,7 +252,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "AudioOutputCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_AudioOutputCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -300,7 +300,7 @@ private:
     {
         ChipLogProgress(chipTool, "Audio Output - Read attribute Audio Output list: Failure Response");
 
-        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+        TV_AudioOutputCluster * runner = reinterpret_cast<TV_AudioOutputCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -320,7 +320,7 @@ private:
     {
         ChipLogProgress(chipTool, "Audio Output - Read attribute Audio Output list: Success Response");
 
-        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+        TV_AudioOutputCluster * runner = reinterpret_cast<TV_AudioOutputCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -378,7 +378,7 @@ private:
     {
         ChipLogProgress(chipTool, "Audio Output - Select Output Command: Failure Response");
 
-        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+        TV_AudioOutputCluster * runner = reinterpret_cast<TV_AudioOutputCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -397,7 +397,7 @@ private:
     {
         ChipLogProgress(chipTool, "Audio Output - Select Output Command: Success Response");
 
-        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+        TV_AudioOutputCluster * runner = reinterpret_cast<TV_AudioOutputCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -449,7 +449,7 @@ private:
     {
         ChipLogProgress(chipTool, "Audio Output - Rename Output Command: Failure Response");
 
-        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+        TV_AudioOutputCluster * runner = reinterpret_cast<TV_AudioOutputCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -468,7 +468,7 @@ private:
     {
         ChipLogProgress(chipTool, "Audio Output - Rename Output Command: Success Response");
 
-        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+        TV_AudioOutputCluster * runner = reinterpret_cast<TV_AudioOutputCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -484,10 +484,10 @@ private:
     }
 };
 
-class ApplicationLauncherCluster : public TestCommand
+class TV_ApplicationLauncherCluster : public TestCommand
 {
 public:
-    ApplicationLauncherCluster() : TestCommand("ApplicationLauncherCluster"), mTestIndex(0) {}
+    TV_ApplicationLauncherCluster() : TestCommand("TV_ApplicationLauncherCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -496,7 +496,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "ApplicationLauncherCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_ApplicationLauncherCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -516,7 +516,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "ApplicationLauncherCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_ApplicationLauncherCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -564,7 +564,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Launcher - Read attribute Application Launcher list: Failure Response");
 
-        ApplicationLauncherCluster * runner = reinterpret_cast<ApplicationLauncherCluster *>(context);
+        TV_ApplicationLauncherCluster * runner = reinterpret_cast<TV_ApplicationLauncherCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -584,7 +584,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Launcher - Read attribute Application Launcher list: Success Response");
 
-        ApplicationLauncherCluster * runner = reinterpret_cast<ApplicationLauncherCluster *>(context);
+        TV_ApplicationLauncherCluster * runner = reinterpret_cast<TV_ApplicationLauncherCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -645,7 +645,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Launcher - Launch App Command: Failure Response");
 
-        ApplicationLauncherCluster * runner = reinterpret_cast<ApplicationLauncherCluster *>(context);
+        TV_ApplicationLauncherCluster * runner = reinterpret_cast<TV_ApplicationLauncherCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -665,7 +665,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Launcher - Launch App Command: Success Response");
 
-        ApplicationLauncherCluster * runner = reinterpret_cast<ApplicationLauncherCluster *>(context);
+        TV_ApplicationLauncherCluster * runner = reinterpret_cast<TV_ApplicationLauncherCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -681,10 +681,10 @@ private:
     }
 };
 
-class KeypadInputCluster : public TestCommand
+class TV_KeypadInputCluster : public TestCommand
 {
 public:
-    KeypadInputCluster() : TestCommand("KeypadInputCluster"), mTestIndex(0) {}
+    TV_KeypadInputCluster() : TestCommand("TV_KeypadInputCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -693,7 +693,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "KeypadInputCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_KeypadInputCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -710,7 +710,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "KeypadInputCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_KeypadInputCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -759,7 +759,7 @@ private:
     {
         ChipLogProgress(chipTool, "Keypad Input - Send Key Command: Failure Response");
 
-        KeypadInputCluster * runner = reinterpret_cast<KeypadInputCluster *>(context);
+        TV_KeypadInputCluster * runner = reinterpret_cast<TV_KeypadInputCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -778,7 +778,7 @@ private:
     {
         ChipLogProgress(chipTool, "Keypad Input - Send Key Command: Success Response");
 
-        KeypadInputCluster * runner = reinterpret_cast<KeypadInputCluster *>(context);
+        TV_KeypadInputCluster * runner = reinterpret_cast<TV_KeypadInputCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -794,10 +794,10 @@ private:
     }
 };
 
-class AccountLoginCluster : public TestCommand
+class TV_AccountLoginCluster : public TestCommand
 {
 public:
-    AccountLoginCluster() : TestCommand("AccountLoginCluster"), mTestIndex(0) {}
+    TV_AccountLoginCluster() : TestCommand("TV_AccountLoginCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -806,7 +806,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "AccountLoginCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_AccountLoginCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -826,7 +826,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "AccountLoginCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_AccountLoginCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -875,7 +875,7 @@ private:
     {
         ChipLogProgress(chipTool, "Account Login - Get Setup PIN Command: Failure Response");
 
-        AccountLoginCluster * runner = reinterpret_cast<AccountLoginCluster *>(context);
+        TV_AccountLoginCluster * runner = reinterpret_cast<TV_AccountLoginCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -894,7 +894,7 @@ private:
     {
         ChipLogProgress(chipTool, "Account Login - Get Setup PIN Command: Success Response");
 
-        AccountLoginCluster * runner = reinterpret_cast<AccountLoginCluster *>(context);
+        TV_AccountLoginCluster * runner = reinterpret_cast<TV_AccountLoginCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -947,7 +947,7 @@ private:
     {
         ChipLogProgress(chipTool, "Account Login - Login Command: Failure Response");
 
-        AccountLoginCluster * runner = reinterpret_cast<AccountLoginCluster *>(context);
+        TV_AccountLoginCluster * runner = reinterpret_cast<TV_AccountLoginCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -966,7 +966,7 @@ private:
     {
         ChipLogProgress(chipTool, "Account Login - Login Command: Success Response");
 
-        AccountLoginCluster * runner = reinterpret_cast<AccountLoginCluster *>(context);
+        TV_AccountLoginCluster * runner = reinterpret_cast<TV_AccountLoginCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -982,10 +982,10 @@ private:
     }
 };
 
-class ApplicationBasicCluster : public TestCommand
+class TV_ApplicationBasicCluster : public TestCommand
 {
 public:
-    ApplicationBasicCluster() : TestCommand("ApplicationBasicCluster"), mTestIndex(0) {}
+    TV_ApplicationBasicCluster() : TestCommand("TV_ApplicationBasicCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -994,7 +994,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "ApplicationBasicCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_ApplicationBasicCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -1029,7 +1029,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "ApplicationBasicCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_ApplicationBasicCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -1078,7 +1078,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Change Status Command: Failure Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -1097,7 +1097,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Change Status Command: Success Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -1147,7 +1147,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute vendor name: Failure Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -1166,7 +1166,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute vendor name: Success Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -1216,7 +1216,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute vendor id: Failure Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -1235,7 +1235,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute vendor id: Success Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -1292,7 +1292,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute name: Failure Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -1312,7 +1312,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute name: Success Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -1362,7 +1362,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute product id: Failure Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -1381,7 +1381,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute product id: Success Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -1438,7 +1438,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute id: Failure Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -1458,7 +1458,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute id: Success Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -1508,7 +1508,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute catalog vendor id: Failure Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -1527,7 +1527,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute catalog vendor id: Success Response");
 
-        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -1550,10 +1550,10 @@ private:
     }
 };
 
-class MediaPlaybackCluster : public TestCommand
+class TV_MediaPlaybackCluster : public TestCommand
 {
 public:
-    MediaPlaybackCluster() : TestCommand("MediaPlaybackCluster"), mTestIndex(0) {}
+    TV_MediaPlaybackCluster() : TestCommand("TV_MediaPlaybackCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -1562,7 +1562,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "MediaPlaybackCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_MediaPlaybackCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -1609,7 +1609,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "MediaPlaybackCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_MediaPlaybackCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -1657,7 +1657,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Play Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -1676,7 +1676,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Play Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -1726,7 +1726,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Pause Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -1745,7 +1745,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Pause Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -1795,7 +1795,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Stop Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -1814,7 +1814,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Stop Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -1864,7 +1864,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Start Over Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -1883,7 +1883,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Start Over Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -1933,7 +1933,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Previous Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -1952,7 +1952,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Previous Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -2002,7 +2002,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Next Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -2021,7 +2021,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Next Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -2071,7 +2071,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Rewind Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -2090,7 +2090,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Rewind Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -2140,7 +2140,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Fast Forward Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_7;
         delete runner->mOnSuccessCallback_7;
@@ -2159,7 +2159,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Fast Forward Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_7;
         delete runner->mOnSuccessCallback_7;
@@ -2211,7 +2211,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Forward Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_8;
         delete runner->mOnSuccessCallback_8;
@@ -2230,7 +2230,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Forward Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_8;
         delete runner->mOnSuccessCallback_8;
@@ -2282,7 +2282,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Backward Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_9;
         delete runner->mOnSuccessCallback_9;
@@ -2302,7 +2302,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Backward Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_9;
         delete runner->mOnSuccessCallback_9;
@@ -2353,7 +2353,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Seek Command: Failure Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_10;
         delete runner->mOnSuccessCallback_10;
@@ -2372,7 +2372,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Seek Command: Success Response");
 
-        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+        TV_MediaPlaybackCluster * runner = reinterpret_cast<TV_MediaPlaybackCluster *>(context);
 
         delete runner->mOnFailureCallback_10;
         delete runner->mOnSuccessCallback_10;
@@ -2388,10 +2388,10 @@ private:
     }
 };
 
-class TvChannelCluster : public TestCommand
+class TV_TvChannelCluster : public TestCommand
 {
 public:
-    TvChannelCluster() : TestCommand("TvChannelCluster"), mTestIndex(0) {}
+    TV_TvChannelCluster() : TestCommand("TV_TvChannelCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -2400,7 +2400,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "TvChannelCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_TvChannelCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -2423,7 +2423,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "TvChannelCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_TvChannelCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -2471,7 +2471,7 @@ private:
     {
         ChipLogProgress(chipTool, "TV Channel - Read attribute TV Channel list: Failure Response");
 
-        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+        TV_TvChannelCluster * runner = reinterpret_cast<TV_TvChannelCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -2491,7 +2491,7 @@ private:
     {
         ChipLogProgress(chipTool, "TV Channel - Read attribute TV Channel list: Success Response");
 
-        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+        TV_TvChannelCluster * runner = reinterpret_cast<TV_TvChannelCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -2551,7 +2551,7 @@ private:
     {
         ChipLogProgress(chipTool, "TV Channel - Change Channel By Number Command: Failure Response");
 
-        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+        TV_TvChannelCluster * runner = reinterpret_cast<TV_TvChannelCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -2570,7 +2570,7 @@ private:
     {
         ChipLogProgress(chipTool, "TV Channel - Change Channel By Number Command: Success Response");
 
-        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+        TV_TvChannelCluster * runner = reinterpret_cast<TV_TvChannelCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -2621,7 +2621,7 @@ private:
     {
         ChipLogProgress(chipTool, "TV Channel - Skip Channel Command: Failure Response");
 
-        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+        TV_TvChannelCluster * runner = reinterpret_cast<TV_TvChannelCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -2640,7 +2640,7 @@ private:
     {
         ChipLogProgress(chipTool, "TV Channel - Skip Channel Command: Success Response");
 
-        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+        TV_TvChannelCluster * runner = reinterpret_cast<TV_TvChannelCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -2656,10 +2656,10 @@ private:
     }
 };
 
-class LowPowerCluster : public TestCommand
+class TV_LowPowerCluster : public TestCommand
 {
 public:
-    LowPowerCluster() : TestCommand("LowPowerCluster"), mTestIndex(0) {}
+    TV_LowPowerCluster() : TestCommand("TV_LowPowerCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -2668,7 +2668,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "LowPowerCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_LowPowerCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -2685,7 +2685,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "LowPowerCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_LowPowerCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -2733,7 +2733,7 @@ private:
     {
         ChipLogProgress(chipTool, "Low Power - Sleep Input Status Command: Failure Response");
 
-        LowPowerCluster * runner = reinterpret_cast<LowPowerCluster *>(context);
+        TV_LowPowerCluster * runner = reinterpret_cast<TV_LowPowerCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -2752,7 +2752,7 @@ private:
     {
         ChipLogProgress(chipTool, "Low Power - Sleep Input Status Command: Success Response");
 
-        LowPowerCluster * runner = reinterpret_cast<LowPowerCluster *>(context);
+        TV_LowPowerCluster * runner = reinterpret_cast<TV_LowPowerCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -2768,10 +2768,10 @@ private:
     }
 };
 
-class MediaInputCluster : public TestCommand
+class TV_MediaInputCluster : public TestCommand
 {
 public:
-    MediaInputCluster() : TestCommand("MediaInputCluster"), mTestIndex(0) {}
+    TV_MediaInputCluster() : TestCommand("TV_MediaInputCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -2780,7 +2780,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "MediaInputCluster: Test complete");
+            ChipLogProgress(chipTool, "TV_MediaInputCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -2809,7 +2809,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "MediaInputCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TV_MediaInputCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -2857,7 +2857,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Read attribute media input list: Failure Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -2877,7 +2877,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Read attribute media input list: Success Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -2935,7 +2935,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Select Input Command: Failure Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -2954,7 +2954,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Select Input Command: Success Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -3004,7 +3004,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Hide Input Status Command: Failure Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -3023,7 +3023,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Hide Input Status Command: Success Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -3073,7 +3073,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Show Input Status Command: Failure Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -3092,7 +3092,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Show Input Status Command: Success Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -3144,7 +3144,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Rename Input Command: Failure Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -3163,7 +3163,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Rename Input Command: Success Response");
 
-        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+        TV_MediaInputCluster * runner = reinterpret_cast<TV_MediaInputCluster *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -14949,16 +14949,16 @@ void registerCommandsTests(Commands & commands)
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
-        make_unique<TargetNavigatorCluster>(),
-        make_unique<AudioOutputCluster>(),
-        make_unique<ApplicationLauncherCluster>(),
-        make_unique<KeypadInputCluster>(),
-        make_unique<AccountLoginCluster>(),
-        make_unique<ApplicationBasicCluster>(),
-        make_unique<MediaPlaybackCluster>(),
-        make_unique<TvChannelCluster>(),
-        make_unique<LowPowerCluster>(),
-        make_unique<MediaInputCluster>(),
+        make_unique<TV_TargetNavigatorCluster>(),
+        make_unique<TV_AudioOutputCluster>(),
+        make_unique<TV_ApplicationLauncherCluster>(),
+        make_unique<TV_KeypadInputCluster>(),
+        make_unique<TV_AccountLoginCluster>(),
+        make_unique<TV_ApplicationBasicCluster>(),
+        make_unique<TV_MediaPlaybackCluster>(),
+        make_unique<TV_TvChannelCluster>(),
+        make_unique<TV_LowPowerCluster>(),
+        make_unique<TV_MediaInputCluster>(),
         make_unique<TestCluster>(),
         make_unique<Test_3_1_1>(),
         make_unique<Test_3_2_1>(),
