@@ -18,13 +18,18 @@
 
 set -e
 
-declare -a test_array=("Test_3_1_1"
-    "Test_3_2_1"
-    "Test_3_2_2"
-    "Test_10_1_1"
-    "TestCluster")
-declare -i iterations=20
+declare -i iterations=1
 declare -i background_pid=0
+declare -a test_array=("TargetNavigatorCluster"
+    "AudioOutputCluster"
+    "ApplicationLauncherCluster"
+    "KeypadInputCluster"
+    "ApplicationBasicCluster"
+    "MediaPlaybackCluster"
+    "TvChannelCluster"
+    "MediaInputCluster"
+    "LowPowerCluster"
+    "AccountLoginCluster")
 
 cleanup() {
     if [[ $background_pid != 0 ]]; then
@@ -57,9 +62,10 @@ for j in "${iter_array[@]}"; do
     for i in "${test_array[@]}"; do
         echo "  ===== Running test: $i"
         echo "          * Starting cluster server"
+        cp examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini /tmp/chip_tv_config.ini
         rm -rf /tmp/chip_tool_config.ini
         # This part is a little complicated.  We want to
-        # 1) Start chip-all-clusters-app in the background
+        # 1) Start chip-tv-app in the background
         # 2) Pipe its output through tee so we can wait until it's ready for a
         #    PASE handshake.
         # 3) Save its pid off so we can kill it.
@@ -76,14 +82,13 @@ for j in "${iter_array[@]}"; do
 
         # Clear out our temp files so we don't accidentally do a stale
         # read from them before we write to them.
-        rm -rf /tmp/all-clusters-log
-        touch /tmp/all-clusters-log
+        rm -rf /tmp/tv-log
         rm -rf /tmp/pid
         (
-            stdbuf -o0 out/debug/standalone/chip-all-clusters-app &
+            stdbuf -o0 out/debug/standalone/chip-tv-app &
             echo $! >&3
-        ) 3>/tmp/pid | tee /tmp/all-clusters-log &
-        while ! grep -q "Server Listening" /tmp/all-clusters-log; do
+        ) 3>/tmp/pid | tee /tmp/tv-log &
+        while ! grep -q "Server Listening" /tmp/tv-log; do
             :
         done
         # Now read $background_pid from /tmp/pid; presumably it's
@@ -95,6 +100,7 @@ for j in "${iter_array[@]}"; do
         out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
         echo "          * Starting test run: $i"
         out/debug/standalone/chip-tool tests "$i"
+
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
