@@ -355,10 +355,15 @@ void NoQueryResponder(nlTestSuite * inSuite, void * inContext)
 
 void AddManyQueryResponders(nlTestSuite * inSuite, void * inContext)
 {
+    // TODO(cecille): Fix this test once #8000 gets resolved.
     CommonTestElements common1(inSuite, "test1");
     CommonTestElements common2(inSuite, "test2");
     CommonTestElements common3(inSuite, "test3");
     CommonTestElements common4(inSuite, "test4");
+    CommonTestElements common5(inSuite, "test5");
+    CommonTestElements common6(inSuite, "test6");
+    CommonTestElements common7(inSuite, "test7");
+    CommonTestElements common8(inSuite, "test8");
 
     ResponseSender responseSender(&common1.server);
 
@@ -368,12 +373,16 @@ void AddManyQueryResponders(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common1.queryResponder) == CHIP_NO_ERROR);
     }
 
-    // The next two should work
+    // There are 7 total
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common2.queryResponder) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common3.queryResponder) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common4.queryResponder) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common5.queryResponder) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common6.queryResponder) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common7.queryResponder) == CHIP_NO_ERROR);
 
     // Last one should return a no memory error (no space)
-    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common4.queryResponder) == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(inSuite, responseSender.AddQueryResponder(&common8.queryResponder) == CHIP_ERROR_NO_MEMORY);
 }
 
 void PtrSrvTxtMultipleRespondersToInstance(nlTestSuite * inSuite, void * inContext)
