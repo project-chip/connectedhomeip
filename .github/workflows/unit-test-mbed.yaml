@@ -16,7 +16,16 @@ name: Build unit test - Mbed OS
 
 on:
     push:
+        paths-ignore:
+            - '**.md'
+            - 'integrations/**'
+            - 'scripts/**'
+
     pull_request:
+        paths-ignore:
+            - '**.md'
+            - 'integrations/**'
+            - 'scripts/**'
 
 jobs:
     mbedos-unittest:
