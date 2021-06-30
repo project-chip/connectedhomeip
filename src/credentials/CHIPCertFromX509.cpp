@@ -49,9 +49,9 @@ using namespace chip::TLV;
 using namespace chip::Protocols;
 using namespace chip::Crypto;
 
-static ASN1_ERROR ParseChipAttribute(ASN1Reader & reader, uint64_t & chipAttrOut)
+static CHIP_ERROR ParseChipAttribute(ASN1Reader & reader, uint64_t & chipAttrOut)
 {
-    ASN1_ERROR err        = ASN1_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     const uint8_t * value = reader.GetValue();
     uint32_t valueLen     = reader.GetValueLen();
 
@@ -96,7 +96,7 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
     // RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
     ASN1_PARSE_ENTER_SEQUENCE
     {
-        while ((err = reader.Next()) == ASN1_NO_ERROR)
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
             // RelativeDistinguishedName ::= SET SIZE (1..MAX) OF AttributeTypeAndValue
             ASN1_ENTER_SET
@@ -180,7 +180,7 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
 
                 // Only one AttributeTypeAndValue allowed per RDN.
                 err = reader.Next();
-                if (err == ASN1_NO_ERROR)
+                if (err == CHIP_NO_ERROR)
                 {
                     ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
                 }
@@ -350,7 +350,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 ASN1_PARSE_ENTER_SEQUENCE
                 {
                     err = reader.Next();
-                    VerifyOrExit(err == ASN1_NO_ERROR, err = ASN1_ERROR_INVALID_ENCODING);
+                    VerifyOrExit(err == CHIP_NO_ERROR, err = ASN1_ERROR_INVALID_ENCODING);
 
                     // keyIdentifier [0] IMPLICIT KeyIdentifier,
                     // KeyIdentifier ::= OCTET STRING
@@ -419,7 +419,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
 
                     // cA BOOLEAN DEFAULT FALSE
                     err = reader.Next();
-                    if (err == ASN1_NO_ERROR && reader.GetClass() == kASN1TagClass_Universal &&
+                    if (err == CHIP_NO_ERROR && reader.GetClass() == kASN1TagClass_Universal &&
                         reader.GetTag() == kASN1UniversalTag_Boolean)
                     {
                         ASN1_GET_BOOLEAN(isCA);
@@ -430,7 +430,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                     }
 
                     // pathLenConstraint INTEGER (0..MAX) OPTIONAL
-                    if (err == ASN1_NO_ERROR && reader.GetClass() == kASN1TagClass_Universal &&
+                    if (err == CHIP_NO_ERROR && reader.GetClass() == kASN1TagClass_Universal &&
                         reader.GetTag() == kASN1UniversalTag_Integer)
                     {
                         ASN1_GET_INTEGER(pathLenConstraint);
@@ -472,7 +472,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 // ExtKeyUsageSyntax ::= SEQUENCE SIZE (1..MAX) OF KeyPurposeId
                 ASN1_PARSE_ENTER_SEQUENCE
                 {
-                    while ((err = reader.Next()) == ASN1_NO_ERROR)
+                    while ((err = reader.Next()) == CHIP_NO_ERROR)
                     {
                         // KeyPurposeId ::= OBJECT IDENTIFIER
                         OID keyPurposeOID;
@@ -522,7 +522,7 @@ static CHIP_ERROR ConvertExtensions(ASN1Reader & reader, TLVWriter & writer)
     // Extensions ::= SEQUENCE SIZE (1..MAX) OF Extension
     ASN1_PARSE_ENTER_SEQUENCE
     {
-        while ((err = reader.Next()) == ASN1_NO_ERROR)
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
             err = ConvertExtension(reader, writer);
             SuccessOrExit(err);
@@ -643,20 +643,20 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer, ui
 
             // issuerUniqueID [1] IMPLICIT UniqueIdentifier OPTIONAL,
             // Not supported.
-            if (err == ASN1_NO_ERROR && reader.GetClass() == kASN1TagClass_ContextSpecific && reader.GetTag() == 1)
+            if (err == CHIP_NO_ERROR && reader.GetClass() == kASN1TagClass_ContextSpecific && reader.GetTag() == 1)
             {
                 ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
             }
 
             // subjectUniqueID [2] IMPLICIT UniqueIdentifier OPTIONAL,
             // Not supported.
-            if (err == ASN1_NO_ERROR && reader.GetClass() == kASN1TagClass_ContextSpecific && reader.GetTag() == 2)
+            if (err == CHIP_NO_ERROR && reader.GetClass() == kASN1TagClass_ContextSpecific && reader.GetTag() == 2)
             {
                 ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
             }
 
             // extensions [3] EXPLICIT Extensions OPTIONAL
-            if (err == ASN1_NO_ERROR && reader.GetClass() == kASN1TagClass_ContextSpecific && reader.GetTag() == 3)
+            if (err == CHIP_NO_ERROR && reader.GetClass() == kASN1TagClass_ContextSpecific && reader.GetTag() == 3)
             {
                 ASN1_ENTER_CONSTRUCTED(kASN1TagClass_ContextSpecific, 3)
                 {

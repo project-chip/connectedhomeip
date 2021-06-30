@@ -78,7 +78,7 @@ WindowCover & AppTask::Cover()
 
 int AppTask::Start()
 {
-    int err = CHIP_ERROR_MAX;
+    int err = CHIP_CONFIG_CORE_ERROR_MAX;
 
     mQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (mQueue == NULL)

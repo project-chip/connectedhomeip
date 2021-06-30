@@ -128,7 +128,7 @@ static CHIP_ERROR ConfigGetFabricId(bool printHeader)
     return CHIP_NO_ERROR;
 }
 
-static int PrintAllConfigs()
+static CHIP_ERROR PrintAllConfigs()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -145,10 +145,8 @@ static int PrintAllConfigs()
     return (error) ? CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND : CHIP_NO_ERROR;
 }
 
-static int ConfigHandler(int argc, char ** argv)
+static CHIP_ERROR ConfigHandler(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     if (argc == 0)
     {
         return PrintAllConfigs();
@@ -160,27 +158,27 @@ static int ConfigHandler(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "productid") == 0)
     {
-        return error = ConfigGetProductId(false);
+        return ConfigGetProductId(false);
     }
     else if (strcmp(argv[0], "productrev") == 0)
     {
-        return error = ConfigGetProductRevision(false);
+        return ConfigGetProductRevision(false);
     }
     else if (strcmp(argv[0], "deviceid") == 0)
     {
-        return error = ConfigGetDeviceId(false);
+        return ConfigGetDeviceId(false);
     }
     else if (strcmp(argv[0], "pincode") == 0)
     {
-        return error = ConfigGetSetupPinCode(false);
+        return ConfigGetSetupPinCode(false);
     }
     else if (strcmp(argv[0], "discriminator") == 0)
     {
-        return error = ConfigGetSetupDiscriminator(false);
+        return ConfigGetSetupDiscriminator(false);
     }
     else if (strcmp(argv[0], "fabricid") == 0)
     {
-        return error = ConfigGetFabricId(false);
+        return ConfigGetFabricId(false);
     }
     else
     {

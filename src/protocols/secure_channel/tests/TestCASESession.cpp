@@ -489,10 +489,11 @@ static nlTestSuite sSuite =
 
 static TestContext sContext;
 
-/**
+namespace {
+/*
  *  Set up the test suite.
  */
-int CASE_TestSecurePairing_Setup(void * inContext)
+CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -511,6 +512,15 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
 
     return InitCredentialSets();
+}
+} // anonymous namespace
+
+/**
+ *  Set up the test suite.
+ */
+int CASE_TestSecurePairing_Setup(void * inContext)
+{
+    return CASETestSecurePairingSetup(inContext) == CHIP_NO_ERROR ? SUCCESS : FAILURE;
 }
 
 /**

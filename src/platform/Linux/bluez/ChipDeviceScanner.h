@@ -75,7 +75,7 @@ public:
     static std::unique_ptr<ChipDeviceScanner> Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
 
 private:
-    static void TimerExpiredCallback(chip::System::Layer * layer, void * appState, chip::System::Error error);
+    static void TimerExpiredCallback(chip::System::Layer * layer, void * appState, CHIP_ERROR error);
     static int MainLoopStartScan(ChipDeviceScanner * self);
     static int MainLoopStopScan(ChipDeviceScanner * self);
     static void SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self);

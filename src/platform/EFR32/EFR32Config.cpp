@@ -566,7 +566,7 @@ CHIP_ERROR EFR32Config::MapNvm3Error(Ecode_t nvm3Res)
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
         break;
     default:
-        err = (nvm3Res & 0xFF) + CHIP_DEVICE_CONFIG_EFR32_NVM3_ERROR_MIN;
+        err = static_cast<CHIP_ERROR>((nvm3Res & 0xFF) + CHIP_DEVICE_CONFIG_EFR32_NVM3_ERROR_MIN);
         break;
     }
 

@@ -310,7 +310,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     uint8_t * msg = nullptr;
 
     msg_R1 = System::PacketBufferHandle::New(data_len);
-    VerifyOrReturnError(!msg_R1.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!msg_R1.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     msg = msg_R1->Start();
 
@@ -519,7 +519,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
                                      msg_r2_signed_enc_len + sizeof(tag));
 
     msg_R2 = System::PacketBufferHandle::New(data_len);
-    VerifyOrExit(!msg_R2.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R2.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Step 10
     // now construct sigmaR2
@@ -783,7 +783,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
     data_len = static_cast<uint16_t>(sizeof(tag) + msg_r3_encrypted_len);
 
     msg_R3 = System::PacketBufferHandle::New(data_len);
-    VerifyOrExit(!msg_R3.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R3.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_R3->Start(), data_len);

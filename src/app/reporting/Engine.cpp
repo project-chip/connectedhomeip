@@ -76,8 +76,8 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving data from clusterId: %" PRIx32 ", err = %" PRId32, aClusterInfo.mClusterId,
-                     err);
+        ChipLogError(DataManagement, "Error retrieving data from clusterId: %" PRIx32 ", err = %" CHIP_ERROR_FORMAT,
+                     aClusterInfo.mClusterId, err);
     }
 
     return err;
@@ -216,7 +216,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportD
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving events, err = %" PRId32, err);
+        ChipLogError(DataManagement, "Error retrieving events, err = %" CHIP_ERROR_FORMAT, err);
     }
 
     return err;
@@ -275,7 +275,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     ChipLogDetail(DataManagement, "<RE> Sending report...");
     err = SendReport(apReadHandler, std::move(bufHandle));
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DataManagement, "<RE> Error sending out report data with %" PRId32 "!", err));
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(DataManagement, "<RE> Error sending out report data with %" CHIP_ERROR_FORMAT "!", err));
 
     ChipLogDetail(DataManagement, "<RE> ReportsInFlight = %" PRIu32 " with readHandler %" PRIu32 ", RE has %s", mNumReportsInFlight,
                   mCurReadHandlerIdx, mMoreChunkedMessages ? "more messages" : "no more messages");
@@ -294,7 +295,7 @@ exit:
     return err;
 }
 
-void Engine::Run(System::Layer * aSystemLayer, void * apAppState, System::Error)
+void Engine::Run(System::Layer * aSystemLayer, void * apAppState, CHIP_ERROR)
 {
     Engine * const pEngine = reinterpret_cast<Engine *>(apAppState);
     pEngine->Run();

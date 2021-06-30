@@ -222,7 +222,7 @@ CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & no
 
     ChipLogProgress(Controller, "Getting intermediate CA certificate from the issuer");
     CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, icaCertSpan);
-    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" PRId32, err);
+    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" CHIP_ERROR_FORMAT, err);
     if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
         // This implies that the commissioner application uses root CA to sign the operational
@@ -347,8 +347,8 @@ CHIP_ERROR DeviceController::Shutdown()
     //
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
-    VerifyOrReturnError(mInetLayer->Shutdown() == INET_NO_ERROR, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(mSystemLayer->Shutdown() == CHIP_SYSTEM_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mInetLayer->Shutdown() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSystemLayer->Shutdown() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     chip::Platform::Delete(mInetLayer);
     chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
@@ -730,7 +730,7 @@ exit:
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to initialize the device list with error: %" PRId32, err);
+        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT, err);
     }
 
     return err;
@@ -1488,7 +1488,7 @@ void DeviceCommissioner::OnSessionEstablishmentTimeout()
     }
 }
 
-void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError)
+void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
 {
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }

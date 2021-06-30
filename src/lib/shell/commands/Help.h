@@ -27,7 +27,7 @@
 namespace chip {
 namespace Shell {
 
-int PrintCommandHelp(shell_command_t * command, void * arg);
+CHIP_ERROR PrintCommandHelp(shell_command_t * command, void * arg);
 
 } // namespace Shell
 } // namespace chip

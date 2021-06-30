@@ -77,12 +77,12 @@ namespace DeviceLayer {
             ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
-        BLE_ERROR BleConnectionDelegateImpl::CancelConnection()
+        CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
             [ble stop];
             ble = nil;
-            return BLE_NO_ERROR;
+            return CHIP_NO_ERROR;
         }
     } // namespace Internal
 } // namespace DeviceLayer
@@ -218,7 +218,7 @@ namespace DeviceLayer {
 
     if (!found || error != nil) {
         ChipLogError(Ble, "Service not found on the device.");
-        _onConnectionError(_appState, BLE_ERROR_INCORRECT_STATE);
+        _onConnectionError(_appState, CHIP_ERROR_INCORRECT_STATE);
     }
 }
 
@@ -310,7 +310,7 @@ namespace DeviceLayer {
         } else {
             ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
             dispatch_async(_chipWorkQueue, ^{
-                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_NO_MEMORY);
+                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, CHIP_ERROR_NO_MEMORY);
             });
         }
     } else {

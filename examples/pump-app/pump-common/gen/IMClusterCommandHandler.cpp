@@ -79,8 +79,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
-                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
@@ -199,8 +199,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
-                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
@@ -395,8 +395,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
-                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
@@ -925,8 +925,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
-                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
@@ -1555,8 +1555,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
-                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
@@ -1622,8 +1622,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
-                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
@@ -2130,8 +2130,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
-                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" PRIu32
-                        ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
                         validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }

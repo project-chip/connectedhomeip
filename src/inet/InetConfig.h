@@ -88,35 +88,6 @@
 #endif // INET_CONFIG_MAX_IP_AND_UDP_HEADER_SIZE
 
 /**
- *  @def INET_CONFIG_ERROR_TYPE
- *
- *  @brief
- *    This defines the data type used to represent errors for the
- *    InetLayer subsystem.
- *
- *  @note
- *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_ERROR_TYPE.
- *
- */
-#ifndef INET_CONFIG_ERROR_TYPE
-#define INET_CONFIG_ERROR_TYPE                              CHIP_SYSTEM_CONFIG_ERROR_TYPE
-#endif // !defined(INET_CONFIG_ERROR_TYPE)
-
-/**
- *  @def INET_CONFIG_NO_ERROR
- *
- *  @brief
- *    This defines the InetLayer error code for no error or success.
- *
- *  @note
- *    By default, this parameter is a copy of CHIP_SYSTEM_CONFIG_NO_ERROR.
- *
- */
-#ifndef INET_CONFIG_NO_ERROR
-#define INET_CONFIG_NO_ERROR                                CHIP_SYSTEM_CONFIG_NO_ERROR
-#endif // !defined(INET_CONFIG_NO_ERROR)
-
-/**
  *  @def INET_CONFIG_ERROR_MIN
  *
  *  @brief
@@ -139,15 +110,15 @@
 #endif // INET_CONFIG_ERROR_MAX
 
 /**
- *  @def _INET_CONFIG_ERROR
+ *  @def INET_CONFIG_ERROR
  *
  *  @brief
  *    This defines a mapping function for InetLayer errors that allows
  *    mapping such errors into a platform- or system-specific range.
  *
  */
-#ifndef _INET_CONFIG_ERROR
-#define _INET_CONFIG_ERROR(e)                               (INET_ERROR_MIN + (e))
+#ifndef INET_CONFIG_ERROR
+#define INET_CONFIG_ERROR(e)                                (INET_CONFIG_ERROR_MIN + (e))
 #endif // _INET_CONFIG_ERROR
 
 /**

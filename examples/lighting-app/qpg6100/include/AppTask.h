@@ -61,7 +61,7 @@ private:
     static void FunctionHandler(AppEvent * aEvent);
 
     static void LightingActionEventHandler(AppEvent * aEvent);
-    static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, chip::System::Error aError);
+    static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError);
 
     void StartTimer(uint32_t aTimeoutMs);
 
