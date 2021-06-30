@@ -38,7 +38,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     {
         if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
         {
-            ChipLogError(Zcl, "ON OFF attribute ID: 0x%" PRIx32 "Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16, attributeId,
+            ChipLogError(Zcl, "ON OFF attribute ID: 0x%" PRIx32 " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16, attributeId,
                          type, *value, size);
             return;
         }
@@ -47,14 +47,14 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
     else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
     {
-        ChipLogProgress(Zcl, "Level Control attribute ID: 0x%" PRIx32 "Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+        ChipLogProgress(Zcl, "Level Control attribute ID: 0x%" PRIx32 " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
                         attributeId, type, *value, size);
 
         // WIP Apply attribute change to Light
     }
     else if (clusterId == ZCL_COLOR_CONTROL_CLUSTER_ID)
     {
-        ChipLogProgress(Zcl, "Color Control attribute ID: 0x%" PRIx32 "Type: %" PRIu8 " Value: %" PRIu16", length %" PRIu16,
+        ChipLogProgress(Zcl, "Color Control attribute ID: 0x%" PRIx32 " Type: %" PRIu8 " Value: %" PRIu16", length %" PRIu16,
                         attributeId, type, *value, size);
 
         // WIP Apply attribute change to Light
