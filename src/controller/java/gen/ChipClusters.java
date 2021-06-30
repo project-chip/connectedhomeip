@@ -1017,6 +1017,15 @@ public class ChipClusters {
     }
   }
 
+  public static class ElectricalMeasurementCluster extends BaseChipCluster {
+    public ElectricalMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  }
+
   public static class EthernetNetworkDiagnosticsCluster extends BaseChipCluster {
     public EthernetNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

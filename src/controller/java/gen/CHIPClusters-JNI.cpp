@@ -7636,6 +7636,15 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
+JNI_METHOD(jlong, ElectricalMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    ElectricalMeasurementCluster * cppCluster = new ElectricalMeasurementCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, EthernetNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());

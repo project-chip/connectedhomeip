@@ -68,6 +68,7 @@ using namespace chip::Encoding::LittleEndian;
 | Descriptor                                                          | 0x001D |
 | DiagnosticLogs                                                      | 0x0032 |
 | DoorLock                                                            | 0x0101 |
+| ElectricalMeasurement                                               | 0x0B04 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
 | FlowMeasurement                                                     | 0x0404 |
@@ -206,6 +207,8 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_SET_YEARDAY_SCHEDULE_COMMAND_ID (0x0E)
 #define ZCL_UNLOCK_DOOR_COMMAND_ID (0x01)
 #define ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID (0x03)
+
+#define ELECTRICAL_MEASUREMENT_CLUSTER_ID 0x0B04
 
 #define ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID 0x0037
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
@@ -2350,6 +2353,153 @@ PacketBufferHandle encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t seq
 PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDoorLockClusterRevision", DOOR_LOCK_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster ElectricalMeasurement                                       | 0x0B04 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasurementType                                                   | 0x0000 |
+| * TotalActivePower                                                  | 0x0304 |
+| * RmsVoltage                                                        | 0x0505 |
+| * RmsVoltageMin                                                     | 0x0506 |
+| * RmsVoltageMax                                                     | 0x0507 |
+| * RmsCurrent                                                        | 0x0508 |
+| * RmsCurrentMin                                                     | 0x0509 |
+| * RmsCurrentMax                                                     | 0x050A |
+| * ActivePower                                                       | 0x050B |
+| * ActivePowerMin                                                    | 0x050C |
+| * ActivePowerMax                                                    | 0x050D |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeElectricalMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverElectricalMeasurementAttributes", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MeasurementType
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadMeasurementTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementMeasurementType", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TotalActivePower
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadTotalActivePowerAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementTotalActivePower", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0304);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsVoltage
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltage", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0505);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsVoltageMin
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltageMin", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0506);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsVoltageMax
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltageMax", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0507);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsCurrent
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrent", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0508);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsCurrentMin
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrentMin", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0509);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsCurrentMax
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrentMax", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x050A);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ActivePower
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementActivePower", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x050B);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ActivePowerMin
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementActivePowerMin", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x050C);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ActivePowerMax
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementActivePowerMax", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x050D);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementClusterRevision", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

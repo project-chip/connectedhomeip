@@ -304,6 +304,8 @@ class ChipClusters:
                     "pin": "str",
                 },
             },
+            "ElectricalMeasurement": {
+            },
             "EthernetNetworkDiagnostics": {
                 "ResetCounts": {
                 },
@@ -1213,6 +1215,56 @@ class ChipClusters:
                 },
                 "ActuatorEnabled": {
                     "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "ElectricalMeasurement": {
+                "MeasurementType": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "TotalActivePower": {
+                    "attributeId": 0x0304,
+                    "type": "int",
+                },
+                "RmsVoltage": {
+                    "attributeId": 0x0505,
+                    "type": "int",
+                },
+                "RmsVoltageMin": {
+                    "attributeId": 0x0506,
+                    "type": "int",
+                },
+                "RmsVoltageMax": {
+                    "attributeId": 0x0507,
+                    "type": "int",
+                },
+                "RmsCurrent": {
+                    "attributeId": 0x0508,
+                    "type": "int",
+                },
+                "RmsCurrentMin": {
+                    "attributeId": 0x0509,
+                    "type": "int",
+                },
+                "RmsCurrentMax": {
+                    "attributeId": 0x050A,
+                    "type": "int",
+                },
+                "ActivePower": {
+                    "attributeId": 0x050B,
+                    "type": "int",
+                },
+                "ActivePowerMin": {
+                    "attributeId": 0x050C,
+                    "type": "int",
+                },
+                "ActivePowerMax": {
+                    "attributeId": 0x050D,
                     "type": "int",
                 },
                 "ClusterRevision": {
@@ -3030,6 +3082,30 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_DoorLock_ActuatorEnabled(device, ZCLendpoint, ZCLgroupid)
     def ClusterDoorLock_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_DoorLock_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeMeasurementType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_MeasurementType(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeTotalActivePower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_TotalActivePower(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsVoltage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltage(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsVoltageMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMin(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsVoltageMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMax(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsCurrent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrent(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsCurrentMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMin(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsCurrentMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMax(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeActivePower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePower(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeActivePowerMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMin(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeActivePowerMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMax(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributePacketRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributePacketTxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4130,6 +4206,43 @@ class ChipClusters:
         # Cluster DoorLock ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_DoorLock_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_DoorLock_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement
+        # Cluster ElectricalMeasurement ReadAttribute MeasurementType
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_MeasurementType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_MeasurementType.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute TotalActivePower
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_TotalActivePower.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_TotalActivePower.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsVoltage
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltage.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsVoltageMin
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMin.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsVoltageMax
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMax.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMax.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsCurrent
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrent.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsCurrentMin
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMin.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsCurrentMax
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMax.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMax.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute ActivePower
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePower.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePower.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute ActivePowerMin
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMin.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute ActivePowerMax
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMax.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMax.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ClusterRevision.restype = ctypes.c_uint32
         # Cluster EthernetNetworkDiagnostics
         # Cluster EthernetNetworkDiagnostics Command ResetCounts
         self._chipLib.chip_ime_AppendCommand_EthernetNetworkDiagnostics_ResetCounts.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
