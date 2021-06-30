@@ -492,7 +492,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     char txtDeviceName[chip::Mdns::kKeyDeviceNameMaxLength + 4];
     if (params.GetDeviceName().HasValue())
     {
-        snprintf(txtDeviceName, sizeof(txtDeviceType), "DN=%s", params.GetDeviceName().Value());
+        snprintf(txtDeviceName, sizeof(txtDeviceName), "DN=%s", params.GetDeviceName().Value());
         txtFields[numTxtFields++] = txtDeviceName;
     }
 
