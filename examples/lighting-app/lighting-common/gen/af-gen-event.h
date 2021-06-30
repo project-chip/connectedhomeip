@@ -65,14 +65,14 @@
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
     { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },       \
-    { &emberAfPluginColorControlServerHueSatTransitionEventControl,                                                                \
+        { &emberAfPluginColorControlServerHueSatTransitionEventControl,                                                            \
           emberAfPluginColorControlServerHueSatTransitionEventHandler },                                                           \
-    { &emberAfPluginColorControlServerTempTransitionEventControl, emberAfPluginColorControlServerTempTransitionEventHandler },     \
-    { &emberAfPluginColorControlServerXyTransitionEventControl, emberAfPluginColorControlServerXyTransitionEventHandler },
+        { &emberAfPluginColorControlServerTempTransitionEventControl, emberAfPluginColorControlServerTempTransitionEventHandler }, \
+        { &emberAfPluginColorControlServerXyTransitionEventControl, emberAfPluginColorControlServerXyTransitionEventHandler },
 
-#define EMBER_AF_GENERATED_EVENT_STRINGS "Level Control Cluster Server EP 1","Color Control Cluster Server Plugin HueSatTransition",                                    \
-        "Color Control Cluster Server Plugin TempTransition", "Color Control Cluster Server Plugin XyTransition",                  \
-
+#define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
+    "Level Control Cluster Server EP 1", "Color Control Cluster Server Plugin HueSatTransition",                                   \
+        "Color Control Cluster Server Plugin TempTransition", "Color Control Cluster Server Plugin XyTransition",
 
 // The length of the event context table used to track and retrieve cluster events
 #define EMBER_AF_EVENT_CONTEXT_LENGTH 1
