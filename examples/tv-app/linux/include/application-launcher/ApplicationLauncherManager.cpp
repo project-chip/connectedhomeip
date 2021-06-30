@@ -18,11 +18,11 @@
 
 #include "ApplicationLauncherManager.h"
 #include <app/Command.h>
+#include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
-
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 
@@ -45,10 +45,10 @@ vector<uint16_t> ApplicationLauncherManager::proxyGetApplicationList()
     return applications;
 }
 
-EmberAfApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data)
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data)
 {
     // TODO: Insert your code
-    EmberAfApplicationLauncherResponse response;
+    ApplicationLauncherResponse response;
     char testData[] = "data";
     response.data   = (uint8_t *) testData;
     response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;

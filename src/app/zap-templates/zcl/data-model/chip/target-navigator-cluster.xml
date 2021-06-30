@@ -51,9 +51,4 @@ limitations under the License.
       <item name="identifier" type="INT8U"/>
       <item name="name" type="OCTET_STRING" length="32"/> <!-- Change this to CHAR_STRING once it is supported #6112 -->
   </struct>
-
-  <struct name="TargetNavigatorResponse">
-    <item name="status" type="NavigateTargetStatus"/>
-    <item name="data" type="CHAR_STRING"/>
-  </struct>
 </configurator>

@@ -7580,7 +7580,7 @@
             },
             {
               "name": "MediaSkipSeekResponse",
-              "code": 10,
+              "code": 11,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,

@@ -38,32 +38,32 @@ exit:
     return err;
 }
 
-EmberAfMediaPlaybackStatus MediaPlaybackManager::proxyMediaPlaybackRequest(EmberAfMediaPlaybackRequest mediaPlaybackRequest,
+EmberAfMediaPlaybackStatus MediaPlaybackManager::proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
                                                                            uint64_t deltaPositionMilliseconds)
 {
     switch (mediaPlaybackRequest)
     {
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_PLAY:
+    case MEDIA_PLAYBACK_REQUEST_PLAY:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_PAUSE:
+    case MEDIA_PLAYBACK_REQUEST_PAUSE:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_STOP:
+    case MEDIA_PLAYBACK_REQUEST_STOP:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_START_OVER:
+    case MEDIA_PLAYBACK_REQUEST_START_OVER:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_PREVIOUS:
+    case MEDIA_PLAYBACK_REQUEST_PREVIOUS:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_NEXT:
+    case MEDIA_PLAYBACK_REQUEST_NEXT:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_REWIND:
+    case MEDIA_PLAYBACK_REQUEST_REWIND:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_FAST_FORWARD:
+    case MEDIA_PLAYBACK_REQUEST_FAST_FORWARD:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD:
+    case MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD:
+    case MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD:
     // TODO: Insert code here
-    case EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_SEEK:
+    case MEDIA_PLAYBACK_REQUEST_SEEK:
         return EMBER_ZCL_MEDIA_PLAYBACK_STATUS_SUCCESS;
         break;
     default: {
@@ -72,7 +72,7 @@ EmberAfMediaPlaybackStatus MediaPlaybackManager::proxyMediaPlaybackRequest(Ember
     }
 }
 
-EmberAfMediaPlaybackStatus mediaPlaybackClusterSendMediaPlaybackRequest(EmberAfMediaPlaybackRequest mediaPlaybackRequest,
+EmberAfMediaPlaybackStatus mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
                                                                         uint64_t deltaPositionMilliseconds)
 {
     return MediaPlaybackManager().proxyMediaPlaybackRequest(mediaPlaybackRequest, deltaPositionMilliseconds);
