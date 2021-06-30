@@ -43,7 +43,8 @@ class MediaPlaybackManager
 public:
     CHIP_ERROR Init();
     void storeNewPlaybackState(chip::EndpointId endpoint, uint8_t newPlaybackState);
-    EmberAfMediaPlaybackStatus proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest);
+    EmberAfMediaPlaybackStatus proxyMediaPlaybackRequest(EmberAfMediaPlaybackRequest mediaPlaybackRequest,
+                                                         uint64_t deltaPositionMilliseconds);
 
 private:
     uint8_t oldPlaybackState;
