@@ -59,6 +59,19 @@ bool ResponseSendingState::IncludeQuery() const
 
 } // namespace Internal
 
+CHIP_ERROR ResponseSender::AddQueryResponder(QueryResponderBase * queryResponder)
+{
+    for (size_t i = 0; i < kMaxQueryResponders; ++i)
+    {
+        if (mResponder[i] == nullptr || mResponder[i] == queryResponder)
+        {
+            mResponder[i] = queryResponder;
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_NO_MEMORY;
+}
+
 CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource)
 {
     mSendState.Reset(messageId, query, querySource);
@@ -66,7 +79,13 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
     // Responder has a stateful 'additional replies required' that is used within the response
     // loop. 'no additionals required' is set at the start and additionals are marked as the query
     // reply is built.
-    mResponder->ResetAdditionals();
+    for (size_t i = 0; i < kMaxQueryResponders; ++i)
+    {
+        if (mResponder[i] != nullptr)
+        {
+            mResponder[i]->ResetAdditionals();
+        }
+    }
 
     // send all 'Answer' replies
     {
@@ -86,17 +105,23 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             constexpr uint64_t kOneSecondMs = 1000;
             responseFilter.SetIncludeOnlyMulticastBeforeMS(kTimeNowMs - kOneSecondMs);
         }
-
-        for (auto it = mResponder->begin(&responseFilter); it != mResponder->end(); it++)
+        for (size_t i = 0; i < kMaxQueryResponders; ++i)
         {
-            it->responder->AddAllResponses(querySource, this);
-            ReturnErrorOnFailure(mSendState.GetError());
-
-            mResponder->MarkAdditionalRepliesFor(it);
-
-            if (!mSendState.SendUnicast())
+            if (mResponder[i] == nullptr)
             {
-                it->lastMulticastTime = kTimeNowMs;
+                continue;
+            }
+            for (auto it = mResponder[i]->begin(&responseFilter); it != mResponder[i]->end(); it++)
+            {
+                it->responder->AddAllResponses(querySource, this);
+                ReturnErrorOnFailure(mSendState.GetError());
+
+                mResponder[i]->MarkAdditionalRepliesFor(it);
+
+                if (!mSendState.SendUnicast())
+                {
+                    it->lastMulticastTime = kTimeNowMs;
+                }
             }
         }
     }
@@ -113,11 +138,17 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         responseFilter
             .SetReplyFilter(&queryReplyFilter) //
             .SetIncludeAdditionalRepliesOnly(true);
-
-        for (auto it = mResponder->begin(&responseFilter); it != mResponder->end(); it++)
+        for (size_t i = 0; i < kMaxQueryResponders; ++i)
         {
-            it->responder->AddAllResponses(querySource, this);
-            ReturnErrorOnFailure(mSendState.GetError());
+            if (mResponder[i] == nullptr)
+            {
+                continue;
+            }
+            for (auto it = mResponder[i]->begin(&responseFilter); it != mResponder[i]->end(); it++)
+            {
+                it->responder->AddAllResponses(querySource, this);
+                ReturnErrorOnFailure(mSendState.GetError());
+            }
         }
     }
 
