@@ -696,7 +696,7 @@ private:
 
 {{/if}}
 {{#if (isReportableAttribute)}}
-- (void) configureAttribute{{asCamelCased name false}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#unless (isDiscreteType)}} change:({{chipType}})change{{/unless}} responseHandler:(ResponseHandler)responseHandler
+- (void) configureAttribute{{asCamelCased name false}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -714,7 +714,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ConfigureAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
+        err = self.cppCluster.ConfigureAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}});
     });
 
     if (err != CHIP_NO_ERROR) {

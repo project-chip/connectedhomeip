@@ -262,7 +262,7 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
     item.name                = item.name || item.label;
     item.isStruct            = false;
     item.atomicTypeId        = atomic.atomicId;
-    item.discrete            = atomic.isDiscrete;
+    item.isAnalog            = atomic.isDiscrete == false && atomic.isString == false;
     item.size                = atomic.size;
     item.chipType            = atomic.chipType;
     item.chipTypePutLength   = asPutLength(atomic.chipType);
