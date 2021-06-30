@@ -25,8 +25,20 @@ tests:
       response:
           value:
               [
-                  { majorNumber: 1, minorNumber: 2, name: 12, callSign: 13, affiliateCallSign: 13 },
-                  { majorNumber: 2, minorNumber: 3, name: 12, callSign: 13, affiliateCallSign: 13 },
+                  {
+                      majorNumber: 1,
+                      minorNumber: 2,
+                      name: 12,
+                      callSign: 13,
+                      affiliateCallSign: 13,
+                  },
+                  {
+                      majorNumber: 2,
+                      minorNumber: 3,
+                      name: 12,
+                      callSign: 13,
+                      affiliateCallSign: 13,
+                  },
               ]
     # TODO: Enable the test once struct response is supported
     # - label: "Change Channel Command"
@@ -35,7 +47,7 @@ tests:
     #       values:
     #           - name: "match"
     #             value: "CNN"
-    
+
     - label: "Change Channel By Number Command"
       command: "ChangeChannelByNumber"
       arguments:

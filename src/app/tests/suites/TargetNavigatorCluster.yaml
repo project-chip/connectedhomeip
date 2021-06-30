@@ -23,11 +23,7 @@ tests:
       command: "readAttribute"
       attribute: "Target Navigator List"
       response:
-          value:
-              [
-                  { identifier: 1, name: 12 },
-                  { identifier: 2, name: 12 },
-              ]
+          value: [{ identifier: 1, name: 12 }, { identifier: 2, name: 12 }]
 
     - label: "Navigate Target Command"
       command: "NavigateTarget"

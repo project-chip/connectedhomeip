@@ -73,11 +73,8 @@ exit:
     }
 }
 
-EmberAfApplicationLauncherApp getApplicationFromCommand(EmberAfClusterCommand * cmd, unsigned char * reqestData,
-                                                        unsigned short catalogVendorId, unsigned char * applicationId)
+EmberAfApplicationLauncherApp getApplicationFromCommand(unsigned short catalogVendorId, unsigned char * applicationId)
 {
-    std::string reqestDataString(reinterpret_cast<char *>(reqestData));
-
     EmberAfApplicationLauncherApp application = {};
     application.applicationId                 = applicationId;
     application.catalogVendorId               = catalogVendorId;
@@ -88,8 +85,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * com
                                                         unsigned short requestApplicationCatalogVendorId,
                                                         unsigned char * requestApplicationId)
 {
-    EmberAfApplicationLauncherApp application =
-        getApplicationFromCommand(emberAfCurrentCommand(), requestData, requestApplicationCatalogVendorId, requestApplicationId);
+    EmberAfApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
     std::string reqestDataString(reinterpret_cast<char *>(requestData));
     EmberAfApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
     sendResponse(command, response);
