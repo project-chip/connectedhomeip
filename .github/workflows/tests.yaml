@@ -83,7 +83,12 @@ jobs:
               timeout-minutes: 10
               run: |
                   ifconfig -a
-                  scripts/tests/test_suites.sh
+                  scripts/tests/test_suites.sh 
+            - name: Run TV Tests
+              timeout-minutes: 10
+              run: |
+                  ifconfig -a
+                  scripts/tests/test_suites.sh -a tv -i 20
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
@@ -164,6 +169,10 @@ jobs:
               timeout-minutes: 15
               run: |
                   scripts/tests/test_suites.sh
+            - name: Run TV Tests
+              timeout-minutes: 10
+              run: |
+                  scripts/tests/test_suites.sh -a tv -i 20
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}

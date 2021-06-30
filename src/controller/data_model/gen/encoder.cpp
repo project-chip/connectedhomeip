@@ -490,7 +490,7 @@ PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uin
 PacketBufferHandle encodeApplicationBasicClusterReadApplicationStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadApplicationBasicApplicationStatus", APPLICATION_BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0007);
     COMMAND_FOOTER();
 }
 
