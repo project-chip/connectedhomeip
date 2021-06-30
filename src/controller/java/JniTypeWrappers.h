@@ -17,8 +17,11 @@
 
 #pragma once
 
+#include "JniReferences.h"
+
 #include <jni.h>
 #include <lib/support/Span.h>
+#include <sstream>
 
 /// Exposes the underlying UTF string from a jni string
 class JniUtfString
@@ -60,6 +63,15 @@ class UtfString
 {
 public:
     UtfString(JNIEnv * env, const char * data) : mEnv(env) { mData = data != nullptr ? mEnv->NewStringUTF(data) : nullptr; }
+    UtfString(JNIEnv * env, chip::ByteSpan data) : mEnv(env)
+    {
+        std::ostringstream os;
+        for (size_t i = 0; i < data.size(); i++)
+        {
+            os << data.data()[i];
+        }
+        mData = env->NewStringUTF(os.str().c_str());
+    }
     ~UtfString() { mEnv->DeleteLocalRef(mData); }
 
     jstring jniValue() { return mData; }
@@ -67,4 +79,17 @@ public:
 private:
     JNIEnv * mEnv;
     jstring mData;
+};
+
+/// Manages an pre-existing global reference to a jclass.
+class JniClass
+{
+public:
+    explicit JniClass(jclass mClassRef) : mClassRef(mClassRef) {}
+    ~JniClass() { chip::Controller::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mClassRef); }
+
+    jclass classRef() { return mClassRef; }
+
+private:
+    jclass mClassRef;
 };
