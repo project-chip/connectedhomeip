@@ -158,7 +158,7 @@ CHIP_ERROR chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelC
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.WriteAttribute{{asCamelCased name false}}(g{{asCallbackAttributeType atomicTypeId}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isString type)}} chip::ByteSpan(value, len){{else}}value{{/if}});
+    return cluster.WriteAttribute{{asCamelCased name false}}(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isString type)}} chip::ByteSpan(value, len){{else}}value{{/if}});
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}
