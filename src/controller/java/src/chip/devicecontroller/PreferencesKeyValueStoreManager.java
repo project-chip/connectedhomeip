@@ -21,9 +21,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-/**
- * Android implementation of a key/value store using SharedPreferences.
- */
+/** Android implementation of a key/value store using SharedPreferences. */
 public class PreferencesKeyValueStoreManager implements KeyValueStoreManager {
   private final String TAG = KeyValueStoreManager.class.getSimpleName();
   private final String PREFERENCE_FILE_KEY = "com.google.chip.KeyValueStore";
