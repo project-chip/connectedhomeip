@@ -4531,14 +4531,12 @@
 /** @brief Command description for LaunchApp
  *
  * Command: LaunchApp
- * @param application ApplicationLauncherApp []
- * @param applicationLen int
+ * @param catalogVendorId INT16U
  */
 #define emberAfFillCommandApplication                                                                                              \
-    LauncherClusterLaunchApp(application, applicationLen)                                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    LauncherClusterLaunchApp(catalogVendorId) emberAfFillExternalBuffer(mask,                                                      \
                                                                                                                                    \
-                                  ZCL_LAUNCH_APP_COMMAND_ID, "b", application, applicationLen);
+                                                                        ZCL_LAUNCH_APP_COMMAND_ID, "u", catalogVendorId);
 
 /** @brief Command description for LaunchAppResponse
  *
@@ -4549,6 +4547,16 @@
     LauncherClusterLaunchAppResponse(data) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
                                                                      ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, "u", data);
+
+/** @brief Command description for LaunchApp
+ *
+ * Command: LaunchApp
+ * @param applicationId CHAR_STRING
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    LauncherClusterLaunchApp(applicationId) emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_LAUNCH_APP_COMMAND_ID, "u", applicationId);
 
 /** @brief Command description for ChangeStatus
  *
