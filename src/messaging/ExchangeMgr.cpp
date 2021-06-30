@@ -201,7 +201,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
-    bool sendAckAndCloseExchange            = false;
 
     ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %" PRIu32 " on exchange %d",
                     payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
@@ -269,36 +268,23 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
     }
 
-    // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
-    // to hand this message, we need to create a temporary exchange to send an ack for this message and then close this exchange.
-    sendAckAndCloseExchange = payloadHeader.NeedsAck() && (matchingUMH == nullptr);
-
-    // If we found a handler or we need to create a new exchange context (EC).
-    if (matchingUMH != nullptr || sendAckAndCloseExchange)
+    // If we found a handler or we need to send an ack, create an exchange to
+    // handle the message.
+    if (matchingUMH != nullptr || payloadHeader.NeedsAck())
     {
-        ExchangeContext * ec = nullptr;
-
-        if (sendAckAndCloseExchange)
-        {
-            // If rcvd msg is from initiator then this exchange is created as not Initiator.
-            // If rcvd msg is not from initiator then this exchange is created as Initiator.
-            // TODO: Figure out which channel to use for the received message
-            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
-        }
-        else
-        {
-            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
-        }
+        ExchangeDelegate * delegate = matchingUMH ? matchingUMH->Delegate : nullptr;
+        // If rcvd msg is from initiator then this exchange is created as not Initiator.
+        // If rcvd msg is not from initiator then this exchange is created as Initiator.
+        // Note that if matchingUMH is not null then rcvd msg if from initiator.
+        // TODO: Figure out which channel to use for the received message
+        ExchangeContext * ec =
+            mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), delegate);
 
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
 
         ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
-
-        // Close exchange if it was created only to send ack for a duplicate message.
-        if (sendAckAndCloseExchange)
-            ec->Close();
     }
 
 exit:

@@ -110,7 +110,6 @@ public:
         streamer_printf(sout, "Response received: len=%u time=%.3fms\n", buffer->DataLength(),
                         static_cast<double>(transitTime) / 1000);
 
-        gExchangeCtx->Close();
         gExchangeCtx = nullptr;
         return CHIP_NO_ERROR;
     }

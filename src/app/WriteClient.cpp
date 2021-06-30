@@ -294,19 +294,15 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     VerifyOrDie(apExchangeContext == mpExchangeCtx);
 
+    // We are done with this exchange, and it will be closing itself.
+    mpExchangeCtx = nullptr;
+
     // Verify that the message is an Write Response.
     // If not, close the exchange and free the payload.
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse))
     {
-        apExchangeContext->Close();
-        mpExchangeCtx = nullptr;
         ExitNow();
     }
-
-    // Close the current exchange after receiving the response since the response message marks the
-    // end of conversation represented by the exchange. We should create an new exchange for a new
-    // conversation defined in Interaction Model protocol.
-    ClearExistingExchangeContext();
 
     err = ProcessWriteResponseMessage(std::move(aPayload));
 

@@ -202,6 +202,14 @@ protected:
 
         /// When set, signifies that at least one message has been received from peer on this exchange context.
         kFlagMsgRcvdFromPeer = 0x0040,
+
+        /// When set, signifies that this exchange is waiting for a call to SendMessage.
+        kFlagWillSendMessage = 0x0080,
+
+        /// When set, signifies that we are currently in the middle of HandleMessage.
+        kFlagHandlingMessage = 0x0100,
+        /// When set, we have had Close() or Abort() called on us already.
+        kFlagClosed = 0x0200,
     };
 
     BitFlags<Flags> mFlags; // Internal state flags

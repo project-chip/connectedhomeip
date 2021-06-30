@@ -277,7 +277,6 @@ exit:
         ChipLogError(SecureChannel, "Failed to handle MsgCounterSyncReq message with error:%s", ErrorStr(err));
     }
 
-    exchangeContext->Close();
     return err;
 }
 
@@ -324,7 +323,6 @@ exit:
         ChipLogError(SecureChannel, "Failed to handle MsgCounterSyncResp message with error:%s", ErrorStr(err));
     }
 
-    exchangeContext->Close();
     return err;
 }
 

@@ -190,7 +190,6 @@ CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext *
     // err = SendStatusReport(ec, kChipProfile_Common, kStatus_UnsupportedMessage);
     // SuccessOrExit(err);
 
-    apExchangeContext->Close();
     apExchangeContext = nullptr;
 
     ChipLogFunctError(err);

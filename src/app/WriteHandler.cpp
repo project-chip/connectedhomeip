@@ -74,6 +74,8 @@ CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeC
 
 exit:
     ChipLogFunctError(err);
+    // Keep Shutdown() from double-closing our exchange.
+    mpExchangeCtx = nullptr;
     Shutdown();
     return err;
 }
