@@ -19,6 +19,5 @@ config:
     endpoint: 1
 
 tests:
-
     - label: "Sleep Input Status Command"
       command: "Sleep"
