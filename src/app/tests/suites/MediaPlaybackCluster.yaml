@@ -19,7 +19,6 @@ config:
     endpoint: 3
 
 tests:
-
     - label: "Media Playback Play Command"
       command: "MediaPlay"
 
