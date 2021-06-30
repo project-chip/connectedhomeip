@@ -53,6 +53,7 @@ class TestWriteInteraction
 public:
     static void TestWriteClient(nlTestSuite * apSuite, void * apContext);
     static void TestWriteHandler(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient);
@@ -88,7 +89,7 @@ void TestWriteInteraction::AddAttributeDataElement(nlTestSuite * apSuite, void *
 
     chip::TLV::TLVWriter * writer = aWriteClient.GetAttributeDataElementTLVWriter();
 
-    err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
+    err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = aWriteClient.FinishAttribute();
@@ -243,14 +244,67 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     AddAttributeStatus(apSuite, apContext, writeHandler);
 
-    writeHandler.mpExchangeCtx = ctx.NewExchangeToLocal(nullptr);
     TestExchangeDelegate delegate;
-    writeHandler.mpExchangeCtx->SetDelegate(&delegate);
-    err = writeHandler.SendWriteResponse();
+    writeHandler.mpExchangeCtx = ctx.NewExchangeToLocal(&delegate);
+    err                        = writeHandler.SendWriteResponse();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     writeHandler.Shutdown();
 }
+
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
+{
+    return aWriteHandler->AddAttributeStatusCode(
+        AttributePathParams(aClusterInfo.mNodeId, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId,
+                            aClusterInfo.mListIndex, AttributePathParams::Flags::kFieldIdValid),
+        Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
+        Protocols::InteractionModel::ProtocolCode::Success);
+}
+
+class RoundtripDelegate : public chip::app::InteractionModelDelegate
+{
+public:
+    CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
+                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
+                                   const uint16_t aProtocolCode, AttributePathParams & aAttributePathParams,
+                                   uint8_t aCommandIndex) override
+    {
+        mGotResponse = true;
+        return CHIP_NO_ERROR;
+    }
+
+    bool mGotResponse = false;
+};
+
+void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    RoundtripDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    app::WriteClient * writeClient;
+    err = engine->NewWriteClient(&writeClient);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    AddAttributeDataElement(apSuite, apContext, *writeClient);
+
+    NL_TEST_ASSERT(apSuite, !delegate.mGotResponse);
+
+    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    err                         = writeClient->SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetAdminId(), &session);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, delegate.mGotResponse);
+
+    engine->Shutdown();
+}
+
 } // namespace app
 } // namespace chip
 
@@ -265,6 +319,7 @@ const nlTest sTests[] =
 {
         NL_TEST_DEF("CheckWriteClient", chip::app::TestWriteInteraction::TestWriteClient),
         NL_TEST_DEF("CheckWriteHandler", chip::app::TestWriteInteraction::TestWriteHandler),
+        NL_TEST_DEF("CheckWriteRoundtrip", chip::app::TestWriteInteraction::TestWriteRoundtrip),
         NL_TEST_SENTINEL()
 };
 // clang-format on
