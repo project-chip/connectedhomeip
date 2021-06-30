@@ -39,11 +39,37 @@
  ******************************************************************************/
 
 #include <app/Command.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
+#include <app/common/gen/enums.h>
 #include <app/util/af.h>
 
-bool emberAfKeypadInputClusterSendKeyCallback(chip::app::Command * commandObj, unsigned char)
+EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode);
+
+static void sendResponse(chip::app::Command * command, EmberAfKeypadInputStatus keypadInputStatus)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
+    static_assert(std::is_same<std::underlying_type_t<EmberAfKeypadInputStatus>, uint8_t>::value, "Wrong enum size");
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_KEYPAD_INPUT_CLUSTER_ID,
+                                               ZCL_SEND_KEY_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::TLV::TLVWriter * writer          = nullptr;
+
+    VerifyOrExit(command != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    SuccessOrExit(err = command->PrepareCommand(cmdParams));
+    VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    SuccessOrExit(err = writer->Put(chip::TLV::ContextTag(0), keypadInputStatus));
+    SuccessOrExit(err = command->FinishCommand());
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode KeypadInputResponse command. Error:%s", chip::ErrorStr(err));
+    }
+}
+
+bool emberAfKeypadInputClusterSendKeyCallback(chip::app::Command * command, unsigned char keyCode)
+{
+    EmberAfKeypadInputStatus status = keypadInputClusterSendKey(static_cast<EmberAfKeypadInputCecKeyCode>(keyCode));
+    sendResponse(command, status);
     return true;
 }
