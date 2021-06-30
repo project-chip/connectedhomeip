@@ -27,7 +27,7 @@ jobs:
         strategy:
             fail-fast: False
             matrix:
-                EXAMPLE_APP:    [lock-app]
+                EXAMPLE_APP:    [lock-app, lighting-app]
                 EXAMPLE_TARGET: [CY8CPROTO_062_4343W]
         
         name: "${{matrix.EXAMPLE_APP}}: ${{matrix.EXAMPLE_TARGET}}"
