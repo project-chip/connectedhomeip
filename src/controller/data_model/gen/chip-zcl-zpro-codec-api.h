@@ -113,7 +113,7 @@ chip::System::PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAtt
 | * ProductId                                                         | 0x0003 |
 | * ApplicationId                                                     | 0x0005 |
 | * CatalogVendorId                                                   | 0x0006 |
-| * ApplicationSatus                                                  | 0x0007 |
+| * ApplicationStatus                                                 | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -168,10 +168,10 @@ chip::System::PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorI
 
 /**
  * @brief
- *    Encode a Application Basic server read command for the application satus attribute into buffer including the APS frame
+ *    Encode a Application Basic server read command for the application status attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum,
-                                                                                            chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationStatusAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
 
 /**
  * @brief

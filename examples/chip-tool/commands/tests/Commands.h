@@ -21,6 +21,3164 @@
 
 #include "TestCommand.h"
 
+class TargetNavigatorCluster : public TestCommand
+{
+public:
+    TargetNavigatorCluster() : TestCommand("TargetNavigatorCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TargetNavigatorCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterTargetNavigatorCommandReadAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterTargetNavigatorCommandNavigateTarget_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "TargetNavigatorCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    //
+    // Tests methods
+    //
+
+    // Test Read attribute Target Navigator list
+    typedef void (*SuccessCallback_0)(void * context, uint16_t count, _NavigateTargetTargetInfo * targetNavigatorList);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterTargetNavigatorCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Target Navigator - Read attribute Target Navigator list: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTargetNavigatorCommandReadAttribute_0_FailureResponse, this);
+        mOnSuccessCallback_0 = new chip::Callback::Callback<SuccessCallback_0>(
+            OnTestSendClusterTargetNavigatorCommandReadAttribute_0_SuccessResponse, this);
+
+        chip::Controller::TargetNavigatorCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeTargetNavigatorList(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTargetNavigatorCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Target Navigator - Read attribute Target Navigator list: Failure Response");
+
+        TargetNavigatorCluster * runner = reinterpret_cast<TargetNavigatorCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void
+    OnTestSendClusterTargetNavigatorCommandReadAttribute_0_SuccessResponse(void * context, uint16_t count,
+                                                                           _NavigateTargetTargetInfo * targetNavigatorList)
+    {
+        ChipLogProgress(chipTool, "Target Navigator - Read attribute Target Navigator list: Success Response");
+
+        TargetNavigatorCluster * runner = reinterpret_cast<TargetNavigatorCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (count != 2)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "[object Object],[object Object]");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Navigate Target Command
+    typedef void (*SuccessCallback_1)(void * context, uint8_t status, chip::ByteSpan data);
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
+    bool mIsFailureExpected_1                                               = 0;
+
+    CHIP_ERROR TestSendClusterTargetNavigatorCommandNavigateTarget_1()
+    {
+        ChipLogProgress(chipTool, "Target Navigator - Navigate Target Command: Sending command...");
+
+        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTargetNavigatorCommandNavigateTarget_1_FailureResponse, this);
+        mOnSuccessCallback_1 = new chip::Callback::Callback<SuccessCallback_1>(
+            OnTestSendClusterTargetNavigatorCommandNavigateTarget_1_SuccessResponse, this);
+
+        chip::Controller::TargetNavigatorCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t targetArgument      = 1;
+        chip::ByteSpan dataArgument = chip::ByteSpan(chip::Uint8::from_const_char("1"), strlen("1"));
+        err = cluster.NavigateTarget(mOnSuccessCallback_1->Cancel(), mOnFailureCallback_1->Cancel(), targetArgument, dataArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_1;
+            delete mOnSuccessCallback_1;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTargetNavigatorCommandNavigateTarget_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Target Navigator - Navigate Target Command: Failure Response");
+
+        TargetNavigatorCluster * runner = reinterpret_cast<TargetNavigatorCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTargetNavigatorCommandNavigateTarget_1_SuccessResponse(void * context, uint8_t status,
+                                                                                        chip::ByteSpan data)
+    {
+        ChipLogProgress(chipTool, "Target Navigator - Navigate Target Command: Success Response");
+
+        TargetNavigatorCluster * runner = reinterpret_cast<TargetNavigatorCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class AudioOutputCluster : public TestCommand
+{
+public:
+    AudioOutputCluster() : TestCommand("AudioOutputCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "AudioOutputCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterAudioOutputCommandReadAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterAudioOutputCommandSelectOutput_1();
+            break;
+        case 2:
+            err = TestSendClusterAudioOutputCommandRenameOutput_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "AudioOutputCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    //
+    // Tests methods
+    //
+
+    // Test Read attribute Audio Output list
+    typedef void (*SuccessCallback_0)(void * context, uint16_t count, _AudioOutputInfo * audioOutputList);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterAudioOutputCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Audio Output - Read attribute Audio Output list: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterAudioOutputCommandReadAttribute_0_FailureResponse, this);
+        mOnSuccessCallback_0 = new chip::Callback::Callback<SuccessCallback_0>(
+            OnTestSendClusterAudioOutputCommandReadAttribute_0_SuccessResponse, this);
+
+        chip::Controller::AudioOutputCluster cluster;
+        cluster.Associate(mDevice, 2);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeAudioOutputList(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterAudioOutputCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Audio Output - Read attribute Audio Output list: Failure Response");
+
+        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterAudioOutputCommandReadAttribute_0_SuccessResponse(void * context, uint16_t count,
+                                                                                   _AudioOutputInfo * audioOutputList)
+    {
+        ChipLogProgress(chipTool, "Audio Output - Read attribute Audio Output list: Success Response");
+
+        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (count != 3)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "[object Object],[object Object],[object Object]");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Select Output Command
+    typedef void (*SuccessCallback_1)(void * context);
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
+    bool mIsFailureExpected_1                                               = 0;
+
+    CHIP_ERROR TestSendClusterAudioOutputCommandSelectOutput_1()
+    {
+        ChipLogProgress(chipTool, "Audio Output - Select Output Command: Sending command...");
+
+        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterAudioOutputCommandSelectOutput_1_FailureResponse, this);
+        mOnSuccessCallback_1 = new chip::Callback::Callback<SuccessCallback_1>(
+            OnTestSendClusterAudioOutputCommandSelectOutput_1_SuccessResponse, this);
+
+        chip::Controller::AudioOutputCluster cluster;
+        cluster.Associate(mDevice, 2);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t indexArgument = 1;
+        err                   = cluster.SelectOutput(mOnSuccessCallback_1->Cancel(), mOnFailureCallback_1->Cancel(), indexArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_1;
+            delete mOnSuccessCallback_1;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterAudioOutputCommandSelectOutput_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Audio Output - Select Output Command: Failure Response");
+
+        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterAudioOutputCommandSelectOutput_1_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Audio Output - Select Output Command: Success Response");
+
+        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Rename Output Command
+    typedef void (*SuccessCallback_2)(void * context);
+    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_2 = nullptr;
+    bool mIsFailureExpected_2                                               = 0;
+
+    CHIP_ERROR TestSendClusterAudioOutputCommandRenameOutput_2()
+    {
+        ChipLogProgress(chipTool, "Audio Output - Rename Output Command: Sending command...");
+
+        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterAudioOutputCommandRenameOutput_2_FailureResponse, this);
+        mOnSuccessCallback_2 = new chip::Callback::Callback<SuccessCallback_2>(
+            OnTestSendClusterAudioOutputCommandRenameOutput_2_SuccessResponse, this);
+
+        chip::Controller::AudioOutputCluster cluster;
+        cluster.Associate(mDevice, 2);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t indexArgument       = 1;
+        chip::ByteSpan nameArgument = chip::ByteSpan(chip::Uint8::from_const_char("exampleName"), strlen("exampleName"));
+        err = cluster.RenameOutput(mOnSuccessCallback_2->Cancel(), mOnFailureCallback_2->Cancel(), indexArgument, nameArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_2;
+            delete mOnSuccessCallback_2;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterAudioOutputCommandRenameOutput_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Audio Output - Rename Output Command: Failure Response");
+
+        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterAudioOutputCommandRenameOutput_2_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Audio Output - Rename Output Command: Success Response");
+
+        AudioOutputCluster * runner = reinterpret_cast<AudioOutputCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class ApplicationLauncherCluster : public TestCommand
+{
+public:
+    ApplicationLauncherCluster() : TestCommand("ApplicationLauncherCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "ApplicationLauncherCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterApplicationLauncherCommandReadAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterApplicationLauncherCommandLaunchApp_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "ApplicationLauncherCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    //
+    // Tests methods
+    //
+
+    // Test Read attribute Application Launcher list
+    typedef void (*SuccessCallback_0)(void * context, uint16_t count, uint16_t * applicationLauncherList);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterApplicationLauncherCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Application Launcher - Read attribute Application Launcher list: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterApplicationLauncherCommandReadAttribute_0_FailureResponse, this);
+        mOnSuccessCallback_0 = new chip::Callback::Callback<SuccessCallback_0>(
+            OnTestSendClusterApplicationLauncherCommandReadAttribute_0_SuccessResponse, this);
+
+        chip::Controller::ApplicationLauncherCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeApplicationLauncherList(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationLauncherCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Launcher - Read attribute Application Launcher list: Failure Response");
+
+        ApplicationLauncherCluster * runner = reinterpret_cast<ApplicationLauncherCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationLauncherCommandReadAttribute_0_SuccessResponse(void * context, uint16_t count,
+                                                                                           uint16_t * applicationLauncherList)
+    {
+        ChipLogProgress(chipTool, "Application Launcher - Read attribute Application Launcher list: Success Response");
+
+        ApplicationLauncherCluster * runner = reinterpret_cast<ApplicationLauncherCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (count != 2)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "123,456");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Launch App Command
+    typedef void (*SuccessCallback_1)(void * context, uint8_t status, chip::ByteSpan data);
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
+    bool mIsFailureExpected_1                                               = 0;
+
+    CHIP_ERROR TestSendClusterApplicationLauncherCommandLaunchApp_1()
+    {
+        ChipLogProgress(chipTool, "Application Launcher - Launch App Command: Sending command...");
+
+        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterApplicationLauncherCommandLaunchApp_1_FailureResponse, this);
+        mOnSuccessCallback_1 = new chip::Callback::Callback<SuccessCallback_1>(
+            OnTestSendClusterApplicationLauncherCommandLaunchApp_1_SuccessResponse, this);
+
+        chip::Controller::ApplicationLauncherCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        chip::ByteSpan dataArgument          = chip::ByteSpan(chip::Uint8::from_const_char("exampleData"), strlen("exampleData"));
+        uint16_t catalogVendorIdArgument     = 1U;
+        chip::ByteSpan applicationIdArgument = chip::ByteSpan(chip::Uint8::from_const_char("appId"), strlen("appId"));
+        err = cluster.LaunchApp(mOnSuccessCallback_1->Cancel(), mOnFailureCallback_1->Cancel(), dataArgument,
+                                catalogVendorIdArgument, applicationIdArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_1;
+            delete mOnSuccessCallback_1;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationLauncherCommandLaunchApp_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Launcher - Launch App Command: Failure Response");
+
+        ApplicationLauncherCluster * runner = reinterpret_cast<ApplicationLauncherCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationLauncherCommandLaunchApp_1_SuccessResponse(void * context, uint8_t status,
+                                                                                       chip::ByteSpan data)
+    {
+        ChipLogProgress(chipTool, "Application Launcher - Launch App Command: Success Response");
+
+        ApplicationLauncherCluster * runner = reinterpret_cast<ApplicationLauncherCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class KeypadInputCluster : public TestCommand
+{
+public:
+    KeypadInputCluster() : TestCommand("KeypadInputCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "KeypadInputCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterKeypadInputCommandSendKey_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "KeypadInputCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    // Test Send Key Command
+    typedef void (*SuccessCallback_0)(void * context, uint8_t status);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterKeypadInputCommandSendKey_0()
+    {
+        ChipLogProgress(chipTool, "Keypad Input - Send Key Command: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterKeypadInputCommandSendKey_0_FailureResponse, this);
+        mOnSuccessCallback_0 =
+            new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterKeypadInputCommandSendKey_0_SuccessResponse, this);
+
+        chip::Controller::KeypadInputCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t keyCodeArgument = 3;
+        err                     = cluster.SendKey(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel(), keyCodeArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterKeypadInputCommandSendKey_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Keypad Input - Send Key Command: Failure Response");
+
+        KeypadInputCluster * runner = reinterpret_cast<KeypadInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterKeypadInputCommandSendKey_0_SuccessResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Keypad Input - Send Key Command: Success Response");
+
+        KeypadInputCluster * runner = reinterpret_cast<KeypadInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class AccountLoginCluster : public TestCommand
+{
+public:
+    AccountLoginCluster() : TestCommand("AccountLoginCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "AccountLoginCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterAccountLoginCommandGetSetupPIN_0();
+            break;
+        case 1:
+            err = TestSendClusterAccountLoginCommandLogin_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "AccountLoginCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    //
+    // Tests methods
+    //
+
+    // Test Get Setup PIN Command
+    typedef void (*SuccessCallback_0)(void * context, chip::ByteSpan setupPIN);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterAccountLoginCommandGetSetupPIN_0()
+    {
+        ChipLogProgress(chipTool, "Account Login - Get Setup PIN Command: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterAccountLoginCommandGetSetupPIN_0_FailureResponse, this);
+        mOnSuccessCallback_0 = new chip::Callback::Callback<SuccessCallback_0>(
+            OnTestSendClusterAccountLoginCommandGetSetupPIN_0_SuccessResponse, this);
+
+        chip::Controller::AccountLoginCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        chip::ByteSpan tempAccountIdentifierArgument = chip::ByteSpan(chip::Uint8::from_const_char("asdf"), strlen("asdf"));
+        err = cluster.GetSetupPIN(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel(), tempAccountIdentifierArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterAccountLoginCommandGetSetupPIN_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Account Login - Get Setup PIN Command: Failure Response");
+
+        AccountLoginCluster * runner = reinterpret_cast<AccountLoginCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterAccountLoginCommandGetSetupPIN_0_SuccessResponse(void * context, chip::ByteSpan setupPIN)
+    {
+        ChipLogProgress(chipTool, "Account Login - Get Setup PIN Command: Success Response");
+
+        AccountLoginCluster * runner = reinterpret_cast<AccountLoginCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Login Command
+    typedef void (*SuccessCallback_1)(void * context);
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
+    bool mIsFailureExpected_1                                               = 0;
+
+    CHIP_ERROR TestSendClusterAccountLoginCommandLogin_1()
+    {
+        ChipLogProgress(chipTool, "Account Login - Login Command: Sending command...");
+
+        mOnFailureCallback_1 =
+            new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterAccountLoginCommandLogin_1_FailureResponse, this);
+        mOnSuccessCallback_1 =
+            new chip::Callback::Callback<SuccessCallback_1>(OnTestSendClusterAccountLoginCommandLogin_1_SuccessResponse, this);
+
+        chip::Controller::AccountLoginCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        chip::ByteSpan tempAccountIdentifierArgument = chip::ByteSpan(chip::Uint8::from_const_char("asdf"), strlen("asdf"));
+        chip::ByteSpan setupPINArgument = chip::ByteSpan(chip::Uint8::from_const_char("tempPin123"), strlen("tempPin123"));
+        err = cluster.Login(mOnSuccessCallback_1->Cancel(), mOnFailureCallback_1->Cancel(), tempAccountIdentifierArgument,
+                            setupPINArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_1;
+            delete mOnSuccessCallback_1;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterAccountLoginCommandLogin_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Account Login - Login Command: Failure Response");
+
+        AccountLoginCluster * runner = reinterpret_cast<AccountLoginCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterAccountLoginCommandLogin_1_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Account Login - Login Command: Success Response");
+
+        AccountLoginCluster * runner = reinterpret_cast<AccountLoginCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class ApplicationBasicCluster : public TestCommand
+{
+public:
+    ApplicationBasicCluster() : TestCommand("ApplicationBasicCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "ApplicationBasicCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterApplicationBasicCommandChangeStatus_0();
+            break;
+        case 1:
+            err = TestSendClusterApplicationBasicCommandReadAttribute_1();
+            break;
+        case 2:
+            err = TestSendClusterApplicationBasicCommandReadAttribute_2();
+            break;
+        case 3:
+            err = TestSendClusterApplicationBasicCommandReadAttribute_3();
+            break;
+        case 4:
+            err = TestSendClusterApplicationBasicCommandReadAttribute_4();
+            break;
+        case 5:
+            err = TestSendClusterApplicationBasicCommandReadAttribute_5();
+            break;
+        case 6:
+            err = TestSendClusterApplicationBasicCommandReadAttribute_6();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "ApplicationBasicCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 7;
+
+    //
+    // Tests methods
+    //
+
+    // Test Change Status Command
+    typedef void (*SuccessCallback_0)(void * context);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandChangeStatus_0()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Change Status Command: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterApplicationBasicCommandChangeStatus_0_FailureResponse, this);
+        mOnSuccessCallback_0 = new chip::Callback::Callback<SuccessCallback_0>(
+            OnTestSendClusterApplicationBasicCommandChangeStatus_0_SuccessResponse, this);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t statusArgument = 1;
+        err = cluster.ChangeStatus(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel(), statusArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandChangeStatus_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Change Status Command: Failure Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandChangeStatus_0_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Change Status Command: Success Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute vendor name
+    typedef void (*SuccessCallback_1)(void * context, chip::ByteSpan vendorName);
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
+    bool mIsFailureExpected_1                                               = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_1()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute vendor name: Sending command...");
+
+        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_1_FailureResponse, this);
+        mOnSuccessCallback_1 = new chip::Callback::Callback<SuccessCallback_1>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_1_SuccessResponse, this);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeVendorName(mOnSuccessCallback_1->Cancel(), mOnFailureCallback_1->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_1;
+            delete mOnSuccessCallback_1;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute vendor name: Failure Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_1_SuccessResponse(void * context, chip::ByteSpan vendorName)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute vendor name: Success Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute vendor id
+    typedef void (*SuccessCallback_2)(void * context, uint16_t vendorId);
+    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_2 = nullptr;
+    bool mIsFailureExpected_2                                               = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_2()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute vendor id: Sending command...");
+
+        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_2_FailureResponse, this);
+        mOnSuccessCallback_2 = new chip::Callback::Callback<SuccessCallback_2>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_2_SuccessResponse, this);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeVendorId(mOnSuccessCallback_2->Cancel(), mOnFailureCallback_2->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_2;
+            delete mOnSuccessCallback_2;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute vendor id: Failure Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_2_SuccessResponse(void * context, uint16_t vendorId)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute vendor id: Success Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (vendorId != 1U)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute name
+    typedef void (*SuccessCallback_3)(void * context, chip::ByteSpan applicationName);
+    chip::Callback::Callback<SuccessCallback_3> * mOnSuccessCallback_3      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_3 = nullptr;
+    bool mIsFailureExpected_3                                               = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_3()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute name: Sending command...");
+
+        mOnFailureCallback_3 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_3_FailureResponse, this);
+        mOnSuccessCallback_3 = new chip::Callback::Callback<SuccessCallback_3>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_3_SuccessResponse, this);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeApplicationName(mOnSuccessCallback_3->Cancel(), mOnFailureCallback_3->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_3;
+            delete mOnSuccessCallback_3;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_3_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute name: Failure Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_3;
+        delete runner->mOnSuccessCallback_3;
+
+        if (runner->mIsFailureExpected_3 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_3_SuccessResponse(void * context,
+                                                                                        chip::ByteSpan applicationName)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute name: Success Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_3;
+        delete runner->mOnSuccessCallback_3;
+
+        if (runner->mIsFailureExpected_3 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute product id
+    typedef void (*SuccessCallback_4)(void * context, uint16_t productId);
+    chip::Callback::Callback<SuccessCallback_4> * mOnSuccessCallback_4      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_4 = nullptr;
+    bool mIsFailureExpected_4                                               = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_4()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute product id: Sending command...");
+
+        mOnFailureCallback_4 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_4_FailureResponse, this);
+        mOnSuccessCallback_4 = new chip::Callback::Callback<SuccessCallback_4>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_4_SuccessResponse, this);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeProductId(mOnSuccessCallback_4->Cancel(), mOnFailureCallback_4->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_4;
+            delete mOnSuccessCallback_4;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_4_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute product id: Failure Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_4;
+        delete runner->mOnSuccessCallback_4;
+
+        if (runner->mIsFailureExpected_4 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_4_SuccessResponse(void * context, uint16_t productId)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute product id: Success Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_4;
+        delete runner->mOnSuccessCallback_4;
+
+        if (runner->mIsFailureExpected_4 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (productId != 1U)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute id
+    typedef void (*SuccessCallback_5)(void * context, chip::ByteSpan applicationId);
+    chip::Callback::Callback<SuccessCallback_5> * mOnSuccessCallback_5      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_5 = nullptr;
+    bool mIsFailureExpected_5                                               = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_5()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute id: Sending command...");
+
+        mOnFailureCallback_5 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_5_FailureResponse, this);
+        mOnSuccessCallback_5 = new chip::Callback::Callback<SuccessCallback_5>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_5_SuccessResponse, this);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeApplicationId(mOnSuccessCallback_5->Cancel(), mOnFailureCallback_5->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_5;
+            delete mOnSuccessCallback_5;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_5_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute id: Failure Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_5;
+        delete runner->mOnSuccessCallback_5;
+
+        if (runner->mIsFailureExpected_5 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_5_SuccessResponse(void * context,
+                                                                                        chip::ByteSpan applicationId)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute id: Success Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_5;
+        delete runner->mOnSuccessCallback_5;
+
+        if (runner->mIsFailureExpected_5 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute catalog vendor id
+    typedef void (*SuccessCallback_6)(void * context, uint16_t catalogVendorId);
+    chip::Callback::Callback<SuccessCallback_6> * mOnSuccessCallback_6      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_6 = nullptr;
+    bool mIsFailureExpected_6                                               = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_6()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute catalog vendor id: Sending command...");
+
+        mOnFailureCallback_6 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_6_FailureResponse, this);
+        mOnSuccessCallback_6 = new chip::Callback::Callback<SuccessCallback_6>(
+            OnTestSendClusterApplicationBasicCommandReadAttribute_6_SuccessResponse, this);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeCatalogVendorId(mOnSuccessCallback_6->Cancel(), mOnFailureCallback_6->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_6;
+            delete mOnSuccessCallback_6;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_6_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute catalog vendor id: Failure Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_6;
+        delete runner->mOnSuccessCallback_6;
+
+        if (runner->mIsFailureExpected_6 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_6_SuccessResponse(void * context, uint16_t catalogVendorId)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute catalog vendor id: Success Response");
+
+        ApplicationBasicCluster * runner = reinterpret_cast<ApplicationBasicCluster *>(context);
+
+        delete runner->mOnFailureCallback_6;
+        delete runner->mOnSuccessCallback_6;
+
+        if (runner->mIsFailureExpected_6 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (catalogVendorId != 1U)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class MediaPlaybackCluster : public TestCommand
+{
+public:
+    MediaPlaybackCluster() : TestCommand("MediaPlaybackCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "MediaPlaybackCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterMediaPlaybackCommandMediaPlay_0();
+            break;
+        case 1:
+            err = TestSendClusterMediaPlaybackCommandMediaPause_1();
+            break;
+        case 2:
+            err = TestSendClusterMediaPlaybackCommandMediaStop_2();
+            break;
+        case 3:
+            err = TestSendClusterMediaPlaybackCommandMediaStartOver_3();
+            break;
+        case 4:
+            err = TestSendClusterMediaPlaybackCommandMediaPrevious_4();
+            break;
+        case 5:
+            err = TestSendClusterMediaPlaybackCommandMediaNext_5();
+            break;
+        case 6:
+            err = TestSendClusterMediaPlaybackCommandMediaRewind_6();
+            break;
+        case 7:
+            err = TestSendClusterMediaPlaybackCommandMediaFastForward_7();
+            break;
+        case 8:
+            err = TestSendClusterMediaPlaybackCommandMediaSkipForward_8();
+            break;
+        case 9:
+            err = TestSendClusterMediaPlaybackCommandMediaSkipBackward_9();
+            break;
+        case 10:
+            err = TestSendClusterMediaPlaybackCommandMediaSkipSeek_10();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "MediaPlaybackCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 11;
+
+    //
+    // Tests methods
+    //
+
+    // Test Media Playback Play Command
+    typedef void (*SuccessCallback_0)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaPlay_0()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Play Command: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaPlay_0_FailureResponse, this);
+        mOnSuccessCallback_0 =
+            new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterMediaPlaybackCommandMediaPlay_0_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.MediaPlay(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaPlay_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Play Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaPlay_0_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Play Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Pause Command
+    typedef void (*SuccessCallback_1)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
+    bool mIsFailureExpected_1                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaPause_1()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Pause Command: Sending command...");
+
+        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaPause_1_FailureResponse, this);
+        mOnSuccessCallback_1 = new chip::Callback::Callback<SuccessCallback_1>(
+            OnTestSendClusterMediaPlaybackCommandMediaPause_1_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.MediaPause(mOnSuccessCallback_1->Cancel(), mOnFailureCallback_1->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_1;
+            delete mOnSuccessCallback_1;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaPause_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Pause Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaPause_1_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Pause Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Stop Command
+    typedef void (*SuccessCallback_2)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_2 = nullptr;
+    bool mIsFailureExpected_2                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaStop_2()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Stop Command: Sending command...");
+
+        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaStop_2_FailureResponse, this);
+        mOnSuccessCallback_2 =
+            new chip::Callback::Callback<SuccessCallback_2>(OnTestSendClusterMediaPlaybackCommandMediaStop_2_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.MediaStop(mOnSuccessCallback_2->Cancel(), mOnFailureCallback_2->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_2;
+            delete mOnSuccessCallback_2;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaStop_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Stop Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaStop_2_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Stop Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Start Over Command
+    typedef void (*SuccessCallback_3)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_3> * mOnSuccessCallback_3      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_3 = nullptr;
+    bool mIsFailureExpected_3                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaStartOver_3()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Start Over Command: Sending command...");
+
+        mOnFailureCallback_3 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaStartOver_3_FailureResponse, this);
+        mOnSuccessCallback_3 = new chip::Callback::Callback<SuccessCallback_3>(
+            OnTestSendClusterMediaPlaybackCommandMediaStartOver_3_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.MediaStartOver(mOnSuccessCallback_3->Cancel(), mOnFailureCallback_3->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_3;
+            delete mOnSuccessCallback_3;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaStartOver_3_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Start Over Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_3;
+        delete runner->mOnSuccessCallback_3;
+
+        if (runner->mIsFailureExpected_3 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaStartOver_3_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Start Over Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_3;
+        delete runner->mOnSuccessCallback_3;
+
+        if (runner->mIsFailureExpected_3 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Previous Command
+    typedef void (*SuccessCallback_4)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_4> * mOnSuccessCallback_4      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_4 = nullptr;
+    bool mIsFailureExpected_4                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaPrevious_4()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Previous Command: Sending command...");
+
+        mOnFailureCallback_4 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaPrevious_4_FailureResponse, this);
+        mOnSuccessCallback_4 = new chip::Callback::Callback<SuccessCallback_4>(
+            OnTestSendClusterMediaPlaybackCommandMediaPrevious_4_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.MediaPrevious(mOnSuccessCallback_4->Cancel(), mOnFailureCallback_4->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_4;
+            delete mOnSuccessCallback_4;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaPrevious_4_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Previous Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_4;
+        delete runner->mOnSuccessCallback_4;
+
+        if (runner->mIsFailureExpected_4 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaPrevious_4_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Previous Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_4;
+        delete runner->mOnSuccessCallback_4;
+
+        if (runner->mIsFailureExpected_4 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Next Command
+    typedef void (*SuccessCallback_5)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_5> * mOnSuccessCallback_5      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_5 = nullptr;
+    bool mIsFailureExpected_5                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaNext_5()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Next Command: Sending command...");
+
+        mOnFailureCallback_5 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaNext_5_FailureResponse, this);
+        mOnSuccessCallback_5 =
+            new chip::Callback::Callback<SuccessCallback_5>(OnTestSendClusterMediaPlaybackCommandMediaNext_5_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.MediaNext(mOnSuccessCallback_5->Cancel(), mOnFailureCallback_5->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_5;
+            delete mOnSuccessCallback_5;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaNext_5_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Next Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_5;
+        delete runner->mOnSuccessCallback_5;
+
+        if (runner->mIsFailureExpected_5 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaNext_5_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Next Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_5;
+        delete runner->mOnSuccessCallback_5;
+
+        if (runner->mIsFailureExpected_5 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Rewind Command
+    typedef void (*SuccessCallback_6)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_6> * mOnSuccessCallback_6      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_6 = nullptr;
+    bool mIsFailureExpected_6                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaRewind_6()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Rewind Command: Sending command...");
+
+        mOnFailureCallback_6 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaRewind_6_FailureResponse, this);
+        mOnSuccessCallback_6 = new chip::Callback::Callback<SuccessCallback_6>(
+            OnTestSendClusterMediaPlaybackCommandMediaRewind_6_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.MediaRewind(mOnSuccessCallback_6->Cancel(), mOnFailureCallback_6->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_6;
+            delete mOnSuccessCallback_6;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaRewind_6_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Rewind Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_6;
+        delete runner->mOnSuccessCallback_6;
+
+        if (runner->mIsFailureExpected_6 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaRewind_6_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Rewind Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_6;
+        delete runner->mOnSuccessCallback_6;
+
+        if (runner->mIsFailureExpected_6 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Fast Forward Command
+    typedef void (*SuccessCallback_7)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_7> * mOnSuccessCallback_7      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_7 = nullptr;
+    bool mIsFailureExpected_7                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaFastForward_7()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Fast Forward Command: Sending command...");
+
+        mOnFailureCallback_7 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaFastForward_7_FailureResponse, this);
+        mOnSuccessCallback_7 = new chip::Callback::Callback<SuccessCallback_7>(
+            OnTestSendClusterMediaPlaybackCommandMediaFastForward_7_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.MediaFastForward(mOnSuccessCallback_7->Cancel(), mOnFailureCallback_7->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_7;
+            delete mOnSuccessCallback_7;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaFastForward_7_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Fast Forward Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_7;
+        delete runner->mOnSuccessCallback_7;
+
+        if (runner->mIsFailureExpected_7 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaFastForward_7_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Fast Forward Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_7;
+        delete runner->mOnSuccessCallback_7;
+
+        if (runner->mIsFailureExpected_7 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Skip Forward Command
+    typedef void (*SuccessCallback_8)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_8> * mOnSuccessCallback_8      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_8 = nullptr;
+    bool mIsFailureExpected_8                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaSkipForward_8()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Forward Command: Sending command...");
+
+        mOnFailureCallback_8 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaSkipForward_8_FailureResponse, this);
+        mOnSuccessCallback_8 = new chip::Callback::Callback<SuccessCallback_8>(
+            OnTestSendClusterMediaPlaybackCommandMediaSkipForward_8_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint64_t deltaPositionMillisecondsArgument = 100ULL;
+        err = cluster.MediaSkipForward(mOnSuccessCallback_8->Cancel(), mOnFailureCallback_8->Cancel(),
+                                       deltaPositionMillisecondsArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_8;
+            delete mOnSuccessCallback_8;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaSkipForward_8_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Forward Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_8;
+        delete runner->mOnSuccessCallback_8;
+
+        if (runner->mIsFailureExpected_8 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaSkipForward_8_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Forward Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_8;
+        delete runner->mOnSuccessCallback_8;
+
+        if (runner->mIsFailureExpected_8 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Skip Backward Command
+    typedef void (*SuccessCallback_9)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_9> * mOnSuccessCallback_9      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_9 = nullptr;
+    bool mIsFailureExpected_9                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaSkipBackward_9()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Backward Command: Sending command...");
+
+        mOnFailureCallback_9 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaSkipBackward_9_FailureResponse, this);
+        mOnSuccessCallback_9 = new chip::Callback::Callback<SuccessCallback_9>(
+            OnTestSendClusterMediaPlaybackCommandMediaSkipBackward_9_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint64_t deltaPositionMillisecondsArgument = 100ULL;
+        err = cluster.MediaSkipBackward(mOnSuccessCallback_9->Cancel(), mOnFailureCallback_9->Cancel(),
+                                        deltaPositionMillisecondsArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_9;
+            delete mOnSuccessCallback_9;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaSkipBackward_9_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Backward Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_9;
+        delete runner->mOnSuccessCallback_9;
+
+        if (runner->mIsFailureExpected_9 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaSkipBackward_9_SuccessResponse(void * context,
+                                                                                         uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Backward Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_9;
+        delete runner->mOnSuccessCallback_9;
+
+        if (runner->mIsFailureExpected_9 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Media Playback Skip Seek Command
+    typedef void (*SuccessCallback_10)(void * context, uint8_t mediaPlaybackStatus);
+    chip::Callback::Callback<SuccessCallback_10> * mOnSuccessCallback_10     = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_10 = nullptr;
+    bool mIsFailureExpected_10                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaSkipSeek_10()
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Seek Command: Sending command...");
+
+        mOnFailureCallback_10 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaPlaybackCommandMediaSkipSeek_10_FailureResponse, this);
+        mOnSuccessCallback_10 = new chip::Callback::Callback<SuccessCallback_10>(
+            OnTestSendClusterMediaPlaybackCommandMediaSkipSeek_10_SuccessResponse, this);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint64_t positionArgument = 100ULL;
+        err = cluster.MediaSkipSeek(mOnSuccessCallback_10->Cancel(), mOnFailureCallback_10->Cancel(), positionArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_10;
+            delete mOnSuccessCallback_10;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaSkipSeek_10_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Seek Command: Failure Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_10;
+        delete runner->mOnSuccessCallback_10;
+
+        if (runner->mIsFailureExpected_10 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaPlaybackCommandMediaSkipSeek_10_SuccessResponse(void * context, uint8_t mediaPlaybackStatus)
+    {
+        ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Seek Command: Success Response");
+
+        MediaPlaybackCluster * runner = reinterpret_cast<MediaPlaybackCluster *>(context);
+
+        delete runner->mOnFailureCallback_10;
+        delete runner->mOnSuccessCallback_10;
+
+        if (runner->mIsFailureExpected_10 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class TvChannelCluster : public TestCommand
+{
+public:
+    TvChannelCluster() : TestCommand("TvChannelCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TvChannelCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterTvChannelCommandReadAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterTvChannelCommandChangeChannelByNumber_1();
+            break;
+        case 2:
+            err = TestSendClusterTvChannelCommandSkipChannel_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "TvChannelCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    //
+    // Tests methods
+    //
+
+    // Test Read attribute TV Channel list
+    typedef void (*SuccessCallback_0)(void * context, uint16_t count, _TvChannelInfo * tvChannelList);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterTvChannelCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "TV Channel - Read attribute TV Channel list: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTvChannelCommandReadAttribute_0_FailureResponse, this);
+        mOnSuccessCallback_0 =
+            new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterTvChannelCommandReadAttribute_0_SuccessResponse, this);
+
+        chip::Controller::TvChannelCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeTvChannelList(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTvChannelCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "TV Channel - Read attribute TV Channel list: Failure Response");
+
+        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTvChannelCommandReadAttribute_0_SuccessResponse(void * context, uint16_t count,
+                                                                                 _TvChannelInfo * tvChannelList)
+    {
+        ChipLogProgress(chipTool, "TV Channel - Read attribute TV Channel list: Success Response");
+
+        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (count != 2)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "[object Object],[object Object]");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Change Channel By Number Command
+    typedef void (*SuccessCallback_1)(void * context);
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
+    bool mIsFailureExpected_1                                               = 0;
+
+    CHIP_ERROR TestSendClusterTvChannelCommandChangeChannelByNumber_1()
+    {
+        ChipLogProgress(chipTool, "TV Channel - Change Channel By Number Command: Sending command...");
+
+        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTvChannelCommandChangeChannelByNumber_1_FailureResponse, this);
+        mOnSuccessCallback_1 = new chip::Callback::Callback<SuccessCallback_1>(
+            OnTestSendClusterTvChannelCommandChangeChannelByNumber_1_SuccessResponse, this);
+
+        chip::Controller::TvChannelCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint16_t majorNumberArgument = 1U;
+        uint16_t minorNumberArgument = 2U;
+        err = cluster.ChangeChannelByNumber(mOnSuccessCallback_1->Cancel(), mOnFailureCallback_1->Cancel(), majorNumberArgument,
+                                            minorNumberArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_1;
+            delete mOnSuccessCallback_1;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTvChannelCommandChangeChannelByNumber_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "TV Channel - Change Channel By Number Command: Failure Response");
+
+        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTvChannelCommandChangeChannelByNumber_1_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "TV Channel - Change Channel By Number Command: Success Response");
+
+        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Skip Channel Command
+    typedef void (*SuccessCallback_2)(void * context);
+    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_2 = nullptr;
+    bool mIsFailureExpected_2                                               = 0;
+
+    CHIP_ERROR TestSendClusterTvChannelCommandSkipChannel_2()
+    {
+        ChipLogProgress(chipTool, "TV Channel - Skip Channel Command: Sending command...");
+
+        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterTvChannelCommandSkipChannel_2_FailureResponse, this);
+        mOnSuccessCallback_2 =
+            new chip::Callback::Callback<SuccessCallback_2>(OnTestSendClusterTvChannelCommandSkipChannel_2_SuccessResponse, this);
+
+        chip::Controller::TvChannelCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint16_t countArgument = 1U;
+        err                    = cluster.SkipChannel(mOnSuccessCallback_2->Cancel(), mOnFailureCallback_2->Cancel(), countArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_2;
+            delete mOnSuccessCallback_2;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTvChannelCommandSkipChannel_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "TV Channel - Skip Channel Command: Failure Response");
+
+        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTvChannelCommandSkipChannel_2_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "TV Channel - Skip Channel Command: Success Response");
+
+        TvChannelCluster * runner = reinterpret_cast<TvChannelCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class LowPowerCluster : public TestCommand
+{
+public:
+    LowPowerCluster() : TestCommand("LowPowerCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "LowPowerCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterLowPowerCommandSleep_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "LowPowerCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    // Test Sleep Input Status Command
+    typedef void (*SuccessCallback_0)(void * context);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterLowPowerCommandSleep_0()
+    {
+        ChipLogProgress(chipTool, "Low Power - Sleep Input Status Command: Sending command...");
+
+        mOnFailureCallback_0 =
+            new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterLowPowerCommandSleep_0_FailureResponse, this);
+        mOnSuccessCallback_0 =
+            new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterLowPowerCommandSleep_0_SuccessResponse, this);
+
+        chip::Controller::LowPowerCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.Sleep(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterLowPowerCommandSleep_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Low Power - Sleep Input Status Command: Failure Response");
+
+        LowPowerCluster * runner = reinterpret_cast<LowPowerCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterLowPowerCommandSleep_0_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Low Power - Sleep Input Status Command: Success Response");
+
+        LowPowerCluster * runner = reinterpret_cast<LowPowerCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class MediaInputCluster : public TestCommand
+{
+public:
+    MediaInputCluster() : TestCommand("MediaInputCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "MediaInputCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterMediaInputCommandReadAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterMediaInputCommandSelectInput_1();
+            break;
+        case 2:
+            err = TestSendClusterMediaInputCommandHideInputStatus_2();
+            break;
+        case 3:
+            err = TestSendClusterMediaInputCommandShowInputStatus_3();
+            break;
+        case 4:
+            err = TestSendClusterMediaInputCommandRenameInput_4();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "MediaInputCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 5;
+
+    //
+    // Tests methods
+    //
+
+    // Test Read attribute media input list
+    typedef void (*SuccessCallback_0)(void * context, uint16_t count, _MediaInputInfo * mediaInputList);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaInputCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Media Input - Read attribute media input list: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaInputCommandReadAttribute_0_FailureResponse, this);
+        mOnSuccessCallback_0 = new chip::Callback::Callback<SuccessCallback_0>(
+            OnTestSendClusterMediaInputCommandReadAttribute_0_SuccessResponse, this);
+
+        chip::Controller::MediaInputCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeMediaInputList(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaInputCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Input - Read attribute media input list: Failure Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaInputCommandReadAttribute_0_SuccessResponse(void * context, uint16_t count,
+                                                                                  _MediaInputInfo * mediaInputList)
+    {
+        ChipLogProgress(chipTool, "Media Input - Read attribute media input list: Success Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (count != 2)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "[object Object],[object Object]");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Select Input Command
+    typedef void (*SuccessCallback_1)(void * context);
+    chip::Callback::Callback<SuccessCallback_1> * mOnSuccessCallback_1      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_1 = nullptr;
+    bool mIsFailureExpected_1                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaInputCommandSelectInput_1()
+    {
+        ChipLogProgress(chipTool, "Media Input - Select Input Command: Sending command...");
+
+        mOnFailureCallback_1 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaInputCommandSelectInput_1_FailureResponse, this);
+        mOnSuccessCallback_1 =
+            new chip::Callback::Callback<SuccessCallback_1>(OnTestSendClusterMediaInputCommandSelectInput_1_SuccessResponse, this);
+
+        chip::Controller::MediaInputCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t indexArgument = 1;
+        err                   = cluster.SelectInput(mOnSuccessCallback_1->Cancel(), mOnFailureCallback_1->Cancel(), indexArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_1;
+            delete mOnSuccessCallback_1;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaInputCommandSelectInput_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Input - Select Input Command: Failure Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaInputCommandSelectInput_1_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Media Input - Select Input Command: Success Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_1;
+        delete runner->mOnSuccessCallback_1;
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Hide Input Status Command
+    typedef void (*SuccessCallback_2)(void * context);
+    chip::Callback::Callback<SuccessCallback_2> * mOnSuccessCallback_2      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_2 = nullptr;
+    bool mIsFailureExpected_2                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaInputCommandHideInputStatus_2()
+    {
+        ChipLogProgress(chipTool, "Media Input - Hide Input Status Command: Sending command...");
+
+        mOnFailureCallback_2 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaInputCommandHideInputStatus_2_FailureResponse, this);
+        mOnSuccessCallback_2 = new chip::Callback::Callback<SuccessCallback_2>(
+            OnTestSendClusterMediaInputCommandHideInputStatus_2_SuccessResponse, this);
+
+        chip::Controller::MediaInputCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.HideInputStatus(mOnSuccessCallback_2->Cancel(), mOnFailureCallback_2->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_2;
+            delete mOnSuccessCallback_2;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaInputCommandHideInputStatus_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Input - Hide Input Status Command: Failure Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaInputCommandHideInputStatus_2_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Media Input - Hide Input Status Command: Success Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_2;
+        delete runner->mOnSuccessCallback_2;
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Show Input Status Command
+    typedef void (*SuccessCallback_3)(void * context);
+    chip::Callback::Callback<SuccessCallback_3> * mOnSuccessCallback_3      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_3 = nullptr;
+    bool mIsFailureExpected_3                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaInputCommandShowInputStatus_3()
+    {
+        ChipLogProgress(chipTool, "Media Input - Show Input Status Command: Sending command...");
+
+        mOnFailureCallback_3 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaInputCommandShowInputStatus_3_FailureResponse, this);
+        mOnSuccessCallback_3 = new chip::Callback::Callback<SuccessCallback_3>(
+            OnTestSendClusterMediaInputCommandShowInputStatus_3_SuccessResponse, this);
+
+        chip::Controller::MediaInputCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ShowInputStatus(mOnSuccessCallback_3->Cancel(), mOnFailureCallback_3->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_3;
+            delete mOnSuccessCallback_3;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaInputCommandShowInputStatus_3_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Input - Show Input Status Command: Failure Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_3;
+        delete runner->mOnSuccessCallback_3;
+
+        if (runner->mIsFailureExpected_3 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaInputCommandShowInputStatus_3_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Media Input - Show Input Status Command: Success Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_3;
+        delete runner->mOnSuccessCallback_3;
+
+        if (runner->mIsFailureExpected_3 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Rename Input Command
+    typedef void (*SuccessCallback_4)(void * context);
+    chip::Callback::Callback<SuccessCallback_4> * mOnSuccessCallback_4      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_4 = nullptr;
+    bool mIsFailureExpected_4                                               = 0;
+
+    CHIP_ERROR TestSendClusterMediaInputCommandRenameInput_4()
+    {
+        ChipLogProgress(chipTool, "Media Input - Rename Input Command: Sending command...");
+
+        mOnFailureCallback_4 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterMediaInputCommandRenameInput_4_FailureResponse, this);
+        mOnSuccessCallback_4 =
+            new chip::Callback::Callback<SuccessCallback_4>(OnTestSendClusterMediaInputCommandRenameInput_4_SuccessResponse, this);
+
+        chip::Controller::MediaInputCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t indexArgument       = 1;
+        chip::ByteSpan nameArgument = chip::ByteSpan(chip::Uint8::from_const_char("newName"), strlen("newName"));
+        err = cluster.RenameInput(mOnSuccessCallback_4->Cancel(), mOnFailureCallback_4->Cancel(), indexArgument, nameArgument);
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_4;
+            delete mOnSuccessCallback_4;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterMediaInputCommandRenameInput_4_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Media Input - Rename Input Command: Failure Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_4;
+        delete runner->mOnSuccessCallback_4;
+
+        if (runner->mIsFailureExpected_4 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterMediaInputCommandRenameInput_4_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Media Input - Rename Input Command: Success Response");
+
+        MediaInputCluster * runner = reinterpret_cast<MediaInputCluster *>(context);
+
+        delete runner->mOnFailureCallback_4;
+        delete runner->mOnSuccessCallback_4;
+
+        if (runner->mIsFailureExpected_4 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
 class TestCluster : public TestCommand
 {
 public:
@@ -11791,8 +14949,21 @@ void registerCommandsTests(Commands & commands)
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
-        make_unique<TestCluster>(), make_unique<Test_3_1_1>(),  make_unique<Test_3_2_1>(),
-        make_unique<Test_3_2_2>(),  make_unique<Test_10_1_1>(),
+        make_unique<TargetNavigatorCluster>(),
+        make_unique<AudioOutputCluster>(),
+        make_unique<ApplicationLauncherCluster>(),
+        make_unique<KeypadInputCluster>(),
+        make_unique<AccountLoginCluster>(),
+        make_unique<ApplicationBasicCluster>(),
+        make_unique<MediaPlaybackCluster>(),
+        make_unique<TvChannelCluster>(),
+        make_unique<LowPowerCluster>(),
+        make_unique<MediaInputCluster>(),
+        make_unique<TestCluster>(),
+        make_unique<Test_3_1_1>(),
+        make_unique<Test_3_2_1>(),
+        make_unique<Test_3_2_2>(),
+        make_unique<Test_10_1_1>(),
     };
 
     commands.Register(clusterName, clusterCommands);
