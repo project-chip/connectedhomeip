@@ -240,6 +240,8 @@ public class ChipDeviceController {
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
 
+  public static native void setKeyValueStoreManager(KeyValueStoreManager manager);
+
   static {
     System.loadLibrary("CHIPController");
   }
