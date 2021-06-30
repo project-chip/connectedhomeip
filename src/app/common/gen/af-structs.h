@@ -32,13 +32,6 @@ typedef struct _ApplicationLauncherApp
     uint8_t * applicationId;
 } EmberAfApplicationLauncherApp;
 
-// Struct for ApplicationLauncherResponse
-typedef struct _ApplicationLauncherResponse
-{
-    uint8_t status;
-    uint8_t * data;
-} EmberAfApplicationLauncherResponse;
-
 // Struct for AudioOutputInfo
 typedef struct _AudioOutputInfo
 {
@@ -352,13 +345,6 @@ typedef struct _SecurityPolicy
     uint16_t RotationTime;
     uint8_t Flags;
 } EmberAfSecurityPolicy;
-
-// Struct for TargetNavigatorResponse
-typedef struct _TargetNavigatorResponse
-{
-    uint8_t status;
-    uint8_t * data;
-} EmberAfTargetNavigatorResponse;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet

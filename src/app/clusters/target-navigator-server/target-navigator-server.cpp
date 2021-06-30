@@ -39,15 +39,16 @@
  ******************************************************************************/
 
 #include <app/Command.h>
+#include <app/clusters/target-navigator-server/target-navigator-server.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/enums.h>
 #include <app/util/af.h>
 
-EmberAfTargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data);
+TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data);
 
-void sendResponse(chip::app::Command * command, EmberAfTargetNavigatorResponse response)
+void sendResponse(chip::app::Command * command, TargetNavigatorResponse response)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TARGET_NAVIGATOR_CLUSTER_ID,
@@ -69,7 +70,7 @@ exit:
 bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::Command * command, unsigned char target, unsigned char * data)
 {
     std::string dataString(reinterpret_cast<char *>(data));
-    EmberAfTargetNavigatorResponse response = targetNavigatorClusterNavigateTarget(target, dataString);
+    TargetNavigatorResponse response = targetNavigatorClusterNavigateTarget(target, dataString);
     sendResponse(command, response);
     return true;
 }

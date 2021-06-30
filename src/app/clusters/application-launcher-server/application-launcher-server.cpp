@@ -39,13 +39,14 @@
  ******************************************************************************/
 
 #include <app/Command.h>
+#include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/enums.h>
 #include <app/util/af.h>
 
-EmberAfApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
 
 bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, unsigned char *, unsigned char *)
 {
@@ -54,7 +55,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * com
     return true;
 }
 
-void sendResponse(chip::app::Command * command, EmberAfApplicationLauncherResponse response)
+void sendResponse(chip::app::Command * command, ApplicationLauncherResponse response)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID,
@@ -87,7 +88,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * com
 {
     EmberAfApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
     std::string reqestDataString(reinterpret_cast<char *>(requestData));
-    EmberAfApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
+    ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
     sendResponse(command, response);
     return true;
 }

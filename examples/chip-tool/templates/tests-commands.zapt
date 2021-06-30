@@ -4,23 +4,23 @@
 
 #include "TestCommand.h"
 
-{{>test_cluster tests="TargetNavigatorCluster, AudioOutputCluster, ApplicationLauncherCluster, KeypadInputCluster, AccountLoginCluster, ApplicationBasicCluster, MediaPlaybackCluster, TvChannelCluster, LowPowerCluster, MediaInputCluster, TestCluster, Test_3_1_1, Test_3_2_1, Test_3_2_2, Test_10_1_1"}}
+{{>test_cluster tests="TV_TargetNavigatorCluster, TV_AudioOutputCluster, TV_ApplicationLauncherCluster, TV_KeypadInputCluster, TV_AccountLoginCluster, TV_ApplicationBasicCluster, TV_MediaPlaybackCluster, TV_TvChannelCluster, TV_LowPowerCluster, TV_MediaInputCluster, TestCluster, Test_3_1_1, Test_3_2_1, Test_3_2_2, Test_10_1_1"}}
 
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
-        make_unique<TargetNavigatorCluster>(),
-        make_unique<AudioOutputCluster>(),
-        make_unique<ApplicationLauncherCluster>(),
-        make_unique<KeypadInputCluster>(),
-        make_unique<AccountLoginCluster>(),
-        make_unique<ApplicationBasicCluster>(),
-        make_unique<MediaPlaybackCluster>(),
-        make_unique<TvChannelCluster>(),
-        make_unique<LowPowerCluster>(),
-        make_unique<MediaInputCluster>(),
+        make_unique<TV_TargetNavigatorCluster>(),
+        make_unique<TV_AudioOutputCluster>(),
+        make_unique<TV_ApplicationLauncherCluster>(),
+        make_unique<TV_KeypadInputCluster>(),
+        make_unique<TV_AccountLoginCluster>(),
+        make_unique<TV_ApplicationBasicCluster>(),
+        make_unique<TV_MediaPlaybackCluster>(),
+        make_unique<TV_TvChannelCluster>(),
+        make_unique<TV_LowPowerCluster>(),
+        make_unique<TV_MediaInputCluster>(),
         make_unique<TestCluster>(),
         make_unique<Test_3_1_1>(),
         make_unique<Test_3_2_1>(),
