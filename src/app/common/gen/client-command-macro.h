@@ -4998,7 +4998,7 @@
  * Command: Bind
  * @param nodeId NODE_ID
  * @param groupId GROUP_ID
- * @param endpointId ENDPOINT_ID
+ * @param endpointId ENDPOINT_NO
  * @param clusterId CLUSTER_ID
  */
 #define emberAfFillCommandBindingClusterBind(nodeId, groupId, endpointId, clusterId)                                               \
@@ -5011,7 +5011,7 @@
  * Command: Unbind
  * @param nodeId NODE_ID
  * @param groupId GROUP_ID
- * @param endpointId ENDPOINT_ID
+ * @param endpointId ENDPOINT_NO
  * @param clusterId CLUSTER_ID
  */
 #define emberAfFillCommandBindingClusterUnbind(nodeId, groupId, endpointId, clusterId)                                             \
