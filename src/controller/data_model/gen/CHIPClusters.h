@@ -892,11 +892,11 @@ public:
     CHIP_ERROR MediaPlay(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR MediaPrevious(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR MediaRewind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR MediaSeek(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
     CHIP_ERROR MediaSkipBackward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                  uint64_t deltaPositionMilliseconds);
     CHIP_ERROR MediaSkipForward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                 uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR MediaSkipSeek(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
     CHIP_ERROR MediaStartOver(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR MediaStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
@@ -911,9 +911,9 @@ private:
     static constexpr CommandId kMediaPlayCommandId         = 0x00;
     static constexpr CommandId kMediaPreviousCommandId     = 0x04;
     static constexpr CommandId kMediaRewindCommandId       = 0x06;
+    static constexpr CommandId kMediaSeekCommandId         = 0x0A;
     static constexpr CommandId kMediaSkipBackwardCommandId = 0x09;
     static constexpr CommandId kMediaSkipForwardCommandId  = 0x08;
-    static constexpr CommandId kMediaSkipSeekCommandId     = 0x0A;
     static constexpr CommandId kMediaStartOverCommandId    = 0x03;
     static constexpr CommandId kMediaStopCommandId         = 0x02;
 };

@@ -74,14 +74,6 @@ EmberAfTvChannelInfo tvChannelClusterChangeChannel(std::string match)
 {
     // TODO: Insert code here
     EmberAfTvChannelInfo channel = {};
-    char affiliateCallSign[]     = "exampleResponseASign";
-    char callSign[]              = "exampleResponseCSign";
-    char name[]                  = "exampleResponseName";
-    channel.affiliateCallSign    = ByteSpan(Uint8::from_char(affiliateCallSign), sizeof(affiliateCallSign));
-    channel.callSign             = ByteSpan(Uint8::from_char(callSign), sizeof(callSign));
-    channel.name                 = ByteSpan(Uint8::from_char(name), sizeof(name));
-    channel.majorNumber          = static_cast<uint8_t>(1);
-    channel.minorNumber          = static_cast<uint16_t>(2);
     return channel;
 }
 bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)

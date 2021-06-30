@@ -2533,6 +2533,12 @@ bool emberAfMediaPlaybackClusterMediaPreviousCallback(chip::app::Command * comma
 bool emberAfMediaPlaybackClusterMediaRewindCallback(chip::app::Command * commandObj);
 
 /**
+ * @brief Media Playback Cluster MediaSeek Command callback
+ */
+
+bool emberAfMediaPlaybackClusterMediaSeekCallback(chip::app::Command * commandObj, uint64_t position);
+
+/**
  * @brief Media Playback Cluster MediaSkipBackward Command callback
  */
 
@@ -2543,12 +2549,6 @@ bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::Command * c
  */
 
 bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::Command * commandObj, uint64_t deltaPositionMilliseconds);
-
-/**
- * @brief Media Playback Cluster MediaSkipSeek Command callback
- */
-
-bool emberAfMediaPlaybackClusterMediaSkipSeekCallback(chip::app::Command * commandObj, uint64_t position);
 
 /**
  * @brief Media Playback Cluster MediaStartOver Command callback

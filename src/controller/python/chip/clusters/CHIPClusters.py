@@ -437,14 +437,14 @@ class ChipClusters:
                 },
                 "MediaRewind": {
                 },
+                "MediaSeek": {
+                    "position": "int",
+                },
                 "MediaSkipBackward": {
                     "deltaPositionMilliseconds": "int",
                 },
                 "MediaSkipForward": {
                     "deltaPositionMilliseconds": "int",
-                },
-                "MediaSkipSeek": {
-                    "position": "int",
                 },
                 "MediaStartOver": {
                 },
@@ -2549,6 +2549,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind(
                 device, ZCLendpoint, ZCLgroupid
         )
+    def ClusterMediaPlayback_CommandMediaSeek(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, position: int):
+        return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSeek(
+                device, ZCLendpoint, ZCLgroupid, position
+        )
     def ClusterMediaPlayback_CommandMediaSkipBackward(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, deltaPositionMilliseconds: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward(
                 device, ZCLendpoint, ZCLgroupid, deltaPositionMilliseconds
@@ -2556,10 +2560,6 @@ class ChipClusters:
     def ClusterMediaPlayback_CommandMediaSkipForward(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, deltaPositionMilliseconds: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward(
                 device, ZCLendpoint, ZCLgroupid, deltaPositionMilliseconds
-        )
-    def ClusterMediaPlayback_CommandMediaSkipSeek(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, position: int):
-        return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek(
-                device, ZCLendpoint, ZCLgroupid, position
         )
     def ClusterMediaPlayback_CommandMediaStartOver(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver(
@@ -4454,15 +4454,15 @@ class ChipClusters:
         # Cluster MediaPlayback Command MediaRewind
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command MediaSeek
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSeek.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSeek.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaSkipBackward
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaSkipForward
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward.restype = ctypes.c_uint32
-        # Cluster MediaPlayback Command MediaSkipSeek
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaStartOver
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver.restype = ctypes.c_uint32

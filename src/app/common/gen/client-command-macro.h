@@ -4316,26 +4316,26 @@
                                                                                                                                    \
                                   ZCL_MEDIA_SKIP_BACKWARD_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for MediaSkipSeek
+/** @brief Command description for MediaSeek
  *
- * Command: MediaSkipSeek
+ * Command: MediaSeek
  * @param position INT64U
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterMediaSkipSeek(position) emberAfFillExternalBuffer(mask,                                                         \
+    PlaybackClusterMediaSeek(position) emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
-                                                                     ZCL_MEDIA_SKIP_SEEK_COMMAND_ID, "u", position);
+                                                                 ZCL_MEDIA_SEEK_COMMAND_ID, "u", position);
 
-/** @brief Command description for MediaSkipSeekResponse
+/** @brief Command description for MediaSeekResponse
  *
- * Command: MediaSkipSeekResponse
+ * Command: MediaSeekResponse
  * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterMediaSkipSeekResponse(mediaPlaybackStatus)                                                                      \
+    PlaybackClusterMediaSeekResponse(mediaPlaybackStatus)                                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_MEDIA_SKIP_SEEK_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+                                  ZCL_MEDIA_SEEK_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
 
 /** @brief Command description for SelectInput
  *
