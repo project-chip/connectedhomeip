@@ -413,7 +413,7 @@ PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t
 | * ProductId                                                         | 0x0003 |
 | * ApplicationId                                                     | 0x0005 |
 | * CatalogVendorId                                                   | 0x0006 |
-| * ApplicationSatus                                                  | 0x0007 |
+| * ApplicationStatus                                                 | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -485,11 +485,11 @@ PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uin
 }
 
 /*
- * Attribute ApplicationSatus
+ * Attribute ApplicationStatus
  */
-PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeApplicationBasicClusterReadApplicationStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadApplicationBasicApplicationSatus", APPLICATION_BASIC_CLUSTER_ID);
+    COMMAND_HEADER("ReadApplicationBasicApplicationStatus", APPLICATION_BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
     COMMAND_FOOTER();
 }

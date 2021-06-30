@@ -1346,7 +1346,7 @@ private:
 | * ProductId                                                         | 0x0003 |
 | * ApplicationId                                                     | 0x0005 |
 | * CatalogVendorId                                                   | 0x0006 |
-| * ApplicationSatus                                                  | 0x0007 |
+| * ApplicationStatus                                                 | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -1619,18 +1619,18 @@ private:
 };
 
 /*
- * Attribute ApplicationSatus
+ * Attribute ApplicationStatus
  */
-class ReadApplicationBasicApplicationSatus : public ModelCommand
+class ReadApplicationBasicApplicationStatus : public ModelCommand
 {
 public:
-    ReadApplicationBasicApplicationSatus() : ModelCommand("read")
+    ReadApplicationBasicApplicationStatus() : ModelCommand("read")
     {
-        AddArgument("attr-name", "application-satus");
+        AddArgument("attr-name", "application-status");
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicApplicationSatus()
+    ~ReadApplicationBasicApplicationStatus()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -1642,7 +1642,7 @@ public:
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeApplicationSatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttributeApplicationStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -21920,11 +21920,11 @@ void registerClusterApplicationBasic(Commands & commands)
     const char * clusterName = "ApplicationBasic";
 
     commands_list clusterCommands = {
-        make_unique<ApplicationBasicChangeStatus>(),         make_unique<DiscoverApplicationBasicAttributes>(),
-        make_unique<ReadApplicationBasicVendorName>(),       make_unique<ReadApplicationBasicVendorId>(),
-        make_unique<ReadApplicationBasicApplicationName>(),  make_unique<ReadApplicationBasicProductId>(),
-        make_unique<ReadApplicationBasicApplicationId>(),    make_unique<ReadApplicationBasicCatalogVendorId>(),
-        make_unique<ReadApplicationBasicApplicationSatus>(), make_unique<ReadApplicationBasicClusterRevision>(),
+        make_unique<ApplicationBasicChangeStatus>(),          make_unique<DiscoverApplicationBasicAttributes>(),
+        make_unique<ReadApplicationBasicVendorName>(),        make_unique<ReadApplicationBasicVendorId>(),
+        make_unique<ReadApplicationBasicApplicationName>(),   make_unique<ReadApplicationBasicProductId>(),
+        make_unique<ReadApplicationBasicApplicationId>(),     make_unique<ReadApplicationBasicCatalogVendorId>(),
+        make_unique<ReadApplicationBasicApplicationStatus>(), make_unique<ReadApplicationBasicClusterRevision>(),
     };
 
     commands.Register(clusterName, clusterCommands);

@@ -3935,7 +3935,7 @@ private:
     }
 }
 
-- (void)readAttributeApplicationSatusWithResponseHandler:(ResponseHandler)responseHandler
+- (void)readAttributeApplicationStatusWithResponseHandler:(ResponseHandler)responseHandler
 {
     CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3952,7 +3952,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ReadAttributeApplicationSatus(onSuccess->Cancel(), onFailure->Cancel());
+        err = self.cppCluster.ReadAttributeApplicationStatus(onSuccess->Cancel(), onFailure->Cancel());
     });
 
     if (err != CHIP_NO_ERROR) {

@@ -258,8 +258,8 @@ CHIP_ERROR ApplicationBasicCluster::ReadAttributeCatalogVendorId(Callback::Cance
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationSatus(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationStatus(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback)
 {
     chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;

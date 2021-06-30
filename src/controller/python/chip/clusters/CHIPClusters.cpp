@@ -432,13 +432,13 @@ CHIP_ERROR chip_ime_ReadAttribute_ApplicationBasic_CatalogVendorId(chip::Control
     return cluster.ReadAttributeCatalogVendorId(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
 }
 
-CHIP_ERROR chip_ime_ReadAttribute_ApplicationBasic_ApplicationSatus(chip::Controller::Device * device,
-                                                                    chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+CHIP_ERROR chip_ime_ReadAttribute_ApplicationBasic_ApplicationStatus(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ApplicationBasicCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeApplicationSatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+    return cluster.ReadAttributeApplicationStatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
 }
 
 CHIP_ERROR chip_ime_ReadAttribute_ApplicationBasic_ClusterRevision(chip::Controller::Device * device,

@@ -178,7 +178,7 @@ bool emberAfMediaPlaybackClusterMediaSkipSeekCallback(chip::app::Command * comma
 {
     EmberAfMediaPlaybackStatus status =
         mediaPlaybackClusterSendMediaPlaybackRequest(EMBER_ZCL_MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds);
-    sendResponse(command, "MediaSeek", ZCL_MEDIA_SKIP_FORWARD_RESPONSE_COMMAND_ID, status);
+    sendResponse(command, "MediaSeek", ZCL_MEDIA_SKIP_SEEK_RESPONSE_COMMAND_ID, status);
     return true;
 }
 
