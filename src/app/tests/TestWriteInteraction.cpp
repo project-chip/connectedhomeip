@@ -24,6 +24,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <messaging/tests/MessagingContext.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -33,16 +34,17 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlunit-test.h>
 
 namespace {
-chip::System::Layer gSystemLayer;
-chip::SecureSessionMgr gSessionManager;
-chip::Messaging::ExchangeManager gExchangeManager;
-chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
-chip::Transport::AdminId gAdminId = 0;
+chip::TransportMgrBase gTransportManager;
+chip::Test::LoopbackTransport gLoopback;
+
+using TestContext = chip::Test::MessagingContext;
+TestContext sContext;
+
 } // namespace
 namespace chip {
 namespace app {
@@ -198,18 +200,21 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
 
 void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apContext)
 {
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     app::WriteClient writeClient;
 
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = writeClient.Init(&gExchangeManager, &delegate);
+    err                            = writeClient.Init(&ctx.GetExchangeManager(), &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataElement(apSuite, apContext, writeClient);
 
-    err = writeClient.SendWriteRequest(kTestDeviceNodeId, gAdminId, nullptr);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    err                         = writeClient.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetAdminId(), &session);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateWriteResponse(apSuite, apContext, buf);
 
@@ -221,6 +226,8 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
 
 void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apContext)
 {
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     app::WriteHandler writeHandler;
@@ -236,11 +243,11 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     AddAttributeStatus(apSuite, apContext, writeHandler);
 
-    writeHandler.mpExchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
+    writeHandler.mpExchangeCtx = ctx.NewExchangeToLocal(nullptr);
     TestExchangeDelegate delegate;
     writeHandler.mpExchangeCtx->SetDelegate(&delegate);
     err = writeHandler.SendWriteResponse();
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     writeHandler.Shutdown();
 }
@@ -248,30 +255,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 } // namespace chip
 
 namespace {
-
-void InitializeChip(nlTestSuite * apSuite)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
-
-    NL_TEST_ASSERT(apSuite, adminInfo != nullptr);
-
-    err = chip::Platform::MemoryInit();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    gSystemLayer.Init(nullptr);
-
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gExchangeManager.Init(&gSessionManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-}
 
 /**
  *   Test Suite. It lists all the test functions.
@@ -285,25 +268,55 @@ const nlTest sTests[] =
         NL_TEST_SENTINEL()
 };
 // clang-format on
+
+int Initialize(void * aContext);
+int Finalize(void * aContext);
+
+// clang-format off
+nlTestSuite sSuite =
+{
+    "TestWriteInteraction",
+    &sTests[0],
+    Initialize,
+    Finalize
+};
+// clang-format on
+
+int Initialize(void * aContext)
+{
+    CHIP_ERROR err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        return FAILURE;
+    }
+
+    gTransportManager.Init(&gLoopback);
+
+    auto * ctx = static_cast<TestContext *>(aContext);
+    err        = ctx->Init(&sSuite, &gTransportManager);
+    if (err != CHIP_NO_ERROR)
+    {
+        return FAILURE;
+    }
+
+    gTransportManager.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
+    return SUCCESS;
+}
+
+int Finalize(void * aContext)
+{
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    chip::Platform::MemoryShutdown();
+    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+}
+
 } // namespace
 
 int TestWriteInteraction()
 {
-    // clang-format off
-    nlTestSuite theSuite =
-            {
-                    "TestWriteInteraction",
-                    &sTests[0],
-                    nullptr,
-                    nullptr
-            };
-    // clang-format on
+    nlTestRunner(&sSuite, &sContext);
 
-    InitializeChip(&theSuite);
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
+    return (nlTestRunnerStats(&sSuite));
 }
 
 CHIP_REGISTER_TEST_SUITE(TestWriteInteraction)
