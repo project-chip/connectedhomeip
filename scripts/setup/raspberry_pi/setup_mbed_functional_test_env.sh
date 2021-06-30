@@ -32,8 +32,8 @@ export AP_PASSWORD=CHIPnet123
 export AP_GATEWAY=192.168.4.1
 export ECHO_SERVER_PORT=7
 
-sudo bash $1/scripts/setup/raspberry_pi/start_wlan_ap.sh start --interface $AP_NAME --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
-sudo bash $1/scripts/setup/raspberry_pi/start_echo_server.sh
+sudo bash $1/scripts/tests/mbed/wlan_ap.sh start --interface $AP_NAME --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
+sudo bash $1/scripts/tests/mbed/echo_server.sh
 
 cd $HOME
 
