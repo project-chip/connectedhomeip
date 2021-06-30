@@ -101,72 +101,6 @@
 namespace chip {
 namespace System {
 
-/**
- * Register a text error formatter for System Layer errors.
- */
-void RegisterLayerErrorFormatter()
-{
-    static ErrorFormatter sSystemLayerErrorFormatter = { FormatLayerError, nullptr };
-
-    RegisterErrorFormatter(&sSystemLayerErrorFormatter);
-}
-
-/**
- * Given a System Layer error, returns a human-readable NULL-terminated C string
- * describing the error.
- *
- * @param[in] buf                   Buffer into which the error string will be placed.
- * @param[in] bufSize               Size of the supplied buffer in bytes.
- * @param[in] err                   The error to be described.
- *
- * @return true                     If a description string was written into the supplied buffer.
- * @return false                    If the supplied error was not a System Layer error.
- *
- */
-bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
-{
-    const char * desc = nullptr;
-
-    if (err < CHIP_SYSTEM_ERROR_MIN || err > CHIP_SYSTEM_ERROR_MAX)
-    {
-        return false;
-    }
-
-#if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (err)
-    {
-    case CHIP_SYSTEM_ERROR_NOT_IMPLEMENTED:
-        desc = "Not implemented";
-        break;
-    case CHIP_SYSTEM_ERROR_NOT_SUPPORTED:
-        desc = "Not supported";
-        break;
-    case CHIP_SYSTEM_ERROR_BAD_ARGS:
-        desc = "Bad arguments";
-        break;
-    case CHIP_SYSTEM_ERROR_UNEXPECTED_STATE:
-        desc = "Unexpected state";
-        break;
-    case CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT:
-        desc = "Unexpected event";
-        break;
-    case CHIP_SYSTEM_ERROR_NO_MEMORY:
-        desc = "No memory";
-        break;
-    case CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED:
-        desc = "Real time not synchronized";
-        break;
-    case CHIP_SYSTEM_ERROR_ACCESS_DENIED:
-        desc = "Access denied";
-        break;
-    }
-#endif // !CHIP_CONFIG_SHORT_ERROR_STR
-
-    chip::FormatError(buf, bufSize, "Sys", err, desc);
-
-    return true;
-}
-
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 /**
  * This implements a mapping function for CHIP System Layer errors that allows mapping integers in the number space of the
@@ -177,9 +111,9 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
  *
  *  @return The mapped POSIX network or OS error.
  */
-DLL_EXPORT Error MapErrorPOSIX(int aError)
+DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
 {
-    return (aError == 0 ? CHIP_SYSTEM_NO_ERROR : CHIP_SYSTEM_POSIX_ERROR_MIN + aError);
+    return (aError == 0 ? CHIP_NO_ERROR : static_cast<CHIP_ERROR>(CHIP_SYSTEM_POSIX_ERROR_MIN + aError));
 }
 
 /**
@@ -190,9 +124,9 @@ DLL_EXPORT Error MapErrorPOSIX(int aError)
  *
  *  @return A NULL-terminated, OS-specific descriptive C string describing the error.
  */
-DLL_EXPORT const char * DescribeErrorPOSIX(Error aError)
+DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 {
-    const int lError = (aError - CHIP_SYSTEM_POSIX_ERROR_MIN);
+    const int lError = (static_cast<int>(aError) - CHIP_SYSTEM_POSIX_ERROR_MIN);
     return strerror(lError);
 }
 
@@ -204,7 +138,7 @@ DLL_EXPORT const char * DescribeErrorPOSIX(Error aError)
  *
  *  @return True if the specified error is an OS error; otherwise, false.
  */
-DLL_EXPORT bool IsErrorPOSIX(Error aError)
+DLL_EXPORT bool IsErrorPOSIX(CHIP_ERROR aError)
 {
     return (aError >= CHIP_SYSTEM_POSIX_ERROR_MIN && aError <= CHIP_SYSTEM_POSIX_ERROR_MAX);
 }
@@ -233,9 +167,9 @@ void RegisterPOSIXErrorFormatter()
  * @return false                    If the supplied error was not a POSIX error.
  *
  */
-bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    const Error sysErr = static_cast<Error>(err);
+    const CHIP_ERROR sysErr = static_cast<CHIP_ERROR>(err);
 
     if (IsErrorPOSIX(sysErr))
     {
@@ -260,7 +194,7 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err)
  *
  *  @return The mapped POSIX error.
  */
-DLL_EXPORT Error MapErrorZephyr(int aError)
+DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
 {
     return MapErrorPOSIX(-aError);
 }
@@ -277,11 +211,11 @@ DLL_EXPORT Error MapErrorZephyr(int aError)
  *  @return The mapped LwIP network or OS error.
  *
  */
-DLL_EXPORT Error MapErrorLwIP(err_t aError)
+DLL_EXPORT CHIP_ERROR MapErrorLwIP(err_t aError)
 {
     static_assert(std::numeric_limits<err_t>::min() == CHIP_SYSTEM_LWIP_ERROR_MIN - CHIP_SYSTEM_LWIP_ERROR_MAX,
                   "Can't represent all LWIP errors");
-    return (aError == ERR_OK ? CHIP_SYSTEM_NO_ERROR : CHIP_SYSTEM_LWIP_ERROR_MIN - aError);
+    return (aError == ERR_OK ? CHIP_NO_ERROR : CHIP_SYSTEM_LWIP_ERROR_MIN - aError);
 }
 
 /**
@@ -293,7 +227,7 @@ DLL_EXPORT Error MapErrorLwIP(err_t aError)
  *  @return A NULL-terminated, LwIP-specific descriptive C string describing the error.
  *
  */
-DLL_EXPORT const char * DescribeErrorLwIP(Error aError)
+DLL_EXPORT const char * DescribeErrorLwIP(CHIP_ERROR aError)
 {
     if (!IsErrorLwIP(aError))
     {
@@ -328,7 +262,7 @@ DLL_EXPORT const char * DescribeErrorLwIP(Error aError)
  *  @return True if the specified error is a LwIP error; otherwise, false.
  *
  */
-DLL_EXPORT bool IsErrorLwIP(Error aError)
+DLL_EXPORT bool IsErrorLwIP(CHIP_ERROR aError)
 {
     return (aError >= CHIP_SYSTEM_LWIP_ERROR_MIN && aError <= CHIP_SYSTEM_LWIP_ERROR_MAX);
 }
@@ -357,9 +291,9 @@ void RegisterLwIPErrorFormatter(void)
  * @return false                    If the supplied error was not an LwIP error.
  *
  */
-bool FormatLwIPError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatLwIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    const chip::System::Error sysErr = static_cast<chip::System::Error>(err);
+    const CHIP_ERROR sysErr = static_cast<CHIP_ERROR>(err);
 
     if (IsErrorLwIP(sysErr))
     {

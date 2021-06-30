@@ -60,7 +60,7 @@ extern bool gDone;
 void InitTestInetCommon();
 void InitSystemLayer();
 void ShutdownSystemLayer();
-void InetFailError(int32_t err, const char * msg);
+void InetFailError(CHIP_ERROR err, const char * msg);
 
 void InitNetwork();
 void ServiceEvents(struct ::timeval & aSleepTime);

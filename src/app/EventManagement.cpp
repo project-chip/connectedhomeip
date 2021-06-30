@@ -403,7 +403,7 @@ EventNumber CircularEventBuffer::VendEventNumber()
     err = mpEventNumberCounter->Advance();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(EventLogging, "%s Advance() for priority %u failed with %" PRId32, __FUNCTION__,
+        ChipLogError(EventLogging, "%s Advance() for priority %u failed with %" CHIP_ERROR_FORMAT, __FUNCTION__,
                      static_cast<unsigned>(mPriority), err);
     }
 

@@ -26,7 +26,7 @@ class AndroidBleConnectionDelegate : public chip::Ble::BleConnectionDelegate
 {
 public:
     void NewConnection(chip::Ble::BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator);
-    BLE_ERROR CancelConnection();
+    CHIP_ERROR CancelConnection();
 
     void SetNewConnectionCallback(NotifyNewConnectionAvailable cb) { newConnectionCb = cb; }
 

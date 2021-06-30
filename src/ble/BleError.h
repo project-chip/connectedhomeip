@@ -32,69 +32,25 @@
 
 #include "BleConfig.h"
 
+#include <core/CHIPError.h>
+
 // clang-format off
 
 /**
- *  @def BLE_NO_ERROR
- *
- *  @brief
- *    This defines the BleLayer error code for success or no
- *    error. This value may be configured via #BLE_CONFIG_NO_ERROR.
- *
- */
-#define BLE_NO_ERROR                   BLE_CONFIG_NO_ERROR
-
-/**
- *  @def BLE_ERROR_MIN
- *
- *  @brief
- *    This defines the base or minimum value of the BleLayer error number
- *    range. This value may be configured via #BLE_CONFIG_ERROR_MIN.
- *
- */
-#define BLE_ERROR_MIN                  BLE_CONFIG_ERROR_MIN
-
-/**
- *  @def BLE_ERROR_MAX
- *
- *  @brief
- *    This defines the top or maximum value of the BleLayer error number
- *    range. This value may be configured via #BLE_CONFIG_ERROR_MAX.
- *
- */
-#define BLE_ERROR_MAX                  BLE_CONFIG_ERROR_MAX
-
-/**
- *  @def _BLE_ERROR(e)
+ *  @def CHIP_BLE_ERROR(e)
  *
  *  @brief
  *    This defines a mapping function for BleLayer errors that allows
  *    mapping such errors into a platform- or system-specific
  *    range. This function may be configured via
- *    #_BLE_CONFIG_ERROR.
+ *    #BLE_CONFIG_ERROR.
  *
  *  @param[in]  e  The BleLayer error to map.
  *
  *  @return The mapped BleLayer error.
  *
  */
-#define _BLE_ERROR(e)                  _BLE_CONFIG_ERROR(e)
-
-/**
- *  @typedef BLE_ERROR
- *
- *  The basic type for all BleLayer errors.
- *
- *  This is defined to a platform- or system-specific type.
- *
- */
-typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
-
-/**
- *  Format specifier for the BLE_ERROR type.
- *
- */
-#define BleErrorFormat BLE_CONFIG_ERROR_FORMAT
+#define CHIP_BLE_ERROR(e)                                  BLE_CONFIG_ERROR(e)
 
 /**
  *  @name Error Definitions
@@ -102,32 +58,9 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *  @{
  */
 
-/**
- *  @def BLE_ERROR_BAD_ARGS
- *
- *  @brief
- *    An invalid argument or arguments were supplied.
- *
- */
-#define BLE_ERROR_BAD_ARGS                                 _BLE_ERROR(0)
-
-/**
- *  @def BLE_ERROR_INCORRECT_STATE
- *
- *  @brief
- *    An unexpected state was encountered.
- *
- */
-#define BLE_ERROR_INCORRECT_STATE                          _BLE_ERROR(1)
-
-/**
- *  @def BLE_ERROR_NO_ENDPOINTS
- *
- *  @brief
- *    No BLE endpoint is available.
- *
- */
-#define BLE_ERROR_NO_ENDPOINTS                             _BLE_ERROR(2)
+// unused                                                  CHIP_BLE_ERROR(0)
+// unused                                                  CHIP_BLE_ERROR(1)
+// unused                                                  CHIP_BLE_ERROR(2)
 
 /**
  *  @def BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK
@@ -137,7 +70,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    connection.
  *
  */
-#define BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK          _BLE_ERROR(3)
+#define BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK          CHIP_BLE_ERROR(3)
 
 /**
  *  @def BLE_ERROR_CENTRAL_UNSUBSCRIBED
@@ -147,7 +80,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    Transport Protocol (BTP) transmit characteristic.
  *
  */
-#define BLE_ERROR_CENTRAL_UNSUBSCRIBED                     _BLE_ERROR(4)
+#define BLE_ERROR_CENTRAL_UNSUBSCRIBED                     CHIP_BLE_ERROR(4)
 
 /**
  *  @def BLE_ERROR_GATT_SUBSCRIBE_FAILED
@@ -157,7 +90,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    Transport Protocol (BTP) transmit characteristic.
  *
  */
-#define BLE_ERROR_GATT_SUBSCRIBE_FAILED                    _BLE_ERROR(5)
+#define BLE_ERROR_GATT_SUBSCRIBE_FAILED                    CHIP_BLE_ERROR(5)
 
 /**
  *  @def BLE_ERROR_GATT_UNSUBSCRIBE_FAILED
@@ -167,7 +100,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    BLE Transport Protocol (BTP) transmit characteristic.
  *
  */
-#define BLE_ERROR_GATT_UNSUBSCRIBE_FAILED                  _BLE_ERROR(6)
+#define BLE_ERROR_GATT_UNSUBSCRIBE_FAILED                  CHIP_BLE_ERROR(6)
 
 /**
  *  @def BLE_ERROR_GATT_WRITE_FAILED
@@ -176,7 +109,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    A General Attribute Profile (GATT) write operation failed.
  *
  */
-#define BLE_ERROR_GATT_WRITE_FAILED                        _BLE_ERROR(7)
+#define BLE_ERROR_GATT_WRITE_FAILED                        CHIP_BLE_ERROR(7)
 
 /**
  *  @def BLE_ERROR_GATT_INDICATE_FAILED
@@ -185,20 +118,10 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    A General Attribute Profile (GATT) indicate operation failed.
  *
  */
-#define BLE_ERROR_GATT_INDICATE_FAILED                     _BLE_ERROR(8)
+#define BLE_ERROR_GATT_INDICATE_FAILED                     CHIP_BLE_ERROR(8)
 
-/**
- *  @def BLE_ERROR_NOT_IMPLEMENTED
- *
- *  @brief
- *    A requested function or feature is not implemented.
- *
- */
-#define BLE_ERROR_NOT_IMPLEMENTED                          _BLE_ERROR(9)
-
-/*
- * Unused                                                  _BLE_ERROR(10)
- */
+// unused                                                  CHIP_BLE_ERROR(9)
+// unused                                                  CHIP_BLE_ERROR(10)
 
 /**
  *  @def BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT
@@ -207,7 +130,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    A BLE Transport Protocol (BTP) error was encountered.
  *
  */
-#define BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT                     _BLE_ERROR(11)
+#define BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT                  CHIP_BLE_ERROR(11)
 
 /**
  *  @def BLE_ERROR_REMOTE_DEVICE_DISCONNECTED
@@ -217,7 +140,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    expiration of a BLE connection supervision timeout.
  *
  */
-#define BLE_ERROR_REMOTE_DEVICE_DISCONNECTED               _BLE_ERROR(12)
+#define BLE_ERROR_REMOTE_DEVICE_DISCONNECTED               CHIP_BLE_ERROR(12)
 
 /**
  *  @def BLE_ERROR_APP_CLOSED_CONNECTION
@@ -226,17 +149,9 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    The local application closed a BLE connection, and has informed BleLayer.
  *
  */
-#define BLE_ERROR_APP_CLOSED_CONNECTION                    _BLE_ERROR(13)
+#define BLE_ERROR_APP_CLOSED_CONNECTION                    CHIP_BLE_ERROR(13)
 
-/**
- *  @def BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG
- *
- *  @brief
- *    More outbound message data is pending than available buffer space
- *    available to copy it.
- *
- */
-#define BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG                 _BLE_ERROR(14)
+// unused                                                  CHIP_BLE_ERROR(14)
 
 /**
  *  @def BLE_ERROR_NOT_CHIP_DEVICE
@@ -246,7 +161,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    (GATT) service required by the Bluetooth Transport Protocol (BTP).
  *
  */
-#define BLE_ERROR_NOT_CHIP_DEVICE                         _BLE_ERROR(15)
+#define BLE_ERROR_NOT_CHIP_DEVICE                         CHIP_BLE_ERROR(15)
 
 /**
  *  @def BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS
@@ -256,25 +171,10 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    Transport Protocol (BTP).
  *
  */
-#define BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS           _BLE_ERROR(16)
+#define BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS           CHIP_BLE_ERROR(16)
 
-/**
- *  @def BLE_ERROR_NO_MEMORY
- *
- *  @brief
- *    A request for memory could not be fulfilled.
- *
- */
-#define BLE_ERROR_NO_MEMORY                                _BLE_ERROR(17)
-
-/**
- *  @def BLE_ERROR_MESSAGE_INCOMPLETE
- *
- *  @brief
- *    A received Bluetooth Transport Protocol (BTP) message was incomplete.
- *
- */
-#define BLE_ERROR_MESSAGE_INCOMPLETE                       _BLE_ERROR(18)
+// unused                                                  CHIP_BLE_ERROR(17)
+// unused                                                  CHIP_BLE_ERROR(18)
 
 /**
  *  @def BLE_ERROR_INVALID_FRAGMENT_SIZE
@@ -284,7 +184,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    fragment size.
  *
  */
-#define BLE_ERROR_INVALID_FRAGMENT_SIZE                    _BLE_ERROR(19)
+#define BLE_ERROR_INVALID_FRAGMENT_SIZE                    CHIP_BLE_ERROR(19)
 
 /**
  *  @def BLE_ERROR_START_TIMER_FAILED
@@ -293,7 +193,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    A timer failed to start within BleLayer.
  *
  */
-#define BLE_ERROR_START_TIMER_FAILED                       _BLE_ERROR(20)
+#define BLE_ERROR_START_TIMER_FAILED                       CHIP_BLE_ERROR(20)
 
 /**
  *  @def BLE_ERROR_CONNECT_TIMED_OUT
@@ -303,7 +203,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    connect handshake response timed out.
  *
  */
-#define BLE_ERROR_CONNECT_TIMED_OUT                        _BLE_ERROR(21)
+#define BLE_ERROR_CONNECT_TIMED_OUT                        CHIP_BLE_ERROR(21)
 
 /**
  *  @def BLE_ERROR_RECEIVE_TIMED_OUT
@@ -313,7 +213,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    handshake timed out.
  *
  */
-#define BLE_ERROR_RECEIVE_TIMED_OUT                        _BLE_ERROR(22)
+#define BLE_ERROR_RECEIVE_TIMED_OUT                        CHIP_BLE_ERROR(22)
 
 /**
  *  @def BLE_ERROR_INVALID_MESSAGE
@@ -322,7 +222,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    An invalid Bluetooth Transport Protocol (BTP) message was received.
  *
  */
-#define BLE_ERROR_INVALID_MESSAGE                          _BLE_ERROR(23)
+#define BLE_ERROR_INVALID_MESSAGE                          CHIP_BLE_ERROR(23)
 
 /**
  *  @def BLE_ERROR_FRAGMENT_ACK_TIMED_OUT
@@ -332,7 +232,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    acknowledgement timed out.
  *
  */
-#define BLE_ERROR_FRAGMENT_ACK_TIMED_OUT                   _BLE_ERROR(24)
+#define BLE_ERROR_FRAGMENT_ACK_TIMED_OUT                   CHIP_BLE_ERROR(24)
 
 /**
  *  @def BLE_ERROR_KEEP_ALIVE_TIMED_OUT
@@ -342,7 +242,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    fragment timed out.
  *
  */
-#define BLE_ERROR_KEEP_ALIVE_TIMED_OUT                     _BLE_ERROR(25)
+#define BLE_ERROR_KEEP_ALIVE_TIMED_OUT                     CHIP_BLE_ERROR(25)
 
 /**
  *  @def BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK
@@ -352,7 +252,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    connect completion.
  *
  */
-#define BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK            _BLE_ERROR(26)
+#define BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK            CHIP_BLE_ERROR(26)
 
 /**
  *  @def BLE_ERROR_INVALID_ACK
@@ -361,7 +261,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    A Bluetooth Transport Protcol (BTP) fragment acknowledgement was invalid.
  *
  */
-#define BLE_ERROR_INVALID_ACK                              _BLE_ERROR(27)
+#define BLE_ERROR_INVALID_ACK                              CHIP_BLE_ERROR(27)
 
 /**
  *  @def BLE_ERROR_REASSEMBLER_MISSING_DATA
@@ -372,7 +272,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    the indicated size of the original fragmented message.
  *
  */
-#define BLE_ERROR_REASSEMBLER_MISSING_DATA                 _BLE_ERROR(28)
+#define BLE_ERROR_REASSEMBLER_MISSING_DATA                 CHIP_BLE_ERROR(28)
 
 /**
  *  @def BLE_ERROR_INVALID_BTP_HEADER_FLAGS
@@ -381,7 +281,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    A set of Bluetooth Transport Protocol (BTP) header flags is invalid.
  *
  */
-#define BLE_ERROR_INVALID_BTP_HEADER_FLAGS                 _BLE_ERROR(29)
+#define BLE_ERROR_INVALID_BTP_HEADER_FLAGS                 CHIP_BLE_ERROR(29)
 
 /**
  *  @def BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER
@@ -390,7 +290,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    A Bluetooth Transport Protocol (BTP) fragment sequence number is invalid.
  *
  */
-#define BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER              _BLE_ERROR(30)
+#define BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER              CHIP_BLE_ERROR(30)
 
 /**
  *  @def BLE_ERROR_REASSEMBLER_INCORRECT_STATE
@@ -400,17 +300,7 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *    encountered an unexpected state.
  *
  */
-#define BLE_ERROR_REASSEMBLER_INCORRECT_STATE              _BLE_ERROR(31)
-
-/**
- *  @def BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG
- *
- *  @brief
- *    More inbound message data is pending than available buffer space
- *    available to copy it.
- *
- */
-#define BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG                 _BLE_ERROR(32)
+#define BLE_ERROR_REASSEMBLER_INCORRECT_STATE              CHIP_BLE_ERROR(31)
 
 // !!!!! IMPORTANT !!!!!  If you add new Ble errors, please update the translation
 // of error codes to strings in BleError.cpp, and add them to unittest
@@ -420,13 +310,27 @@ typedef BLE_CONFIG_ERROR_TYPE BLE_ERROR;
  *  @}
  */
 
+// !!!!! IMPORTANT !!!!!
+// These definitions are present temporarily in order to reduce breakage for PRs in flight.
+// TODO: remove compatibility definitions
+#define BLE_ERROR                               CHIP_ERROR
+#define BLE_NO_ERROR                            CHIP_NO_ERROR
+#define BLE_ERROR_BAD_ARGS                      CHIP_ERROR_INVALID_ARGUMENT
+#define BLE_ERROR_INCORRECT_STATE               CHIP_ERROR_INCORRECT_STATE
+#define BLE_ERROR_MESSAGE_INCOMPLETE            CHIP_ERROR_MESSAGE_INCOMPLETE
+#define BLE_ERROR_NOT_IMPLEMENTED               CHIP_ERROR_NOT_IMPLEMENTED
+#define BLE_ERROR_NO_ENDPOINTS                  CHIP_ERROR_ENDPOINT_POOL_FULL
+#define BLE_ERROR_NO_MEMORY                     CHIP_ERROR_NO_MEMORY
+#define BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG      CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG
+#define BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG      CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG
+
 // clang-format on
 
 namespace chip {
 namespace Ble {
 
 extern void RegisterLayerErrorFormatter();
-extern bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err);
+extern bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 } /* namespace Ble */
 } /* namespace chip */

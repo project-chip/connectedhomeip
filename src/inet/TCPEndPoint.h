@@ -99,9 +99,9 @@ public:
      * @param[in]   port        the TCP port
      * @param[in]   reuseAddr   option to share binding with other endpoints
      *
-     * @retval  INET_NO_ERROR               success: endpoint bound to address
-     * @retval  INET_ERROR_INCORRECT_STATE  endpoint has been bound previously
-     * @retval  INET_NO_MEMORY              insufficient memory for endpoint
+     * @retval  CHIP_NO_ERROR               success: endpoint bound to address
+     * @retval  CHIP_ERROR_INCORRECT_STATE  endpoint has been bound previously
+     * @retval  CHIP_ERROR_NO_MEMORY        insufficient memory for endpoint
      *
      * @retval  INET_ERROR_WRONG_PROTOCOL_TYPE
      *      \c addrType does not match \c IPVer.
@@ -118,15 +118,15 @@ public:
      *  On LwIP, this method must not be called with the LwIP stack lock
      *  already acquired.
      */
-    INET_ERROR Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr = false);
+    CHIP_ERROR Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr = false);
 
     /**
      * @brief   Prepare the endpoint to receive TCP messages.
      *
      * @param[in]   backlog     maximum depth of connection acceptance queue
      *
-     * @retval  INET_NO_ERROR   success: endpoint ready to receive messages.
-     * @retval  INET_ERROR_INCORRECT_STATE  endpoint is already listening.
+     * @retval  CHIP_NO_ERROR   success: endpoint ready to receive messages.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  endpoint is already listening.
      *
      * @details
      *  If \c State is already \c kState_Listening, then no operation is
@@ -140,7 +140,7 @@ public:
      *  On LwIP systems, this method must not be called with the LwIP stack
      *  lock already acquired
      */
-    INET_ERROR Listen(uint16_t backlog);
+    CHIP_ERROR Listen(uint16_t backlog);
 
     /**
      * @brief   Initiate a TCP connection.
@@ -149,8 +149,8 @@ public:
      * @param[in]   port        the destination TCP port
      * @param[in]   intfId      an optional network interface indicator
      *
-     * @retval  INET_NO_ERROR       success: \c msg is queued for transmit.
-     * @retval  INET_ERROR_NOT_IMPLEMENTED  system implementation not complete.
+     * @retval  CHIP_NO_ERROR       success: \c msg is queued for transmit.
+     * @retval  CHIP_ERROR_NOT_IMPLEMENTED  system implementation not complete.
      *
      * @retval  INET_ERROR_WRONG_ADDRESS_TYPE
      *      the destination address and the bound interface address do not
@@ -164,7 +164,7 @@ public:
      *      destination \c addr (with \c intfId used as the scope
      *      identifier for IPv6 link-local destinations) and \c port.
      */
-    INET_ERROR Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
+    CHIP_ERROR Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
 
     /**
      * @brief   Extract IP address and TCP port of remote endpoint.
@@ -172,14 +172,14 @@ public:
      * @param[out]  retAddr     IP address of remote endpoint.
      * @param[out]  retPort     TCP port of remote endpoint.
      *
-     * @retval  INET_NO_ERROR           success: address and port extracted.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
-     * @retval  INET_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
      *
      * @details
      *  Do not use \c NULL pointer values for either argument.
      */
-    INET_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const;
+    CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const;
 
     /**
      * @brief   Extract IP address and TCP port of local endpoint.
@@ -187,25 +187,25 @@ public:
      * @param[out]  retAddr     IP address of local endpoint.
      * @param[out]  retPort     TCP port of local endpoint.
      *
-     * @retval  INET_NO_ERROR           success: address and port extracted.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
-     * @retval  INET_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
      *
      * @details
      *  Do not use \c NULL pointer values for either argument.
      */
-    INET_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort);
+    CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort);
 
     /**
      * @brief   Extract the interface id of the TCP endpoint.
      *
      * @param[out]  retInterface  The interface id.
      *
-     * @retval  INET_NO_ERROR           success: address and port extracted.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
-     * @retval  INET_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
      */
-    INET_ERROR GetInterfaceId(InterfaceId * retInterface);
+    CHIP_ERROR GetInterfaceId(InterfaceId * retInterface);
 
     /**
      * @brief   Send message text on TCP connection.
@@ -213,10 +213,10 @@ public:
      * @param[out]  data    Message text to send.
      * @param[out]  push    If \c true, then send immediately, otherwise queue.
      *
-     * @retval  INET_NO_ERROR           success: address and port extracted.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
      */
-    INET_ERROR Send(chip::System::PacketBufferHandle && data, bool push = true);
+    CHIP_ERROR Send(chip::System::PacketBufferHandle && data, bool push = true);
 
     /**
      * @brief   Disable reception.
@@ -239,7 +239,7 @@ public:
     /**
      *  @brief EnableNoDelay
      */
-    INET_ERROR EnableNoDelay();
+    CHIP_ERROR EnableNoDelay();
 
     /**
      * @brief
@@ -254,10 +254,10 @@ public:
      *    The maximum number of unacknowledged probes before the connection will be deemed
      *    to have failed.
      *
-     * @retval  INET_NO_ERROR           success: address and port extracted.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
-     * @retval  INET_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
-     * @retval  INET_ERROR_NOT_IMPLEMENTED  system implementation not complete.
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
+     * @retval  CHIP_ERROR_NOT_IMPLEMENTED  system implementation not complete.
      *
      * @retval  other                   another system or platform error
      *
@@ -275,27 +275,27 @@ public:
      *
      *  See RFC 1122, section 4.2.3.6 for specification details.
      */
-    INET_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount);
+    CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount);
 
     /**
      * @brief   Disable the TCP "keep-alive" option.
      *
-     * @retval  INET_NO_ERROR           success: address and port extracted.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
-     * @retval  INET_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
-     * @retval  INET_ERROR_NOT_IMPLEMENTED  system implementation not complete.
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
+     * @retval  CHIP_ERROR_NOT_IMPLEMENTED  system implementation not complete.
      *
      * @retval  other                   another system or platform error
      */
-    INET_ERROR DisableKeepAlive();
+    CHIP_ERROR DisableKeepAlive();
 
     /**
      * @brief   Set the TCP TCP_USER_TIMEOUT socket option.
      *
      * @param[in]   userTimeoutMillis    Tcp user timeout value in milliseconds.
      *
-     * @retval  INET_NO_ERROR           success: address and port extracted.
-     * @retval  INET_ERROR_NOT_IMPLEMENTED  system implementation not complete.
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_NOT_IMPLEMENTED  system implementation not complete.
      *
      * @retval  other                   another system or platform error
      *
@@ -307,37 +307,37 @@ public:
      *  TCP will to use the system default.
      *  See RFC 5482, for further details.
      */
-    INET_ERROR SetUserTimeout(uint32_t userTimeoutMillis);
+    CHIP_ERROR SetUserTimeout(uint32_t userTimeoutMillis);
 
     /**
      * @brief   Acknowledge receipt of message text.
      *
      * @param[in]   len     number of bytes to acknowledge.
      *
-     * @retval  INET_NO_ERROR           success: reception acknowledged.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
-     * @retval  INET_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
+     * @retval  CHIP_NO_ERROR           success: reception acknowledged.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_ERROR_CONNECTION_ABORTED   TCP connection no longer open.
      *
      * @details
      *  Use this method to acknowledge reception of all or part of the data
      *  received. The operational semantics are undefined if \c len is larger
      *  than the total outstanding unacknowledged received data.
      */
-    INET_ERROR AckReceive(uint16_t len);
+    CHIP_ERROR AckReceive(uint16_t len);
 
     /**
      * @brief   Set the receive queue, for testing.
      *
      * @param[out]  data    Message text to push.
      *
-     * @retval  INET_NO_ERROR           success: reception acknowledged.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_NO_ERROR           success: reception acknowledged.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
      *
      * @details
      *  This method may only be called by data reception event handlers to
      *  put data on the receive queue for unit test purposes.
      */
-    INET_ERROR SetReceivedDataForTesting(chip::System::PacketBufferHandle && data);
+    CHIP_ERROR SetReceivedDataForTesting(chip::System::PacketBufferHandle && data);
 
     /**
      * @brief   Extract the length of the data awaiting first transmit.
@@ -357,23 +357,23 @@ public:
     /**
      * @brief   Initiate TCP half close, in other words, finished with sending.
      *
-     * @retval  INET_NO_ERROR           success: address and port extracted.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
      *
      * @retval  other                   another system or platform error
      */
-    INET_ERROR Shutdown();
+    CHIP_ERROR Shutdown();
 
     /**
      * @brief   Initiate TCP full close, in other words, finished with both send and
      *  receive.
      *
-     * @retval  INET_NO_ERROR           success: address and port extracted.
-     * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
      *
      * @retval  other                   another system or platform error
      */
-    INET_ERROR Close();
+    CHIP_ERROR Close();
 
     /**
      * @brief   Abortively close the endpoint, in other words, send RST packets.
@@ -428,14 +428,14 @@ public:
      * @brief   Type of connection establishment event handling function.
      *
      * @param[in]   endPoint    The TCP endpoint associated with the event.
-     * @param[in]   err         \c INET_NO_ERROR if success, else another code.
+     * @param[in]   err         \c CHIP_NO_ERROR if success, else another code.
      *
      * @details
      *  Provide a function of this type to the \c OnConnectComplete delegate
      *  member to process connection establishment events on \c endPoint. The
      *  \c err argument distinguishes successful connections from failures.
      */
-    typedef void (*OnConnectCompleteFunct)(TCPEndPoint * endPoint, INET_ERROR err);
+    typedef void (*OnConnectCompleteFunct)(TCPEndPoint * endPoint, CHIP_ERROR err);
 
     /**
      * The endpoint's connection establishment event handling function
@@ -449,7 +449,7 @@ public:
      * @param[in]   endPoint        The TCP endpoint associated with the event.
      * @param[in]   data            The data received.
      *
-     * @retval      INET_NO_ERROR   If the received data can be handled by higher layers.
+     * @retval      CHIP_NO_ERROR   If the received data can be handled by higher layers.
      * @retval      other           If the received data can not be used, and higher layers will not see it.
      *
      * @details
@@ -460,7 +460,7 @@ public:
      *  If this function returns an error, the connection will be closed, since higher layers
      *  are not able to process the data for a better response.
      */
-    typedef INET_ERROR (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle && data);
+    typedef CHIP_ERROR (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle && data);
 
     /**
      * The endpoint's message text reception event handling function delegate.
@@ -491,14 +491,14 @@ public:
      * @brief   Type of connection establishment event handling function.
      *
      * @param[in]   endPoint    The TCP endpoint associated with the event.
-     * @param[in]   err         \c INET_NO_ERROR if success, else another code.
+     * @param[in]   err         \c CHIP_NO_ERROR if success, else another code.
      *
      * @details
      *  Provide a function of this type to the \c OnConnectionClosed delegate
      *  member to process connection termination events on \c endPoint. The
      *  \c err argument distinguishes successful terminations from failures.
      */
-    typedef void (*OnConnectionClosedFunct)(TCPEndPoint * endPoint, INET_ERROR err);
+    typedef void (*OnConnectionClosedFunct)(TCPEndPoint * endPoint, CHIP_ERROR err);
 
     /** The endpoint's close event handling function delegate. */
     OnConnectionClosedFunct OnConnectionClosed;
@@ -548,7 +548,7 @@ public:
      *  member to process connection acceptance error events on \c endPoint. The
      *  \c err argument provides specific detail about the type of the error.
      */
-    typedef void (*OnAcceptErrorFunct)(TCPEndPoint * endPoint, INET_ERROR err);
+    typedef void (*OnAcceptErrorFunct)(TCPEndPoint * endPoint, CHIP_ERROR err);
 
     /**
      * The endpoint's connection acceptance event handling function delegate.
@@ -612,7 +612,7 @@ private:
 
     bool mUserTimeoutTimerRunning; // Indicates whether the TCP UserTimeout timer has been started.
 
-    static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError);
+    static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     void StartTCPUserTimeoutTimer();
 
@@ -632,7 +632,7 @@ private:
 
     uint32_t mLastTCPKernelSendQueueLen; // This is the measured size(in bytes) of the kernel TCP send queue
                                          // at the end of the last user timeout window.
-    INET_ERROR CheckConnectionProgress(bool & IsProgressing);
+    CHIP_ERROR CheckConnectionProgress(bool & IsProgressing);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
@@ -642,14 +642,14 @@ private:
     ~TCPEndPoint();                   // not defined
 
     void Init(InetLayer * inetLayer);
-    INET_ERROR DriveSending();
+    CHIP_ERROR DriveSending();
     void DriveReceiving();
-    void HandleConnectComplete(INET_ERROR err);
-    void HandleAcceptError(INET_ERROR err);
-    INET_ERROR DoClose(INET_ERROR err, bool suppressCallback);
+    void HandleConnectComplete(CHIP_ERROR err);
+    void HandleAcceptError(CHIP_ERROR err);
+    CHIP_ERROR DoClose(CHIP_ERROR err, bool suppressCallback);
     static bool IsConnected(int state);
 
-    static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError);
+    static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     void StartConnectTimerIfSet();
     void StopConnectTimer();
@@ -672,11 +672,11 @@ private:
 
     uint16_t RemainingToSend();
     BufferOffset FindStartOfUnsent();
-    INET_ERROR GetPCB(IPAddressType addrType);
+    CHIP_ERROR GetPCB(IPAddressType addrType);
     void HandleDataSent(uint16_t len);
     void HandleDataReceived(chip::System::PacketBufferHandle && buf);
     void HandleIncomingConnection(TCPEndPoint * pcb);
-    void HandleError(INET_ERROR err);
+    void HandleError(CHIP_ERROR err);
 
     static err_t LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, err_t lwipErr);
     static err_t LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tcpConPCB, err_t lwipErr);
@@ -687,11 +687,11 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    INET_ERROR GetSocket(IPAddressType addrType);
+    CHIP_ERROR GetSocket(IPAddressType addrType);
     void HandlePendingIO();
     void ReceiveData();
     void HandleIncomingConnection();
-    INET_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
+    CHIP_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
     static void HandlePendingIO(System::WatchableSocket & socket);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH

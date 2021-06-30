@@ -143,7 +143,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(unsigned timeoutMs)
     return CHIP_NO_ERROR;
 }
 
-void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState, chip::System::Error error)
+void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState, CHIP_ERROR error)
 {
     static_cast<ChipDeviceScanner *>(appState)->StopScan();
 }

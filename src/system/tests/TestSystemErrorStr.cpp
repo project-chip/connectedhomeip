@@ -48,16 +48,15 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static int32_t sContext[] =
+static CHIP_ERROR sContext[] =
 {
-    CHIP_SYSTEM_ERROR_NOT_IMPLEMENTED,
-    CHIP_SYSTEM_ERROR_NOT_SUPPORTED,
-    CHIP_SYSTEM_ERROR_BAD_ARGS,
-    CHIP_SYSTEM_ERROR_UNEXPECTED_STATE,
-    CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT,
-    CHIP_SYSTEM_ERROR_NO_MEMORY,
-    CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED,
-    CHIP_SYSTEM_ERROR_ACCESS_DENIED
+    CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+    CHIP_ERROR_INVALID_ARGUMENT,
+    CHIP_ERROR_INCORRECT_STATE,
+    CHIP_ERROR_UNEXPECTED_EVENT,
+    CHIP_ERROR_NO_MEMORY,
+    CHIP_ERROR_REAL_TIME_NOT_SYNCED,
+    CHIP_ERROR_ACCESS_DENIED
 };
 // clang-format on
 
@@ -65,10 +64,10 @@ static void CheckSystemErrorStr(nlTestSuite * inSuite, void * inContext)
 {
     // Register the layer error formatter
 
-    System::RegisterLayerErrorFormatter();
+    RegisterCHIPLayerErrorFormatter();
 
     // For each defined error...
-    for (int err : sContext)
+    for (CHIP_ERROR err : sContext)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];

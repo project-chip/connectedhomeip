@@ -380,7 +380,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
             {
                 ChipLogError(Inet,
                              "Message counter synchronization for received message, failed to "
-                             "QueueReceivedMessageAndStartSync, err = %" PRId32,
+                             "QueueReceivedMessageAndStartSync, err = %" CHIP_ERROR_FORMAT,
                              err);
             }
             else
@@ -400,7 +400,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Inet, "Message counter verify failed, err = %" PRId32, err);
+            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err);
         }
         SuccessOrExit(err);
     }
@@ -532,7 +532,7 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
     mTransportMgr->Disconnect(state.GetPeerAddress());
 }
 
-void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
+void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, CHIP_ERROR error)
 {
     SecureSessionMgr * mgr = reinterpret_cast<SecureSessionMgr *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING

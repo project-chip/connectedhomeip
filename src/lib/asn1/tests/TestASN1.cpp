@@ -90,9 +90,9 @@ uint8_t TestASN1_EncodedData[] = {
     0x65, 0x6E, 0x65, 0x64, 0x69, 0x67, 0x04, 0x0D, 0x30, 0x0B, 0x06, 0x03, 0x55, 0x04, 0x03, 0x03, 0x04, 0x00, 0x02, 0x01, 0x2A
 };
 
-static ASN1_ERROR EncodeASN1TestData(ASN1Writer & writer)
+static CHIP_ERROR EncodeASN1TestData(ASN1Writer & writer)
 {
-    ASN1_ERROR err = ASN1_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ASN1_START_SEQUENCE
     {
@@ -155,7 +155,7 @@ exit:
 
 static void TestASN1_Encode(nlTestSuite * inSuite, void * inContext)
 {
-    ASN1_ERROR err;
+    CHIP_ERROR err;
     uint8_t buf[2048];
     ASN1Writer writer;
     uint16_t encodedLen;
@@ -163,10 +163,10 @@ static void TestASN1_Encode(nlTestSuite * inSuite, void * inContext)
     writer.Init(buf, sizeof(buf));
 
     err = EncodeASN1TestData(writer);
-    NL_TEST_ASSERT(inSuite, err == ASN1_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.Finalize();
-    NL_TEST_ASSERT(inSuite, err == ASN1_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     encodedLen = writer.GetLengthWritten();
     NL_TEST_ASSERT(inSuite, encodedLen == sizeof(TestASN1_EncodedData));
@@ -186,7 +186,7 @@ static void TestASN1_Encode(nlTestSuite * inSuite, void * inContext)
 
 static void TestASN1_Decode(nlTestSuite * inSuite, void * inContext)
 {
-    ASN1_ERROR err = ASN1_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     ASN1Reader reader;
     bool boolVal;
     uint32_t bitStringVal;
@@ -285,22 +285,22 @@ static void TestASN1_Decode(nlTestSuite * inSuite, void * inContext)
     ASN1_EXIT_SEQUENCE;
 
 exit:
-    NL_TEST_ASSERT(inSuite, err == ASN1_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 static void TestASN1_NullWriter(nlTestSuite * inSuite, void * inContext)
 {
-    ASN1_ERROR err;
+    CHIP_ERROR err;
     ASN1Writer writer;
     uint16_t encodedLen;
 
     writer.InitNullWriter();
 
     err = EncodeASN1TestData(writer);
-    NL_TEST_ASSERT(inSuite, err == ASN1_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.Finalize();
-    NL_TEST_ASSERT(inSuite, err == ASN1_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     encodedLen = writer.GetLengthWritten();
     NL_TEST_ASSERT(inSuite, encodedLen == 0);
@@ -308,7 +308,7 @@ static void TestASN1_NullWriter(nlTestSuite * inSuite, void * inContext)
 
 static void TestASN1_ObjectID(nlTestSuite * inSuite, void * inContext)
 {
-    ASN1_ERROR err;
+    CHIP_ERROR err;
     uint8_t buf[2048];
     ASN1Writer writer;
     ASN1Reader reader;
@@ -328,7 +328,7 @@ static void TestASN1_ObjectID(nlTestSuite * inSuite, void * inContext)
     ASN1_END_SEQUENCE;
 
     err = writer.Finalize();
-    NL_TEST_ASSERT(inSuite, err == ASN1_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     encodedLen = writer.GetLengthWritten();
     NL_TEST_ASSERT(inSuite, encodedLen > 0);
@@ -370,7 +370,7 @@ static void TestASN1_ObjectID(nlTestSuite * inSuite, void * inContext)
     ASN1_EXIT_SEQUENCE;
 
 exit:
-    NL_TEST_ASSERT(inSuite, err == ASN1_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 /**

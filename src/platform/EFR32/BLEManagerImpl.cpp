@@ -550,7 +550,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
     case SL_STATUS_INVALID_PARAMETER:
         return CHIP_ERROR_INVALID_ARGUMENT;
     default:
-        return (CHIP_ERROR) bleErr + CHIP_DEVICE_CONFIG_EFR32_BLE_ERROR_MIN;
+        return static_cast<CHIP_ERROR>(bleErr + CHIP_DEVICE_CONFIG_EFR32_BLE_ERROR_MIN);
     }
 }
 

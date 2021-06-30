@@ -132,7 +132,7 @@ Protocols::Echo::EchoClient gEchoClient;
 Transport::AdminPairingTable gAdmins;
 
 CHIP_ERROR SendEchoRequest(streamer_t * stream);
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, chip::System::Error error);
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
 
 Transport::PeerAddress GetEchoPeerAddress()
 {
@@ -166,7 +166,7 @@ void Shutdown()
     gSessionManager.Shutdown();
 }
 
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
     if (gPingArguments.GetEchoRespCount() != gPingArguments.GetEchoCount())
     {
@@ -374,10 +374,9 @@ void PrintUsage(streamer_t * stream)
     streamer_printf(stream, "  -s  <size>      application payload size in bytes\n");
 }
 
-int cmd_ping(int argc, char ** argv)
+CHIP_ERROR cmd_ping(int argc, char ** argv)
 {
     streamer_t * sout = streamer_get();
-    int ret           = 0;
     int optIndex      = 0;
 
     gPingArguments.Reset();
@@ -388,7 +387,7 @@ int cmd_ping(int argc, char ** argv)
         {
         case 'h':
             PrintUsage(sout);
-            return 0;
+            return CHIP_NO_ERROR;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         case 'u':
             gPingArguments.SetUsingTCP(false);
@@ -401,7 +400,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -i\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -412,7 +411,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -c\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -423,7 +422,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -p\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -434,7 +433,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -s\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -445,7 +444,7 @@ int cmd_ping(int argc, char ** argv)
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
                 streamer_printf(sout, "Invalid argument specified for -r\n");
-                return -1;
+                return CHIP_ERROR_INVALID_ARGUMENT;
             }
             else
             {
@@ -461,12 +460,12 @@ int cmd_ping(int argc, char ** argv)
                 }
                 else
                 {
-                    ret = -1;
+                    return CHIP_ERROR_INVALID_ARGUMENT;
                 }
             }
             break;
         default:
-            ret = -1;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         optIndex++;
@@ -475,16 +474,13 @@ int cmd_ping(int argc, char ** argv)
     if (optIndex >= argc)
     {
         streamer_printf(sout, "Missing IP address\n");
-        ret = -1;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (ret == 0)
-    {
-        streamer_printf(sout, "IP address: %s\n", argv[optIndex]);
-        StartPinging(sout, argv[optIndex]);
-    }
+    streamer_printf(sout, "IP address: %s\n", argv[optIndex]);
+    StartPinging(sout, argv[optIndex]);
 
-    return ret;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace

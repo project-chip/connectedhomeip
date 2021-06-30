@@ -86,7 +86,7 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = params.GetInetLayer()->NewTCPEndPoint(&mListenSocket);
 #else
-    err = CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
     SuccessOrExit(err);
 
@@ -248,7 +248,7 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = mListenSocket->Layer().NewTCPEndPoint(&endPoint);
 #else
-    err = CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
     SuccessOrExit(err);
 
@@ -352,7 +352,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
     return CHIP_NO_ERROR;
 }
 
-INET_ERROR TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle && buffer)
+CHIP_ERROR TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle && buffer)
 {
     Inet::IPAddress ipAddress;
     uint16_t port;
@@ -369,12 +369,12 @@ INET_ERROR TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuf
     {
         // Connection could need to be closed at this point
         ChipLogError(Inet, "Failed to accept received TCP message: %s", ErrorStr(err));
-        return INET_ERROR_UNEXPECTED_EVENT;
+        return CHIP_ERROR_UNEXPECTED_EVENT;
     }
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inetErr)
+void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, CHIP_ERROR inetErr)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     bool foundPendingPacket = false;
@@ -448,7 +448,7 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inet
     }
 }
 
-void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err)
+void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, CHIP_ERROR err)
 {
     TCPBase * tcp = reinterpret_cast<TCPBase *>(endPoint->AppState);
 
@@ -497,7 +497,7 @@ void TCPBase::OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCP
     }
 }
 
-void TCPBase::OnAcceptError(Inet::TCPEndPoint * endPoint, INET_ERROR err)
+void TCPBase::OnAcceptError(Inet::TCPEndPoint * endPoint, CHIP_ERROR err)
 {
     ChipLogError(Inet, "Accept error: %s", ErrorStr(err));
 }

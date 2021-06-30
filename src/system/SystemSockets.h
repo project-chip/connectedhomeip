@@ -309,8 +309,6 @@ protected:
 namespace chip {
 namespace System {
 
-using ::chip::System::Error;
-
 /**
  * @class WakeEvent
  *
@@ -320,13 +318,13 @@ using ::chip::System::Error;
 class WakeEvent
 {
 public:
-    Error Open(WatchableEventManager & watchState); /**< Initialize the pipeline */
-    Error Close();                                  /**< Close both ends of the pipeline. */
+    CHIP_ERROR Open(WatchableEventManager & watchState); /**< Initialize the pipeline */
+    CHIP_ERROR Close();                                  /**< Close both ends of the pipeline. */
 
     int GetNotifFD() const { return mFD.GetFD(); }
 
-    Error Notify(); /**< Set the event. */
-    void Confirm(); /**< Clear the event. */
+    CHIP_ERROR Notify(); /**< Set the event. */
+    void Confirm();      /**< Clear the event. */
     static void Confirm(WatchableSocket & socket) { reinterpret_cast<WakeEvent *>(socket.GetCallbackData())->Confirm(); }
 
 private:
