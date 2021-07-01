@@ -49,7 +49,7 @@ namespace chip {
 constexpr uint16_t kAEADKeySize = 16;
 
 constexpr uint16_t kSigmaParamRandomNumberSize = 32;
-constexpr uint16_t kTrustedRootIdSize          = 20;
+constexpr uint16_t kTrustedRootIdSize          = Credentials::kKeyIdentifierLength;
 constexpr uint16_t kMaxTrustedRootIds          = 5;
 
 constexpr uint16_t kIPKSize = 16;

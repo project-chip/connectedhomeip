@@ -555,15 +555,13 @@ CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1Reader & reader, TLVWriter & writer
         {
             // r INTEGER
             ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Integer);
-            VerifyOrReturnError(reader.GetValueLen() <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(
-                ConvertIntegerDERToRaw(reader.GetValue(), static_cast<uint16_t>(reader.GetValueLen()), rawSig, kP256_FE_Length));
+                ConvertIntegerDERToRaw(ByteSpan(reader.GetValue(), reader.GetValueLen()), rawSig, kP256_FE_Length));
 
             // s INTEGER
             ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Integer);
-            VerifyOrReturnError(reader.GetValueLen() <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorOnFailure(ConvertIntegerDERToRaw(reader.GetValue(), static_cast<uint16_t>(reader.GetValueLen()),
-                                                        rawSig + kP256_FE_Length, kP256_FE_Length));
+            ReturnErrorOnFailure(ConvertIntegerDERToRaw(ByteSpan(reader.GetValue(), reader.GetValueLen()), rawSig + kP256_FE_Length,
+                                                        kP256_FE_Length));
         }
         ASN1_EXIT_SEQUENCE;
     }
@@ -703,37 +701,36 @@ exit:
     return err;
 }
 
-DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509CertLen, uint8_t * chipCertBuf,
-                                                uint32_t chipCertBufSize, uint32_t & chipCertLen)
+DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, uint8_t * chipCertBuf, uint32_t chipCertBufSize,
+                                                uint32_t & chipCertLen)
 {
-    CHIP_ERROR err;
     ASN1Reader reader;
     TLVWriter writer;
 
     uint64_t issuer, subject;
     Optional<uint64_t> fabric;
 
-    reader.Init(x509Cert, x509CertLen);
+    VerifyOrReturnError(!x509Cert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CanCastTo<uint32_t>(x509Cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    reader.Init(x509Cert.data(), static_cast<uint32_t>(x509Cert.size()));
 
     writer.Init(chipCertBuf, chipCertBufSize);
 
-    err = ConvertCertificate(reader, writer, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate),
-                             issuer, subject, fabric);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(ConvertCertificate(
+        reader, writer, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate), issuer, subject, fabric));
 
-    err = writer.Finalize();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(writer.Finalize());
 
     chipCertLen = writer.GetLengthWritten();
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteSpan & x509ICAC, MutableByteSpan & chipCertArray)
 {
     // NOC is mandatory
-    VerifyOrReturnError(x509NOC.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!x509NOC.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     TLVWriter writer;
 
@@ -754,7 +751,7 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
     VerifyOrReturnError(nocFabric.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // ICAC is optional
-    if (x509ICAC.size() > 0)
+    if (!x509ICAC.empty())
     {
         VerifyOrReturnError(CanCastTo<uint32_t>(x509ICAC.size()), CHIP_ERROR_INVALID_ARGUMENT);
         reader.Init(x509ICAC.data(), static_cast<uint32_t>(x509ICAC.size()));

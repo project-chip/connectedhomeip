@@ -92,9 +92,7 @@ OptionSet * gCmdOptionSets[] =
 
 enum
 {
-    kMaxCerts        = 16,
-    kTestCertBufSize = 1024, // Size of buffer needed to hold any of the test certificates
-                             // (in either CHIP or DER form), or to decode the certificates.
+    kMaxCerts = 16,
 };
 
 const char * gTargetCertFileName = nullptr;
@@ -148,7 +146,7 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     const ChipCertificateData * certToBeValidated;
     ChipCertificateData * validatedCert;
     ValidationContext context;
-    uint8_t certsBuf[kMaxCerts * kMaxChipCertBufSize];
+    uint8_t certsBuf[kMaxCerts * kMaxCHIPCertLength];
 
     context.Reset();
 
@@ -161,7 +159,7 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets, HandleNonOptionArgs);
     VerifyTrueOrExit(res);
 
-    err = certSet.Init(kMaxCerts, kTestCertBufSize);
+    err = certSet.Init(kMaxCerts, kMaxDERCertLength);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "Failed to initialize certificate set: %s\n", chip::ErrorStr(err));
@@ -170,13 +168,12 @@ bool Cmd_ValidateCert(int argc, char * argv[])
 
     for (size_t i = 0; i < gNumCertFileNames; i++)
     {
-        res = LoadChipCert(gCACertFileNames[i], gCACertIsTrusted[i], certSet, &certsBuf[i * kMaxChipCertBufSize],
-                           kMaxChipCertBufSize);
+        res =
+            LoadChipCert(gCACertFileNames[i], gCACertIsTrusted[i], certSet, &certsBuf[i * kMaxCHIPCertLength], kMaxCHIPCertLength);
         VerifyTrueOrExit(res);
     }
 
-    res =
-        LoadChipCert(gTargetCertFileName, false, certSet, &certsBuf[gNumCertFileNames * kMaxChipCertBufSize], kMaxChipCertBufSize);
+    res = LoadChipCert(gTargetCertFileName, false, certSet, &certsBuf[gNumCertFileNames * kMaxCHIPCertLength], kMaxCHIPCertLength);
     VerifyTrueOrExit(res);
 
     certToBeValidated = certSet.GetLastCert();
