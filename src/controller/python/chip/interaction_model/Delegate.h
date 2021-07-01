@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDeviceController.h>
 
@@ -35,7 +37,10 @@ struct __attribute__((packed)) CommandStatus
     uint8_t CommandIndex;
 };
 
-static_assert(sizeof(CommandStatus) == 4 + 2 + 2 + 4 + 4 + 1, "CommandStatus has padding");
+static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<chip::ClusterId, uint32_t>::value &&
+                  std::is_same<chip::CommandId, uint32_t>::value,
+              "Members in CommandStatus does not match interaction_model/delegate.py");
+static_assert(sizeof(CommandStatus) == 4 + 2 + 2 + 4 + 4 + 1, "Size of CommandStatus might contains padding");
 
 extern "C" {
 typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
