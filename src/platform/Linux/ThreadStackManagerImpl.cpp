@@ -21,7 +21,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
 #include <support/CodeUtils.h>
-#include <support/SmartPointerUtility.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -40,14 +39,13 @@ constexpr char ThreadStackManagerImpl::kOpenthreadDeviceRoleLeader[];
 
 constexpr char ThreadStackManagerImpl::kPropertyDeviceRole[];
 
-ThreadStackManagerImpl::ThreadStackManagerImpl() : mProxy(nullptr, g_object_unref), mAttached(false) {}
+ThreadStackManagerImpl::ThreadStackManagerImpl() : mAttached(false) {}
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    GError * gdbusError = nullptr;
+    std::unique_ptr<GError, GErrorDeleter> err;
     mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
-        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr, &gdbusError));
-    auto err = wrap_unique(gdbusError, &g_error_free);
+        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr, &MakeUniquePointerReceiver(err).Get()));
     if (!mProxy)
     {
         ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error");
@@ -58,7 +56,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX
     // which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
-    auto role = wrap_unique(openthread_io_openthread_border_router_dup_device_role(mProxy.get()), g_free);
+    std::unique_ptr<gchar, GFree> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
     if (role)
     {
         ThreadDevcieRoleChangedHandler(role.get());
@@ -73,15 +71,14 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
     ThreadStackManagerImpl * me = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
     if (g_variant_n_children(changed_properties) > 0)
     {
-        GVariantIter * iter;
         const gchar * key;
         GVariant * value;
 
-        g_variant_get(changed_properties, "a{sv}", &iter);
-        auto pIter = wrap_unique(iter, g_variant_iter_free);
-        if (!pIter)
+        std::unique_ptr<GVariantIter, GVariantIterDeleter> iter;
+        g_variant_get(changed_properties, "a{sv}", &MakeUniquePointerReceiver(iter).Get());
+        if (!iter)
             return;
-        while (g_variant_iter_loop(iter, "{&sv}", &key, &value))
+        while (g_variant_iter_loop(iter.get(), "{&sv}", &key, &value))
         {
             if (key == nullptr || value == nullptr)
                 continue;
@@ -131,41 +128,38 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
         return true;
     }
 
-    auto routes = wrap_unique(openthread_io_openthread_border_router_dup_external_routes(mProxy.get()), &g_variant_unref);
+    std::unique_ptr<GVariant, GVariantDeleter> routes(openthread_io_openthread_border_router_dup_external_routes(mProxy.get()));
     if (!routes)
         return false;
 
     if (g_variant_n_children(routes.get()) > 0)
     {
-        GVariantIter * iter;
-        GVariant * route;
-
-        g_variant_get(routes.get(), "av", &iter);
-        auto pIter = wrap_unique(iter, g_variant_iter_free);
-        if (!pIter)
+        std::unique_ptr<GVariantIter, GVariantIterDeleter> iter;
+        g_variant_get(routes.get(), "av", &MakeUniquePointerReceiver(iter).Get());
+        if (!iter)
             return false;
-        while (g_variant_iter_loop(iter, "&v", &route))
+
+        GVariant * route;
+        while (g_variant_iter_loop(iter.get(), "&v", &route))
         {
             if (route == nullptr)
                 continue;
-            GVariant * prefix;
+            std::unique_ptr<GVariant, GVariantDeleter> prefix;
             guint16 rloc16;
             guchar preference;
             gboolean stable;
             gboolean nextHopIsThisDevice;
-            g_variant_get(route, "(&vqybb)", &prefix, &rloc16, &preference, &stable, &nextHopIsThisDevice);
-            auto pPrefix = wrap_unique(prefix, &g_variant_unref);
-            if (!pPrefix)
+            g_variant_get(route, "(&vqybb)", &MakeUniquePointerReceiver(prefix).Get(), &rloc16, &preference, &stable, &nextHopIsThisDevice);
+            if (!prefix)
                 continue;
 
-            GVariant * address;
+            std::unique_ptr<GVariant, GVariantDeleter> address;
             guchar prefixLength;
-            g_variant_get(prefix, "(&vy)", &address, &prefixLength);
-            auto pAddress = wrap_unique(address, &g_variant_unref);
-            if (!pAddress)
+            g_variant_get(prefix.get(), "(&vy)", &MakeUniquePointerReceiver(address).Get(), &prefixLength);
+            if (!address)
                 continue;
 
-            GBytes * bytes = g_variant_get_data_as_bytes(address); // the ownership still hold by address
+            GBytes * bytes = g_variant_get_data_as_bytes(address.get()); // the ownership still hold by address
             if (bytes == nullptr)
                 continue;
             gsize size;
@@ -202,10 +196,10 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
     VerifyOrReturnError(Thread::OperationalDataset::IsValid(netInfo), CHIP_ERROR_INVALID_ARGUMENT);
 
     {
-        auto bytes = wrap_unique(g_bytes_new(netInfo.data(), netInfo.size()), g_bytes_unref);
+        std::unique_ptr<GBytes, GBytesDeleter> bytes(g_bytes_new(netInfo.data(), netInfo.size()));
         if (!bytes)
             return CHIP_ERROR_NO_MEMORY;
-        auto value = wrap_unique(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true), &g_variant_unref);
+        std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
         if (!value)
             return CHIP_ERROR_NO_MEMORY;
         openthread_io_openthread_border_router_set_active_dataset_tlvs(mProxy.get(), value.release());
@@ -225,7 +219,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
 
     {
-        auto value = wrap_unique(openthread_io_openthread_border_router_dup_active_dataset_tlvs(mProxy.get()), &g_variant_unref);
+        std::unique_ptr<GVariant, GVariantDeleter> value(openthread_io_openthread_border_router_dup_active_dataset_tlvs(mProxy.get()));
         GBytes * bytes = g_variant_get_data_as_bytes(value.get());
         gsize size;
         const uint8_t * data = reinterpret_cast<const uint8_t *>(g_bytes_get_data(bytes, &size));
@@ -254,7 +248,7 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
         return false;
     }
 
-    auto role = wrap_unique(openthread_io_openthread_border_router_dup_device_role(mProxy.get()), g_free);
+    std::unique_ptr<gchar, GFree> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
     return (strcmp(role.get(), kOpenthreadDeviceRoleDisabled) != 0);
 }
 
@@ -268,9 +262,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     if (val)
     {
-        GError * gdbusError = nullptr;
-        gboolean result     = openthread_io_openthread_border_router_call_attach_sync(mProxy.get(), nullptr, &gdbusError);
-        auto err            = wrap_unique(gdbusError, &g_error_free);
+        std::unique_ptr<GError, GErrorDeleter> err;
+        gboolean result     = openthread_io_openthread_border_router_call_attach_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Attach", err->message);
@@ -285,9 +278,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     }
     else
     {
-        GError * gdbusError = nullptr;
-        gboolean result     = openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &gdbusError);
-        auto err            = wrap_unique(gdbusError, &g_error_free);
+        std::unique_ptr<GError, GErrorDeleter> err;
+        gboolean result     = openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Reset", err->message);
@@ -312,7 +304,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
 
-    auto role = wrap_unique(openthread_io_openthread_border_router_dup_device_role(mProxy.get()), g_free);
+    std::unique_ptr<gchar, GFree> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
     if (!role)
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     if (strcmp(role.get(), kOpenthreadDeviceRoleDetached) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleDisabled) == 0)
@@ -321,7 +313,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     }
     else if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
     {
-        auto linkMode = wrap_unique(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()), &g_variant_unref);
+        std::unique_ptr<GVariant, GVariantDeleter> linkMode(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()));
         if (!linkMode)
             return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
         gboolean rx_on_when_idle;
@@ -368,7 +360,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
 
     if (!network_data)
     {
-        auto linkMode = wrap_unique(g_variant_new("(bbb)", rx_on_when_idle, device_type, network_data), &g_variant_unref);
+        std::unique_ptr<GVariant, GVariantDeleter> linkMode(g_variant_new("(bbb)", rx_on_when_idle, device_type, network_data));
         if (!linkMode)
             return CHIP_ERROR_NO_MEMORY;
         openthread_io_openthread_border_router_set_link_mode(mProxy.get(), linkMode.release());

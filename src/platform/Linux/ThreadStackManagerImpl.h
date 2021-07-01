@@ -19,6 +19,7 @@
 
 #include <memory>
 
+#include <platform/Linux/GlibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -100,7 +101,7 @@ private:
 
     static constexpr char kPropertyDeviceRole[] = "DeviceRole";
 
-    std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, decltype(&g_object_unref)> mProxy;
+    std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
 
     static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                         const gchar * const * invalidated_properties, gpointer user_data);
