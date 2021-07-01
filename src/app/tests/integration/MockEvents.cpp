@@ -151,7 +151,7 @@ CHIP_ERROR MockEventGeneratorImpl::Init(chip::Messaging::ExchangeManager * apExc
     return err;
 }
 
-void MockEventGeneratorImpl::HandleNextEvent(chip::System::Layer * apSystemLayer, void * apAppState, chip::System::Error aErr)
+void MockEventGeneratorImpl::HandleNextEvent(chip::System::Layer * apSystemLayer, void * apAppState, CHIP_ERROR aErr)
 {
     MockEventGeneratorImpl * generator = static_cast<MockEventGeneratorImpl *>(apAppState);
     if (gMockEventStop)

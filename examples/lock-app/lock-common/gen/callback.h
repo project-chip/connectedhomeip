@@ -1022,7 +1022,7 @@ bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj);
  * @brief Operational Credentials Cluster AddOpCert Command callback
  */
 
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan OperationalCert,
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOCArray,
                                                            chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
                                                            uint16_t AdminVendorId);
 

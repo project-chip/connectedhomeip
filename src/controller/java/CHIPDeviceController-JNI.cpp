@@ -257,7 +257,8 @@ exit:
     return result;
 }
 
-JNI_METHOD(void, pairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode)
+JNI_METHOD(void, pairDevice)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -271,6 +272,11 @@ JNI_METHOD(void, pairDevice)(JNIEnv * env, jobject self, jlong handle, jlong dev
                                       .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
                                       .SetBleLayer(&sBleLayer)
                                       .SetPeerAddress(Transport::PeerAddress::BLE());
+    if (csrNonce != nullptr)
+    {
+        JniByteArray jniCsrNonce(env, csrNonce);
+        params = params.SetCSRNonce(jniCsrNonce.byteSpan());
+    }
     err = wrapper->Controller()->PairDevice(deviceId, params);
 
     if (err != CHIP_NO_ERROR)

@@ -72,7 +72,7 @@ static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = 10000;
 
 CASESession::CASESession()
 {
-    mTrustedRootId.mId = nullptr;
+    mTrustedRootId = CertificateKeyId();
     // dummy initialization REMOVE LATER
     for (size_t i = 0; i < mFabricSecret.Capacity(); i++)
     {
@@ -95,10 +95,10 @@ void CASESession::Clear()
     mCommissioningHash.Clear();
     mPairingComplete = false;
     mConnectionState.Reset();
-    if (mTrustedRootId.mId != nullptr)
+    if (!mTrustedRootId.empty())
     {
-        chip::Platform::MemoryFree(const_cast<uint8_t *>(mTrustedRootId.mId));
-        mTrustedRootId.mId = nullptr;
+        chip::Platform::MemoryFree(const_cast<uint8_t *>(mTrustedRootId.data()));
+        mTrustedRootId = CertificateKeyId();
     }
 
     CloseExchange();
@@ -310,7 +310,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     uint8_t * msg = nullptr;
 
     msg_R1 = System::PacketBufferHandle::New(data_len);
-    VerifyOrReturnError(!msg_R1.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!msg_R1.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     msg = msg_R1->Start();
 
@@ -332,9 +332,10 @@ CHIP_ERROR CASESession::SendSigmaR1()
         bbuf.Put16(n_trusted_roots);
         for (uint16_t i = 0; i < n_trusted_roots; ++i)
         {
-            if (mOpCredSet->GetTrustedRootId(i) != nullptr && mOpCredSet->GetTrustedRootId(i)->mId != nullptr)
+            CertificateKeyId trustedRootId = mOpCredSet->GetTrustedRootId(i);
+            if (!trustedRootId.empty())
             {
-                bbuf.Put(mOpCredSet->GetTrustedRootId(i)->mId, kTrustedRootIdSize);
+                bbuf.Put(trustedRootId.data(), trustedRootId.size());
             }
         }
         bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
@@ -519,7 +520,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
                                      msg_r2_signed_enc_len + sizeof(tag));
 
     msg_R2 = System::PacketBufferHandle::New(data_len);
-    VerifyOrExit(!msg_R2.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R2.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Step 10
     // now construct sigmaR2
@@ -530,7 +531,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         // Responder's session ID
         bbuf.Put16(mConnectionState.GetLocalKeyID());
         // Step 2
-        bbuf.Put(mTrustedRootId.mId, mTrustedRootId.mLen);
+        bbuf.Put(mTrustedRootId.data(), mTrustedRootId.size());
         bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
         bbuf.Put(msg_R2_Encrypted.Get(), msg_r2_signed_enc_len);
         bbuf.Put(tag, sizeof(tag));
@@ -783,7 +784,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
     data_len = static_cast<uint16_t>(sizeof(tag) + msg_r3_encrypted_len);
 
     msg_R3 = System::PacketBufferHandle::New(data_len);
-    VerifyOrExit(!msg_R3.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    VerifyOrExit(!msg_R3.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_R3->Start(), data_len);
@@ -948,27 +949,25 @@ CHIP_ERROR CASESession::FindValidTrustedRoot(const uint8_t ** msgIterator, uint3
 
     for (uint32_t i = 0; i < nTrustedRoots; ++i)
     {
-        trustedRoot[i].mId  = *msgIterator;
-        trustedRoot[i].mLen = kTrustedRootIdSize;
+        trustedRoot[i] = CertificateKeyId(*msgIterator);
         *msgIterator += kTrustedRootIdSize;
 
         if (mOpCredSet->IsTrustedRootIn(trustedRoot[i]))
         {
-            if (mTrustedRootId.mId != nullptr)
+            if (!mTrustedRootId.empty())
             {
-                chip::Platform::MemoryFree(const_cast<uint8_t *>(mTrustedRootId.mId));
-                mTrustedRootId.mId = nullptr;
+                chip::Platform::MemoryFree(const_cast<uint8_t *>(mTrustedRootId.data()));
+                mTrustedRootId = CertificateKeyId();
             }
-            mTrustedRootId.mId = reinterpret_cast<const uint8_t *>(chip::Platform::MemoryAlloc(kTrustedRootIdSize));
-            VerifyOrReturnError(mTrustedRootId.mId != nullptr, CHIP_ERROR_NO_MEMORY);
+            mTrustedRootId = CertificateKeyId(reinterpret_cast<const uint8_t *>(chip::Platform::MemoryAlloc(kTrustedRootIdSize)));
+            VerifyOrReturnError(!mTrustedRootId.empty(), CHIP_ERROR_NO_MEMORY);
 
-            memcpy(const_cast<uint8_t *>(mTrustedRootId.mId), trustedRoot[i].mId, trustedRoot[i].mLen);
-            mTrustedRootId.mLen = trustedRoot[i].mLen;
+            memcpy(const_cast<uint8_t *>(mTrustedRootId.data()), trustedRoot[i].data(), trustedRoot[i].size());
 
             break;
         }
     }
-    VerifyOrReturnError(mTrustedRootId.mId != nullptr, CHIP_ERROR_CERT_NOT_TRUSTED);
+    VerifyOrReturnError(!mTrustedRootId.empty(), CHIP_ERROR_CERT_NOT_TRUSTED);
 
     return CHIP_NO_ERROR;
 }
@@ -1015,7 +1014,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIte
 
     ChipCertificateSet certSet;
     // Certificate set can contain up to 3 certs (NOC, ICA cert, and Root CA cert)
-    ReturnErrorOnFailure(certSet.Init(3, kMaxCHIPCertLength * 3));
+    ReturnErrorOnFailure(certSet.Init(3, kMaxDERCertLength));
 
     responderOpCertLen = chip::Encoding::LittleEndian::Read16(*msgIterator);
     *responderOpCert   = *msgIterator;
@@ -1025,7 +1024,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIte
     ReturnErrorOnFailure(
         certSet.LoadCerts(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
 
-    bbuf.Put(certSet.GetCertSet()[0].mPublicKey, certSet.GetCertSet()[0].mPublicKeyLen);
+    bbuf.Put(certSet.GetCertSet()[0].mPublicKey.data(), certSet.GetCertSet()[0].mPublicKey.size());
 
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 

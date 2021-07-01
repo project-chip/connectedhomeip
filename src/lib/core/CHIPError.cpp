@@ -50,11 +50,11 @@ void RegisterCHIPLayerErrorFormatter()
  * @return false                    If the supplied error was not a CHIP error.
  *
  */
-bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < CHIP_ERROR_MIN || err > CHIP_ERROR_MAX)
+    if (err < CHIP_CONFIG_CORE_ERROR_MIN || err > CHIP_CONFIG_CORE_ERROR_MAX)
     {
         return false;
     }
@@ -91,6 +91,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         break;
     case CHIP_ERROR_TOO_MANY_PEER_NODES:
         desc = "Too many peer nodes";
+        break;
+    case CHIP_ERROR_SENTINEL:
+        desc = "Internal sentinel";
         break;
     case CHIP_ERROR_NO_MEMORY:
         desc = "No memory";
@@ -617,6 +620,30 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         break;
     case CHIP_ERROR_PEER_NODE_NOT_FOUND:
         desc = "Unable to find the peer node";
+        break;
+    case CHIP_ERROR_HSM:
+        desc = "Hardware security module";
+        break;
+    case CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED:
+        desc = "Intermediate CA not required";
+        break;
+    case CHIP_ERROR_REAL_TIME_NOT_SYNCED:
+        desc = "Real time not synchronized";
+        break;
+    case CHIP_ERROR_UNEXPECTED_EVENT:
+        desc = "Unexpected event";
+        break;
+    case CHIP_ERROR_ENDPOINT_POOL_FULL:
+        desc = "Endpoint pool full";
+        break;
+    case CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG:
+        desc = "Inbound message too big";
+        break;
+    case CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG:
+        desc = "Outbound message too big";
+        break;
+    case CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED:
+        desc = "Duplicate message received";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

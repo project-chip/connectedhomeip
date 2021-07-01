@@ -18,6 +18,7 @@
 #pragma once
 
 #include <jni.h>
+#include <lib/support/Span.h>
 
 /// Exposes the underlying UTF string from a jni string
 class JniUtfString
@@ -44,6 +45,7 @@ public:
     ~JniByteArray() { mEnv->ReleaseByteArrayElements(mArray, mData, 0); }
 
     const jbyte * data() const { return mData; }
+    chip::ByteSpan byteSpan() const { return chip::ByteSpan(reinterpret_cast<const uint8_t *>(data()), size()); }
     jsize size() const { return mDataLength; }
 
 private:

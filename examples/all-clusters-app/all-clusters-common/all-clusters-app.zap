@@ -1204,10 +1204,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -1255,10 +1255,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [
@@ -7204,10 +7204,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -7255,10 +7255,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [
@@ -7298,16 +7298,16 @@
           ]
         },
         {
-          "name": "OTA Software Update Client",
+          "name": "OTA Software Update Requestor",
           "code": 42,
           "mfgCode": null,
-          "define": "OTA_CLIENT_CLUSTER",
+          "define": "OTA_REQUESTOR_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [],
           "attributes": [
             {
-              "name": "default ota server",
+              "name": "default ota provider",
               "code": 0,
               "mfgCode": null,
               "side": "client",
@@ -7354,10 +7354,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Client",
+          "name": "OTA Software Update Requestor",
           "code": 42,
           "mfgCode": null,
-          "define": "OTA_CLIENT_CLUSTER",
+          "define": "OTA_REQUESTOR_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [],
@@ -8832,7 +8832,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "DownOrClose",
@@ -8840,7 +8840,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "StopMotion",
@@ -8848,7 +8848,39 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 1
+              "outgoing": 0
+            },
+            {
+              "name": "GoToLiftValue",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
+              "name": "GoToLiftPercentage",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
+              "name": "GoToTiltValue",
+              "code": 7,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
+              "name": "GoToTiltPercentage",
+              "code": 8,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -8939,6 +8971,126 @@
               "reportableChange": 0
             },
             {
+              "name": "CurrentPositionLiftPercentage",
+              "code": 8,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 100,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPositionTiltPercentage",
+              "code": 9,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 100,
+              "reportableChange": 0
+            },
+            {
+              "name": "OperationalStatus",
+              "code": 10,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x00",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 127,
+              "reportableChange": 0
+            },
+            {
+              "name": "TargetPositionLiftPercent100ths",
+              "code": 11,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 10000,
+              "reportableChange": 0
+            },
+            {
+              "name": "TargetPositionTiltPercent100ths",
+              "code": 12,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFFFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 10000,
+              "reportableChange": 0
+            },
+            {
+              "name": "EndProductType",
+              "code": 13,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x00",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPositionLiftPercent100ths",
+              "code": 14,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 10000,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentPositionTiltPercent100ths",
+              "code": 15,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xFF",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 10000,
+              "reportableChange": 0
+            },
+            {
               "name": "InstalledOpenLimitLift",
               "code": 16,
               "mfgCode": null,
@@ -9007,8 +9159,23 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x14",
+              "defaultValue": "0x00",
               "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 15,
+              "reportableChange": 0
+            },
+            {
+              "name": "SafetyStatus",
+              "code": 26,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x00",
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0

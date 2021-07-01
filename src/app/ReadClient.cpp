@@ -158,10 +158,8 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    // TODO (#7909): Disable CRMP temporary for duplicate ACK issues, should be enabled later.
-    err = mpExchangeCtx->SendMessage(
-        Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
-        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(ClientState::AwaitingResponse);
 

@@ -38,7 +38,8 @@ using otbr::DBus::LinkModeConfig;
 #endif
 
 #define OTBR_TO_CHIP_ERROR(x)                                                                                                      \
-    (x == ClientError::ERROR_NONE ? CHIP_NO_ERROR : _CHIP_ERROR(CHIP_CONFIG_OTBR_CLIENT_ERROR_MIN + static_cast<int>(x)))
+    (x == ClientError::ERROR_NONE ? CHIP_NO_ERROR                                                                                  \
+                                  : static_cast<CHIP_ERROR>(CHIP_CONFIG_OTBR_CLIENT_ERROR_MIN + static_cast<int>(x)))
 
 #define LogClientError(error)                                                                                                      \
     do                                                                                                                             \

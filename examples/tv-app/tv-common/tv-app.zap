@@ -1189,10 +1189,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -1240,10 +1240,10 @@
           ]
         },
         {
-          "name": "OTA Software Update Server",
+          "name": "OTA Software Update Provider",
           "code": 41,
           "mfgCode": null,
-          "define": "OTA_SERVER_CLUSTER",
+          "define": "OTA_PROVIDER_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [

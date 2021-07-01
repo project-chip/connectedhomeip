@@ -67,7 +67,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // Initialize the CHIP system layer.
     new (&SystemLayer) System::Layer();
     err = SystemLayer.Init(nullptr);
-    if (err != CHIP_SYSTEM_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
     }
@@ -76,7 +76,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // Initialize the CHIP Inet layer.
     new (&InetLayer) Inet::InetLayer();
     err = InetLayer.Init(SystemLayer, nullptr);
-    if (err != INET_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
     }
@@ -87,7 +87,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // Initialize the CHIP BLE manager.
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     err = BLEMgr().Init();
-    if (err != BLE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "BLEManager initialization failed: %s", ErrorStr(err));
     }
@@ -255,7 +255,7 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const Chi
     // Invoke the System Layer's event handler function.
     err = SystemLayer.HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
                                   event->ChipSystemLayerEvent.Argument);
-    if (err != CHIP_SYSTEM_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s", event->Type, ErrorStr(err));
     }

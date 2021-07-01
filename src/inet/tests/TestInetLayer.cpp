@@ -236,7 +236,7 @@ static void HandleSignal(int aSignal)
 int main(int argc, char * argv[])
 {
     bool lSuccessful = true;
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     InitTestInetCommon();
 
@@ -269,7 +269,7 @@ int main(int argc, char * argv[])
     if (gInterfaceName != nullptr)
     {
         lStatus = InterfaceNameToId(gInterfaceName, gInterfaceId);
-        if (lStatus != INET_NO_ERROR)
+        if (lStatus != CHIP_NO_ERROR)
         {
             PrintArgError("%s: unknown network interface %s\n", kToolName, gInterfaceName);
             lSuccessful = false;
@@ -522,11 +522,11 @@ static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBu
 
 // TCP Endpoint Callbacks
 
-void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, INET_ERROR aError)
+void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 {
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
-    if (aError == INET_NO_ERROR)
+    if (aError == CHIP_NO_ERROR)
     {
         IPAddress lPeerAddress;
         uint16_t lPeerPort;
@@ -564,9 +564,9 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, INET_ERROR aError)
     }
 }
 
-static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError)
+static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 {
-    if (aError == INET_NO_ERROR)
+    if (aError == CHIP_NO_ERROR)
     {
         printf("TCP connection closed\n");
     }
@@ -587,7 +587,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError
 
 static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len) {}
 
-static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle && aBuffer)
+static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle && aBuffer)
 {
     const uint32_t lFirstValueReceived = sTestState.mStats.mReceive.mActual;
     const uint8_t lFirstValue          = uint8_t(lFirstValueReceived);
@@ -596,13 +596,13 @@ static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
     uint16_t lPeerPort;
     char lPeerAddressBuffer[INET6_ADDRSTRLEN];
     bool lCheckPassed;
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     // Check that we did not lose information in our narrowing cast.
-    VerifyOrExit(lFirstValue == lFirstValueReceived, lStatus = INET_ERROR_UNEXPECTED_EVENT);
+    VerifyOrExit(lFirstValue == lFirstValueReceived, lStatus = CHIP_ERROR_UNEXPECTED_EVENT);
 
-    VerifyOrExit(aEndPoint != nullptr, lStatus = INET_ERROR_BAD_ARGS);
-    VerifyOrExit(!aBuffer.IsNull(), lStatus = INET_ERROR_BAD_ARGS);
+    VerifyOrExit(aEndPoint != nullptr, lStatus = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!aBuffer.IsNull(), lStatus = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (aEndPoint->State != TCPEndPoint::kState_Connected)
     {
@@ -620,20 +620,20 @@ static INET_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
            static_cast<size_t>(aBuffer->DataLength()));
 
     lCheckPassed = HandleDataReceived(aBuffer, lCheckBuffer, lFirstValue);
-    VerifyOrExit(lCheckPassed == true, lStatus = INET_ERROR_UNEXPECTED_EVENT);
+    VerifyOrExit(lCheckPassed == true, lStatus = CHIP_ERROR_UNEXPECTED_EVENT);
 
     lStatus = aEndPoint->AckReceive(aBuffer->TotalLength());
     INET_FAIL_ERROR(lStatus, "TCPEndPoint::AckReceive failed");
 
 exit:
-    if (lStatus != INET_NO_ERROR)
+    if (lStatus != CHIP_NO_ERROR)
     {
         SetStatusFailed(sTestState.mStatus);
     }
     return lStatus;
 }
 
-static void HandleTCPAcceptError(TCPEndPoint * aEndPoint, INET_ERROR aError)
+static void HandleTCPAcceptError(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 {
     printf("TCP accept error: %s\n", ErrorStr(aError));
 
@@ -703,7 +703,7 @@ exit:
     }
 }
 
-static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleRawReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -732,7 +732,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -774,9 +774,9 @@ static bool IsTransportReadyForSend()
     return (lStatus);
 }
 
-static INET_ERROR PrepareTransportForSend()
+static CHIP_ERROR PrepareTransportForSend()
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     if (gOptFlags & kOptFlagUseTCPIP)
     {
@@ -798,7 +798,7 @@ static INET_ERROR PrepareTransportForSend()
     return (lStatus);
 }
 
-static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
+static CHIP_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
     PacketBufferHandle lBuffer;
 
@@ -812,13 +812,13 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         if ((gOptFlags & kOptFlagUseIPv6) == (kOptFlagUseIPv6))
         {
             lBuffer = Common::MakeICMPv6DataBuffer(aSize);
-            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if ((gOptFlags & kOptFlagUseIPv4) == (kOptFlagUseIPv4))
         {
             lBuffer = Common::MakeICMPv4DataBuffer(aSize);
-            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -834,14 +834,14 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
             // patterned from zero to aSize - 1.
 
             lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
-            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
             ReturnErrorOnFailure(sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer)));
         }
         else if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
         {
             const uint32_t lFirstValue = sTestState.mStats.mTransmit.mActual;
-            VerifyOrReturnError(lFirstValue < 256u, INET_ERROR_UNEXPECTED_EVENT);
+            VerifyOrReturnError(lFirstValue < 256u, CHIP_ERROR_UNEXPECTED_EVENT);
 
             // For TCP, we'll send one byte stream of
             // sTestState.mStats.mTransmit.mExpected in n aSize or
@@ -849,18 +849,18 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
             // sTestState.mStats.mTransmit.mExpected - 1.
 
             lBuffer = Common::MakeDataBuffer(aSize, uint8_t(lFirstValue));
-            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
             ReturnErrorOnFailure(sTCPIPEndPoint->Send(std::move(lBuffer)));
         }
     }
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 void DriveSend()
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     if (!Common::IsSender())
         goto exit;
@@ -897,7 +897,7 @@ void DriveSend()
     }
 
 exit:
-    if (lStatus != INET_NO_ERROR)
+    if (lStatus != CHIP_NO_ERROR)
     {
         SetStatusFailed(sTestState.mStatus);
     }
@@ -909,7 +909,7 @@ static void StartTest()
     IPProtocol lIPProtocol       = kIPProtocol_ICMPv6;
     IPVersion lIPVersion         = kIPVersion_6;
     IPAddress lAddress           = chip::Inet::IPAddress::Any;
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     if (!gNetworkOptions.LocalIPv6Addr.empty())
         lAddress = gNetworkOptions.LocalIPv6Addr[0];
@@ -1011,7 +1011,7 @@ static void StartTest()
 
 static void CleanupTest()
 {
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     gSendIntervalExpired = false;
     gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);

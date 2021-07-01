@@ -524,13 +524,13 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharComplete(const ChipDeviceEvent * event)
     return CHIP_NO_ERROR;
 }
 
-void BLEManagerImpl::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, System::Error error)
+void BLEManagerImpl::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, CHIP_ERROR error)
 {
     BLEMgr().SetAdvertisingEnabled(false);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because of timeout expired");
 }
 
-void BLEManagerImpl::HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param, System::Error error)
+void BLEManagerImpl::HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param, CHIP_ERROR error)
 {
     BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising mode changed to slow");

@@ -41,7 +41,7 @@ int BoltLockManager::Init()
     {
         ChipLogProgress(NotSpecified, "sLockTimer timer create failed");
         // TODO:
-        // appError(CHIP_ERROR_MAX);
+        // appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 
     mState              = kState_LockingCompleted;
@@ -136,7 +136,7 @@ void BoltLockManager::StartTimer(uint32_t aTimeoutMs)
     if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
     {
         ChipLogError(NotSpecified, "sLockTimer timer start() failed");
-        // appError(CHIP_ERROR_MAX);
+        // appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 }
 
@@ -145,7 +145,7 @@ void BoltLockManager::CancelTimer(void)
     if (xTimerStop(sLockTimer, 0) == pdFAIL)
     {
         ChipLogError(NotSpecified, "Lock timer timer stop() failed");
-        // appError(CHIP_ERROR_MAX);
+        // appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 }
 

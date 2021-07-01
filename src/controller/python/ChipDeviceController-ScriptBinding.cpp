@@ -252,7 +252,7 @@ CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissione
 
 CHIP_ERROR pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
 {
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, 0);
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
     return devCtrl->DiscoverCommissionableNodes(filter);
 }
 
@@ -310,7 +310,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
         Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
 
-        ChipLogProgress(Discovery, "Device %d", i);
+        ChipLogProgress(Discovery, "Commissionable Node %d", i);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
         ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
         ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);

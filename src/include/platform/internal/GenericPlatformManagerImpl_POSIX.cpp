@@ -312,7 +312,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-    return System::MapErrorPOSIX(GenericPlatformManagerImpl<ImplClass>::_Shutdown());
+    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.

@@ -72,8 +72,8 @@ PacketBufferHandle encode{{asCamelCased name false}}ClusterDiscoverAttributes(ui
     COMMAND_HEADER("Discover{{asCamelCased name false}}Attributes", {{define}}_ID);
     buf.Put8(kFrameControlGlobalCommand)
        .Put8(seqNum)
-       .Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
-       .Put16(0x0000)
+       .Put32(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID)
+       .Put32(0x0000)
        .Put8(0xFF);
     COMMAND_FOOTER();
 }
@@ -87,8 +87,8 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterRead{{asCamelC
     COMMAND_HEADER("Read{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
     buf.Put8(kFrameControlGlobalCommand)
        .Put8(seqNum)
-       .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
-       .Put16({{asHex code 4}});
+       .Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID)
+       .Put32({{asHex code 4}});
     COMMAND_FOOTER();
 }
 
@@ -107,8 +107,8 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamel
     {{/if}}
     buf.Put8(kFrameControlGlobalCommand)
        .Put8(seqNum)
-       .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-       .Put16({{asHex code 4}})
+       .Put32(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+       .Put32({{asHex code 4}})
        .Put8({{atomicTypeId}})
     {{#if (isString type)}}
        .Put{{#if (isLongString type)}}16{{/if}}(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased name}}StrLen))
@@ -122,20 +122,20 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamel
 
 {{/if}}
 {{#if (isReportableAttribute)}}
-PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
+PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
 {
     COMMAND_HEADER("Report{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
     buf.Put8(kFrameControlGlobalCommand)
        .Put8(seqNum)
-       .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+       .Put32(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-       .Put16({{asHex code 4}})
+       .Put32({{asHex code 4}})
        .Put8({{atomicTypeId}})
        .Put16(minInterval)
        .Put16(maxInterval);
-    {{#unless (isDiscreteType)}}
+    {{#if isAnalog}}
     buf.Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>(change));
-    {{/unless}}
+    {{/if}}
     COMMAND_FOOTER();
 }
 

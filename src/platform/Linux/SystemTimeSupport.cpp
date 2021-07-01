@@ -64,7 +64,7 @@ uint64_t GetClock_MonotonicHiRes()
     return static_cast<uint64_t>(epoch.count());
 }
 
-System::Error GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
 {
     struct timeval tv;
     int res = gettimeofday(&tv, nullptr);
@@ -74,18 +74,18 @@ System::Error GetClock_RealTime(uint64_t & curTime)
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     if (tv.tv_usec < 0)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
     curTime = (static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec);
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-System::Error GetClock_RealTimeMS(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime)
 {
     struct timeval tv;
     int res = gettimeofday(&tv, nullptr);
@@ -95,18 +95,18 @@ System::Error GetClock_RealTimeMS(uint64_t & curTime)
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     if (tv.tv_usec < 0)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
     curTime = (static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000);
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-System::Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 {
     struct timeval tv;
     tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
@@ -114,7 +114,7 @@ System::Error SetClock_RealTime(uint64_t newCurTime)
     int res    = settimeofday(&tv, nullptr);
     if (res != 0)
     {
-        return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
+        return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
     }
 #if CHIP_PROGRESS_LOGGING
     {
@@ -127,7 +127,7 @@ System::Error SetClock_RealTime(uint64_t newCurTime)
             tv.tv_sec, calendar.tm_year, calendar.tm_mon, calendar.tm_mday, calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
     }
 #endif // CHIP_PROGRESS_LOGGING
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Layer

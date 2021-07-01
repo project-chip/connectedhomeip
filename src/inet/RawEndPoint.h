@@ -74,16 +74,16 @@ public:
      */
     IPProtocol IPProto; // This data member is read-only
 
-    INET_ERROR Bind(IPAddressType addrType, const IPAddress & addr, InterfaceId intfId = INET_NULL_INTERFACEID);
-    INET_ERROR BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & addr);
-    INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
+    CHIP_ERROR Bind(IPAddressType addrType, const IPAddress & addr, InterfaceId intfId = INET_NULL_INTERFACEID);
+    CHIP_ERROR BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & addr);
+    CHIP_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface();
-    INET_ERROR Listen(IPEndPointBasis::OnMessageReceivedFunct onMessageReceived,
+    CHIP_ERROR Listen(IPEndPointBasis::OnMessageReceivedFunct onMessageReceived,
                       IPEndPointBasis::OnReceiveErrorFunct onReceiveError, void * appState = nullptr);
-    INET_ERROR SendTo(const IPAddress & addr, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
-    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
-    INET_ERROR SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICMPTypes);
+    CHIP_ERROR SendTo(const IPAddress & addr, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
+    CHIP_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
+    CHIP_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
+    CHIP_ERROR SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICMPTypes);
     void Close();
     void Free();
 
@@ -101,7 +101,7 @@ private:
     const uint8_t * ICMPTypes;
 
     void HandleDataReceived(chip::System::PacketBufferHandle && msg);
-    INET_ERROR GetPCB(IPAddressType addrType);
+    CHIP_ERROR GetPCB(IPAddressType addrType);
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     static u8_t LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct pbuf * p, const ip_addr_t * addr);
@@ -111,7 +111,7 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    INET_ERROR GetSocket(IPAddressType addrType);
+    CHIP_ERROR GetSocket(IPAddressType addrType);
     void HandlePendingIO();
     static void HandlePendingIO(System::WatchableSocket & socket);
 

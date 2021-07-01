@@ -78,6 +78,38 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/pigweed-app/esp32/build/chip-pigweed-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-pigweed-app.elf
+            - name: Build example Lock App
+              timeout-minutes: 5
+              run: scripts/examples/esp_example.sh lock-app
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/lock-app/esp32/build/chip-lock-app.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-lock-app.elf
+            - name: Build example Persistent Storage App
+              timeout-minutes: 5
+              run: scripts/examples/esp_example.sh persistent-storage
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/persistent-storage/esp32/build/chip-persistent-storage.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-persistent-storage.elf
+            - name: Build example Shell App
+              timeout-minutes: 5
+              run: scripts/examples/esp_example.sh shell
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/shell/esp32/build/chip-shell.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-shell.elf
+            - name: Build example Temperature Measurement App
+              timeout-minutes: 15
+              run: scripts/examples/esp_example.sh temperature-measurement-app
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/temperature-measurement-app/esp32/build/chip-temperature-measurement-app.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-temperature-measurement-app.elf
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

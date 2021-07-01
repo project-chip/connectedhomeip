@@ -150,7 +150,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
-    BLE_ERROR CancelConnection() override;
+    CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
     void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;

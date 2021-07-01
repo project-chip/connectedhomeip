@@ -78,7 +78,7 @@ public:
             {
                 test_os_sleep_ms(65);
                 ReliableMessageMgr * rm = mContext->GetExchangeManager().GetReliableMessageMgr();
-                ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+                ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm, CHIP_NO_ERROR);
             }
         }
 

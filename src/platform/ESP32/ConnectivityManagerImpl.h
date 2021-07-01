@@ -114,12 +114,12 @@ private:
     void OnStationConnected(void);
     void OnStationDisconnected(void);
     void ChangeWiFiStationState(WiFiStationState newState);
-    static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
+    static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError);
 
     void DriveAPState(void);
     CHIP_ERROR ConfigureWiFiAP(void);
     void ChangeWiFiAPState(WiFiAPState newState);
-    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
+    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError);
 
     void UpdateInternetConnectivityState(void);
     void OnStationIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);

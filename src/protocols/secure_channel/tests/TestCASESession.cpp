@@ -108,7 +108,7 @@ public:
 
 static CHIP_ERROR InitCredentialSets()
 {
-    CertificateKeyId trustedRootId = { .mId = sTestCert_Root01_SubjectKeyId, .mLen = sTestCert_Root01_SubjectKeyId_Len };
+    CertificateKeyId trustedRootId = CertificateKeyId(sTestCert_Root01_SubjectKeyId);
 
     commissionerDevOpCred.Release();
     accessoryDevOpCred.Release();
@@ -362,7 +362,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                    ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
                                                    ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len),
                                                    chipCertSpan) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, admin->SetOperationalCert(chipCertSpan) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, admin->SetOperationalCertsFromCertArray(chipCertSpan) == CHIP_NO_ERROR);
 
     adminTable.Store(0);
     adminTable.ReleaseAdminId(0);
@@ -489,10 +489,11 @@ static nlTestSuite sSuite =
 
 static TestContext sContext;
 
-/**
+namespace {
+/*
  *  Set up the test suite.
  */
-int CASE_TestSecurePairing_Setup(void * inContext)
+CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -511,6 +512,15 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
 
     return InitCredentialSets();
+}
+} // anonymous namespace
+
+/**
+ *  Set up the test suite.
+ */
+int CASE_TestSecurePairing_Setup(void * inContext)
+{
+    return CASETestSecurePairingSetup(inContext) == CHIP_NO_ERROR ? SUCCESS : FAILURE;
 }
 
 /**

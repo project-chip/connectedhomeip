@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPCluster : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttribute{{asCamelCased name false}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{#if (isReportableAttribute)}}
-- (void) configureAttribute{{asCamelCased name false}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#unless (isDiscreteType)}} change:({{chipType}})change{{/unless}} responseHandler:(ResponseHandler)responseHandler;
+- (void) configureAttribute{{asCamelCased name false}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler;
 - (void) reportAttribute{{asCamelCased name false}}WithResponseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{/chip_server_cluster_attributes}}

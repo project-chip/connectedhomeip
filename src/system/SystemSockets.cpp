@@ -50,7 +50,7 @@ inline int SetNonBlockingMode(int fd)
 }
 } // anonymous namespace
 
-Error WakeEvent::Open(WatchableEventManager & watchState)
+CHIP_ERROR WakeEvent::Open(WatchableEventManager & watchState)
 {
     enum
     {
@@ -75,10 +75,10 @@ Error WakeEvent::Open(WatchableEventManager & watchState)
 
     mWriteFD = fds[FD_WRITE];
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-Error WakeEvent::Close()
+CHIP_ERROR WakeEvent::Close()
 {
     int res = 0;
 
@@ -91,7 +91,7 @@ Error WakeEvent::Close()
         return chip::System::MapErrorPOSIX(errno);
     }
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 void WakeEvent::Confirm()
@@ -110,7 +110,7 @@ void WakeEvent::Confirm()
     } while (res == sizeof(buffer));
 }
 
-Error WakeEvent::Notify()
+CHIP_ERROR WakeEvent::Notify()
 {
     char byte = 1;
 
@@ -119,12 +119,12 @@ Error WakeEvent::Notify()
         return chip::System::MapErrorPOSIX(errno);
     }
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 #else // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
-Error WakeEvent::Open(WatchableEventManager & watchState)
+CHIP_ERROR WakeEvent::Open(WatchableEventManager & watchState)
 {
     mFD.Init(watchState);
 
@@ -138,10 +138,10 @@ Error WakeEvent::Open(WatchableEventManager & watchState)
     mFD.SetCallback(Confirm, reinterpret_cast<intptr_t>(this));
     mFD.RequestCallbackOnPendingRead();
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-Error WakeEvent::Close()
+CHIP_ERROR WakeEvent::Close()
 {
     int res = mFD.Close();
 
@@ -150,7 +150,7 @@ Error WakeEvent::Close()
         return chip::System::MapErrorPOSIX(errno);
     }
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 void WakeEvent::Confirm()
@@ -163,7 +163,7 @@ void WakeEvent::Confirm()
     }
 }
 
-Error WakeEvent::Notify()
+CHIP_ERROR WakeEvent::Notify()
 {
     uint64_t value = 1;
 
@@ -172,7 +172,7 @@ Error WakeEvent::Notify()
         return chip::System::MapErrorPOSIX(errno);
     }
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE

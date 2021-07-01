@@ -84,7 +84,7 @@ const char * GetOIDName(OID oid)
     return "Unknown";
 }
 
-ASN1_ERROR ASN1Reader::GetObjectId(OID & oid)
+CHIP_ERROR ASN1Reader::GetObjectId(OID & oid)
 {
     if (Value == nullptr)
         return ASN1_ERROR_INVALID_STATE;
@@ -93,10 +93,10 @@ ASN1_ERROR ASN1Reader::GetObjectId(OID & oid)
     if (mElemStart + mHeadLen + ValueLen > mContainerEnd)
         return ASN1_ERROR_UNDERRUN;
     oid = ParseObjectID(Value, ValueLen);
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-ASN1_ERROR ASN1Writer::PutObjectId(OID oid)
+CHIP_ERROR ASN1Writer::PutObjectId(OID oid)
 {
     const uint8_t * encodedOID;
     uint16_t encodedOIDLen;

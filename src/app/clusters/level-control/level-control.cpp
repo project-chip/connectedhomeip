@@ -138,8 +138,8 @@ static void deactivate(EndpointId endpoint)
 
 static EmberAfLevelControlState * getState(EndpointId endpoint)
 {
-    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
-    return (ep == 0xFF ? NULL : &stateTable[ep]);
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
+    return (ep == 0xFFFF ? NULL : &stateTable[ep]);
 }
 
 #if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)

@@ -1430,7 +1430,7 @@
               ZAP_SIMPLE_DEFAULT(0x00) },                                                          /* LocalConfigDisabled */       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_SIMPLE_DEFAULT(3) }, /* cluster revision */          \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: OTA Software Update Server (server) */                                                        \
+            /* Endpoint: 0, Cluster: OTA Software Update Provider (server) */                                                      \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
@@ -1682,7 +1682,7 @@
               chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                               \
             {                                                                                                                      \
                 0x0029, ZAP_ATTRIBUTE_INDEX(23), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
-            }, /* Endpoint: 0, Cluster: OTA Software Update Server (server) */                                                     \
+            }, /* Endpoint: 0, Cluster: OTA Software Update Provider (server) */                                                   \
             {                                                                                                                      \
                 0x0030, ZAP_ATTRIBUTE_INDEX(24), 3, 18, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
@@ -1857,7 +1857,7 @@
             { 0x0028, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) },                                     /* Leave */                   \
             { 0x0028, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* MfgSpecificPing */         \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: OTA Software Update Server (server) */                                                        \
+            /* Endpoint: 0, Cluster: OTA Software Update Provider (server) */                                                      \
             { 0x0029, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* QueryImage */                                                  \
             { 0x0029, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ApplyUpdateRequest */                                          \
             { 0x0029, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* NotifyUpdateApplied */                                         \
@@ -2057,7 +2057,7 @@
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: OTA Software Update Server (server) */                                                            \
+        /* Endpoint: 0, Cluster: OTA Software Update Provider (server) */                                                          \
         {                                                                                                                          \
             ZAP_REPORT_DIRECTION(REPORTED), 0x0000, 0x0029, 0xFFFD, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }          \
         }, /* cluster revision */                                                                                                  \

@@ -214,7 +214,7 @@ bool emberAfReadSequentialAttributesAddToResponse(EndpointId endpoint, ClusterId
         }
         else if (discovered < maxAttributeIds)
         {
-            emberAfPutInt16uInResp(metadata->attributeId);
+            emberAfPutInt32uInResp(metadata->attributeId);
             emberAfPutInt8uInResp(metadata->attributeType);
             if (includeAccessControl)
             {
@@ -365,7 +365,7 @@ void emberAfRetrieveAttributeAndCraftResponse(EndpointId endpoint, ClusterId clu
     }
     else
     {
-        emberAfPutInt16uInResp(attrId);
+        emberAfPutInt32uInResp(attrId);
         emberAfPutStatusInResp(status);
         emberAfAttributesPrintln("READ: clus %2x, attr %2x failed %x", clusterId, attrId, status);
         emberAfAttributesFlush();
@@ -373,7 +373,7 @@ void emberAfRetrieveAttributeAndCraftResponse(EndpointId endpoint, ClusterId clu
     }
 
     // put attribute in least sig byte first
-    emberAfPutInt16uInResp(attrId);
+    emberAfPutInt32uInResp(attrId);
 
     // attribute is found, so copy in the status and the data type
     emberAfPutInt8uInResp(EMBER_ZCL_STATUS_SUCCESS);
