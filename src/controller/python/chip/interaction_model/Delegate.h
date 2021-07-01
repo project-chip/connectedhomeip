@@ -35,6 +35,8 @@ struct __attribute__((packed)) CommandStatus
     uint8_t CommandIndex;
 };
 
+static_assert(sizeof(CommandStatus) == 4 + 2 + 1 + 2 + 1 + 1, "");
+
 extern "C" {
 typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
                                                                                         void * commandStatusBuf,
