@@ -18,6 +18,7 @@
 
 #include <support/BytesCircularBuffer.h>
 
+#include <algorithm>
 #include <limits>
 #include <nlassert.h>
 #include <string.h>
@@ -43,44 +44,34 @@ void BytesCircularBuffer::Read(uint8_t * dest, size_t length, size_t offset) con
     VerifyOrDie(StorageUsed() >= offset + length);
 
     size_t start = Advance(mDataStart, offset);
-    if (mCapacity - start >= length)
-    {
-        ::memcpy(dest, mStorage + start, length);
-    }
-    else
-    {
-        size_t firstPiece  = mCapacity - start;
-        size_t secondPiece = length - firstPiece;
-        ::memcpy(dest, mStorage + start, firstPiece);
-        ::memcpy(dest + firstPiece, mStorage, secondPiece);
-    }
+    size_t firstPiece  = std::min(mCapacity - start, length);
+    size_t secondPiece = length - firstPiece;
+    ::memcpy(dest, mStorage + start, firstPiece);
+    ::memcpy(dest + firstPiece, mStorage, secondPiece);
 }
 
 void BytesCircularBuffer::Write(const uint8_t * source, size_t length)
 {
     // Always reserve 1 byte to prevent mDataStart == mDataEnd because then it would be
     // ambiguous whether we have 0 bytes or mCapacity bytes stored.
-    VerifyOrDie(mCapacity - StorageUsed() - 1 >= length);
+    VerifyOrDie(StorageAvailable() - 1 >= length);
 
-    if (mCapacity - mDataEnd >= length)
-    {
-        ::memcpy(mStorage + mDataEnd, source, length);
-        mDataEnd = Advance(mDataEnd, length); // Use advance in case that mDataEnd wrap to 0
-    }
-    else
-    {
-        size_t firstPiece  = mCapacity - mDataEnd;
-        size_t secondPiece = length - firstPiece;
-        ::memcpy(mStorage + mDataEnd, source, firstPiece);
-        ::memcpy(mStorage, source + firstPiece, secondPiece);
-        mDataEnd = secondPiece;
-    }
+    size_t firstPiece  = std::min(mCapacity - mDataEnd, length);
+    size_t secondPiece = length - firstPiece;
+    ::memcpy(mStorage + mDataEnd, source, firstPiece);
+    ::memcpy(mStorage, source + firstPiece, secondPiece);
+    mDataEnd = Advance(mDataEnd, length);
 }
 
 void BytesCircularBuffer::Drop(size_t length)
 {
     VerifyOrDie(StorageUsed() >= length);
     mDataStart = Advance(mDataStart, length);
+}
+
+size_t BytesCircularBuffer::StorageAvailable() const
+{
+    return mCapacity - StorageUsed();
 }
 
 size_t BytesCircularBuffer::StorageUsed() const
@@ -108,7 +99,7 @@ CHIP_ERROR BytesCircularBuffer::Push(const ByteSpan & payload)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     // Free up space until there is enough space.
-    while (storageNeed > mCapacity - StorageUsed())
+    while (storageNeed > StorageAvailable())
     {
         VerifyOrDie(Pop() == CHIP_NO_ERROR);
     }
