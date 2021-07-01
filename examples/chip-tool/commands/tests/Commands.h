@@ -7831,10 +7831,10 @@ private:
     }
 };
 
-class Test_3_1_1 : public TestCommand
+class Test_TC_OO_1_1 : public TestCommand
 {
 public:
-    Test_3_1_1() : TestCommand("Test_3_1_1"), mTestIndex(0) {}
+    Test_TC_OO_1_1() : TestCommand("Test_TC_OO_1_1"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -7843,7 +7843,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "Test_3_1_1: Test complete");
+            ChipLogProgress(chipTool, "Test_TC_OO_1_1: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -7869,7 +7869,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "Test_3_1_1: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "Test_TC_OO_1_1: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -7917,7 +7917,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read the global attribute: ClusterRevision: Failure Response");
 
-        Test_3_1_1 * runner = reinterpret_cast<Test_3_1_1 *>(context);
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -7936,7 +7936,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read the global attribute: ClusterRevision: Success Response");
 
-        Test_3_1_1 * runner = reinterpret_cast<Test_3_1_1 *>(context);
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -7993,7 +7993,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back global attribute: ClusterRevision: Failure Response");
 
-        Test_3_1_1 * runner = reinterpret_cast<Test_3_1_1 *>(context);
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -8012,7 +8012,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back global attribute: ClusterRevision: Success Response");
 
-        Test_3_1_1 * runner = reinterpret_cast<Test_3_1_1 *>(context);
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -8069,7 +8069,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read the optional global attribute: FeatureMap: Failure Response");
 
-        Test_3_1_1 * runner = reinterpret_cast<Test_3_1_1 *>(context);
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -8088,7 +8088,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read the optional global attribute: FeatureMap: Success Response");
 
-        Test_3_1_1 * runner = reinterpret_cast<Test_3_1_1 *>(context);
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -8145,7 +8145,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back optional global attribute: FeatureMap: Failure Response");
 
-        Test_3_1_1 * runner = reinterpret_cast<Test_3_1_1 *>(context);
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -8164,7 +8164,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back optional global attribute: FeatureMap: Success Response");
 
-        Test_3_1_1 * runner = reinterpret_cast<Test_3_1_1 *>(context);
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -8187,10 +8187,10 @@ private:
     }
 };
 
-class Test_3_2_1 : public TestCommand
+class Test_TC_OO_2_1 : public TestCommand
 {
 public:
-    Test_3_2_1() : TestCommand("Test_3_2_1"), mTestIndex(0) {}
+    Test_TC_OO_2_1() : TestCommand("Test_TC_OO_2_1"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -8199,7 +8199,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "Test_3_2_1: Test complete");
+            ChipLogProgress(chipTool, "Test_TC_OO_2_1: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -8249,7 +8249,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "Test_3_2_1: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "Test_TC_OO_2_1: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -8297,7 +8297,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read the mandatory attribute: OnOff: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -8316,7 +8316,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read the mandatory attribute: OnOff: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -8373,7 +8373,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back mandatory attribute: OnOff: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -8392,7 +8392,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back mandatory attribute: OnOff: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -8449,7 +8449,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: GlobalSceneControl: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -8468,7 +8468,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: GlobalSceneControl: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -8525,7 +8525,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: OnTime: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -8544,7 +8544,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: OnTime: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -8601,7 +8601,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: OffWaitTime: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -8620,7 +8620,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: OffWaitTime: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -8677,7 +8677,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: StartUpOnOff: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -8696,7 +8696,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: StartUpOnOff: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -8754,7 +8754,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - write the default value to LT attribute: OnTime: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -8773,7 +8773,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - write the default value to LT attribute: OnTime: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -8825,7 +8825,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - write the default value to LT attribute: OffWaitTime: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_7;
         delete runner->mOnSuccessCallback_7;
@@ -8844,7 +8844,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - write the default value to LT attribute: OffWaitTime: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_7;
         delete runner->mOnSuccessCallback_7;
@@ -8896,7 +8896,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - write the default value to LT attribute: StartUpOnOff: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_8;
         delete runner->mOnSuccessCallback_8;
@@ -8915,7 +8915,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - write the default value to LT attribute: StartUpOnOff: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_8;
         delete runner->mOnSuccessCallback_8;
@@ -8965,7 +8965,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back LT attribute: OnTime: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_9;
         delete runner->mOnSuccessCallback_9;
@@ -8984,7 +8984,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back LT attribute: OnTime: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_9;
         delete runner->mOnSuccessCallback_9;
@@ -9041,7 +9041,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back LT attribute: OffWaitTime: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_10;
         delete runner->mOnSuccessCallback_10;
@@ -9060,7 +9060,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back LT attribute: OffWaitTime: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_10;
         delete runner->mOnSuccessCallback_10;
@@ -9117,7 +9117,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back LT attribute: StartUpOnOff: Failure Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_11;
         delete runner->mOnSuccessCallback_11;
@@ -9136,7 +9136,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back LT attribute: StartUpOnOff: Success Response");
 
-        Test_3_2_1 * runner = reinterpret_cast<Test_3_2_1 *>(context);
+        Test_TC_OO_2_1 * runner = reinterpret_cast<Test_TC_OO_2_1 *>(context);
 
         delete runner->mOnFailureCallback_11;
         delete runner->mOnSuccessCallback_11;
@@ -9159,10 +9159,10 @@ private:
     }
 };
 
-class Test_3_2_2 : public TestCommand
+class Test_TC_OO_2_2 : public TestCommand
 {
 public:
-    Test_3_2_2() : TestCommand("Test_3_2_2"), mTestIndex(0) {}
+    Test_TC_OO_2_2() : TestCommand("Test_TC_OO_2_2"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -9171,7 +9171,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "Test_3_2_2: Test complete");
+            ChipLogProgress(chipTool, "Test_TC_OO_2_2: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -9227,7 +9227,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "Test_3_2_2: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "Test_TC_OO_2_2: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -9275,7 +9275,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -9294,7 +9294,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -9344,7 +9344,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -9363,7 +9363,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -9420,7 +9420,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send On Command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -9439,7 +9439,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send On Command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -9489,7 +9489,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -9508,7 +9508,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -9565,7 +9565,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -9584,7 +9584,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -9634,7 +9634,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -9653,7 +9653,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -9710,7 +9710,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Toggle Command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -9729,7 +9729,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Toggle Command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -9779,7 +9779,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after toggle command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_7;
         delete runner->mOnSuccessCallback_7;
@@ -9798,7 +9798,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after toggle command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_7;
         delete runner->mOnSuccessCallback_7;
@@ -9855,7 +9855,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Toggle Command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_8;
         delete runner->mOnSuccessCallback_8;
@@ -9874,7 +9874,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Toggle Command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_8;
         delete runner->mOnSuccessCallback_8;
@@ -9924,7 +9924,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after toggle command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_9;
         delete runner->mOnSuccessCallback_9;
@@ -9943,7 +9943,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after toggle command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_9;
         delete runner->mOnSuccessCallback_9;
@@ -10000,7 +10000,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send On Command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_10;
         delete runner->mOnSuccessCallback_10;
@@ -10019,7 +10019,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send On Command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_10;
         delete runner->mOnSuccessCallback_10;
@@ -10069,7 +10069,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_11;
         delete runner->mOnSuccessCallback_11;
@@ -10088,7 +10088,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_11;
         delete runner->mOnSuccessCallback_11;
@@ -10145,7 +10145,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_12;
         delete runner->mOnSuccessCallback_12;
@@ -10164,7 +10164,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_12;
         delete runner->mOnSuccessCallback_12;
@@ -10214,7 +10214,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Failure Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_13;
         delete runner->mOnSuccessCallback_13;
@@ -10233,7 +10233,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Success Response");
 
-        Test_3_2_2 * runner = reinterpret_cast<Test_3_2_2 *>(context);
+        Test_TC_OO_2_2 * runner = reinterpret_cast<Test_TC_OO_2_2 *>(context);
 
         delete runner->mOnFailureCallback_13;
         delete runner->mOnSuccessCallback_13;
@@ -10256,10 +10256,10 @@ private:
     }
 };
 
-class Test_10_1_1 : public TestCommand
+class Test_TC_DM_1_1 : public TestCommand
 {
 public:
-    Test_10_1_1() : TestCommand("Test_10_1_1"), mTestIndex(0) {}
+    Test_TC_DM_1_1() : TestCommand("Test_TC_DM_1_1"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -10268,7 +10268,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "Test_10_1_1: Test complete");
+            ChipLogProgress(chipTool, "Test_TC_DM_1_1: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -10336,7 +10336,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "Test_10_1_1: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "Test_TC_DM_1_1: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -10384,7 +10384,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Interaction Model Version: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -10403,7 +10403,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Interaction Model Version: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_0;
         delete runner->mOnSuccessCallback_0;
@@ -10456,7 +10456,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Vendor Name: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -10475,7 +10475,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Vendor Name: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_1;
         delete runner->mOnSuccessCallback_1;
@@ -10534,7 +10534,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query VendorID: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -10553,7 +10553,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query VendorID: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_2;
         delete runner->mOnSuccessCallback_2;
@@ -10605,7 +10605,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Product Name: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -10624,7 +10624,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Product Name: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_3;
         delete runner->mOnSuccessCallback_3;
@@ -10683,7 +10683,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ProductID: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -10702,7 +10702,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ProductID: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_4;
         delete runner->mOnSuccessCallback_4;
@@ -10754,7 +10754,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query User Label: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -10773,7 +10773,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query User Label: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_5;
         delete runner->mOnSuccessCallback_5;
@@ -10832,7 +10832,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query User Location: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -10851,7 +10851,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query User Location: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_6;
         delete runner->mOnSuccessCallback_6;
@@ -10913,7 +10913,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query HardwareVersion: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_7;
         delete runner->mOnSuccessCallback_7;
@@ -10932,7 +10932,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query HardwareVersion: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_7;
         delete runner->mOnSuccessCallback_7;
@@ -10984,7 +10984,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query HardwareVersionString: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_8;
         delete runner->mOnSuccessCallback_8;
@@ -11003,7 +11003,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query HardwareVersionString: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_8;
         delete runner->mOnSuccessCallback_8;
@@ -11072,7 +11072,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query SoftwareVersion: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_9;
         delete runner->mOnSuccessCallback_9;
@@ -11091,7 +11091,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query SoftwareVersion: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_9;
         delete runner->mOnSuccessCallback_9;
@@ -11143,7 +11143,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query SoftwareVersionString: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_10;
         delete runner->mOnSuccessCallback_10;
@@ -11162,7 +11162,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query SoftwareVersionString: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_10;
         delete runner->mOnSuccessCallback_10;
@@ -11234,7 +11234,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ManufacturingDate: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_11;
         delete runner->mOnSuccessCallback_11;
@@ -11259,7 +11259,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ManufacturingDate: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_11;
         delete runner->mOnSuccessCallback_11;
@@ -11328,7 +11328,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query PartNumber: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_12;
         delete runner->mOnSuccessCallback_12;
@@ -11353,7 +11353,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query PartNumber: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_12;
         delete runner->mOnSuccessCallback_12;
@@ -11412,7 +11412,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ProductURL: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_13;
         delete runner->mOnSuccessCallback_13;
@@ -11437,7 +11437,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ProductURL: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_13;
         delete runner->mOnSuccessCallback_13;
@@ -11498,7 +11498,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ProductLabel: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_14;
         delete runner->mOnSuccessCallback_14;
@@ -11523,7 +11523,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ProductLabel: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_14;
         delete runner->mOnSuccessCallback_14;
@@ -11582,7 +11582,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query SerialNumber: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_15;
         delete runner->mOnSuccessCallback_15;
@@ -11607,7 +11607,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query SerialNumber: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_15;
         delete runner->mOnSuccessCallback_15;
@@ -11666,7 +11666,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query LocalConfigDisabled: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_16;
         delete runner->mOnSuccessCallback_16;
@@ -11691,7 +11691,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query LocalConfigDisabled: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_16;
         delete runner->mOnSuccessCallback_16;
@@ -11743,7 +11743,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Reachable: Failure Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_17;
         delete runner->mOnSuccessCallback_17;
@@ -11768,7 +11768,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Reachable: Success Response");
 
-        Test_10_1_1 * runner = reinterpret_cast<Test_10_1_1 *>(context);
+        Test_TC_DM_1_1 * runner = reinterpret_cast<Test_TC_DM_1_1 *>(context);
 
         delete runner->mOnFailureCallback_17;
         delete runner->mOnSuccessCallback_17;
@@ -11831,8 +11831,8 @@ void registerCommandsTests(Commands & commands)
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
-        make_unique<TestCluster>(), make_unique<Test_3_1_1>(),  make_unique<Test_3_2_1>(),
-        make_unique<Test_3_2_2>(),  make_unique<Test_10_1_1>(), make_unique<Test_TC_DM_3_1>(),
+        make_unique<TestCluster>(),    make_unique<Test_TC_OO_1_1>(), make_unique<Test_TC_OO_2_1>(),
+        make_unique<Test_TC_OO_2_2>(), make_unique<Test_TC_DM_1_1>(), make_unique<Test_TC_DM_3_1>(),
     };
 
     commands.Register(clusterName, clusterCommands);
