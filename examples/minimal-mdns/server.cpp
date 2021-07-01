@@ -188,22 +188,27 @@ int main(int argc, char ** args)
     mdns::Minimal::Server<10 /* endpoints */> mdnsServer;
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
-    mdns::Minimal::QNamePart tcpServiceName[]       = { kOperationalServiceName, kOperationalProtocol, kLocalDomain };
-    mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, kOperationalServiceName, kOperationalProtocol,
-                                                        kLocalDomain };
-    mdns::Minimal::QNamePart udpServiceName[]       = { kCommissionableServiceName, kCommissionProtocol, kLocalDomain };
-    mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, kCommissionableServiceName, kCommissionProtocol,
-                                                        kLocalDomain };
+    mdns::Minimal::QNamePart tcpServiceName[]       = { chip::Mdns::kOperationalServiceName, chip::Mdns::kOperationalProtocol,
+                                                  chip::Mdns::kLocalDomain };
+    mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, chip::Mdns::kOperationalServiceName,
+                                                        chip::Mdns::kOperationalProtocol, chip::Mdns::kLocalDomain };
+    mdns::Minimal::QNamePart udpServiceName[]       = { chip::Mdns::kCommissionableServiceName, chip::Mdns::kCommissionProtocol,
+                                                  chip::Mdns::kLocalDomain };
+    mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, chip::Mdns::kCommissionableServiceName,
+                                                        chip::Mdns::kCommissionProtocol, chip::Mdns::kLocalDomain };
 
     // several UDP versions for discriminators
-    mdns::Minimal::QNamePart udpDiscriminator1[] = { "S52", kSubtypeServiceNamePart, kCommissionableServiceName,
-                                                     kCommissionProtocol, kLocalDomain };
-    mdns::Minimal::QNamePart udpDiscriminator2[] = { "V123", kSubtypeServiceNamePart, kCommissionableServiceName,
-                                                     kCommissionProtocol, kLocalDomain };
-    mdns::Minimal::QNamePart udpDiscriminator3[] = { "L840", kSubtypeServiceNamePart, kCommissionableServiceName,
-                                                     kCommissionProtocol, kLocalDomain };
+    mdns::Minimal::QNamePart udpDiscriminator1[] = { "S52", chip::Mdns::kSubtypeServiceNamePart,
+                                                     chip::Mdns::kCommissionableServiceName, chip::Mdns::kCommissionProtocol,
+                                                     chip::Mdns::kLocalDomain };
+    mdns::Minimal::QNamePart udpDiscriminator2[] = { "V123", chip::Mdns::kSubtypeServiceNamePart,
+                                                     chip::Mdns::kCommissionableServiceName, chip::Mdns::kCommissionProtocol,
+                                                     chip::Mdns::kLocalDomain };
+    mdns::Minimal::QNamePart udpDiscriminator3[] = { "L840", chip::Mdns::kSubtypeServiceNamePart,
+                                                     chip::Mdns::kCommissionableServiceName, chip::Mdns::kCommissionProtocol,
+                                                     chip::Mdns::kLocalDomain };
 
-    mdns::Minimal::QNamePart serverName[] = { gOptions.instanceName, kLocalDomain };
+    mdns::Minimal::QNamePart serverName[] = { gOptions.instanceName, chip::Mdns::kLocalDomain };
 
     mdns::Minimal::IPv4Responder ipv4Responder(serverName);
     mdns::Minimal::IPv6Responder ipv6Responder(serverName);

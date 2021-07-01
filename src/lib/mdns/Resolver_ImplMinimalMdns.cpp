@@ -153,11 +153,14 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
 {
     // Host name is the first part of the qname
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
-    if (!it.Next())
+    if (it.Next())
     {
-        return;
+        strncpy(mDiscoveredNodeData.hostName, it.Value(), sizeof(DiscoveredNodeData::hostName));
     }
-    strncpy(mDiscoveredNodeData.hostName, it.Value(), sizeof(DiscoveredNodeData::hostName));
+    if (name.Next())
+    {
+        strncpy(mDiscoveredNodeData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
+    }
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
@@ -235,6 +238,18 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             else
             {
                 mValid = false;
+            }
+        }
+        break;
+    }
+    case QType::PTR: {
+        if (mDiscoveryType == DiscoveryType::kCommissionableNode)
+        {
+            SerializedQNameIterator qname;
+            ParsePtrRecord(data.GetData(), mPacketRange, &qname);
+            if (qname.Next())
+            {
+                strncpy(mDiscoveredNodeData.instanceName, qname.Value(), sizeof(DiscoveredNodeData::instanceName));
             }
         }
         break;
@@ -423,6 +438,10 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
         if (filter.type == DiscoveryFilterType::kNone)
         {
             qname = CheckAndAllocateQName(kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
+        }
+        else if (filter.type == DiscoveryFilterType::kInstanceName)
+        {
+            qname = CheckAndAllocateQName(filter.instanceName, kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
         }
         else
         {

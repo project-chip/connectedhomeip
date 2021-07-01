@@ -27,7 +27,7 @@
 
 namespace chip {
 namespace Mdns {
-constexpr size_t kMaxSubtypeDescSize        = 8; // max 5 decimal digits + _X prefix. + null character
+constexpr size_t kMaxSubtypeDescSize        = 16; // max 16 char service name
 constexpr char kSubtypeServiceNamePart[]    = "_sub";
 constexpr char kCommissionableServiceName[] = "_matterc";
 constexpr char kOperationalServiceName[]    = "_matter";
