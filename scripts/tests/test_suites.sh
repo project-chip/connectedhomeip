@@ -25,9 +25,9 @@ declare -i background_pid=0
 # - a for application
 # - i for number of iterations you want to have
 while getopts a:i: flag; do
-    case "${flag}" in
-    a) application=${OPTARG} ;;
-    i) iterations=${OPTARG} ;;
+    case "$flag" in
+    a) application=$OPTARG ;;
+    i) iterations=$OPTARG ;;
     esac
 done
 
@@ -90,14 +90,14 @@ for j in "${iter_array[@]}"; do
 
         # Clear out our temp files so we don't accidentally do a stale
         # read from them before we write to them.
-        rm -rf /tmp/$application-log
-        touch /tmp/$application-log
+        rm -rf /tmp/"$application"-log
+        touch /tmp/"$application"-log
         rm -rf /tmp/pid
         (
-            stdbuf -o0 out/debug/standalone/chip-$application-app &
+            stdbuf -o0 out/debug/standalone/chip-"$application"-app &
             echo $! >&3
-        ) 3>/tmp/pid | tee /tmp/$application-log &
-        while ! grep -q "Server Listening" /tmp/$application-log; do
+        ) 3>/tmp/pid | tee /tmp/"$application"-log &
+        while ! grep -q "Server Listening" /tmp/"$application"-log; do
             :
         done
         # Now read $background_pid from /tmp/pid; presumably it's
