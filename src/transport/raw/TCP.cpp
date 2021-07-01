@@ -31,6 +31,7 @@
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
+#include <limits>
 
 namespace chip {
 namespace Transport {
