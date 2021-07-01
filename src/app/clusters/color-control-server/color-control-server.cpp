@@ -523,7 +523,6 @@ bool emberAfColorControlClusterMoveHueCallback(chip::app::Command * commandObj, 
     return moveHue(moveMode, static_cast<uint16_t>(rate), optionsMask, optionsOverride, false);
 }
 
-
 bool emberAfColorControlClusterMoveSaturationCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate,
                                                       uint8_t optionsMask, uint8_t optionsOverride)
 {
