@@ -328,7 +328,7 @@ static bool moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t tr
                                    uint8_t optionsOverride, bool isEnhanced)
 {
     // If isEnhanced is True this function was called by EnhancedMoveToHueAndSaturation command and the hue is a uint16
-    // If isEnhanced is False this function was called by MoveToHueAndSaturation command and the hue is are a uint8 
+    // If isEnhanced is False this function was called by MoveToHueAndSaturation command and the hue is are a uint8
 
     EndpointId endpoint = emberAfCurrentEndpoint();
     uint16_t currentHue = isEnhanced ? readEnhancedHue(endpoint) : static_cast<uint16_t>(readHue(endpoint));
