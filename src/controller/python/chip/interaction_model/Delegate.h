@@ -35,7 +35,7 @@ struct __attribute__((packed)) CommandStatus
     uint8_t CommandIndex;
 };
 
-static_assert(sizeof(CommandStatus) == 4 + 2 + 1 + 2 + 1 + 1, "");
+static_assert(sizeof(CommandStatus) == 4 + 2 + 2 + 4 + 4 + 1, "CommandStatus has padding");
 
 extern "C" {
 typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,

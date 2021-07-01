@@ -24,9 +24,9 @@ import chip.exceptions
 IMCommandStatus = Struct(
     "ProtocolId" /  Int32ul,
     "ProtocolCode" / Int16ul,
-    "EndpointId" / Int8ul,
-    "ClusterId" / Int16ul,
-    "CommandId" / Int8ul,
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "CommandId" / Int32ul,
     "CommandIndex" / Int8ul,
 )
 
