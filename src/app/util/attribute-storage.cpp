@@ -44,8 +44,7 @@
 #include <app/util/attribute-storage.h>
 
 #include <app/common/gen/attribute-type.h>
-
-#include "gen/callback.h"
+#include <app/common/gen/callback.h>
 
 using namespace chip;
 
