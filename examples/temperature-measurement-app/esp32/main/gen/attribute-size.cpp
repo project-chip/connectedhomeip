@@ -45,8 +45,7 @@ void copyListMember(uint8_t * dest, uint8_t * src, bool write, uint16_t * offset
     *offset = static_cast<uint16_t>(*offset + length);
 }
 
-uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
-                         int32_t index)
+uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src, int32_t index)
 {
     if (index == -1)
     {
@@ -59,12 +58,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         if (write)
         {
             // src is a pointer to native-endian uint16_t, dest is pointer to buffer that should hold little-endian value
-            emberAfCopyInt16u(dest, 0, *reinterpret_cast<uint16_t *>(src));
+            emberAfCopyInt16u(dest, 0, *reinterpret_cast<uint16_t*>(src));
         }
         else
         {
             // src is pointer to buffer holding little-endian value, dest is a pointer to native-endian uint16_t
-            *reinterpret_cast<uint16_t *>(dest) = emberAfGetInt16u(src, 0, kSizeLengthInBytes);
+            *reinterpret_cast<uint16_t*>(dest) = emberAfGetInt16u(src, 0, kSizeLengthInBytes);
         }
         return kSizeLengthInBytes;
     }
@@ -83,83 +82,70 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-        case 0x0000: // NetworkInterfaces
-        {
-            entryLength = 48;
-            if (((index - 1) * entryLength) > (am->size - entryLength))
+            case 0x0000: // NetworkInterfaces
             {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                return 0;
+                entryLength  = 48;
+                if (((index - 1) * entryLength) > (am->size - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+                // Struct _NetworkInterfaceType
+                _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
+                chip::ByteSpan * NameSpan = &entry->Name; // OCTET_STRING
+                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
+                {
+                    ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + 34);
+                copyListMember(write ? dest : (uint8_t *)&entry->FabricConnected, write ? (uint8_t *)&entry->FabricConnected : src, write, &entryOffset, sizeof(entry->FabricConnected)); // BOOLEAN
+                copyListMember(write ? dest : (uint8_t *)&entry->OffPremiseServicesReachableIPv4, write ? (uint8_t *)&entry->OffPremiseServicesReachableIPv4 : src, write, &entryOffset, sizeof(entry->OffPremiseServicesReachableIPv4)); // BOOLEAN
+                copyListMember(write ? dest : (uint8_t *)&entry->OffPremiseServicesReachableIPv6, write ? (uint8_t *)&entry->OffPremiseServicesReachableIPv6 : src, write, &entryOffset, sizeof(entry->OffPremiseServicesReachableIPv6)); // BOOLEAN
+                chip::ByteSpan * HardwareAddressSpan = &entry->HardwareAddress; // OCTET_STRING
+                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, 10, HardwareAddressSpan) : ReadByteSpan(src + entryOffset, 10, HardwareAddressSpan)))
+                {
+                    ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + 10);
+                copyListMember(write ? dest : (uint8_t *)&entry->Type, write ? (uint8_t *)&entry->Type : src, write, &entryOffset, sizeof(entry->Type)); // ENUM8
+                break;
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-            // Struct _NetworkInterfaceType
-            _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
-            chip::ByteSpan * NameSpan     = &entry->Name; // OCTET_STRING
-            if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
-            {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                return 0;
-            }
-            entryOffset = static_cast<uint16_t>(entryOffset + 34);
-            copyListMember(write ? dest : (uint8_t *) &entry->FabricConnected, write ? (uint8_t *) &entry->FabricConnected : src,
-                           write, &entryOffset, sizeof(entry->FabricConnected)); // BOOLEAN
-            copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv4,
-                           write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv4 : src, write, &entryOffset,
-                           sizeof(entry->OffPremiseServicesReachableIPv4)); // BOOLEAN
-            copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv6,
-                           write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv6 : src, write, &entryOffset,
-                           sizeof(entry->OffPremiseServicesReachableIPv6)); // BOOLEAN
-            chip::ByteSpan * HardwareAddressSpan = &entry->HardwareAddress; // OCTET_STRING
-            if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, 10, HardwareAddressSpan)
-                       : ReadByteSpan(src + entryOffset, 10, HardwareAddressSpan)))
-            {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                return 0;
-            }
-            entryOffset = static_cast<uint16_t>(entryOffset + 10);
-            copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
-                           sizeof(entry->Type)); // ENUM8
-            break;
-        }
-        }
-        break;
+      }
+      break;
     }
     case 0x003E: // Operational Credentials Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-        case 0x0001: // fabrics list
-        {
-            entryLength = 52;
-            if (((index - 1) * entryLength) > (am->size - entryLength))
+            case 0x0001: // fabrics list
             {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                return 0;
+                entryLength  = 52;
+                if (((index - 1) * entryLength) > (am->size - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+                // Struct _FabricDescriptor
+                _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
+                copyListMember(write ? dest : (uint8_t *)&entry->FabricId, write ? (uint8_t *)&entry->FabricId : src, write, &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
+                copyListMember(write ? dest : (uint8_t *)&entry->VendorId, write ? (uint8_t *)&entry->VendorId : src, write, &entryOffset, sizeof(entry->VendorId)); // INT16U
+                copyListMember(write ? dest : (uint8_t *)&entry->NodeId, write ? (uint8_t *)&entry->NodeId : src, write, &entryOffset, sizeof(entry->NodeId)); // NODE_ID
+                chip::ByteSpan * LabelSpan = &entry->Label; // OCTET_STRING
+                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
+                {
+                    ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + 34);
+                break;
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-            // Struct _FabricDescriptor
-            _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
-            copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
-                           &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
-            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
-                           &entryOffset, sizeof(entry->VendorId)); // INT16U
-            copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
-                           sizeof(entry->NodeId));      // NODE_ID
-            chip::ByteSpan * LabelSpan = &entry->Label; // OCTET_STRING
-            if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
-            {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                return 0;
-            }
-            entryOffset = static_cast<uint16_t>(entryOffset + 34);
-            break;
-        }
-        }
-        break;
+      }
+      break;
     }
     }
 
@@ -183,21 +169,21 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     case 0x0033: // General Diagnostics Cluster
         switch (attributeId)
         {
-        case 0x0000: // NetworkInterfaces
+            case 0x0000: // NetworkInterfaces
             // Struct _NetworkInterfaceType
             entryLength = 48;
             break;
         }
-        break;
+    break;
     case 0x003E: // Operational Credentials Cluster
         switch (attributeId)
         {
-        case 0x0001: // fabrics list
+            case 0x0001: // fabrics list
             // Struct _FabricDescriptor
             entryLength = 52;
             break;
         }
-        break;
+    break;
     }
 
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);
