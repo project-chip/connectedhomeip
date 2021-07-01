@@ -845,7 +845,7 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
         emberAfPutInt16uInResp(cmd->mfgCode);
     }
     emberAfPutInt8uInResp(cmd->seqNum);
-    emberAfPutInt8uInResp(ZCL_DEFAULT_RESPONSE_COMMAND_ID);
+    emberAfPutInt32uInResp(ZCL_DEFAULT_RESPONSE_COMMAND_ID);
     emberAfPutInt32uInResp(cmd->commandId);
     emberAfPutStatusInResp(status);
 
