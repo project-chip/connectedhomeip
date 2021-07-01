@@ -29,8 +29,6 @@
 
 #include "SetupPayload.h"
 
-#include <string>
-
 #pragma once
 
 namespace chip {
@@ -81,6 +79,24 @@ public:
      *               producing the requested string.
      */
     CHIP_ERROR payloadBase38Representation(std::string & base38Representation, uint8_t * tlvDataStart, uint32_t tlvDataStartSize);
+
+    /**
+     * This function is called to encode the binary data of a payload to a
+     * base38 string. The payload's optional data is ignored for compatibility
+     * with devices that don't support std::string or STL.
+     *
+     * @param[out] outBuffer
+     *                  The buffer to copy the base38 to.
+     * @param[in]  outBufferSize
+     *                  The size of the output buffer.
+     *
+     * @retval #CHIP_NO_ERROR if the method succeeded.
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT if the payload is invalid.
+     * @retval other Other CHIP or platform-specific error codes indicating
+     *               that an error occurred preventing the function from
+     *               producing the requested string.
+     */
+    CHIP_ERROR payloadBase38Representation(char * outBuffer, size_t outBufferSize);
 
 private:
     CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,

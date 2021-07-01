@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,29 +17,13 @@
 
 /**
  *    @file
- *      This file implements converting an array of bytes into a Base38 String and
- *       the reverse.
- *
- *      The encoding chosen is: treat every 3 bytes of input data as a little-endian
- *        uint32_t, then div and mod that into 5 base38 characters, with the least-significant
- *        encoding bits in the first character of the resulting string. If a number of bytes
- *        is used that is not multiple of 3, then last 2 bytes are encoded to 4 base38 characters
- *        or last 1 byte is encoded to 2 base38 characters. Algoritm considers worst case size
- *        of bytes chunks and does not introduce code length optimization.
+ *      This file implements converting a Base38 String into an array of bytes.
  *
  */
 
-#include "Base38.h"
-
-#include <climits>
+#include "Base38Decode.h"
 
 namespace {
-
-static const char kCodes[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-                               'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '-', '.' };
-static const uint8_t kBase38CharactersNeededInNBytesChunk[] = { 2, 4, 5 };
-static const uint8_t kMaxBytesSingleChunkLen                = 3;
-static const uint8_t kRadix                                 = sizeof(kCodes) / sizeof(kCodes[0]);
 
 static inline CHIP_ERROR decodeChar(char c, uint8_t & value)
 {
@@ -110,36 +94,6 @@ static inline CHIP_ERROR decodeChar(char c, uint8_t & value)
 } // unnamed namespace
 
 namespace chip {
-
-std::string base38Encode(const uint8_t * buf, size_t buf_len)
-{
-    std::string result;
-
-    while (buf_len > 0)
-    {
-        uint32_t value = 0;
-        static_assert(sizeof(value) * CHAR_BIT >= kMaxBytesSingleChunkLen * 8, "value might overflow");
-
-        size_t bytesInChunk = (buf_len >= kMaxBytesSingleChunkLen) ? kMaxBytesSingleChunkLen : buf_len;
-
-        for (uint8_t byte = 0; byte < bytesInChunk; byte++)
-        {
-            value += static_cast<uint32_t>(buf[byte] << (8 * byte));
-        }
-        buf_len -= bytesInChunk;
-        buf += bytesInChunk;
-
-        // Without code length optimization there is constant characters number needed for specific chunk size.
-        const int base38CharactersNeeded = kBase38CharactersNeededInNBytesChunk[bytesInChunk - 1];
-
-        for (uint8_t character = 0; character < base38CharactersNeeded; character++)
-        {
-            result += kCodes[value % kRadix];
-            value /= kRadix;
-        }
-    }
-    return result;
-}
 
 CHIP_ERROR base38Decode(std::string base38, std::vector<uint8_t> & result)
 {
