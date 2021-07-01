@@ -249,6 +249,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Secu
 ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
+    VerifyOrDie(!IsAckPending());
 
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and
@@ -381,6 +382,15 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     CHIP_ERROR err = mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, msgFlags,
                                                   GetReliableMessageContext());
     SuccessOrExit(err);
+
+    if (IsAckPending() && !mDelegate)
+    {
+        // The incoming message wants an ack, but we have no delegate, so
+        // there's not going to be a response to piggyback on.  Just flush the
+        // ack out right now.
+        err = FlushAcks();
+        SuccessOrExit(err);
+    }
 
     // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
