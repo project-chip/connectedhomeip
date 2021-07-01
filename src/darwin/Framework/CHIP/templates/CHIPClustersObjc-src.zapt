@@ -429,7 +429,7 @@ public:
 
     ~CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge() {};
 
-    static void CallbackFn(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
+    static void CallbackFn(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
     {
         CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge * callback = reinterpret_cast<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge *>(context);
         if (callback && callback->mQueue)
@@ -439,7 +439,7 @@ public:
                   {{#zcl_command_arguments}}
                   {{#unless (isStrEqual label "status")}}
                   {{#if isArray}}
-                  // {{asSymbol label}}: {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}}
+                  // {{asSymbol label}}: {{asUnderlyingZclType type}}
                   // Conversion from this type to Objc is not properly implemented yet
                   {{else if (isOctetString type)}}
                   @"{{asSymbol label}}": [NSData dataWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size()],
@@ -616,7 +616,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}chip::ByteSpan((const uint8_t*){{asCamelCased label}}.bytes, {{asCamelCased label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asCamelCased label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asCamelCased label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
+        err = self.cppCluster.{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*){{asCamelCased label}}.bytes, {{asCamelCased label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asCamelCased label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asCamelCased label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
     });
 
     if (err != CHIP_NO_ERROR) {
