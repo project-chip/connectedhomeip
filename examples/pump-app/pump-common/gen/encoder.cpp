@@ -23,10 +23,14 @@
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <app/common/gen/ids/Attributes.h>
+#include <app/common/gen/ids/Clusters.h>
+#include <app/common/gen/ids/Commands.h>
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::System;
 using namespace chip::Encoding::LittleEndian;
 
@@ -77,36 +81,6 @@ using namespace chip::Encoding::LittleEndian;
 
 #define EMBER_ZCL_REPORTING_DIRECTION_REPORTED 0x00
 
-#define ZCL_READ_ATTRIBUTES_COMMAND_ID (0x00)
-#define ZCL_READ_ATTRIBUTES_RESPONSE_COMMAND_ID (0x01)
-#define ZCL_WRITE_ATTRIBUTES_COMMAND_ID (0x02)
-#define ZCL_WRITE_ATTRIBUTES_UNDIVIDED_COMMAND_ID (0x03)
-#define ZCL_WRITE_ATTRIBUTES_RESPONSE_COMMAND_ID (0x04)
-#define ZCL_WRITE_ATTRIBUTES_NO_RESPONSE_COMMAND_ID (0x05)
-#define ZCL_CONFIGURE_REPORTING_COMMAND_ID (0x06)
-#define ZCL_CONFIGURE_REPORTING_RESPONSE_COMMAND_ID (0x07)
-#define ZCL_READ_REPORTING_CONFIGURATION_COMMAND_ID (0x08)
-#define ZCL_READ_REPORTING_CONFIGURATION_RESPONSE_COMMAND_ID (0x09)
-#define ZCL_REPORT_ATTRIBUTES_COMMAND_ID (0x0A)
-#define ZCL_DEFAULT_RESPONSE_COMMAND_ID (0x0B)
-#define ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID (0x0C)
-#define ZCL_DISCOVER_ATTRIBUTES_RESPONSE_COMMAND_ID (0x0D)
-#define ZCL_READ_ATTRIBUTES_STRUCTURED_COMMAND_ID (0x0E)
-#define ZCL_WRITE_ATTRIBUTES_STRUCTURED_COMMAND_ID (0x0F)
-#define ZCL_WRITE_ATTRIBUTES_STRUCTURED_RESPONSE_COMMAND_ID (0x10)
-#define ZCL_DISCOVER_COMMANDS_RECEIVED_COMMAND_ID (0x11)
-#define ZCL_DISCOVER_COMMANDS_RECEIVED_RESPONSE_COMMAND_ID (0x12)
-#define ZCL_DISCOVER_COMMANDS_GENERATED_COMMAND_ID (0x13)
-#define ZCL_DISCOVER_COMMANDS_GENERATED_RESPONSE_COMMAND_ID (0x14)
-#define ZCL_DISCOVER_ATTRIBUTES_EXTENDED_COMMAND_ID (0x15)
-#define ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID (0x16)
-
-#define FLOW_MEASUREMENT_CLUSTER_ID 0x0404
-
-#define PRESSURE_MEASUREMENT_CLUSTER_ID 0x0403
-
-#define TEMP_MEASUREMENT_CLUSTER_ID 0x0402
-
 // TODO: Find a way to calculate maximum message length for clusters
 //       https://github.com/project-chip/connectedhomeip/issues/965
 constexpr uint16_t kMaxBufferSize = 1024;
@@ -133,8 +107,8 @@ constexpr EndpointId kSourceEndpoint = 1;
 
 PacketBufferHandle encodeFlowMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverFlowMeasurementAttributes", FLOW_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put32(0x0000).Put8(0xFF);
+    COMMAND_HEADER("DiscoverFlowMeasurementAttributes", FlowMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -143,8 +117,11 @@ PacketBufferHandle encodeFlowMeasurementClusterDiscoverAttributes(uint8_t seqNum
  */
 PacketBufferHandle encodeFlowMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadFlowMeasurementMeasuredValue", FLOW_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0000);
+    COMMAND_HEADER("ReadFlowMeasurementMeasuredValue", FlowMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(FlowMeasurement::Attributes::Ids::MeasuredValue);
     COMMAND_FOOTER();
 }
 
@@ -152,12 +129,12 @@ PacketBufferHandle encodeFlowMeasurementClusterConfigureMeasuredValueAttribute(u
                                                                                uint16_t minInterval, uint16_t maxInterval,
                                                                                int16_t change)
 {
-    COMMAND_HEADER("ReportFlowMeasurementMeasuredValue", FLOW_MEASUREMENT_CLUSTER_ID);
+    COMMAND_HEADER("ReportFlowMeasurementMeasuredValue", FlowMeasurement::Id);
     buf.Put8(kFrameControlGlobalCommand)
         .Put8(seqNum)
-        .Put32(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put32(0x0000)
+        .Put32(FlowMeasurement::Attributes::Ids::MeasuredValue)
         .Put8(41)
         .Put16(minInterval)
         .Put16(maxInterval);
@@ -170,8 +147,11 @@ PacketBufferHandle encodeFlowMeasurementClusterConfigureMeasuredValueAttribute(u
  */
 PacketBufferHandle encodeFlowMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadFlowMeasurementMinMeasuredValue", FLOW_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0001);
+    COMMAND_HEADER("ReadFlowMeasurementMinMeasuredValue", FlowMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(FlowMeasurement::Attributes::Ids::MinMeasuredValue);
     COMMAND_FOOTER();
 }
 
@@ -180,8 +160,11 @@ PacketBufferHandle encodeFlowMeasurementClusterReadMinMeasuredValueAttribute(uin
  */
 PacketBufferHandle encodeFlowMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadFlowMeasurementMaxMeasuredValue", FLOW_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0002);
+    COMMAND_HEADER("ReadFlowMeasurementMaxMeasuredValue", FlowMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(FlowMeasurement::Attributes::Ids::MaxMeasuredValue);
     COMMAND_FOOTER();
 }
 
@@ -190,8 +173,11 @@ PacketBufferHandle encodeFlowMeasurementClusterReadMaxMeasuredValueAttribute(uin
  */
 PacketBufferHandle encodeFlowMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadFlowMeasurementClusterRevision", FLOW_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0xFFFD);
+    COMMAND_HEADER("ReadFlowMeasurementClusterRevision", FlowMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::ClusterRevision);
     COMMAND_FOOTER();
 }
 
@@ -209,8 +195,8 @@ PacketBufferHandle encodeFlowMeasurementClusterReadClusterRevisionAttribute(uint
 
 PacketBufferHandle encodePressureMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverPressureMeasurementAttributes", PRESSURE_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put32(0x0000).Put8(0xFF);
+    COMMAND_HEADER("DiscoverPressureMeasurementAttributes", PressureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -219,8 +205,11 @@ PacketBufferHandle encodePressureMeasurementClusterDiscoverAttributes(uint8_t se
  */
 PacketBufferHandle encodePressureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadPressureMeasurementMeasuredValue", PRESSURE_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0000);
+    COMMAND_HEADER("ReadPressureMeasurementMeasuredValue", PressureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(PressureMeasurement::Attributes::Ids::MeasuredValue);
     COMMAND_FOOTER();
 }
 
@@ -228,12 +217,12 @@ PacketBufferHandle encodePressureMeasurementClusterConfigureMeasuredValueAttribu
                                                                                    uint16_t minInterval, uint16_t maxInterval,
                                                                                    int16_t change)
 {
-    COMMAND_HEADER("ReportPressureMeasurementMeasuredValue", PRESSURE_MEASUREMENT_CLUSTER_ID);
+    COMMAND_HEADER("ReportPressureMeasurementMeasuredValue", PressureMeasurement::Id);
     buf.Put8(kFrameControlGlobalCommand)
         .Put8(seqNum)
-        .Put32(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put32(0x0000)
+        .Put32(PressureMeasurement::Attributes::Ids::MeasuredValue)
         .Put8(41)
         .Put16(minInterval)
         .Put16(maxInterval);
@@ -246,8 +235,11 @@ PacketBufferHandle encodePressureMeasurementClusterConfigureMeasuredValueAttribu
  */
 PacketBufferHandle encodePressureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadPressureMeasurementMinMeasuredValue", PRESSURE_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0001);
+    COMMAND_HEADER("ReadPressureMeasurementMinMeasuredValue", PressureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(PressureMeasurement::Attributes::Ids::MinMeasuredValue);
     COMMAND_FOOTER();
 }
 
@@ -256,8 +248,11 @@ PacketBufferHandle encodePressureMeasurementClusterReadMinMeasuredValueAttribute
  */
 PacketBufferHandle encodePressureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadPressureMeasurementMaxMeasuredValue", PRESSURE_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0002);
+    COMMAND_HEADER("ReadPressureMeasurementMaxMeasuredValue", PressureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(PressureMeasurement::Attributes::Ids::MaxMeasuredValue);
     COMMAND_FOOTER();
 }
 
@@ -266,8 +261,11 @@ PacketBufferHandle encodePressureMeasurementClusterReadMaxMeasuredValueAttribute
  */
 PacketBufferHandle encodePressureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadPressureMeasurementClusterRevision", PRESSURE_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0xFFFD);
+    COMMAND_HEADER("ReadPressureMeasurementClusterRevision", PressureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::ClusterRevision);
     COMMAND_FOOTER();
 }
 
@@ -285,8 +283,8 @@ PacketBufferHandle encodePressureMeasurementClusterReadClusterRevisionAttribute(
 
 PacketBufferHandle encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverTemperatureMeasurementAttributes", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put32(0x0000).Put8(0xFF);
+    COMMAND_HEADER("DiscoverTemperatureMeasurementAttributes", TemperatureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -295,8 +293,11 @@ PacketBufferHandle encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t
  */
 PacketBufferHandle encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadTemperatureMeasurementMeasuredValue", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0000);
+    COMMAND_HEADER("ReadTemperatureMeasurementMeasuredValue", TemperatureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(TemperatureMeasurement::Attributes::Ids::MeasuredValue);
     COMMAND_FOOTER();
 }
 
@@ -305,12 +306,12 @@ PacketBufferHandle encodeTemperatureMeasurementClusterConfigureMeasuredValueAttr
                                                                                       uint16_t minInterval, uint16_t maxInterval,
                                                                                       int16_t change)
 {
-    COMMAND_HEADER("ReportTemperatureMeasurementMeasuredValue", TEMP_MEASUREMENT_CLUSTER_ID);
+    COMMAND_HEADER("ReportTemperatureMeasurementMeasuredValue", TemperatureMeasurement::Id);
     buf.Put8(kFrameControlGlobalCommand)
         .Put8(seqNum)
-        .Put32(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
         .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-        .Put32(0x0000)
+        .Put32(TemperatureMeasurement::Attributes::Ids::MeasuredValue)
         .Put8(41)
         .Put16(minInterval)
         .Put16(maxInterval);
@@ -323,8 +324,11 @@ PacketBufferHandle encodeTemperatureMeasurementClusterConfigureMeasuredValueAttr
  */
 PacketBufferHandle encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadTemperatureMeasurementMinMeasuredValue", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0001);
+    COMMAND_HEADER("ReadTemperatureMeasurementMinMeasuredValue", TemperatureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(TemperatureMeasurement::Attributes::Ids::MinMeasuredValue);
     COMMAND_FOOTER();
 }
 
@@ -333,8 +337,11 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadMinMeasuredValueAttrib
  */
 PacketBufferHandle encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadTemperatureMeasurementMaxMeasuredValue", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0x0002);
+    COMMAND_HEADER("ReadTemperatureMeasurementMaxMeasuredValue", TemperatureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(TemperatureMeasurement::Attributes::Ids::MaxMeasuredValue);
     COMMAND_FOOTER();
 }
 
@@ -343,7 +350,10 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttrib
  */
 PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadTemperatureMeasurementClusterRevision", TEMP_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put32(0xFFFD);
+    COMMAND_HEADER("ReadTemperatureMeasurementClusterRevision", TemperatureMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::ClusterRevision);
     COMMAND_FOOTER();
 }
