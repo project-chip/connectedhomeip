@@ -84,6 +84,9 @@ const int kTotalPayloadDataSizeInBits =
 
 const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 
+// From 5.1.2.2. QR Code Version 3 (29x29), ECC=L
+const int kQRCodeMaxCharLength = 77;
+
 const char * const kQRCodePrefix = "MT:";
 
 /// The rendezvous type this device supports.
