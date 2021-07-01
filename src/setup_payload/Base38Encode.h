@@ -17,20 +17,18 @@
 
 /**
  *    @file
- *      Shared header for encoding and decoding Base38
+ *      Utility header to encode an input into a Base38 String
  */
 
 #pragma once
 
-#include <core/CHIPError.h>
+#include "Base38.h"
 
-#include <stdint.h>
+#include <stddef.h>
 
 namespace chip {
 
-static const char kCodes[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-                               'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '-', '.' };
-static const uint8_t kBase38CharactersNeededInNBytesChunk[] = { 2, 4, 5 };
-static const uint8_t kRadix                                 = sizeof(kCodes) / sizeof(kCodes[0]);
+// returns CHIP_NO_ERROR on successful encode
+CHIP_ERROR base38Encode(const uint8_t * in_buf, size_t in_buf_len, char * out_buf, size_t out_buf_len);
 
 } // namespace chip
