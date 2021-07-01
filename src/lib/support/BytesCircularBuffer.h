@@ -42,7 +42,7 @@ public:
      * @param storage  The underlying storage. This class doesn't take the ownership of the storage.
      * @param capacity The length of the storage.
      */
-    BytesCircularBuffer(uint8_t * storage, size_t capacity) : mStorage(storage), mCapacity(capacity), mDataStart(0), mDataEnd(0)
+    BytesCircularBuffer(uint8_t * storage, size_t capacity) : mStorage(storage), mCapacity(capacity)
     {
         VerifyOrDie(mCapacity > sizeof(SizeType) + 1);
     }
@@ -61,7 +61,7 @@ public:
     /** @brief discard the oldest byte sequence in the buffer.
      *
      *  @returns CHIP_NO_ERROR if successful
-     *           CHIP_ERROR_INCORRECT_STATE if the bufer is empty
+     *           CHIP_ERROR_INCORRECT_STATE if the buffer is empty
      */
     CHIP_ERROR Pop();
 
@@ -81,7 +81,8 @@ private:
     void Read(uint8_t * dest, size_t length, size_t offset) const; // read length bytes into dest
     void Write(const uint8_t * source, size_t length);
     void Drop(size_t length);
-    size_t StorageUsed() const; // returns number of bytes stored
+    size_t StorageAvailable() const; // returns number of bytes available
+    size_t StorageUsed() const;      // returns number of bytes stored
 
     /** @brief advance dataLocation by amount, wrap around on mCapacity
      *
@@ -91,8 +92,8 @@ private:
 
     // Internal storage. Arranged by packets with following structure:
     // | Size (2 bytes) | Byte sequence (size bytes) |
-    uint8_t * mStorage;
-    size_t mCapacity;
+    uint8_t * const mStorage;
+    const size_t mCapacity;
 
     using SizeType = uint16_t;
 
@@ -100,8 +101,8 @@ private:
     // When mDataStart == mDataEnd, the buffer is empty
     // When mDataStart < mDataEnd, the actual data is stored in [mDataStart, mDataEnd)
     // When mDataStart > mDataEnd, the actual data is stored in [mDataStart, mCapacity) ++ [0, mDataEnd)
-    size_t mDataStart;
-    size_t mDataEnd;
+    size_t mDataStart = 0;
+    size_t mDataEnd   = 0;
 };
 
 } // namespace chip
