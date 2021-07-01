@@ -32,7 +32,7 @@ limitations under the License.
     <attribute side="server" code="0x0010" define="PRESSURE_SCALED_VALUE" type="INT16S" writable="false" reportable="true" default="0x0000" optional="true" default="0">scaled value</attribute>
     <attribute side="server" code="0x0011" define="PRESSURE_MIN_SCALED_VALUE" type="INT16S" min="0x8001" max="0x7FFE" writable="false" optional="true" default="0">min scaled value</attribute>
     <attribute side="server" code="0x0012" define="PRESSURE_MAX_SCALED_VALUE" type="INT16S" min="0x8002" max="0x7FFF" writable="false" optional="true" default="0">max scaled value</attribute>
-    <attribute side="server" code="0x0013" define="PRESSURE_SCALED_TOLERANCE" type="INT16S" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true" default="0">scaled tolerance</attribute>
+    <attribute side="server" code="0x0013" define="PRESSURE_SCALED_TOLERANCE" type="INT16U" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true" default="0">scaled tolerance</attribute>
     <attribute side="server" code="0x0014" define="PRESSURE_SCALE" type="INT8S" min="0x81" max="0x7F" writable="false" optional="true" default="0">scale</attribute>
   </cluster>
 
