@@ -103,6 +103,21 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
     }
 }
 
+CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
+{
+    if (maxLength < (chip::Mdns::kMaxInstanceNameSize + 1))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    size_t len = snprintf(instanceName, maxLength, "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
+                          static_cast<uint32_t>(mCommissionInstanceName));
+    if (len >= maxLength)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -143,8 +158,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         return error;
     }
 
-    snprintf(service.mName, sizeof(service.mName), "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
-             static_cast<uint32_t>(mCommissionInstanceName));
+    ReturnErrorOnFailure(GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
+
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         strncpy(service.mType, kCommissionableServiceName, sizeof(service.mType));

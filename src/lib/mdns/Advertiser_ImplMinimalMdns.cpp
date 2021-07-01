@@ -116,6 +116,7 @@ public:
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
     CHIP_ERROR StopPublishDevice() override;
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
     // MdnsPacketDelegate
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -146,6 +147,8 @@ private:
     QueryResponderAllocator<kMaxCommissionRecords> mQueryResponderAllocatorCommissioner;
 
     ResponseSender mResponseSender;
+    uint32_t mCommissionInstanceName1;
+    uint32_t mCommissionInstanceName2;
 
     // current request handling
     const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
@@ -190,6 +193,9 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
 CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t port)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
+
+    mCommissionInstanceName1 = GetRandU32();
+    mCommissionInstanceName2 = GetRandU32();
 
     ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port));
 
@@ -277,8 +283,23 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
+{
+    if (maxLength < (kMaxInstanceNameSize + 1))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    size_t len = snprintf(instanceName, maxLength, ChipLogFormatX64, mCommissionInstanceName1, mCommissionInstanceName2);
+    if (len >= maxLength)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
+
     // TODO: When multi-admin is enabled, operational does not need to be cleared here.
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
@@ -291,11 +312,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     // TODO: need to detect colisions here
     char nameBuffer[64] = "";
-    size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), ChipLogFormatX64, GetRandU32(), GetRandU32());
-    if (len >= sizeof(nameBuffer))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer)));
+
     QueryResponderAllocator<kMaxCommissionRecords> * allocator =
         params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode ? &mQueryResponderAllocatorCommissionable
                                                                                            : &mQueryResponderAllocatorCommissioner;
@@ -486,26 +504,26 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     char txtVidPid[chip::Mdns::kKeyVendorProductMaxLength + 4];
     if (params.GetProductId().HasValue() && params.GetVendorId().HasValue())
     {
-        sprintf(txtVidPid, "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
+        snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
         txtFields[numTxtFields++] = txtVidPid;
     }
     else if (params.GetVendorId().HasValue())
     {
-        sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
+        snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d", params.GetVendorId().Value());
         txtFields[numTxtFields++] = txtVidPid;
     }
 
     char txtDeviceType[chip::Mdns::kKeyDeviceTypeMaxLength + 4];
     if (params.GetDeviceType().HasValue())
     {
-        sprintf(txtDeviceType, "DT=%d", params.GetDeviceType().Value());
+        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%d", params.GetDeviceType().Value());
         txtFields[numTxtFields++] = txtDeviceType;
     }
 
     char txtDeviceName[chip::Mdns::kKeyDeviceNameMaxLength + 4];
     if (params.GetDeviceName().HasValue())
     {
-        sprintf(txtDeviceName, "DN=%s", params.GetDeviceName().Value());
+        snprintf(txtDeviceName, sizeof(txtDeviceName), "DN=%s", params.GetDeviceName().Value());
         txtFields[numTxtFields++] = txtDeviceName;
     }
 
@@ -514,7 +532,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     {
         // a discriminator always exists
         char txtDiscriminator[chip::Mdns::kKeyDiscriminatorMaxLength + 3];
-        sprintf(txtDiscriminator, "D=%d", params.GetLongDiscriminator());
+        snprintf(txtDiscriminator, sizeof(txtDiscriminator), "D=%d", params.GetLongDiscriminator());
         txtFields[numTxtFields++] = txtDiscriminator;
 
         if (!params.GetVendorId().HasValue())
@@ -523,34 +541,34 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         }
 
         char txtCommissioningMode[chip::Mdns::kKeyCommissioningModeMaxLength + 4];
-        sprintf(txtCommissioningMode, "CM=%d", params.GetCommissioningMode() ? 1 : 0);
+        snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", params.GetCommissioningMode() ? 1 : 0);
         txtFields[numTxtFields++] = txtCommissioningMode;
 
         char txtOpenWindowCommissioningMode[chip::Mdns::kKeyAdditionalPairingMaxLength + 4];
         if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
-            sprintf(txtOpenWindowCommissioningMode, "AP=1");
+            snprintf(txtOpenWindowCommissioningMode, sizeof(txtOpenWindowCommissioningMode), "AP=1");
             txtFields[numTxtFields++] = txtOpenWindowCommissioningMode;
         }
 
         char txtRotatingDeviceId[chip::Mdns::kKeyRotatingIdMaxLength + 4];
         if (params.GetRotatingId().HasValue())
         {
-            sprintf(txtRotatingDeviceId, "RI=%s", params.GetRotatingId().Value());
+            snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", params.GetRotatingId().Value());
             txtFields[numTxtFields++] = txtRotatingDeviceId;
         }
 
         char txtPairingHint[chip::Mdns::kKeyPairingInstructionMaxLength + 4];
         if (params.GetPairingHint().HasValue())
         {
-            sprintf(txtPairingHint, "PH=%d", params.GetPairingHint().Value());
+            snprintf(txtPairingHint, sizeof(txtPairingHint), "PH=%d", params.GetPairingHint().Value());
             txtFields[numTxtFields++] = txtPairingHint;
         }
 
         char txtPairingInstr[chip::Mdns::kKeyPairingInstructionMaxLength + 4];
         if (params.GetPairingInstr().HasValue())
         {
-            sprintf(txtPairingInstr, "PI=%s", params.GetPairingInstr().Value());
+            snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", params.GetPairingInstr().Value());
             txtFields[numTxtFields++] = txtPairingInstr;
         }
     }
