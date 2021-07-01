@@ -362,9 +362,7 @@ CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentia
     credentials.Release();
     ReturnErrorOnFailure(credentials.Init(&certificates, 1));
 
-    const CertificateKeyId * id = credentials.GetTrustedRootId(0);
-    rootKeyId.mId               = id->mId;
-    rootKeyId.mLen              = id->mLen;
+    rootKeyId = credentials.GetTrustedRootId(0);
 
     ReturnErrorOnFailure(credentials.SetDevOpCred(rootKeyId, mNOCCert, mNOCCertLen));
     ReturnErrorOnFailure(credentials.SetDevOpCredKeypair(rootKeyId, mOperationalKey));

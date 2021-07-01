@@ -1463,8 +1463,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     P256PublicKey publicKey;
 
-    const uint8_t * cert;
-    uint32_t certLen;
+    ByteSpan cert;
     const uint8_t * certPubkey;
     uint32_t certPubkeyLen;
 
@@ -1472,12 +1471,12 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
     {
         uint8_t certType = TestCerts::gTestCerts[i];
 
-        err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert, certLen);
+        err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         err = GetTestCertPubkey(certType, certPubkey, certPubkeyLen);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = ExtractPubkeyFromX509Cert(ByteSpan(cert, certLen), publicKey);
+        err = ExtractPubkeyFromX509Cert(cert, publicKey);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(publicKey, certPubkey, certPubkeyLen) == 0);
     }

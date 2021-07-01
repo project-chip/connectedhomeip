@@ -108,7 +108,7 @@ public:
 
 static CHIP_ERROR InitCredentialSets()
 {
-    CertificateKeyId trustedRootId = { .mId = sTestCert_Root01_SubjectKeyId, .mLen = sTestCert_Root01_SubjectKeyId_Len };
+    CertificateKeyId trustedRootId = CertificateKeyId(sTestCert_Root01_SubjectKeyId);
 
     commissionerDevOpCred.Release();
     accessoryDevOpCred.Release();

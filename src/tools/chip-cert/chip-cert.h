@@ -61,6 +61,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/SafeInt.h>
 #include <support/TimeUtils.h>
 
 using chip::ASN1::OID;
@@ -86,12 +87,6 @@ enum KeyFormat
     kKeyFormat_X509_PUBKEY_PEM,
     kKeyFormat_Chip_Raw,
     kKeyFormat_Chip_Base64
-};
-
-enum
-{
-    kMaxChipCertBufSize = 400, // Maximum size of a buffer needed to hold CHIP TLV encoded certificates.
-    kMaxX509CertBufSize = 600, // Maximum size of a buffer needed to hold/encode X.509 certificates in DER form.
 };
 
 struct FutureExtension
