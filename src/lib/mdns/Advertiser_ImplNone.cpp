@@ -50,6 +50,12 @@ public:
         ChipLogError(Discovery, "mDNS advertising not available. mDNS stop not available.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override
+    {
+        ChipLogError(Discovery, "mDNS advertising not available. mDNS GetCommissionableInstanceName not available.");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 NoneAdvertiser gAdvertiser;
