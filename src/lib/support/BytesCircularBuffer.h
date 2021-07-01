@@ -82,7 +82,7 @@ private:
     void Write(const uint8_t * source, size_t length);
     void Drop(size_t length);
     size_t StorageAvailable() const; // returns number of bytes available
-    size_t StorageUsed() const; // returns number of bytes stored
+    size_t StorageUsed() const;      // returns number of bytes stored
 
     /** @brief advance dataLocation by amount, wrap around on mCapacity
      *
@@ -102,7 +102,7 @@ private:
     // When mDataStart < mDataEnd, the actual data is stored in [mDataStart, mDataEnd)
     // When mDataStart > mDataEnd, the actual data is stored in [mDataStart, mCapacity) ++ [0, mDataEnd)
     size_t mDataStart = 0;
-    size_t mDataEnd = 0;
+    size_t mDataEnd   = 0;
 };
 
 } // namespace chip

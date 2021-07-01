@@ -43,7 +43,7 @@ void BytesCircularBuffer::Read(uint8_t * dest, size_t length, size_t offset) con
                   "SizeType too large, may cause overflow");
     VerifyOrDie(StorageUsed() >= offset + length);
 
-    size_t start = Advance(mDataStart, offset);
+    size_t start       = Advance(mDataStart, offset);
     size_t firstPiece  = std::min(mCapacity - start, length);
     size_t secondPiece = length - firstPiece;
     ::memcpy(dest, mStorage + start, firstPiece);
