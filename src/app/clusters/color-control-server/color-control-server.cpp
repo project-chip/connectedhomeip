@@ -324,9 +324,112 @@ static void writeColorTemperature(EndpointId endpoint, uint16_t colorTemperature
 // ****** callback section *******
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+static bool moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
+                                   uint8_t optionsOverride, bool isEnhanced)
+{
+    // If isEnhanced is True this function was called by EnhancedMoveToHueAndSaturation command and the hue is a uint16
+    // If isEnhanced is False this function was called by MoveToHueAndSaturation command and the hue is are a uint8 
+
+    EndpointId endpoint = emberAfCurrentEndpoint();
+    uint16_t currentHue = isEnhanced ? readEnhancedHue(endpoint) : static_cast<uint16_t>(readHue(endpoint));
+    bool moveUp;
+
+    if (transitionTime == 0)
+    {
+        transitionTime++;
+    }
+
+    // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
+    // this and report a malformed packet.
+    if ((!isEnhanced && hue > MAX_HUE_VALUE) || saturation > MAX_SATURATION_VALUE)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        return true;
+    }
+
+    if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        return true;
+    }
+
+    // compute shortest direction
+    uint16_t halfWay = isEnhanced ? HALF_MAX_UINT16T : HALF_MAX_UINT8T;
+    if (hue > currentHue)
+    {
+        moveUp = (hue - currentHue) < halfWay;
+    }
+    else
+    {
+        moveUp = (currentHue - hue) > halfWay;
+    }
+
+    // New command.  Need to stop any active transitions.
+    stopAllColorTransitions();
+
+    // Handle color mode transition, if necessary.
+    handleModeSwitch(endpoint, COLOR_MODE_HSV);
+
+    // now, kick off the state machine.
+    initHueSat(endpoint);
+    colorHueTransitionState.isEnhancedHue = isEnhanced;
+
+    if (isEnhanced)
+    {
+        colorHueTransitionState.initialEnhancedHue = currentHue;
+        colorHueTransitionState.currentEnhancedHue = currentHue;
+        colorHueTransitionState.finalEnhancedHue   = hue;
+    }
+    else
+    {
+        colorHueTransitionState.initialHue = static_cast<uint8_t>(currentHue);
+        colorHueTransitionState.currentHue = static_cast<uint8_t>(currentHue);
+        colorHueTransitionState.finalHue   = static_cast<uint8_t>(hue);
+    }
+
+    colorHueTransitionState.stepsRemaining = transitionTime;
+    colorHueTransitionState.stepsTotal     = transitionTime;
+    colorHueTransitionState.endpoint       = endpoint;
+    colorHueTransitionState.up             = moveUp;
+    colorHueTransitionState.repeat         = false;
+
+    colorSaturationTransitionState.initialValue   = readSaturation(endpoint);
+    colorSaturationTransitionState.currentValue   = readSaturation(endpoint);
+    colorSaturationTransitionState.finalValue     = saturation;
+    colorSaturationTransitionState.stepsRemaining = transitionTime;
+    colorSaturationTransitionState.stepsTotal     = transitionTime;
+    colorSaturationTransitionState.endpoint       = endpoint;
+    colorSaturationTransitionState.lowLimit       = MIN_SATURATION_VALUE;
+    colorSaturationTransitionState.highLimit      = MAX_SATURATION_VALUE;
+
+    writeRemainingTime(endpoint, transitionTime);
+
+    // kick off the state machine:
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+/** @brief Move To Hue And Saturation
+ *
+ *
+ *
+ * @param hue   Ver.: always
+ * @param saturation   Ver.: always
+ * @param transitionTime   Ver.: always
+ */
+bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t saturation,
+                                                              uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+{
+    return moveToHueAndSaturation(static_cast<uint16_t>(hue), saturation, transitionTime, optionsMask, optionsOverride, false);
+}
 
 static bool moveHue(uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride, bool isEnhanced)
 {
+    // If isEnhanced is True this function was called by EnhancedMoveHue command and rate is a uint16 value
+    // If isEnhanced is False this function was called by MoveHue command and rate is a uint8 value
+
     uint8_t currentHue          = 0;
     uint16_t currentEnhancedHue = 0;
     EndpointId endpoint         = emberAfCurrentEndpoint();
@@ -414,9 +517,76 @@ static bool moveHue(uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_
     return true;
 }
 
+bool emberAfColorControlClusterMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
+                                               uint8_t optionsOverride)
+{
+    return moveHue(moveMode, static_cast<uint16_t>(rate), optionsMask, optionsOverride, false);
+}
+
+
+bool emberAfColorControlClusterMoveSaturationCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate,
+                                                      uint8_t optionsMask, uint8_t optionsOverride)
+{
+    EndpointId endpoint = emberAfCurrentEndpoint();
+
+    if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        return true;
+    }
+
+    uint16_t transitionTime;
+
+    // New command.  Need to stop any active transitions.
+    stopAllColorTransitions();
+
+    if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_STOP || rate == 0)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        return true;
+    }
+
+    // Handle color mode transition, if necessary.
+    handleModeSwitch(endpoint, COLOR_MODE_HSV);
+
+    // now, kick off the state machine.
+    initHueSat(endpoint);
+
+    colorHueTransitionState.stepsRemaining = 0;
+
+    colorSaturationTransitionState.initialValue = readSaturation(endpoint);
+    colorSaturationTransitionState.currentValue = readSaturation(endpoint);
+    if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_UP)
+    {
+        colorSaturationTransitionState.finalValue = MAX_SATURATION_VALUE;
+    }
+    else
+    {
+        colorSaturationTransitionState.finalValue = MIN_SATURATION_VALUE;
+    }
+
+    transitionTime = computeTransitionTimeFromStateAndRate(&colorSaturationTransitionState, rate);
+
+    colorSaturationTransitionState.stepsRemaining = transitionTime;
+    colorSaturationTransitionState.stepsTotal     = transitionTime;
+    colorSaturationTransitionState.endpoint       = endpoint;
+    colorSaturationTransitionState.lowLimit       = MIN_SATURATION_VALUE;
+    colorSaturationTransitionState.highLimit      = MAX_SATURATION_VALUE;
+
+    writeRemainingTime(endpoint, transitionTime);
+
+    // kick off the state machine:
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
 static bool moveToHue(uint16_t hue, uint8_t hueMoveMode, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
                       bool isEnhanced)
 {
+    // If isEnhanced is True this function was called by EnhancedMoveToHue and hue is a uint16 value
+    // If isEnhanced is False this function was called by MoveToHue command and hue is are a uint8 value
     EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
@@ -519,12 +689,22 @@ static bool moveToHue(uint16_t hue, uint8_t hueMoveMode, uint16_t transitionTime
     return true;
 }
 
-static bool moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
-                                   uint8_t optionsOverride, bool isEnhanced)
+bool emberAfColorControlClusterMoveToHueCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t hueMoveMode,
+                                                 uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+{
+    return moveToHue(static_cast<uint16_t>(hue), hueMoveMode, transitionTime, optionsMask, optionsOverride, false);
+}
+
+bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::Command * commandObj, uint8_t saturation,
+                                                        uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
-    uint16_t currentHue = isEnhanced ? readEnhancedHue(endpoint) : static_cast<uint16_t>(readHue(endpoint));
-    bool moveUp;
+
+    if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        return true;
+    }
 
     if (transitionTime == 0)
     {
@@ -533,27 +713,10 @@ static bool moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t tr
 
     // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
     // this and report a malformed packet.
-    if ((!isEnhanced && hue > MAX_HUE_VALUE) || saturation > MAX_SATURATION_VALUE)
+    if (saturation > MAX_SATURATION_VALUE)
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
         return true;
-    }
-
-    if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-        return true;
-    }
-
-    // compute shortest direction
-    uint16_t halfWay = isEnhanced ? HALF_MAX_UINT16T : HALF_MAX_UINT8T;
-    if (hue > currentHue)
-    {
-        moveUp = (hue - currentHue) < halfWay;
-    }
-    else
-    {
-        moveUp = (currentHue - hue) > halfWay;
     }
 
     // New command.  Need to stop any active transitions.
@@ -564,26 +727,8 @@ static bool moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t tr
 
     // now, kick off the state machine.
     initHueSat(endpoint);
-    colorHueTransitionState.isEnhancedHue = isEnhanced;
 
-    if (isEnhanced)
-    {
-        colorHueTransitionState.initialEnhancedHue = readEnhancedHue(endpoint);
-        colorHueTransitionState.currentEnhancedHue = readEnhancedHue(endpoint);
-        colorHueTransitionState.finalEnhancedHue   = hue;
-    }
-    else
-    {
-        colorHueTransitionState.initialHue = readHue(endpoint);
-        colorHueTransitionState.currentHue = readHue(endpoint);
-        colorHueTransitionState.finalHue   = static_cast<uint8_t>(hue);
-    }
-
-    colorHueTransitionState.stepsRemaining = transitionTime;
-    colorHueTransitionState.stepsTotal     = transitionTime;
-    colorHueTransitionState.endpoint       = endpoint;
-    colorHueTransitionState.up             = moveUp;
-    colorHueTransitionState.repeat         = false;
+    colorHueTransitionState.stepsRemaining = 0;
 
     colorSaturationTransitionState.initialValue   = readSaturation(endpoint);
     colorSaturationTransitionState.currentValue   = readSaturation(endpoint);
@@ -606,6 +751,9 @@ static bool moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t tr
 static bool stepHue(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride,
                     bool isEnhanced)
 {
+    // If isEnhanced is True this function was called by EnhancedStepHue and hue is a uint16 value
+    // If isEnhanced is False this function was called by StepHue command and hue is are a uint8 value
+
     EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
@@ -670,143 +818,6 @@ static bool stepHue(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime
     colorHueTransitionState.repeat         = false;
 
     colorSaturationTransitionState.stepsRemaining = 0;
-
-    writeRemainingTime(endpoint, transitionTime);
-
-    // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
-
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
-
-/** @brief Move To Hue And Saturation
- *
- *
- *
- * @param hue   Ver.: always
- * @param saturation   Ver.: always
- * @param transitionTime   Ver.: always
- */
-bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t saturation,
-                                                              uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
-{
-    return moveToHueAndSaturation(static_cast<uint16_t>(hue), saturation, transitionTime, optionsMask, optionsOverride, false);
-}
-
-bool emberAfColorControlClusterMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
-                                               uint8_t optionsOverride)
-{
-    return moveHue(moveMode, static_cast<uint16_t>(rate), optionsMask, optionsOverride, false);
-}
-
-bool emberAfColorControlClusterMoveSaturationCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate,
-                                                      uint8_t optionsMask, uint8_t optionsOverride)
-{
-    EndpointId endpoint = emberAfCurrentEndpoint();
-
-    if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-        return true;
-    }
-
-    uint16_t transitionTime;
-
-    // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
-
-    if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_STOP || rate == 0)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-        return true;
-    }
-
-    // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_HSV);
-
-    // now, kick off the state machine.
-    initHueSat(endpoint);
-
-    colorHueTransitionState.stepsRemaining = 0;
-
-    colorSaturationTransitionState.initialValue = readSaturation(endpoint);
-    colorSaturationTransitionState.currentValue = readSaturation(endpoint);
-    if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_UP)
-    {
-        colorSaturationTransitionState.finalValue = MAX_SATURATION_VALUE;
-    }
-    else
-    {
-        colorSaturationTransitionState.finalValue = MIN_SATURATION_VALUE;
-    }
-
-    transitionTime = computeTransitionTimeFromStateAndRate(&colorSaturationTransitionState, rate);
-
-    colorSaturationTransitionState.stepsRemaining = transitionTime;
-    colorSaturationTransitionState.stepsTotal     = transitionTime;
-    colorSaturationTransitionState.endpoint       = endpoint;
-    colorSaturationTransitionState.lowLimit       = MIN_SATURATION_VALUE;
-    colorSaturationTransitionState.highLimit      = MAX_SATURATION_VALUE;
-
-    writeRemainingTime(endpoint, transitionTime);
-
-    // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
-
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
-
-bool emberAfColorControlClusterMoveToHueCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t hueMoveMode,
-                                                 uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
-{
-    return moveToHue(static_cast<uint16_t>(hue), hueMoveMode, transitionTime, optionsMask, optionsOverride, false);
-}
-
-bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::Command * commandObj, uint8_t saturation,
-                                                        uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
-{
-    EndpointId endpoint = emberAfCurrentEndpoint();
-
-    if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-        return true;
-    }
-
-    if (transitionTime == 0)
-    {
-        transitionTime++;
-    }
-
-    // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
-    // this and report a malformed packet.
-    if (saturation > MAX_SATURATION_VALUE)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
-        return true;
-    }
-
-    // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
-
-    // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_HSV);
-
-    // now, kick off the state machine.
-    initHueSat(endpoint);
-
-    colorHueTransitionState.stepsRemaining = 0;
-
-    colorSaturationTransitionState.initialValue   = readSaturation(endpoint);
-    colorSaturationTransitionState.currentValue   = readSaturation(endpoint);
-    colorSaturationTransitionState.finalValue     = saturation;
-    colorSaturationTransitionState.stepsRemaining = transitionTime;
-    colorSaturationTransitionState.stepsTotal     = transitionTime;
-    colorSaturationTransitionState.endpoint       = endpoint;
-    colorSaturationTransitionState.lowLimit       = MIN_SATURATION_VALUE;
-    colorSaturationTransitionState.highLimit      = MAX_SATURATION_VALUE;
 
     writeRemainingTime(endpoint, transitionTime);
 
@@ -1637,7 +1648,8 @@ static bool computeNewHueValue(ColorHueTransitionState * p)
     {
         newHue32 = static_cast<uint32_t>(p->isEnhancedHue ? subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue)
                                                           : subtractHue(p->finalHue, p->initialHue));
-        newHue32 *= static_cast<uint32_t>((p->stepsRemaining / p->stepsTotal));
+        newHue32 *= static_cast<uint32_t>(p->stepsRemaining);
+        newHue32 /= static_cast<uint32_t>(p->stepsTotal);
 
         if (p->isEnhancedHue)
         {
@@ -1652,7 +1664,8 @@ static bool computeNewHueValue(ColorHueTransitionState * p)
     {
         newHue32 = static_cast<uint32_t>(p->isEnhancedHue ? subtractEnhancedHue(p->initialEnhancedHue, p->finalEnhancedHue)
                                                           : subtractHue(p->initialHue, p->finalHue));
-        newHue32 *= static_cast<uint32_t>((p->stepsRemaining / p->stepsTotal));
+        newHue32 *= static_cast<uint32_t>(p->stepsRemaining);
+        newHue32 /= static_cast<uint32_t>(p->stepsTotal);
 
         if (p->isEnhancedHue)
         {
