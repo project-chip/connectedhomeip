@@ -26,8 +26,8 @@ declare -i background_pid=0
 # - i for number of iterations you want to have
 while getopts a:i: flag; do
     case "$flag" in
-    a) application=$OPTARG ;;
-    i) iterations=$OPTARG ;;
+        a) application=$OPTARG ;;
+        i) iterations=$OPTARG ;;
     esac
 done
 
