@@ -420,5 +420,3 @@ const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {\
   /* Endpoint: 1, Cluster: Temperature Measurement (server) */ \
   { ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0402, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* measured value */ \
 }
-
-

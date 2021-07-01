@@ -437,4 +437,3 @@ static constexpr chip::ClusterId ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID = 0xFC00;
 
 // Definitions for cluster: Sample Mfg Specific Cluster 2
 static constexpr chip::ClusterId ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID = 0xFC00;
-
