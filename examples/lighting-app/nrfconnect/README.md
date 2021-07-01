@@ -77,7 +77,7 @@ manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
-In CHIP, the commissioning procedure (called rendezvous) is done over Bluetooth
+In CHIP, the commissioning procedure is done over Bluetooth
 LE between a CHIP device and the CHIP controller, where the controller has the
 commissioner role.
 
@@ -164,6 +164,15 @@ The example supports building and running on the following devices:
 This section lists the User Interface elements that you can use to control and
 monitor the state of the device. These correspond to PCB components on the
 platform image.
+
+> **Note**:
+>
+> The following Device UI elements are missing on the nRF52840 Dongle:
+> **Button 2**, **Button 3**, **Button 4**, **SEGGER J-Link USB port**, and
+> **NFC port with antenna attached**. You can collect logs from the nRF52840 Dongle
+> using the **nRF USB port** instead of the **SEGGER J-Link USB port**.
+> Functionalities associated with the remaining missing elements are
+> inaccessible.
 
 **LED 1** shows the overall state of the device and its connectivity. The
 following states are possible:
@@ -460,7 +469,7 @@ directory:
 ### Flashing on the nRF52840 Dongle
 
 Visit
-[Programming and Flashing nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
+[Programming and Debugging nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
 to read more about flashing on the nRF52840 Dongle.
 
 <hr>

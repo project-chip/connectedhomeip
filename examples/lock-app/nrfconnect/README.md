@@ -74,7 +74,7 @@ LE advertising manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
-In this example, the commissioning procedure (called rendezvous) is done over
+In this example, the commissioning procedure is done over
 Bluetooth LE between a CHIP device and the CHIP controller, where the controller
 has the commissioner role.
 
