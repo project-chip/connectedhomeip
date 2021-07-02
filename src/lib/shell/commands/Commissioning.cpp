@@ -28,7 +28,6 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT || CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
-#include <controller/CHIPDeviceController.h>
 #endif
 
 using chip::DeviceLayer::ConfigurationMgr;

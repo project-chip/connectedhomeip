@@ -128,9 +128,8 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Mdns::Disc
     UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName, nullptr);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)
     {
-        ChipLogDetail(AppServer, "OnCommissionableNodeFound instance: name=%s, expiration=%llu old_state=%d new_state=%d",
-                      client->GetInstanceName(), client->GetExpirationTimeMs(), (int) client->GetUDCClientProcessingState(),
-                      (int) UDCClientProcessingState::kPromptingUser);
+        ChipLogDetail(AppServer, "OnCommissionableNodeFound instance: name=%s old_state=%d new_state=%d", client->GetInstanceName(),
+                      (int) client->GetUDCClientProcessingState(), (int) UDCClientProcessingState::kPromptingUser);
         client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
 
         // Call the registered mUserConfirmationProvider, if any.
