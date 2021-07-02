@@ -68,12 +68,6 @@ void ASN1Writer::InitNullWriter(void)
     mDeferredLengthCount = 0;
 }
 
-CHIP_ERROR ASN1Writer::Finalize()
-{
-    // TODO: This method is not required and can be deprecated.
-    return CHIP_NO_ERROR;
-}
-
 uint16_t ASN1Writer::GetLengthWritten() const
 {
     return (mBuf != nullptr) ? mWritePoint - mBuf : 0;
