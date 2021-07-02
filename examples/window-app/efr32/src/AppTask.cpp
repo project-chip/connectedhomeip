@@ -76,24 +76,18 @@ WindowCover & AppTask::Cover()
     return mCover;
 }
 
-int AppTask::Start()
+CHIP_ERROR AppTask::Start()
 {
-    int err = CHIP_CONFIG_CORE_ERROR_MAX;
-
     mQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (mQueue == NULL)
     {
         EFR32_LOG("Failed to allocate app event queue");
-        appError(err);
+        appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
 
     // Start App task.
     mHandle = xTaskCreateStatic(Main, APP_TASK_NAME, ArraySize(sAppStack), NULL, 1, sAppStack, &sAppTaskStruct);
-    if (mHandle != NULL)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    return err;
+    return mHandle ? CHIP_NO_ERROR : APP_ERROR_CREATE_TASK_FAILED;
 }
 
 void AppTask::Main(void * pvParameter)
