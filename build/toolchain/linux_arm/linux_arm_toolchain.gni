@@ -24,7 +24,9 @@ declare_args() {
 
 template("linux_arm_toolchain") {
   if (linux_arm_cross_compile == "") {
-    assert(false, "assign a value to the build argument 'linux_arm_cross_compile' when use linux_arm_toolchain")
+    assert(
+        false,
+        "assign a value to the build argument 'linux_arm_cross_compile' when use linux_arm_toolchain")
   }
 
   _invoker_toolchain_args = invoker.toolchain_args
