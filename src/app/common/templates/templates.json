@@ -64,6 +64,21 @@
             "path": "../../zap-templates/templates/app/print-cluster.zapt",
             "name": "ZCL print-cluster header",
             "output": "src/app/common/gen/print-cluster.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Attributes.zapt",
+            "name": "Attributes Ids header",
+            "output": "src/app/common/gen/ids/Attributes.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Clusters.zapt",
+            "name": "Clusters Ids header",
+            "output": "src/app/common/gen/ids/Clusters.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Commands.zapt",
+            "name": "Commands Ids header",
+            "output": "src/app/common/gen/ids/Commands.h"
         }
     ]
 }

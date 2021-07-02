@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/qpg6100_sdk.gni")
-import("${qpg6100_sdk_build_root}/qpg6100_sdk.gni")
+import("//build_overrides/qpg_sdk.gni")
+import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
 declare_args() {
-  # Build target to use for QPG6100 SDK. Use this to set global SDK defines.
-  qpg6100_sdk_target = ""
+  # Build target to use for QPG SDK. Use this to set global SDK defines.
+  qpg_sdk_target = ""
 }
 
-assert(qpg6100_sdk_target != "", "qpg6100_sdk_target must be specified")
+assert(qpg_sdk_target != "", "qpg_sdk_target must be specified")
 
-group("qpg6100_sdk") {
-  public_deps = [ qpg6100_sdk_target ]
+group("qpg_sdk") {
+  public_deps = [ qpg_sdk_target ]
 }
