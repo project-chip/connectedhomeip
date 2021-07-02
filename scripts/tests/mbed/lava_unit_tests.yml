@@ -3,6 +3,7 @@ job_name: Mbed CHIP unit tests
 
 tags:
 - chip
+- artur-device
 
 secrets:
   GITHUB_TOKEN: _
