@@ -15,22 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2021 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 /****************************************************************************
  * @file
  * @brief Routines for the Application Launcher plugin, the
@@ -48,7 +32,7 @@
 
 ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, unsigned char *, unsigned char *)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, uint8_t *, uint8_t *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
@@ -74,7 +58,7 @@ exit:
     }
 }
 
-EmberAfApplicationLauncherApp getApplicationFromCommand(unsigned short catalogVendorId, unsigned char * applicationId)
+EmberAfApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, uint8_t * applicationId)
 {
     EmberAfApplicationLauncherApp application = {};
     application.applicationId                 = applicationId;
@@ -82,11 +66,11 @@ EmberAfApplicationLauncherApp getApplicationFromCommand(unsigned short catalogVe
     return application;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * command, unsigned char * requestData,
-                                                        unsigned short requestApplicationCatalogVendorId,
-                                                        unsigned char * requestApplicationId)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * command, uint8_t * requestData,
+                                                        uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId)
 {
     EmberAfApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
+    // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string reqestDataString(reinterpret_cast<char *>(requestData));
     ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
     sendResponse(command, response);
