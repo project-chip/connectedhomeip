@@ -117,7 +117,7 @@
         {
             "label": "Build QPG6100 Lock Example",
             "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lock-app/qpg6100 out/qpg6100_lock_app",
+            "command": "scripts/examples/gn_build_example.sh examples/lock-app/qpg out/qpg6100_lock_app qpg6100",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",

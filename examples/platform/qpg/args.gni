@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/qpg_sdk.gni")
-import("${qpg_sdk_build_root}/qpg_sdk.gni")
+import("//build_overrides/chip.gni")
 
-declare_args() {
-  # Build target to use for QPG SDK. Use this to set global SDK defines.
-  qpg_sdk_target = ""
-}
+import("${chip_root}/src/platform/qpg/args.gni")
 
-assert(qpg_sdk_target != "", "qpg_sdk_target must be specified")
+openthread_project_core_config_file = "OpenThreadConfig.h"
+openthread_core_config_deps = []
+openthread_core_config_deps = [
+  "${chip_root}/examples/platform/qpg:openthread_core_config_qpg_chip_examples",
+]
 
-group("qpg_sdk") {
-  public_deps = [ qpg_sdk_target ]
-}
+chip_ble_project_config_include = "<CHIPProjectConfig.h>"
+chip_device_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_inet_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"
