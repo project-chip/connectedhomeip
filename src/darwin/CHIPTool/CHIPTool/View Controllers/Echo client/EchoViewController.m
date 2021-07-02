@@ -28,8 +28,6 @@
 @property (nonatomic, strong) UILabel * resultLabel;
 @property (nonatomic, strong) UIStackView * stackView;
 
-@property (readwrite) CHIPBasic * cluster;
-
 @end
 
 @implementation EchoViewController
@@ -44,8 +42,6 @@
     // listen for taps to dismiss the keyboard
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
-
-    self.cluster = [[CHIPBasic alloc] initWithDevice:CHIPGetPairedDevice() endpoint:0 queue:dispatch_get_main_queue()];
 }
 
 - (void)dismissKeyboard
@@ -110,22 +106,29 @@
 
 - (IBAction)sendMessage:(id)sender
 {
-    if (!self.cluster) {
-        [self updateResult:@"Something went wrong. Cluster is not initialized."];
-    }
-
     NSString * msg = [self.messageTextField text];
     if (msg.length == 0) {
         msg = [self.messageTextField placeholder];
     }
 
-    [self updateResult:@"MfgSpecificPing command sent..."];
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+                [self updateResult:@"MfgSpecificPing command sent..."];
 
-    [self.cluster mfgSpecificPing:^(NSError * error, NSDictionary * values) {
-        NSString * resultString = (error == nil) ? @"MfgSpecificPing command: success!"
-                                                 : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
-        [self updateResult:resultString];
-    }];
+                [cluster mfgSpecificPing:^(NSError * error, NSDictionary * values) {
+                    NSString * resultString = (error == nil) ? @"MfgSpecificPing command: success!"
+                                                             : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+                    [self updateResult:resultString];
+                }];
+            } else {
+                [self updateResult:@"Failed to establish a connection with the device"];
+            }
+        })) {
+        [self updateResult:@"Waiting for connection with the device"];
+    } else {
+        [self updateResult:@"Failed to trigger the connection with the device"];
+    }
 }
 
 @end

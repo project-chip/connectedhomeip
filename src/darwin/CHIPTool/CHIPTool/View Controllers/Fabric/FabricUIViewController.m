@@ -23,9 +23,6 @@
 
 @property (nonatomic, strong) NSArray * fabricsList;
 @property (nonatomic, strong) NSNumber * fabricID;
-
-@property (readwrite) CHIPOperationalCredentials * cluster;
-
 @end
 
 @implementation FabricUIViewController
@@ -34,9 +31,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.cluster = [[CHIPOperationalCredentials alloc] initWithDevice:CHIPGetPairedDevice()
-                                                             endpoint:0
-                                                                queue:dispatch_get_main_queue()];
 
     [self setupUIElements];
     [self fetchFabricsList];
@@ -222,21 +216,35 @@
 - (void)fetchFabricsList
 {
     NSLog(@"Request to fetchFabricsList");
-    [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
-    [self.cluster readAttributeFabricsListWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-        NSArray * fabricsList = [values objectForKey:@"value"];
-        if (error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command failed: %@.", error] isError:YES];
-            });
-        } else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self updateResult:[NSString stringWithFormat:@"Command readAttributeFabricsList command succeeded."] isError:NO];
-            });
-        }
-        NSLog(@"Got back fabrics list: %@ error %@", values, error);
-        [self updateFabricsListUIWithFabrics:fabricsList error:error];
-    }];
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                CHIPOperationalCredentials * cluster =
+                    [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+                [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
+                [cluster readAttributeFabricsListWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                    NSArray * fabricsList = [values objectForKey:@"value"];
+                    if (error) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command failed: %@.", error]
+                                       isError:YES];
+                        });
+                    } else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self updateResult:[NSString stringWithFormat:@"Command readAttributeFabricsList command succeeded."]
+                                       isError:NO];
+                        });
+                    }
+                    NSLog(@"Got back fabrics list: %@ error %@", values, error);
+                    [self updateFabricsListUIWithFabrics:fabricsList error:error];
+                }];
+            } else {
+                [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
+            }
+        })) {
+        [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"] isError:NO];
+    } else {
+        [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"] isError:YES];
+    }
 }
 
 // MARK: UIButton methods
@@ -251,20 +259,36 @@
                                                     @"accessory, including this one, and put the device back in commissioning."
                                      preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction * defaultAction =
-        [UIAlertAction actionWithTitle:@"Remove"
-                                 style:UIAlertActionStyleDefault
-                               handler:^(UIAlertAction * action) {
-                                   [self.cluster removeAllFabrics:^(NSError * error, NSDictionary * values) {
-                                       BOOL errorOccured = (error != nil);
-                                       NSString * resultString = errorOccured
-                                           ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
-                                           : @"Remove all fabrics success";
-                                       dispatch_async(dispatch_get_main_queue(), ^{
-                                           [self updateResult:resultString isError:errorOccured];
-                                       });
-                                   }];
-                               }];
+    UIAlertAction * defaultAction = [UIAlertAction
+        actionWithTitle:@"Remove"
+                  style:UIAlertActionStyleDefault
+                handler:^(UIAlertAction * action) {
+                    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+                            if (chipDevice) {
+                                CHIPOperationalCredentials * cluster =
+                                    [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice
+                                                                              endpoint:0
+                                                                                 queue:dispatch_get_main_queue()];
+                                [cluster removeAllFabrics:^(NSError * error, NSDictionary * values) {
+                                    BOOL errorOccured = (error != nil);
+                                    NSString * resultString = errorOccured
+                                        ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                                        : @"Remove all fabrics success";
+                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                        [self updateResult:resultString isError:errorOccured];
+                                    });
+                                }];
+                            } else {
+                                [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]
+                                           isError:YES];
+                            }
+                        })) {
+                        [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"] isError:NO];
+                    } else {
+                        [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"]
+                                   isError:YES];
+                    }
+                }];
 
     UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
                                                             style:UIAlertActionStyleCancel
@@ -282,31 +306,46 @@
     NSString * label = _updateFabricLabelTextField.text;
     NSLog(@"Request to updateFabricLabel %@", label);
     [self.updateFabricLabelTextField resignFirstResponder];
-    [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
-    [self.cluster
-        updateFabricLabel:label
-          responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  if (error) {
-                      NSLog(@"Got back error trying to updateFabricLabel %@", error);
-                      dispatch_async(dispatch_get_main_queue(), ^{
-                          self->_updateFabricLabelTextField.text = @"";
-                          [self updateResult:[NSString stringWithFormat:@"Command updateFabricLabel failed with error %@", error]
-                                     isError:YES];
-                      });
-                  } else {
-                      NSLog(@"Successfully updated the label: %@", values);
-                      dispatch_async(dispatch_get_main_queue(), ^{
-                          self->_updateFabricLabelTextField.text = @"";
-                          [self
-                              updateResult:[NSString
-                                               stringWithFormat:@"Command updateFabricLabel succeeded to update label to %@", label]
-                                   isError:NO];
-                          [self fetchFabricsList];
-                      });
-                  }
-              });
-          }];
+
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                CHIPOperationalCredentials * cluster =
+                    [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+                [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
+                [cluster
+                    updateFabricLabel:label
+                      responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                          dispatch_async(dispatch_get_main_queue(), ^{
+                              if (error) {
+                                  NSLog(@"Got back error trying to updateFabricLabel %@", error);
+                                  dispatch_async(dispatch_get_main_queue(), ^{
+                                      self->_updateFabricLabelTextField.text = @"";
+                                      [self
+                                          updateResult:[NSString stringWithFormat:@"Command updateFabricLabel failed with error %@",
+                                                                 error]
+                                               isError:YES];
+                                  });
+                              } else {
+                                  NSLog(@"Successfully updated the label: %@", values);
+                                  dispatch_async(dispatch_get_main_queue(), ^{
+                                      self->_updateFabricLabelTextField.text = @"";
+                                      [self updateResult:[NSString stringWithFormat:
+                                                                       @"Command updateFabricLabel succeeded to update label to %@",
+                                                                   label]
+                                                 isError:NO];
+                                      [self fetchFabricsList];
+                                  });
+                              }
+                          });
+                      }];
+            } else {
+                [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
+            }
+        })) {
+        [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"] isError:NO];
+    } else {
+        [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"] isError:YES];
+    }
 }
 
 - (IBAction)removeFabricButtonPressed:(id)sender
@@ -319,28 +358,43 @@
         NSNumber * fabricId = [fabricToRemove objectForKey:@"FabricId"];
         NSNumber * nodeID = [fabricToRemove objectForKey:@"NodeId"];
         NSNumber * vendorID = [fabricToRemove objectForKey:@"VendorId"];
-        [self updateResult:[NSString stringWithFormat:@"removeFabric command sent for fabricID %@.", fabricId] isError:NO];
-        [self.cluster removeFabric:[fabricId unsignedLongLongValue]
-                            nodeId:[nodeID unsignedLongLongValue]
-                          vendorId:[vendorID unsignedShortValue]
-                   responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                       if (error) {
-                           NSLog(@"Failed to remove fabric with error %@", error);
-                           dispatch_async(dispatch_get_main_queue(), ^{
-                               [self updateResult:[NSString stringWithFormat:@"Command removeFabric failed with error %@", error]
-                                          isError:YES];
-                               self->_removeFabricTextField.text = @"";
-                           });
-                       } else {
-                           NSLog(@"Succeeded removing fabric!");
-                           dispatch_async(dispatch_get_main_queue(), ^{
-                               self->_removeFabricTextField.text = @"";
-                               [self
-                                   updateResult:[NSString stringWithFormat:@"Command removeFabric succeeded to remove %@", fabricId]
-                                        isError:NO];
-                           });
-                       }
-                   }];
+
+        if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+                if (chipDevice) {
+                    CHIPOperationalCredentials * cluster =
+                        [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+                    [self updateResult:[NSString stringWithFormat:@"removeFabric command sent for fabricID %@.", fabricId]
+                               isError:NO];
+                    [cluster removeFabric:[fabricId unsignedLongLongValue]
+                                   nodeId:[nodeID unsignedLongLongValue]
+                                 vendorId:[vendorID unsignedShortValue]
+                          responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                              if (error) {
+                                  NSLog(@"Failed to remove fabric with error %@", error);
+                                  dispatch_async(dispatch_get_main_queue(), ^{
+                                      [self updateResult:[NSString
+                                                             stringWithFormat:@"Command removeFabric failed with error %@", error]
+                                                 isError:YES];
+                                      self->_removeFabricTextField.text = @"";
+                                  });
+                              } else {
+                                  NSLog(@"Succeeded removing fabric!");
+                                  dispatch_async(dispatch_get_main_queue(), ^{
+                                      self->_removeFabricTextField.text = @"";
+                                      [self updateResult:[NSString stringWithFormat:@"Command removeFabric succeeded to remove %@",
+                                                                   fabricId]
+                                                 isError:NO];
+                                  });
+                              }
+                          }];
+                } else {
+                    [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
+                }
+            })) {
+            [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"] isError:NO];
+        } else {
+            [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"] isError:YES];
+        }
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_removeFabricTextField.text = @"";

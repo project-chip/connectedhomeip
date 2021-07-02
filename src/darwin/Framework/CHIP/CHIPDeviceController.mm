@@ -25,6 +25,8 @@
 #import "CHIPSetupPayload.h"
 #import "gen/CHIPClustersObjc.h"
 
+#import "CHIPDeviceConnectionBridge.h"
+
 #include <platform/CHIPDeviceBuildConfig.h>
 
 #include <controller/CHIPDeviceController.h>
@@ -353,6 +355,47 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     });
 
     return success;
+}
+
+- (BOOL)isDevicePaired:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
+{
+    __block BOOL paired = NO;
+    if (![self isRunning]) {
+        [self checkForError:CHIP_ERROR_INCORRECT_STATE logMsg:kErrorNotRunning error:error];
+        return paired;
+    }
+    dispatch_sync(_chipWorkQueue, ^{
+        if ([self isRunning]) {
+            paired = self.cppCommissioner->DoesDevicePairingExist(chip::PeerId().SetNodeId(deviceID));
+        }
+    });
+
+    return paired;
+}
+
+- (BOOL)getConnectedDevice:(uint64_t)deviceID
+         completionHandler:(CHIPDeviceConnectionCallback)completionHandler
+                     queue:(dispatch_queue_t)queue
+                     error:(NSError * __autoreleasing *)error
+{
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    if (![self isRunning]) {
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return NO;
+    }
+
+    dispatch_async(_chipWorkQueue, ^{
+        CHIPDeviceConnectionBridge * connectionBridge = new CHIPDeviceConnectionBridge(completionHandler, queue);
+        errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
+
+        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:error]) {
+            // Errors are propagated to the caller thru completionHandler.
+            // No extra error handling is needed here.
+            return;
+        }
+    });
+
+    return YES;
 }
 
 - (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
