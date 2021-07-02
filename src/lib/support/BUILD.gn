@@ -57,6 +57,8 @@ static_library("support") {
     "BufferReader.h",
     "BufferWriter.cpp",
     "BufferWriter.h",
+    "BytesCircularBuffer.cpp",
+    "BytesCircularBuffer.h",
     "BytesToHex.cpp",
     "BytesToHex.h",
     "CHIPArgParser.cpp",
