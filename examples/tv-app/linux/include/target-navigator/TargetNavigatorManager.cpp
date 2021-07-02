@@ -16,12 +16,7 @@
  */
 
 #include "TargetNavigatorManager.h"
-#include <app/Command.h>
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -63,8 +58,8 @@ TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std
 {
     // TODO: Insert code here
     TargetNavigatorResponse response;
-    char testData[] = "data response";
-    response.data   = (uint8_t *) testData;
-    response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    const char * testData = "data response";
+    response.data         = (uint8_t *) testData;
+    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
     return response;
 }

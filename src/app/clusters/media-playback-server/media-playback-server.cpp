@@ -15,22 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2021 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 /****************************************************************************
  * @file
  * @brief Routines for the Media Playback plugin, the
@@ -50,13 +34,10 @@
 EmberAfMediaPlaybackStatus mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
                                                                         uint64_t deltaPositionMilliseconds);
 
-uint8_t mediaPlaybackClusterPlaybackState;
-
 static void writePlaybackState(chip::EndpointId endpoint, uint8_t playbackState)
 {
-    EmberAfStatus status =
-        emberAfWriteServerAttribute(endpoint, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID,
-                                    (uint8_t *) &playbackState, ZCL_INT8U_ATTRIBUTE_TYPE);
+    EmberAfStatus status = emberAfWriteServerAttribute(
+        endpoint, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID, &playbackState, ZCL_INT8U_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store media playback attribute.");
@@ -66,9 +47,8 @@ static void writePlaybackState(chip::EndpointId endpoint, uint8_t playbackState)
 static uint8_t readPlaybackStatus(chip::EndpointId endpoint)
 {
     uint8_t playbackState;
-    EmberAfStatus status =
-        emberAfReadServerAttribute(endpoint, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID,
-                                   (uint8_t *) &playbackState, sizeof(uint8_t));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_MEDIA_PLAYBACK_CLUSTER_ID,
+                                                      ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID, &playbackState, sizeof(uint8_t));
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to read media playback attribute.");
@@ -79,7 +59,7 @@ static uint8_t readPlaybackStatus(chip::EndpointId endpoint)
 
 void storeNewPlaybackState(chip::EndpointId endpoint, uint8_t newPlaybackState)
 {
-    mediaPlaybackClusterPlaybackState = readPlaybackStatus(endpoint);
+    uint8_t mediaPlaybackClusterPlaybackState = readPlaybackStatus(endpoint);
 
     if (mediaPlaybackClusterPlaybackState == newPlaybackState)
     {
@@ -94,7 +74,6 @@ void storeNewPlaybackState(chip::EndpointId endpoint, uint8_t newPlaybackState)
 static void sendResponse(chip::app::Command * command, const char * responseName, chip::CommandId commandId,
                          EmberAfMediaPlaybackStatus mediaPlaybackStatus)
 {
-    static_assert(std::is_same<std::underlying_type_t<EmberAfMediaPlaybackStatus>, uint8_t>::value, "Wrong enum size");
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_MEDIA_PLAYBACK_CLUSTER_ID, commandId,
                                                (chip::app::CommandPathFlags::kEndpointIdValid) };

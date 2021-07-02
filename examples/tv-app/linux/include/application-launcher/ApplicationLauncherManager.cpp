@@ -17,12 +17,7 @@
  */
 
 #include "ApplicationLauncherManager.h"
-#include <app/Command.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 
@@ -49,9 +44,9 @@ ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicati
 {
     // TODO: Insert your code
     ApplicationLauncherResponse response;
-    char testData[] = "data";
-    response.data   = (uint8_t *) testData;
-    response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    const char * testData = "data";
+    response.data         = (uint8_t *) testData;
+    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
     // TODO: Update once storing a structure attribute is supported
     // emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_LAUNCH_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID,
     //                             (uint8_t *) &application, ZCL_STRUCT_ATTRIBUTE_TYPE);
