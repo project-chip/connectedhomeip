@@ -16,31 +16,46 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
-assert(chip_device_platform == "mbed")
+assert(chip_device_platform == "telink")
 
-static_library("mbed") {
+static_library("telink") {
   sources = [
-    "BLEManagerImpl.cpp",
+    "../Zephyr/BLEManagerImpl.cpp",
+    "../Zephyr/ConfigurationManagerImpl.cpp",
+    "../Zephyr/KeyValueStoreManagerImpl.cpp",
+    "../Zephyr/Logging.cpp",
+    "../Zephyr/PlatformManagerImpl.cpp",
+    "../Zephyr/SystemTimeSupport.cpp",
+    "../Zephyr/ZephyrConfig.cpp",
+    "../Zephyr/ZephyrConfig.h",
     "BLEManagerImpl.h",
-    "ConfigurationManagerImpl.cpp",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
-    "KeyValueStoreManagerImpl.cpp",
+    "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
-    "MbedConfig.cpp",
-    "MbedEventTimeout.cpp",
-    "PlatformManagerImpl.cpp",
-    "SystemTimeSupport.cpp",
-    "arch.c",
+    "PlatformManagerImpl.h",
+    "SystemPlatformConfig.h",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  if (chip_enable_openthread && chip_mdns == "platform") {
-    sources += [ "../OpenThread/MdnsImpl.cpp" ]
-    deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+  if (chip_enable_openthread) {
+    sources += [
+      "../OpenThread/OpenThreadUtils.cpp",
+      "../Zephyr/ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [ "../OpenThread/MdnsImpl.cpp" ]
+      deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+    }
   }
 }
