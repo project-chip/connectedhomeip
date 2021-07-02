@@ -1,7 +1,7 @@
 # CHIP Test Suites
 
 This directory contains a set of tests describing interactions between nodes,
-and more specifically between a controller and a controlle.
+and more specifically between a controller and a controllee.
 
 This test set is written in a high level language before being automatically
 converted into a language understandable by the different controllers.
