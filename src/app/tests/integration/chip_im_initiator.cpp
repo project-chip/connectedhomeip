@@ -178,8 +178,16 @@ CHIP_ERROR SendReadRequest()
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     chip::EventNumber number = 0;
-    chip::app::EventPathParams eventPathParams(kTestNodeId, kTestEndpointId, kTestClusterId, kLivenessChangeEvent,
-                                               false /*not urgent*/);
+    chip::app::EventPathParams eventPathParams[2];
+    eventPathParams[0].mNodeId     = kTestNodeId;
+    eventPathParams[0].mEndpointId = kTestEndpointId;
+    eventPathParams[0].mClusterId  = kTestClusterId;
+    eventPathParams[0].mEventId    = kTestChangeEvent1;
+
+    eventPathParams[1].mNodeId     = kTestNodeId;
+    eventPathParams[1].mEndpointId = kTestEndpointId;
+    eventPathParams[1].mClusterId  = kTestClusterId;
+    eventPathParams[1].mEventId    = kTestChangeEvent2;
 
     chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, 1, 0,
                                                        chip::app::AttributePathParams::Flags::kFieldIdValid);
@@ -187,7 +195,7 @@ CHIP_ERROR SendReadRequest()
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, nullptr,
-                                                                            &eventPathParams, 1, &attributePathParams, 1, number);
+                                                                            eventPathParams, 2, &attributePathParams, 1, number);
     SuccessOrExit(err);
 
 exit:
