@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app/server/Server.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
@@ -26,8 +25,11 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT || CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #include <app/server/Mdns.h>
+#include <app/server/Server.h>
 #include <controller/CHIPDeviceController.h>
+#endif
 
 using chip::DeviceLayer::ConfigurationMgr;
 
