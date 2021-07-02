@@ -42,6 +42,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 namespace {
 
@@ -57,36 +58,8 @@ TestContext sContext;
 
 const char PAYLOAD[] = "Hello!";
 
-class OutgoingTransport : public Transport::Base
-{
-public:
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
-    {
-        mSendMessageCount++;
-
-        if (mNumMessagesToDrop == 0)
-        {
-            System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-            HandleMessageReceived(address, std::move(receivedMessage));
-        }
-        else
-        {
-            mNumMessagesToDrop--;
-            mDroppedMessageCount++;
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-
-    uint32_t mNumMessagesToDrop   = 0;
-    uint32_t mDroppedMessageCount = 0;
-    uint32_t mSendMessageCount    = 0;
-};
-
 TransportMgrBase gTransportMgr;
-OutgoingTransport gLoopback;
+Test::LoopbackTransport gLoopback;
 
 class MockAppDelegate : public ExchangeDelegate
 {
@@ -288,7 +261,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     });
 
     // Let's drop the initial message
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 2;
     gLoopback.mDroppedMessageCount = 0;
 
@@ -308,7 +281,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
@@ -318,7 +291,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 3);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
@@ -353,7 +326,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     });
 
     // Let's drop the initial message
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 2;
     gLoopback.mDroppedMessageCount = 0;
 
@@ -374,7 +347,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
@@ -384,7 +357,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 3);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
@@ -422,7 +395,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
 
     // Let's drop the initial message
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
     gLoopback.mDroppedMessageCount = 0;
 
@@ -478,7 +451,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     });
 
     // Let's drop the initial message
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
     gLoopback.mDroppedMessageCount = 0;
 
@@ -500,7 +473,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
     NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
@@ -545,7 +518,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     });
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
 
@@ -562,7 +535,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 
     // Ensure the message was sent
     // The ack was dropped, and message was added to the retransmit table
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
@@ -578,7 +551,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
@@ -628,7 +601,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Let's drop the initial message
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
     gLoopback.mDroppedMessageCount = 0;
 
@@ -650,7 +623,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
     NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
@@ -705,7 +678,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     });
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
 
@@ -723,7 +696,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
 
     // Ensure the message was sent
     // The ack was dropped, and message was added to the retransmit table
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
@@ -740,7 +713,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
@@ -780,7 +753,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     // returned, then a reply is returned.  We need to keep both exchanges alive
     // for that (so we can send the response from the receiver and so the
     // initial sender exchange can get it).
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
     mockReceiver.mRetainExchange   = true;
@@ -790,7 +763,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Ensure the message was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // And that it was received.
@@ -806,7 +779,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     receiverRc->SendStandaloneAckMessage();
 
     // Ensure the ack was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // Ensure that we have not gotten any app-level responses so far.
@@ -825,7 +798,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mExchange->Close();
 
     // Ensure the response was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // Ensure that we have received that response.
@@ -876,7 +849,7 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     // piggybacked.  We need to keep both exchanges alive for that (so we can
     // send the response from the receiver and so the initial sender exchange
     // can get it).
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
     mockReceiver.mRetainExchange   = true;
@@ -886,7 +859,7 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Ensure the message was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // And that it was received.
@@ -911,7 +884,7 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
                                         SendFlags(SendMessageFlags::kExpectResponse).Set(SendMessageFlags::kNoAutoRequestAck));
 
     // Ensure the response was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // Ensure that we have received that response and it had a piggyback ack.
@@ -933,7 +906,7 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Ensure the message was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // And that it was received.
@@ -952,7 +925,7 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mExchange->Close();
 
     // Ensure the response was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 4);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // Ensure that we have received that response and it did not have a piggyback
