@@ -1,0 +1,79 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/qpg_sdk.gni")
+
+import("${build_root}/config/defaults.gni")
+
+import("${qpg_sdk_build_root}/qpg_executable.gni")
+import("${qpg_sdk_build_root}/qpg_sdk.gni")
+
+assert(current_os == "freertos")
+
+qpg_project_dir = "${chip_root}/examples/persistent-storage/qpg"
+examples_plat_dir = "${chip_root}/examples/platform/qpg"
+
+qpg_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/qpg",
+    "${examples_plat_dir}/project_include",
+  ]
+
+  sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
+
+  defines = []
+}
+
+qpg_executable("persistent_storage") {
+  include_dirs = [ "${qpg_project_dir}/.." ]
+  defines = []
+  output_name = "chip-${qpg_target_ic}-persistent_storage-example.out"
+
+  deps = []
+
+  public_deps = [
+    ":sdk",
+    "${chip_root}/src/app",
+    "${chip_root}/src/lib",
+  ]
+
+  include_dirs += [
+    "${qpg_project_dir}/include",
+    "${examples_plat_dir}",
+    "${examples_plat_dir}/app/include",
+  ]
+
+  sources = [
+    "${qpg_project_dir}/../KeyValueStorageTest.cpp",
+    "main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${qpg_sdk_root}/${qpg_target_ic}/ldscripts/chip-${qpg_target_ic}-example.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+}
+
+group("qpg") {
+  deps = [ ":persistent_storage" ]
+}
+
+group("default") {
+  deps = [ ":qpg" ]
+}

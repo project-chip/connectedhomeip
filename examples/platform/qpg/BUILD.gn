@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/qpg_sdk.gni")
+
 import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
-declare_args() {
-  # Build target to use for QPG SDK. Use this to set global SDK defines.
-  qpg_sdk_target = ""
+config("chip_examples_project_config") {
+  include_dirs = [ "project_include" ]
 }
 
-assert(qpg_sdk_target != "", "qpg_sdk_target must be specified")
+source_set("openthread_core_config_qpg_chip_examples") {
+  sources = [ "project_include/OpenThreadConfig.h" ]
 
-group("qpg_sdk") {
-  public_deps = [ qpg_sdk_target ]
+  public_deps = [
+    "${chip_root}/third_party/openthread/platforms/qpg:openthread_core_config_qpg",
+    "${qpg_sdk_build_root}:qpg_sdk",
+  ]
+
+  public_configs = [ ":chip_examples_project_config" ]
 }
