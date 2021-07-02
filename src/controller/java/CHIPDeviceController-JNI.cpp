@@ -140,8 +140,6 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeMethodForward(sJVM, env);
-
     ChipLogProgress(Controller, "Loading Java class references.");
 
     // Get various class references need by the API.
@@ -257,6 +255,12 @@ exit:
     return result;
 }
 
+JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject manager)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(manager);
+}
+
 JNI_METHOD(void, pairDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce)
 {
@@ -275,7 +279,7 @@ JNI_METHOD(void, pairDevice)
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
-        params = params.SetCSRNonce(jniCsrNonce.byteSpan());
+        params.SetCSRNonce(jniCsrNonce.byteSpan());
     }
     err = wrapper->Controller()->PairDevice(deviceId, params);
 
