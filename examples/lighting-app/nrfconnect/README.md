@@ -77,9 +77,8 @@ manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
-In CHIP, the commissioning procedure is done over Bluetooth
-LE between a CHIP device and the CHIP controller, where the controller has the
-commissioner role.
+In CHIP, the commissioning procedure is done over Bluetooth LE between a CHIP
+device and the CHIP controller, where the controller has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
@@ -167,10 +166,10 @@ platform image.
 
 > **Note**:
 >
-> The following Device UI elements are missing on the nRF52840 Dongle:
-> **Button 2**, **Button 3**, **Button 4**, **SEGGER J-Link USB port**, and
-> **NFC port with antenna attached**. You can collect logs from the nRF52840 Dongle
-> using the **nRF USB port** instead of the **SEGGER J-Link USB port**.
+> The following Device UI elements are missing on the nRF52840 Dongle: **Button
+> 2**, **Button 3**, **Button 4**, **SEGGER J-Link USB port**, and **NFC port
+> with antenna attached**. You can collect logs from the nRF52840 Dongle using
+> the **nRF USB port** instead of the **SEGGER J-Link USB port**.
 > Functionalities associated with the remaining missing elements are
 > inaccessible.
 
