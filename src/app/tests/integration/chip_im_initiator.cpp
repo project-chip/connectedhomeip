@@ -309,7 +309,7 @@ public:
     }
     CHIP_ERROR ReportError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
-        printf("ReportError with err %d", aError);
+        printf("ReportError with err %" CHIP_ERROR_FORMAT, aError);
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender,

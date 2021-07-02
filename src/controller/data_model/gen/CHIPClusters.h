@@ -43,6 +43,7 @@ constexpr ClusterId kDiagnosticLogsClusterId              = 0x0032;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
 constexpr ClusterId kFixedLabelClusterId                  = 0x0040;
+constexpr ClusterId kFlowMeasurementClusterId             = 0x0404;
 constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
 constexpr ClusterId kGeneralDiagnosticsClusterId          = 0x0033;
 constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
@@ -54,7 +55,7 @@ constexpr ClusterId kLowPowerClusterId                    = 0x0508;
 constexpr ClusterId kMediaInputClusterId                  = 0x0507;
 constexpr ClusterId kMediaPlaybackClusterId               = 0x0506;
 constexpr ClusterId kNetworkCommissioningClusterId        = 0x0031;
-constexpr ClusterId kOtaSoftwareUpdateServerClusterId     = 0x0029;
+constexpr ClusterId kOtaSoftwareUpdateProviderClusterId   = 0x0029;
 constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
 constexpr ClusterId kPressureMeasurementClusterId         = 0x0403;
@@ -634,6 +635,20 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
+class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
+{
+public:
+    FlowMeasurementCluster() : ClusterBase(kFlowMeasurementClusterId) {}
+    ~FlowMeasurementCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
@@ -922,11 +937,11 @@ private:
     static constexpr CommandId kUpdateWiFiNetworkCommandId                 = 0x04;
 };
 
-class DLL_EXPORT OtaSoftwareUpdateServerCluster : public ClusterBase
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    OtaSoftwareUpdateServerCluster() : ClusterBase(kOtaSoftwareUpdateServerClusterId) {}
-    ~OtaSoftwareUpdateServerCluster() {}
+    OtaSoftwareUpdateProviderCluster() : ClusterBase(kOtaSoftwareUpdateProviderClusterId) {}
+    ~OtaSoftwareUpdateProviderCluster() {}
 
     // Cluster Commands
     CHIP_ERROR ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -935,8 +950,8 @@ public:
                                    chip::ByteSpan updateToken, uint32_t currentVersion);
     CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t vendorId,
                           uint16_t productId, uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion,
-                          uint8_t protocolsSupported, chip::ByteSpan location, uint8_t clientCanConsent,
-                          chip::ByteSpan metadataForServer);
+                          uint8_t protocolsSupported, chip::ByteSpan location, uint8_t requestorCanConsent,
+                          chip::ByteSpan metadataForProvider);
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -992,8 +1007,7 @@ public:
 
     // Cluster Commands
     CHIP_ERROR AddOpCert(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                         chip::ByteSpan operationalCert, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
-                         uint16_t adminVendorId);
+                         chip::ByteSpan nOCArray, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
     CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan rootCertificate);
     CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,

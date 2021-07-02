@@ -96,7 +96,7 @@ private:
 
     static void PrepareBinding(intptr_t arg);
     static void StartDownload(intptr_t arg);
-    static void HandleHoldOffTimerExpired(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
+    static void HandleHoldOffTimerExpired(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError);
     static void DefaultRetryPolicyCallback(void * aAppState, SoftwareUpdateManager::RetryParam & aRetryParam,
                                            uint32_t & aOutIntervalMsec);
 

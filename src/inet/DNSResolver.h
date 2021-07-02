@@ -101,7 +101,7 @@ private:
      *  Provide a function of this type to the \c Resolve method to process
      *  completion events.
      */
-    typedef void (*OnResolveCompleteFunct)(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
+    typedef void (*OnResolveCompleteFunct)(void * appState, CHIP_ERROR err, uint8_t addrCount, IPAddress * addrArray);
 
     static chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> sPool;
 
@@ -133,7 +133,7 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     void InitAddrInfoHints(struct addrinfo & hints);
-    INET_ERROR ProcessGetAddrInfoResult(int returnCode, struct addrinfo * results);
+    CHIP_ERROR ProcessGetAddrInfoResult(int returnCode, struct addrinfo * results);
     void CopyAddresses(int family, uint8_t maxAddrs, const struct addrinfo * addrs);
     uint8_t CountAddresses(int family, const struct addrinfo * addrs);
 
@@ -142,7 +142,7 @@ private:
     /* Hostname that requires resolution */
     char asyncHostNameBuf[NL_DNS_HOSTNAME_MAX_LEN + 1]; // DNS limits hostnames to 253 max characters.
 
-    INET_ERROR asyncDNSResolveResult;
+    CHIP_ERROR asyncDNSResolveResult;
     /* The next DNSResolver object in the asynchronous DNS resolution queue. */
     DNSResolver * pNextAsyncDNSResolver;
 
@@ -154,9 +154,9 @@ private:
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    INET_ERROR Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs, IPAddress * addrArray,
+    CHIP_ERROR Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs, IPAddress * addrArray,
                        OnResolveCompleteFunct onComplete, void * appState);
-    INET_ERROR Cancel();
+    CHIP_ERROR Cancel();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     void HandleResolveComplete(void);

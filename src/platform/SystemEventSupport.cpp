@@ -34,8 +34,8 @@ namespace Layer {
 
 using namespace ::chip::DeviceLayer;
 
-System::Error PostEvent(System::Layer & aLayer, void * aContext, System::Object & aTarget, System::EventType aType,
-                        uintptr_t aArgument)
+CHIP_ERROR PostEvent(System::Layer & aLayer, void * aContext, System::Object & aTarget, System::EventType aType,
+                     uintptr_t aArgument)
 {
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kChipSystemLayerEvent;
@@ -45,21 +45,21 @@ System::Error PostEvent(System::Layer & aLayer, void * aContext, System::Object 
 
     PlatformMgr().PostEvent(&event);
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-System::Error DispatchEvents(Layer & aLayer, void * aContext)
+CHIP_ERROR DispatchEvents(Layer & aLayer, void * aContext)
 {
     PlatformMgr().RunEventLoop();
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-System::Error DispatchEvent(System::Layer & aLayer, void * aContext, const ChipDeviceEvent * aEvent)
+CHIP_ERROR DispatchEvent(System::Layer & aLayer, void * aContext, const ChipDeviceEvent * aEvent)
 {
     PlatformMgr().DispatchEvent(aEvent);
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Layer

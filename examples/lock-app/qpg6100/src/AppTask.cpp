@@ -207,7 +207,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = CHIP_ERROR_MAX;
+        err = CHIP_ERROR_INTERNAL;
     }
 
     if (err == CHIP_NO_ERROR)
@@ -245,7 +245,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     }
 }
 
-void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, chip::System::Error aError)
+void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;

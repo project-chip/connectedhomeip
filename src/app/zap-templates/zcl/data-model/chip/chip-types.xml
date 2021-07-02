@@ -16,24 +16,12 @@ limitations under the License.
 -->
 <configurator>
   <atomic>
-    <type id="0x00" description="No data"                  name="no_data"           size="0"                  />
+    <type id="0x00" description="No data"                 name="no_data"            size="0"                  />
     <!-- Base Data Types -->
-    <type id="0x08" description="8-bit data"               name="data8"             size="1"  discrete="true" />
-    <type id="0x09" description="16-bit data"              name="data16"            size="2"  discrete="true" />
-    <type id="0x0A" description="24-bit data"              name="data24"            size="3"  discrete="true" />
-    <type id="0x0B" description="32-bit data"              name="data32"            size="4"  discrete="true" />
-    <type id="0x0C" description="40-bit data"              name="data40"            size="5"  discrete="true" />
-    <type id="0x0D" description="48-bit data"              name="data48"            size="6"  discrete="true" />
-    <type id="0x0E" description="56-bit data"              name="data56"            size="7"  discrete="true" />
-    <type id="0x0F" description="64-bit data"              name="data64"            size="8"  discrete="true" />
     <type id="0x10" description="Boolean"                  name="boolean"           size="1"  discrete="true" />
     <type id="0x18" description="8-bit bitmap"             name="bitmap8"           size="1"  discrete="true" />
     <type id="0x19" description="16-bit bitmap"            name="bitmap16"          size="2"  discrete="true" />
-    <type id="0x1A" description="24-bit bitmap"            name="bitmap24"          size="3"  discrete="true" />
     <type id="0x1B" description="32-bit bitmap"            name="bitmap32"          size="4"  discrete="true" />
-    <type id="0x1C" description="40-bit bitmap"            name="bitmap40"          size="5"  discrete="true" />
-    <type id="0x1D" description="48-bit bitmap"            name="bitmap48"          size="6"  discrete="true" />
-    <type id="0x1E" description="56-bit bitmap"            name="bitmap56"          size="7"  discrete="true" />
     <type id="0x1F" description="64-bit bitmap"            name="bitmap64"          size="8"  discrete="true" />
     <type id="0x20" description="Unsigned 8-bit integer"   name="int8u"             size="1"  analog="true"   />
     <type id="0x21" description="Unsigned 16-bit integer"  name="int16u"            size="2"  analog="true"   />
@@ -53,39 +41,37 @@ limitations under the License.
     <type id="0x2F" description="Signed 64-bit integer"    name="int64s"            size="8"  analog="true"   />
     <type id="0x30" description="8-bit enumeration"        name="enum8"             size="1"  discrete="true" />
     <type id="0x31" description="16-bit enumeration"       name="enum16"            size="2"  discrete="true" />
-    <type id="0x38" description="Semi-precision"           name="float_semi"        size="2"  analog="true"   />
-    <type id="0x39" description="Single precision"         name="float_single"      size="4"  analog="true"   />
-    <type id="0x3A" description="Double precision"         name="float_double"      size="8"  analog="true"   />
-    <type id="0x41" description="Octet string"             name="octet_string"                composite="true"/>
-    <type id="0x42" description="Character string"         name="char_string"                 composite="true"/>
-    <type id="0x43" description="Long octet string"        name="long_octet_string"           composite="true"/>
-    <type id="0x44" description="Long character string"    name="long_char_string"            composite="true"/>
-    <type id="0x48" description="Array"                    name="array"                       composite="true"/>
+    <type id="0x39" description="Single precision"         name="single"            size="4"  analog="true"   />
+    <type id="0x3A" description="Double precision"         name="double"            size="8"  analog="true"   />
+    <type id="0x41" description="Octet String"             name="octet_string"                composite="true"/>
+    <type id="0x43" description="Long Octet String"        name="long_octet_string"           composite="true"/>
+    <type id="0x48" description="List"                     name="array"                       composite="true"/>
     <type id="0x4C" description="Structure"                name="struct"                      composite="true"/>
-    <type id="0x50" description="Set"                      name="set"                         composite="true" />
-    <type id="0x51" description="Bag"                      name="bag"                         composite="true" />
-    <type id="0xE0" description="Time of day"              name="time_of_day"       size="4"  analog="true"   />
+    <!-- Derived Data Types -->
+    <type id="0x42" description="Character String"         name="char_string"                 composite="true"/>
+    <type id="0x44" description="Long Character String"    name="long_char_string"            composite="true"/>
+    <type id="0xE0" description="Time of day"              name="tod"               size="4"  analog="true"   />
     <type id="0xE1" description="Date"                     name="date"              size="4"  analog="true"   />
-    <type id="0xE2" description="UTC Time"                 name="utc_time"          size="4"  analog="true"   />
+    <type id="0xE2" description="UTC Time"                 name="utc"               size="4"  analog="true"   />
     <type id="0xE3" description="Epoch Microseconds"       name="epoch_us"          size="8"  analog="true"   />
     <type id="0xE4" description="Epoch Seconds"            name="epoch_s"           size="4"  analog="true"   />
     <type id="0xE5" description="System Time Microseconds" name="systime_us"        size="8"  analog="true"   />
-    <type id="0xE8" description="Cluster ID"               name="cluster_id"        size="2"  discrete="true" />
-    <type id="0xE9" description="Attribute ID"             name="attribute_id"      size="2"  discrete="true" />
+    <type id="0xE8" description="Cluster ID"               name="cluster_id"        size="4"  discrete="true" />
+    <type id="0xE9" description="Attribute ID"             name="attrib_id"         size="4"  discrete="true" />
     <type id="0xEA" description="Field ID"                 name="field_id"          size="4"  discrete="true" />
     <type id="0xEB" description="Event ID"                 name="event_id"          size="4"  discrete="true" />
-    <type id="0xEC" description="Command ID"               name="command_id"        size="1"  discrete="true" />
+    <type id="0xEC" description="Command ID"               name="command_id"        size="4"  discrete="true" />
     <type id="0xED" description="Action ID"                name="action_id"         size="1"  discrete="true" />
     <type id="0xEF" description="Transaction ID"           name="trans_id"          size="4"  discrete="true" />
     <type id="0xF0" description="Node ID"                  name="node_id"           size="8"  discrete="true" />
     <type id="0xF1" description="Vendor ID"                name="vendor_id"         size="2"  discrete="true" />
-    <type id="0xF2" description="Device Type ID"           name="device_type_id"    size="4"  discrete="true" />
+    <type id="0xF2" description="Device Type ID"           name="devtype_id"        size="4"  discrete="true" />
     <type id="0xF3" description="Fabric ID"                name="fabric_id"         size="8"  discrete="true" />
     <type id="0xF4" description="Group ID"                 name="group_id"          size="2"  discrete="true" />
     <type id="0xF5" description="Status Code"              name="status"            size="4"  discrete="true" />
     <type id="0xF6" description="Data Version"             name="data_ver"          size="4"  discrete="true" />
     <type id="0xF7" description="Event Number"             name="event_no"          size="8"  discrete="true" />
-    <type id="0xF8" description="Endpoint Number"          name="endpoint_id"       size="1"  discrete="true" />
+    <type id="0xF8" description="Endpoint Number"          name="endpoint_no"       size="2"  discrete="true" />
     <type id="0xF9" description="Fabric Index"             name="fabric_idx"        size="1"  discrete="true" />
     <type id="0xFA" description="IP Address"               name="ipadr"                       composite="true"/>
     <type id="0xFB" description="IPv4 Address"             name="ipv4adr"           size="4"  composite="true"/>

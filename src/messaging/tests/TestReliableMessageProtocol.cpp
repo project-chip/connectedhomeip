@@ -305,7 +305,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
@@ -315,7 +315,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // sleep another 65 ms to trigger second re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 3);
@@ -371,7 +371,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
@@ -381,7 +381,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     // sleep another 65 ms to trigger second re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 3);
@@ -436,7 +436,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit table is empty, as we did not provide a message to retain
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
@@ -497,7 +497,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 2);
@@ -574,7 +574,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
@@ -647,7 +647,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 2);

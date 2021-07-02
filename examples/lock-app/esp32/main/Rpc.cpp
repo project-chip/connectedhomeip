@@ -39,25 +39,6 @@ using chip::DeviceLayer::ConfigurationMgr;
 
 static bool uartInitialised;
 
-extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, const char * format, ...)
-{
-    va_list v;
-    va_start(v, format);
-#ifndef CONFIG_LOG_DEFAULT_LEVEL_NONE
-    if (uartInitialised)
-    {
-        char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-        size_t len = vsnprintf(formattedMsg, sizeof formattedMsg, format, v);
-        if (len >= sizeof formattedMsg)
-        {
-            len = sizeof formattedMsg - 1;
-        }
-        PigweedLogger::putString(formattedMsg, len);
-    }
-#endif
-    va_end(v);
-}
-
 namespace chip {
 namespace rpc {
 

@@ -53,7 +53,7 @@ EmberAfStatus emberAfLowPowerClusterClientCommandParse(EmberAfClusterCommand * c
 EmberAfStatus emberAfMediaInputClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfNetworkCommissioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
-EmberAfStatus emberAfOtaSoftwareUpdateServerClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfOtaSoftwareUpdateProviderClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfPumpConfigurationAndControlClusterClientCommandParse(EmberAfClusterCommand * cmd);
@@ -192,8 +192,8 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
             result = emberAfNetworkCommissioningClusterClientCommandParse(cmd);
             break;
-        case ZCL_OTA_SERVER_CLUSTER_ID:
-            result = emberAfOtaSoftwareUpdateServerClusterClientCommandParse(cmd);
+        case ZCL_OTA_PROVIDER_CLUSTER_ID:
+            result = emberAfOtaSoftwareUpdateProviderClusterClientCommandParse(cmd);
             break;
         case ZCL_ON_OFF_CLUSTER_ID:
             // No commands are enabled for cluster On/off
@@ -1483,7 +1483,7 @@ EmberAfStatus emberAfNetworkCommissioningClusterClientCommandParse(EmberAfCluste
     }
     return status(wasHandled, true, cmd->mfgSpecific);
 }
-EmberAfStatus emberAfOtaSoftwareUpdateServerClusterClientCommandParse(EmberAfClusterCommand * cmd)
+EmberAfStatus emberAfOtaSoftwareUpdateProviderClusterClientCommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;
 
@@ -1509,7 +1509,7 @@ EmberAfStatus emberAfOtaSoftwareUpdateServerClusterClientCommandParse(EmberAfClu
             delayedActionTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled =
-                emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(nullptr, action, delayedActionTime);
+                emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(nullptr, action, delayedActionTime);
             break;
         }
         case ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID: {
@@ -1520,7 +1520,7 @@ EmberAfStatus emberAfOtaSoftwareUpdateServerClusterClientCommandParse(EmberAfClu
             uint32_t softwareVersion;
             chip::ByteSpan updateToken;
             uint8_t userConsentNeeded;
-            chip::ByteSpan metadataForClient;
+            chip::ByteSpan metadataForRequestor;
 
             if (cmd->bufLen < payloadOffset + 1)
             {
@@ -1566,12 +1566,13 @@ EmberAfStatus emberAfOtaSoftwareUpdateServerClusterClientCommandParse(EmberAfClu
                 return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
             }
             {
-                uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-                metadataForClient = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
+                uint8_t * rawData    = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                metadataForRequestor = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
             }
 
-            wasHandled = emberAfOtaSoftwareUpdateServerClusterQueryImageResponseCallback(
-                nullptr, status, delayedActionTime, imageURI, softwareVersion, updateToken, userConsentNeeded, metadataForClient);
+            wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(nullptr, status, delayedActionTime,
+                                                                                           imageURI, softwareVersion, updateToken,
+                                                                                           userConsentNeeded, metadataForRequestor);
             break;
         }
         default: {

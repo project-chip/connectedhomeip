@@ -96,7 +96,7 @@ EmberEventData emAfEvents[] = {
     { NULL, NULL }
 };
 
-void EventControlHandler(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+void EventControlHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
     EmberEventControl * control = reinterpret_cast<EmberEventControl *>(appState);
     if (control->status != EMBER_EVENT_INACTIVE)

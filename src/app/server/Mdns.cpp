@@ -88,7 +88,7 @@ chip::ByteSpan FillMAC(uint8_t (&mac)[8])
 
 } // namespace
 
-CHIP_ERROR GetCommissionInstanceName(char * buffer, size_t bufferLen)
+CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen)
 {
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
     return mdnsAdvertiser.GetCommissionableInstanceName(buffer, bufferLen);

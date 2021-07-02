@@ -145,7 +145,7 @@ exit:
     }
 }
 
-void BLEBase::OnBleConnectionError(BLE_ERROR err)
+void BLEBase::OnBleConnectionError(CHIP_ERROR err)
 {
     ClearPendingPackets();
     ChipLogDetail(Inet, "BleConnection Error: %s", ErrorStr(err));
@@ -156,11 +156,11 @@ void BLEBase::OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHand
     HandleMessageReceived(Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
 }
 
-void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
+void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err)
 {
     mState = State::kConnected;
 
-    if (err != BLE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed to establish BLE connection: %s", ErrorStr(err));
         ClearPendingPackets();
@@ -177,7 +177,7 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
     ChipLogDetail(Inet, "BLE EndPoint %p Connection Complete", endPoint);
 }
 
-void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
+void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err)
 {
     mState       = State::kInitialized;
     mBleEndPoint = nullptr;

@@ -74,8 +74,8 @@ static EmAfIdentifyState * getIdentifyState(EndpointId endpoint);
 
 static EmAfIdentifyState * getIdentifyState(EndpointId endpoint)
 {
-    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_IDENTIFY_CLUSTER_ID);
-    return (ep == 0xFF ? NULL : &stateTable[ep]);
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_IDENTIFY_CLUSTER_ID);
+    return (ep == 0xFFFF ? NULL : &stateTable[ep]);
 }
 
 void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)

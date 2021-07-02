@@ -831,7 +831,7 @@ void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
     }
 }
 
-void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError)
+void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError)
 {
     sInstance.DriveAPState();
 }

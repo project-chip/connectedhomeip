@@ -63,10 +63,10 @@ namespace Inet {
  *                                           malformed.
  *  @return  #INET_ERROR_HOST_NAME_TOO_LONG  If the host name exceeds 253
  *                                           characters.
- *  @return  #INET_NO_ERROR                  On success.
+ *  @return  #CHIP_NO_ERROR                  On success.
  *
  */
-DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
+DLL_EXPORT CHIP_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
                                        uint16_t & aPort)
 {
     const char * end = aString + aStringLen;
@@ -149,7 +149,7 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen
     else
         aPort = 0;
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -193,10 +193,10 @@ DLL_EXPORT INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen
  *                                           malformed.
  *  @return  #INET_ERROR_HOST_NAME_TOO_LONG  If the host name exceeds 253
  *                                           characters.
- *  @return  #INET_NO_ERROR                  On success.
+ *  @return  #CHIP_NO_ERROR                  On success.
  *
  */
-DLL_EXPORT INET_ERROR ParseHostPortAndInterface(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
+DLL_EXPORT CHIP_ERROR ParseHostPortAndInterface(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
                                                 uint16_t & aPort, const char *& aInterface, uint16_t & aInterfaceLen)
 {
     const char * end = aString + aStringLen;

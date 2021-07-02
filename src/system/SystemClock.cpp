@@ -116,7 +116,7 @@ uint64_t GetClock_MonotonicHiRes()
 #endif // HAVE_CLOCK_GETTIME
 }
 
-Error GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
 {
 #if HAVE_CLOCK_GETTIME
     struct timespec ts;
@@ -127,10 +127,10 @@ Error GetClock_RealTime(uint64_t & curTime)
     }
     if (ts.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = (static_cast<uint64_t>(ts.tv_sec) * UINT64_C(1000000)) + (static_cast<uint64_t>(ts.tv_nsec) / 1000);
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 #else  // HAVE_CLOCK_GETTIME
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
@@ -140,23 +140,23 @@ Error GetClock_RealTime(uint64_t & curTime)
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 #endif // HAVE_CLOCK_GETTIME
 }
 
-Error GetClock_RealTimeMS(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime)
 {
-    Error err = GetClock_RealTime(curTime);
-    curTime   = curTime / 1000;
+    CHIP_ERROR err = GetClock_RealTime(curTime);
+    curTime        = curTime / 1000;
     return err;
 }
 
 #if HAVE_CLOCK_SETTIME || HAVE_SETTIMEOFDAY
 
-Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 {
 #if HAVE_CLOCK_SETTIME
     struct timespec ts;
@@ -165,9 +165,9 @@ Error SetClock_RealTime(uint64_t newCurTime)
     int res    = clock_settime(CLOCK_REALTIME, &ts);
     if (res != 0)
     {
-        return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
+        return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
     }
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 #else  // HAVE_CLOCK_SETTIME
     struct timeval tv;
     tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
@@ -175,17 +175,17 @@ Error SetClock_RealTime(uint64_t newCurTime)
     int res    = settimeofday(&tv, NULL);
     if (res != 0)
     {
-        return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
+        return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
     }
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 #endif // HAVE_CLOCK_SETTIME
 }
 
 #else // !HAVE_CLOCK_SETTTIME
 
-Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 {
-    return CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 #endif // HAVE_CLOCK_SETTIME || HAVE_SETTIMEOFDAY
@@ -246,19 +246,19 @@ uint64_t GetClock_MonotonicHiRes(void)
     return GetClock_MonotonicMS();
 }
 
-Error GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
 {
-    return CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-Error GetClock_RealTimeMS(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime)
 {
-    return CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 {
-    return CHIP_SYSTEM_ERROR_NOT_SUPPORTED;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME

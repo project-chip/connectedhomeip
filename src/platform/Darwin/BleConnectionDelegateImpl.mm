@@ -48,6 +48,7 @@ constexpr uint64_t kScanningTimeoutInSeconds = 60;
 @property (strong, nonatomic) CBPeripheral * peripheral;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
 @property (nonatomic, readonly, nullable) dispatch_source_t timer;
+@property (unsafe_unretained, nonatomic) bool found;
 @property (unsafe_unretained, nonatomic) uint16_t deviceDiscriminator;
 @property (unsafe_unretained, nonatomic) void * appState;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
@@ -77,12 +78,12 @@ namespace DeviceLayer {
             ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
-        BLE_ERROR BleConnectionDelegateImpl::CancelConnection()
+        CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
             [ble stop];
             ble = nil;
-            return BLE_NO_ERROR;
+            return CHIP_NO_ERROR;
         }
     } // namespace Internal
 } // namespace DeviceLayer
@@ -103,6 +104,7 @@ namespace DeviceLayer {
         _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
         _centralManager = [CBCentralManager alloc];
+        _found = false;
 
         dispatch_source_set_event_handler(_timer, ^{
             [self stop];
@@ -206,19 +208,17 @@ namespace DeviceLayer {
         ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%s]", [error.localizedDescription UTF8String]);
     }
 
-    bool found;
-
     for (CBService * service in peripheral.services) {
-        if ([service.UUID.data isEqualToData:_shortServiceUUID.data]) {
-            found = true;
+        if ([service.UUID.data isEqualToData:_shortServiceUUID.data] && !self.found) {
             [peripheral discoverCharacteristics:nil forService:service];
+            self.found = true;
             break;
         }
     }
 
-    if (!found || error != nil) {
+    if (!self.found || error != nil) {
         ChipLogError(Ble, "Service not found on the device.");
-        _onConnectionError(_appState, BLE_ERROR_INCORRECT_STATE);
+        _onConnectionError(_appState, CHIP_ERROR_INCORRECT_STATE);
     }
 }
 
@@ -310,7 +310,7 @@ namespace DeviceLayer {
         } else {
             ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
             dispatch_async(_chipWorkQueue, ^{
-                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_NO_MEMORY);
+                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, CHIP_ERROR_NO_MEMORY);
             });
         }
     } else {

@@ -591,7 +591,7 @@ exit:
 
 template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleHoldOffTimerExpired(::chip::System::Layer * aLayer, void * aAppState,
-                                                                            ::chip::System::Error aError)
+                                                                            ::CHIP_ERROR aError)
 {
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
 

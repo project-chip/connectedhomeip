@@ -26,21 +26,21 @@ namespace app {
 namespace clusters {
 
 /** @brief
- *    Defines methods for implementing application-specific logic for the OTA Server Cluster.
+ *    Defines methods for implementing application-specific logic for the OTA Provider Cluster.
  */
-class OTAServerDelegate
+class OTAProviderDelegate
 {
 public:
     // TODO: protocolsSupported should be list of OTADownloadProtocol enums, not uint8_t*
     virtual EmberAfStatus HandleQueryImage(uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
                                            uint32_t currentVersion, uint8_t * protocolsSupported, const chip::ByteSpan & location,
-                                           bool clientCanConsent, const chip::ByteSpan & metadataForServer) = 0;
+                                           bool clientCanConsent, const chip::ByteSpan & metadataForProvider) = 0;
 
     virtual EmberAfStatus HandleApplyUpdateRequest(const chip::ByteSpan & updateToken, uint32_t newVersion) = 0;
 
     virtual EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t currentVersion) = 0;
 
-    virtual ~OTAServerDelegate() = default;
+    virtual ~OTAProviderDelegate() = default;
 };
 
 } // namespace clusters

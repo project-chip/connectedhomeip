@@ -139,7 +139,7 @@ void TestClose(nlTestSuite * inSuite, void * aContext)
     const auto notifFD = lContext.mWakeEvent.GetNotifFD();
 
     // Check that Close() has cleaned up itself and reopen is possible
-    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open(lContext.mWatchableEvents) == CHIP_SYSTEM_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open(lContext.mWatchableEvents) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, notifFD < 0);
 }
 } // namespace

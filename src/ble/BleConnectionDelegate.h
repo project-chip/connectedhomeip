@@ -47,7 +47,7 @@ public:
     typedef void (*OnConnectionCompleteFunct)(void * appState, BLE_CONNECTION_OBJECT connObj);
     OnConnectionCompleteFunct OnConnectionComplete;
 
-    typedef void (*OnConnectionErrorFunct)(void * appState, BLE_ERROR err);
+    typedef void (*OnConnectionErrorFunct)(void * appState, CHIP_ERROR err);
     OnConnectionErrorFunct OnConnectionError;
 
     // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
@@ -55,7 +55,7 @@ public:
     virtual void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) = 0;
 
     // Call this function to stop the connection
-    virtual BLE_ERROR CancelConnection() = 0;
+    virtual CHIP_ERROR CancelConnection() = 0;
 };
 
 } /* namespace Ble */

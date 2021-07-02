@@ -45,13 +45,13 @@ namespace Inet {
  *
  *  @param[in]  aInet  A pointer to the InetLayer object.
  *
- *  @retval #INET_NO_ERROR                   if initialization is
+ *  @retval #CHIP_NO_ERROR                   if initialization is
  *                                           successful.
  *  @retval other appropriate POSIX network or OS error.
  */
-INET_ERROR AsyncDNSResolverSockets::Init(InetLayer * aInet)
+CHIP_ERROR AsyncDNSResolverSockets::Init(InetLayer * aInet)
 {
-    INET_ERROR err = INET_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int pthreadErr;
 
     mInet = aInet;
@@ -80,12 +80,12 @@ INET_ERROR AsyncDNSResolverSockets::Init(InetLayer * aInet)
  *  and it takes care of shutting the threads down and destroying the mutex
  *  and semaphore variables.
  *
- *  @retval #INET_NO_ERROR                   if shutdown is successful.
+ *  @retval #CHIP_NO_ERROR                   if shutdown is successful.
  *  @retval other appropriate POSIX network or OS error.
  */
-INET_ERROR AsyncDNSResolverSockets::Shutdown()
+CHIP_ERROR AsyncDNSResolverSockets::Shutdown()
 {
-    INET_ERROR err = INET_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int pthreadErr;
 
     AsyncMutexLock();
@@ -132,15 +132,15 @@ INET_ERROR AsyncDNSResolverSockets::Shutdown()
  *  @param[in]  appState    A pointer to the application state to be passed to
  *                          onComplete when a DNS request is complete.
  *
- *  @retval INET_NO_ERROR                   if a DNS request is handled
+ *  @retval CHIP_NO_ERROR                   if a DNS request is handled
  *                                          successfully.
  *
  */
-INET_ERROR AsyncDNSResolverSockets::PrepareDNSResolver(DNSResolver & resolver, const char * hostName, uint16_t hostNameLen,
+CHIP_ERROR AsyncDNSResolverSockets::PrepareDNSResolver(DNSResolver & resolver, const char * hostName, uint16_t hostNameLen,
                                                        uint8_t options, uint8_t maxAddrs, IPAddress * addrArray,
                                                        DNSResolver::OnResolveCompleteFunct onComplete, void * appState)
 {
-    INET_ERROR err = INET_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     memcpy(resolver.asyncHostNameBuf, hostName, hostNameLen);
     resolver.asyncHostNameBuf[hostNameLen] = 0;
@@ -150,7 +150,7 @@ INET_ERROR AsyncDNSResolverSockets::PrepareDNSResolver(DNSResolver & resolver, c
     resolver.AddrArray                     = addrArray;
     resolver.AppState                      = appState;
     resolver.OnComplete                    = onComplete;
-    resolver.asyncDNSResolveResult         = INET_NO_ERROR;
+    resolver.asyncDNSResolveResult         = CHIP_NO_ERROR;
     resolver.mState                        = DNSResolver::kState_Active;
     resolver.pNextAsyncDNSResolver         = nullptr;
 
@@ -162,16 +162,16 @@ INET_ERROR AsyncDNSResolverSockets::PrepareDNSResolver(DNSResolver & resolver, c
  *
  *  @param[in]  resolver    A reference to the DNSResolver object.
  *
- *  @retval #INET_NO_ERROR                   if a DNS request is queued
+ *  @retval #CHIP_NO_ERROR                   if a DNS request is queued
  *                                           successfully.
- *  @retval #INET_ERROR_NO_MEMORY            if the Inet layer resolver pool
+ *  @retval #CHIP_ERROR_NO_MEMORY            if the Inet layer resolver pool
  *                                           is full.
  *  @retval other appropriate POSIX network or OS error.
  *
  */
-INET_ERROR AsyncDNSResolverSockets::EnqueueRequest(DNSResolver & resolver)
+CHIP_ERROR AsyncDNSResolverSockets::EnqueueRequest(DNSResolver & resolver)
 {
-    INET_ERROR err = INET_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int pthreadErr;
 
     AsyncMutexLock();
@@ -202,9 +202,9 @@ INET_ERROR AsyncDNSResolverSockets::EnqueueRequest(DNSResolver & resolver)
  * Make the worker thread block if there is no item in the queue.
  *
  */
-INET_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver ** outResolver)
+CHIP_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver ** outResolver)
 {
-    INET_ERROR err = INET_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int pthreadErr;
 
     AsyncMutexLock();
@@ -246,9 +246,9 @@ INET_ERROR AsyncDNSResolverSockets::DequeueRequest(DNSResolver ** outResolver)
  *
  *  @param[in]    resolver   A reference to the DNSResolver object.
  */
-INET_ERROR AsyncDNSResolverSockets::Cancel(DNSResolver & resolver)
+CHIP_ERROR AsyncDNSResolverSockets::Cancel(DNSResolver & resolver)
 {
-    INET_ERROR err = INET_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     AsyncMutexLock();
 
@@ -297,7 +297,7 @@ void AsyncDNSResolverSockets::Resolve(DNSResolver & resolver)
 }
 
 /* Event handler function for asynchronous DNS notification */
-void AsyncDNSResolverSockets::DNSResultEventHandler(chip::System::Layer * aLayer, void * aAppState, chip::System::Error aError)
+void AsyncDNSResolverSockets::DNSResultEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
 {
     DNSResolver * resolver = static_cast<DNSResolver *>(aAppState);
 
@@ -319,7 +319,7 @@ void AsyncDNSResolverSockets::NotifyChipThread(DNSResolver * resolver)
 void * AsyncDNSResolverSockets::AsyncDNSThreadRun(void * args)
 {
 
-    INET_ERROR err                          = INET_NO_ERROR;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
     AsyncDNSResolverSockets * asyncResolver = static_cast<AsyncDNSResolverSockets *>(args);
 
     while (true)
@@ -332,7 +332,7 @@ void * AsyncDNSResolverSockets::AsyncDNSThreadRun(void * args)
 
         // If shutdown has been called, DeQueue would return with an empty request.
         // In that case, break out of the loop and exit thread.
-        VerifyOrExit(err == INET_NO_ERROR && request != nullptr, );
+        VerifyOrExit(err == CHIP_NO_ERROR && request != nullptr, );
 
         if (request->mState != DNSResolver::kState_Canceled)
         {

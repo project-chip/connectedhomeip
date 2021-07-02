@@ -26,6 +26,7 @@
 #include <inet/InetLayer.h>
 #include <lib/support/ChipMemString.h>
 #include <lib/support/Span.h>
+#include <support/CHIPMemString.h>
 
 namespace chip {
 namespace Mdns {
