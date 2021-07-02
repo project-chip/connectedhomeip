@@ -45,7 +45,8 @@ namespace {
 chip::Protocols::Echo::EchoServer gEchoServer;
 chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer gUDCServer =
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance();
-chip::TransportMgr<chip::Transport::UDP> gUDPManager;
+chip::TransportMgr<chip::Transport::UDP> gUDPManager; // for Echo Traffic
+chip::TransportMgr<chip::Transport::UDP> gUDCManager; // for User Directed Commissioning
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 
@@ -146,6 +147,14 @@ int main(int argc, char * argv[])
     if (!disableUDC)
     {
         err = gUDCServer.Init(&gExchangeManager);
+
+        gUDCManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
+                             .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                             .SetListenPort(CHIP_PORT + 3));
+
+        gUDCManager.SetSecureSessionMgr(
+            &chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance());
+
         SuccessOrExit(err);
     }
 

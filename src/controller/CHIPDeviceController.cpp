@@ -840,7 +840,27 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     ReturnErrorOnFailure(mIDAllocator.ReserveUpTo(nextKeyID));
     mPairingDelegate = params.pairingDelegate;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
+    // TODO: fix listen port
+    ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mInetLayer)
+                                                    .SetAddressType(Inet::kIPAddressType_IPv6)
+                                                    .SetListenPort((uint16_t)(mListenPort + 1))
+#if INET_CONFIG_ENABLE_IPV4
+                                                    ,
+                                                Transport::UdpListenParameters(mInetLayer)
+                                                    .SetAddressType(Inet::kIPAddressType_IPv4)
+                                                    .SetListenPort((uint16_t)(mListenPort + 1))
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                                    ,
+                                                Transport::BleListenParameters(mBleLayer)
+#endif
+                                                    ));
+
+    mUdcTransportMgr->SetSecureSessionMgr(
+        &chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance());
+
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().SetInstanceNameResolver(this);
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().SetUserConfirmationProvider(this);
 #endif
@@ -856,6 +876,14 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     mPairingSession.Clear();
 
     PersistDeviceList();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    if (mUdcTransportMgr != nullptr)
+    {
+        chip::Platform::Delete(mUdcTransportMgr);
+        mUdcTransportMgr = nullptr;
+    }
+#endif
 
     DeviceController::Shutdown();
     return CHIP_NO_ERROR;

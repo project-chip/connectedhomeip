@@ -573,10 +573,6 @@ void InitServer(AppDelegate * delegate)
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-    err = chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().Init(&gExchangeMgr);
-    SuccessOrExit(err);
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     err = InitCommissioner();
     SuccessOrExit(err);
@@ -599,25 +595,14 @@ exit:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 // NOTE: UDC client is located in Server.cpp because it really only makes sense
-// to send UDC from a Matter device because its payload needs to include the device's
+// to send UDC from a Matter device. The UDC message payload needs to include the device's
 // randomly generated service name.
 
 CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port)
 {
-    ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest");
+    ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
 
     CHIP_ERROR err;
-    chip::Optional<chip::Transport::PeerAddress> peerAddr;
-    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
-    VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    peerAddr = chip::Optional<chip::Transport::PeerAddress>::Value(
-        chip::Transport::PeerAddress::UDP(commissioner, port, INET_NULL_INTERFACEID));
-
-    // TODO: remove this
-    err = gSessions.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
-                               chip::SecureSession::SessionRole::kInitiator, gAdminId);
-
     char nameBuffer[chip::Mdns::kMaxInstanceNameSize + 1];
     err = app::Mdns::GetCommissionInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
@@ -627,23 +612,17 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
     }
     ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
 
-    err = gUDCClient.Init(&gExchangeMgr, { chip::kTestDeviceNodeId, 0, gAdminId });
-
-    SuccessOrExit(err);
-
     // send UDC message 5 times per spec (no ACK on this message)
     for (unsigned int i = 0; i < 5; i++)
     {
         chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
-
         if (payloadBuf.IsNull())
         {
             ChipLogError(AppServer, "Unable to allocate packet buffer\n");
             return CHIP_ERROR_NO_MEMORY;
         }
 
-        err = gUDCClient.SendUDCRequest(std::move(payloadBuf));
-
+        err = gUDCClient.SendUDCMessage(&gTransports, std::move(payloadBuf), commissioner, port);
         if (err == CHIP_NO_ERROR)
         {
             ChipLogDetail(AppServer, "Send UDC request success");
@@ -655,17 +634,9 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
 
         sleep(1);
     }
-
-exit:
-    gUDCClient.Shutdown();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "UDC Send failed: %s\n", chip::ErrorStr(err));
-    }
-
     return err;
 }
+
 #endif
 
 CHIP_ERROR AddTestPairing()

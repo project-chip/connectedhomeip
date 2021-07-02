@@ -29,81 +29,42 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-CHIP_ERROR UserDirectedCommissioningClient::Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session)
+CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload,
+                                                           chip::Inet::IPAddress commissioner, uint16_t port)
 {
-    // Error if already initialized.
-    if (mExchangeMgr != nullptr)
-        return CHIP_ERROR_INCORRECT_STATE;
+    CHIP_ERROR err;
 
-    mExchangeMgr   = exchangeMgr;
-    mSecureSession = session;
-    mExchangeCtx   = nullptr;
+    PayloadHeader payloadHeader;
+    PacketHeader packetHeader;
 
-    return CHIP_NO_ERROR;
-}
+    payloadHeader.SetMessageType(Protocols::UserDirectedCommissioning::Id, (uint8_t) MsgType::IdentificationDeclaration)
+        .SetInitiator(true);
+    payloadHeader.SetNeedsAck(false);
 
-void UserDirectedCommissioningClient::Shutdown()
-{
-    if (mExchangeCtx != nullptr)
-    {
-        mExchangeCtx->Abort();
-        mExchangeCtx = nullptr;
-    }
+    VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!payload->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(payload->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
 
-    mExchangeMgr = nullptr;
-}
+    ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(payload));
 
-CHIP_ERROR UserDirectedCommissioningClient::SendUDCRequest(System::PacketBufferHandle && payload,
-                                                           const Messaging::SendFlags & sendFlags)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    packetHeader.SetEncryptionType(Header::EncryptionType::kEncryptionTypeNone);
 
-    // Discard any existing exchange context. Effectively we can only have one Echo exchange with
-    // a single node at any one time.
-    if (mExchangeCtx != nullptr)
-    {
-        mExchangeCtx->Abort();
-        mExchangeCtx = nullptr;
-    }
+    uint16_t totalLen = payload->TotalLength();
+    uint16_t taglen   = 0;
+    ChipLogDetail(Inet, "SendUDCMessage totalLen=%d taglen=%d", totalLen, taglen);
 
-    payload->DebugDump("UserDirectedCommissioningClient::SendUDCRequest");
+    payload->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession, this);
-    if (mExchangeCtx == nullptr)
-    {
-        ChipLogError(Inet, "UserDirectedCommissioningClient::SendUDCRequest no exchange");
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(payload));
 
-    // Send an Echo Request message.  Discard the exchange context if the send fails.
-    err = mExchangeCtx->SendMessage(MsgType::IdentificationDeclaration, std::move(payload), sendFlags);
+    chip::Transport::PeerAddress peerAddress;
+    peerAddress = chip::Transport::PeerAddress::UDP(commissioner, port, INET_NULL_INTERFACEID);
 
-    if (err != CHIP_NO_ERROR)
-    {
-        mExchangeCtx->Abort();
-        mExchangeCtx = nullptr;
-        return err;
-    }
+    ChipLogProgress(Inet, "Sending secure msg on generic transport");
+    err = transportMgr->SendMessage(peerAddress, std::move(payload));
 
+    ChipLogProgress(Inet, "Secure msg send status %s", ErrorStr(err));
     return err;
-}
-
-CHIP_ERROR UserDirectedCommissioningClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                              const PayloadHeader & payloadHeader,
-                                                              System::PacketBufferHandle && payload)
-{
-    // There is no response to UDC at this time
-    ChipLogProgress(Echo, "Unexpected UDC response from Exchange: %p", ec);
-    ec->Close();
-    mExchangeCtx->Abort();
-    mExchangeCtx = nullptr;
-    return CHIP_NO_ERROR;
-}
-
-void UserDirectedCommissioningClient::OnResponseTimeout(Messaging::ExchangeContext * ec)
-{
-    ChipLogProgress(Echo, "Time out! No UDC response from Exchange: %p", ec);
 }
 
 } // namespace UserDirectedCommissioning

@@ -139,7 +139,7 @@ CHIP_ERROR SendUDCRequest(const char * name)
 
     printf("\nSend UDC request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gUDCClient.SendUDCRequest(std::move(payloadBuf));
+    err = gUDCClient.SendUDCMessage(&gSessionManager, std::move(payloadBuf), gDestAddr, CHIP_PORT + 3);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -321,12 +321,7 @@ int main(int argc, char * argv[])
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
     if (gUseUDC)
     {
-        err = gUDCClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
-        SuccessOrExit(err);
-
         RunPinging();
-
-        gUDCClient.Shutdown();
     }
     else
     {

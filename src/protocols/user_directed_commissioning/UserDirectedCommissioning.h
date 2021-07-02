@@ -35,6 +35,7 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
+#include <transport/TransportMgr.h>
 
 namespace chip {
 namespace Protocols {
@@ -83,87 +84,34 @@ public:
     virtual ~UserConfirmationProvider() {}
 };
 
-class DLL_EXPORT UserDirectedCommissioningClient : public Messaging::ExchangeDelegate
+class DLL_EXPORT UserDirectedCommissioningClient
 {
 public:
-    // TODO: Init function will take a Channel instead a SecureSessionHandle, when Channel API is ready
-    /**
-     *  Initialize the UserDirectedCommissioningClient object. Within the lifetime
-     *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
-     *  instance.
-     *
-     *  @param[in]    exchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    sessoin        A handle to the session.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          kState_NotInitialized.
-     *  @retval #CHIP_NO_ERROR On success.
-     *
-     */
-    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session);
-
-    /**
-     *  Shutdown the UserDirectedCommissioningClient. This terminates this instance
-     *  of the object and releases all held resources.
-     *
-     */
-    void Shutdown();
-
     /**
      * Send a User Directed Commissioning message to a CHIP node.
      *
+     * @param transportMgr  A transport to use for sending the message.
      * @param payload       A PacketBufferHandle with the payload.
-     * @param sendFlags     Flags set by the application for the CHIP message being sent.
+     * @param commissioner  Address of destination.
+     * @param port          Port of destination.
      *
-     * @return CHIP_ERROR_NO_MEMORY if no ExchangeContext is available.
+     * @return CHIP_ERROR_NO_MEMORY if allocation fails.
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
-    CHIP_ERROR
-    SendUDCRequest(System::PacketBufferHandle && payload,
-                   const Messaging::SendFlags & sendFlags = Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 
-private:
-    Messaging::ExchangeManager * mExchangeMgr = nullptr;
-    Messaging::ExchangeContext * mExchangeCtx = nullptr;
-    SecureSessionHandle mSecureSession;
-
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    CHIP_ERROR SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload,
+                              chip::Inet::IPAddress commissioner, uint16_t port);
 };
 
-class DLL_EXPORT UserDirectedCommissioningServer : public Messaging::ExchangeDelegate
+class DLL_EXPORT UserDirectedCommissioningServer : public TransportMgrDelegate
 {
 public:
-    /**
-     *  Initialize the UserDirectedCommissioningServer object. Within the lifetime
-     *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
-     *  instance.
-     *
-     *  @param[in]    exchangeMgr    A pointer to the ExchangeManager object.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          kState_NotInitialized.
-     *  @retval #CHIP_NO_ERROR On success.
-     *
-     */
-    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr);
-
     static UserDirectedCommissioningServer & GetInstance()
     {
         static UserDirectedCommissioningServer instance;
         return instance;
     }
-
-    /**
-     *  Shutdown the EchoServer. This terminates this instance
-     *  of the object and releases all held resources.
-     *
-     */
-    void Shutdown();
 
     /**
      * Set the listener to be called when a UDC request is received
@@ -224,13 +172,10 @@ public:
     void OnCommissionableNodeFound(const Mdns::DiscoveredNodeData & nodeData);
 
 private:
-    Messaging::ExchangeManager * mExchangeMgr            = nullptr;
     InstanceNameResolver * mInstanceNameResolver         = nullptr;
     UserConfirmationProvider * mUserConfirmationProvider = nullptr;
 
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
     UDCClients<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mUdcClients; // < Active UDC clients
 };

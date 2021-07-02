@@ -575,6 +575,9 @@ private:
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
+    // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
+    DeviceTransportMgr * mUdcTransportMgr = nullptr;
+
     void PersistDeviceList();
 
     void FreeRendezvousSession();

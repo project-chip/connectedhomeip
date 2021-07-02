@@ -29,38 +29,28 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-CHIP_ERROR UserDirectedCommissioningServer::Init(Messaging::ExchangeManager * exchangeMgr)
+void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf)
 {
-    ChipLogDetail(AppServer, "UserDirectedCommissioningServer::Init");
-    // Error if already initialized.
-    if (mExchangeMgr != nullptr)
-        return CHIP_ERROR_INCORRECT_STATE;
+    msgBuf->DebugDump("NEW UserDirectedCommissioningServer::OnMessageReceive");
+    ChipLogProgress(AppServer, "NEW UserDirectedCommissioningServer::OnMessageReceived");
 
-    mExchangeMgr              = exchangeMgr;
-    mInstanceNameResolver     = nullptr;
-    mUserConfirmationProvider = nullptr;
+    PacketHeader packetHeader;
 
-    // Register to receive unsolicited Echo Request messages from the exchange manager.
-    mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MsgType::IdentificationDeclaration, this);
+    ReturnOnFailure(packetHeader.DecodeAndConsume(msgBuf));
 
-    ChipLogDetail(AppServer, "UserDirectedCommissioningServer::Init done");
-    return CHIP_NO_ERROR;
-}
-
-void UserDirectedCommissioningServer::Shutdown()
-{
-    if (mExchangeMgr != nullptr)
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
     {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(MsgType::IdentificationDeclaration);
-        mExchangeMgr = nullptr;
+        ChipLogError(AppServer, "UDC encryption flag set - ignoring");
+        return;
     }
-}
 
-CHIP_ERROR UserDirectedCommissioningServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                              const PayloadHeader & payloadHeader,
-                                                              System::PacketBufferHandle && payload)
-{
-    payload->DebugDump("UserDirectedCommissioningServer::OnMessageReceive");
+    // TODO: do we need these std::move calls?
+    System::PacketBufferHandle && msg = std::move(msgBuf);
+
+    PayloadHeader payloadHeader;
+    ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
+
+    System::PacketBufferHandle && payload = std::move(msg);
 
     char instanceName[chip::Mdns::kMaxInstanceNameSize + 1];
     int instanceNameLength =
@@ -69,24 +59,24 @@ CHIP_ERROR UserDirectedCommissioningServer::OnMessageReceived(Messaging::Exchang
 
     instanceName[instanceNameLength] = '\0';
 
-    // printf("UserDirectedCommissioningServer::OnMessageReceived instance=%s\n", instanceName);
+    ChipLogProgress(AppServer, "UDC instance=%s", instanceName);
 
     UDCClientState * client = mUdcClients.FindUDCClientState(instanceName, nullptr);
     if (client == nullptr)
     {
-        ChipLogProgress(AppServer, "UserDirectedCommissioningServer::OnMessageReceived new instance state received");
+        ChipLogProgress(AppServer, "UDC new instance state received");
 
         CHIP_ERROR err;
         err = mUdcClients.CreateNewUDCClientState(instanceName, &client);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived error creating new connection state");
-            return err;
+            ChipLogError(AppServer, "UDC error creating new connection state");
+            return;
         }
         if (client == nullptr)
         {
-            ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived no memory");
-            return CHIP_ERROR_NO_MEMORY;
+            ChipLogError(AppServer, "UDC no memory");
+            return;
         }
 
         // Call the registered InstanceNameResolver, if any.
@@ -101,10 +91,6 @@ CHIP_ERROR UserDirectedCommissioningServer::OnMessageReceived(Messaging::Exchang
     }
 
     mUdcClients.MarkUDCClientActive(client);
-
-    // Discard the exchange context.
-    ec->Close();
-    return CHIP_NO_ERROR;
 }
 
 void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanceName, UDCClientProcessingState state)

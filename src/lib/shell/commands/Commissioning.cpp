@@ -44,8 +44,7 @@ static CHIP_ERROR SendUDC(bool printHeader, chip::Inet::IPAddress commissioner)
         streamer_printf(sout, "SendUDC:        ");
     }
 
-    // SendUserDirectedCommissioningRequest(commissioner, CHIP_PORT + 2);
-    SendUserDirectedCommissioningRequest(commissioner, CHIP_PORT);
+    SendUserDirectedCommissioningRequest(commissioner, CHIP_PORT + 3);
 
     streamer_printf(sout, "done\r\n");
 
