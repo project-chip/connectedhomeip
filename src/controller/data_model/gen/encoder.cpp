@@ -2485,8 +2485,8 @@ PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seq
 
 PacketBufferHandle encodeElectricalMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("DiscoverElectricalMeasurementAttributes", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_HEADER("DiscoverElectricalMeasurementAttributes", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -2495,8 +2495,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterDiscoverAttributes(uint8_t 
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadMeasurementTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementMeasurementType", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_HEADER("ReadElectricalMeasurementMeasurementType", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::MeasurementType);
     COMMAND_FOOTER();
 }
 
@@ -2505,8 +2508,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadMeasurementTypeAttribut
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadTotalActivePowerAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementTotalActivePower", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0304);
+    COMMAND_HEADER("ReadElectricalMeasurementTotalActivePower", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::TotalActivePower);
     COMMAND_FOOTER();
 }
 
@@ -2515,8 +2521,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadTotalActivePowerAttribu
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltage", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0505);
+    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltage", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsVoltage);
     COMMAND_FOOTER();
 }
 
@@ -2525,8 +2534,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageAttribute(uin
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltageMin", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0506);
+    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltageMin", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsVoltageMin);
     COMMAND_FOOTER();
 }
 
@@ -2535,8 +2547,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMinAttribute(
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltageMax", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0507);
+    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltageMax", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsVoltageMax);
     COMMAND_FOOTER();
 }
 
@@ -2545,8 +2560,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMaxAttribute(
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrent", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0508);
+    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrent", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsCurrent);
     COMMAND_FOOTER();
 }
 
@@ -2555,8 +2573,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentAttribute(uin
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrentMin", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0509);
+    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrentMin", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsCurrentMin);
     COMMAND_FOOTER();
 }
 
@@ -2565,8 +2586,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMinAttribute(
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrentMax", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x050A);
+    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrentMax", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsCurrentMax);
     COMMAND_FOOTER();
 }
 
@@ -2575,8 +2599,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMaxAttribute(
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementActivePower", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x050B);
+    COMMAND_HEADER("ReadElectricalMeasurementActivePower", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::ActivePower);
     COMMAND_FOOTER();
 }
 
@@ -2585,8 +2612,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerAttribute(ui
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementActivePowerMin", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x050C);
+    COMMAND_HEADER("ReadElectricalMeasurementActivePowerMin", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::ActivePowerMin);
     COMMAND_FOOTER();
 }
 
@@ -2595,8 +2625,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerMinAttribute
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementActivePowerMax", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x050D);
+    COMMAND_HEADER("ReadElectricalMeasurementActivePowerMax", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::ActivePowerMax);
     COMMAND_FOOTER();
 }
 
@@ -2605,8 +2638,11 @@ PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerMaxAttribute
  */
 PacketBufferHandle encodeElectricalMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadElectricalMeasurementClusterRevision", ELECTRICAL_MEASUREMENT_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_HEADER("ReadElectricalMeasurementClusterRevision", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::ClusterRevision);
     COMMAND_FOOTER();
 }
 
