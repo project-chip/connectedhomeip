@@ -63,6 +63,12 @@ void RegisterOnboardingCodesCommands();
 void RegisterWiFiCommands();
 
 /**
+ * This function registers the commissioning commands.
+ *
+ */
+void RegisterCommissioningCommands();
+
+/**
  * This function registers the NFC commands.
  *
  */

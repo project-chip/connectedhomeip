@@ -33,6 +33,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/TCP.h>
@@ -56,6 +57,7 @@ constexpr chip::Transport::AdminId gAdminId = 0;
 
 // The EchoClient object.
 chip::Protocols::Echo::EchoClient gEchoClient;
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
 
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
@@ -74,7 +76,11 @@ uint64_t gEchoCount = 0;
 // Count of the number of EchoResponses received.
 uint64_t gEchoRespCount = 0;
 
+const char gInstanceName[] = "1234567890abcdef";
+
 bool gUseTCP = false;
+
+bool gUseUDC = false;
 
 bool EchoIntervalExpired(void)
 {
@@ -111,6 +117,38 @@ CHIP_ERROR SendEchoRequest(void)
     else
     {
         printf("Send echo request failed, err: %s\n", chip::ErrorStr(err));
+    }
+
+    return err;
+}
+
+CHIP_ERROR SendUDCRequest(const char * name)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    char instanceName[16];
+    snprintf(instanceName, sizeof instanceName, "%s", name);
+    chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(instanceName, strlen(instanceName));
+
+    if (payloadBuf.IsNull())
+    {
+        printf("Unable to allocate packet buffer\n");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
+
+    printf("\nSend UDC request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
+
+    err = gUDCClient.SendUDCMessage(&gUDPManager, std::move(payloadBuf), gDestAddr, CHIP_PORT + 3);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        gWaitingForEchoResp = true;
+        gEchoCount++;
+    }
+    else
+    {
+        printf("Send UDC request failed, err: %s\n", chip::ErrorStr(err));
     }
 
     return err;
@@ -162,6 +200,8 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
 
     printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
            static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
+
+    payload->DebugDump("HandleEchoResponseReceived");
 }
 
 void RunPinging()
@@ -171,7 +211,15 @@ void RunPinging()
     // Connection has been established. Now send the EchoRequests.
     for (unsigned int i = 0; i < kMaxEchoCount; i++)
     {
-        err = SendEchoRequest();
+        if (gUseUDC)
+        {
+            err = SendUDCRequest(gInstanceName);
+        }
+        else
+        {
+            err = SendEchoRequest();
+        }
+
         if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
@@ -217,6 +265,11 @@ int main(int argc, char * argv[])
     if ((argc == 3) && (strcmp(argv[2], "--tcp") == 0))
     {
         gUseTCP = true;
+    }
+
+    if ((argc == 3) && (strcmp(argv[2], "--send-udc") == 0))
+    {
+        gUseUDC = true;
     }
 
     if (!chip::Inet::IPAddress::FromString(argv[1], gDestAddr))
@@ -266,15 +319,22 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
-    SuccessOrExit(err);
+    if (gUseUDC)
+    {
+        RunPinging();
+    }
+    else
+    {
+        err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
+        SuccessOrExit(err);
 
-    // Arrange to get a callback whenever an Echo Response is received.
-    gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
+        // Arrange to get a callback whenever an Echo Response is received.
+        gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    RunPinging();
+        RunPinging();
 
-    gEchoClient.Shutdown();
+        gEchoClient.Shutdown();
+    }
 
     ShutdownChip();
 

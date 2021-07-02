@@ -30,6 +30,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
+#include <mdns/ServiceNaming.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
@@ -43,6 +44,16 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include <controller/CHIPDeviceController.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <core/CHIPPersistentStorageDelegate.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <app/server/Mdns.h>
@@ -412,6 +423,21 @@ secure_channel::MessageCounterManager gMessageCounterManager;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
+constexpr chip::Transport::AdminId gAdminId = 0;
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
+ChipDeviceCommissioner mCommissioner;
+bool mCommissionerInited = false;
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 } // namespace
 
 CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
@@ -550,6 +576,11 @@ void InitServer(AppDelegate * delegate)
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    err = InitCommissioner();
+    SuccessOrExit(err);
+#endif
+
     err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable(),
                                                     &gSessionIDAllocator);
     SuccessOrExit(err);
@@ -564,6 +595,52 @@ exit:
         ChipLogProgress(AppServer, "Server Listening...");
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+// NOTE: UDC client is located in Server.cpp because it really only makes sense
+// to send UDC from a Matter device. The UDC message payload needs to include the device's
+// randomly generated service name.
+
+CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port)
+{
+    ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
+
+    CHIP_ERROR err;
+    char nameBuffer[chip::Mdns::kMaxInstanceNameSize + 1];
+    err = app::Mdns::GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to get mdns instance name error: %s", ErrorStr(err));
+        return err;
+    }
+    ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
+
+    // send UDC message 5 times per spec (no ACK on this message)
+    for (unsigned int i = 0; i < 5; i++)
+    {
+        chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+        if (payloadBuf.IsNull())
+        {
+            ChipLogError(AppServer, "Unable to allocate packet buffer\n");
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        err = gUDCClient.SendUDCMessage(&gTransports, std::move(payloadBuf), commissioner, port);
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogDetail(AppServer, "Send UDC request success");
+        }
+        else
+        {
+            ChipLogError(AppServer, "Send UDC request failed, err: %s\n", chip::ErrorStr(err));
+        }
+
+        sleep(1);
+    }
+    return err;
+}
+
+#endif
 
 CHIP_ERROR AddTestPairing()
 {
@@ -605,3 +682,83 @@ AdminPairingTable & GetGlobalAdminPairingTable()
 {
     return gAdminPairings;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+CHIP_ERROR InitCommissioner()
+{
+    if (mCommissionerInited)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    NodeId localId = chip::kAnyNodeId;
+
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+    chip::Controller::CommissionerInitParams params;
+
+    params.storageDelegate = &gServerStorage;
+    // params.mDeviceAddressUpdateDelegate   = this;
+    params.operationalCredentialsDelegate = &mOpCredsIssuer;
+
+    ReturnErrorOnFailure(mOpCredsIssuer.Initialize(gServerStorage));
+
+    // ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
+    ReturnErrorOnFailure(mCommissioner.Init(localId, params));
+    ReturnErrorOnFailure(mCommissioner.ServiceEvents());
+
+    mCommissionerInited = true;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoverCommissionableNodes()
+{
+    InitCommissioner();
+
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
+    mCommissioner.DiscoverCommissionableNodes(filter);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoverCommissionableNodes(char * instance)
+{
+    InitCommissioner();
+
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kInstanceName, instance);
+    mCommissioner.DiscoverCommissionableNodes(filter);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DisplayCommissionableNodes()
+{
+    InitCommissioner();
+
+    for (int i = 0; i < 10; i++)
+    {
+        const chip::Mdns::DiscoveredNodeData * next = mCommissioner.GetDiscoveredDevice(i);
+        if (next == nullptr)
+        {
+            ChipLogProgress(AppServer, "  Entry %d null", i);
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "  Entry %d instanceName=%s host=%s longDiscriminator=%d vendorId=%d productId=%d", i,
+                            next->instanceName, next->hostName, next->longDiscriminator, next->vendorId, next->productId);
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ResetUDCStates()
+{
+    InitCommissioner();
+
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().ResetUDCClientProcessingStates();
+
+    return CHIP_NO_ERROR;
+}
+#endif
