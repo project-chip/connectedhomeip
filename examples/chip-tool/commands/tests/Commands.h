@@ -11786,13 +11786,53 @@ private:
     }
 };
 
+class Test_TC_DM_3_1 : public TestCommand
+{
+public:
+    Test_TC_DM_3_1() : TestCommand("Test_TC_DM_3_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "Test_TC_DM_3_1: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "Test_TC_DM_3_1: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    //
+    // Tests methods
+    //
+};
+
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
         make_unique<TestCluster>(), make_unique<Test_3_1_1>(),  make_unique<Test_3_2_1>(),
-        make_unique<Test_3_2_2>(),  make_unique<Test_10_1_1>(),
+        make_unique<Test_3_2_2>(),  make_unique<Test_10_1_1>(), make_unique<Test_TC_DM_3_1>(),
     };
 
     commands.Register(clusterName, clusterCommands);
