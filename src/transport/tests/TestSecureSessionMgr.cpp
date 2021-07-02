@@ -47,6 +47,7 @@ namespace {
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
+using namespace chip::Test;
 
 using TestContext = chip::Test::IOContext;
 
@@ -57,38 +58,6 @@ constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 
 const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
-
-class LoopbackTransport : public Transport::Base
-{
-public:
-    /// Transports are required to have a constructor that takes exactly one argument
-    CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
-    {
-        HandleMessageReceived(address, std::move(msgBuf));
-        return CHIP_NO_ERROR;
-    }
-
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-};
-
-class OutgoingTransport : public Transport::Base
-{
-public:
-    /// Transports are required to have a constructor that takes exactly one argument
-    CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
-    {
-        System::PacketBufferHandle recvdMsg = msgBuf.CloneData();
-
-        HandleMessageReceived(address, std::move(recvdMsg));
-        return CHIP_NO_ERROR;
-    }
-
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-};
 
 class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
@@ -274,7 +243,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<OutgoingTransport> transportMgr;
+    TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
     secure_channel::MessageCounterManager gMessageCounterManager;
 
@@ -356,7 +325,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<OutgoingTransport> transportMgr;
+    TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
     secure_channel::MessageCounterManager gMessageCounterManager;
 
