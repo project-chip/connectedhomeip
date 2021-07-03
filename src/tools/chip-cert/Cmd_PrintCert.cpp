@@ -221,7 +221,7 @@ bool PrintCert(const char * fileName, X509 * cert)
     res = X509ToChipCert(cert, certBuf.get(), kMaxCHIPCertLength, certLen);
     VerifyTrueOrExit(res);
 
-    err = certSet.Init(1, 1024);
+    err = certSet.Init(1, kMaxCHIPCertDecodeBufLength);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "Failed to initialize certificate set: %s\n", chip::ErrorStr(err));

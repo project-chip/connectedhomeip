@@ -1014,7 +1014,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIte
 
     ChipCertificateSet certSet;
     // Certificate set can contain up to 3 certs (NOC, ICA cert, and Root CA cert)
-    ReturnErrorOnFailure(certSet.Init(3, kMaxDERCertLength));
+    ReturnErrorOnFailure(certSet.Init(3, kMaxCHIPCertDecodeBufLength));
 
     responderOpCertLen = chip::Encoding::LittleEndian::Read16(*msgIterator);
     *responderOpCert   = *msgIterator;
