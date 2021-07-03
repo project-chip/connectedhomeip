@@ -44,10 +44,12 @@ public:
 
 private:
     CHIP_ERROR GenerateKeys();
+    CHIP_ERROR StoreKeysInKeyChain(NSData * keypairData);
     CHIP_ERROR LoadKeysFromKeyChain();
+    CHIP_ERROR LoadDeprecatedKeysFromKeyChain();
     CHIP_ERROR DeleteKeys();
 
-    CHIP_ERROR ConvertToP256Keypair(SecKeyRef privateKey);
+    CHIP_ERROR ConvertToP256Keypair(NSData * keypairData);
 
     CHIP_ERROR SetIssuerID(CHIPPersistentStorageDelegateBridge * storage);
 
@@ -57,8 +59,10 @@ private:
     uint32_t mIssuerId = 1234;
 
     const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
-    const NSString * kCHIPCAKeyLabel = @"chip.nodeopcerts.CA:0";
-    const NSData * kCHIPCAKeyTag = [@"com.zigbee.chip.commissioner.ca.issuer.id" dataUsingEncoding:NSUTF8StringEncoding];
+    const NSString * kCHIPCADeprecatedKeyLabel = @"chip.nodeopcerts.CA:0";
+    const NSData * kCHIPCADeprecatedKeyTag = [@"com.zigbee.chip.commissioner.ca.issuer.id" dataUsingEncoding:NSUTF8StringEncoding];
+    const NSString * kCHIPCAKeyLabel = @"matter.nodeopcerts.CA:0";
+    const NSData * kCHIPCAKeyTag = [@"com.zigbee.matter.commissioner.ca.issuer.id" dataUsingEncoding:NSUTF8StringEncoding];
 
     id mKeyType = (id) kSecAttrKeyTypeECSECPrimeRandom;
     id mKeySize = @256;
