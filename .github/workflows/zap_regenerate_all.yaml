@@ -1,0 +1,70 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: ZAP
+
+on:
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    zap_templates_regeneration:
+        name: ZAP templates re-generation
+        timeout-minutes: 60
+
+        runs-on: ubuntu-18.04
+        if: github.actor != 'restyled-io[bot]'
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+            - name: Use Node.js 12.x
+              uses: actions/setup-node@v1
+              with:
+                node-version: '12.x'
+
+            - run: sudo apt-get update
+            - run: sudo apt-get install --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev
+            - name: Setup ZAP
+              timeout-minutes: 5
+              run: |
+                cd third_party/zap/repo/
+                npm ci
+                npm run version-stamp
+                npm rebuild canvas --update-binary
+                npm run build-spa
+            - name: Generate all
+              timeout-minutes: 5
+              run: scripts/tools/zap_regen_all.py
+            - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
+              with:
+                # Determines the way the action fills missing author name and email. Three options are available:
+                # - github_actor -> UserName <UserName@users.noreply.github.com>
+                # - user_info -> Your Display Name <your-actual@email.com>
+                # - github_actions -> github-actions <email associated with the github logo>
+                # Default:
+                default_author: github_actor
+
+                # The message for the commit
+                # Default: 'Commit from GitHub Actions (name of the workflow)'
+                message: 'Commited regenerated ZAP code'
+
+                # The flag used on the pull strategy. Use NO-PULL to avoid the action pulling at all.
+                # Default: '--no-rebase'
+                pull_strategy: 'NO-PULL or --no-rebase or --no-ff or --rebase'
