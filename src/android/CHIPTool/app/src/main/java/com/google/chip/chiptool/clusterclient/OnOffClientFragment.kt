@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.on_off_client_fragment.levelBar
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.levelBar
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.offBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.onBtn
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.readBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.toggleBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.updateAddressBtn
 
@@ -63,7 +64,21 @@ class OnOffClientFragment : Fragment() {
           sendLevelCommandClick()
         }
       })
+      readBtn.setOnClickListener { sendReadOnOffClick() }
     }
+  }
+
+  private fun sendReadOnOffClick() {
+    getOnOffClusterForDevice().readOnOffAttribute(object : ChipClusters.BooleanAttributeCallback {
+      override fun onSuccess(on: Boolean) {
+        Log.v(TAG, "On/Off attribute value: $on")
+        showMessage("On/Off attribute value: $on")
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "Error reading onOff attribute", ex)
+      }
+    })
   }
 
   override fun onStart() {

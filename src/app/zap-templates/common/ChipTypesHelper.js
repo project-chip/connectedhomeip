@@ -44,6 +44,32 @@ function asBasicType(type)
   }
 }
 
+function asCallbackAttributeBasicType(type)
+{
+  switch (type) {
+  case 'Boolean':
+    return 'bool';
+  case 'Int8u':
+    return 'uint8_t';
+  case 'Int16u':
+    return 'uint16_t';
+  case 'Int32u':
+    return 'uint32_t';
+  case 'Int64u':
+    return 'uint64_t';
+  case 'Int8s':
+    return 'int8_t';
+  case 'Int16s':
+    return 'int16_t';
+  case 'Int32s':
+    return 'int32_t';
+  case 'Int64s':
+    return 'int64_t';
+  default:
+    return type;
+  }
+}
+
 const signedTypes = [ 'INT8S', 'INT16S', 'INT32S', 'INT64S' ];
 function isSigned(type)
 {
@@ -53,5 +79,6 @@ function isSigned(type)
 //
 // Module exports
 //
-exports.asBasicType = asBasicType;
-exports.isSigned    = isSigned;
+exports.asBasicType                  = asBasicType;
+exports.asCallbackAttributeBasicType = asCallbackAttributeBasicType;
+exports.isSigned                     = isSigned;
