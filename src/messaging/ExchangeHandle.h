@@ -30,6 +30,7 @@ class ExchangeHandle
 {
 public:
     explicit ExchangeHandle() : mContext(nullptr) {}
+    explicit ExchangeHandle(ExchangeContext * context);
     ~ExchangeHandle();
 
     ExchangeHandle(const ExchangeHandle & that);
@@ -40,6 +41,7 @@ public:
     {
         if (this == &that)
             return *this;
+        Release();
         mContext      = that.mContext;
         that.mContext = nullptr;
         return *this;
@@ -53,9 +55,6 @@ public:
     bool operator!=(const ExchangeHandle & that) const { return !(*this == that); }
 
 private:
-    friend class ExchangeContext;
-    friend class ExchangeManager;
-    explicit ExchangeHandle(ExchangeContext * context);
     ExchangeContext * mContext;
 };
 
