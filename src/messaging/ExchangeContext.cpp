@@ -39,6 +39,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
+#include <support/Defer.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
 
@@ -82,7 +83,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // If we were waiting for a message send, this is it.
     mFlags.Clear(Flags::kFlagWillSendMessage);
 
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
@@ -93,7 +93,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // we hold the exchange context here in case the entity that
     // originally generated it tries to close it as a result of
     // an error arising below. at the end, we have to close it.
-    Retain();
+    ExchangeHandle ref(*this);
 
     bool reliableTransmissionRequested = true;
 
@@ -112,36 +112,37 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     if (sendFlags.Has(SendMessageFlags::kExpectResponse))
     {
         // Only one 'response expected' message can be outstanding at a time.
-        VerifyOrExit(!IsResponseExpected(), err = CHIP_ERROR_INCORRECT_STATE);
+        if (IsResponseExpected())
+        {
+            // TODO: add a test for this case.
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
 
         SetResponseExpected(true);
 
         // Arm the response timer if a timeout has been specified.
         if (mResponseTimeout > 0)
         {
-            err = StartResponseTimer();
-            SuccessOrExit(err);
+            CHIP_ERROR err = StartResponseTimer();
+            if (err != CHIP_NO_ERROR)
+            {
+                SetResponseExpected(false);
+                return err;
+            }
         }
     }
 
-    err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
-                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
-
-exit:
-    if (err != CHIP_NO_ERROR && IsResponseExpected())
     {
-        CancelResponseTimer();
-        SetResponseExpected(false);
+        CHIP_ERROR err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
+                                                reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+        if (err != CHIP_NO_ERROR && IsResponseExpected())
+        {
+            CancelResponseTimer();
+            SetResponseExpected(false);
+        }
+
+        return err;
     }
-
-    // Release the reference to the exchange context acquired above. Under normal circumstances
-    // this will merely decrement the reference count, without actually freeing the exchange context.
-    // However if one of the function calls in this method resulted in a callback to the protocol,
-    // the protocol may have released its reference, resulting in the exchange context actually
-    // being freed here.
-    Release();
-
-    return err;
 }
 
 void ExchangeContext::DoClose(bool clearRetransTable)
@@ -382,7 +383,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // guard against Close() calls(decrementing the reference
     // count) by the protocol before the CHIP Exchange
     // layer has completed its work on the ExchangeContext.
-    Retain();
+    ExchangeHandle ref(*this);
 
     // Keep track of whether we're nested under an outer HandleMessage
     // invocation.
@@ -392,29 +393,59 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
     bool isDuplicate     = msgFlags.Has(MessageFlagValues::kDuplicateMessage);
 
-    CHIP_ERROR err = mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, msgFlags,
-                                                  GetReliableMessageContext());
-    SuccessOrExit(err);
+    auto deffered = MakeDefer([&]() {
+        // Also don't close if there's an outer HandleMessage invocation.  It'll deal with the closing.
+        if (alreadyHandlingMessage)
+            return;
+        mFlags.Clear(Flags::kFlagHandlingMessage);
+
+        // We are the outermost HandleMessage invocation.  We're not handling a message anymore.
+
+        // Don't close ourselves if we're already closed.
+        if (mFlags.Has(Flags::kFlagClosed))
+            return;
+
+        if (mFlags.Has(Flags::kFlagWillSendMessage))
+            return;
+
+        if (IsResponseExpected())
+            return;
+
+        // Don't close ourselves if this message is a standalone ack. We're still not closed and getting an ack should not affect
+        // that.  In particular, since the standalone ack was not passed to the delegate, the delegate never got a chance to say
+        // "stay open". The one exception here is if mDelegate is null: in that case this is an unsolicited message and we were just
+        // created to ack it and close after that.
+        if (isStandaloneAck && mDelegate != nullptr)
+            return;
+
+        // Don't close for duplicates for similar reasons, with the same exception.
+        if (isDuplicate && mDelegate != nullptr)
+            return;
+
+        Close();
+    });
+
+    ReturnErrorOnFailure(mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, msgFlags,
+                                                      GetReliableMessageContext()));
 
     if (IsAckPending() && !mDelegate)
     {
         // The incoming message wants an ack, but we have no delegate, so
         // there's not going to be a response to piggyback on.  Just flush the
         // ack out right now.
-        err = FlushAcks();
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(FlushAcks());
     }
 
     // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
     if (isStandaloneAck)
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
     // Since the message is duplicate, let's not forward it up the stack
     if (isDuplicate)
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
     // Since we got the response, cancel the response timer.
@@ -426,47 +457,14 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        err = mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+        return mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
     }
     else
     {
         DefaultOnMessageReceived(this, packetHeader, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(),
                                  std::move(msgBuf));
+        return CHIP_NO_ERROR;
     }
-
-exit:
-    // Don't close ourselves if we're already closed.
-    //
-    // Don't close ourselves if this message is a standalone ack. We're still
-    // not closed and getting an ack should not affect that.  In particular,
-    // since the standalone ack was not passed to the delegate, the delegate
-    // never got a chance to say "stay open". The one exception here is if
-    // mDelegate is null: in that case this is an unsolicited message and we
-    // were just created to ack it and close after that.
-    //
-    // Don't close for duplicates for similar reasons, with the same exception.
-    //
-    // Also don't close if there's an outer HandleMessage invocation.  It'll
-    // deal with the closing.
-    if (!mFlags.Has(Flags::kFlagClosed) && !mFlags.Has(Flags::kFlagWillSendMessage) && !IsResponseExpected() &&
-        (!isStandaloneAck || (mDelegate == nullptr)) && (!isDuplicate || (mDelegate == nullptr)) && !alreadyHandlingMessage)
-    {
-        Close();
-    }
-
-    if (!alreadyHandlingMessage)
-    {
-        // We are the outermost HandleMessage invocation.  We're not handling a
-        // message anymore.
-        mFlags.Clear(Flags::kFlagHandlingMessage);
-    }
-
-    // Release the reference to the ExchangeContext that was held at the beginning of this function.
-    // This call should also do the needful of closing the ExchangeContext if the protocol has
-    // already made a prior call to Close().
-    Release();
-
-    return err;
 }
 
 } // namespace Messaging

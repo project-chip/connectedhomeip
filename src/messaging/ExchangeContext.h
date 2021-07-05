@@ -32,6 +32,7 @@
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <support/TypeTraits.h>
+#include <support/ReferenceCountedHandle.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -42,6 +43,7 @@ namespace Messaging {
 class ExchangeManager;
 class ExchangeContext;
 class ExchangeMessageDispatch;
+using ExchangeHandle = ReferenceCountedHandle<ExchangeContext>;
 
 class ExchangeContextDeletor
 {
