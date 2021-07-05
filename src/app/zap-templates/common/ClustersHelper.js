@@ -26,6 +26,7 @@ const zclQuery      = require(zapPath + 'db/query-zcl.js')
 const { Deferred }    = require('./Deferred.js');
 const ListHelper      = require('./ListHelper.js');
 const StringHelper    = require('./StringHelper.js');
+const StructHelper    = require('./StructHelper.js');
 const ChipTypesHelper = require('./ChipTypesHelper.js');
 
 //
@@ -118,6 +119,14 @@ function loadAttributes(packageId)
   //.then(attributes => Promise.all(attributes.map(attribute => types.typeSizeAttribute(db, packageId, attribute))
 }
 
+function loadGlobalAttributes(packageId)
+{
+  const { db, sessionId } = this.global;
+  return zclQuery.selectAllAttributes(db, packageId)
+      .then(attributes => attributes.filter(attribute => attribute.clusterRef == null))
+      .then(attributes => attributes.map(attribute => attribute.code));
+}
+
 //
 // Load step 2
 //
@@ -163,6 +172,37 @@ function asPutCastType(zclType)
     return type;
   default:
     throw error = 'asPutCastType: Unhandled type: ' + zclType;
+  }
+}
+
+function asChipCallback(item)
+{
+  if (StringHelper.isString(item.type)) {
+    return { name : 'String', type : 'const chip::ByteSpan' };
+  }
+
+  if (ListHelper.isList(item.type)) {
+    return { name : 'List', type : null };
+  }
+
+  if (item.type == 'boolean') {
+    return { name : 'Boolean', type : 'bool' };
+  }
+
+  const basicType = ChipTypesHelper.asBasicType(item.chipType);
+  switch (basicType) {
+  case 'int8_t':
+  case 'int16_t':
+  case 'int32_t':
+  case 'int64_t':
+    return { name : 'Int' + basicType.replace(/[^0-9]/g, '') + 's', type : basicType };
+  case 'uint8_t':
+  case 'uint16_t':
+  case 'uint32_t':
+  case 'uint64_t':
+    return { name : 'Int' + basicType.replace(/[^0-9]/g, '') + 'u', type : basicType };
+  default:
+    return { name : 'Unsupported', type : null };
   }
 }
 
@@ -321,7 +361,8 @@ function enhancedCommands(commands, types)
   });
 
   commands.forEach(command => {
-    command.isResponse = command.name.includes('Response');
+    command.isResponse                    = command.name.includes('Response');
+    command.isManufacturerSpecificCommand = !!this.mfgCode;
   });
 
   commands.forEach(command => {
@@ -392,14 +433,25 @@ function enhancedCommands(commands, types)
   return commands;
 }
 
-function enhancedAttributes(attributes, types)
+function enhancedAttributes(attributes, globalAttributes, types)
 {
   attributes.forEach(attribute => {
     enhancedItem(attribute, types);
+    attribute.isGlobalAttribute     = globalAttributes.includes(attribute.code);
+    attribute.isWritableAttribute   = attribute.isWritable === 1;
+    attribute.isReportableAttribute = attribute.includedReportable === 1;
+    attribute.chipCallback          = asChipCallback(attribute);
   });
 
   attributes.forEach(attribute => {
-    const argument = { isList : attribute.isList, name : attribute.name, chipType : attribute.chipType, type : attribute.type };
+    const argument = {
+      name : attribute.name,
+      type : attribute.type,
+      size : attribute.size,
+      isList : attribute.isList,
+      chipType : attribute.chipType,
+      chipCallback : attribute.chipCallback
+    };
     attribute.arguments = [ argument ];
     attribute.response  = { arguments : [ argument ] };
   });
@@ -434,12 +486,13 @@ Clusters.init = function(context, packageId) {
     loadClusters.call(context),
     loadCommands.call(context, packageId),
     loadAttributes.call(context, packageId),
+    loadGlobalAttributes.call(context, packageId),
   ];
 
-  return Promise.all(promises).then(([types, clusters, commands, attributes]) => {
+  return Promise.all(promises).then(([types, clusters, commands, attributes, globalAttributes]) => {
     this._clusters = clusters;
     this._commands = enhancedCommands(commands, types);
-    this._attributes = enhancedAttributes(attributes, types);
+    this._attributes = enhancedAttributes(attributes, globalAttributes, types);
 
     return this.ready.resolve();
   });
@@ -461,78 +514,123 @@ function asPromise(promise)
   return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
 }
 
+//
+// Helpers: Get all clusters/commands/responses/attributes.
+//
+const kResponseFilter = (isResponse, item) => isResponse == item.isResponse;
+
 Clusters.getClusters = function()
 {
     return this.ready.then(() => this._clusters);
 }
 
-Clusters.getCommands = function(name, side)
+Clusters.getCommands = function()
 {
-    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.isResponse == false;
-    return this.ready.then(() => this._commands.filter(filter));
+    return this.ready.then(() => this._commands.filter(kResponseFilter.bind(null, false)));
 }
 
-Clusters.getResponses = function(name, side)
+Clusters.getResponses = function()
 {
-    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.isResponse == true;
-    return this.ready.then(() => this._commands.filter(filter));
+    return this.ready.then(() => this._commands.filter(kResponseFilter.bind(null, true)));
 }
 
-Clusters.getAttributes = function(name, side)
+Clusters.getAttributes = function()
+{
+    return this.ready.then(() => this._attributes);
+}
+
+//
+// Helpers: Get by Cluster Name
+//
+const kNameFilter = (name, item) => name.toLowerCase() == (item.clusterName || item.name).toLowerCase();
+
+Clusters.getCommandsByClusterName = function(name)
+{
+    return this.getCommands().then(items => items.filter(kNameFilter.bind(null, name)));
+}
+
+Clusters.getResponsesByClusterName = function(name)
+{
+    return this.getResponses().then(items => items.filter(kNameFilter.bind(null, name)));
+}
+
+Clusters.getAttributesByClusterName = function(name)
 {
     return this.ready.then(() => {
-      const code = this._clusters.find(cluster => cluster.name.toLowerCase() == name.toLowerCase()).id;
-      const filter = attribute => attribute.clusterId == code && attribute.side == side;
-      return this._attributes.filter(filter);
+      const clusterId = this._clusters.find(kNameFilter.bind(null, name)).id;
+      const filter = attribute => attribute.clusterId == clusterId;
+      return this.getAttributes().then(items => items.filter(filter));
     });
+}
+
+//
+// Helpers: Get by Cluster Side
+//
+const kSideFilter = (side, item) => side == (item.clusterSide || item.side);
+
+Clusters.getCommandsByClusterSide = function(side)
+{
+    return this.getCommands().then(items => items.filter(kSideFilter.bind(null, side)));
+}
+
+Clusters.getResponsesByClusterSide = function(side)
+{
+    return this.getResponses().then(items => items.filter(kSideFilter.bind(null, side)));
+}
+
+Clusters.getAttributesByClusterSide = function(side)
+{
+    return this.getAttributes().then(items => items.filter(kSideFilter.bind(null, side)));
 }
 
 //
 // Helpers: Client
 //
+const kClientSideFilter = kSideFilter.bind(null, 'client');
+
 Clusters.getClientClusters = function()
 {
-    const filter = cluster => cluster.side == 'client';
-    return this.ready.then(() => this._clusters.filter(filter));
+    return this.getClusters().then(items => items.filter(kClientSideFilter));
 }
 
 Clusters.getClientCommands = function(name)
 {
-    return this.getCommands(name, 'client');
+    return this.getCommandsByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
 Clusters.getClientResponses = function(name)
 {
-    return this.getResponses(name, 'client');
+    return this.getResponsesByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
 Clusters.getClientAttributes = function(name)
 {
-    return this.getAttributes(name, 'client');
+    return this.getAttributesByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
 //
 // Helpers: Server
 //
+const kServerSideFilter = kSideFilter.bind(null, 'server');
+
 Clusters.getServerClusters = function()
 {
-    const filter = cluster => cluster.side == 'server';
-    return this.ready.then(() => this._clusters.filter(filter));
+    return this.getClusters().then(items => items.filter(kServerSideFilter));
 }
 
 Clusters.getServerCommands = function(name)
 {
-    return this.getCommands(name, 'server');
+    return this.getCommandsByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
 Clusters.getServerResponses = function(name)
 {
-    return this.getResponses(name, 'server');
+    return this.getResponsesByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
 Clusters.getServerAttributes = function(name)
 {
-    return this.getAttributes(name, 'server');
+    return this.getAttributesByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
 //
