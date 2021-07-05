@@ -519,7 +519,8 @@ exit:
 
 void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state)
 {
-    ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired", ChipLogValueX64(state.GetPeerNodeId()));
+    ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired",
+                  ChipLogValueX64(state.GetPeerNodeId()));
 
     if (mCB != nullptr)
     {
