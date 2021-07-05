@@ -44,6 +44,7 @@ ExchangeHandle & ExchangeHandle::operator=(const ExchangeHandle & that)
 {
     if (this == &that)
         return *this;
+    Release();
     mContext = that.mContext;
     if (mContext != nullptr)
         mContext->Retain();
