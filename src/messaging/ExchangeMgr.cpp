@@ -199,7 +199,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                                         SecureSessionHandle session, const Transport::PeerAddress & source,
                                         DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
@@ -235,7 +234,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
     if (found)
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        return;
     }
 
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
@@ -266,7 +265,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // an ack to the peer.
     else if (!payloadHeader.NeedsAck())
     {
-        ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR));
+        return;
     }
 
     // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
@@ -290,7 +290,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
         }
 
-        VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        if (ec == nullptr)
+        {
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_MEMORY));
+            return;
+        }
 
         ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
 
@@ -299,12 +303,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         // Close exchange if it was created only to send ack for a duplicate message.
         if (sendAckAndCloseExchange)
             ec->Close();
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
     }
 }
 

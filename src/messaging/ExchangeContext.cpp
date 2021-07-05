@@ -36,6 +36,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPKeyIds.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHandle.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
@@ -90,7 +91,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // we hold the exchange context here in case the entity that
     // originally generated it tries to close it as a result of
     // an error arising below. at the end, we have to close it.
-    Retain();
+    ExchangeHandle ref(this);
 
     bool reliableTransmissionRequested = true;
 
@@ -109,7 +110,10 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     if (sendFlags.Has(SendMessageFlags::kExpectResponse))
     {
         // Only one 'response expected' message can be outstanding at a time.
-        VerifyOrExit(!IsResponseExpected(), err = CHIP_ERROR_INCORRECT_STATE);
+        if (IsResponseExpected())
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
 
         SetResponseExpected(true);
 
@@ -117,26 +121,22 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         if (mResponseTimeout > 0)
         {
             err = StartResponseTimer();
-            SuccessOrExit(err);
+            if (err != CHIP_NO_ERROR)
+            {
+                SetResponseExpected(false);
+                return err;
+            }
         }
     }
 
+    // It is required to set `err`, which is used in the deferred `handleError`
     err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
                                  reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
-
-exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
     {
         CancelResponseTimer();
         SetResponseExpected(false);
     }
-
-    // Release the reference to the exchange context acquired above. Under normal circumstances
-    // this will merely decrement the reference count, without actually freeing the exchange context.
-    // However if one of the function calls in this method resulted in a callback to the protocol,
-    // the protocol may have released its reference, resulting in the exchange context actually
-    // being freed here.
-    Release();
 
     return err;
 }
@@ -377,11 +377,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // guard against Close() calls(decrementing the reference
     // count) by the protocol before the CHIP Exchange
     // layer has completed its work on the ExchangeContext.
-    Retain();
+    ExchangeHandle ref(this);
 
-    CHIP_ERROR err = mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, msgFlags,
-                                                  GetReliableMessageContext());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, msgFlags,
+                                                      GetReliableMessageContext()));
 
     if (IsAckPending() && !mDelegate)
     {
@@ -395,13 +394,13 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
     // Since the message is duplicate, let's not forward it up the stack
     if (msgFlags.Has(MessageFlagValues::kDuplicateMessage))
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
 
     // Since we got the response, cancel the response timer.
@@ -413,21 +412,14 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        err = mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+        return mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
     }
     else
     {
         DefaultOnMessageReceived(this, packetHeader, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(),
                                  std::move(msgBuf));
+        return CHIP_NO_ERROR;
     }
-
-exit:
-    // Release the reference to the ExchangeContext that was held at the beginning of this function.
-    // This call should also do the needful of closing the ExchangeContext if the protocol has
-    // already made a prior call to Close().
-    Release();
-
-    return err;
 }
 
 } // namespace Messaging
