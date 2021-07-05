@@ -3137,6 +3137,74 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPMediaPlaybackClusterMediaSeekResponseCallback : public Callback::Callback<MediaPlaybackClusterMediaSeekResponseCallback>
+{
+public:
+    CHIPMediaPlaybackClusterMediaSeekResponseCallback(jobject javaCallback) :
+        Callback::Callback<MediaPlaybackClusterMediaSeekResponseCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+    ~CHIPMediaPlaybackClusterMediaSeekResponseCallback()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+        env->DeleteGlobalRef(javaCallbackRef);
+    };
+
+    static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
+    {
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+        jmethodID javaMethod;
+        CHIPMediaPlaybackClusterMediaSeekResponseCallback * cppCallback = nullptr;
+
+        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+        cppCallback = reinterpret_cast<CHIPMediaPlaybackClusterMediaSeekResponseCallback *>(context);
+        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+
+        javaCallbackRef = cppCallback->javaCallbackRef;
+        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
+
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        SuccessOrExit(err);
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
+
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error invoking Java callback: %d", err);
+        }
+        if (cppCallback != nullptr)
+        {
+            cppCallback->Cancel();
+            delete cppCallback;
+        }
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback
     : public Callback::Callback<MediaPlaybackClusterMediaSkipBackwardResponseCallback>
 {
@@ -3249,75 +3317,6 @@ public:
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
         cppCallback = reinterpret_cast<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback *>(context);
-        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
-
-        javaCallbackRef = cppCallback->javaCallbackRef;
-        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
-
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
-        SuccessOrExit(err);
-
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
-
-    exit:
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Error invoking Java callback: %d", err);
-        }
-        if (cppCallback != nullptr)
-        {
-            cppCallback->Cancel();
-            delete cppCallback;
-        }
-    }
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback
-    : public Callback::Callback<MediaPlaybackClusterMediaSkipSeekResponseCallback>
-{
-public:
-    CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback(jobject javaCallback) :
-        Callback::Callback<MediaPlaybackClusterMediaSkipSeekResponseCallback>(CallbackFn, this)
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        if (env == nullptr)
-        {
-            ChipLogError(Zcl, "Could not create global reference for Java callback");
-            return;
-        }
-
-        javaCallbackRef = env->NewGlobalRef(javaCallback);
-        if (javaCallbackRef == nullptr)
-        {
-            ChipLogError(Zcl, "Could not create global reference for Java callback");
-        }
-    }
-    ~CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback()
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        if (env == nullptr)
-        {
-            ChipLogError(Zcl, "Could not create global reference for Java callback");
-            return;
-        }
-        env->DeleteGlobalRef(javaCallbackRef);
-    };
-
-    static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
-    {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-        jobject javaCallbackRef;
-        jmethodID javaMethod;
-        CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback * cppCallback = nullptr;
-
-        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
-
-        cppCallback = reinterpret_cast<CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback *>(context);
         VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
         javaCallbackRef = cppCallback->javaCallbackRef;
@@ -9228,6 +9227,51 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
+JNI_METHOD(void, MediaPlaybackCluster, mediaSeek)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong position)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    MediaPlaybackCluster * cppCluster;
+
+    CHIPMediaPlaybackClusterMediaSeekResponseCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<MediaPlaybackCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPMediaPlaybackClusterMediaSeekResponseCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->MediaSeek(onSuccess->Cancel(), onFailure->Cancel(), position);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
 JNI_METHOD(void, MediaPlaybackCluster, mediaSkipBackward)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong deltaPositionMilliseconds)
 {
@@ -9293,52 +9337,6 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipForward)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->MediaSkipForward(onSuccess->Cancel(), onFailure->Cancel(), deltaPositionMilliseconds);
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        delete onSuccess;
-        delete onFailure;
-
-        jthrowable exception;
-        jmethodID method;
-
-        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
-            return;
-        }
-
-        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
-            return;
-        }
-        env->CallVoidMethod(callback, method, exception);
-    }
-}
-JNI_METHOD(void, MediaPlaybackCluster, mediaSkipSeek)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong position)
-{
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    MediaPlaybackCluster * cppCluster;
-
-    CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback * onSuccess;
-    CHIPDefaultFailureCallback * onFailure;
-
-    cppCluster = reinterpret_cast<MediaPlaybackCluster *>(clusterPtr);
-    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    onSuccess = new CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback(callback);
-    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    onFailure = new CHIPDefaultFailureCallback(callback);
-    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = cppCluster->MediaSkipSeek(onSuccess->Cancel(), onFailure->Cancel(), position);
     SuccessOrExit(err);
 
 exit:
