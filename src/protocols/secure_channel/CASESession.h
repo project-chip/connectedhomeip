@@ -34,13 +34,13 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/PairingState.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/PairingSession.h>
-#include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -135,7 +135,7 @@ public:
      *
      * @return NodeId The associated peer NodeId
      */
-    NodeId GetPeerNodeId() const { return mConnectionState.GetPeerNodeId(); }
+    NodeId GetPeerNodeId() const { return mPairingState.GetPeerNodeId(); }
 
     /**
      * @brief
@@ -143,7 +143,7 @@ public:
      *
      * @return uint16_t The associated peer key id
      */
-    uint16_t GetPeerKeyId() override { return mConnectionState.GetPeerKeyID(); }
+    uint16_t GetPeerKeyId() override { return mPairingState.GetPeerKeyID(); }
 
     /**
      * @brief
@@ -151,13 +151,13 @@ public:
      *
      * @return uint16_t The assocated local key id
      */
-    uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
+    uint16_t GetLocalKeyId() override { return mPairingState.GetLocalKeyID(); }
 
     const char * GetI2RSessionInfo() const override { return "Sigma I2R Key"; }
 
     const char * GetR2ISessionInfo() const override { return "Sigma R2I Key"; }
 
-    Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
+    PairingState & GetPairingState() { return mPairingState; }
 
     /**
      * @brief Serialize the Pairing Session to a string.
@@ -280,7 +280,7 @@ private:
 protected:
     bool mPairingComplete = false;
 
-    Transport::PeerConnectionState mConnectionState;
+    PairingState mPairingState;
 };
 
 typedef struct CASESessionSerialized
