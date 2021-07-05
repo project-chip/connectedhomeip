@@ -31,6 +31,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeString.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <app/common/gen/att-storage.h>
@@ -54,6 +55,15 @@ EmberAfClusterCommand imCompatibilityEmberAfCluster;
 EmberApsFrame imCompatibilityEmberApsFrame;
 EmberAfInterpanHeader imCompatibilityInterpanHeader;
 Command * currentCommandObject;
+
+template <typename T>
+T ReadNumericFromBuffer(const uint8_t * buf)
+{
+    T ret = 0;
+    // memcpy will take care of alignment of data, and this can be optimized to reinterpret_cast by compiler when possible.
+    memcpy(&ret, buf, sizeof(ret));
+    return ret;
+}
 
 // BasicType maps the type to basic int(8|16|32|64)(s|u) types.
 EmberAfAttributeType BaseType(EmberAfAttributeType type)
@@ -224,73 +234,68 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         break;
     case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
     {
-        uint16_t uint16_data;
-        memcpy(&uint16_data, data, sizeof(uint16_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint16_data));
+        ReturnErrorOnFailure(
+            apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), ReadNumericFromBuffer<uint16_t>(data)));
         break;
     }
     case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
     {
-        uint32_t uint32_data;
-        memcpy(&uint32_data, data, sizeof(uint32_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint32_data));
+        ReturnErrorOnFailure(
+            apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), ReadNumericFromBuffer<uint32_t>(data)));
         break;
     }
     case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
     {
-        uint64_t uint64_data;
-        memcpy(&uint64_data, data, sizeof(uint64_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), uint64_data));
+        ReturnErrorOnFailure(
+            apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), ReadNumericFromBuffer<uint64_t>(data)));
         break;
     }
     case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
     {
-        int8_t int8_data;
-        memcpy(&int8_data, data, sizeof(int8_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int8_data));
+        ReturnErrorOnFailure(
+            apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), ReadNumericFromBuffer<int8_t>(data)));
         break;
     }
     case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
     {
-        int16_t int16_data;
-        memcpy(&int16_data, data, sizeof(int16_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int16_data));
+        ReturnErrorOnFailure(
+            apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), ReadNumericFromBuffer<int16_t>(data)));
         break;
     }
     case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
     {
-        int32_t int32_data;
-        memcpy(&int32_data, data, sizeof(int32_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int32_data));
+        ReturnErrorOnFailure(
+            apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), ReadNumericFromBuffer<int32_t>(data)));
         break;
     }
     case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
     {
-        int64_t int64_data;
-        memcpy(&int64_data, data, sizeof(int64_data));
-        ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int64_data));
+        ReturnErrorOnFailure(
+            apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), ReadNumericFromBuffer<int64_t>(data)));
         break;
     }
-    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
+    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // String
     {
-        char * actualData  = reinterpret_cast<char *>(data + 1);
-        uint8_t dataLength = data[0];
+        uint8_t * actualData = data + 1;
+        uint8_t dataLength   = data[0];
         if (dataLength == 0xFF /* invalid data, put empty value instead */)
         {
             dataLength = 0;
         }
-        ReturnErrorOnFailure(apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), actualData, dataLength));
+        ReturnErrorOnFailure(
+            apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), Uint8::to_const_char(actualData), dataLength));
         break;
     }
-    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
-        char * actualData = reinterpret_cast<char *>(data + 2); // The pascal string contains 2 bytes length
-        uint16_t dataLength;
-        memcpy(&dataLength, data, sizeof(dataLength));
+    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: // String
+    {
+        uint8_t * actualData = data + 2;
+        uint16_t dataLength  = ReadNumericFromBuffer<uint16_t>(data);
         if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
         {
             dataLength = 0;
         }
-        ReturnErrorOnFailure(apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), actualData, dataLength));
+        ReturnErrorOnFailure(
+            apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), Uint8::to_const_char(actualData), dataLength));
         break;
     }
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
@@ -307,8 +312,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     }
     case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE: {
         uint8_t * actualData = data + 2; // The pascal string contains 2 bytes length
-        uint16_t dataLength;
-        memcpy(&dataLength, data, sizeof(dataLength));
+        uint16_t dataLength  = ReadNumericFromBuffer<uint16_t>(data);
         if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
         {
             dataLength = 0;
