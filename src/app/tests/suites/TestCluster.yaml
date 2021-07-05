@@ -562,7 +562,7 @@ tests:
       response:
           value: 0
 
-    # Tests for Octet String attribute
+    # Tests for Octet String and Char String attribute
 
     - label: "Read attribute OCTET_STRING Default Value"
       command: "readAttribute"
@@ -600,7 +600,43 @@ tests:
       arguments:
           value: ""
 
-    # Tests for Long Octet String attribute
+    - label: "Read attribute OCTET_STRING Default Value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: ""
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "TestValue"
+
+    - label: "Read attribute CHAR_STRING"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: "TestValue"
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "TestValueLongerThan10"
+
+    - label: "Read attribute CHAR_STRING"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: "TestValue"
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: ""
+
+    # Tests for Long Octet String and Long Char String attribute
 
     - label: "Read attribute LONG_OCTET_STRING Default Value"
       command: "readAttribute"
@@ -623,6 +659,30 @@ tests:
     - label: "Write attribute LONG_OCTET_STRING"
       command: "writeAttribute"
       attribute: "long_octet_string"
+      arguments:
+          value: ""
+
+    - label: "Read attribute LONG_CHAR_STRING Default Value"
+      command: "readAttribute"
+      attribute: "long_char_string"
+      response:
+          value: ""
+
+    - label: "Write attribute LONG_CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "long_char_string"
+      arguments:
+          value: "222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222"
+
+    - label: "Read attribute LONG_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "long_char_string"
+      response:
+          value: "222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222"
+
+    - label: "Write attribute LONG_CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "long_char_string"
       arguments:
           value: ""
 
