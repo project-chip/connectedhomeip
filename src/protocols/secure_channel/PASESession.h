@@ -39,7 +39,6 @@
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PairingSession.h>
-#include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -167,27 +166,9 @@ public:
      */
     CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override;
 
-    /**
-     * @brief
-     *  Return the associated peer key id
-     *
-     * @return uint16_t The associated peer key id
-     */
-    uint16_t GetPeerKeyId() override { return mConnectionState.GetPeerKeyID(); }
-
-    /**
-     * @brief
-     *  Return the associated local key id
-     *
-     * @return uint16_t The assocated local key id
-     */
-    uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
-
     const char * GetI2RSessionInfo() const override { return kSpake2pI2RSessionInfo; }
 
     const char * GetR2ISessionInfo() const override { return kSpake2pR2ISessionInfo; }
-
-    Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
     /** @brief Serialize the Pairing Session to a string.
      *
@@ -326,8 +307,6 @@ protected:
     size_t mKeLen = sizeof(mKe);
 
     bool mPairingComplete = false;
-
-    Transport::PeerConnectionState mConnectionState;
 };
 
 /*
@@ -347,9 +326,17 @@ constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
 class SecurePairingUsingTestSecret : public PairingSession
 {
 public:
-    SecurePairingUsingTestSecret() {}
+    SecurePairingUsingTestSecret()
+    {
+        SetLocalKeyId(0);
+        SetPeerKeyId(0);
+    }
 
-    SecurePairingUsingTestSecret(uint16_t peerKeyId, uint16_t localKeyId) : mPeerKeyID(peerKeyId), mLocalKeyID(localKeyId) {}
+    SecurePairingUsingTestSecret(uint16_t peerKeyId, uint16_t localKeyId)
+    {
+        SetLocalKeyId(localKeyId);
+        SetPeerKeyId(peerKeyId);
+    }
 
     CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override
     {
@@ -365,16 +352,12 @@ public:
         memset(&serializable, 0, sizeof(serializable));
         serializable.mKeLen           = static_cast<uint16_t>(secretLen);
         serializable.mPairingComplete = 1;
-        serializable.mLocalKeyId      = mLocalKeyID;
-        serializable.mPeerKeyId       = mPeerKeyID;
+        serializable.mLocalKeyId      = GetLocalKeyId();
+        serializable.mPeerKeyId       = GetPeerKeyId();
 
         memcpy(serializable.mKe, kTestSecret, secretLen);
         return CHIP_NO_ERROR;
     }
-
-    uint16_t GetPeerKeyId() override { return mPeerKeyID; }
-
-    uint16_t GetLocalKeyId() override { return mLocalKeyID; }
 
     const char * GetI2RSessionInfo() const override { return "i2r"; }
 
@@ -382,9 +365,6 @@ public:
 
 private:
     const char * kTestSecret = "Test secret for key derivation";
-
-    uint16_t mPeerKeyID  = 0;
-    uint16_t mLocalKeyID = 0;
 };
 
 typedef struct PASESessionSerialized

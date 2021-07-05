@@ -92,7 +92,7 @@ void CASESession::Clear()
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
     mCommissioningHash.Clear();
     mPairingComplete = false;
-    mConnectionState.Reset();
+    PairingSession::Clear();
 
     CloseExchange();
 }
@@ -148,7 +148,7 @@ CHIP_ERROR CASESession::Deserialize(CASESessionSerialized & input)
 
 CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
 {
-    const NodeId peerNodeId = mConnectionState.GetPeerNodeId();
+    const NodeId peerNodeId = GetPeerNodeId();
     VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mMessageDigest)), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mIPK)), CHIP_ERROR_INTERNAL);
@@ -160,8 +160,8 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mIPKLen           = static_cast<uint16_t>(sizeof(mIPK));
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
     serializable.mPeerNodeId       = peerNodeId;
-    serializable.mLocalKeyId       = mConnectionState.GetLocalKeyID();
-    serializable.mPeerKeyId        = mConnectionState.GetPeerKeyID();
+    serializable.mLocalKeyId       = GetLocalKeyId();
+    serializable.mPeerKeyId        = GetPeerKeyId();
 
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
     memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
@@ -183,9 +183,9 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     memcpy(mMessageDigest, serializable.mMessageDigest, serializable.mMessageDigestLen);
     memcpy(mIPK, serializable.mIPK, serializable.mIPKLen);
 
-    mConnectionState.SetPeerNodeId(serializable.mPeerNodeId);
-    mConnectionState.SetLocalKeyID(serializable.mLocalKeyId);
-    mConnectionState.SetPeerKeyID(serializable.mPeerKeyId);
+    SetPeerNodeId(serializable.mPeerNodeId);
+    SetLocalKeyId(serializable.mLocalKeyId);
+    SetPeerKeyId(serializable.mPeerKeyId);
 
     return CHIP_NO_ERROR;
 }
@@ -202,7 +202,7 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     mDelegate = delegate;
-    mConnectionState.SetLocalKeyID(myKeyId);
+    SetLocalKeyId(myKeyId);
     mOpCredSet = operationalCredentialSet;
 
     mValidContext.Reset();
@@ -247,8 +247,8 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     SuccessOrExit(err);
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout);
-    mConnectionState.SetPeerAddress(peerAddress);
-    mConnectionState.SetPeerNodeId(peerNodeId);
+    SetPeerAddress(peerAddress);
+    SetPeerNodeId(peerNodeId);
     mTrustedRootId = operationalCredentialSet->GetTrustedRootId(opCredSetIndex);
     VerifyOrExit(!mTrustedRootId.empty(), err = CHIP_ERROR_INTERNAL);
 
@@ -333,7 +333,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), initiatorRandom, sizeof(initiatorRandom)));
     // Retrieve Session Identifier
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mConnectionState.GetLocalKeyID(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
     // Generate a Destination Identifier
     {
         const ChipCertificateData * rootCertificate = mOpCredSet->GetRootCertificate(mTrustedRootId);
@@ -350,8 +350,8 @@ CHIP_ERROR CASESession::SendSigmaR1()
         // retrieve Fabric IPK
         MutableByteSpan ipkSpan(mIPK);
         ReturnErrorOnFailure(RetrieveIPK(fabricId, ipkSpan));
-        ReturnErrorOnFailure(GenerateDestinationID(ByteSpan(initiatorRandom), rootCertificate->mPublicKey,
-                                                   mConnectionState.GetPeerNodeId(), fabricId, ByteSpan(mIPK), destinationIdSpan));
+        ReturnErrorOnFailure(GenerateDestinationID(ByteSpan(initiatorRandom), rootCertificate->mPublicKey, GetPeerNodeId(),
+                                                   fabricId, ByteSpan(mIPK), destinationIdSpan));
     }
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(3), destinationIdentifier, sizeof(destinationIdentifier)));
 
@@ -410,7 +410,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle & msg)
     SuccessOrExit(err = tlvReader.Get(initiatorSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", initiatorSessionId);
-    mConnectionState.SetPeerKeyID(initiatorSessionId);
+    SetPeerKeyId(initiatorSessionId);
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
@@ -545,7 +545,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         tlvWriter.Init(std::move(msg_R2));
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), &msg_rand[0], sizeof(msg_rand)));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), mConnectionState.GetLocalKeyID(), true));
+        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyID(), true));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(3), mEphemeralKey.Pubkey(),
                                                static_cast<uint32_t>(mEphemeralKey.Pubkey().Length())));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),
@@ -636,7 +636,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", responderSessionId);
-    mConnectionState.SetPeerKeyID(responderSessionId);
+    SetPeerKeyId(responderSessionId);
 
     // Retrieve Responder's Ephemeral Pubkey
     SuccessOrExit(err = tlvReader.Next());
@@ -1140,7 +1140,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & respon
         // peer's operational identity from it.
         PeerId peerId;
         ReturnErrorOnFailure(ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], &peerId));
-        mConnectionState.SetPeerNodeId(peerId.GetNodeId());
+        SetPeerNodeId(peerId.GetNodeId());
     }
 
     // Release the previously loaded NOC Certificate
@@ -1275,7 +1275,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHead
     CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);
     SuccessOrExit(err);
 
-    mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
+    SetPeerAddress(mMessageDispatch.GetPeerAddress());
 
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
