@@ -70,6 +70,12 @@ using chip::ASN1::OID;
     "Copyright (c) 2021 Project CHIP Authors.\nCopyright (c) 2019 Google LLC.\nCopyright (c) 2013-2017 Nest Labs, Inc.\nAll "      \
     "rights reserved.\n"
 
+enum
+{
+    kCertValidDays_Undefined               = 0,
+    kCertValidDays_NoWellDefinedExpiration = UINT32_MAX
+};
+
 enum CertFormat
 {
     kCertFormat_Unknown = 0,
