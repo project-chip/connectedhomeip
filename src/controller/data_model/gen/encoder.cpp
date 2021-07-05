@@ -165,7 +165,7 @@ PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t
 | * ProductId                                                         | 0x0003 |
 | * ApplicationId                                                     | 0x0005 |
 | * CatalogVendorId                                                   | 0x0006 |
-| * ApplicationSatus                                                  | 0x0007 |
+| * ApplicationStatus                                                 | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -255,15 +255,15 @@ PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uin
 }
 
 /*
- * Attribute ApplicationSatus
+ * Attribute ApplicationStatus
  */
-PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeApplicationBasicClusterReadApplicationStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadApplicationBasicApplicationSatus", ApplicationBasic::Id);
+    COMMAND_HEADER("ReadApplicationBasicApplicationStatus", ApplicationBasic::Id);
     buf.Put8(kFrameControlGlobalCommand)
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ApplicationBasic::Attributes::Ids::ApplicationSatus);
+        .Put32(ApplicationBasic::Attributes::Ids::ApplicationStatus);
     COMMAND_FOOTER();
 }
 
@@ -3341,9 +3341,9 @@ PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttribute(uint8_t s
 | * MediaPlay                                                         |   0x00 |
 | * MediaPrevious                                                     |   0x04 |
 | * MediaRewind                                                       |   0x06 |
+| * MediaSeek                                                         |   0x0A |
 | * MediaSkipBackward                                                 |   0x09 |
 | * MediaSkipForward                                                  |   0x08 |
-| * MediaSkipSeek                                                     |   0x0A |
 | * MediaStartOver                                                    |   0x03 |
 | * MediaStop                                                         |   0x02 |
 |------------------------------------------------------------------------------|
