@@ -124,7 +124,7 @@ inline void Mutex::Unlock(void)
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_MBED_LOCKING
-inline Error Mutex::Init(Mutex & aMutex)
+inline CHIP_ERROR Mutex::Init(Mutex & aMutex)
 {
     // The mutex is initialized when constructed and generates
     // a runtime error in case of failure.
