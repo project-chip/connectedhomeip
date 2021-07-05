@@ -571,7 +571,7 @@ CHIP_ERROR P256KeypairHSM::NewCertificateSigningRequest(uint8_t * csr, size_t & 
     ChipLogDetail(Crypto, "NewCertificateSigningRequest: Using SE05X for creating CSR !");
 
     // No extensions are copied
-    buffer_index = buffer_index - 2;
+    buffer_index -= kTlvHeader;
     add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_CONTEXT_SPECIFIC), 0, NULL);
 
     // Copy public key (with header)
@@ -587,21 +587,22 @@ CHIP_ERROR P256KeypairHSM::NewCertificateSigningRequest(uint8_t * csr, size_t & 
         pubKeyLen = pubKeyLen + public_key.Length();
     }
 
-    buffer_index = buffer_index - pubKeyLen;
+    buffer_index -= pubKeyLen;
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
-    memcpy((void *) &data_to_hash[buffer_index], pubkey, pubKeyLen);
+    memcpy((void*)&data_to_hash[buffer_index], pubkey, pubKeyLen);
+
 
     // Copy subject (in the current implementation only organisation name info is added) and organisation OID
-    buffer_index = buffer_index - (kTlvHeader + sizeof(SUBJECT_STR)-1);
+    buffer_index -= (kTlvHeader + sizeof(SUBJECT_STR)-1);
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
     add_tlv(data_to_hash, buffer_index, ASN1_UTF8_STRING, sizeof(SUBJECT_STR)-1, (uint8_t*)SUBJECT_STR);
 
-    buffer_index = buffer_index - (kTlvHeader + sizeof(organisation_oid));
+    buffer_index -= (kTlvHeader + sizeof(organisation_oid));
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
     add_tlv(data_to_hash, buffer_index, ASN1_OID, sizeof(organisation_oid), organisation_oid);
 
     // Add length
-    buffer_index = buffer_index - kTlvHeader;
+    buffer_index -= kTlvHeader;
     // Subject TLV ==> 1 + 1 + len(subject)
     // Org OID TLV ==> 1 + 1 + len(organisation_oid)
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
@@ -609,24 +610,24 @@ CHIP_ERROR P256KeypairHSM::NewCertificateSigningRequest(uint8_t * csr, size_t & 
         ((2*kTlvHeader) + (sizeof(SUBJECT_STR)-1) + sizeof(organisation_oid)),
         NULL);
 
-    buffer_index = buffer_index - kTlvHeader;
+    buffer_index -= kTlvHeader;
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
     add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SET),
         ((3*kTlvHeader) + (sizeof(SUBJECT_STR)-1) + sizeof(organisation_oid)),
         NULL);
 
-    buffer_index = buffer_index - kTlvHeader;
+    buffer_index -= kTlvHeader;
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
     add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE),
         ((4*kTlvHeader) + (sizeof(SUBJECT_STR)-1) + sizeof(organisation_oid)),
         NULL);
 
 
-    buffer_index = buffer_index - 3;
+    buffer_index -= 3;
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
     memcpy((void*)&data_to_hash[buffer_index], version, sizeof(version));
 
-    buffer_index = buffer_index - kTlvHeader;
+    buffer_index -= kTlvHeader;
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
     add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE),
         (data_to_hash_len - buffer_index - kTlvHeader),
