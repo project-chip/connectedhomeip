@@ -460,7 +460,6 @@ void BasicAttributeFilter<StringAttributeCallback>(chip::TLV::TLVReader * data, 
     }
     else
     {
-        // Both of kTLVType_ByteString and kTLVType_UTF8String can use GetDataPtr for the actual data in the buffer.
         err = data->GetDataPtr(val);
         len = data->GetLength();
     }
