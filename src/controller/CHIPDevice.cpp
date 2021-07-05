@@ -128,8 +128,7 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
         Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
 
         // Check if the connection state has the correct transport information
-        if (connectionState == nullptr || connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined ||
-            connectionState->GetTransport() != nullptr)
+        if (connectionState == nullptr || connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
         {
             mState = ConnectionState::NotConnected;
             ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
@@ -565,7 +564,7 @@ void Device::OnSessionEstablished()
     mCASESession.PeerConnection().SetPeerNodeId(mDeviceId);
 
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
-                                                 SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
+                                                 SecureSession::SessionRole::kInitiator, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
