@@ -313,7 +313,7 @@ directory:
 ### Flashing on the nRF52840 Dongle
 
 Visit
-[Programming and Flashing nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
+[Programming and Debugging nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
 to read more about flashing on the nRF52840 Dongle.
 
 <hr>

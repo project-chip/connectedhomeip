@@ -225,7 +225,7 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             env->DeleteGlobalRef(javaCallbackRef);
         };
 
-        static void CallbackFn(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
+        static void CallbackFn(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
         {
             StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
             CHIP_ERROR err = CHIP_NO_ERROR;
@@ -271,7 +271,7 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
                 {{#zcl_command_arguments}}
                 {{#unless (isStrEqual label "status")}}
                 {{#if isArray}}
-                // {{asSymbol label}}: {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}}
+                // {{asSymbol label}}: {{asUnderlyingZclType type}}
                 // Conversion from this type to Java is not properly implemented yet
                 {{else if (isOctetString type)}}
                 , {{asSymbol label}}Arr
@@ -368,7 +368,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, {{asCamelCased name}})(J
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}chip::ByteSpan((const uint8_t*) {{asCamelCased label}}Arr.data(), {{asCamelCased label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asCamelCased label}}, strlen({{asCamelCased label}}Str.c_str())){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
+    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asCamelCased label}}Arr.data(), {{asCamelCased label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asCamelCased label}}, strlen({{asCamelCased label}}Str.c_str())){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
     SuccessOrExit(err);
 
 exit: 

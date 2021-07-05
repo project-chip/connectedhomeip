@@ -350,7 +350,7 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         const ValidationTestCase & testCase = sValidationTestCases[i];
 
         // Initialize the certificate set and load the specified test certificates.
-        certSet.Init(kMaxCertsPerTestCase, kMaxDERCertLength);
+        certSet.Init(kMaxCertsPerTestCase, kMaxCHIPCertDecodeBufLength);
         for (size_t i2 = 0; i2 < kMaxCertsPerTestCase; i2++)
         {
             if (testCase.InputCerts[i2].Type != TestCert::kNone)
@@ -408,7 +408,7 @@ static void TestChipCert_CertValidTime(nlTestSuite * inSuite, void * inContext)
     ChipCertificateSet certSet;
     ValidationContext validContext;
 
-    certSet.Init(kStandardCertsCount, kMaxDERCertLength);
+    certSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength);
 
     err = LoadTestCertSet01(certSet);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -568,7 +568,7 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
     // clang-format on
     size_t sNumUsageTestCases = sizeof(sUsageTestCases) / sizeof(sUsageTestCases[0]);
 
-    certSet.Init(kStandardCertsCount, kMaxDERCertLength);
+    certSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength);
 
     err = LoadTestCertSet01(certSet);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -624,7 +624,7 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
         uint8_t certType;
 
         // Initialize the certificate set and load the test certificate.
-        certSet.Init(1, kMaxDERCertLength);
+        certSet.Init(1, kMaxCHIPCertDecodeBufLength);
         err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -671,7 +671,7 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
         uint64_t chipId;
 
         // Initialize the certificate set and load the test certificate.
-        certSet.Init(1, kMaxDERCertLength);
+        certSet.Init(1, kMaxCHIPCertDecodeBufLength);
         err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -689,7 +689,7 @@ static void TestChipCert_LoadDuplicateCerts(nlTestSuite * inSuite, void * inCont
     ChipCertificateSet certSet;
     ValidationContext validContext;
 
-    certSet.Init(kStandardCertsCount, kMaxDERCertLength);
+    certSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength);
 
     // Let's load two distinct certificates, and make sure cert count is 2
     err = LoadTestCert(certSet, TestCert::kRoot01, sNullLoadFlag, sTrustAnchorFlag);
@@ -935,7 +935,7 @@ static void TestChipCert_VerifyGeneratedCerts(nlTestSuite * inSuite, void * inCo
                                               sizeof(noc_cert), noc_len) == CHIP_NO_ERROR);
 
     ChipCertificateSet certSet;
-    NL_TEST_ASSERT(inSuite, certSet.Init(3, kMaxDERCertLength) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, certSet.Init(3, kMaxCHIPCertDecodeBufLength) == CHIP_NO_ERROR);
 
     static uint8_t rootCertBuf[kMaxCHIPCertLength];
     static uint8_t icaCertBuf[kMaxCHIPCertLength];
@@ -1023,7 +1023,7 @@ static void TestChipCert_X509ToChipArray(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, outCert.size() <= sizeof(outCertBuf));
 
     ChipCertificateSet certSet;
-    NL_TEST_ASSERT(inSuite, certSet.Init(3, kMaxDERCertLength) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, certSet.Init(3, kMaxCHIPCertDecodeBufLength) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    certSet.LoadCerts(outCert.data(), static_cast<uint32_t>(outCert.size()),
@@ -1088,7 +1088,7 @@ static void TestChipCert_X509ToChipArrayNoICA(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, outCert.size() <= sizeof(outCertBuf));
 
     ChipCertificateSet certSet;
-    NL_TEST_ASSERT(inSuite, certSet.Init(3, kMaxDERCertLength) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, certSet.Init(3, kMaxCHIPCertDecodeBufLength) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    certSet.LoadCerts(outCert.data(), static_cast<uint32_t>(outCert.size()),

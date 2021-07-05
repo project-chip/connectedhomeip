@@ -31,7 +31,7 @@ limitations under the License.
       <description>
         Command description for ReadAttributes
       </description>
-      <arg name="attributeIds" type="ATTRIBUTE_ID" array="true"/>
+      <arg name="attributeIds" type="ATTRIB_ID" array="true"/>
     </command>
     <command code="0x01" name="ReadAttributesResponse" source="either" disableDefaultResponse="true">
       <description>
@@ -104,7 +104,7 @@ limitations under the License.
       <description>
         Command description for DiscoverAttributes
       </description>
-      <arg name="startId" type="ATTRIBUTE_ID"/>
+      <arg name="startId" type="ATTRIB_ID"/>
       <arg name="maxAttributeIds" type="INT8U"/>
     </command>
     <command code="0x0D" name="DiscoverAttributesResponse" source="either" disableDefaultResponse="true">
@@ -154,7 +154,7 @@ limitations under the License.
     </command>
     <command code="0x15" name="DiscoverAttributesExtended" source="either">
       <description>This command is similar to the discover attributes command, but also includes a field to indicate whether the attribute is readable, writeable or reportable.</description>
-      <arg name="startId" type="ATTRIBUTE_ID"/>
+      <arg name="startId" type="ATTRIB_ID"/>
       <arg name="maxAttributeIds" type="INT8U"/>
     </command>
     <command code="0x16" name="DiscoverAttributesExtendedResponse" source="either" disableDefaultResponse="true">

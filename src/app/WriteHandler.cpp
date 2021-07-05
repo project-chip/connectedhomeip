@@ -63,7 +63,7 @@ void WriteHandler::ClearExistingExchangeContext()
     }
 }
 
-CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle aPayload)
+CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     mpExchangeCtx  = apExchangeContext;

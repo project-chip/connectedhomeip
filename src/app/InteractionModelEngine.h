@@ -128,12 +128,12 @@ public:
                                EventNumber aEventNumber, intptr_t aAppIdentifier = 0);
 
     /**
-     *  Retrieve a WriteClient that the SDK consumer can use to send do a write.  If the call succeeds, the consumer
-     *  is responsible for calling Shutdown() on the WriteClient once it's done using it.
+     *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
+     *  see WriteClient documentation for lifetime handling.
      *
      *  @param[out]    apWriteClient    A pointer to the WriteClient object.
      *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no WriteClient available
+     *  @retval #CHIP_ERROR_NO_MEMORY If there is no WriteClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR NewWriteClient(WriteClient ** const apWriteClient);

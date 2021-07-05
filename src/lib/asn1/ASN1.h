@@ -165,7 +165,6 @@ class DLL_EXPORT ASN1Writer
 public:
     void Init(uint8_t * buf, uint32_t maxLen);
     void InitNullWriter(void);
-    CHIP_ERROR Finalize(void);
     uint16_t GetLengthWritten(void) const;
 
     CHIP_ERROR PutInteger(int64_t val);

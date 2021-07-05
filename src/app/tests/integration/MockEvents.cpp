@@ -53,43 +53,53 @@ void LivenessEventGenerator::Generate(void)
     switch (mState)
     {
     case 0:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE, kTestChangeEvent1,
+                    chip::app::PriorityLevel::Critical);
         break;
 
     case 1:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE, kTestChangeEvent2,
+                    chip::app::PriorityLevel::Debug);
         break;
 
     case 2:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE, kTestChangeEvent1,
+                    chip::app::PriorityLevel::Critical);
         break;
 
     case 3:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_UNREACHABLE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_UNREACHABLE, kTestChangeEvent2,
+                    chip::app::PriorityLevel::Debug);
         break;
 
     case 4:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE, kTestChangeEvent1,
+                    chip::app::PriorityLevel::Critical);
         break;
 
     case 5:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_REBOOTING);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_REBOOTING, kTestChangeEvent2,
+                    chip::app::PriorityLevel::Debug);
         break;
 
     case 6:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE, kTestChangeEvent1,
+                    chip::app::PriorityLevel::Critical);
         break;
 
     case 7:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE, kTestChangeEvent2,
+                    chip::app::PriorityLevel::Debug);
         break;
 
     case 8:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE, kTestChangeEvent1,
+                    chip::app::PriorityLevel::Critical);
         break;
 
     case 9:
-        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE, kTestChangeEvent2,
+                    chip::app::PriorityLevel::Debug);
         break;
 
     default:
@@ -107,13 +117,12 @@ CHIP_ERROR LivenessEventGenerator::WriteEvent(chip::TLV::TLVWriter & aWriter)
 }
 
 chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId,
-                                                      LivenessDeviceStatus aStatus)
+                                                      LivenessDeviceStatus aStatus, chip::EventId aEventId,
+                                                      chip::app::PriorityLevel aPriorityLevel)
 {
     chip::app::EventManagement & logManager = chip::app::EventManagement::GetInstance();
     chip::EventNumber number                = 0;
-    chip::app::EventSchema schema           = {
-        aNodeId, aEndpointId, kTestClusterId, kLivenessChangeEvent, chip::app::PriorityLevel::Critical,
-    };
+    chip::app::EventSchema schema           = { aNodeId, aEndpointId, kTestClusterId, aEventId, aPriorityLevel };
     chip::app::EventOptions options;
     mStatus               = static_cast<int32_t>(aStatus);
     options.mpEventSchema = &schema;

@@ -24,6 +24,10 @@
 
 #include <kernel.h>
 
+#ifdef CONFIG_USB
+#include <usb/usb_device.h>
+#endif
+
 LOG_MODULE_REGISTER(app);
 
 using namespace ::chip;
@@ -32,11 +36,20 @@ using namespace ::chip::DeviceLayer;
 
 int main(void)
 {
-#if CONFIG_CHIP_PW_RPC
+#ifdef CONFIG_CHIP_PW_RPC
     chip::rpc::Init();
 #endif
 
     int ret = 0;
+
+#ifdef CONFIG_USB
+    ret = usb_enable(nullptr);
+    if (ret)
+    {
+        LOG_ERR("Failed to initialize USB device");
+        goto exit;
+    }
+#endif
 
     ret = chip::Platform::MemoryInit();
     if (ret != CHIP_NO_ERROR)

@@ -14,7 +14,7 @@
 // Struct for {{label}}
 typedef struct _{{asType label}} {
 {{#zcl_struct_items}}
-{{ident}}{{asChipUnderlyingType label type}} {{asSymbol label}};
+{{ident}}{{asUnderlyingZclType type}} {{asSymbol label}};
 {{/zcl_struct_items}}
 } {{asUnderlyingType label}};
 {{else}}

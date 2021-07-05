@@ -36,6 +36,7 @@
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 
@@ -51,29 +52,9 @@ using namespace chip::Protocols;
 
 using TestContext = chip::Test::MessagingContext;
 
-class LoopbackTransport : public Transport::Base
-{
-public:
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
-    {
-        ReturnErrorOnFailure(mMessageSendError);
-        mSentMessageCount++;
-
-        System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-        HandleMessageReceived(address, std::move(receivedMessage));
-
-        return CHIP_NO_ERROR;
-    }
-
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-
-    uint32_t mSentMessageCount   = 0;
-    CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
-};
-
 namespace {
 TransportMgrBase gTransportMgr;
-LoopbackTransport gLoopback;
+Test::LoopbackTransport gLoopback;
 
 OperationalCredentialSet commissionerDevOpCred;
 OperationalCredentialSet accessoryDevOpCred;
@@ -91,8 +72,6 @@ P256Keypair accessoryOpKeys;
 enum
 {
     kStandardCertsCount = 4,
-    kTestCertBufSize    = 1024, // Size of buffer needed to hold any of the test certificates
-                                // (in either CHIP or DER form), or to decode the certificates.
 };
 
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
@@ -133,9 +112,9 @@ static CHIP_ERROR InitCredentialSets()
 
     ReturnErrorOnFailure(accessoryOpKeys.Deserialize(accessoryOpKeysSerialized));
 
-    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount, kTestCertBufSize));
+    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
 
-    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount, kTestCertBufSize));
+    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
 
     // Add the trusted root certificate to the certificate set.
     ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,

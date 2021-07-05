@@ -23,7 +23,7 @@
 /** @brief Command description for ReadAttributes
  *
  * Command: ReadAttributes
- * @param attributeIds ATTRIBUTE_ID []
+ * @param attributeIds ATTRIB_ID []
  * @param attributeIdsLen int
  */
 #define emberAfFillCommandGlobalReadAttributes(clusterId, attributeIds, attributeIdsLen)                                           \
@@ -144,7 +144,7 @@
 /** @brief Command description for DiscoverAttributes
  *
  * Command: DiscoverAttributes
- * @param startId ATTRIBUTE_ID
+ * @param startId ATTRIB_ID
  * @param maxAttributeIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverAttributes(clusterId, startId, maxAttributeIds)                                            \
@@ -238,7 +238,7 @@
 /** @brief Command description for DiscoverAttributesExtended
  *
  * Command: DiscoverAttributesExtended
- * @param startId ATTRIBUTE_ID
+ * @param startId ATTRIB_ID
  * @param maxAttributeIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverAttributesExtended(clusterId, startId, maxAttributeIds)                                    \

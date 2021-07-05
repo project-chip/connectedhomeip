@@ -64,7 +64,7 @@ SecureSessionHandle MessagingContext::GetSessionLocalToPeer()
 SecureSessionHandle MessagingContext::GetSessionPeerToLocal()
 {
     // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
-    return { GetSourceNodeId(), GetLocalKeyId(), GetAdminId() };
+    return { GetSourceNodeId(), GetLocalKeyId(), mDestAdminId };
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)

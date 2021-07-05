@@ -111,27 +111,8 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
 
         if (aEventPathParamsListSize != 0 && apEventPathParamsList != nullptr)
         {
-            EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
-            EventPath::Builder eventPathBuilder           = eventPathListBuilder.CreateEventPathBuilder();
-            for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
-            {
-                EventPathParams eventPath = apEventPathParamsList[eventIndex];
-                eventPathBuilder.NodeId(eventPath.mNodeId)
-                    .EventId(eventPath.mEventId)
-                    .EndpointId(eventPath.mEndpointId)
-                    .ClusterId(eventPath.mClusterId)
-                    .EndOfEventPath();
-                SuccessOrExit(err = eventPathBuilder.GetError());
-            }
-
-            eventPathListBuilder.EndOfEventPathList();
-            SuccessOrExit(err = eventPathListBuilder.GetError());
-
-            if (aEventNumber != 0)
-            {
-                // EventNumber is optional
-                request.EventNumber(aEventNumber);
-            }
+            err = GenerateEventPathList(request, apEventPathParamsList, aEventPathParamsListSize, aEventNumber);
+            SuccessOrExit(err);
         }
 
         if (aAttributePathParamsListSize != 0 && apAttributePathParamsList != nullptr)
@@ -171,6 +152,37 @@ exit:
         AbortExistingExchangeContext();
     }
 
+    return err;
+}
+
+CHIP_ERROR ReadClient::GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
+                                             size_t aEventPathParamsListSize, EventNumber & aEventNumber)
+{
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
+    EventPathList::Builder & eventPathListBuilder = aRequest.CreateEventPathListBuilder();
+    for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
+    {
+        EventPath::Builder eventPathBuilder = eventPathListBuilder.CreateEventPathBuilder();
+        EventPathParams eventPath           = apEventPathParamsList[eventIndex];
+        eventPathBuilder.NodeId(eventPath.mNodeId)
+            .EventId(eventPath.mEventId)
+            .EndpointId(eventPath.mEndpointId)
+            .ClusterId(eventPath.mClusterId)
+            .EndOfEventPath();
+        SuccessOrExit(err = eventPathBuilder.GetError());
+    }
+
+    eventPathListBuilder.EndOfEventPathList();
+    SuccessOrExit(err = eventPathListBuilder.GetError());
+
+    if (aEventNumber != 0)
+    {
+        // EventNumber is optional
+        aRequest.EventNumber(aEventNumber);
+    }
+
+exit:
+    ChipLogFunctError(err);
     return err;
 }
 

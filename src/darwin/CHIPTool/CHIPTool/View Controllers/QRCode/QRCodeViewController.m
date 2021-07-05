@@ -368,21 +368,27 @@
 - (void)setVendorIDOnAccessory
 {
     NSLog(@"Call to setVendorIDOnAccessory");
-    CHIPDevice * device = CHIPGetPairedDevice();
-    if (device) {
-        CHIPOperationalCredentials * opCreds = [[CHIPOperationalCredentials alloc] initWithDevice:device
-                                                                                         endpoint:0
-                                                                                            queue:dispatch_get_main_queue()];
-        [opCreds setFabric:kCHIPToolTmpVendorId
-            responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                if (error.code != CHIPSuccess) {
-                    NSLog(@"Got back error trying to getFabricId %@", error);
-                } else {
-                    NSLog(@"Got back fabricID values %@, storing it", values);
-                    NSNumber * fabricID = [values objectForKey:@"FabricId"];
-                    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey, fabricID);
-                }
-            }];
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+            if (device) {
+                CHIPOperationalCredentials * opCreds =
+                    [[CHIPOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:dispatch_get_main_queue()];
+                [opCreds setFabric:kCHIPToolTmpVendorId
+                    responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                        if (error.code != CHIPSuccess) {
+                            NSLog(@"Got back error trying to getFabricId %@", error);
+                        } else {
+                            NSLog(@"Got back fabricID values %@, storing it", values);
+                            NSNumber * fabricID = [values objectForKey:@"FabricId"];
+                            CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey, fabricID);
+                        }
+                    }];
+            } else {
+                NSLog(@"Status: Failed to establish a connection with the device");
+            }
+        })) {
+        NSLog(@"Status: Waiting for connection with the device");
+    } else {
+        NSLog(@"Status: Failed to trigger the connection with the device");
     }
 }
 
@@ -543,39 +549,59 @@
 
 - (void)addWiFiNetwork:(NSString *)ssid password:(NSString *)password
 {
-    self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
-                                                           endpoint:0
-                                                              queue:dispatch_get_main_queue()];
-    NSData * networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
-    NSData * credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
-    uint64_t breadcrumb = 0;
-    uint32_t timeoutMs = 3000;
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
+                                                                       endpoint:0
+                                                                          queue:dispatch_get_main_queue()];
+                NSData * networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+                NSData * credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
+                uint64_t breadcrumb = 0;
+                uint32_t timeoutMs = 3000;
 
-    __weak typeof(self) weakSelf = self;
-    [_cluster addWiFiNetwork:networkId
-                 credentials:credentials
-                  breadcrumb:breadcrumb
-                   timeoutMs:timeoutMs
-             responseHandler:^(NSError * error, NSDictionary * values) {
-                 [weakSelf onAddNetworkResponse:error isWiFi:YES];
-             }];
+                __weak typeof(self) weakSelf = self;
+                [self->_cluster addWiFiNetwork:networkId
+                                   credentials:credentials
+                                    breadcrumb:breadcrumb
+                                     timeoutMs:timeoutMs
+                               responseHandler:^(NSError * error, NSDictionary * values) {
+                                   [weakSelf onAddNetworkResponse:error isWiFi:YES];
+                               }];
+            } else {
+                NSLog(@"Status: Failed to establish a connection with the device");
+            }
+        })) {
+        NSLog(@"Status: Waiting for connection with the device");
+    } else {
+        NSLog(@"Status: Failed to trigger the connection with the device");
+    }
 }
 
 - (void)addThreadNetwork:(NSData *)threadDataSet
 {
-    self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
-                                                           endpoint:0
-                                                              queue:dispatch_get_main_queue()];
-    uint64_t breadcrumb = 0;
-    uint32_t timeoutMs = 3000;
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
+                                                                       endpoint:0
+                                                                          queue:dispatch_get_main_queue()];
+                uint64_t breadcrumb = 0;
+                uint32_t timeoutMs = 3000;
 
-    __weak typeof(self) weakSelf = self;
-    [_cluster addThreadNetwork:threadDataSet
-                    breadcrumb:breadcrumb
-                     timeoutMs:timeoutMs
-               responseHandler:^(NSError * error, NSDictionary * values) {
-                   [weakSelf onAddNetworkResponse:error isWiFi:NO];
-               }];
+                __weak typeof(self) weakSelf = self;
+                [self->_cluster addThreadNetwork:threadDataSet
+                                      breadcrumb:breadcrumb
+                                       timeoutMs:timeoutMs
+                                 responseHandler:^(NSError * error, NSDictionary * values) {
+                                     [weakSelf onAddNetworkResponse:error isWiFi:NO];
+                                 }];
+            } else {
+                NSLog(@"Status: Failed to establish a connection with the device");
+            }
+        })) {
+        NSLog(@"Status: Waiting for connection with the device");
+    } else {
+        NSLog(@"Status: Failed to trigger the connection with the device");
+    }
 }
 
 - (void)onAddNetworkResponse:(NSError *)error isWiFi:(BOOL)isWiFi

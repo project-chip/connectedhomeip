@@ -217,7 +217,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_efr32_lock_app_build = enable_efr32_builds
 
     # Build the qpgxxxx lock app example.
-    enable_qpg_lock_app_build = enable_qpg_builds
+    enable_qpg_lock_app_build = enable_qpg_builds && !is_debug
 
     # Build the efr32 lighting app example.
     enable_efr32_lighting_app_build = enable_efr32_builds
