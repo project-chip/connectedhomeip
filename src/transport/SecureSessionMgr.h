@@ -221,7 +221,7 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
-                          SecureSession::SessionRole direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
+                          SecureSession::SessionRole direction, Transport::AdminId admin);
 
     void ExpirePairing(SecureSessionHandle session);
     void ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin);
