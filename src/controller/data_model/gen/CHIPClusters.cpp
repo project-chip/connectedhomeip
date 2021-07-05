@@ -348,6 +348,30 @@ CHIP_ERROR ApplicationLauncherCluster::ReadAttributeApplicationLauncherList(Call
                                              ApplicationLauncherClusterApplicationLauncherListListAttributeFilter);
 }
 
+CHIP_ERROR ApplicationLauncherCluster::ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0001;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ApplicationLauncherCluster::ReadAttributeApplicationId(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0002;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
 CHIP_ERROR ApplicationLauncherCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback)
 {
@@ -463,6 +487,18 @@ CHIP_ERROR AudioOutputCluster::ReadAttributeAudioOutputList(Callback::Cancelable
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              AudioOutputClusterAudioOutputListListAttributeFilter);
+}
+
+CHIP_ERROR AudioOutputCluster::ReadAttributeCurrentAudioOutput(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0001;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
 CHIP_ERROR AudioOutputCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -6131,6 +6167,18 @@ CHIP_ERROR MediaInputCluster::ReadAttributeMediaInputList(Callback::Cancelable *
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              MediaInputClusterMediaInputListListAttributeFilter);
+}
+
+CHIP_ERROR MediaInputCluster::ReadAttributeCurrentMediaInput(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0001;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
 CHIP_ERROR MediaInputCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
