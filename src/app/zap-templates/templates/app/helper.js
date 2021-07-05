@@ -22,6 +22,7 @@ const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
 const zclHelper     = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery      = require(zapPath + 'db/query-zcl.js')
 const cHelper       = require(zapPath + 'generator/helper-c.js')
+const string        = require(zapPath + 'util/string.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
@@ -352,6 +353,18 @@ function asTypeLiteralSuffix(type)
   }
 }
 
+function asLowerCamelCase(label)
+{
+  let str = string.toCamelCase(label, true);
+  return str.replace(/[\.:]/g, '');
+}
+
+function asUpperCamelCase(label)
+{
+  let str = string.toCamelCase(label, false);
+  return str.replace(/[\.:]/g, '');
+}
+
 //
 // Module exports
 //
@@ -366,3 +379,5 @@ exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_li
 exports.isSigned                                      = ChipTypesHelper.isSigned;
 exports.isStrEndsWith                                 = isStrEndsWith;
 exports.asTypeLiteralSuffix                           = asTypeLiteralSuffix;
+exports.asLowerCamelCase                              = asLowerCamelCase;
+exports.asUpperCamelCase                              = asUpperCamelCase;

@@ -161,7 +161,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
 - (void)testSendCluster{{asCamelCased parent.name false}}WriteAttribute{{asCamelCased name false}}WithValue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"{{asCamelCased parent.name false}}WriteAttribute{{asCamelCased name false}}WithValue"];

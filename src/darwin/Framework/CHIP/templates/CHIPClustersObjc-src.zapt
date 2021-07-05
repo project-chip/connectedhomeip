@@ -625,7 +625,7 @@ private:
 {{#if isList}}
     CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge(responseHandler, [self callbackQueue]);
 {{else}}
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(responseHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
+    CHIP{{chipCallback.name}}AttributeCallbackBridge * onSuccess = new CHIP{{chipCallback.name}}AttributeCallbackBridge(responseHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
 {{/if}}
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
@@ -651,7 +651,7 @@ private:
     }
 }
 
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
 - (void)writeAttribute{{asCamelCased name false}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -687,7 +687,7 @@ private:
 }
 
 {{/if}}
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
 - (void) configureAttribute{{asCamelCased name false}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -718,7 +718,7 @@ private:
 
 - (void) reportAttribute{{asCamelCased name false}}WithResponseHandler:(ResponseHandler)reportHandler
 {
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onReport = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(reportHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true);
+    CHIP{{chipCallback.name}}AttributeCallbackBridge * onReport = new CHIP{{chipCallback.name}}AttributeCallbackBridge(reportHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true);
     if (!onReport) {
         reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
