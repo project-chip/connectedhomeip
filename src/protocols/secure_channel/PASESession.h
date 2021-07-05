@@ -34,12 +34,12 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMessageDispatch.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/PairingState.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PairingSession.h>
-#include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -155,7 +155,7 @@ public:
      *
      * @return uint16_t The associated peer key id
      */
-    uint16_t GetPeerKeyId() override { return mConnectionState.GetPeerKeyID(); }
+    uint16_t GetPeerKeyId() override { return mPairingState.GetPeerKeyID(); }
 
     /**
      * @brief
@@ -163,13 +163,13 @@ public:
      *
      * @return uint16_t The assocated local key id
      */
-    uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
+    uint16_t GetLocalKeyId() override { return mPairingState.GetLocalKeyID(); }
 
     const char * GetI2RSessionInfo() const override { return kSpake2pI2RSessionInfo; }
 
     const char * GetR2ISessionInfo() const override { return kSpake2pR2ISessionInfo; }
 
-    Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
+    PairingState & GetPairingState() { return mPairingState; }
 
     /** @brief Serialize the Pairing Session to a string.
      *
@@ -307,7 +307,7 @@ protected:
 
     bool mPairingComplete = false;
 
-    Transport::PeerConnectionState mConnectionState;
+    PairingState mPairingState;
 };
 
 /*

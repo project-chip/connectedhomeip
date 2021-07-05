@@ -170,11 +170,11 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
             connection.GetPASESession(session);
 
             ChipLogProgress(AppServer, "Fetched the session information: from 0x" ChipLogFormatX64,
-                            ChipLogValueX64(session->PeerConnection().GetPeerNodeId()));
+                            ChipLogValueX64(session->GetPairingState().GetPeerNodeId()));
             if (gSessionIDAllocator.Reserve(keyId) == CHIP_NO_ERROR)
             {
-                sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
-                                      session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
+                sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->GetPairingState().GetPeerAddress()),
+                                      session->GetPairingState().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
                                       connection.GetAdminId());
             }
             else

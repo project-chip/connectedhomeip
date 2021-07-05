@@ -147,8 +147,8 @@ void RendezvousServer::OnSessionEstablishmentError(CHIP_ERROR err)
 void RendezvousServer::OnSessionEstablished()
 {
     CHIP_ERROR err =
-        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-                                mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
+        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.GetPairingState().GetPeerAddress()),
+                                mPairingSession.GetPairingState().GetPeerNodeId(), &mPairingSession,
                                 SecureSession::SessionRole::kResponder, mAdmin->GetAdminId());
     if (err != CHIP_NO_ERROR)
     {
@@ -165,7 +165,7 @@ void RendezvousServer::OnSessionEstablished()
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 
-    if (mPairingSession.PeerConnection().GetPeerAddress().GetTransportType() == Transport::Type::kBle)
+    if (mPairingSession.GetPairingState().GetPeerAddress().GetTransportType() == Transport::Type::kBle)
     {
         Cleanup();
     }
