@@ -61,7 +61,7 @@ uint64_t GetClock_MonotonicHiRes()
 // Platform-specific function for getting the current real (civil) time in microsecond Unix time format,
 // where |curTime| argument is the current time, expressed as Unix time scaled to microseconds.
 // Returns CHIP_NO_ERROR if the method succeeded.
-Error GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
 {
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
@@ -80,7 +80,7 @@ Error GetClock_RealTime(uint64_t & curTime)
 // Platform-specific function for getting the current real (civil) time in millisecond Unix time
 // where |curTimeMS| is the current time, expressed as Unix time scaled to milliseconds.
 // Returns CHIP_NO_ERROR if the method succeeded.
-Error GetClock_RealTimeMS(uint64_t & curTimeMS)
+CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTimeMS)
 {
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
@@ -99,7 +99,7 @@ Error GetClock_RealTimeMS(uint64_t & curTimeMS)
 // Platform-specific function for setting the current real (civil) time
 // where |newCurTime| is the  new current time, expressed as Unix time scaled to microseconds.
 // Returns CHIP_NO_ERROR if the method succeeded.
-Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 {
     struct timeval tv;
     tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
