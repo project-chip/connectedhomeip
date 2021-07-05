@@ -36,6 +36,28 @@ public:
     PairingSession() {}
     virtual ~PairingSession() {}
 
+    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
+
+    uint16_t GetPeerKeyId() const { return mPeerKeyId; }
+    void SetPeerKeyId(uint16_t id) { mPeerKeyId = id; }
+    bool IsValidPeerKeyId() const { return mPeerKeyId != kInvalidKeyId; }
+
+    uint16_t GetLocalKeyId() const { return mLocalKeyId; }
+    void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
+    bool IsValidLocalKeyId() const { return mLocalKeyId != kInvalidKeyId; }
+
+    const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
+    Transport::PeerAddress & GetPeerAddress() { return mPeerAddress; }
+    void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
+
+    void Clear()
+    {
+        mPeerAddress = Transport::PeerAddress::Uninitialized();
+        mPeerKeyId   = kInvalidKeyId;
+        mLocalKeyId  = kInvalidKeyId;
+    }
+
     /**
      * @brief
      *   Derive a secure session from the paired session. The API will return error
@@ -50,22 +72,6 @@ public:
 
     /**
      * @brief
-     *  Return the associated peer key id
-     *
-     * @return uint16_t The associated peer key id
-     */
-    virtual uint16_t GetPeerKeyId() = 0;
-
-    /**
-     * @brief
-     *  Return the associated local key id
-     *
-     * @return uint16_t The associated local key id
-     */
-    virtual uint16_t GetLocalKeyId() = 0;
-
-    /**
-     * @brief
      *   Get the value of peer session counter which is synced during session establishment
      */
     virtual uint32_t GetPeerCounter()
@@ -77,6 +83,14 @@ public:
     virtual const char * GetI2RSessionInfo() const = 0;
 
     virtual const char * GetR2ISessionInfo() const = 0;
+
+private:
+    NodeId mPeerNodeId = kUndefinedNodeId;
+    // TODO(#8206): Remove address and use peer cache instead.
+    Transport::PeerAddress mPeerAddress     = Transport::PeerAddress::Uninitialized();
+    static constexpr uint16_t kInvalidKeyId = UINT16_MAX;
+    uint16_t mPeerKeyId                     = kInvalidKeyId;
+    uint16_t mLocalKeyId                    = kInvalidKeyId;
 };
 
 } // namespace chip

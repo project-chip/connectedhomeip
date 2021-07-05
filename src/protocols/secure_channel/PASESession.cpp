@@ -99,7 +99,7 @@ void PASESession::Clear()
     mKeLen           = sizeof(mKe);
     mPairingComplete = false;
     mComputeVerifier = true;
-    mConnectionState.Reset();
+    PairingSession::Clear();
     CloseExchange();
 }
 
@@ -155,8 +155,8 @@ CHIP_ERROR PASESession::ToSerializable(PASESessionSerializable & serializable)
     memset(&serializable, 0, sizeof(serializable));
     serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
     serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
-    serializable.mLocalKeyId      = mConnectionState.GetLocalKeyID();
-    serializable.mPeerKeyId       = mConnectionState.GetPeerKeyID();
+    serializable.mLocalKeyId      = GetLocalKeyId();
+    serializable.mPeerKeyId       = GetPeerKeyId();
 
     memcpy(serializable.mKe, mKe, mKeLen);
 
@@ -172,8 +172,8 @@ CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & seriali
     memset(mKe, 0, sizeof(mKe));
     memcpy(mKe, serializable.mKe, mKeLen);
 
-    mConnectionState.SetLocalKeyID(serializable.mLocalKeyId);
-    mConnectionState.SetPeerKeyID(serializable.mPeerKeyId);
+    SetLocalKeyId(serializable.mLocalKeyId);
+    SetPeerKeyId(serializable.mPeerKeyId);
 
     return CHIP_NO_ERROR;
 }
@@ -191,7 +191,7 @@ CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstabl
     mDelegate = delegate;
 
     ChipLogDetail(SecureChannel, "Assigned local session key ID %d", myKeyId);
-    mConnectionState.SetLocalKeyID(myKeyId);
+    SetLocalKeyId(myKeyId);
     mSetupPINCode    = setupCode;
     mComputeVerifier = true;
 
@@ -313,7 +313,7 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
     mExchangeCtxt = exchangeCtxt;
     mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout);
 
-    mConnectionState.SetPeerAddress(peerAddress);
+    SetPeerAddress(peerAddress);
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
@@ -503,7 +503,7 @@ CHIP_ERROR PASESession::SendMsg1()
 
     Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(sizeof(uint16_t) + X_len));
     VerifyOrReturnError(!bbuf.IsNull(), CHIP_ERROR_NO_MEMORY);
-    bbuf.Put16(mConnectionState.GetLocalKeyID());
+    bbuf.Put16(GetLocalKeyId());
     bbuf.Put(&X[0], X_len);
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
@@ -550,7 +550,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const System::PacketBufferHandle
     SuccessOrExit(err);
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", encryptionKeyId);
-    mConnectionState.SetPeerKeyID(encryptionKeyId);
+    SetPeerKeyId(encryptionKeyId);
 
     err = mSpake2p.ComputeRoundTwo(msg->Start(), msg->DataLength(), verifier, &verifier_len);
     SuccessOrExit(err);
@@ -563,7 +563,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const System::PacketBufferHandle
     {
         Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(data_len));
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-        bbuf.Put16(mConnectionState.GetLocalKeyID());
+        bbuf.Put16(GetLocalKeyId());
         bbuf.Put(&Y[0], Y_len);
         bbuf.Put(verifier, verifier_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
@@ -616,7 +616,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
     buf_len = msg->DataLength();
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", encryptionKeyId);
-    mConnectionState.SetPeerKeyID(encryptionKeyId);
+    SetPeerKeyId(encryptionKeyId);
 
     err = mSpake2p.ComputeRoundTwo(buf, kMAX_Point_Length, verifier, &verifier_len_raw);
     SuccessOrExit(err);
@@ -793,7 +793,7 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Pack
     CHIP_ERROR err = ValidateReceivedMessage(exchange, packetHeader, payloadHeader, std::move(msg));
     SuccessOrExit(err);
 
-    mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
+    SetPeerAddress(mMessageDispatch.GetPeerAddress());
 
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
