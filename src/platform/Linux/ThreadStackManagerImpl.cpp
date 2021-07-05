@@ -44,8 +44,9 @@ ThreadStackManagerImpl::ThreadStackManagerImpl() : mAttached(false) {}
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
     std::unique_ptr<GError, GErrorDeleter> err;
-    mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
-        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr, &MakeUniquePointerReceiver(err).Get()));
+    mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
+                                                                               kDBusOpenThreadService, kDBusOpenThreadObjectPath,
+                                                                               nullptr, &MakeUniquePointerReceiver(err).Get()));
     if (!mProxy)
     {
         ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error");
@@ -149,7 +150,8 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
             guchar preference;
             gboolean stable;
             gboolean nextHopIsThisDevice;
-            g_variant_get(route, "(&vqybb)", &MakeUniquePointerReceiver(prefix).Get(), &rloc16, &preference, &stable, &nextHopIsThisDevice);
+            g_variant_get(route, "(&vqybb)", &MakeUniquePointerReceiver(prefix).Get(), &rloc16, &preference, &stable,
+                          &nextHopIsThisDevice);
             if (!prefix)
                 continue;
 
@@ -199,7 +201,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
         std::unique_ptr<GBytes, GBytesDeleter> bytes(g_bytes_new(netInfo.data(), netInfo.size()));
         if (!bytes)
             return CHIP_ERROR_NO_MEMORY;
-        std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
+        std::unique_ptr<GVariant, GVariantDeleter> value(
+            g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
         if (!value)
             return CHIP_ERROR_NO_MEMORY;
         openthread_io_openthread_border_router_set_active_dataset_tlvs(mProxy.get(), value.release());
@@ -219,7 +222,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
 
     {
-        std::unique_ptr<GVariant, GVariantDeleter> value(openthread_io_openthread_border_router_dup_active_dataset_tlvs(mProxy.get()));
+        std::unique_ptr<GVariant, GVariantDeleter> value(
+            openthread_io_openthread_border_router_dup_active_dataset_tlvs(mProxy.get()));
         GBytes * bytes = g_variant_get_data_as_bytes(value.get());
         gsize size;
         const uint8_t * data = reinterpret_cast<const uint8_t *>(g_bytes_get_data(bytes, &size));
@@ -263,7 +267,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     if (val)
     {
         std::unique_ptr<GError, GErrorDeleter> err;
-        gboolean result     = openthread_io_openthread_border_router_call_attach_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
+        gboolean result =
+            openthread_io_openthread_border_router_call_attach_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Attach", err->message);
@@ -279,7 +284,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     else
     {
         std::unique_ptr<GError, GErrorDeleter> err;
-        gboolean result     = openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
+        gboolean result =
+            openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Reset", err->message);
