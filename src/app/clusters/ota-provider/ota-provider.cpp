@@ -20,11 +20,11 @@
 #include <app/common/gen/att-storage.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/callback.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/enums.h>
 #include <app/util/af.h>
-#include <gen/callback.h>
 
 #include <support/Span.h>
 
