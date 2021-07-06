@@ -470,6 +470,8 @@
 
 // Server attributes
 #define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
+#define ZCL_SUPPORTED_FABRICS_ATTRIBUTE_ID (0x0002)
+#define ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID (0x0003)
 
 // Attribute ids for cluster: Fixed Label
 
