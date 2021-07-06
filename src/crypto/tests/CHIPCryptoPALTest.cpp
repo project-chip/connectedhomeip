@@ -91,7 +91,7 @@ using TestHKDF_sha = HKDF_shaHSM;
 using TestHKDF_sha                      = HKDF_sha;
 #endif
 
-using TestHMAC_sha                      = HMAC_sha;
+using TestHMAC_sha = HMAC_sha;
 
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)

@@ -44,7 +44,7 @@ constexpr size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
 constexpr size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
 constexpr size_t kSHA256_Hash_Length              = 32;
 
-constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES = kP256_FE_Length;
+constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
 
 constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
@@ -54,7 +54,7 @@ constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
 constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 constexpr size_t kMAX_CSR_Length             = 512;
 
-constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES  = kSHA256_Hash_Length;
+constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
 constexpr size_t kMin_Salt_Length = 8;
 constexpr size_t kMax_Salt_Length = 16;

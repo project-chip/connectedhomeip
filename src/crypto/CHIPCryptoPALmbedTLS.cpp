@@ -287,8 +287,8 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     const mbedtls_md_info_t * const md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
     VerifyOrReturnError(md != nullptr, CHIP_ERROR_INTERNAL);
 
-    const int result = mbedtls_md_hmac(md, Uint8::to_const_uchar(key), key_length,
-                Uint8::to_const_uchar(message), message_length, out_buffer);
+    const int result =
+        mbedtls_md_hmac(md, Uint8::to_const_uchar(key), key_length, Uint8::to_const_uchar(message), message_length, out_buffer);
 
     _log_mbedTLS_error(result);
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
