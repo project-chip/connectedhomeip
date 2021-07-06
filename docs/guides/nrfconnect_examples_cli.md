@@ -310,23 +310,25 @@ NFC tag emulation is disabled
 
 ### dns
 
-Handles a group of commands that are used to trigger performing DNS queries.
-You must use this command together with one of the additional subcommands listed below.
+Handles a group of commands that are used to trigger performing DNS queries. You
+must use this command together with one of the additional subcommands listed
+below.
 
 #### browse
 
-Browses for DNS services of `_matterc_udp` type and prints the received response. Takes no argument.
+Browses for DNS services of `_matterc_udp` type and prints the received
+response. Takes no argument.
 
 ```shell
 uart:~$ matter dns browse
 Browsing ...
-DNS browse succeeded: 
+DNS browse succeeded:
    Hostname: 0E824F0CA6DE309C
    Vendor ID: 9050
    Product ID: 20043
    Long discriminator: 3840
    Device type: 0
-   Device name: 
+   Device name:
    Commissioning mode: 0
    IP addresses:
       fd08:b65e:db8e:f9c7:2cc2:2043:1366:3b31
@@ -334,7 +336,8 @@ DNS browse succeeded:
 
 #### resolve
 
-Resolves the specified Matter node service given by the <fabric-id> and <node-id>.
+Resolves the specified Matter node service given by the <fabric-id> and
+<node-id>.
 
 ```shell
 uart:~$ matter dns resolve <fabric-id> <node-id>
