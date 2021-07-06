@@ -2470,6 +2470,19 @@ bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(chip::app::Command *
     return true;
 }
 
+bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaSeekResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSeekResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaSeekResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaSeekResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
 bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
 {
     ChipLogProgress(Zcl, "MediaSkipBackwardResponse:");
@@ -2492,19 +2505,6 @@ bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(chip::app::Comm
 
     Callback::Callback<MediaPlaybackClusterMediaSkipForwardResponseCallback> * cb =
         Callback::Callback<MediaPlaybackClusterMediaSkipForwardResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaSkipSeekResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaSkipSeekResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSkipSeekResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaSkipSeekResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaSkipSeekResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, mediaPlaybackStatus);
     return true;
 }

@@ -51,11 +51,12 @@ function checkIsInsideClusterBlock(context, name)
 
 function checkIsInsideCommandBlock(context, name)
 {
-  const commandSource = context.commandSource;
-  const commandId     = context.id;
-  const errorMsg      = name + ': Not inside a ({#chip_cluster_commands}} block.';
+  const clusterName = context.clusterName;
+  const clusterSide = context.clusterSide;
+  const commandId   = context.id;
+  const errorMsg    = name + ': Not inside a ({#chip_cluster_commands}} block.';
 
-  throwErrorIfUndefined(context, errorMsg, [ commandId, commandSource ]);
+  throwErrorIfUndefined(context, errorMsg, [ commandId, clusterName, clusterSide ]);
 
   return commandId;
 }
@@ -151,6 +152,21 @@ function chip_server_cluster_commands(options)
 }
 
 /**
+ * Creates block iterator over the server side cluster responses
+ * for a given cluster.
+ *
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_cluster_responses(options)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_server_cluster_response');
+  return asBlocks.call(this, Clusters.getServerResponses(clusterName), options);
+}
+
+/**
  * Creates block iterator over the server side cluster command arguments
  * for a given command.
  *
@@ -161,11 +177,30 @@ function chip_server_cluster_commands(options)
  */
 function chip_server_cluster_command_arguments(options)
 {
-  const commandId                    = checkIsInsideCommandBlock(this, 'isManufacturerSpecificCommand');
-  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'isManufacturerSpecificCommand');
+  const commandId                    = checkIsInsideCommandBlock(this, 'chip_server_cluster_command_arguments');
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'chip_server_cluster_command_arguments');
 
   const filter = command => command.id == commandId;
   const promise          = Clusters.getClientCommands(clusterName).then(commands => commands.find(filter).arguments);
+  return asBlocks.call(this, promise, options);
+}
+
+/**
+ * Creates block iterator over the server side cluster response arguments
+ * for a given command.
+ *
+ * This function is meant to be used inside a {{#chip_server_cluster_responses}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_cluster_response_arguments(options)
+{
+  const commandId                    = checkIsInsideCommandBlock(this, 'chip_server_cluster_response_arguments');
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'chip_server_cluster_response_arguments');
+
+  const filter = command => command.id == commandId;
+  const promise          = Clusters.getServerResponses(clusterName).then(commands => commands.find(filter).arguments);
   return asBlocks.call(this, promise, options);
 }
 
@@ -391,25 +426,27 @@ function hasSpecificAttributes(options)
 //
 // Module exports
 //
-exports.chip_clusters                         = chip_clusters;
-exports.chip_has_clusters                     = chip_has_clusters;
-exports.chip_client_clusters                  = chip_client_clusters;
-exports.chip_has_client_clusters              = chip_has_client_clusters;
-exports.chip_server_clusters                  = chip_server_clusters;
-exports.chip_has_server_clusters              = chip_has_server_clusters;
-exports.chip_server_cluster_commands          = chip_server_cluster_commands;
-exports.chip_server_cluster_command_arguments = chip_server_cluster_command_arguments
-exports.chip_attribute_list_entryTypes        = chip_attribute_list_entryTypes;
-exports.asBasicType                           = ChipTypesHelper.asBasicType;
-exports.chip_server_cluster_attributes        = chip_server_cluster_attributes;
-exports.chip_has_list_attributes              = chip_has_list_attributes;
-exports.chip_server_has_list_attributes       = chip_server_has_list_attributes;
-exports.chip_client_has_list_attributes       = chip_client_has_list_attributes;
-exports.isGlobalAttribute                     = isGlobalAttribute;
-exports.isWritableAttribute                   = isWritableAttribute;
-exports.isReportableAttribute                 = isReportableAttribute;
-exports.isManufacturerSpecificCommand         = isManufacturerSpecificCommand;
-exports.asCallbackAttributeType               = asCallbackAttributeType;
-exports.asLowerCamelCase                      = asLowerCamelCase;
-exports.asUpperCamelCase                      = asUpperCamelCase;
-exports.hasSpecificAttributes                 = hasSpecificAttributes;
+exports.chip_clusters                          = chip_clusters;
+exports.chip_has_clusters                      = chip_has_clusters;
+exports.chip_client_clusters                   = chip_client_clusters;
+exports.chip_has_client_clusters               = chip_has_client_clusters;
+exports.chip_server_clusters                   = chip_server_clusters;
+exports.chip_has_server_clusters               = chip_has_server_clusters;
+exports.chip_server_cluster_commands           = chip_server_cluster_commands;
+exports.chip_server_cluster_command_arguments  = chip_server_cluster_command_arguments
+exports.chip_server_cluster_responses          = chip_server_cluster_responses;
+exports.chip_server_cluster_response_arguments = chip_server_cluster_response_arguments
+exports.chip_attribute_list_entryTypes         = chip_attribute_list_entryTypes;
+exports.asBasicType                            = ChipTypesHelper.asBasicType;
+exports.chip_server_cluster_attributes         = chip_server_cluster_attributes;
+exports.chip_has_list_attributes               = chip_has_list_attributes;
+exports.chip_server_has_list_attributes        = chip_server_has_list_attributes;
+exports.chip_client_has_list_attributes        = chip_client_has_list_attributes;
+exports.isGlobalAttribute                      = isGlobalAttribute;
+exports.isWritableAttribute                    = isWritableAttribute;
+exports.isReportableAttribute                  = isReportableAttribute;
+exports.isManufacturerSpecificCommand          = isManufacturerSpecificCommand;
+exports.asCallbackAttributeType                = asCallbackAttributeType;
+exports.asLowerCamelCase                       = asLowerCamelCase;
+exports.asUpperCamelCase                       = asUpperCamelCase;
+exports.hasSpecificAttributes                  = hasSpecificAttributes;

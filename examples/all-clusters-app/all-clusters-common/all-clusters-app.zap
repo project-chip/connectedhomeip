@@ -11616,7 +11616,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaSkipSeek",
+              "name": "MediaSeek",
               "code": 10,
               "mfgCode": null,
               "source": "client",
@@ -11731,11 +11731,11 @@
               "outgoing": 0
             },
             {
-              "name": "MediaSkipSeekResponse",
-              "code": 10,
+              "name": "MediaSeekResponse",
+              "code": 11,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             }
           ],
@@ -12399,7 +12399,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application satus",
+              "name": "application status",
               "code": 7,
               "mfgCode": null,
               "side": "server",

@@ -1619,16 +1619,9 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 0
-            },
-            {
-              "name": "RetrieveLogsResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
             }
-          ]
+          ],
+          "attributes": []
         },
         {
           "name": "General Diagnostics",
@@ -6028,7 +6021,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6036,7 +6029,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6044,7 +6037,7 @@
               "code": 2,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -6159,7 +6152,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -6244,7 +6237,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6252,7 +6245,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6260,7 +6253,7 @@
               "code": 2,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6268,7 +6261,7 @@
               "code": 3,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -6344,7 +6337,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -6405,7 +6398,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -6591,7 +6584,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -7091,7 +7084,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaSkipSeek",
+              "name": "MediaSeek",
               "code": 10,
               "mfgCode": null,
               "source": "client",
@@ -7200,14 +7193,6 @@
             {
               "name": "MediaSkipBackwardResponse",
               "code": 9,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaSkipSeekResponse",
-              "code": 10,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -7603,7 +7588,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application satus",
+              "name": "application status",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -7647,7 +7632,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -7655,7 +7640,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -7962,7 +7947,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application satus",
+              "name": "application status",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -8127,7 +8112,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application satus",
+              "name": "application status",
               "code": 7,
               "mfgCode": null,
               "side": "server",

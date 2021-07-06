@@ -1,0 +1,71 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "k32w")
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+}
+
+static_library("K32W") {
+  sources = [
+    "../FreeRTOS/SystemTimeSupport.cpp",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DeviceNetworkProvisioningDelegateImpl.cpp",
+    "DeviceNetworkProvisioningDelegateImpl.h",
+    "K32WConfig.cpp",
+    "K32WConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
+    "NFCManagerImpl.cpp",
+    "NFCManagerImpl.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "SoftwareUpdateManagerImpl.h",
+    "ble_function_mux.c",
+  ]
+
+  deps = []
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (chip_enable_openthread) {
+    public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+
+    sources += [
+      "../OpenThread/OpenThreadUtils.cpp",
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [ "../OpenThread/MdnsImpl.cpp" ]
+      deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+    }
+  }
+
+  public_deps += [ "${chip_root}/src/crypto" ]
+}

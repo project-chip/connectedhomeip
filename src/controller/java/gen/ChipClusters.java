@@ -1459,6 +1459,10 @@ public class ChipClusters {
       mediaRewind(chipClusterPtr, callback);
     }
 
+    public void mediaSeek(MediaSeekResponseCallback callback, long position) {
+      mediaSeek(chipClusterPtr, callback, position);
+    }
+
     public void mediaSkipBackward(
         MediaSkipBackwardResponseCallback callback, long deltaPositionMilliseconds) {
       mediaSkipBackward(chipClusterPtr, callback, deltaPositionMilliseconds);
@@ -1467,10 +1471,6 @@ public class ChipClusters {
     public void mediaSkipForward(
         MediaSkipForwardResponseCallback callback, long deltaPositionMilliseconds) {
       mediaSkipForward(chipClusterPtr, callback, deltaPositionMilliseconds);
-    }
-
-    public void mediaSkipSeek(MediaSkipSeekResponseCallback callback, long position) {
-      mediaSkipSeek(chipClusterPtr, callback, position);
     }
 
     public void mediaStartOver(MediaStartOverResponseCallback callback) {
@@ -1494,6 +1494,9 @@ public class ChipClusters {
 
     private native void mediaRewind(long chipClusterPtr, MediaRewindResponseCallback callback);
 
+    private native void mediaSeek(
+        long chipClusterPtr, MediaSeekResponseCallback callback, long position);
+
     private native void mediaSkipBackward(
         long chipClusterPtr,
         MediaSkipBackwardResponseCallback callback,
@@ -1503,9 +1506,6 @@ public class ChipClusters {
         long chipClusterPtr,
         MediaSkipForwardResponseCallback callback,
         long deltaPositionMilliseconds);
-
-    private native void mediaSkipSeek(
-        long chipClusterPtr, MediaSkipSeekResponseCallback callback, long position);
 
     private native void mediaStartOver(
         long chipClusterPtr, MediaStartOverResponseCallback callback);
@@ -1548,6 +1548,12 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public interface MediaSeekResponseCallback {
+      void onSuccess(int mediaPlaybackStatus);
+
+      void onError(Exception error);
+    }
+
     public interface MediaSkipBackwardResponseCallback {
       void onSuccess(int mediaPlaybackStatus);
 
@@ -1555,12 +1561,6 @@ public class ChipClusters {
     }
 
     public interface MediaSkipForwardResponseCallback {
-      void onSuccess(int mediaPlaybackStatus);
-
-      void onError(Exception error);
-    }
-
-    public interface MediaSkipSeekResponseCallback {
       void onSuccess(int mediaPlaybackStatus);
 
       void onError(Exception error);

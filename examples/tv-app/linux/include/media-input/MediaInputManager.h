@@ -29,8 +29,4 @@ class MediaInputManager
 public:
     CHIP_ERROR Init();
     std::vector<EmberAfMediaInputInfo> proxyGetInputList();
-    bool proxySelectInputRequest(uint8_t input);
-    bool proxyShowInputStatusRequest();
-    bool proxyHideInputStatusRequest();
-    bool proxyRenameInputRequest(uint8_t input, std::string name);
 };

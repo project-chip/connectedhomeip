@@ -22,7 +22,6 @@
 #include <stdlib.h>
 
 #include <core/CHIPCore.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #include <support/Span.h>
 
 namespace chip {

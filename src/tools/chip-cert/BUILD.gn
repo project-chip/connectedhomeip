@@ -23,6 +23,7 @@ executable("chip-cert") {
     "CertUtils.cpp",
     "Cmd_ConvertCert.cpp",
     "Cmd_ConvertKey.cpp",
+    "Cmd_GenAttCert.cpp",
     "Cmd_GenCert.cpp",
     "Cmd_PrintCert.cpp",
     "Cmd_ResignCert.cpp",

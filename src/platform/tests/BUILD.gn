@@ -32,17 +32,18 @@ if (chip_device_platform != "none") {
       test_sources += [ "TestPlatformMgr.cpp" ]
     }
 
-    if (chip_mdns != "none" && chip_enable_happy_tests &&
-        (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
-      test_sources += [ "TestMdns.cpp" ]
-    }
-
     public_deps = [
       "${chip_root}/src/lib/support",
       "${chip_root}/src/platform",
       "${chip_root}/src/system",
       "${nlunit_test_root}:nlunit-test",
     ]
+
+    if (chip_mdns != "none" && chip_enable_happy_tests &&
+        (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+      test_sources += [ "TestMdns.cpp" ]
+      public_deps += [ "${chip_root}/src/lib/mdns" ]
+    }
 
     # These tests appear to be broken on Mac.
     if (current_os != "mac") {

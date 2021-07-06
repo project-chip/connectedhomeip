@@ -18,32 +18,19 @@
 
 #pragma once
 
+#include <app/clusters/media-playback-server/media-playback-server.h>
 #include <app/common/gen/enums.h>
 #include <app/util/af-types.h>
 
 #include <core/CHIPError.h>
-
-enum MediaPlaybackRequest
-{
-    Play,
-    Pause,
-    Stop,
-    StartOver,
-    Previous,
-    Next,
-    Rewind,
-    FastForward,
-    SkipForward,
-    SkipBackward,
-    Seek
-};
 
 class MediaPlaybackManager
 {
 public:
     CHIP_ERROR Init();
     void storeNewPlaybackState(chip::EndpointId endpoint, uint8_t newPlaybackState);
-    EmberAfMediaPlaybackStatus proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest);
+    EmberAfMediaPlaybackStatus proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
+                                                         uint64_t deltaPositionMilliseconds);
 
 private:
     uint8_t oldPlaybackState;
