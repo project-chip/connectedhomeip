@@ -439,7 +439,7 @@ public:
     virtual ~HMAC_sha() {}
 
     /**
-     * @brief A function that implements SHA-256 based HMAC per <<FIPS1981>>.
+     * @brief A function that implements SHA-256 based HMAC per FIPS1981.
      *
      * The `out_length` must be at least CHIP_CRYPTO_HASH_LEN_BYTES
      *
