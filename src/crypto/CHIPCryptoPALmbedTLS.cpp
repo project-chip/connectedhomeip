@@ -274,6 +274,28 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                 uint8_t * out_buffer, size_t out_length)
+{
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(key_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(message != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(message_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_length >= CHIP_CRYPTO_HASH_LEN_BYTES, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const mbedtls_md_info_t * const md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    VerifyOrReturnError(md != nullptr, CHIP_ERROR_INTERNAL);
+
+    const int result = mbedtls_md_hmac(md, Uint8::to_const_uchar(key), key_length,
+                Uint8::to_const_uchar(message), message_length, out_buffer);
+
+    _log_mbedTLS_error(result);
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
                                         unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
