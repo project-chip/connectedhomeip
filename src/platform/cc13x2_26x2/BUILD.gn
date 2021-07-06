@@ -1,0 +1,90 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "cc13x2_26x2")
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+}
+
+static_library("cc13x2_26x2") {
+  sources = [
+    "../FreeRTOS/SystemTimeSupport.cpp",
+    "BlePlatformConfig.h",
+    "CC13X2_26X2Config.cpp",
+    "CC13X2_26X2Config.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DeviceNetworkProvisioningDelegateImpl.cpp",
+    "DeviceNetworkProvisioningDelegateImpl.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "Random.c",
+    "SystemPlatformConfig.h",
+  ]
+
+  deps = []
+
+  public_deps = [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform:platform_base",
+  ]
+
+  if (chip_enable_ble) {
+    sources += [
+      "BLEManagerImpl.cpp",
+      "BLEManagerImpl.h",
+    ]
+  }
+
+  if (chip_enable_openthread) {
+    # needed for MTD/FTD
+    import("//build_overrides/ti_simplelink_sdk.gni")
+    import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
+    public_deps += [
+      "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
+      "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
+      "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+    ]
+
+    if (ti_simplelink_device_family == "cc13x2_26x2") {
+      public_deps += [ "${openthread_root}:libopenthread-mtd" ]
+    } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+      public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+    }
+
+    sources += [
+      "../OpenThread/OpenThreadUtils.cpp",
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [ "../OpenThread/MdnsImpl.cpp" ]
+      deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+    }
+  }
+}
