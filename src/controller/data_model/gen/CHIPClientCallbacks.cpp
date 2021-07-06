@@ -272,14 +272,14 @@ static void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
     case Protocols::InteractionModel::ProtocolCode::UnsupportedCommand:
         ChipLogProgress(Zcl, "  status: UnsupportedCommand     (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reserved82:
-        ChipLogProgress(Zcl, "  status: Reserved82             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecated82:
+        ChipLogProgress(Zcl, "  status: Deprecated82           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reserved83:
-        ChipLogProgress(Zcl, "  status: Reserved83             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecated83:
+        ChipLogProgress(Zcl, "  status: Deprecated83           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reserved84:
-        ChipLogProgress(Zcl, "  status: Reserved84             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecated84:
+        ChipLogProgress(Zcl, "  status: Deprecated84           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
     case Protocols::InteractionModel::ProtocolCode::InvalidCommand:
         ChipLogProgress(Zcl, "  status: InvalidCommand         (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
@@ -296,8 +296,8 @@ static void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
     case Protocols::InteractionModel::ProtocolCode::ResourceExhausted:
         ChipLogProgress(Zcl, "  status: ResourceExhausted      (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reserved8a:
-        ChipLogProgress(Zcl, "  status: Reserved8a             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecated8a:
+        ChipLogProgress(Zcl, "  status: Deprecated8a           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
     case Protocols::InteractionModel::ProtocolCode::NotFound:
         ChipLogProgress(Zcl, "  status: NotFound               (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
@@ -308,23 +308,23 @@ static void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
     case Protocols::InteractionModel::ProtocolCode::InvalidDataType:
         ChipLogProgress(Zcl, "  status: InvalidDataType        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reserved8e:
-        ChipLogProgress(Zcl, "  status: Reserved8e             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecated8e:
+        ChipLogProgress(Zcl, "  status: Deprecated8e           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
     case Protocols::InteractionModel::ProtocolCode::UnsupportedRead:
         ChipLogProgress(Zcl, "  status: UnsupportedRead        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reserved90:
-        ChipLogProgress(Zcl, "  status: Reserved90             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecated90:
+        ChipLogProgress(Zcl, "  status: Deprecated90           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reserved91:
-        ChipLogProgress(Zcl, "  status: Reserved91             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecated91:
+        ChipLogProgress(Zcl, "  status: Deprecated91           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
     case Protocols::InteractionModel::ProtocolCode::Reserved92:
         ChipLogProgress(Zcl, "  status: Reserved92             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reserved93:
-        ChipLogProgress(Zcl, "  status: Reserved93             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecated93:
+        ChipLogProgress(Zcl, "  status: Deprecated93           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
     case Protocols::InteractionModel::ProtocolCode::Timeout:
         ChipLogProgress(Zcl, "  status: Timeout                (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
@@ -353,20 +353,20 @@ static void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
     case Protocols::InteractionModel::ProtocolCode::Busy:
         ChipLogProgress(Zcl, "  status: Busy                   (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reservedc0:
-        ChipLogProgress(Zcl, "  status: Reservedc0             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecatedc0:
+        ChipLogProgress(Zcl, "  status: Deprecatedc0           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reservedc1:
-        ChipLogProgress(Zcl, "  status: Reservedc1             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecatedc1:
+        ChipLogProgress(Zcl, "  status: Deprecatedc1           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reservedc2:
-        ChipLogProgress(Zcl, "  status: Reservedc2             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecatedc2:
+        ChipLogProgress(Zcl, "  status: Deprecatedc2           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
     case Protocols::InteractionModel::ProtocolCode::UnsupportedCluster:
         ChipLogProgress(Zcl, "  status: UnsupportedCluster     (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
-    case Protocols::InteractionModel::ProtocolCode::Reservedc4:
-        ChipLogProgress(Zcl, "  status: Reservedc4             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+    case Protocols::InteractionModel::ProtocolCode::Deprecatedc4:
+        ChipLogProgress(Zcl, "  status: Deprecatedc4           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
         break;
     case Protocols::InteractionModel::ProtocolCode::NoUpstreamSubscription:
         ChipLogProgress(Zcl, "  status: NoUpstreamSubscription (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
