@@ -389,7 +389,7 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="SCENE_VALID" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">scene valid</attribute>
     <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
-    <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="IEEE_ADDRESS" writable="false" optional="true">last configured by</attribute>
+    <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="EUI64" writable="false" optional="true">last configured by</attribute>
     <command source="client" code="0x00" name="AddScene" optional="false" cli="zcl scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as arrays of the form [[cluster ID] [length] [value0...n] ...]
