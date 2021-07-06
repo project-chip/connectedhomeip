@@ -88,6 +88,7 @@ using namespace chip::Encoding::LittleEndian;
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
+| OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
@@ -1201,6 +1202,11 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadClusterRevisionAttribute(u
 | Cluster ColorControl                                                | 0x0300 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ColorLoopSet                                                      |   0x44 |
+| * EnhancedMoveHue                                                   |   0x41 |
+| * EnhancedMoveToHue                                                 |   0x40 |
+| * EnhancedMoveToHueAndSaturation                                    |   0x43 |
+| * EnhancedStepHue                                                   |   0x42 |
 | * MoveColor                                                         |   0x08 |
 | * MoveColorTemperature                                              |   0x4B |
 | * MoveHue                                                           |   0x01 |
@@ -3435,6 +3441,93 @@ PacketBufferHandle encodeOtaSoftwareUpdateProviderClusterReadClusterRevisionAttr
                                                                                       EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadOtaSoftwareUpdateProviderClusterRevision", OtaSoftwareUpdateProvider::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::ClusterRevision);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster OccupancySensing                                            | 0x0406 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Occupancy                                                         | 0x0000 |
+| * OccupancySensorType                                               | 0x0001 |
+| * OccupancySensorTypeBitmap                                         | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeOccupancySensingClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverOccupancySensingAttributes", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Occupancy
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadOccupancyAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingOccupancy", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OccupancySensing::Attributes::Ids::Occupancy);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOccupancySensingClusterConfigureOccupancyAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                            uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportOccupancySensingOccupancy", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put32(OccupancySensing::Attributes::Ids::Occupancy)
+        .Put8(24)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OccupancySensorType
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadOccupancySensorTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingOccupancySensorType", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OccupancySensing::Attributes::Ids::OccupancySensorType);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OccupancySensorTypeBitmap
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadOccupancySensorTypeBitmapAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingOccupancySensorTypeBitmap", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OccupancySensing::Attributes::Ids::OccupancySensorTypeBitmap);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingClusterRevision", OccupancySensing::Id);
     buf.Put8(kFrameControlGlobalCommand)
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
