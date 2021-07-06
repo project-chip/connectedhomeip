@@ -82,7 +82,7 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
 
 EmberAfStatus writeCommissionedFabricsAttribute(uint8_t numberCommissionedFabrics)
 {
-    
+
     return emberAfWriteServerAttribute(0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID, (uint8_t *) &numberCommissionedFabrics,
                                                      ZCL_INT8U_ATTRIBUTE_TYPE);
 

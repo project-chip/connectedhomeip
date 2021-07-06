@@ -154,7 +154,7 @@
     _resultLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_resultLabel.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
     _resultLabel.adjustsFontSizeToFitWidth = YES;
-    
+
     // commissionedFabricsTextView
     _commissionedFabricsLabel = [UILabel new];
     _commissionedFabricsLabel.font = [UIFont systemFontOfSize:12];
@@ -248,7 +248,7 @@
                         });
                     }
                 }];
-    
+
             } else {
                 [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
             }
