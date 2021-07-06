@@ -1082,34 +1082,30 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(strlen(aName) <= SrpClient::kMaxNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
-    // Check if service with desired instance name already exists and try to find empty slot in array for new service
+    // Try to find an empty slot in array for the new service and
+    // remove the possible existing entry from anywhere in the list
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
-        if (strcmp(service.mInstanceName, "") == 0)
+        // Remove possible existing entry
+        if ((strcmp(service.mInstanceName, aInstanceName) == 0) && (strcmp(service.mName, aName) == 0))
         {
-            // Assign first empty slot in array for a new service.
-            srpService = &service;
-            break;
+            VerifyOrExit(MapOpenThreadError(otSrpClientClearService(mOTInst, &(service.mService))) == CHIP_NO_ERROR,
+                         error = MapOpenThreadError(OT_ERROR_FAILED));
+
+            // Clear memory immediately, as OnSrpClientNotification will not be called.
+            memset(&service, 0, sizeof(service));
         }
-        else
+
+        if ((srpService == nullptr) && (strcmp(service.mInstanceName, "") == 0))
         {
-            // Renew existing entry
-            if ((strcmp(service.mInstanceName, aInstanceName) == 0) && (strcmp(service.mName, aName) == 0))
-            {
-                VerifyOrExit(MapOpenThreadError(otSrpClientClearService(mOTInst, &(service.mService))) == CHIP_NO_ERROR,
-                             error = MapOpenThreadError(OT_ERROR_FAILED));
+            // Assign first empty slot found in array for a new service.
+            srpService = &service;
 
-                // Clear memory immediately, as OnSrpClientNotification will not be called.
-                memset(&service, 0, sizeof(service));
-
-                // Assign freed up entry for use
-                srpService = &service;
-                break;
-            }
+            // Keep looping to remove possible existing entry further in the list
         }
     }
 
-    // Verify is there an empty place for new service.
+    // Verify there is a slot found for the new service.
     VerifyOrExit(srpService, error = MapOpenThreadError(OT_ERROR_NO_BUFS));
 
     otSrpClientSetLeaseInterval(mOTInst, aLeaseInterval);
