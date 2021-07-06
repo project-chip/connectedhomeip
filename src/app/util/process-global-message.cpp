@@ -352,8 +352,8 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         }
         savedIndex                  = appResponseLength;
         flag                        = emberAfExtractCommandIds(flag, cmd, clusterId, appResponseData + appResponseLength + 1,
-                                                               static_cast<uint16_t>(EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength - 1),
-                                                               &appResponseLength, startCommandIdentifier, maximumCommandIdentifiers);
+                                        static_cast<uint16_t>(EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength - 1),
+                                        &appResponseLength, startCommandIdentifier, maximumCommandIdentifiers);
         appResponseData[savedIndex] = (flag ? 1 : 0);
         appResponseLength++;
         emberAfSendResponse();
