@@ -83,9 +83,8 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
 EmberAfStatus writeCommissionedFabricsAttribute(uint8_t numberCommissionedFabrics)
 {
 
-    return emberAfWriteServerAttribute(0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID, (uint8_t *) &numberCommissionedFabrics,
-                                                     ZCL_INT8U_ATTRIBUTE_TYPE);
-
+    return emberAfWriteServerAttribute(0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID,
+                                       (uint8_t *) &numberCommissionedFabrics, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, int32_t index)
@@ -154,7 +153,8 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
 
     if (err == CHIP_NO_ERROR && writeCommissionedFabricsAttribute(fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics", fabricIndex);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
+                       fabricIndex);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 

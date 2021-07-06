@@ -232,18 +232,22 @@
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
-                [cluster readAttributeCommissionedFabricsWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                [cluster readAttributeCommissionedFabricsWithResponseHandler:^(
+                    NSError * _Nullable error, NSDictionary * _Nullable values) {
                     if (error) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            [self updateResult:[NSString stringWithFormat:@"readAttributeCommissionedFabrics command failed: %@.", error]
+                            [self updateResult:[NSString
+                                                   stringWithFormat:@"readAttributeCommissionedFabrics command failed: %@.", error]
                                        isError:YES];
                         });
                     } else {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            [self updateResult:[NSString stringWithFormat:@"Command readAttributeCommissionedFabrics command succeeded."]
+                            [self updateResult:[NSString
+                                                   stringWithFormat:@"Command readAttributeCommissionedFabrics command succeeded."]
                                        isError:NO];
                             NSNumber * commissionedFabrics = [values objectForKey:@"value"];
-                            NSString *stringResult = [NSString stringWithFormat:@"# commissioned fabrics: %@", commissionedFabrics];
+                            NSString * stringResult =
+                                [NSString stringWithFormat:@"# commissioned fabrics: %@", commissionedFabrics];
                             _commissionedFabricsLabel.text = stringResult;
                         });
                     }
