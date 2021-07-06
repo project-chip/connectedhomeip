@@ -31,6 +31,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <app/common/gen/att-storage.h>
@@ -207,7 +208,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             Protocols::InteractionModel::ToUint16(ToInteractionModelProtocolCode(status)));
+                             chip::to_underlying(ToInteractionModelProtocolCode(status)));
     }
 
     // TODO: ZCL_STRUCT_ATTRIBUTE_TYPE is not included in this switch case currently, should add support for structures.
@@ -331,7 +332,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     default:
         ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
         return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             Protocols::InteractionModel::ToUint16(Protocols::InteractionModel::ProtocolCode::UnsupportedRead));
+                             chip::to_underlying(Protocols::InteractionModel::ProtocolCode::UnsupportedRead));
     }
 
     // TODO: Add DataVersion support
