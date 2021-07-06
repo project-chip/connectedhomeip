@@ -56,7 +56,10 @@ void EchoServer::Shutdown()
 CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
+    payload->DebugDump("EchoServer::OnMessageReceive");
+
     CHIP_ERROR err = CHIP_NO_ERROR;
+
     System::PacketBufferHandle response;
 
     // NOTE: we already know this is an Echo Request message because we explicitly registered with the
