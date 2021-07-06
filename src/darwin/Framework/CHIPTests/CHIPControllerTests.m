@@ -66,8 +66,8 @@
     XCTAssertFalse([controller getConnectedDevice:1234
                                             queue:dispatch_get_main_queue()
                                 completionHandler:^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+                                    XCTAssertEqual(error.code, CHIPErrorCodeInvalidState);
                                 }]);
-    XCTAssertEqual(error.code, CHIPErrorCodeInvalidState);
     XCTAssertFalse([controller unpairDevice:1 error:&error]);
     XCTAssertEqual(error.code, CHIPErrorCodeInvalidState);
 }
