@@ -47,7 +47,7 @@
 
 // for pulling in defines dealing with EITHER server or client
 #include "app/util/common.h"
-#include "gen/callback.h"
+#include <app/common/gen/callback.h>
 #include <app/util/af-main.h>
 
 #include <app/reporting/reporting.h>

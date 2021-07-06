@@ -1318,13 +1318,13 @@ static constexpr AttributeId ApplicationId           = 0x0002;
 namespace ApplicationBasic {
 namespace Attributes {
 namespace Ids {
-static constexpr AttributeId VendorName       = 0x0000;
-static constexpr AttributeId VendorId         = 0x0001;
-static constexpr AttributeId ApplicationName  = 0x0002;
-static constexpr AttributeId ProductId        = 0x0003;
-static constexpr AttributeId ApplicationId    = 0x0005;
-static constexpr AttributeId CatalogVendorId  = 0x0006;
-static constexpr AttributeId ApplicationSatus = 0x0007;
+static constexpr AttributeId VendorName        = 0x0000;
+static constexpr AttributeId VendorId          = 0x0001;
+static constexpr AttributeId ApplicationName   = 0x0002;
+static constexpr AttributeId ProductId         = 0x0003;
+static constexpr AttributeId ApplicationId     = 0x0005;
+static constexpr AttributeId CatalogVendorId   = 0x0006;
+static constexpr AttributeId ApplicationStatus = 0x0007;
 } // namespace Ids
 } // namespace Attributes
 } // namespace ApplicationBasic

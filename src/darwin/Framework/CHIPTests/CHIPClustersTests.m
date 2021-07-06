@@ -3072,18 +3072,18 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterApplicationBasicReadAttributeApplicationSatusWithResponseHandler
+- (void)testSendClusterApplicationBasicReadAttributeApplicationStatusWithResponseHandler
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"ApplicationBasicReadAttributeApplicationSatusWithResponseHandler"];
+        [self expectationWithDescription:@"ApplicationBasicReadAttributeApplicationStatusWithResponseHandler"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeApplicationSatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"ApplicationBasic ApplicationSatus Error: %@", err);
+    [cluster readAttributeApplicationStatusWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ApplicationBasic ApplicationStatus Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

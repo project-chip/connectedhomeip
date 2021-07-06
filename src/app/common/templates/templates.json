@@ -41,6 +41,11 @@
             "output": "src/app/common/gen/attribute-type.h"
         },
         {
+            "path": "../../zap-templates/templates/app/callback.zapt",
+            "name": "ZCL callback header",
+            "output": "src/app/common/gen/callback.h"
+        },
+        {
             "path": "../../zap-templates/templates/app/cluster-id.zapt",
             "name": "ZCL cluster-id header",
             "output": "src/app/common/gen/cluster-id.h"

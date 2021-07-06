@@ -806,15 +806,11 @@ void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAtt
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters}}
-{{#if (user_cluster_has_enabled_command name side)}}
-{{#all_user_cluster_commands}}
-{{#if (isStrEqual clusterName parent.name)}}
-{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
-{{#if (isStrEndsWith name "Response")}}
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::Command * commandObj{{#zcl_command_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/zcl_command_arguments}})
+{{#chip_server_cluster_responses}}
+bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::Command * commandObj{{#chip_server_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_server_cluster_response_arguments}})
 {
     ChipLogProgress(Zcl, "{{asCamelCased name false}}:");
-    {{#zcl_command_arguments}}
+    {{#chip_server_cluster_response_arguments}}
     {{#if (isStrEqual label "status")}}
     LogStatus(status);
     {{else if (isOctetString type)}}
@@ -825,11 +821,11 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
     {{else}}
     ChipLogProgress(Zcl, "  {{asSymbol label}}: {{asPrintFormat type}}", {{asSymbol label}});
     {{/if}}
-    {{/zcl_command_arguments}}
+    {{/chip_server_cluster_response_arguments}}
 
     GET_CLUSTER_RESPONSE_CALLBACKS("{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback");
 
-    {{#zcl_command_arguments}}
+    {{#chip_server_cluster_response_arguments}}
     {{#if (isStrEqual label "status")}}
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -838,18 +834,14 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
         return true;
     }
     {{/if}}
-    {{/zcl_command_arguments}}
+    {{/chip_server_cluster_response_arguments}}
 
     Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback> * cb = Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}});
+    cb->mCall(cb->mContext{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}});
     return true;
 }
 
-{{/if}}
-{{/if}}
-{{/if}}
-{{/all_user_cluster_commands}}
-{{/if}}
+{{/chip_server_cluster_responses}}
 {{/chip_client_clusters}}
 
 bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)

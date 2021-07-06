@@ -566,8 +566,8 @@ static constexpr CommandId MediaSkipForward          = 0x08;
 static constexpr CommandId MediaSkipForwardResponse  = 0x08;
 static constexpr CommandId MediaSkipBackward         = 0x09;
 static constexpr CommandId MediaSkipBackwardResponse = 0x09;
-static constexpr CommandId MediaSkipSeek             = 0x0A;
-static constexpr CommandId MediaSkipSeekResponse     = 0x0A;
+static constexpr CommandId MediaSeek                 = 0x0A;
+static constexpr CommandId MediaSeekResponse         = 0x0B;
 } // namespace Ids
 } // namespace Commands
 } // namespace MediaPlayback

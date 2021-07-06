@@ -18,23 +18,8 @@
 
 #include "LowPowerManager.h"
 
-#include <app/util/af.h>
-
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-
-bool LowPowerManager::proxySleepRequest()
+bool lowPowerClusterSleep()
 {
     // TODO: Insert code here
-    return true;
-}
-
-bool emberAfLowPowerClusterSleepCallback()
-{
-    bool success         = LowPowerManager().proxySleepRequest();
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
     return true;
 }
