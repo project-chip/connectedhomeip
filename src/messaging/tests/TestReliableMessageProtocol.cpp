@@ -963,6 +963,130 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     exchange->Close();
 }
 
+void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
+{
+    /**
+     * This test performs the following sequence of actions, where all messages
+     * are sent with MRP enabled:
+     *
+     * 1) Initiator sends message to responder.
+     * 2) Responder responds to the message (piggybacking an ack) and closes
+     *    the exchange.
+     * 3) Initiator sends a response to the response on the same exchange, again
+     *    piggybacking an ack.
+     *
+     * This is basically the "command, response, status response" flow, with the
+     * responder closing the exchange after it sends the response.
+     */
+
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockReceiver;
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    mockReceiver.mTestSuite = inSuite;
+
+    MockAppDelegate mockSender;
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    mockSender.mTestSuite = inSuite;
+
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 0;
+    gLoopback.mDroppedMessageCount = 0;
+    // We need to keep both exchanges alive for the thing we are testing here.
+    mockReceiver.mRetainExchange = true;
+    mockSender.mRetainExchange   = true;
+
+    NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, !mockReceiver.mReceivedPiggybackAck);
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // And that it was received.
+    NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, !mockReceiver.mReceivedPiggybackAck);
+
+    // And that we have not seen an ack yet.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    ReliableMessageContext * receiverRc = mockReceiver.mExchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, receiverRc->IsAckPending());
+
+    // Ensure that we have not gotten any app-level responses or acks so far.
+    NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, !mockSender.mReceivedPiggybackAck);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    // Now send a message from the other side.
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    mockReceiver.mExchange->Close();
+
+    // Ensure the response was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // Ensure that we have received that response and it had a piggyback ack.
+    NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, mockSender.mReceivedPiggybackAck);
+    // And that we are now waiting for an ack for the response.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    // Reset various state so we can measure things again.
+    mockReceiver.IsOnMessageReceivedCalled = false;
+    mockReceiver.mReceivedPiggybackAck     = false;
+    mockSender.IsOnMessageReceivedCalled   = false;
+    mockSender.mReceivedPiggybackAck       = false;
+
+    // Now send a second message to the other side.
+    buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    exchange->Close();
+
+    // Ensure the message was sent (and the ack for it was also sent).
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 4);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+
+    // And that it was not received (because the exchange is closed on the
+    // receiver).
+    NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
+
+    // And that we are not expecting an ack; acks should have been flushed
+    // immediately on the receiver, due to the exchange being closed.
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+}
+
 // Test Suite
 
 /**
@@ -983,6 +1107,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test that a reply after a standalone ack comes through correctly", CheckReceiveAfterStandaloneAck),
     NL_TEST_DEF("Test that a reply to a non-MRP message does not piggyback an ack even if there were MRP things happening on the context before", CheckNoPiggybackAfterPiggyback),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
+    NL_TEST_DEF("Test command, response, default response, with receiver closing exchange after sending response", CheckMessageAfterClosed),
 
     NL_TEST_SENTINEL()
 };
