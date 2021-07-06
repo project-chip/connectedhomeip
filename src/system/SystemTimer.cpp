@@ -119,10 +119,10 @@ bool Timer::IsEarlierEpoch(const Timer::Epoch & inFirst, const Timer::Epoch & in
  *  @param[in]  aOnComplete          A pointer to the callback function when this timer fires
  *  @param[in]  aAppState            An arbitrary pointer to be passed into onComplete when this timer fires
  *
- *  @retval #CHIP_SYSTEM_NO_ERROR Unconditionally.
+ *  @retval #CHIP_NO_ERROR Unconditionally.
  *
  */
-Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState)
+CHIP_ERROR Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState)
 {
     Layer & lLayer = this->SystemLayer();
 
@@ -168,7 +168,7 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
         this->mNextTimer   = lTimer->mNextTimer;
         lTimer->mNextTimer = this;
     }
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -191,7 +191,7 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
             this->HandleComplete();
         });
         dispatch_resume(timerSource);
-        return CHIP_SYSTEM_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
@@ -200,12 +200,12 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
 #endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
+CHIP_ERROR Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
 {
-    Error err      = CHIP_SYSTEM_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     Layer & lLayer = this->SystemLayer();
 
     this->AppState     = aAppState;
@@ -243,9 +243,9 @@ Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
 /**
  *  This method de-initializes the timer object, and prevents this timer from firing if it hasn't done so.
  *
- *  @retval #CHIP_SYSTEM_NO_ERROR Unconditionally.
+ *  @retval #CHIP_NO_ERROR Unconditionally.
  */
-Error Timer::Cancel()
+CHIP_ERROR Timer::Cancel()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     Layer & lLayer = this->SystemLayer();
@@ -297,7 +297,7 @@ Error Timer::Cancel()
 
     this->Release();
 exit:
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -321,7 +321,7 @@ void Timer::HandleComplete()
 
     // Invoke the app's callback, if it's still valid.
     if (lOnComplete != nullptr)
-        lOnComplete(&lLayer, lAppState, CHIP_SYSTEM_NO_ERROR);
+        lOnComplete(&lLayer, lAppState, CHIP_NO_ERROR);
 
 exit:
     return;
@@ -339,10 +339,10 @@ exit:
  *  @note
  *      It's harmless if this API gets called and there are no expired timers.
  *
- *  @return CHIP_SYSTEM_NO_ERROR on success, error code otherwise.
+ *  @return CHIP_NO_ERROR on success, error code otherwise.
  *
  */
-Error Timer::HandleExpiredTimers(Layer & aLayer)
+CHIP_ERROR Timer::HandleExpiredTimers(Layer & aLayer)
 {
     size_t timersHandled = 0;
 
@@ -394,7 +394,7 @@ Error Timer::HandleExpiredTimers(Layer & aLayer)
         }
     }
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 

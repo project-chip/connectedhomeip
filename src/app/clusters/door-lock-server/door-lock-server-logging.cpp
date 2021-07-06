@@ -40,12 +40,11 @@
 
 #include "door-lock-server.h"
 #include <app/common/gen/attribute-id.h>
+#include <app/common/gen/callback.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <assert.h>
-
-#include "gen/callback.h"
 
 #include <app/Command.h>
 #include <support/CodeUtils.h>

@@ -221,7 +221,7 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
-                          SecureSession::SessionRole direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
+                          SecureSession::SessionRole direction, Transport::AdminId admin);
 
     void ExpirePairing(SecureSessionHandle session);
     void ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin);
@@ -324,7 +324,7 @@ private:
     /**
      * Callback for timer expiry check
      */
-    static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
+    static void ExpiryTimerCallback(System::Layer * layer, void * param, CHIP_ERROR error);
 
     void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                System::PacketBufferHandle && msg);

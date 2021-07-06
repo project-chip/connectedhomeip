@@ -19,10 +19,13 @@
 const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const string       = require(zapPath + 'util/string.js')
 
 const { Clusters, asBlocks, asPromise } = require('../../common/ClustersHelper.js');
 const StringHelper                      = require('../../common/StringHelper.js');
 const ChipTypesHelper                   = require('../../common/ChipTypesHelper.js');
+
+const kGlobalAttributes = [ 0xfffc, 0xfffd ];
 
 function throwErrorIfUndefined(item, errorMsg, conditions)
 {
@@ -48,11 +51,12 @@ function checkIsInsideClusterBlock(context, name)
 
 function checkIsInsideCommandBlock(context, name)
 {
-  const commandSource = context.commandSource;
-  const commandId     = context.id;
-  const errorMsg      = name + ': Not inside a ({#chip_cluster_commands}} block.';
+  const clusterName = context.clusterName;
+  const clusterSide = context.clusterSide;
+  const commandId   = context.id;
+  const errorMsg    = name + ': Not inside a ({#chip_cluster_commands}} block.';
 
-  throwErrorIfUndefined(context, errorMsg, [ commandId, commandSource ]);
+  throwErrorIfUndefined(context, errorMsg, [ commandId, clusterName, clusterSide ]);
 
   return commandId;
 }
@@ -137,7 +141,7 @@ function chip_has_clusters(options)
  * for a given cluster.
  *
  * This function is meant to be used inside a {{#chip_server_clusters}}
- * block. It will throws otherwise.
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
@@ -148,18 +152,33 @@ function chip_server_cluster_commands(options)
 }
 
 /**
+ * Creates block iterator over the server side cluster responses
+ * for a given cluster.
+ *
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_cluster_responses(options)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_server_cluster_response');
+  return asBlocks.call(this, Clusters.getServerResponses(clusterName), options);
+}
+
+/**
  * Creates block iterator over the server side cluster command arguments
  * for a given command.
  *
  * This function is meant to be used inside a {{#chip_server_cluster_commands}}
- * block. It will throws otherwise.
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
 function chip_server_cluster_command_arguments(options)
 {
-  const commandId                    = checkIsInsideCommandBlock(this, 'isManufacturerSpecificCommand');
-  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'isManufacturerSpecificCommand');
+  const commandId                    = checkIsInsideCommandBlock(this, 'chip_server_cluster_command_arguments');
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'chip_server_cluster_command_arguments');
 
   const filter = command => command.id == commandId;
   const promise          = Clusters.getClientCommands(clusterName).then(commands => commands.find(filter).arguments);
@@ -167,10 +186,29 @@ function chip_server_cluster_command_arguments(options)
 }
 
 /**
+ * Creates block iterator over the server side cluster response arguments
+ * for a given command.
+ *
+ * This function is meant to be used inside a {{#chip_server_cluster_responses}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_cluster_response_arguments(options)
+{
+  const commandId                    = checkIsInsideCommandBlock(this, 'chip_server_cluster_response_arguments');
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'chip_server_cluster_response_arguments');
+
+  const filter = command => command.id == commandId;
+  const promise          = Clusters.getServerResponses(clusterName).then(commands => commands.find(filter).arguments);
+  return asBlocks.call(this, promise, options);
+}
+
+/**
  * Returns if a given cluster has any attributes of type List[T]
  *
  * This function is meant to be used inside a {{#chip_server_clusters}}
- * block. It will throws otherwise.
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
@@ -186,7 +224,7 @@ function chip_has_list_attributes(options)
  * Returns if a given server cluster has any attributes of type List[T]
  *
  * This function is meant to be used inside a {{#chip_server_clusters}}
- * block. It will throws otherwise.
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
@@ -202,7 +240,7 @@ function chip_server_has_list_attributes(options)
  * Returns if a given client cluster has any attributes of type List[T]
  *
  * This function is meant to be used inside a {{#chip_client_clusters}}
- * block. It will throws otherwise.
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
@@ -215,47 +253,11 @@ function chip_client_has_list_attributes(options)
 }
 
 /**
- * Returns if a given command argument chip type is signed.
- *
- * This function is meant to be used inside a {{#chip_*}} block.
- * It will throws otherwise.
- *
- * @param {*} options
- */
-function isSignedType()
-{
-  const type = checkIsChipType(this, 'isSignedType');
-  switch (type) {
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-    return true;
-  default:
-    return false;
-  }
-}
-
-/**
- * Returns if a given command argument chip type is discrete.
- *
- * This function is meant to be used inside a {{#chip_*}} block.
- * It will throws otherwise.
- *
- * @param {*} options
- */
-function isDiscreteType()
-{
-  checkIsChipType(this, 'isSignedType');
-  return this.discrete;
-}
-
-/**
  * Creates block iterator over the server side cluster attributes
  * for a given cluster.
  *
  * This function is meant to be used inside a {{#chip_server_clusters}}
- * block. It will throws otherwise.
+ * block. It will throw otherwise.
  *
  * @param {*} options
  */
@@ -266,10 +268,24 @@ function chip_server_cluster_attributes(options)
 }
 
 /**
+ * Returns whether a given attribute is global.
+ *
+ * This function is meant to be used inside a {{#chip_server_cluster_attributes}} block.
+ * It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function isGlobalAttribute(options)
+{
+  checkIsInsideAttributeBlock(this, 'isGlobalAttribute');
+  return kGlobalAttributes.includes(this.code);
+}
+
+/**
  * Returns if a given attribute is writable.
  *
  * This function is meant to be used inside a {{#chip_server_cluster_attributes}} block.
- * It will throws otherwise.
+ * It will throw otherwise.
  *
  * @param {*} options
  */
@@ -283,7 +299,7 @@ function isWritableAttribute(options)
  * Returns if a given attribute is reportable.
  *
  * This function is meant to be used inside a {{#chip_server_cluster_attributes}} block.
- * It will throws otherwise.
+ * It will throw otherwise.
  *
  * @param {*} options
  */
@@ -297,7 +313,7 @@ function isReportableAttribute(options)
  * Returns if a given command is manufacturer specific
  *
  * This function is meant to be used inside a {{#chip_server_cluster_commands}} block.
- * It will throws otherwise.
+ * It will throw otherwise.
  *
  * @param {*} options
  */
@@ -390,26 +406,47 @@ function chip_attribute_list_entryTypes(options)
   return templateUtil.collectBlocks(this.items, options, this);
 }
 
+function asLowerCamelCase(label)
+{
+  let str = string.toCamelCase(label, true);
+  return str.replace(/[\.:]/g, '');
+}
+
+function asUpperCamelCase(label)
+{
+  let str = string.toCamelCase(label, false);
+  return str.replace(/[\.:]/g, '');
+}
+
+function hasSpecificAttributes(options)
+{
+  return this.count > kGlobalAttributes.length;
+}
+
 //
 // Module exports
 //
-exports.chip_clusters                         = chip_clusters;
-exports.chip_has_clusters                     = chip_has_clusters;
-exports.chip_client_clusters                  = chip_client_clusters;
-exports.chip_has_client_clusters              = chip_has_client_clusters;
-exports.chip_server_clusters                  = chip_server_clusters;
-exports.chip_has_server_clusters              = chip_has_server_clusters;
-exports.chip_server_cluster_commands          = chip_server_cluster_commands;
-exports.chip_server_cluster_command_arguments = chip_server_cluster_command_arguments
-exports.chip_attribute_list_entryTypes        = chip_attribute_list_entryTypes;
-exports.asBasicType                           = ChipTypesHelper.asBasicType;
-exports.isSignedType                          = isSignedType;
-exports.isDiscreteType                        = isDiscreteType;
-exports.chip_server_cluster_attributes        = chip_server_cluster_attributes;
-exports.chip_has_list_attributes              = chip_has_list_attributes;
-exports.chip_server_has_list_attributes       = chip_server_has_list_attributes;
-exports.chip_client_has_list_attributes       = chip_client_has_list_attributes;
-exports.isWritableAttribute                   = isWritableAttribute;
-exports.isReportableAttribute                 = isReportableAttribute;
-exports.isManufacturerSpecificCommand         = isManufacturerSpecificCommand;
-exports.asCallbackAttributeType               = asCallbackAttributeType;
+exports.chip_clusters                          = chip_clusters;
+exports.chip_has_clusters                      = chip_has_clusters;
+exports.chip_client_clusters                   = chip_client_clusters;
+exports.chip_has_client_clusters               = chip_has_client_clusters;
+exports.chip_server_clusters                   = chip_server_clusters;
+exports.chip_has_server_clusters               = chip_has_server_clusters;
+exports.chip_server_cluster_commands           = chip_server_cluster_commands;
+exports.chip_server_cluster_command_arguments  = chip_server_cluster_command_arguments
+exports.chip_server_cluster_responses          = chip_server_cluster_responses;
+exports.chip_server_cluster_response_arguments = chip_server_cluster_response_arguments
+exports.chip_attribute_list_entryTypes         = chip_attribute_list_entryTypes;
+exports.asBasicType                            = ChipTypesHelper.asBasicType;
+exports.chip_server_cluster_attributes         = chip_server_cluster_attributes;
+exports.chip_has_list_attributes               = chip_has_list_attributes;
+exports.chip_server_has_list_attributes        = chip_server_has_list_attributes;
+exports.chip_client_has_list_attributes        = chip_client_has_list_attributes;
+exports.isGlobalAttribute                      = isGlobalAttribute;
+exports.isWritableAttribute                    = isWritableAttribute;
+exports.isReportableAttribute                  = isReportableAttribute;
+exports.isManufacturerSpecificCommand          = isManufacturerSpecificCommand;
+exports.asCallbackAttributeType                = asCallbackAttributeType;
+exports.asLowerCamelCase                       = asLowerCamelCase;
+exports.asUpperCamelCase                       = asUpperCamelCase;
+exports.hasSpecificAttributes                  = hasSpecificAttributes;

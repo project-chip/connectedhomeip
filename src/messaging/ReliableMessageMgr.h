@@ -102,7 +102,7 @@ public:
      * Handle physical wakeup of system due to ReliableMessageProtocol wakeup.
      *
      */
-    static void Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static void Timeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     /**
      *  Add a CHIP message into the retransmission table to be subsequently resent if a corresponding acknowledgment

@@ -39,14 +39,14 @@ int DeviceHelpHandler(int argc, char ** argv)
     return 0;
 }
 
-static int FactoryResetHandler(int argc, char ** argv)
+static CHIP_ERROR FactoryResetHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "Performing factory reset ... \r\n");
     DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-static int DeviceHandler(int argc, char ** argv)
+static CHIP_ERROR DeviceHandler(int argc, char ** argv)
 {
     if (argc == 0)
     {

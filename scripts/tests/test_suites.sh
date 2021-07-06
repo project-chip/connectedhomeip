@@ -18,9 +18,30 @@
 
 set -e
 
-declare -a test_array="($(find src/app/tests/suites -type f -name "*.yaml" -exec basename {} .yaml \;))"
 declare -i iterations=20
 declare -i background_pid=0
+
+# read shell arguments
+# - a for application
+# - i for number of iterations you want to have
+while getopts a:i: flag; do
+    case "$flag" in
+        a) application=$OPTARG ;;
+        i) iterations=$OPTARG ;;
+    esac
+done
+
+echo "Running tests for application: $application, with iterations set to: $iterations"
+
+if [[ $application == "tv" ]]; then
+    declare -a test_array="($(find src/app/tests/suites -type f -name "TV_*.yaml" -exec basename {} .yaml \;))"
+    cp examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini /tmp/chip_tv_config.ini
+# in case there's no application argument
+# always default to all-cluters app
+else
+    application="all-clusters"
+    declare -a test_array="($(find src/app/tests/suites -type f -name "Test*.yaml" -exec basename {} .yaml \;))"
+fi
 
 cleanup() {
     if [[ $background_pid != 0 ]]; then
@@ -30,12 +51,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
-if [[ -n $1 ]]; then
-    iterations=$1
-    if [[ $iterations == 0 ]]; then
-        echo "Invalid iteration count: '$1'"
-        exit 1
-    fi
+if [[ $iterations == 0 ]]; then
+    echo "Invalid iteration count: '$1'"
+    exit 1
 fi
 
 echo "Found tests:"
@@ -55,7 +73,7 @@ for j in "${iter_array[@]}"; do
         echo "          * Starting cluster server"
         rm -rf /tmp/chip_tool_config.ini
         # This part is a little complicated.  We want to
-        # 1) Start chip-all-clusters-app in the background
+        # 1) Start chip-app in the background
         # 2) Pipe its output through tee so we can wait until it's ready for a
         #    PASE handshake.
         # 3) Save its pid off so we can kill it.
@@ -72,14 +90,14 @@ for j in "${iter_array[@]}"; do
 
         # Clear out our temp files so we don't accidentally do a stale
         # read from them before we write to them.
-        rm -rf /tmp/all-clusters-log
-        touch /tmp/all-clusters-log
+        rm -rf /tmp/"$application"-log
+        touch /tmp/"$application"-log
         rm -rf /tmp/pid
         (
-            stdbuf -o0 out/debug/standalone/chip-all-clusters-app &
+            stdbuf -o0 out/debug/standalone/chip-"$application"-app &
             echo $! >&3
-        ) 3>/tmp/pid | tee /tmp/all-clusters-log &
-        while ! grep -q "Server Listening" /tmp/all-clusters-log; do
+        ) 3>/tmp/pid | tee /tmp/"$application"-log &
+        while ! grep -q "Server Listening" /tmp/"$application"-log; do
             :
         done
         # Now read $background_pid from /tmp/pid; presumably it's

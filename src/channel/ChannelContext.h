@@ -165,7 +165,7 @@ private:
 
     // Preparing sub-states
     void EnterAddressResolve();
-    static void AddressResolveTimeout(System::Layer * aLayer, void * aAppState, System::Error aError);
+    static void AddressResolveTimeout(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError);
     void AddressResolveTimeout();
     void ExitAddressResolve() {}
 

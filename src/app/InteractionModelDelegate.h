@@ -153,23 +153,25 @@ public:
     }
 
     /**
-     * Notification that a WriteClient has received an Write Response containing a status code.
+     * Notification that a WriteClient has received a Write Response containing a status code.
+     * aAttributeIndex is processing attribute index which can identify attribute if there exists multiple attribute changes with
+     * same attribute path
      */
     virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
                                            const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                            const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                           AttributePathParams & aAttributePathParams, uint8_t aCommandIndex)
+                                           AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     /**
-     * Notification that a Write Response has already been processed.
+     * Notification that a Write Response has been processed and application can do further work .
      */
     virtual CHIP_ERROR WriteResponseProcessed(const WriteClient * apWriteClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
-     * Notification that a Write Client has received an Write Response and fails to process a attribute data element in that
+     * Notification that a Write Client has received a Write Response and fails to process a attribute data element in that
      * write response
      */
     virtual CHIP_ERROR WriteResponseProtocolError(const WriteClient * apWriteClient, uint8_t aAttributeIndex)
@@ -179,7 +181,8 @@ public:
 
     /**
      * Notification that a write client encountered an asynchronous failure.
-     * @param[in]  aCWriteClient write interactions
+     * @param[in]  apWriteClient  A current write client which can identify the write client to the consumer, particularly
+     * during multiple write interactions
      * @param[in]  aError         A error that could be CHIP_ERROR_TIMEOUT when write client fails to receive, or other error when
      *                            fail to process write response.
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented

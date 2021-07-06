@@ -193,12 +193,8 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
 
 // TODO(#7376): add attribute callbacks.
 
-{{#all_user_clusters}}
-{{#if (isClient side) }}
-{{#if (user_cluster_has_enabled_command name side)}}
-{{#all_user_cluster_commands}}
-{{#if (isStrEqual clusterName parent.name)}}
-{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+{{#chip_client_clusters}}
+{{#chip_server_cluster_responses}}
 class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback : public Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>
 {
     public:
@@ -225,7 +221,7 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             env->DeleteGlobalRef(javaCallbackRef);
         };
 
-        static void CallbackFn(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
+        static void CallbackFn(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}})
         {
             StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
             CHIP_ERROR err = CHIP_NO_ERROR;
@@ -233,7 +229,7 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             jobject javaCallbackRef;
             jmethodID javaMethod;
             CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback * cppCallback = nullptr;
-            {{#zcl_command_arguments}}
+            {{#chip_server_cluster_response_arguments}}
             {{#unless (isStrEqual label "status")}}
             {{#if (isOctetString type)}}
             jbyteArray {{asSymbol label}}Arr;
@@ -242,7 +238,7 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             UtfString {{asSymbol label}}Str(env, "");
             {{/if}}
             {{/unless}}
-            {{/zcl_command_arguments}}
+            {{/chip_server_cluster_response_arguments}}
 
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -252,10 +248,10 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             javaCallbackRef = cppCallback->javaCallbackRef;
             VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}{{#if isArray}}{{else if (isOctetString type)}}[B{{else if (isShortString type)}}Ljava/lang/String;{{else}}{{asJniSignature label type}}{{/if}}{{/unless}}{{/zcl_command_arguments}})V", &javaMethod);
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}{{#if isArray}}{{else if (isOctetString type)}}[B{{else if (isShortString type)}}Ljava/lang/String;{{else}}{{asJniSignature label type}}{{/if}}{{/unless}}{{/chip_server_cluster_response_arguments}})V", &javaMethod);
             SuccessOrExit(err);
 
-            {{#zcl_command_arguments}}
+            {{#chip_server_cluster_response_arguments}}
             {{#unless (isStrEqual label "status")}}
             {{#if (isOctetString type)}}
             {{asSymbol label}}Arr = env->NewByteArray({{asSymbol label}}.size());
@@ -265,13 +261,13 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
             {{/if}}
             {{/unless}}
-            {{/zcl_command_arguments}}
+            {{/chip_server_cluster_response_arguments}}
 
             env->CallVoidMethod(javaCallbackRef, javaMethod
-                {{#zcl_command_arguments}}
+                {{#chip_server_cluster_response_arguments}}
                 {{#unless (isStrEqual label "status")}}
                 {{#if isArray}}
-                // {{asSymbol label}}: {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}}
+                // {{asSymbol label}}: {{asUnderlyingZclType type}}
                 // Conversion from this type to Java is not properly implemented yet
                 {{else if (isOctetString type)}}
                 , {{asSymbol label}}Arr
@@ -281,16 +277,16 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
                 , static_cast<{{asJniBasicTypeForZclType type}}>({{asSymbol label}})
                 {{/if}}
                 {{/unless}}
-                {{/zcl_command_arguments}}
+                {{/chip_server_cluster_response_arguments}}
             );
 
-            {{#zcl_command_arguments}}
+            {{#chip_server_cluster_response_arguments}}
             {{#unless (isStrEqual label "status")}}
             {{#if (isOctetString type)}}
             env->DeleteLocalRef({{asSymbol label}}Arr);
             {{/if}}
             {{/unless}}
-            {{/zcl_command_arguments}}
+            {{/chip_server_cluster_response_arguments}}
 
         exit:
             if (err != CHIP_NO_ERROR) {
@@ -306,12 +302,8 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
         jobject javaCallbackRef;
 };
 
-{{/if}}
-{{/if}}
-{{/all_user_cluster_commands}}
-{{/if}}
-{{/if}}
-{{/all_user_clusters}}
+{{/chip_server_cluster_responses}}
+{{/chip_client_clusters}}
 JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlong clusterPtr)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -368,7 +360,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, {{asCamelCased name}})(J
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}chip::ByteSpan((const uint8_t*) {{asCamelCased label}}Arr.data(), {{asCamelCased label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asCamelCased label}}, strlen({{asCamelCased label}}Str.c_str())){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
+    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asCamelCased label}}Arr.data(), {{asCamelCased label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asCamelCased label}}, strlen({{asCamelCased label}}Str.c_str())){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
     SuccessOrExit(err);
 
 exit: 

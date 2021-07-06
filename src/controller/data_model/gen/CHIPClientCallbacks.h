@@ -137,9 +137,9 @@ typedef void (*MediaPlaybackClusterMediaPauseResponseCallback)(void * context, u
 typedef void (*MediaPlaybackClusterMediaPlayResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaPreviousResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaRewindResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaSeekResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaSkipBackwardResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaSkipForwardResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
-typedef void (*MediaPlaybackClusterMediaSkipSeekResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaStartOverResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaStopResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*NetworkCommissioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
@@ -154,12 +154,12 @@ typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(v
                                                                                uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                              uint8_t * debugText);
-typedef void (*OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
-                                                                                 uint32_t delayedActionTime);
-typedef void (*OtaSoftwareUpdateServerClusterQueryImageResponseCallback)(void * context, uint32_t delayedActionTime,
-                                                                         uint8_t * imageURI, uint32_t softwareVersion,
-                                                                         chip::ByteSpan updateToken, uint8_t userConsentNeeded,
-                                                                         chip::ByteSpan metadataForClient);
+typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
+                                                                                   uint32_t delayedActionTime);
+typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(void * context, uint32_t delayedActionTime,
+                                                                           uint8_t * imageURI, uint32_t softwareVersion,
+                                                                           chip::ByteSpan updateToken, uint8_t userConsentNeeded,
+                                                                           chip::ByteSpan metadataForRequestor);
 typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
                                                                    chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
                                                                    chip::ByteSpan VendorReserved3, chip::ByteSpan Signature);

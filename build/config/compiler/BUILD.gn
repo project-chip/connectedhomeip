@@ -182,6 +182,7 @@ config("strict_warnings") {
     cflags += [
       "-Wimplicit-fallthrough",
       "-Wheader-hygiene",
+      "-Wformat-type-confusion",
     ]
   }
 

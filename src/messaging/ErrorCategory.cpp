@@ -77,8 +77,8 @@ CHIP_ERROR FilterUDPSendError(CHIP_ERROR err, bool isMulticast)
  */
 bool IsSendErrorNonCritical(CHIP_ERROR err)
 {
-    return (err == INET_ERROR_NOT_IMPLEMENTED || err == INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED ||
-            err == INET_ERROR_MESSAGE_TOO_LONG || err == INET_ERROR_NO_MEMORY || CHIP_CONFIG_IsPlatformErrorNonCritical(err));
+    return (err == CHIP_ERROR_NOT_IMPLEMENTED || err == CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG || err == CHIP_ERROR_MESSAGE_TOO_LONG ||
+            err == CHIP_ERROR_NO_MEMORY || CHIP_CONFIG_IsPlatformErrorNonCritical(err));
 }
 
 } // namespace Messaging

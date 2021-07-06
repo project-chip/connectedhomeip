@@ -25,6 +25,9 @@
 
 // ==================== General Platform Adaptations ====================
 
+#define CHIP_CONFIG_ERROR_TYPE int32_t
+#define CHIP_CONFIG_ERROR_FORMAT PRId32
+
 #define ChipDie() abort()
 
 // TODO:(#756) Add FabricState support

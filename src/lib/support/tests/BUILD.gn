@@ -24,6 +24,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestBufferReader.cpp",
     "TestBufferWriter.cpp",
+    "TestBytesCircularBuffer.cpp",
     "TestBytesToHex.cpp",
     "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",

@@ -226,7 +226,7 @@ private:
     CHIP_ERROR StartResponseTimer();
 
     void CancelResponseTimer();
-    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     void DoClose(bool clearRetransTable);
 };

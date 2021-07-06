@@ -68,15 +68,9 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16
 
 // Cluster Specific Response Callbacks
 {{#chip_client_clusters}}
-{{#if (user_cluster_has_enabled_command name side)}}
-{{#all_user_cluster_commands}}
-{{#if (isStrEqual clusterName parent.name)}}
-{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
-typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}});
-{{/if}}
-{{/if}}
-{{/all_user_cluster_commands}}
-{{/if}}
+{{#chip_server_cluster_responses}}
+typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}});
+{{/chip_server_cluster_responses}}
 {{/chip_client_clusters}}
 {{/if}}
 

@@ -104,7 +104,7 @@ private:
     static void TimeServiceSync_HandleSyncComplete(void * context, CHIP_ERROR result, int64_t syncedRealTimeUS);
 #endif
 
-    static void DriveTimeSync(::chip::System::Layer * layer, void * appState, ::chip::System::Error err);
+    static void DriveTimeSync(::chip::System::Layer * layer, void * appState, ::CHIP_ERROR err);
 
 protected:
     // Construction/destruction limited to subclasses.

@@ -43,8 +43,8 @@ public:
     {}
 
     constexpr pointer data() const { return mDataBuf; }
-    size_t size() const { return mDataLen; }
-    bool empty() const { return size() == 0; }
+    constexpr size_t size() const { return mDataLen; }
+    constexpr bool empty() const { return size() == 0; }
 
     // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
@@ -89,8 +89,8 @@ public:
     constexpr explicit FixedSpan(pointer databuf) : mDataBuf(databuf) {}
 
     constexpr pointer data() const { return mDataBuf; }
-    size_t size() const { return N; }
-    bool empty() const { return data() == nullptr; }
+    constexpr size_t size() const { return N; }
+    constexpr bool empty() const { return data() == nullptr; }
 
     // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>

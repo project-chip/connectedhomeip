@@ -16,8 +16,10 @@
  */
 
 #include "FreeRTOS.h"
+#include "esp_log.h"
 #include "pw_sys_io_esp32/init.h"
 #include "semphr.h"
+#include "support/logging/CHIPLogging.h"
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
 
@@ -33,6 +35,8 @@ pw::stream::SysIoWriter sWriter;
 size_t sWriteBufferPos;
 char sWriteBuffer[kWriteBufferSize];
 
+bool uartInitialised;
+
 void send()
 {
     pw::hdlc::WriteUIFrame(kLogHdlcAddress, std::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
@@ -46,6 +50,7 @@ void init()
     esp_log_mutex = xSemaphoreCreateMutex();
     assert(esp_log_mutex != NULL);
     pw_sys_io_Init();
+    uartInitialised = true;
 }
 
 int putString(const char * buffer, size_t size)
@@ -79,6 +84,25 @@ int putString(const char * buffer, size_t size)
 SemaphoreHandle_t * getSemaphore()
 {
     return &esp_log_mutex;
+}
+
+extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, const char * format, ...)
+{
+    va_list v;
+    va_start(v, format);
+#ifndef CONFIG_LOG_DEFAULT_LEVEL_NONE
+    if (uartInitialised)
+    {
+        char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        size_t len = vsnprintf(formattedMsg, sizeof formattedMsg, format, v);
+        if (len >= sizeof formattedMsg)
+        {
+            len = sizeof formattedMsg - 1;
+        }
+        PigweedLogger::putString(formattedMsg, len);
+    }
+#endif
+    va_end(v);
 }
 
 } // namespace PigweedLogger

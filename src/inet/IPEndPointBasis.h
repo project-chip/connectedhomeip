@@ -104,11 +104,11 @@ public:
      *  member to process reception error events on \c endPoint. The \c err
      *  argument provides specific detail about the type of the error.
      */
-    typedef void (*OnReceiveErrorFunct)(IPEndPointBasis * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo);
+    typedef void (*OnReceiveErrorFunct)(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 
-    INET_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback);
-    INET_ERROR JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
-    INET_ERROR LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
+    CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback);
+    CHIP_ERROR JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
+    CHIP_ERROR LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
 
 protected:
     void Init(InetLayer * aInetLayer);
@@ -122,8 +122,8 @@ protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 public:
     static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
-    static System::Error PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget, System::EventType aEventType,
-                                               System::PacketBufferHandle && aBuffer);
+    static CHIP_ERROR PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget, System::EventType aEventType,
+                                            System::PacketBufferHandle && aBuffer);
 
 protected:
     void HandleDataReceived(chip::System::PacketBufferHandle && aBuffer);
@@ -134,10 +134,10 @@ protected:
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     InterfaceId mBoundIntfId;
 
-    INET_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId);
-    INET_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
-    INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags);
-    INET_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
+    CHIP_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId);
+    CHIP_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
+    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags);
+    CHIP_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
     void HandlePendingIO(uint16_t aPort);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -151,17 +151,17 @@ protected:
     dispatch_queue_t mDispatchQueue;
     dispatch_semaphore_t mSendSemaphore;
 
-    INET_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, const nw_parameters_t & aParameters);
-    INET_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
-    INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags);
-    INET_ERROR StartListener();
-    INET_ERROR GetConnection(const IPPacketInfo * aPktInfo);
-    INET_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort);
-    INET_ERROR StartConnection(nw_connection_t & aConnection);
+    CHIP_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, const nw_parameters_t & aParameters);
+    CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
+    CHIP_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle && aBuffer, uint16_t aSendFlags);
+    CHIP_ERROR StartListener();
+    CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
+    CHIP_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort);
+    CHIP_ERROR StartConnection(nw_connection_t & aConnection);
     void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
     void HandleDataReceived(const nw_connection_t & aConnection);
-    INET_ERROR ReleaseListener();
-    INET_ERROR ReleaseConnection();
+    CHIP_ERROR ReleaseListener();
+    CHIP_ERROR ReleaseConnection();
     void ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 

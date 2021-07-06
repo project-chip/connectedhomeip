@@ -60,7 +60,7 @@ public:
     void Shutdown();
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
-     *  guarantees that it will call Shutdown on itself when processing is done (including if OnWriteHandler
+     *  guarantees that it will call Shutdown on itself when processing is done (including if OnWriteRequest
      *  returns an error).
      *
      *  @param[in]    apExchangeContext    A pointer to the ExchangeContext.
@@ -69,9 +69,7 @@ public:
      *  @retval #Others If fails to process read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle aPayload);
-
-    CHIP_ERROR SendWriteResponse(System::PacketBufferHandle aPayload);
+    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
     bool IsFree() const { return mState == State::Uninitialized; }
 

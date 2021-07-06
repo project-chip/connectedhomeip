@@ -47,26 +47,19 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static int32_t sContext[] =
+static CHIP_ERROR sContext[] =
 {
-    BLE_ERROR_BAD_ARGS,
-    BLE_ERROR_INCORRECT_STATE,
-    BLE_ERROR_NO_ENDPOINTS,
     BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK,
     BLE_ERROR_CENTRAL_UNSUBSCRIBED,
     BLE_ERROR_GATT_SUBSCRIBE_FAILED,
     BLE_ERROR_GATT_UNSUBSCRIBE_FAILED,
     BLE_ERROR_GATT_WRITE_FAILED,
     BLE_ERROR_GATT_INDICATE_FAILED,
-    BLE_ERROR_NOT_IMPLEMENTED,
     BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT,
     BLE_ERROR_REMOTE_DEVICE_DISCONNECTED,
     BLE_ERROR_APP_CLOSED_CONNECTION,
-    BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG,
     BLE_ERROR_NOT_CHIP_DEVICE,
     BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS,
-    BLE_ERROR_NO_MEMORY,
-    BLE_ERROR_MESSAGE_INCOMPLETE,
     BLE_ERROR_INVALID_FRAGMENT_SIZE,
     BLE_ERROR_START_TIMER_FAILED,
     BLE_ERROR_CONNECT_TIMED_OUT,
@@ -80,7 +73,6 @@ static int32_t sContext[] =
     BLE_ERROR_INVALID_BTP_HEADER_FLAGS,
     BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER,
     BLE_ERROR_REASSEMBLER_INCORRECT_STATE,
-    BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG
 };
 // clang-format on
 
@@ -95,7 +87,7 @@ static void CheckBleErrorStr(nlTestSuite * inSuite, void * inContext)
     // For each defined error...
     for (size_t i = 0; i < kTestElements; i++)
     {
-        int32_t err         = sContext[i];
+        CHIP_ERROR err      = sContext[i];
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 

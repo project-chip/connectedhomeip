@@ -263,7 +263,7 @@ namespace TestInetLayerMulticast {
 int main(int argc, char * argv[])
 {
     bool lSuccessful = true;
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     InitTestInetCommon();
 
@@ -296,7 +296,7 @@ int main(int argc, char * argv[])
     if (gInterfaceName != nullptr)
     {
         lStatus = InterfaceNameToId(gInterfaceName, gInterfaceId);
-        if (lStatus != INET_NO_ERROR)
+        if (lStatus != CHIP_NO_ERROR)
         {
             PrintArgError("%s: unknown network interface %s\n", kToolName, gInterfaceName);
             lSuccessful = false;
@@ -665,7 +665,7 @@ exit:
     }
 }
 
-static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleRawReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -694,7 +694,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -717,14 +717,14 @@ static bool IsTransportReadyForSend()
     return (lStatus);
 }
 
-static INET_ERROR PrepareTransportForSend()
+static CHIP_ERROR PrepareTransportForSend()
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     return (lStatus);
 }
 
-static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
+static CHIP_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
     PacketBufferHandle lBuffer;
 
@@ -738,13 +738,13 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         if ((gOptFlags & kOptFlagUseIPv6) == (kOptFlagUseIPv6))
         {
             lBuffer = Common::MakeICMPv6DataBuffer(aSize);
-            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if ((gOptFlags & kOptFlagUseIPv4) == (kOptFlagUseIPv4))
         {
             lBuffer = Common::MakeICMPv4DataBuffer(aSize);
-            VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -759,15 +759,15 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         // patterned from zero to aSize - 1.
 
         lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
-        VerifyOrReturnError(!lBuffer.IsNull(), INET_ERROR_NO_MEMORY);
+        VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         return sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer));
     }
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-static INET_ERROR DriveSendForGroup(GroupAddress & aGroupAddress)
+static CHIP_ERROR DriveSendForGroup(GroupAddress & aGroupAddress)
 {
     if (aGroupAddress.mStats.mTransmit.mActual < aGroupAddress.mStats.mTransmit.mExpected)
     {
@@ -779,11 +779,11 @@ static INET_ERROR DriveSendForGroup(GroupAddress & aGroupAddress)
                aGroupAddress.mStats.mTransmit.mExpected, aGroupAddress.mGroup);
     }
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 template <size_t tCapacity>
-static INET_ERROR DriveSendForGroups(GroupAddresses<tCapacity> & aGroupAddresses)
+static CHIP_ERROR DriveSendForGroups(GroupAddresses<tCapacity> & aGroupAddresses)
 {
     // Iterate over each multicast group for which this node is a
     // member and send a packet.
@@ -792,12 +792,12 @@ static INET_ERROR DriveSendForGroups(GroupAddresses<tCapacity> & aGroupAddresses
         ReturnErrorOnFailure(DriveSendForGroup(aGroupAddresses.mAddresses[i]));
     }
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 void DriveSend()
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     if (!Common::IsSender())
         goto exit;
@@ -820,7 +820,7 @@ void DriveSend()
     }
 
 exit:
-    if (lStatus != INET_NO_ERROR)
+    if (lStatus != CHIP_NO_ERROR)
     {
         SetStatusFailed(sTestState.mStatus);
     }
@@ -834,7 +834,7 @@ static void StartTest()
     IPAddress lAddress           = IPAddress::Any;
     IPEndPointBasis * lEndPoint  = nullptr;
     const bool lUseLoopback      = ((gOptFlags & kOptFlagNoLoopback) == 0);
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
 #if INET_CONFIG_ENABLE_IPV4
     if (gOptFlags & kOptFlagUseIPv4)
@@ -943,7 +943,7 @@ static void StartTest()
 static void CleanupTest()
 {
     IPEndPointBasis * lEndPoint = nullptr;
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     gSendIntervalExpired = false;
     gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);

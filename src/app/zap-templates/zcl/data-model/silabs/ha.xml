@@ -2285,7 +2285,7 @@ limitations under the License.
     <attribute side="server" code="0x0A05" define="RMS_VOLTAGE_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0xffff" optional="true">rms voltage phase c</attribute>
     <attribute side="server" code="0x0A06" define="RMS_VOLTAGE_MIN_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0xffff" optional="true">rms voltage min phase c</attribute>
     <attribute side="server" code="0x0A07" define="RMS_VOLTAGE_MAX_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0xffff" optional="true">rms voltage max phase c</attribute>
-    <attribute side="server" code="0x0A08" define="RMS_CURRENT_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0xffff" optional="true">rms current phase b</attribute>
+    <attribute side="server" code="0x0A08" define="RMS_CURRENT_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0xffff" optional="true">rms current phase c</attribute>
     <attribute side="server" code="0x0A09" define="RMS_CURRENT_MIN_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0xffff" optional="true">rms current min phase c</attribute>
     <attribute side="server" code="0x0A0A" define="RMS_CURRENT_MAX_PHASE_C" type="INT16U" min="0x0000" max="0xffff" writable="false" default="0xffff" optional="true">rms current max phase c</attribute>
     <attribute side="server" code="0x0A0B" define="ACTIVE_POWER_PHASE_C" type="INT16S" min="-32768" max="32767" writable="false" default="0xffff" optional="true">active power phase c</attribute>

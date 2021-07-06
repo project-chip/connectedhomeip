@@ -82,7 +82,7 @@ AppTask AppTask::sAppTask;
 
 int AppTask::StartAppTask()
 {
-    int err = CHIP_ERROR_MAX;
+    int err = CHIP_CONFIG_CORE_ERROR_MAX;
 
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (sAppEventQueue == NULL)
@@ -176,7 +176,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     EFR32_LOG("App Task started");
-    SetDeviceName("EFR32LightingDemo._chip._udp.local.");
+    SetDeviceName("EFR32LightingDemo._matter._udp.local.");
 
     while (true)
     {
@@ -275,7 +275,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = CHIP_ERROR_MAX;
+        err = CHIP_CONFIG_CORE_ERROR_MAX;
     }
 
     if (err == CHIP_NO_ERROR)
@@ -419,7 +419,7 @@ void AppTask::CancelTimer()
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
     {
         EFR32_LOG("app timer stop() failed");
-        appError(CHIP_ERROR_MAX);
+        appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 
     mFunctionTimerActive = false;
@@ -439,7 +439,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
     {
         EFR32_LOG("app timer start() failed");
-        appError(CHIP_ERROR_MAX);
+        appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 
     mFunctionTimerActive = true;

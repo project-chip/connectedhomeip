@@ -31,20 +31,12 @@
 
 #include "ASN1Config.h"
 
+#include <core/CHIPError.h>
+
 namespace chip {
 namespace ASN1 {
 
 // clang-format off
-
-/**
- *  @def ASN1_NO_ERROR
- *
- *  @brief
- *    This defines the InetLayer error code for success or no
- *    error. This value may be configured via #ASN1_CONFIG_NO_ERROR.
- *
- */
-#define ASN1_NO_ERROR                   ASN1_CONFIG_NO_ERROR
 
 /**
  *  @def ASN1_ERROR_MIN
@@ -67,28 +59,20 @@ namespace ASN1 {
 #define ASN1_ERROR_MAX                  ASN1_CONFIG_ERROR_MAX
 
 /**
- *  @def _ASN1_ERROR(e)
+ *  @def CHIP_ASN1_ERROR(e)
  *
  *  @brief
  *    This defines a mapping function for ASN1 errors that allows
  *    mapping such errors into a platform- or system-specific
  *    range. This function may be configured via
- *    #_ASN1_CONFIG_ERROR(e).
+ *    #ASN1_CONFIG_ERROR(e).
  *
  *  @param[in]  e  The ASN1 error to map.
  *
  *  @return The mapped ASN1 error.
  *
  */
-#define _ASN1_ERROR(e)                  _ASN1_CONFIG_ERROR(e)
-
-/**
- *  The basic type for all ASN1 subsystem errors.
- *
- *  This is defined to a platform- or system-specific type.
- *
- */
-typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
+#define CHIP_ASN1_ERROR(e)              ASN1_CONFIG_ERROR(e)
 
 
 /**
@@ -104,7 +88,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    An end of ASN1 container or stream condition occurred.
  *
  */
-#define ASN1_END                        _ASN1_ERROR(0)
+#define ASN1_END                        CHIP_ASN1_ERROR(0)
 
 /**
  *  @def ASN1_ERROR_UNDERRUN
@@ -113,7 +97,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    The ASN.1 encoding ended prematurely.
  *
  */
-#define ASN1_ERROR_UNDERRUN             _ASN1_ERROR(1)
+#define ASN1_ERROR_UNDERRUN             CHIP_ASN1_ERROR(1)
 
 /**
  *  @def ASN1_ERROR_OVERFLOW
@@ -122,7 +106,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    The encoding exceeds the available space required to write it.
  *
  */
-#define ASN1_ERROR_OVERFLOW             _ASN1_ERROR(2)
+#define ASN1_ERROR_OVERFLOW             CHIP_ASN1_ERROR(2)
 
 /**
  *  @def ASN1_ERROR_INVALID_STATE
@@ -131,7 +115,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    An unexpected or invalid state was encountered.
  *
  */
-#define ASN1_ERROR_INVALID_STATE        _ASN1_ERROR(3)
+#define ASN1_ERROR_INVALID_STATE        CHIP_ASN1_ERROR(3)
 
 /**
  *  @def ASN1_ERROR_MAX_DEPTH_EXCEEDED
@@ -140,7 +124,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    The maximum number of container reading contexts was exceeded.
  *
  */
-#define ASN1_ERROR_MAX_DEPTH_EXCEEDED   _ASN1_ERROR(4)
+#define ASN1_ERROR_MAX_DEPTH_EXCEEDED   CHIP_ASN1_ERROR(4)
 
 /**
  *  @def ASN1_ERROR_INVALID_ENCODING
@@ -149,7 +133,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    The ASN.1 encoding is invalid.
  *
  */
-#define ASN1_ERROR_INVALID_ENCODING     _ASN1_ERROR(5)
+#define ASN1_ERROR_INVALID_ENCODING     CHIP_ASN1_ERROR(5)
 
 /**
  *  @def ASN1_ERROR_UNSUPPORTED_ENCODING
@@ -158,7 +142,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    An unsupported encoding was requested or encountered.
  *
  */
-#define ASN1_ERROR_UNSUPPORTED_ENCODING _ASN1_ERROR(6)
+#define ASN1_ERROR_UNSUPPORTED_ENCODING CHIP_ASN1_ERROR(6)
 
 /**
  *  @def ASN1_ERROR_TAG_OVERFLOW
@@ -168,7 +152,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    for it.
  *
  */
-#define ASN1_ERROR_TAG_OVERFLOW         _ASN1_ERROR(7)
+#define ASN1_ERROR_TAG_OVERFLOW         CHIP_ASN1_ERROR(7)
 
 /**
  *  @def ASN1_ERROR_LENGTH_OVERFLOW
@@ -178,7 +162,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    required for it.
  *
  */
-#define ASN1_ERROR_LENGTH_OVERFLOW      _ASN1_ERROR(8)
+#define ASN1_ERROR_LENGTH_OVERFLOW      CHIP_ASN1_ERROR(8)
 
 /**
  *  @def ASN1_ERROR_VALUE_OVERFLOW
@@ -188,7 +172,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    required for it.
  *
  */
-#define ASN1_ERROR_VALUE_OVERFLOW       _ASN1_ERROR(9)
+#define ASN1_ERROR_VALUE_OVERFLOW       CHIP_ASN1_ERROR(9)
 
 /**
  *  @def ASN1_ERROR_UNKNOWN_OBJECT_ID
@@ -198,7 +182,7 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
  *    supported object identifiers.
  *
  */
-#define ASN1_ERROR_UNKNOWN_OBJECT_ID    _ASN1_ERROR(10)
+#define ASN1_ERROR_UNKNOWN_OBJECT_ID    CHIP_ASN1_ERROR(10)
 
 //                        !!!!! IMPORTANT !!!!!
 //
@@ -209,6 +193,12 @@ typedef ASN1_CONFIG_ERROR_TYPE ASN1_ERROR;
 /**
  *  @}
  */
+
+// !!!!! IMPORTANT !!!!!
+// These definitions are present temporarily in order to reduce breakage for PRs in flight.
+// TODO: remove compatibility definitions
+#define ASN1_ERROR                              CHIP_ERROR
+#define ASN1_NO_ERROR                           CHIP_NO_ERROR
 
 // clang-format on
 

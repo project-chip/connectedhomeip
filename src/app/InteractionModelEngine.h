@@ -49,15 +49,15 @@
 #include <app/reporting/Engine.h>
 #include <app/util/basic-types.h>
 
-// TODO: Make number of command handler and command sender configurable
+// TODO: Make number of command/read/write client/handler configurable
 #define CHIP_MAX_NUM_COMMAND_HANDLER 4
 #define CHIP_MAX_NUM_COMMAND_SENDER 4
 #define CHIP_MAX_NUM_READ_CLIENT 4
 #define CHIP_MAX_NUM_READ_HANDLER 4
-#define CHIP_MAX_REPORTS_IN_FLIGHT 1
+#define CHIP_MAX_REPORTS_IN_FLIGHT 4
 #define IM_SERVER_MAX_NUM_PATH_GROUPS 8
-#define CHIP_MAX_NUM_WRITE_CLIENT 1
-#define CHIP_MAX_NUM_WRITE_HANDLER 1
+#define CHIP_MAX_NUM_WRITE_CLIENT 4
+#define CHIP_MAX_NUM_WRITE_HANDLER 4
 
 namespace chip {
 namespace app {
@@ -128,12 +128,12 @@ public:
                                EventNumber aEventNumber, intptr_t aAppIdentifier = 0);
 
     /**
-     *  Retrieve a WriteClient that the SDK consumer can use to send do a write.  If the call succeeds, the consumer
-     *  is responsible for calling Shutdown() on the WriteClient once it's done using it.
+     *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
+     *  see WriteClient documentation for lifetime handling.
      *
      *  @param[out]    apWriteClient    A pointer to the WriteClient object.
      *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no WriteClient available
+     *  @retval #CHIP_ERROR_NO_MEMORY If there is no WriteClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR NewWriteClient(WriteClient ** const apWriteClient);

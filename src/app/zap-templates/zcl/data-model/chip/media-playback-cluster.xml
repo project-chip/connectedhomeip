@@ -79,7 +79,7 @@ limitations under the License.
       <arg name="deltaPositionMilliseconds" type="INT64U"/>
     </command>
 
-    <command source="client" code="0x0A" name="MediaSkipSeek" optional="false">
+    <command source="client" code="0x0A" name="MediaSeek" optional="false">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
       <arg name="position" type="INT64U"/>
     </command>
@@ -134,7 +134,7 @@ limitations under the License.
       <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
     </command>
 
-    <command source="server" code="0x0A" name="MediaSkipSeekResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x0B" name="MediaSeekResponse" optional="false" disableDefaultResponse="true">
       <description>Upon receipt, this SHALL change the playback position in the media to the given position using data as follows:</description>
       <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
     </command>

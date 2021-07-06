@@ -26,14 +26,16 @@ limitations under the License.
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
     <attribute side="server" code="0x0000" define="APPLICATION_LAUNCHER_LIST" type="ARRAY" entryType="INT16U" length="254" writable="false" optional="false">application launcher list</attribute>
-    <!-- TODO: Covert this to stuct one it is supported -->
+    <!-- TODO: Convert this to struct once it is supported -->
     <attribute side="server" code="0x0001" define="APPLICATION_LAUNCHER_CURRENT_APP_CATALOG_VENDOR_ID" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">catalog vendor id</attribute>
     <attribute side="server" code="0x0002" define="APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">application id</attribute>
 
     <command source="client" code="0x00" name="LaunchApp" optional="false">
       <description>Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response.</description>
       <arg name="data" type="CHAR_STRING"/>
-      <arg name="application" type="ApplicationLauncherApp" array="true"/>
+      <!-- TODO: Convert this to struct once it is supported -->
+      <arg name="catalogVendorId" type="INT16U"/>
+      <arg name="applicationId" type="CHAR_STRING"/>
     </command>
 
     <command source="server" code="0x00" name="LaunchAppResponse" optional="false">

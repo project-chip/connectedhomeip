@@ -117,9 +117,9 @@ static void OnLwIPInitComplete(void * arg);
 char gDefaultTapDeviceName[32];
 bool gDone = false;
 
-void InetFailError(int32_t err, const char * msg)
+void InetFailError(CHIP_ERROR err, const char * msg)
 {
-    if (err != INET_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "%s: %s\n", msg, ErrorStr(err));
         exit(-1);

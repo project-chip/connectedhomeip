@@ -33,16 +33,16 @@ using namespace ::chip;
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
-    ChipLogProgress(Zcl, "%s: %d %d %d %d", __FUNCTION__, endpoint, clusterId, attributeId, *value);
+    ChipLogProgress(Zcl, "%s: %" PRIx16 " %" PRIx32 " %" PRIx32 " %d", __FUNCTION__, endpoint, clusterId, attributeId, *value);
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
+        ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
         return;
     }
 
     if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
     {
-        ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
+        ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
         return;
     }
 
@@ -105,7 +105,7 @@ void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
                                         chip::AttributeId attributeId)
 {
-    ChipLogProgress(Zcl, "%s: %d %d %d %d", __FUNCTION__, endpoint, clusterId, manufacturerCode, attributeId);
+    ChipLogProgress(Zcl, "%s: %d %" PRIx32 " %" PRIx32 " %d", __FUNCTION__, endpoint, clusterId, manufacturerCode, attributeId);
     return true;
 }
 
@@ -120,7 +120,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, c
 bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
                                          chip::AttributeId attributeId)
 {
-    ChipLogProgress(Zcl, "%s: %d %d %d %d", __FUNCTION__, endpoint, clusterId, manufacturerCode, attributeId);
+    ChipLogProgress(Zcl, "%s: %d %" PRIx32 " %" PRIx32 " %d", __FUNCTION__, endpoint, clusterId, manufacturerCode, attributeId);
     return true;
 }
 
@@ -171,44 +171,44 @@ EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::
 
 bool emberAfReadAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
     return false;
 }
 
 bool emberAfWriteAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
     return false;
 }
 
 bool emberAfConfigureReportingResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
     return false;
 }
 
 bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
     return false;
 }
 
 bool emberAfReportAttributesCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
     return false;
 }
 
 bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status)
 {
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
     return false;
 }
 
 bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool discoveryComplete, uint8_t * buffer, uint16_t bufLen,
                                                bool extended)
 {
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
     return false;
 }
 

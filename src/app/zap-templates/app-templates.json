@@ -39,11 +39,6 @@
             "output": "callback-stub.cpp"
         },
         {
-            "path": "templates/app/callback.zapt",
-            "name": "ZCL callback header",
-            "output": "callback.h"
-        },
-        {
             "path": "templates/app/chip-zcl-zpro-codec-api.zapt",
             "name": "CHIP ZCL API Header",
             "output": "chip-zcl-zpro-codec-api.h"

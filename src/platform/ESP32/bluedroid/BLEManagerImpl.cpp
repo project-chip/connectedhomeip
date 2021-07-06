@@ -443,7 +443,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
     case ESP_ERR_NO_MEM:
         return CHIP_ERROR_NO_MEMORY;
     default:
-        return CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + (CHIP_ERROR) bleErr;
+        return CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + static_cast<CHIP_ERROR>(bleErr);
     }
 }
 
@@ -725,7 +725,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ExitNow();
     }
 
-    VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(advData), err = BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
+    VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(advData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
     memcpy(&advData[index], &deviceIdInfo, sizeof(deviceIdInfo));
     index = static_cast<uint8_t>(index + sizeof(deviceIdInfo));
 

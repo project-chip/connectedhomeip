@@ -91,10 +91,8 @@ static int PrintAllOnboardingCodes()
     return error;
 }
 
-static int OnboardingHandler(int argc, char ** argv)
+static CHIP_ERROR OnboardingHandler(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     if (argc == 0)
     {
         return PrintAllOnboardingCodes();
@@ -106,11 +104,11 @@ static int OnboardingHandler(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "qrcodeurl") == 0)
     {
-        return error = GetOnboardingQRCodeUrl(false);
+        return GetOnboardingQRCodeUrl(false);
     }
     else if (strcmp(argv[0], "manualpairingcode") == 0)
     {
-        return error = GetOnboardingManualPairingCode(false);
+        return GetOnboardingManualPairingCode(false);
     }
     else
     {

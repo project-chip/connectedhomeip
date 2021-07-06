@@ -114,8 +114,8 @@ typedef int InterfaceId;
  */
 #define IsInterfaceIdPresent(intfId) ((intfId) != INET_NULL_INTERFACEID)
 
-extern INET_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize);
-extern INET_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId);
+extern CHIP_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize);
+extern CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId);
 extern uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLen);
 
 /**
@@ -149,7 +149,7 @@ public:
     bool Next();
     InterfaceId GetInterface();
     InterfaceId GetInterfaceId();
-    INET_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize);
+    CHIP_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize);
     bool IsUp();
     bool SupportsMulticast();
     bool HasBroadcastAddress();
@@ -223,7 +223,7 @@ public:
     void GetAddressWithPrefix(IPPrefix & addrWithPrefix);
     InterfaceId GetInterface();
     InterfaceId GetInterfaceId();
-    INET_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize);
+    CHIP_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize);
     bool IsUp();
     bool SupportsMulticast();
     bool HasBroadcastAddress();

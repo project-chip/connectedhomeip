@@ -384,7 +384,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
-    if (mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
@@ -524,13 +524,13 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharComplete(const ChipDeviceEvent * event)
     return CHIP_NO_ERROR;
 }
 
-void BLEManagerImpl::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, System::Error error)
+void BLEManagerImpl::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, CHIP_ERROR error)
 {
     BLEMgr().SetAdvertisingEnabled(false);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because of timeout expired");
 }
 
-void BLEManagerImpl::HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param, System::Error error)
+void BLEManagerImpl::HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param, CHIP_ERROR error)
 {
     BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising mode changed to slow");
