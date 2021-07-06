@@ -3695,13 +3695,13 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void addOpCert(
-        OpCertResponseCallback callback,
+    public void addNOC(
+        NOCResponseCallback callback,
         byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId) {
-      addOpCert(chipClusterPtr, callback, nOCArray, iPKValue, caseAdminNode, adminVendorId);
+      addNOC(chipClusterPtr, callback, nOCArray, iPKValue, caseAdminNode, adminVendorId);
     }
 
     public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
@@ -3717,7 +3717,7 @@ public class ChipClusters {
     }
 
     public void removeFabric(
-        OpCertResponseCallback callback, long fabricId, long nodeId, int vendorId) {
+        NOCResponseCallback callback, long fabricId, long nodeId, int vendorId) {
       removeFabric(chipClusterPtr, callback, fabricId, nodeId, vendorId);
     }
 
@@ -3730,13 +3730,13 @@ public class ChipClusters {
       setFabric(chipClusterPtr, callback, vendorId);
     }
 
-    public void updateFabricLabel(OpCertResponseCallback callback, String label) {
+    public void updateFabricLabel(NOCResponseCallback callback, String label) {
       updateFabricLabel(chipClusterPtr, callback, label);
     }
 
-    private native void addOpCert(
+    private native void addNOC(
         long chipClusterPtr,
-        OpCertResponseCallback callback,
+        NOCResponseCallback callback,
         byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
@@ -3752,7 +3752,7 @@ public class ChipClusters {
 
     private native void removeFabric(
         long chipClusterPtr,
-        OpCertResponseCallback callback,
+        NOCResponseCallback callback,
         long fabricId,
         long nodeId,
         int vendorId);
@@ -3764,7 +3764,13 @@ public class ChipClusters {
         long chipClusterPtr, SetFabricResponseCallback callback, int vendorId);
 
     private native void updateFabricLabel(
-        long chipClusterPtr, OpCertResponseCallback callback, String label);
+        long chipClusterPtr, NOCResponseCallback callback, String label);
+
+    public interface NOCResponseCallback {
+      void onSuccess(int StatusCode, int FabricIndex, byte[] DebugText);
+
+      void onError(Exception error);
+    }
 
     public interface OpCSRResponseCallback {
       void onSuccess(
@@ -3774,12 +3780,6 @@ public class ChipClusters {
           byte[] VendorReserved2,
           byte[] VendorReserved3,
           byte[] Signature);
-
-      void onError(Exception error);
-    }
-
-    public interface OpCertResponseCallback {
-      void onSuccess(int StatusCode, long FabricIndex, String DebugText);
 
       void onError(Exception error);
     }

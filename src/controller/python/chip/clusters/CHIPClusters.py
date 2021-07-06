@@ -577,7 +577,7 @@ class ChipClusters:
                 },
             },
             "OperationalCredentials": {
-                "AddOpCert": {
+                "AddNOC": {
                     "nOCArray": "bytes",
                     "iPKValue": "bytes",
                     "caseAdminNode": "int",
@@ -2776,8 +2776,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterOperationalCredentials_CommandAddOpCert(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCArray: bytes, iPKValue: bytes, caseAdminNode: int, adminVendorId: int):
-        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert(
+    def ClusterOperationalCredentials_CommandAddNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCArray: bytes, iPKValue: bytes, caseAdminNode: int, adminVendorId: int):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC(
                 device, ZCLendpoint, ZCLgroupid, nOCArray, len(nOCArray), iPKValue, len(iPKValue), caseAdminNode, adminVendorId
         )
     def ClusterOperationalCredentials_CommandAddTrustedRootCertificate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rootCertificate: bytes):
@@ -4798,9 +4798,9 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OperationalCredentials
-        # Cluster OperationalCredentials Command AddOpCert
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials Command AddNOC
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command AddTrustedRootCertificate
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate.restype = ctypes.c_uint32

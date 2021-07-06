@@ -588,20 +588,20 @@ static void OnOtaSoftwareUpdateProviderClusterQueryImageResponse(void * context,
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOperationalCredentialsClusterOpCSRResponse(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
-                                                         chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
-                                                         chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
+static void OnOperationalCredentialsClusterNOCResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex,
+                                                       chip::ByteSpan DebugText)
 {
-    ChipLogProgress(chipTool, "OperationalCredentialsClusterOpCSRResponse");
+    ChipLogProgress(chipTool, "OperationalCredentialsClusterNOCResponse");
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOperationalCredentialsClusterOpCertResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex,
-                                                          uint8_t * DebugText)
+static void OnOperationalCredentialsClusterOpCSRResponse(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
+                                                         chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
+                                                         chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
 {
-    ChipLogProgress(chipTool, "OperationalCredentialsClusterOpCertResponse");
+    ChipLogProgress(chipTool, "OperationalCredentialsClusterOpCSRResponse");
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -14251,7 +14251,7 @@ private:
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddOpCert                                                         |   0x06 |
+| * AddNOC                                                            |   0x06 |
 | * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
@@ -14266,12 +14266,12 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command AddOpCert
+ * Command AddNOC
  */
-class OperationalCredentialsAddOpCert : public ModelCommand
+class OperationalCredentialsAddNOC : public ModelCommand
 {
 public:
-    OperationalCredentialsAddOpCert() : ModelCommand("add-op-cert")
+    OperationalCredentialsAddNOC() : ModelCommand("add-noc")
     {
         AddArgument("NOCArray", &mNOCArray);
         AddArgument("IPKValue", &mIPKValue);
@@ -14279,7 +14279,7 @@ public:
         AddArgument("AdminVendorId", 0, UINT16_MAX, &mAdminVendorId);
         ModelCommand::AddArguments();
     }
-    ~OperationalCredentialsAddOpCert()
+    ~OperationalCredentialsAddNOC()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -14291,14 +14291,14 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddOpCert(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCArray, mIPKValue, mCaseAdminNode,
-                                 mAdminVendorId);
+        return cluster.AddNOC(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCArray, mIPKValue, mCaseAdminNode,
+                              mAdminVendorId);
     }
 
 private:
-    chip::Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>(
-            OnOperationalCredentialsClusterOpCertResponse, this);
+    chip::Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsClusterNOCResponseCallback>(OnOperationalCredentialsClusterNOCResponse,
+                                                                                       this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::ByteSpan mNOCArray;
@@ -14434,9 +14434,9 @@ public:
     }
 
 private:
-    chip::Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>(
-            OnOperationalCredentialsClusterOpCertResponse, this);
+    chip::Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsClusterNOCResponseCallback>(OnOperationalCredentialsClusterNOCResponse,
+                                                                                       this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::FabricId mFabricId;
@@ -14542,9 +14542,9 @@ public:
     }
 
 private:
-    chip::Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>(
-            OnOperationalCredentialsClusterOpCertResponse, this);
+    chip::Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsClusterNOCResponseCallback>(OnOperationalCredentialsClusterNOCResponse,
+                                                                                       this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     char * mLabel;
@@ -23958,11 +23958,16 @@ void registerClusterOperationalCredentials(Commands & commands)
     const char * clusterName = "OperationalCredentials";
 
     commands_list clusterCommands = {
-        make_unique<OperationalCredentialsAddOpCert>(),           make_unique<OperationalCredentialsAddTrustedRootCertificate>(),
-        make_unique<OperationalCredentialsOpCSRRequest>(),        make_unique<OperationalCredentialsRemoveAllFabrics>(),
-        make_unique<OperationalCredentialsRemoveFabric>(),        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(),
-        make_unique<OperationalCredentialsSetFabric>(),           make_unique<OperationalCredentialsUpdateFabricLabel>(),
-        make_unique<DiscoverOperationalCredentialsAttributes>(),  make_unique<ReadOperationalCredentialsFabricsList>(),
+        make_unique<OperationalCredentialsAddNOC>(),
+        make_unique<OperationalCredentialsAddTrustedRootCertificate>(),
+        make_unique<OperationalCredentialsOpCSRRequest>(),
+        make_unique<OperationalCredentialsRemoveAllFabrics>(),
+        make_unique<OperationalCredentialsRemoveFabric>(),
+        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(),
+        make_unique<OperationalCredentialsSetFabric>(),
+        make_unique<OperationalCredentialsUpdateFabricLabel>(),
+        make_unique<DiscoverOperationalCredentialsAttributes>(),
+        make_unique<ReadOperationalCredentialsFabricsList>(),
         make_unique<ReadOperationalCredentialsClusterRevision>(),
     };
 

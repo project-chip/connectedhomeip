@@ -3767,7 +3767,7 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddOpCert                                                         |   0x06 |
+| * AddNOC                                                            |   0x06 |
 | * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
