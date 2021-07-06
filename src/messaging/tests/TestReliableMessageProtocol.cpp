@@ -1006,7 +1006,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     // Ensure the retransmit table is empty right now
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
-    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
     // We need to keep both exchanges alive for the thing we are testing here.
@@ -1020,7 +1020,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Ensure the message was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // And that it was received.
@@ -1046,7 +1046,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mExchange->Close();
 
     // Ensure the response was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // Ensure that we have received that response and it had a piggyback ack.
@@ -1070,7 +1070,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     exchange->Close();
 
     // Ensure the message was sent (and the ack for it was also sent).
-    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 4);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // And that it was not received (because the exchange is closed on the
