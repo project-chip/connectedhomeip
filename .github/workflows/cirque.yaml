@@ -78,7 +78,7 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Run Tests
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \
