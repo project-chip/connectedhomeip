@@ -19,6 +19,7 @@
 @property (nonatomic, strong) UILabel * resultLabel;
 
 @property (nonatomic, strong) UITextView * fabricsListTextView;
+@property (nonatomic, strong) UILabel * commissionedFabricsLabel;
 @property (nonatomic, strong) UIStackView * stackView;
 
 @property (nonatomic, strong) NSArray * fabricsList;
@@ -153,6 +154,16 @@
     _resultLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_resultLabel.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
     _resultLabel.adjustsFontSizeToFitWidth = YES;
+    
+    // commissionedFabricsTextView
+    _commissionedFabricsLabel = [UILabel new];
+    _commissionedFabricsLabel.font = [UIFont systemFontOfSize:12];
+    _commissionedFabricsLabel.textColor = UIColor.systemBlueColor;
+    [_stackView addArrangedSubview:_commissionedFabricsLabel];
+
+    _commissionedFabricsLabel.translatesAutoresizingMaskIntoConstraints = false;
+    [_commissionedFabricsLabel.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
+    _commissionedFabricsLabel.adjustsFontSizeToFitWidth = YES;
 
     // Fabrics text view
     _fabricsListTextView = [UITextView new];
@@ -213,6 +224,41 @@
     });
 }
 
+- (void)fetchCommissionedFabricsNumber
+{
+    NSLog(@"Fetching the commissioned fabrics attribute");
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                CHIPOperationalCredentials * cluster =
+                    [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+                [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
+                [cluster readAttributeCommissionedFabricsWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                    if (error) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self updateResult:[NSString stringWithFormat:@"readAttributeCommissionedFabrics command failed: %@.", error]
+                                       isError:YES];
+                        });
+                    } else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self updateResult:[NSString stringWithFormat:@"Command readAttributeCommissionedFabrics command succeeded."]
+                                       isError:NO];
+                            NSNumber * commissionedFabrics = [values objectForKey:@"value"];
+                            NSString *stringResult = [NSString stringWithFormat:@"# commissioned fabrics: %@", commissionedFabrics];
+                            _commissionedFabricsLabel.text = stringResult;
+                        });
+                    }
+                }];
+    
+            } else {
+                [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
+            }
+        })) {
+        [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"] isError:NO];
+    } else {
+        [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"] isError:YES];
+    }
+}
+
 - (void)fetchFabricsList
 {
     NSLog(@"Request to fetchFabricsList");
@@ -245,6 +291,7 @@
     } else {
         [self updateResult:[NSString stringWithFormat:@"Failed to trigger the connection with the device"] isError:YES];
     }
+    [self fetchCommissionedFabricsNumber];
 }
 
 // MARK: UIButton methods
