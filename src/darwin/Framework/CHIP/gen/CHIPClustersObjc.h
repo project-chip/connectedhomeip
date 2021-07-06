@@ -229,6 +229,37 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPColorControl : CHIPCluster
 
+- (void)colorLoopSet:(uint8_t)updateFlags
+              action:(uint8_t)action
+           direction:(uint8_t)direction
+                time:(uint16_t)time
+            startHue:(uint16_t)startHue
+         optionsMask:(uint8_t)optionsMask
+     optionsOverride:(uint8_t)optionsOverride
+     responseHandler:(ResponseHandler)responseHandler;
+- (void)enhancedMoveHue:(uint8_t)moveMode
+                   rate:(uint16_t)rate
+            optionsMask:(uint8_t)optionsMask
+        optionsOverride:(uint8_t)optionsOverride
+        responseHandler:(ResponseHandler)responseHandler;
+- (void)enhancedMoveToHue:(uint16_t)enhancedHue
+                direction:(uint8_t)direction
+           transitionTime:(uint16_t)transitionTime
+              optionsMask:(uint8_t)optionsMask
+          optionsOverride:(uint8_t)optionsOverride
+          responseHandler:(ResponseHandler)responseHandler;
+- (void)enhancedMoveToHueAndSaturation:(uint16_t)enhancedHue
+                            saturation:(uint8_t)saturation
+                        transitionTime:(uint16_t)transitionTime
+                           optionsMask:(uint8_t)optionsMask
+                       optionsOverride:(uint8_t)optionsOverride
+                       responseHandler:(ResponseHandler)responseHandler;
+- (void)enhancedStepHue:(uint8_t)stepMode
+               stepSize:(uint16_t)stepSize
+         transitionTime:(uint16_t)transitionTime
+            optionsMask:(uint8_t)optionsMask
+        optionsOverride:(uint8_t)optionsOverride
+        responseHandler:(ResponseHandler)responseHandler;
 - (void)moveColor:(int16_t)rateX
               rateY:(int16_t)rateY
         optionsMask:(uint8_t)optionsMask
@@ -820,6 +851,23 @@ NS_ASSUME_NONNULL_BEGIN
     metadataForProvider:(NSData *)metadataForProvider
         responseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Occupancy Sensing
+ *
+ */
+@interface CHIPOccupancySensing : CHIPCluster
+
+- (void)readAttributeOccupancyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeOccupancyWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOccupancyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOccupancySensorTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOccupancySensorTypeBitmapWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
