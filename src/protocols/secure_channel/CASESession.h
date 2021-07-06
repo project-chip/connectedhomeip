@@ -38,7 +38,6 @@
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/TLVPacketBufferBackingStore.h>
 #include <transport/PairingSession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
@@ -113,9 +112,9 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress,
-                                Credentials::OperationalCredentialSet * operationalCredentialSet, NodeId peerNodeId,
-                                uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
-                                SessionEstablishmentDelegate * delegate);
+                                Credentials::OperationalCredentialSet * operationalCredentialSet,
+                                const Credentials::CertificateKeyId & trustedRootId, NodeId peerNodeId, uint16_t myKeyId,
+                                Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -207,6 +206,7 @@ private:
 
     CHIP_ERROR Init(Credentials::OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
                     SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR SetTrustedRootId(const Credentials::CertificateKeyId & trustedRootId);
 
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg);
@@ -220,17 +220,17 @@ private:
     CHIP_ERROR SendSigmaR1Resume();
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-    CHIP_ERROR FindValidTrustedRoot(const System::PacketBufferTLVReader & tlvReader, uint32_t nTrustedRoots);
-    CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const uint8_t * ipk, size_t ipkLen,
+    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::CertificateKeyId * trustedRootId, NodeId nodeId,
+                                     MutableByteSpan & destinationId);
+    CHIP_ERROR FindDestinationIdCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
+    CHIP_ERROR FindValidTrustedRoot(const Credentials::CertificateKeyId & trustedRootId);
+    CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
-    CHIP_ERROR Validate_and_RetrieveResponderID(const uint8_t * responderOpCert, uint16_t responderOpCertLen,
-                                                Crypto::P256PublicKey & responderID);
-    CHIP_ERROR ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen, MutableByteSpan & salt);
-    CHIP_ERROR ConstructTBS2Data(const uint8_t * responderOpCert, uint32_t responderOpCertLen, uint8_t * tbsData,
-                                 uint16_t & tbsDataLen);
-    CHIP_ERROR ConstructTBS3Data(const uint8_t * responderOpCert, uint32_t responderOpCertLen, uint8_t * tbsData,
-                                 uint16_t & tbsDataLen);
-    CHIP_ERROR ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen);
+    CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
+    CHIP_ERROR ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSpan & salt);
+    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
+    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
+    CHIP_ERROR ComputeIPK(const uint16_t sessionID, MutableByteSpan & ipk);
 
     void SendErrorMsg(SigmaErrorType errorCode);
 
@@ -267,7 +267,6 @@ private:
 
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     uint8_t mIPK[kIPKSize];
-    uint8_t mRemoteIPK[kIPKSize];
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
     SessionEstablishmentExchangeDispatch mMessageDispatch;

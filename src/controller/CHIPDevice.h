@@ -81,6 +81,7 @@ struct ControllerDeviceInitParams
     Inet::InetLayer * inetLayer                         = nullptr;
     PersistentStorageDelegate * storageDelegate         = nullptr;
     Credentials::OperationalCredentialSet * credentials = nullptr;
+    Credentials::CertificateKeyId * trustedRoot         = nullptr;
     SessionIDAllocator * idAllocator                    = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
@@ -185,6 +186,7 @@ public:
         mAdminId         = admin;
         mStorageDelegate = params.storageDelegate;
         mCredentials     = params.credentials;
+        mTrustedRootId   = params.trustedRoot;
         mIDAllocator     = params.idAllocator;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -473,6 +475,7 @@ private:
     CASESession mCASESession;
 
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
+    Credentials::CertificateKeyId * mTrustedRootId       = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
