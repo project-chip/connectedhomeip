@@ -9,13 +9,11 @@ namespace Clusters {
 namespace Globals {
 namespace Attributes {
 namespace Ids {
-{{#zcl_attributes}}
-{{#if (isServer side)}}
+{{#zcl_attributes_server}}
 {{#unless clusterRef}}
 static constexpr AttributeId {{asUpperCamelCase label}} = {{asHex code 4}};
 {{/unless}}
-{{/if}}
-{{/zcl_attributes}}
+{{/zcl_attributes_server}}
 } // namespace Ids
 } // namespace Attributes
 } // namespace Globals
