@@ -79,7 +79,7 @@ int AppTask::StartAppTask()
 
 int AppTask::Init()
 {
-    int ret = CHIP_ERROR_MAX;
+    int ret = CHIP_CONFIG_CORE_ERROR_MAX;
     LED_Params ledParams;
     Button_Params buttionParams;
     ConnectivityManager::ThreadPollingConfig pollingConfig;

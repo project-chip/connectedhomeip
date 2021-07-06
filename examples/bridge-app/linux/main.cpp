@@ -307,7 +307,7 @@ EmberAfStatus HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attribut
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus HandleReadDescriptorAttribute(uint8_t endpointIndex, chip::AttributeId attributeId, uint8_t * buffer,
+EmberAfStatus HandleReadDescriptorAttribute(uint16_t endpointIndex, chip::AttributeId attributeId, uint8_t * buffer,
                                             uint16_t maxReadLength)
 {
     if ((maxReadLength <= kDescriptorAttributeArraySize) && (attributeId < kDescriptorAttributeCount))
@@ -331,7 +331,7 @@ EmberAfStatus HandleReadFixedLabelAttribute(Device * dev, EmberAfAttributeMetada
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-EmberAfStatus HandleWriteDescriptorAttribute(uint8_t endpointIndex, EmberAfAttributeMetadata * am, uint8_t * buffer,
+EmberAfStatus HandleWriteDescriptorAttribute(uint16_t endpointIndex, EmberAfAttributeMetadata * am, uint8_t * buffer,
                                              uint16_t length, int32_t index)
 {
     chip::AttributeId attributeId = am->attributeId;
@@ -349,7 +349,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                    uint8_t * buffer, uint16_t maxReadLength, int32_t index)
 {
-    uint8_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
+    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
@@ -382,7 +382,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                     uint8_t * buffer, int32_t index)
 {
-    uint8_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
+    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
@@ -519,12 +519,12 @@ int main(int argc, char * argv[])
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
-        static_cast<int>(emberAfEndpointFromIndex(static_cast<uint8_t>(emberAfFixedEndpointCount() - 1))) + 1);
+        static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     gCurrentEndpointId = gFirstDynamicEndpointId;
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
-    emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint8_t>(emberAfFixedEndpointCount() - 1)), false);
+    emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, DEVICE_TYPE_LO_ON_OFF_LIGHT);

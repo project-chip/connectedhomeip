@@ -183,12 +183,7 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SecureSessionHandle session, co
     ChipLogProgress(Inet, "Sending msg %p to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec", &preparedMessage,
                     ChipLogValueX64(state->GetPeerNodeId()), System::Layer::GetClock_MonotonicMS());
 
-    if (state->GetTransport() != nullptr)
-    {
-        ChipLogProgress(Inet, "Sending secure msg on connection specific transport");
-        err = state->GetTransport()->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
-    }
-    else if (mTransportMgr != nullptr)
+    if (mTransportMgr != nullptr)
     {
         ChipLogProgress(Inet, "Sending secure msg on generic transport");
         err = mTransportMgr->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
@@ -243,8 +238,7 @@ void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, Transport::AdminId a
 }
 
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                                        PairingSession * pairing, SecureSession::SessionRole direction, Transport::AdminId admin,
-                                        Transport::Base * transport)
+                                        PairingSession * pairing, SecureSession::SessionRole direction, Transport::AdminId admin)
 {
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
     uint16_t localKeyId         = pairing->GetLocalKeyId();
@@ -257,15 +251,14 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
     }
 
-    ChipLogDetail(Inet, "New pairing for device 0x%08" PRIx32 "%08" PRIx32 ", key %d!!", static_cast<uint32_t>(peerNodeId >> 32),
-                  static_cast<uint32_t>(peerNodeId), peerKeyId);
+    ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
+                  peerKeyId);
     state = nullptr;
     ReturnErrorOnFailure(
         mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state));
     ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_NO_MEMORY);
 
     state->SetAdminId(admin);
-    state->SetTransport(transport);
 
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
     {
@@ -380,7 +373,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
             {
                 ChipLogError(Inet,
                              "Message counter synchronization for received message, failed to "
-                             "QueueReceivedMessageAndStartSync, err = %" PRId32,
+                             "QueueReceivedMessageAndStartSync, err = %" CHIP_ERROR_FORMAT,
                              err);
             }
             else
@@ -400,7 +393,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Inet, "Message counter verify failed, err = %" PRId32, err);
+            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err);
         }
         SuccessOrExit(err);
     }
@@ -519,10 +512,8 @@ exit:
 
 void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state)
 {
-    char addr[Transport::PeerAddress::kMaxToStringSize];
-    state.GetPeerAddress().ToString(addr);
-
-    ChipLogDetail(Inet, "Connection from '%s' expired", addr);
+    NodeId peerNodeId = state.GetPeerNodeId();
+    ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired", ChipLogValueX64(peerNodeId));
 
     if (mCB != nullptr)
     {
@@ -532,7 +523,7 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
     mTransportMgr->Disconnect(state.GetPeerAddress());
 }
 
-void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
+void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, CHIP_ERROR error)
 {
     SecureSessionMgr * mgr = reinterpret_cast<SecureSessionMgr *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING

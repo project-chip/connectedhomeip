@@ -21,12 +21,14 @@ import chip.native
 import threading
 import chip.exceptions
 
+# The type should match CommandStatus in interaction_model/Delegate.h
+# CommandStatus should not contain padding
 IMCommandStatus = Struct(
     "ProtocolId" /  Int32ul,
     "ProtocolCode" / Int16ul,
-    "EndpointId" / Int8ul,
-    "ClusterId" / Int16ul,
-    "CommandId" / Int8ul,
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "CommandId" / Int32ul,
     "CommandIndex" / Int8ul,
 )
 

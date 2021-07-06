@@ -65,7 +65,7 @@ AppTask AppTask::sAppTask;
 
 int AppTask::StartAppTask()
 {
-    int err = CHIP_ERROR_MAX;
+    int err = CHIP_CONFIG_CORE_ERROR_MAX;
 
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
@@ -237,7 +237,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = CHIP_ERROR_MAX;
+        err = CHIP_CONFIG_CORE_ERROR_MAX;
     }
 
     if (err == CHIP_NO_ERROR)

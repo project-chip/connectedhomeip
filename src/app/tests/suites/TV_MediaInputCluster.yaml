@@ -1,0 +1,52 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Media Input Cluster Tests
+
+config:
+    cluster: "Media Input"
+    endpoint: 1
+
+tests:
+    - label: "Read attribute media input list"
+      command: "readAttribute"
+      attribute: "media input list"
+      response:
+          value:
+              [
+                  { index: 1, inputType: 4, name: 12, description: 19 },
+                  { index: 2, inputType: 4, name: 12, description: 19 },
+              ]
+
+    - label: "Select Input Command"
+      command: "SelectInput"
+      arguments:
+          values:
+              - name: "index"
+                value: 1
+
+    - label: "Hide Input Status Command"
+      command: "HideInputStatus"
+
+    - label: "Show Input Status Command"
+      command: "ShowInputStatus"
+
+    - label: "Rename Input Command"
+      command: "RenameInput"
+      arguments:
+          values:
+              - name: "index"
+                value: 1
+              - name: "name"
+                value: "newName"

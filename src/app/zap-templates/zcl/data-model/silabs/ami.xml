@@ -24,6 +24,40 @@ limitations under the License.
     <older spec="se-1.1-07-5356-16" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
     <older spec="se-1.0-07-5356-15" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
   </domain>
+ <!-- Messaging Cluster - Structs, BITMAPs & ENUMs -->
+   <bitmap name="MessagingControlMask" type="BITMAP8">
+     <field name="transMechanism" mask="0x03"/>
+     <field name="messageUrgency" mask="0x0C"/>
+     <field name="enhancedConfirmationRequest" mask="0x20"/>
+     <field name="messageConfirmation" mask="0x80"/>
+   </bitmap>
+   <enum name="MessagingControlTransmission" type="ENUM8">
+     <item name="normal" value="0x00"/>
+     <item name="normalAndAnonymous" value="0x01"/>
+     <item name="anonymous" value="0x02"/>
+     <item name="reserved" value="0x03"/>
+   </enum>
+   <enum name="MessagingControlImportance" type="ENUM8">
+     <item name="low" value="0x00"/>
+     <item name="medium" value="0x04"/>
+     <item name="high" value="0x08"/>
+     <item name="critical" value="0x0C"/>
+   </enum>
+   <enum name="MessagingControlEnhancedConfirmation" type="ENUM8">
+     <item name="notRequired" value="0x00"/>
+     <item name="required" value="0x20"/>
+   </enum>
+   <enum name="MessagingControlConfirmation" type="ENUM8">
+     <item name="notRequired" value="0x00"/>
+     <item name="required" value="0x80"/>
+   </enum>
+   <bitmap name="MessagingExtendedControlMask" type="BITMAP8">
+     <field name="messageConfirmationStatus" mask="0x01"/>
+   </bitmap>
+   <bitmap name="MessagingConfirmationControl" type="BITMAP8">
+     <field name="NoReturned" mask="0x01"/>
+     <field name="YesReturned" mask="0x02"/>
+   </bitmap>
   <!-- Messaging Cluster -->
   <cluster>
     <name>Messaging</name>

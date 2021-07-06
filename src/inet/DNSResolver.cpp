@@ -76,10 +76,10 @@ chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> DNSResolver
  *  @param[in]  appState    A pointer to the application state to be passed to
  *                          onComplete when a DNS request is complete.
  *
- *  @retval INET_NO_ERROR                   if a DNS request is handled
+ *  @retval CHIP_NO_ERROR                   if a DNS request is handled
  *                                          successfully.
  *
- *  @retval INET_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
+ *  @retval CHIP_ERROR_NOT_IMPLEMENTED      if DNS resolution is not enabled on
  *                                          the underlying platform.
  *
  *  @retval _other_                         if other POSIX network or OS error
@@ -87,14 +87,14 @@ chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> DNSResolver
  *                                          resolver implementation.
  *
  */
-INET_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
+CHIP_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
                                 IPAddress * addrArray, DNSResolver::OnResolveCompleteFunct onComplete, void * appState)
 {
-    INET_ERROR res = INET_NO_ERROR;
+    CHIP_ERROR res = CHIP_NO_ERROR;
 
 #if !CHIP_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
     Release();
-    return INET_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS && !LWIP_DNS
 
     uint8_t addrFamilyOption = (options & kDNSOption_AddrFamily_Mask);
@@ -107,7 +107,7 @@ INET_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
         (optionFlags & ~kDNSOption_ValidFlags) != 0)
     {
         Release();
-        return INET_ERROR_BAD_ARGS;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_DNS)
@@ -163,7 +163,7 @@ INET_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
 #endif
     {
         Release();
-        return INET_ERROR_NOT_IMPLEMENTED;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR < 5
@@ -229,7 +229,7 @@ INET_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
     // Release DNSResolver object.
     Release();
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || (CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_DNS)
@@ -238,10 +238,10 @@ INET_ERROR DNSResolver::Resolve(const char * hostName, uint16_t hostNameLen, uin
 /**
  *  This method cancels DNS requests that are in progress.
  *
- *  @retval INET_NO_ERROR.
+ *  @retval CHIP_NO_ERROR.
  *
  */
-INET_ERROR DNSResolver::Cancel()
+CHIP_ERROR DNSResolver::Cancel()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -283,7 +283,7 @@ INET_ERROR DNSResolver::Cancel()
 #endif // INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -297,7 +297,7 @@ void DNSResolver::HandleResolveComplete()
 {
     // Call the application's completion handler if the request hasn't been canceled.
     if (OnComplete != NULL)
-        OnComplete(AppState, (NumAddrs > 0) ? INET_NO_ERROR : INET_ERROR_HOST_NOT_FOUND, NumAddrs, AddrArray);
+        OnComplete(AppState, (NumAddrs > 0) ? CHIP_NO_ERROR : INET_ERROR_HOST_NOT_FOUND, NumAddrs, AddrArray);
 
     // Release the resolver object.
     Release();
@@ -369,9 +369,9 @@ void DNSResolver::InitAddrInfoHints(struct addrinfo & hints)
     hints.ai_flags = AI_ADDRCONFIG;
 }
 
-INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo * results)
+CHIP_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo * results)
 {
-    INET_ERROR err = INET_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // If getaddrinfo() succeeded, copy addresses in the returned addrinfo structures into the
     // application's output array...

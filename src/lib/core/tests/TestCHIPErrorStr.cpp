@@ -47,7 +47,7 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static int32_t sContext[] =
+static CHIP_ERROR sContext[] =
 {
     CHIP_ERROR_TOO_MANY_CONNECTIONS,
     CHIP_ERROR_SENDING_BLOCKED,
@@ -236,7 +236,7 @@ static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
     RegisterCHIPLayerErrorFormatter();
 
     // For each defined error...
-    for (int err : sContext)
+    for (CHIP_ERROR err : sContext)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];

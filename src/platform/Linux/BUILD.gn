@@ -1,0 +1,113 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "linux")
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+  import("//build_overrides/ot_br_posix.gni")
+}
+
+if (chip_mdns != "none") {
+  pkg_config("avahi_client_config") {
+    packages = [ "avahi-client" ]
+  }
+}
+
+static_library("Linux") {
+  sources = [
+    "../DeviceSafeQueue.cpp",
+    "../DeviceSafeQueue.h",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPLinuxStorage.cpp",
+    "CHIPLinuxStorage.h",
+    "CHIPLinuxStorageIni.cpp",
+    "CHIPLinuxStorageIni.h",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DeviceNetworkProvisioningDelegateImpl.cpp",
+    "DeviceNetworkProvisioningDelegateImpl.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "PosixConfig.cpp",
+    "PosixConfig.h",
+    "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
+    "bluez/AdapterIterator.cpp",
+    "bluez/AdapterIterator.h",
+    "bluez/ChipDeviceScanner.cpp",
+    "bluez/ChipDeviceScanner.h",
+    "bluez/Helper.cpp",
+    "bluez/Helper.h",
+    "bluez/MainLoop.cpp",
+    "bluez/MainLoop.h",
+    "bluez/Types.h",
+  ]
+
+  deps = [ "${chip_root}/src/setup_payload" ]
+
+  public_deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  public_configs = []
+
+  if (chip_mdns != "none") {
+    sources += [
+      "MdnsImpl.cpp",
+      "MdnsImpl.h",
+    ]
+
+    deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+
+    public_configs += [ ":avahi_client_config" ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [
+      "GlibTypeDeleter.h",
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    public_deps += [ "dbus/openthread" ]
+  }
+
+  if (chip_enable_wifi) {
+    public_deps += [ "dbus/wpa" ]
+  }
+
+  if (chip_enable_ble) {
+    public_deps += [ "dbus/bluez" ]
+  }
+}

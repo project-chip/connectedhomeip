@@ -16,8 +16,6 @@
 @property (nonatomic, strong) UITextField * maxIntervalInSecondsTextField;
 @property (nonatomic, strong) UITextField * deltaInFahrenheitTextField;
 @property (nonatomic, strong) UIButton * sendReportingSetup;
-
-@property (nonatomic, strong) CHIPTemperatureMeasurement * cluster;
 @end
 
 @implementation TemperatureSensorViewController
@@ -32,9 +30,6 @@
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
-    self.cluster = [[CHIPTemperatureMeasurement alloc] initWithDevice:CHIPGetPairedDevice()
-                                                             endpoint:1
-                                                                queue:dispatch_get_main_queue()];
     [self readCurrentTemperature];
 }
 
@@ -166,12 +161,26 @@
 
 - (void)readCurrentTemperature
 {
-    [self.cluster readAttributeMeasuredValueWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-        if (error != nil)
-            return;
-        NSNumber * value = values[@"value"];
-        [self updateTempInUI:value.shortValue];
-    }];
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                CHIPTemperatureMeasurement * cluster =
+                    [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
+
+                [cluster
+                    readAttributeMeasuredValueWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                        if (error != nil)
+                            return;
+                        NSNumber * value = values[@"value"];
+                        [self updateTempInUI:value.shortValue];
+                    }];
+            } else {
+                NSLog(@"Status: Failed to establish a connection with the device");
+            }
+        })) {
+        NSLog(@"Status: Waiting for connection with the device");
+    } else {
+        NSLog(@"Status: Failed to trigger the connection with the device");
+    }
 }
 
 - (void)reportFromUserEnteredSettings
@@ -183,22 +192,36 @@
     NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds),
         @(deltaInFahrenheit));
 
-    [self.cluster configureAttributeMeasuredValueWithMinInterval:minIntervalSeconds
-                                                     maxInterval:maxIntervalSeconds
-                                                          change:deltaInFahrenheit
-                                                 responseHandler:^(NSError * error, NSDictionary * values) {
-                                                     if (error == nil)
-                                                         return;
-                                                     NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
-                                                         [error description]);
-                                                 }];
+    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+            if (chipDevice) {
+                CHIPTemperatureMeasurement * cluster =
+                    [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
 
-    [self.cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
-        if (error != nil)
-            return;
-        NSNumber * value = values[@"value"];
-        [self updateTempInUI:value.shortValue];
-    }];
+                [cluster
+                    configureAttributeMeasuredValueWithMinInterval:minIntervalSeconds
+                                                       maxInterval:maxIntervalSeconds
+                                                            change:deltaInFahrenheit
+                                                   responseHandler:^(NSError * error, NSDictionary * values) {
+                                                       if (error == nil)
+                                                           return;
+                                                       NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
+                                                           [error description]);
+                                                   }];
+
+                [cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
+                    if (error != nil)
+                        return;
+                    NSNumber * value = values[@"value"];
+                    [self updateTempInUI:value.shortValue];
+                }];
+            } else {
+                NSLog(@"Status: Failed to establish a connection with the device");
+            }
+        })) {
+        NSLog(@"Status: Waiting for connection with the device");
+    } else {
+        NSLog(@"Status: Failed to trigger the connection with the device");
+    }
 }
 
 @end

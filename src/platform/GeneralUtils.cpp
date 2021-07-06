@@ -111,7 +111,7 @@ void RegisterDeviceLayerErrorFormatter()
  * @return false                    If the supplied error was not a Device Layer error.
  *
  */
-bool FormatDeviceLayerError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatDeviceLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 

@@ -45,11 +45,11 @@ void RegisterLayerErrorFormatter()
     RegisterErrorFormatter(&sBleLayerErrorFormatter);
 }
 
-bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < BLE_ERROR_MIN || err > BLE_ERROR_MAX)
+    if (err < BLE_CONFIG_ERROR_MIN || err > BLE_CONFIG_ERROR_MAX)
     {
         return false;
     }
@@ -57,15 +57,6 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
 #if !CHIP_CONFIG_SHORT_ERROR_STR
     switch (err)
     {
-    case BLE_ERROR_BAD_ARGS:
-        desc = "Bad arguments";
-        break;
-    case BLE_ERROR_INCORRECT_STATE:
-        desc = "Incorrect state";
-        break;
-    case BLE_ERROR_NO_ENDPOINTS:
-        desc = "No more BLE endpoints";
-        break;
     case BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK:
         desc = "No chip over BLE connection received callback set";
         break;
@@ -84,9 +75,6 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
     case BLE_ERROR_GATT_INDICATE_FAILED:
         desc = "GATT indicate characteristic operation failed";
         break;
-    case BLE_ERROR_NOT_IMPLEMENTED:
-        desc = "Not implemented";
-        break;
     case BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT:
         desc = "BLE transport protocol fired abort";
         break;
@@ -96,20 +84,11 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
     case BLE_ERROR_APP_CLOSED_CONNECTION:
         desc = "Application closed BLE connection";
         break;
-    case BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG:
-        desc = "Outbound message too big";
-        break;
     case BLE_ERROR_NOT_CHIP_DEVICE:
         desc = "BLE device doesn't seem to support chip";
         break;
     case BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS:
         desc = "Incompatible BLE transport protocol versions";
-        break;
-    case BLE_ERROR_NO_MEMORY:
-        desc = "No memory";
-        break;
-    case BLE_ERROR_MESSAGE_INCOMPLETE:
-        desc = "Message incomplete";
         break;
     case BLE_ERROR_INVALID_FRAGMENT_SIZE:
         desc = "Invalid fragment size";
@@ -149,9 +128,6 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
         break;
     case BLE_ERROR_REASSEMBLER_INCORRECT_STATE:
         desc = "BLE message reassembler received packet in incorrect state";
-        break;
-    case BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG:
-        desc = "Message received by BLE message reassembler was too large";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

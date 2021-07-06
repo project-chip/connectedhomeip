@@ -128,12 +128,12 @@ extern uint64_t GetClock_MonotonicHiRes();
  * rate of least at whole seconds (values of 1,000,000), but may tick faster.
  *
  * On those platforms that are capable of tracking real time, GetClock_RealTime() must return the
- * error CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED whenever the system is unsynchronized with real time.
+ * error CHIP_ERROR_REAL_TIME_NOT_SYNCED whenever the system is unsynchronized with real time.
  *
  * Platforms that are incapable of tracking real time should not implement the GetClock_RealTime()
  * function, thereby forcing link-time failures of features that depend on access to real time.
  * Alternatively, such platforms may supply an implementation of GetClock_RealTime() that returns
- * the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
+ * the error CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.
  *
  * This function is expected to be thread-safe on any platform that employs threading.
  *
@@ -143,14 +143,14 @@ extern uint64_t GetClock_MonotonicHiRes();
  *
  * @param[out] curTime                  The current time, expressed as Unix time scaled to microseconds.
  *
- * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
+ * @retval #CHIP_NO_ERROR       If the method succeeded.
+ * @retval #CHIP_ERROR_REAL_TIME_NOT_SYNCED
  *                                      If the platform is capable of tracking real time, but is
  *                                      is currently unsynchronized.
- * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
+ * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
  *                                      If the platform is incapable of tracking real time.
  */
-extern Error GetClock_RealTime(uint64_t & curTime);
+extern CHIP_ERROR GetClock_RealTime(uint64_t & curTime);
 
 /**
  * @brief
@@ -168,14 +168,14 @@ extern Error GetClock_RealTime(uint64_t & curTime);
  *
  * @param[out] curTimeMS               The current time, expressed as Unix time scaled to milliseconds.
  *
- * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
+ * @retval #CHIP_NO_ERROR       If the method succeeded.
+ * @retval #CHIP_ERROR_REAL_TIME_NOT_SYNCED
  *                                      If the platform is capable of tracking real time, but is
  *                                      is currently unsynchronized.
- * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
+ * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
  *                                      If the platform is incapable of tracking real time.
  */
-extern Error GetClock_RealTimeMS(uint64_t & curTimeMS);
+extern CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTimeMS);
 
 /**
  * @brief
@@ -188,13 +188,13 @@ extern Error GetClock_RealTimeMS(uint64_t & curTimeMS);
  * seconds.
  *
  * On platforms that support tracking real time, the SetClock_RealTime() function must return the error
- * CHIP_SYSTEM_ERROR_ACCESS_DENIED if the calling application does not have the privilege to set the
+ * CHIP_ERROR_ACCESS_DENIED if the calling application does not have the privilege to set the
  * current time.
  *
  * Platforms that are incapable of tracking real time, or do not offer the ability to set real time,
  * should not implement the SetClock_RealTime() function, thereby forcing link-time failures of features
  * that depend on setting real time.  Alternatively, such platforms may supply an implementation of
- * SetClock_RealTime() that returns the error CHIP_SYSTEM_ERROR_NOT_SUPPORTED.
+ * SetClock_RealTime() that returns the error CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.
  *
  * This function is expected to be thread-safe on any platform that employs threading.
  *
@@ -204,14 +204,14 @@ extern Error GetClock_RealTimeMS(uint64_t & curTimeMS);
  *
  * @param[in] newCurTime                The new current time, expressed as Unix time scaled to microseconds.
  *
- * @retval #CHIP_SYSTEM_NO_ERROR       If the method succeeded.
- * @retval #CHIP_SYSTEM_ERROR_NOT_SUPPORTED
+ * @retval #CHIP_NO_ERROR       If the method succeeded.
+ * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
  *                                      If the platform is incapable of tracking real time.
- * @retval #CHIP_SYSTEM_ERROR_ACCESS_DENIED
+ * @retval #CHIP_ERROR_ACCESS_DENIED
  *                                      If the calling application does not have the privilege to set the
  *                                      current time.
  */
-extern Error SetClock_RealTime(uint64_t newCurTime);
+extern CHIP_ERROR SetClock_RealTime(uint64_t newCurTime);
 
 } // namespace Layer
 } // namespace Platform

@@ -103,6 +103,21 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
     }
 }
 
+CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
+{
+    if (maxLength < (chip::Mdns::kMaxInstanceNameSize + 1))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    size_t len = snprintf(instanceName, maxLength, "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
+                          static_cast<uint32_t>(mCommissionInstanceName));
+    if (len >= maxLength)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -143,8 +158,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         return error;
     }
 
-    snprintf(service.mName, sizeof(service.mName), "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
-             static_cast<uint32_t>(mCommissionInstanceName));
+    ReturnErrorOnFailure(GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
+
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         strncpy(service.mType, kCommissionableServiceName, sizeof(service.mType));
@@ -414,7 +429,6 @@ CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
 
 CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegate)
 {
-    VerifyOrReturnError(delegate == nullptr || mResolverDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mResolverDelegate = delegate;
     return CHIP_NO_ERROR;
 }
@@ -432,16 +446,15 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
 }
 
-void DiscoveryImplPlatform::HandleCommissionableNodeBrowse(void * context, MdnsService * services, size_t servicesSize,
-                                                           CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleNodeBrowse(void * context, MdnsService * services, size_t servicesSize, CHIP_ERROR error)
 {
     for (size_t i = 0; i < servicesSize; ++i)
     {
-        ChipMdnsResolve(&services[i], INET_NULL_INTERFACEID, HandleCommissionableNodeResolve, context);
+        ChipMdnsResolve(&services[i], INET_NULL_INTERFACEID, HandleNodeResolve, context);
     }
 }
 
-void DiscoveryImplPlatform::HandleCommissionableNodeResolve(void * context, MdnsService * result, CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * result, CHIP_ERROR error)
 {
     if (error != CHIP_NO_ERROR)
     {
@@ -469,10 +482,20 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
 {
     ReturnErrorOnFailure(Init());
     char serviceName[kMaxCommisisonableServiceNameSize];
-    ReturnErrorOnFailure(MakeCommissionableNodeServiceTypeName(serviceName, sizeof(serviceName), filter));
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
     return ChipMdnsBrowse(serviceName, MdnsServiceProtocol::kMdnsProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
-                          HandleCommissionableNodeBrowse, this);
+                          HandleNodeBrowse, this);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
+{
+    ReturnErrorOnFailure(Init());
+    char serviceName[kMaxCommisisonerServiceNameSize];
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
+
+    return ChipMdnsBrowse(serviceName, MdnsServiceProtocol::kMdnsProtocolUdp, Inet::kIPAddressType_Any, INET_NULL_INTERFACEID,
+                          HandleNodeBrowse, this);
 }
 
 void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error)

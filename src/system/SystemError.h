@@ -32,166 +32,54 @@
 #pragma once
 
 // Include headers
+#include <core/CHIPError.h>
 #include <system/SystemConfig.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/err.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-/**
- *  @def CHIP_SYSTEM_NO_ERROR
- *
- *  @brief
- *      This macro expands to a constant expression representing the error code for success or no error. Its definition may be
- *      configured via the #CHIP_SYSTEM_CONFIG_NO_ERROR configuration variable.
- */
-#define CHIP_SYSTEM_NO_ERROR CHIP_SYSTEM_CONFIG_NO_ERROR
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_ERROR_MIN
- *
- *  @brief
- *      This macro expands to a constant expression representing the minimum code number for error conditions in the CHIP System
- *      Layer. This value may be configured via #CHIP_SYSTEM_CONFIG_ERROR_MIN.
- */
-#ifdef CHIP_SYSTEM_CONFIG_ERROR_MIN
-#define CHIP_SYSTEM_ERROR_MIN CHIP_SYSTEM_CONFIG_ERROR_MIN
-#endif // CHIP_SYSTEM_CONFIG_ERROR_MIN
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_ERROR_MAX
- *
- *  @brief
- *      This macro expands to a constant expression representing the maximum code number for error conditions in the CHIP System
- *      Layer. This value may be configured via #CHIP_SYSTEM_CONFIG_ERROR_MAX.
- */
-#ifdef CHIP_SYSTEM_CONFIG_ERROR_MAX
-#define CHIP_SYSTEM_ERROR_MAX CHIP_SYSTEM_CONFIG_ERROR_MAX
-#endif // CHIP_SYSTEM_CONFIG_ERROR_MAX
-
-/**
- *  @def _CHIP_SYSTEM_ERROR(e)
- *
- *  @brief
- *      This defines a mapping function for CHIP System Layer errors that allows mapping such errors into a platform- or
- *      system-specific range. This function may be configured via #_CHIP_SYSTEM_CONFIG_ERROR(e).
- *
- *  @param[in]  e  The CHIP System Layer error to map.
- *
- *  @return The mapped CHIP System Layer error.
- */
-#define _CHIP_SYSTEM_ERROR(e) _CHIP_SYSTEM_CONFIG_ERROR(e)
-
-/**
- *  @name Error Definitions
- *
- *  @{
- */
-
-/**
- *  @def CHIP_SYSTEM_ERROR_NOT_IMPLEMENTED
- *
- *  @brief
- *      A requested function has not been implemented.
- */
-#define CHIP_SYSTEM_ERROR_NOT_IMPLEMENTED _CHIP_SYSTEM_ERROR(0)
-
-/**
- *  @def CHIP_SYSTEM_ERROR_NOT_SUPPORTED
- *
- *  @brief
- *      A requested function or feature is not supported.
- */
-#define CHIP_SYSTEM_ERROR_NOT_SUPPORTED _CHIP_SYSTEM_ERROR(1)
-
-/**
- *  @def CHIP_SYSTEM_ERROR_BAD_ARGS
- *
- *  @brief
- *      An invalid argument or arguments were supplied.
- */
-#define CHIP_SYSTEM_ERROR_BAD_ARGS _CHIP_SYSTEM_ERROR(2)
-
-/**
- *  @def CHIP_SYSTEM_ERROR_UNEXPECTED_STATE
- *
- *  @brief
- *      An unexpected state was encountered.
- */
-#define CHIP_SYSTEM_ERROR_UNEXPECTED_STATE _CHIP_SYSTEM_ERROR(3)
-
-/**
- *  @def CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT
- *
- *  @brief
- *      An unexpected event was encountered.
- */
-#define CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT _CHIP_SYSTEM_ERROR(4)
-
-/**
- *  @def CHIP_SYSTEM_ERROR_NO_MEMORY
- *
- *  @brief
- *      A request for memory could not be fulfilled.
- */
-#define CHIP_SYSTEM_ERROR_NO_MEMORY _CHIP_SYSTEM_ERROR(5)
-
-/**
- *  @def CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED
- *
- *  @brief
- *      The system's real time clock is not synchronized to an accurate time source.
- */
-#define CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED _CHIP_SYSTEM_ERROR(6)
-
-/**
- *  @def CHIP_SYSTEM_ERROR_ACCESS_DENIED
- *
- *  @brief
- *      The requestor is not privileged to perform the requested operation.
- */
-#define CHIP_SYSTEM_ERROR_ACCESS_DENIED _CHIP_SYSTEM_ERROR(7)
-
-//                        !!!!! IMPORTANT !!!!!
-//
-// If you add new CHIP System Layer errors, please update the translation of error
-// codes to strings in SystemError.cpp, and add them to unittest in test-apps/TestErrorStr.cpp
-
-/**
- *  @}
- */
-
 #ifdef __cplusplus
 
 namespace chip {
 namespace System {
 
-/**
- *  The basic type for all chip::System errors.
- *
- *  This is defined to a platform- or system-specific type.
- */
-typedef CHIP_SYSTEM_CONFIG_ERROR_TYPE Error;
-
 extern void RegisterLayerErrorFormatter();
-extern bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err);
+extern bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
-extern Error MapErrorPOSIX(int code);
-extern const char * DescribeErrorPOSIX(Error code);
-extern bool IsErrorPOSIX(Error code);
+extern CHIP_ERROR MapErrorPOSIX(int code);
+extern const char * DescribeErrorPOSIX(CHIP_ERROR code);
+extern bool IsErrorPOSIX(CHIP_ERROR code);
 extern void RegisterPOSIXErrorFormatter();
-extern bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err);
-extern Error MapErrorZephyr(int code);
+extern bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err);
+extern CHIP_ERROR MapErrorZephyr(int code);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-extern Error MapErrorLwIP(err_t code);
-extern const char * DescribeErrorLwIP(Error code);
-extern bool IsErrorLwIP(Error code);
+extern CHIP_ERROR MapErrorLwIP(err_t code);
+extern const char * DescribeErrorLwIP(CHIP_ERROR code);
+extern bool IsErrorLwIP(CHIP_ERROR code);
 extern void RegisterLwIPErrorFormatter(void);
-extern bool FormatLwIPError(char * buf, uint16_t bufSize, int32_t err);
+extern bool FormatLwIPError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+// clang-format off
+
+// !!!!! IMPORTANT !!!!!
+// These definitions are present temporarily in order to reduce breakage for PRs in flight.
+// TODO: remove compatibility definitions
+using Error = CHIP_ERROR;
+#define CHIP_SYSTEM_NO_ERROR                    CHIP_NO_ERROR
+#define CHIP_SYSTEM_ERROR_ACCESS_DENIED         CHIP_ERROR_ACCESS_DENIED
+#define CHIP_SYSTEM_ERROR_BAD_ARGS              CHIP_ERROR_INVALID_ARGUMENT
+#define CHIP_SYSTEM_ERROR_NOT_SUPPORTED         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
+#define CHIP_SYSTEM_ERROR_NO_MEMORY             CHIP_ERROR_NO_MEMORY
+#define CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED  CHIP_ERROR_REAL_TIME_NOT_SYNCED
+#define CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT      CHIP_ERROR_UNEXPECTED_EVENT
+#define CHIP_SYSTEM_ERROR_UNEXPECTED_STATE      CHIP_ERROR_INCORRECT_STATE
+
+// clang-format on
 
 } // namespace System
 } // namespace chip

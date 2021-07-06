@@ -137,7 +137,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-{{>test_cluster tests="TestCluster, Test_3_1_1, Test_3_2_1, Test_3_2_2, Test_10_1_1"}}
+{{>test_cluster tests="TestCluster, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1"}}
 
 {{#chip_client_clusters}}
 {{#unless (isStrEqual "Test Cluster" name)}}

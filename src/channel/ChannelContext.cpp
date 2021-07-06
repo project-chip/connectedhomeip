@@ -187,7 +187,7 @@ void ChannelContext::EnterAddressResolve()
     }
 }
 
-void ChannelContext::AddressResolveTimeout(System::Layer * aLayer, void * aAppState, System::Error aError)
+void ChannelContext::AddressResolveTimeout(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
 {
     ChannelContext * me = static_cast<ChannelContext *>(aAppState);
     me->AddressResolveTimeout();

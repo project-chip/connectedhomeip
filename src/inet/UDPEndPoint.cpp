@@ -87,9 +87,9 @@ chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint
  *   udp_bind_netif(aUDP, intfId);
  *
  */
-static INET_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
+static CHIP_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
 {
-    INET_ERROR res = INET_NO_ERROR;
+    CHIP_ERROR res = CHIP_NO_ERROR;
 
 #if HAVE_LWIP_UDP_BIND_NETIF
     if (!IsInterfaceIdPresent(intfId))
@@ -129,9 +129,9 @@ static INET_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
  * @param[in]   port        the UDP port
  * @param[in]   intfId      an optional network interface indicator
  *
- * @retval  INET_NO_ERROR               success: endpoint bound to address
- * @retval  INET_ERROR_INCORRECT_STATE  endpoint has been bound previously
- * @retval  INET_NO_MEMORY              insufficient memory for endpoint
+ * @retval  CHIP_NO_ERROR               success: endpoint bound to address
+ * @retval  CHIP_ERROR_INCORRECT_STATE  endpoint has been bound previously
+ * @retval  CHIP_ERROR_NO_MEMORY        insufficient memory for endpoint
  *
  * @retval  INET_ERROR_UNKNOWN_INTERFACE
  *      On some platforms, the optionally specified interface is not
@@ -152,11 +152,11 @@ static INET_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired.
  */
-INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId)
+CHIP_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     if (mState != kState_Ready && mState != kState_Bound)
     {
-        return INET_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     if ((addr != IPAddress::Any) && (addr.Type() != kIPAddressType_Any) && (addr.Type() != addrType))
@@ -170,10 +170,10 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
     LOCK_TCPIP_CORE();
 
     // Make sure we have the appropriate type of PCB.
-    INET_ERROR res = GetPCB(addrType);
+    CHIP_ERROR res = GetPCB(addrType);
 
     // Bind the PCB to the specified address/port.
-    if (res == INET_NO_ERROR)
+    if (res == CHIP_NO_ERROR)
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t ipAddr = addr.ToLwIPAddr();
@@ -200,7 +200,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
     }
 
-    if (res == INET_NO_ERROR)
+    if (res == CHIP_NO_ERROR)
     {
         res = LwIPBindInterface(mUDP, intfId);
     }
@@ -252,7 +252,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
         unsigned long fd = static_cast<unsigned long>(mSocket.GetFD());
 
         mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
-        ReturnErrorCodeIf(mReadableSource == nullptr, INET_ERROR_NO_MEMORY);
+        ReturnErrorCodeIf(mReadableSource == nullptr, CHIP_ERROR_NO_MEMORY);
 
         dispatch_source_set_event_handler(mReadableSource, ^{
             this->mSocket.SetPendingIO(System::SocketEventFlags::kRead);
@@ -271,7 +271,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
 
     if (intfId != INET_NULL_INTERFACEID)
     {
-        return INET_ERROR_NOT_IMPLEMENTED;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
@@ -285,7 +285,7 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
 
     mState = kState_Bound;
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -295,8 +295,8 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
  * @param[in]  onReceiveError      The endpoint's receive error event handling function delegate.
  * @param[in]  appState            Application state pointer.
  *
- * @retval  INET_NO_ERROR   success: endpoint ready to receive messages.
- * @retval  INET_ERROR_INCORRECT_STATE  endpoint is already listening.
+ * @retval  CHIP_NO_ERROR   success: endpoint ready to receive messages.
+ * @retval  CHIP_ERROR_INCORRECT_STATE  endpoint is already listening.
  *
  * @details
  *  If \c State is already \c kState_Listening, then no operation is
@@ -307,16 +307,16 @@ INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired
  */
-INET_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnReceiveErrorFunct onReceiveError, void * appState)
+CHIP_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnReceiveErrorFunct onReceiveError, void * appState)
 {
     if (mState == kState_Listening)
     {
-        return INET_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
 
     if (mState != kState_Bound)
     {
-        return INET_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     OnMessageReceived = onMessageReceived;
@@ -354,7 +354,7 @@ INET_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnRecei
     mSocket.RequestCallbackOnPendingRead();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -442,7 +442,7 @@ void UDPEndPoint::Free()
 /**
  *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, uint16_t sendFlags)
+CHIP_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, uint16_t sendFlags)
 {
     return SendTo(addr, port, INET_NULL_INTERFACEID, std::move(msg), sendFlags);
 }
@@ -456,19 +456,19 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::Syst
  * @param[in]   msg         the packet buffer containing the UDP message
  * @param[in]   sendFlags   optional transmit option flags
  *
- * @retval  INET_NO_ERROR       success: \c msg is queued for transmit.
+ * @retval  CHIP_NO_ERROR       success: \c msg is queued for transmit.
  *
- * @retval  INET_ERROR_NOT_SUPPORTED
+ * @retval  CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
  *      the system does not support the requested operation.
  *
  * @retval  INET_ERROR_WRONG_ADDRESS_TYPE
  *      the destination address and the bound interface address do not
  *      have matching protocol versions or address type.
  *
- * @retval  INET_ERROR_MESSAGE_TOO_LONG
+ * @retval  CHIP_ERROR_MESSAGE_TOO_LONG
  *      \c msg does not contain the whole UDP message.
  *
- * @retval  INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED
+ * @retval  CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG
  *      On some platforms, only a truncated portion of \c msg was queued
  *      for transmit.
  *
@@ -481,7 +481,7 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::Syst
  *      identifier for IPv6 link-local destinations) and \c port with the
  *      transmit option flags encoded in \c sendFlags.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
+CHIP_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
                                uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
@@ -499,20 +499,20 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceI
  * @param[in]   msg         a packet buffer containing the UDP message
  * @param[in]   sendFlags   optional transmit option flags
  *
- * @retval  INET_NO_ERROR
+ * @retval  CHIP_NO_ERROR
  *      success: \c msg is queued for transmit.
  *
- * @retval  INET_ERROR_NOT_SUPPORTED
+ * @retval  CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
  *      the system does not support the requested operation.
  *
  * @retval  INET_ERROR_WRONG_ADDRESS_TYPE
  *      the destination address and the bound interface address do not
  *      have matching protocol versions or address type.
  *
- * @retval  INET_ERROR_MESSAGE_TOO_LONG
+ * @retval  CHIP_ERROR_MESSAGE_TOO_LONG
  *      \c msg does not contain the whole UDP message.
  *
- * @retval  INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED
+ * @retval  CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG
  *      On some platforms, only a truncated portion of \c msg was queued
  *      for transmit.
  *
@@ -525,13 +525,13 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceI
  *      over the specified interface.  If \c pktInfo contains a source address, the
  *      given address will be used as the source of the UDP message.
  */
-INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg, uint16_t sendFlags)
+CHIP_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg, uint16_t sendFlags)
 {
-    INET_ERROR res             = INET_NO_ERROR;
+    CHIP_ERROR res             = CHIP_NO_ERROR;
     const IPAddress & destAddr = pktInfo->DestAddress;
 
     INET_FAULT_INJECT(FaultInjection::kFault_Send, return INET_ERROR_UNKNOWN_INTERFACE;);
-    INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical, return INET_ERROR_NO_MEMORY;);
+    INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical, return CHIP_ERROR_NO_MEMORY;);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -543,7 +543,7 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
         // msg into a fresh object in this case, and queues that for transmission, leaving
         // the original msg available after return.
         msg = msg.CloneData();
-        VerifyOrExit(!msg.IsNull(), res = INET_ERROR_NO_MEMORY);
+        VerifyOrExit(!msg.IsNull(), res = CHIP_ERROR_NO_MEMORY);
     }
 
     // Lock LwIP stack
@@ -649,10 +649,6 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
     SuccessOrExit(res);
 
     res = IPEndPointBasis::SendMsg(pktInfo, std::move(msg), sendFlags);
-
-    // Wait for ability to write on this endpoint.
-    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
-    mSocket.OnRequestCallbackOnPendingWrite();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -672,9 +668,9 @@ exit:
  *
  * @param[in]   intfId      indicator of the network interface.
  *
- * @retval  INET_NO_ERROR               success: endpoint bound to address
- * @retval  INET_NO_MEMORY              insufficient memory for endpoint
- * @retval  INET_ERROR_NOT_IMPLEMENTED  system implementation not complete.
+ * @retval  CHIP_NO_ERROR               success: endpoint bound to address
+ * @retval  CHIP_ERROR_NO_MEMORY        insufficient memory for endpoint
+ * @retval  CHIP_ERROR_NOT_IMPLEMENTED  system implementation not complete.
  *
  * @retval  INET_ERROR_UNKNOWN_INTERFACE
  *      On some platforms, the interface is not present.
@@ -687,11 +683,11 @@ exit:
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired.
  */
-INET_ERROR UDPEndPoint::BindInterface(IPAddressType addrType, InterfaceId intfId)
+CHIP_ERROR UDPEndPoint::BindInterface(IPAddressType addrType, InterfaceId intfId)
 {
     if (mState != kState_Ready && mState != kState_Bound)
     {
-        return INET_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -702,9 +698,9 @@ INET_ERROR UDPEndPoint::BindInterface(IPAddressType addrType, InterfaceId intfId
     LOCK_TCPIP_CORE();
 
     // Make sure we have the appropriate type of PCB.
-    INET_ERROR err = GetPCB(addrType);
+    CHIP_ERROR err = GetPCB(addrType);
 
-    if (err == INET_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
         err = LwIPBindInterface(mUDP, intfId);
     }
@@ -727,7 +723,7 @@ INET_ERROR UDPEndPoint::BindInterface(IPAddressType addrType, InterfaceId intfId
 
     mState = kState_Bound;
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 void UDPEndPoint::Init(InetLayer * inetLayer)
@@ -782,7 +778,7 @@ void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle && msg)
     IPEndPointBasis::HandleDataReceived(std::move(msg));
 }
 
-INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
+CHIP_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
 {
     // IMPORTANT: This method MUST be called with the LwIP stack LOCKED!
 
@@ -817,7 +813,7 @@ INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
         if (mUDP == NULL)
         {
             ChipLogError(Inet, "Unable to allocate UDP PCB");
-            return INET_ERROR_NO_MEMORY;
+            return CHIP_ERROR_NO_MEMORY;
         }
 
         // Allow multiple bindings to the same port.
@@ -856,7 +852,7 @@ INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
         VerifyOrReturnError(addrType == pcbAddrType, INET_ERROR_WRONG_ADDRESS_TYPE);
     }
 
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
@@ -902,7 +898,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-INET_ERROR UDPEndPoint::GetSocket(IPAddressType aAddressType)
+CHIP_ERROR UDPEndPoint::GetSocket(IPAddressType aAddressType)
 {
     constexpr int lType     = (SOCK_DGRAM | SOCK_FLAGS);
     constexpr int lProtocol = 0;

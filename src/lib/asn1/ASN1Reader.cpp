@@ -44,7 +44,7 @@ void ASN1Reader::Init(const uint8_t * buf, uint32_t len)
     mNumSavedContexts = 0;
 }
 
-ASN1_ERROR ASN1Reader::Next()
+CHIP_ERROR ASN1Reader::Next()
 {
     if (EndOfContents)
         return ASN1_END;
@@ -64,7 +64,7 @@ ASN1_ERROR ASN1Reader::Next()
     return DecodeHead();
 }
 
-ASN1_ERROR ASN1Reader::EnterConstructedType()
+CHIP_ERROR ASN1Reader::EnterConstructedType()
 {
     if (!Constructed)
         return ASN1_ERROR_INVALID_STATE;
@@ -72,12 +72,12 @@ ASN1_ERROR ASN1Reader::EnterConstructedType()
     return EnterContainer(0);
 }
 
-ASN1_ERROR ASN1Reader::ExitConstructedType()
+CHIP_ERROR ASN1Reader::ExitConstructedType()
 {
     return ExitContainer();
 }
 
-ASN1_ERROR ASN1Reader::GetConstructedType(const uint8_t *& val, uint32_t & valLen)
+CHIP_ERROR ASN1Reader::GetConstructedType(const uint8_t *& val, uint32_t & valLen)
 {
     if (!Constructed)
         return ASN1_ERROR_INVALID_STATE;
@@ -85,9 +85,9 @@ ASN1_ERROR ASN1Reader::GetConstructedType(const uint8_t *& val, uint32_t & valLe
     val    = mElemStart;
     valLen = mHeadLen + ValueLen;
 
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
-ASN1_ERROR ASN1Reader::EnterEncapsulatedType()
+CHIP_ERROR ASN1Reader::EnterEncapsulatedType()
 {
     if (Class != kASN1TagClass_Universal || (Tag != kASN1UniversalTag_OctetString && Tag != kASN1UniversalTag_BitString))
         return ASN1_ERROR_INVALID_STATE;
@@ -98,12 +98,12 @@ ASN1_ERROR ASN1Reader::EnterEncapsulatedType()
     return EnterContainer((Tag == kASN1UniversalTag_BitString) ? 1 : 0);
 }
 
-ASN1_ERROR ASN1Reader::ExitEncapsulatedType()
+CHIP_ERROR ASN1Reader::ExitEncapsulatedType()
 {
     return ExitContainer();
 }
 
-ASN1_ERROR ASN1Reader::EnterContainer(uint32_t offset)
+CHIP_ERROR ASN1Reader::EnterContainer(uint32_t offset)
 {
     if (mNumSavedContexts == kMaxContextDepth)
         return ASN1_ERROR_MAX_DEPTH_EXCEEDED;
@@ -121,10 +121,10 @@ ASN1_ERROR ASN1Reader::EnterContainer(uint32_t offset)
 
     ResetElementState();
 
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-ASN1_ERROR ASN1Reader::ExitContainer()
+CHIP_ERROR ASN1Reader::ExitContainer()
 {
     if (mNumSavedContexts == 0)
         return ASN1_ERROR_INVALID_STATE;
@@ -142,7 +142,7 @@ ASN1_ERROR ASN1Reader::ExitContainer()
 
     ResetElementState();
 
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 bool ASN1Reader::IsContained() const
@@ -150,7 +150,7 @@ bool ASN1Reader::IsContained() const
     return mNumSavedContexts > 0;
 }
 
-ASN1_ERROR ASN1Reader::GetInteger(int64_t & val)
+CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
 {
     if (Value == nullptr)
         return ASN1_ERROR_INVALID_STATE;
@@ -164,10 +164,10 @@ ASN1_ERROR ASN1Reader::GetInteger(int64_t & val)
     val               = ((*p & 0x80) == 0) ? 0 : -1;
     for (uint32_t i = ValueLen; i > 0; i--, p++)
         val = (val << 8) | *p;
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-ASN1_ERROR ASN1Reader::GetBoolean(bool & val)
+CHIP_ERROR ASN1Reader::GetBoolean(bool & val)
 {
     if (Value == nullptr)
         return ASN1_ERROR_INVALID_STATE;
@@ -181,10 +181,10 @@ ASN1_ERROR ASN1Reader::GetBoolean(bool & val)
         val = true;
     else
         return ASN1_ERROR_INVALID_ENCODING;
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-ASN1_ERROR ASN1Reader::GetUTCTime(ASN1UniversalTime & outTime)
+CHIP_ERROR ASN1Reader::GetUTCTime(ASN1UniversalTime & outTime)
 {
     // Supported Encoding: YYMMDDHHMMSSZ
 
@@ -214,10 +214,10 @@ ASN1_ERROR ASN1Reader::GetUTCTime(ASN1UniversalTime & outTime)
     else
         outTime.Year += 2000;
 
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-ASN1_ERROR ASN1Reader::GetGeneralizedTime(ASN1UniversalTime & outTime)
+CHIP_ERROR ASN1Reader::GetGeneralizedTime(ASN1UniversalTime & outTime)
 {
     // Supported Encoding: YYYYMMDDHHMMSSZ
 
@@ -242,7 +242,7 @@ ASN1_ERROR ASN1Reader::GetGeneralizedTime(ASN1UniversalTime & outTime)
     outTime.Minute = (Value[10] - '0') * 10 + (Value[11] - '0');
     outTime.Second = (Value[12] - '0') * 10 + (Value[13] - '0');
 
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 static uint8_t ReverseBits(uint8_t v)
@@ -256,7 +256,7 @@ static uint8_t ReverseBits(uint8_t v)
     return v;
 }
 
-ASN1_ERROR ASN1Reader::GetBitString(uint32_t & outVal)
+CHIP_ERROR ASN1Reader::GetBitString(uint32_t & outVal)
 {
     // NOTE: only supports DER encoding.
 
@@ -279,10 +279,10 @@ ASN1_ERROR ASN1Reader::GetBitString(uint32_t & outVal)
             outVal |= (ReverseBits(Value[i]) << shift);
     }
 
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-ASN1_ERROR ASN1Reader::DecodeHead()
+CHIP_ERROR ASN1Reader::DecodeHead()
 {
     const uint8_t * p = mElemStart;
 
@@ -345,7 +345,7 @@ ASN1_ERROR ASN1Reader::DecodeHead()
 
     Value = p;
 
-    return ASN1_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 void ASN1Reader::ResetElementState()
@@ -360,9 +360,9 @@ void ASN1Reader::ResetElementState()
     mHeadLen      = 0;
 }
 
-ASN1_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * indent)
+CHIP_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * indent)
 {
-    ASN1_ERROR err = ASN1_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (indent == nullptr)
         indent = "  ";
@@ -371,14 +371,14 @@ ASN1_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * i
     while (true)
     {
         err = asn1Parser.Next();
-        if (err != ASN1_NO_ERROR)
+        if (err != CHIP_NO_ERROR)
         {
             if (err == ASN1_END)
             {
                 if (asn1Parser.IsContained())
                 {
                     err = asn1Parser.ExitConstructedType();
-                    if (err != ASN1_NO_ERROR)
+                    if (err != CHIP_NO_ERROR)
                     {
                         printf("ASN1Reader::ExitConstructedType() failed: %ld\n", (long) err);
                         return err;
@@ -475,7 +475,7 @@ ASN1_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * i
         if (asn1Parser.IsConstructed())
         {
             err = asn1Parser.EnterConstructedType();
-            if (err != ASN1_NO_ERROR)
+            if (err != CHIP_NO_ERROR)
             {
                 printf("ASN1Reader::EnterConstructedType() failed: %ld\n", (long) err);
                 return err;

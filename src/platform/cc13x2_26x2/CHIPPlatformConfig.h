@@ -31,10 +31,7 @@
 // ==================== General Platform Adaptations ====================
 
 #define CHIP_CONFIG_ERROR_TYPE uint32_t
-#define CHIP_CONFIG_NO_ERROR (0)
-
-#define ASN1_CONFIG_ERROR_TYPE uint32_t
-#define ASN1_CONFIG_NO_ERROR (0)
+#define CHIP_CONFIG_ERROR_FORMAT PRIu32
 
 #define ChipDie() assert()
 

@@ -67,6 +67,7 @@ android_library("java") {
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
     "src/chip/devicecontroller/KeyValueStoreManager.java",
+    "src/chip/devicecontroller/PreferencesKeyValueStoreManager.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

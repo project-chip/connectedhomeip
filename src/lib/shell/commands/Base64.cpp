@@ -35,13 +35,13 @@ chip::Shell::Engine sShellBase64Commands;
 namespace chip {
 namespace Shell {
 
-static int Base64HelpHandler(int argc, char ** argv)
+static CHIP_ERROR Base64HelpHandler(int argc, char ** argv)
 {
     sShellBase64Commands.ForEachCommand(PrintCommandHelp, nullptr);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-static int Base64DecodeHandler(int argc, char ** argv)
+static CHIP_ERROR Base64DecodeHandler(int argc, char ** argv)
 {
     streamer_t * sout = streamer_get();
     uint32_t binarySize;
@@ -54,7 +54,7 @@ static int Base64DecodeHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static int Base64EncodeHandler(int argc, char ** argv)
+static CHIP_ERROR Base64EncodeHandler(int argc, char ** argv)
 {
     streamer_t * sout = streamer_get();
     char base64[256];
@@ -68,17 +68,13 @@ static int Base64EncodeHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static int Base64Dispatch(int argc, char ** argv)
+static CHIP_ERROR Base64Dispatch(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     if (argc == 0)
     {
-        Base64HelpHandler(argc, argv);
-        return error;
+        return Base64HelpHandler(argc, argv);
     }
-    error = sShellBase64Commands.ExecCommand(argc, argv);
-    return error;
+    return sShellBase64Commands.ExecCommand(argc, argv);
 }
 
 void RegisterBase64Commands()

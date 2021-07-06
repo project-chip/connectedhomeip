@@ -76,8 +76,8 @@ namespace Inet {
  * @param[in]   nameBuf     region of memory to write the interface name
  * @param[in]   nameBufSize size of the region denoted by \c nameBuf
  *
- * @retval  INET_NO_ERROR           successful result, interface name written
- * @retval  INET_ERROR_NO_MEMORY    name is too large to be written in buffer
+ * @retval  CHIP_NO_ERROR           successful result, interface name written
+ * @retval  CHIP_ERROR_NO_MEMORY    name is too large to be written in buffer
  * @retval  other                   another system or platform error
  *
  * @details
@@ -85,15 +85,15 @@ namespace Inet {
  *     at \c nameBuf. The name of the unspecified network interface is the empty
  *     string.
  */
-DLL_EXPORT INET_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize)
+DLL_EXPORT CHIP_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_t nameBufSize)
 {
     if (intfId != INET_NULL_INTERFACEID)
     {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         int status = snprintf(nameBuf, nameBufSize, "%c%c%d", intfId->name[0], intfId->name[1], intfId->num);
         if (status >= static_cast<int>(nameBufSize))
-            return INET_ERROR_NO_MEMORY;
-        return INET_NO_ERROR;
+            return CHIP_ERROR_NO_MEMORY;
+        return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
@@ -101,29 +101,29 @@ DLL_EXPORT INET_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_
         if (if_indextoname(intfId, intfName) == nullptr)
             return chip::System::MapErrorPOSIX(errno);
         if (strlen(intfName) >= nameBufSize)
-            return INET_ERROR_NO_MEMORY;
+            return CHIP_ERROR_NO_MEMORY;
         strcpy(nameBuf, intfName);
-        return INET_NO_ERROR;
+        return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
         net_if * currentInterface = net_if_get_by_index(intfId);
         if (!currentInterface)
-            return INET_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_INCORRECT_STATE;
         const char * name = net_if_get_device(currentInterface)->name;
         if (strlen(name) >= nameBufSize)
-            return INET_ERROR_NO_MEMORY;
+            return CHIP_ERROR_NO_MEMORY;
         strcpy(nameBuf, name);
-        return INET_NO_ERROR;
+        return CHIP_NO_ERROR;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
     }
 
     if (nameBufSize < 1)
-        return INET_ERROR_NO_MEMORY;
+        return CHIP_ERROR_NO_MEMORY;
 
     nameBuf[0] = 0;
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -132,7 +132,7 @@ DLL_EXPORT INET_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_
  * @param[in]   intfName    name of the network interface to find
  * @param[out]  intfId      indicator of the network interface to assign
  *
- * @retval  INET_NO_ERROR                 success, network interface indicated
+ * @retval  CHIP_NO_ERROR                 success, network interface indicated
  * @retval  INET_ERROR_UNKNOWN_INTERFACE  no network interface found
  * @retval  other                   another system or platform error
  *
@@ -140,10 +140,10 @@ DLL_EXPORT INET_ERROR GetInterfaceName(InterfaceId intfId, char * nameBuf, size_
  *     On LwIP, this function must be called with the LwIP stack lock acquired.
  *
  *     The \c intfId parameter is not updated unless the value returned is
- *     \c INET_NO_ERROR. It should be initialized with \c INET_NULL_INTERFACEID
+ *     \c CHIP_NO_ERROR. It should be initialized with \c INET_NULL_INTERFACEID
  *     before calling this function.
  */
-DLL_EXPORT INET_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId)
+DLL_EXPORT CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (strlen(intfName) < 3)
@@ -162,7 +162,7 @@ DLL_EXPORT INET_ERROR InterfaceNameToId(const char * intfName, InterfaceId & int
         if (intf->name[0] == intfName[0] && intf->name[1] == intfName[1] && intf->num == (uint8_t) intfNum)
         {
             intfId = intf;
-            return INET_NO_ERROR;
+            return CHIP_NO_ERROR;
         }
     }
     intfId = INET_NULL_INTERFACEID;
@@ -173,7 +173,7 @@ DLL_EXPORT INET_ERROR InterfaceNameToId(const char * intfName, InterfaceId & int
     intfId = if_nametoindex(intfName);
     if (intfId == 0)
         return (errno == ENXIO) ? INET_ERROR_UNKNOWN_INTERFACE : chip::System::MapErrorPOSIX(errno);
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -185,7 +185,7 @@ DLL_EXPORT INET_ERROR InterfaceNameToId(const char * intfName, InterfaceId & int
         if (strcmp(net_if_get_device(currentInterface)->name, intfName) == 0)
         {
             intfId = currentId;
-            return INET_NO_ERROR;
+            return CHIP_NO_ERROR;
         }
     }
     return INET_ERROR_UNKNOWN_INTERFACE;
@@ -560,25 +560,25 @@ InterfaceId InterfaceIterator::GetInterfaceId(void)
  * @param[in]   nameBuf     region of memory to write the interface name
  * @param[in]   nameBufSize size of the region denoted by \c nameBuf
  *
- * @retval  INET_NO_ERROR           successful result, interface name written
- * @retval  INET_ERROR_INCORRECT_STATE
+ * @retval  CHIP_NO_ERROR           successful result, interface name written
+ * @retval  CHIP_ERROR_INCORRECT_STATE
  *                                  iterator is positioned beyond the end of
  *                                  the list
- * @retval  INET_ERROR_NO_MEMORY    name is too large to be written in buffer
+ * @retval  CHIP_ERROR_NO_MEMORY    name is too large to be written in buffer
  * @retval  other                   another system or platform error
  *
  * @details
  *     Writes the name of the network interface as \c NUL terminated text string
  *     at \c nameBuf.
  */
-INET_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
+CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
-    VerifyOrReturnError(HasCurrent(), INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-    VerifyOrReturnError(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, INET_ERROR_NO_MEMORY);
+    VerifyOrReturnError(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, CHIP_ERROR_NO_MEMORY);
     strncpy(nameBuf, mIntfArray[mCurIntf].if_name, nameBufSize);
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -589,7 +589,7 @@ INET_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSiz
     return ::chip::Inet::GetInterfaceName(mCurNetif, nameBuf, nameBufSize);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    return INET_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 /**
@@ -923,8 +923,14 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
         if (mCurAddr->ifa_addr->sa_family == AF_INET6)
         {
+#if !__MBED__
             struct sockaddr_in6 & netmask = *reinterpret_cast<struct sockaddr_in6 *>(mCurAddr->ifa_netmask);
             return NetmaskToPrefixLength(netmask.sin6_addr.s6_addr, 16);
+#else  // __MBED__
+       // netmask is not available through an API for IPv6 interface in Mbed.
+       // Default prefix length to 64.
+            return 64;
+#endif // !__MBED__
         }
         if (mCurAddr->ifa_addr->sa_family == AF_INET)
         {
@@ -981,7 +987,7 @@ InterfaceId InterfaceAddressIterator::GetInterfaceId()
 }
 
 /**
- * @fn      INET_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
+ * @fn      CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
  *
  * @brief   Get the name of the network interface associated with the
  *          current interface address.
@@ -989,9 +995,9 @@ InterfaceId InterfaceAddressIterator::GetInterfaceId()
  * @param[in]   nameBuf     region of memory to write the interface name
  * @param[in]   nameBufSize size of the region denoted by \c nameBuf
  *
- * @retval  INET_NO_ERROR           successful result, interface name written
- * @retval  INET_ERROR_NO_MEMORY    name is too large to be written in buffer
- * @retval  INET_ERROR_INCORRECT_STATE
+ * @retval  CHIP_NO_ERROR           successful result, interface name written
+ * @retval  CHIP_ERROR_NO_MEMORY    name is too large to be written in buffer
+ * @retval  CHIP_ERROR_INCORRECT_STATE
  *                                  the iterator is not currently positioned on an
  *                                  interface address
  * @retval  other                   another system or platform error
@@ -1000,21 +1006,21 @@ InterfaceId InterfaceAddressIterator::GetInterfaceId()
  *     Writes the name of the network interface as \c NUL terminated text string
  *     at \c nameBuf.
  */
-INET_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
+CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
-    VerifyOrReturnError(HasCurrent(), INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-    VerifyOrReturnError(strlen(mCurAddr->ifa_name) < nameBufSize, INET_ERROR_NO_MEMORY);
+    VerifyOrReturnError(strlen(mCurAddr->ifa_name) < nameBufSize, CHIP_ERROR_NO_MEMORY);
     strncpy(nameBuf, mCurAddr->ifa_name, nameBufSize);
-    return INET_NO_ERROR;
+    return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
     return mIntfIter.GetInterfaceName(nameBuf, nameBufSize);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
-    return INET_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 /**

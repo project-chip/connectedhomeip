@@ -35,8 +35,7 @@
 namespace chip {
 namespace Credentials {
 
-static constexpr size_t kOperationalCredentialsMax     = 5;
-static constexpr size_t kOperationalCertificateMaxSize = 400;
+static constexpr size_t kOperationalCredentialsMax = 5;
 
 using namespace Crypto;
 
@@ -49,13 +48,13 @@ struct NodeCredential
 struct OperationalCredentialSerializable
 {
     uint16_t mNodeCredentialLen;
-    uint8_t mNodeCredential[kOperationalCertificateMaxSize];
+    uint8_t mNodeCredential[kMaxCHIPCertLength];
     uint16_t mNodeKeypairLen;
     uint8_t mNodeKeypair[kP256_PublicKey_Length + kP256_PrivateKey_Length];
     uint16_t mRootCertificateLen;
-    uint8_t mRootCertificate[kOperationalCertificateMaxSize];
+    uint8_t mRootCertificate[kMaxCHIPCertLength];
     uint16_t mCACertificateLen;
-    uint8_t mCACertificate[kOperationalCertificateMaxSize];
+    uint8_t mCACertificate[kMaxCHIPCertLength];
 };
 
 struct NodeCredentialMap
@@ -153,7 +152,7 @@ public:
      *
      * @return A pointer to the Trusted Root ID on success. Otherwise, nullptr if no Trust Anchor is found.
      **/
-    const CertificateKeyId * GetTrustedRootId(uint16_t certSetIndex) const;
+    CertificateKeyId GetTrustedRootId(uint16_t certSetIndex) const;
 
     /**
      * @brief Check whether certificate set is in the operational credential set.

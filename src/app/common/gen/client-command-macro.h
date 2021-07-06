@@ -23,7 +23,7 @@
 /** @brief Command description for ReadAttributes
  *
  * Command: ReadAttributes
- * @param attributeIds ATTRIBUTE_ID []
+ * @param attributeIds ATTRIB_ID []
  * @param attributeIdsLen int
  */
 #define emberAfFillCommandGlobalReadAttributes(clusterId, attributeIds, attributeIdsLen)                                           \
@@ -144,7 +144,7 @@
 /** @brief Command description for DiscoverAttributes
  *
  * Command: DiscoverAttributes
- * @param startId ATTRIBUTE_ID
+ * @param startId ATTRIB_ID
  * @param maxAttributeIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverAttributes(clusterId, startId, maxAttributeIds)                                            \
@@ -238,7 +238,7 @@
 /** @brief Command description for DiscoverAttributesExtended
  *
  * Command: DiscoverAttributesExtended
- * @param startId ATTRIBUTE_ID
+ * @param startId ATTRIB_ID
  * @param maxAttributeIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverAttributesExtended(clusterId, startId, maxAttributeIds)                                    \
@@ -1739,17 +1739,17 @@
  * @param protocolsSupported OTADownloadProtocol []
  * @param protocolsSupportedLen int
  * @param location CHAR_STRING
- * @param clientCanConsent BOOLEAN
- * @param metadataForServer OCTET_STRING
+ * @param requestorCanConsent BOOLEAN
+ * @param metadataForProvider OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,   \
-                                            protocolsSupportedLen, location, clientCanConsent, metadataForServer)                  \
+    Software Update ProviderClusterQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, \
+                                              protocolsSupportedLen, location, requestorCanConsent, metadataForProvider)           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuubuuu", vendorId, productId, imageType, hardwareVersion,        \
-                                  currentVersion, protocolsSupported, protocolsSupportedLen, location, clientCanConsent,           \
-                                  metadataForServer);
+                                  currentVersion, protocolsSupported, protocolsSupportedLen, location, requestorCanConsent,        \
+                                  metadataForProvider);
 
 /** @brief Command description for ApplyUpdateRequest
  *
@@ -1758,7 +1758,7 @@
  * @param newVersion INT32U
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterApplyUpdateRequest(updateToken, newVersion)                                                       \
+    Software Update ProviderClusterApplyUpdateRequest(updateToken, newVersion)                                                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID, "uu", updateToken, newVersion);
@@ -1770,7 +1770,7 @@
  * @param currentVersion INT32U
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterNotifyUpdateApplied(updateToken, currentVersion)                                                  \
+    Software Update ProviderClusterNotifyUpdateApplied(updateToken, currentVersion)                                                \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID, "uu", updateToken, currentVersion);
@@ -1784,15 +1784,15 @@
  * @param softwareVersion INT32U
  * @param updateToken OCTET_STRING
  * @param userConsentNeeded BOOLEAN
- * @param metadataForClient OCTET_STRING
+ * @param metadataForRequestor OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterQueryImageResponse(status, delayedActionTime, imageURI, softwareVersion, updateToken,             \
-                                                    userConsentNeeded, metadataForClient)                                          \
+    Software Update ProviderClusterQueryImageResponse(status, delayedActionTime, imageURI, softwareVersion, updateToken,           \
+                                                      userConsentNeeded, metadataForRequestor)                                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID, "uuuuuuu", status, delayedActionTime, imageURI,             \
-                                  softwareVersion, updateToken, userConsentNeeded, metadataForClient);
+                                  softwareVersion, updateToken, userConsentNeeded, metadataForRequestor);
 
 /** @brief Command description for ApplyUpdateRequestResponse
  *
@@ -1801,24 +1801,24 @@
  * @param delayedActionTime INT32U
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ServerClusterApplyUpdateRequestResponse(action, delayedActionTime)                                             \
+    Software Update ProviderClusterApplyUpdateRequestResponse(action, delayedActionTime)                                           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_APPLY_UPDATE_REQUEST_RESPONSE_COMMAND_ID, "uu", action, delayedActionTime);
 
-/** @brief Command description for AnnounceOtaServer
+/** @brief Command description for AnnounceOtaProvider
  *
- * Command: AnnounceOtaServer
+ * Command: AnnounceOtaProvider
  * @param serverLocation OCTET_STRING
  * @param vendorId INT16U
  * @param announcementReason OTAAnnouncementReason
  * @param metadataForNode OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ClientClusterAnnounceOtaServer(serverLocation, vendorId, announcementReason, metadataForNode)                  \
+    Software Update RequestorClusterAnnounceOtaProvider(serverLocation, vendorId, announcementReason, metadataForNode)             \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ANNOUNCE_OTA_SERVER_COMMAND_ID, "uuuu", serverLocation, vendorId, announcementReason,        \
+                                  ZCL_ANNOUNCE_OTA_PROVIDER_COMMAND_ID, "uuuu", serverLocation, vendorId, announcementReason,      \
                                   metadataForNode);
 
 /** @brief Command description for ArmFailSafe
@@ -2261,16 +2261,16 @@
 /** @brief Command description for AddOpCert
  *
  * Command: AddOpCert
- * @param OperationalCert OCTET_STRING
+ * @param NOCArray OCTET_STRING
  * @param IPKValue OCTET_STRING
  * @param CaseAdminNode NODE_ID
  * @param AdminVendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterAddOpCert(OperationalCert, IPKValue, CaseAdminNode, AdminVendorId)                                           \
+    CredentialsClusterAddOpCert(NOCArray, IPKValue, CaseAdminNode, AdminVendorId)                                                  \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ADD_OP_CERT_COMMAND_ID, "uuuu", OperationalCert, IPKValue, CaseAdminNode, AdminVendorId);
+                                  ZCL_ADD_OP_CERT_COMMAND_ID, "uuuu", NOCArray, IPKValue, CaseAdminNode, AdminVendorId);
 
 /** @brief Command description for OpCertResponse
  *
@@ -4316,26 +4316,26 @@
                                                                                                                                    \
                                   ZCL_MEDIA_SKIP_BACKWARD_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for MediaSkipSeek
+/** @brief Command description for MediaSeek
  *
- * Command: MediaSkipSeek
+ * Command: MediaSeek
  * @param position INT64U
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterMediaSkipSeek(position) emberAfFillExternalBuffer(mask,                                                         \
+    PlaybackClusterMediaSeek(position) emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
-                                                                     ZCL_MEDIA_SKIP_SEEK_COMMAND_ID, "u", position);
+                                                                 ZCL_MEDIA_SEEK_COMMAND_ID, "u", position);
 
-/** @brief Command description for MediaSkipSeekResponse
+/** @brief Command description for MediaSeekResponse
  *
- * Command: MediaSkipSeekResponse
+ * Command: MediaSeekResponse
  * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterMediaSkipSeekResponse(mediaPlaybackStatus)                                                                      \
+    PlaybackClusterMediaSeekResponse(mediaPlaybackStatus)                                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_MEDIA_SKIP_SEEK_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+                                  ZCL_MEDIA_SEEK_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
 
 /** @brief Command description for SelectInput
  *
@@ -4531,14 +4531,12 @@
 /** @brief Command description for LaunchApp
  *
  * Command: LaunchApp
- * @param application ApplicationLauncherApp []
- * @param applicationLen int
+ * @param catalogVendorId INT16U
  */
 #define emberAfFillCommandApplication                                                                                              \
-    LauncherClusterLaunchApp(application, applicationLen)                                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    LauncherClusterLaunchApp(catalogVendorId) emberAfFillExternalBuffer(mask,                                                      \
                                                                                                                                    \
-                                  ZCL_LAUNCH_APP_COMMAND_ID, "b", application, applicationLen);
+                                                                        ZCL_LAUNCH_APP_COMMAND_ID, "u", catalogVendorId);
 
 /** @brief Command description for LaunchAppResponse
  *
@@ -4549,6 +4547,16 @@
     LauncherClusterLaunchAppResponse(data) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
                                                                      ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, "u", data);
+
+/** @brief Command description for LaunchApp
+ *
+ * Command: LaunchApp
+ * @param applicationId CHAR_STRING
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    LauncherClusterLaunchApp(applicationId) emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_LAUNCH_APP_COMMAND_ID, "u", applicationId);
 
 /** @brief Command description for ChangeStatus
  *
@@ -4998,7 +5006,7 @@
  * Command: Bind
  * @param nodeId NODE_ID
  * @param groupId GROUP_ID
- * @param endpointId ENDPOINT_ID
+ * @param endpointId ENDPOINT_NO
  * @param clusterId CLUSTER_ID
  */
 #define emberAfFillCommandBindingClusterBind(nodeId, groupId, endpointId, clusterId)                                               \
@@ -5011,7 +5019,7 @@
  * Command: Unbind
  * @param nodeId NODE_ID
  * @param groupId GROUP_ID
- * @param endpointId ENDPOINT_ID
+ * @param endpointId ENDPOINT_NO
  * @param clusterId CLUSTER_ID
  */
 #define emberAfFillCommandBindingClusterUnbind(nodeId, groupId, endpointId, clusterId)                                             \

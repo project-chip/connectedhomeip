@@ -39,7 +39,7 @@ int BoltLockManager::Init()
     if (sLockTimer == NULL)
     {
         ESP_LOGE(TAG, "sLockTimer timer create failed");
-        return CHIP_ERROR_MAX;
+        return CHIP_CONFIG_CORE_ERROR_MAX;
     }
 
     mState              = kState_LockingCompleted;

@@ -436,23 +436,23 @@ limitations under the License.
     <item name="InvalidDataType" value="0x8D"/>
   </enum>
   <struct name="ReadAttributeStatusRecord">
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="status" type="Status"/>
     <item name="attributeType" type="INT8U"/>
     <item name="attributeLocation" type="NO_DATA"/>
   </struct>
   <struct name="WriteAttributeRecord">
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="attributeType" type="INT8U"/>
     <item name="attributeLocation" type="NO_DATA"/>
   </struct>
   <struct name="WriteAttributeStatusRecord">
     <item name="status" type="Status"/>
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
   </struct>
   <struct name="ConfigureReportingRecord">
     <item name="direction" type="INT8U"/>
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="attributeType" type="INT8U"/>
     <item name="minimumReportingInterval" type="INT16U"/>
     <item name="maximumReportingInterval" type="INT16U"/>
@@ -462,12 +462,12 @@ limitations under the License.
   <struct name="ConfigureReportingStatusRecord">
     <item name="status" type="Status"/>
     <item name="direction" type="INT8U"/>
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
   </struct>
   <struct name="ReadReportingConfigurationRecord">
     <item name="status" type="Status"/>
     <item name="direction" type="INT8U"/>
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="attributeType" type="INT8U"/>
     <item name="minimumReportingInterval" type="INT16U"/>
     <item name="maximumReportingInterval" type="INT16U"/>
@@ -480,29 +480,29 @@ limitations under the License.
   </enum>
   <struct name="ReadReportingConfigurationAttributeRecord">
     <item name="direction" type="INT8U"/>
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
   </struct>
   <struct name="ReportAttributeRecord">
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="attributeType" type="INT8U"/>
     <item name="attributeLocation" type="NO_DATA"/>
   </struct>
   <struct name="DiscoverAttributesInfoRecord">
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="attributeType" type="INT8U"/>
   </struct>
   <struct name="ExtendedDiscoverAttributesInfoRecord">
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="attributeType" type="INT8U"/>
     <item name="attributeAccessControl" type="INT8U"/>
   </struct>
   <struct name="ReadStructuredAttributeRecord">
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="indicator" type="INT8U"/>
     <item name="indicies" type="INT16U" array="true"/>
   </struct>
   <struct name="WriteStructuredAttributeRecord">
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="indicator" type="INT8U"/>
     <item name="indicies" type="INT16U" array="true"/>
     <item name="attributeType" type="INT8U"/>
@@ -510,7 +510,7 @@ limitations under the License.
   </struct>
   <struct name="WriteStructuredAttributeStatusRecord">
     <item name="status" type="Status"/>
-    <item name="attributeId" type="ATTRIBUTE_ID"/>
+    <item name="attributeId" type="ATTRIB_ID"/>
     <item name="indicator" type="INT8U"/>
     <item name="indicies" type="INT16U" array="true"/>
   </struct>

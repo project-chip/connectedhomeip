@@ -111,13 +111,13 @@ void TimerFailed(void * aState)
     sOverflowTestDone = true;
 }
 
-void HandleTimerFailed(Layer * inetLayer, void * aState, Error aError)
+void HandleTimerFailed(Layer * inetLayer, void * aState, CHIP_ERROR aError)
 {
     (void) inetLayer, (void) aError;
     TimerFailed(aState);
 }
 
-void HandleTimer10Success(Layer * inetLayer, void * aState, Error aError)
+void HandleTimer10Success(Layer * inetLayer, void * aState, CHIP_ERROR aError)
 {
     TestContext & lContext = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, true);
@@ -153,7 +153,7 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
     lSys.CancelTimer(HandleTimer10Success, aContext);
 }
 
-void HandleGreedyTimer(Layer * aLayer, void * aState, Error aError)
+void HandleGreedyTimer(Layer * aLayer, void * aState, CHIP_ERROR aError)
 {
     static uint32_t sNumTimersHandled = 0;
     TestContext & lContext            = *static_cast<TestContext *>(aState);

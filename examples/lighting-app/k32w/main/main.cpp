@@ -55,7 +55,7 @@ uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
 
 extern "C" void main_task(void const * argument)
 {
-    CHIP_ERROR ret = CHIP_ERROR_MAX;
+    CHIP_ERROR ret = CHIP_CONFIG_CORE_ERROR_MAX;
 
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;

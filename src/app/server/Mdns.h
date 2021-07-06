@@ -42,6 +42,9 @@ void StartServer();
 
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
+/// Generates the (random) instance name that a CHIP device is to use for pre-commissioning DNS-SD
+CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen);
+
 } // namespace Mdns
 } // namespace app
 } // namespace chip

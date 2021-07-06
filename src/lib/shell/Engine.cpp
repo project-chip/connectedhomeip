@@ -71,9 +71,9 @@ void Engine::RegisterCommands(shell_command_t * command_set, unsigned count)
     ++_commandSetCount;
 }
 
-int Engine::ExecCommand(int argc, char * argv[])
+CHIP_ERROR Engine::ExecCommand(int argc, char * argv[])
 {
-    int retval = CHIP_ERROR_INVALID_ARGUMENT;
+    CHIP_ERROR retval = CHIP_ERROR_INVALID_ARGUMENT;
 
     VerifyOrReturnError(argc > 0, retval);
     // Find the command

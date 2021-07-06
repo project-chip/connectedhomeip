@@ -99,7 +99,7 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret = CHIP_ERROR_MAX;
+    int ret = CHIP_CONFIG_CORE_ERROR_MAX;
 
     init_efrPlatform();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);

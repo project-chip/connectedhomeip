@@ -111,27 +111,8 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
 
         if (aEventPathParamsListSize != 0 && apEventPathParamsList != nullptr)
         {
-            EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
-            EventPath::Builder eventPathBuilder           = eventPathListBuilder.CreateEventPathBuilder();
-            for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
-            {
-                EventPathParams eventPath = apEventPathParamsList[eventIndex];
-                eventPathBuilder.NodeId(eventPath.mNodeId)
-                    .EventId(eventPath.mEventId)
-                    .EndpointId(eventPath.mEndpointId)
-                    .ClusterId(eventPath.mClusterId)
-                    .EndOfEventPath();
-                SuccessOrExit(err = eventPathBuilder.GetError());
-            }
-
-            eventPathListBuilder.EndOfEventPathList();
-            SuccessOrExit(err = eventPathListBuilder.GetError());
-
-            if (aEventNumber != 0)
-            {
-                // EventNumber is optional
-                request.EventNumber(aEventNumber);
-            }
+            err = GenerateEventPathList(request, apEventPathParamsList, aEventPathParamsListSize, aEventNumber);
+            SuccessOrExit(err);
         }
 
         if (aAttributePathParamsListSize != 0 && apAttributePathParamsList != nullptr)
@@ -158,10 +139,8 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
-    // TODO (#7909): Disable CRMP temporary for duplicate ACK issues, should be enabled later.
-    err = mpExchangeCtx->SendMessage(
-        Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
-        Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(ClientState::AwaitingResponse);
 
@@ -173,6 +152,37 @@ exit:
         AbortExistingExchangeContext();
     }
 
+    return err;
+}
+
+CHIP_ERROR ReadClient::GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
+                                             size_t aEventPathParamsListSize, EventNumber & aEventNumber)
+{
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
+    EventPathList::Builder & eventPathListBuilder = aRequest.CreateEventPathListBuilder();
+    for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
+    {
+        EventPath::Builder eventPathBuilder = eventPathListBuilder.CreateEventPathBuilder();
+        EventPathParams eventPath           = apEventPathParamsList[eventIndex];
+        eventPathBuilder.NodeId(eventPath.mNodeId)
+            .EventId(eventPath.mEventId)
+            .EndpointId(eventPath.mEndpointId)
+            .ClusterId(eventPath.mClusterId)
+            .EndOfEventPath();
+        SuccessOrExit(err = eventPathBuilder.GetError());
+    }
+
+    eventPathListBuilder.EndOfEventPathList();
+    SuccessOrExit(err = eventPathListBuilder.GetError());
+
+    if (aEventNumber != 0)
+    {
+        // EventNumber is optional
+        aRequest.EventNumber(aEventNumber);
+    }
+
+exit:
+    ChipLogFunctError(err);
     return err;
 }
 

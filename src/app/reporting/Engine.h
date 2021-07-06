@@ -100,7 +100,7 @@ private:
      * Generate and send the report data request when there exists subscription or read request
      *
      */
-    static void Run(System::Layer * aSystemLayer, void * apAppState, System::Error);
+    static void Run(System::Layer * aSystemLayer, void * apAppState, CHIP_ERROR);
 
     /**
      * Boolean to show if more chunk message on the way

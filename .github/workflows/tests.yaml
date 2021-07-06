@@ -20,7 +20,7 @@ on:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 jobs:
@@ -161,7 +161,7 @@ jobs:
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Test Suites
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/tests/test_suites.sh
             - name: Uploading core files

@@ -59,7 +59,7 @@ void AppTimer::Start()
     if (xTimerStart(mHandler, 100) != pdPASS)
     {
         EFR32_LOG("AppTimer start() failed");
-        appError(CHIP_ERROR_MAX);
+        appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 
     mIsActive = true;
@@ -79,7 +79,7 @@ void AppTimer::Start(uint32_t timeoutInMs)
     if (xTimerChangePeriod(mHandler, timeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
     {
         EFR32_LOG("AppTimer start() failed");
-        appError(CHIP_ERROR_MAX);
+        appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 
     mIsActive = true;
@@ -104,7 +104,7 @@ void AppTimer::Stop()
     if (xTimerStop(mHandler, 0) == pdFAIL)
     {
         EFR32_LOG("AppTimer stop() failed");
-        appError(CHIP_ERROR_MAX);
+        appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 }
 

@@ -59,32 +59,59 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
 {
     switch (type)
     {
-    case ZCL_ENDPOINT_ID_ATTRIBUTE_TYPE: // Endpoint Id
-    case ZCL_COMMAND_ID_ATTRIBUTE_TYPE:  // Command Id
-    case ZCL_BITMAP8_ATTRIBUTE_TYPE:     // 8-bit bitmap
-    case ZCL_ENUM8_ATTRIBUTE_TYPE:       // 8-bit enumeration
-        static_assert(std::is_same<chip::EndpointId, uint8_t>::value,
-                      "chip::EndpointId is expected to be uint8_t, change this when necessary");
-        static_assert(std::is_same<chip::CommandId, uint8_t>::value,
-                      "chip::CommandId is expected to be uint8_t, change this when necessary");
+    case ZCL_ACTION_ID_ATTRIBUTE_TYPE:  // Action Id
+    case ZCL_FABRIC_IDX_ATTRIBUTE_TYPE: // Fabric Index
+    case ZCL_BITMAP8_ATTRIBUTE_TYPE:    // 8-bit bitmap
+    case ZCL_ENUM8_ATTRIBUTE_TYPE:      // 8-bit enumeration
         return ZCL_INT8U_ATTRIBUTE_TYPE;
 
-    case ZCL_GROUP_ID_ATTRIBUTE_TYPE: // Group Id
-    case ZCL_ENUM16_ATTRIBUTE_TYPE:   // 16-bit enumeration
-    case ZCL_BITMAP16_ATTRIBUTE_TYPE: // 16-bit bitmap
+    case ZCL_ENDPOINT_NO_ATTRIBUTE_TYPE: // Endpoint Number
+    case ZCL_GROUP_ID_ATTRIBUTE_TYPE:    // Group Id
+    case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:   // Vendor Id
+    case ZCL_ENUM16_ATTRIBUTE_TYPE:      // 16-bit enumeration
+    case ZCL_BITMAP16_ATTRIBUTE_TYPE:    // 16-bit bitmap
+        static_assert(std::is_same<chip::EndpointId, uint16_t>::value,
+                      "chip::EndpointId is expected to be uint8_t, change this when necessary");
         static_assert(std::is_same<chip::GroupId, uint16_t>::value,
                       "chip::GroupId is expected to be uint16_t, change this when necessary");
         return ZCL_INT16U_ATTRIBUTE_TYPE;
 
-    case ZCL_BITMAP32_ATTRIBUTE_TYPE:       // 32-bit bitmap
-    case ZCL_DEVICE_TYPE_ID_ATTRIBUTE_TYPE: // Device Type Id
+    case ZCL_CLUSTER_ID_ATTRIBUTE_TYPE: // Cluster Id
+    case ZCL_ATTRIB_ID_ATTRIBUTE_TYPE:  // Attribute Id
+    case ZCL_FIELD_ID_ATTRIBUTE_TYPE:   // Field Id
+    case ZCL_EVENT_ID_ATTRIBUTE_TYPE:   // Event Id
+    case ZCL_COMMAND_ID_ATTRIBUTE_TYPE: // Command Id
+    case ZCL_TRANS_ID_ATTRIBUTE_TYPE:   // Transaction Id
+    case ZCL_DEVTYPE_ID_ATTRIBUTE_TYPE: // Device Type Id
+    case ZCL_STATUS_ATTRIBUTE_TYPE:     // Status Code
+    case ZCL_DATA_VER_ATTRIBUTE_TYPE:   // Data Version
+    case ZCL_BITMAP32_ATTRIBUTE_TYPE:   // 32-bit bitmap
+        static_assert(std::is_same<chip::ClusterId, uint32_t>::value,
+                      "chip::Cluster is expected to be uint32_t, change this when necessary");
+        static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
+                      "chip::AttributeId is expected to be uint32_t, change this when necessary");
+        static_assert(std::is_same<chip::FieldId, uint32_t>::value,
+                      "chip::FieldId is expected to be uint32_t, change this when necessary");
+        static_assert(std::is_same<chip::EventId, uint32_t>::value,
+                      "chip::EventId is expected to be uint32_t, change this when necessary");
+        static_assert(std::is_same<chip::CommandId, uint32_t>::value,
+                      "chip::CommandId is expected to be uint32_t, change this when necessary");
+        static_assert(std::is_same<chip::TransactionId, uint32_t>::value,
+                      "chip::TransactionId is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::DeviceTypeId, uint32_t>::value,
                       "chip::DeviceTypeId is expected to be uint32_t, change this when necessary");
+        static_assert(std::is_same<chip::StatusCode, uint32_t>::value,
+                      "chip::StatusCode is expected to be uint32_t, change this when necessary");
+        static_assert(std::is_same<chip::DataVersion, uint32_t>::value,
+                      "chip::DataVersion is expected to be uint32_t, change this when necessary");
         return ZCL_INT32U_ATTRIBUTE_TYPE;
 
-    case ZCL_BITMAP64_ATTRIBUTE_TYPE:  // 64-bit bitmap
+    case ZCL_EVENT_NO_ATTRIBUTE_TYPE:  // Event Number
     case ZCL_FABRIC_ID_ATTRIBUTE_TYPE: // Fabric Id
     case ZCL_NODE_ID_ATTRIBUTE_TYPE:   // Node Id
+    case ZCL_BITMAP64_ATTRIBUTE_TYPE:  // 64-bit bitmap
+        static_assert(std::is_same<chip::EventNumber, uint64_t>::value,
+                      "chip::EventNumber is expected to be uint64_t, change this when necessary");
         static_assert(std::is_same<chip::FabricId, uint64_t>::value,
                       "chip::FabricId is expected to be uint64_t, change this when necessary");
         static_assert(std::is_same<chip::NodeId, uint64_t>::value,
@@ -165,8 +192,8 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     static uint8_t data[kAttributeReadBufferSize];
 
     ChipLogDetail(DataManagement,
-                  "Received Cluster Command: Cluster=%" PRIx16 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx8 " FieldId=%" PRIx16
-                  " ListIndex=%" PRIx16,
+                  "Received Cluster Command: Cluster=%" PRIx32 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
+                  " FieldId=%" PRIx32 " ListIndex=%" PRIx16,
                   aClusterInfo.mClusterId, ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId, aClusterInfo.mFieldId,
                   aClusterInfo.mListIndex);
 

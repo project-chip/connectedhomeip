@@ -25,6 +25,7 @@
 #include <core/PeerId.h>
 #include <inet/InetLayer.h>
 #include <lib/support/Span.h>
+#include <support/CHIPMemString.h>
 
 namespace chip {
 namespace Mdns {
@@ -179,34 +180,55 @@ public:
     {
         if (deviceName.HasValue())
         {
-            strncpy(sDeviceName, deviceName.Value(), min(strlen(deviceName.Value()) + 1, sizeof(sDeviceName)));
-            mDeviceName = Optional<const char *>::Value(static_cast<const char *>(sDeviceName));
+            chip::Platform::CopyString(mDeviceName, sizeof(mDeviceName), deviceName.Value());
+            mDeviceNameHasValue = true;
+        }
+        else
+        {
+            mDeviceNameHasValue = false;
         }
         return *this;
     }
-    Optional<const char *> GetDeviceName() const { return mDeviceName; }
+    Optional<const char *> GetDeviceName() const
+    {
+        return mDeviceNameHasValue ? Optional<const char *>::Value(mDeviceName) : Optional<const char *>::Missing();
+    }
 
     CommissionAdvertisingParameters & SetRotatingId(Optional<const char *> rotatingId)
     {
         if (rotatingId.HasValue())
         {
-            strncpy(sRotatingId, rotatingId.Value(), min(strlen(rotatingId.Value()) + 1, sizeof(sRotatingId)));
-            mRotatingId = Optional<const char *>::Value(static_cast<const char *>(sRotatingId));
+            chip::Platform::CopyString(mRotatingId, sizeof(mRotatingId), rotatingId.Value());
+            mRotatingIdHasValue = true;
+        }
+        else
+        {
+            mRotatingIdHasValue = false;
         }
         return *this;
     }
-    Optional<const char *> GetRotatingId() const { return mRotatingId; }
+    Optional<const char *> GetRotatingId() const
+    {
+        return mRotatingIdHasValue ? Optional<const char *>::Value(mRotatingId) : Optional<const char *>::Missing();
+    }
 
     CommissionAdvertisingParameters & SetPairingInstr(Optional<const char *> pairingInstr)
     {
         if (pairingInstr.HasValue())
         {
-            strncpy(sPairingInstr, pairingInstr.Value(), min(strlen(pairingInstr.Value()) + 1, sizeof(sPairingInstr)));
-            mPairingInstr = Optional<const char *>::Value(static_cast<const char *>(sPairingInstr));
+            chip::Platform::CopyString(mPairingInstr, sizeof(mPairingInstr), pairingInstr.Value());
+            mPairingInstrHasValue = true;
+        }
+        else
+        {
+            mPairingInstrHasValue = false;
         }
         return *this;
     }
-    Optional<const char *> GetPairingInstr() const { return mPairingInstr; }
+    Optional<const char *> GetPairingInstr() const
+    {
+        return mPairingInstrHasValue ? Optional<const char *>::Value(mPairingInstr) : Optional<const char *>::Missing();
+    }
 
     CommissionAdvertisingParameters & SetPairingHint(Optional<uint16_t> pairingHint)
     {
@@ -233,14 +255,14 @@ private:
     chip::Optional<uint16_t> mDeviceType;
     chip::Optional<uint16_t> mPairingHint;
 
-    char sDeviceName[kKeyDeviceNameMaxLength + 1];
-    chip::Optional<const char *> mDeviceName;
+    char mDeviceName[kKeyDeviceNameMaxLength + 1];
+    bool mDeviceNameHasValue = false;
 
-    char sRotatingId[kKeyRotatingIdMaxLength + 1];
-    chip::Optional<const char *> mRotatingId;
+    char mRotatingId[kKeyRotatingIdMaxLength + 1];
+    bool mRotatingIdHasValue = false;
 
-    char sPairingInstr[kKeyPairingInstructionMaxLength + 1];
-    chip::Optional<const char *> mPairingInstr;
+    char mPairingInstr[kKeyPairingInstructionMaxLength + 1];
+    bool mPairingInstrHasValue = false;
 };
 
 /// Handles advertising of CHIP nodes
@@ -264,6 +286,9 @@ public:
 
     /// Provides the system-wide implementation of the service advertiser
     static ServiceAdvertiser & Instance();
+
+    /// Returns DNS-SD instance name formatted as hex string
+    virtual CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) = 0;
 };
 
 } // namespace Mdns

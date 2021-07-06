@@ -36,6 +36,7 @@
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 
@@ -51,29 +52,9 @@ using namespace chip::Protocols;
 
 using TestContext = chip::Test::MessagingContext;
 
-class LoopbackTransport : public Transport::Base
-{
-public:
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
-    {
-        ReturnErrorOnFailure(mMessageSendError);
-        mSentMessageCount++;
-
-        System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-        HandleMessageReceived(address, std::move(receivedMessage));
-
-        return CHIP_NO_ERROR;
-    }
-
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-
-    uint32_t mSentMessageCount   = 0;
-    CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
-};
-
 namespace {
 TransportMgrBase gTransportMgr;
-LoopbackTransport gLoopback;
+Test::LoopbackTransport gLoopback;
 
 OperationalCredentialSet commissionerDevOpCred;
 OperationalCredentialSet accessoryDevOpCred;
@@ -91,8 +72,6 @@ P256Keypair accessoryOpKeys;
 enum
 {
     kStandardCertsCount = 4,
-    kTestCertBufSize    = 1024, // Size of buffer needed to hold any of the test certificates
-                                // (in either CHIP or DER form), or to decode the certificates.
 };
 
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
@@ -108,7 +87,7 @@ public:
 
 static CHIP_ERROR InitCredentialSets()
 {
-    CertificateKeyId trustedRootId = { .mId = sTestCert_Root01_SubjectKeyId, .mLen = sTestCert_Root01_SubjectKeyId_Len };
+    CertificateKeyId trustedRootId = CertificateKeyId(sTestCert_Root01_SubjectKeyId);
 
     commissionerDevOpCred.Release();
     accessoryDevOpCred.Release();
@@ -133,9 +112,9 @@ static CHIP_ERROR InitCredentialSets()
 
     ReturnErrorOnFailure(accessoryOpKeys.Deserialize(accessoryOpKeysSerialized));
 
-    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount, kTestCertBufSize));
+    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
 
-    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount, kTestCertBufSize));
+    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
 
     // Add the trusted root certificate to the certificate set.
     ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
@@ -362,7 +341,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                    ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
                                                    ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len),
                                                    chipCertSpan) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, admin->SetOperationalCert(chipCertSpan) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, admin->SetOperationalCertsFromCertArray(chipCertSpan) == CHIP_NO_ERROR);
 
     adminTable.Store(0);
     adminTable.ReleaseAdminId(0);
@@ -489,10 +468,11 @@ static nlTestSuite sSuite =
 
 static TestContext sContext;
 
-/**
+namespace {
+/*
  *  Set up the test suite.
  */
-int CASE_TestSecurePairing_Setup(void * inContext)
+CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -511,6 +491,15 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
 
     return InitCredentialSets();
+}
+} // anonymous namespace
+
+/**
+ *  Set up the test suite.
+ */
+int CASE_TestSecurePairing_Setup(void * inContext)
+{
+    return CASETestSecurePairingSetup(inContext) == CHIP_NO_ERROR ? SUCCESS : FAILURE;
 }
 
 /**

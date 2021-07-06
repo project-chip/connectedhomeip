@@ -50,7 +50,7 @@ uint64_t GetClock_MonotonicHiRes(void)
     return (uint64_t)::esp_timer_get_time();
 }
 
-Error GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
 {
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
@@ -60,13 +60,13 @@ Error GetClock_RealTime(uint64_t & curTime)
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-Error GetClock_RealTimeMS(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime)
 {
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
@@ -76,13 +76,13 @@ Error GetClock_RealTimeMS(uint64_t & curTime)
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = (tv.tv_sec * UINT64_C(1000)) + (tv.tv_usec / 1000);
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 {
     struct timeval tv;
     tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
@@ -90,7 +90,7 @@ Error SetClock_RealTime(uint64_t newCurTime)
     int res    = settimeofday(&tv, NULL);
     if (res != 0)
     {
-        return (errno == EPERM) ? CHIP_SYSTEM_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
+        return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
     }
 #if CHIP_PROGRESS_LOGGING
     {
@@ -103,7 +103,7 @@ Error SetClock_RealTime(uint64_t newCurTime)
                         tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
     }
 #endif // CHIP_PROGRESS_LOGGING
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Layer
