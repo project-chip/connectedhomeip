@@ -388,11 +388,11 @@ function enhancedCommands(commands, types)
 
     const manualFilter = response => {
       switch (command.name) {
-      case 'AddOpCert':
-      case 'UpdateOpCert':
+      case 'AddNOC':
+      case 'UpdateNOC':
       case 'UpdateFabricLabel':
       case 'RemoveFabric':
-        return response.name == 'OpCertResponse';
+        return response.name == 'NOCResponse';
       default:
         return false;
       }

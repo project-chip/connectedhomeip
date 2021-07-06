@@ -810,8 +810,8 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 DeviceCommissioner::DeviceCommissioner() :
     mSuccess(BasicSuccess, this), mFailure(BasicFailure, this),
     mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
-    mOpCertResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
-    mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddOpCertFailureResponse, this),
+    mNOCResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
+    mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddNOCFailureResponse, this),
     mOnRootCertFailureCallback(OnRootCertFailureResponse, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this), mDeviceNOCCallback(OnDeviceNOCGenerated, this)
 {
@@ -1241,7 +1241,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
 void DeviceCommissioner::OnCSRFailureResponse(void * context, uint8_t status)
 {
     ChipLogProgress(Controller, "Device failed to receive the CSR request Response: 0x%02x", status);
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->mOpCSRResponseCallback.Cancel();
     commissioner->mOnCSRFailureCallback.Cancel();
     // TODO: Map error status to correct error code
@@ -1253,7 +1253,7 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
                                                                 ByteSpan VendorReserved3, ByteSpan Signature)
 {
     ChipLogProgress(Controller, "Received certificate signing request from the device");
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     commissioner->mOpCSRResponseCallback.Cancel();
     commissioner->mOnCSRFailureCallback.Cancel();
@@ -1336,10 +1336,10 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     cluster.Associate(device, 0);
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
-    Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
+    Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(cluster.AddOpCert(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, 0));
+    ReturnErrorOnFailure(cluster.AddNOC(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, 0));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
@@ -1347,21 +1347,21 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::OnAddOpCertFailureResponse(void * context, uint8_t status)
+void DeviceCommissioner::OnAddNOCFailureResponse(void * context, uint8_t status)
 {
     ChipLogProgress(Controller, "Device failed to receive the operational certificate Response: 0x%02x", status);
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->mOpCSRResponseCallback.Cancel();
     commissioner->mOnCertFailureCallback.Cancel();
     // TODO: Map error status to correct error code
     commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
 }
 
-void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex,
-                                                             uint8_t * DebugText)
+void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex,
+                                                             ByteSpan DebugText)
 {
     ChipLogProgress(Controller, "Device confirmed that it has received the operational certificate");
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
@@ -1415,7 +1415,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
 void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
 {
     ChipLogProgress(Controller, "Device confirmed that it has received the root certificate");
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
@@ -1442,7 +1442,7 @@ exit:
 void DeviceCommissioner::OnRootCertFailureResponse(void * context, uint8_t status)
 {
     ChipLogProgress(Controller, "Device failed to receive the root certificate Response: 0x%02x", status);
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->mRootCertResponseCallback.Cancel();
     commissioner->mOnRootCertFailureCallback.Cancel();
     // TODO: Map error status to correct error code
@@ -1530,7 +1530,7 @@ void DeviceCommissioner::OnSessionEstablishmentTimeout()
 
 void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
 {
-    reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
+    static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Mdns::DiscoveryFilter filter)
@@ -1689,7 +1689,7 @@ void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHI
 
 void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
 {
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
     if (commissioner->mDeviceBeingPaired < kNumMaxActiveDevices)
@@ -1708,7 +1708,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
 
 void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
 {
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
     VerifyOrReturn(commissioner != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
