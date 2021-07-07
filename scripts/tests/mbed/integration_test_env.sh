@@ -33,7 +33,7 @@ if [[ "$COMMAND" == *"start"* ]]; then
     bash $CHIP_DIR/scripts/tests/mbed/wlan_ap.sh start --ap_gateway $AP_GATEWAY --ap_ssid $AP_SSID --ap_pswd $AP_PASSWORD
     bash $CHIP_DIR/scripts/tests/mbed/echo_server.sh
 
-    pip install mbed-flasher pytest
+    pip install mbed-host-tests pytest
 
     source $CHIP_DIR/scripts/tests/mbed/common.sh
     mount_mbed_device

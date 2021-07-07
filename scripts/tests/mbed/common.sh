@@ -195,16 +195,18 @@ flash_image_to_device() {
     for index in $(eval echo "{0..$(($target_number - 1))}"); do
         platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
         if [[ "$target_name" = "$platform_name" ]]; then
-            target_id=$(cat devices.json | jq -r ".[$index] .target_id")
+            target_disk=$(cat devices.json | jq -r ".[$index] .mount_point")
         fi
     done
 
-    if [ -z "$target_id" ]; then
+    if [ -z "$target_disk" ]; then
         echo "Target not available"
         exit 1
     fi
 
     # Flash the binary
     # For now ignore command error - sometimes the issue with transfer timeout during verification for CY8CPROTO_062_4343W board occurs
-    mbedflash -vvv flash -i $image --tid $target_id || true
+    #mbedflash -vvv flash -i $image --tid $target_id
+    mbedflsh -f $image -d $target_disk
+    sleep 5
 }
