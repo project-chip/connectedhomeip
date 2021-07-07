@@ -207,6 +207,10 @@ flash_image_to_device() {
     # Flash the binary
     # For now ignore command error - sometimes the issue with transfer timeout during verification for CY8CPROTO_062_4343W board occurs
     #mbedflash -vvv flash -i $image --tid $target_id
-    mbedflsh -f $image -d $target_disk
+    result='mbedflsh -f $image -d $target_disk'
+    if [ "$result" -eq "0" ]; then
+        echo "TFlash binary failed"
+        exit 1
+    fi
     sleep 5
 }
