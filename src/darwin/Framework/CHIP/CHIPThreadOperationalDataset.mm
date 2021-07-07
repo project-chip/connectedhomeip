@@ -18,14 +18,14 @@
 #import "CHIPThreadOperationalDataset.h"
 
 #include "CHIPLogging.h"
-#include <support/ThreadOperationalDataset.h>
 #include <support/Span.h>
+#include <support/ThreadOperationalDataset.h>
 
-size_t const CHIPSizeThreadNetworkName     = chip::Thread::kSizeNetworkName;
-size_t const CHIPSizeThreadExtendedPanId   = chip::Thread::kSizeExtendedPanId;
-size_t const CHIPSizeThreadMasterKey       = chip::Thread::kSizeMasterKey;
+size_t const CHIPSizeThreadNetworkName = chip::Thread::kSizeNetworkName;
+size_t const CHIPSizeThreadExtendedPanId = chip::Thread::kSizeExtendedPanId;
+size_t const CHIPSizeThreadMasterKey = chip::Thread::kSizeMasterKey;
 size_t const CHIPSizeThreadMeshLocalPrefix = chip::Thread::kSizeMeshLocalPrefix;
-size_t const CHIPSizeThreadPSKc            = chip::Thread::kSizePSKc;
+size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
 
 @interface CHIPThreadOperationalDataset ()
 
@@ -42,8 +42,7 @@ size_t const CHIPSizeThreadPSKc            = chip::Thread::kSizePSKc;
                                      channel:(uint16_t)channel
                                        panID:(NSData *)panID
 {
-    if (self = [super init])
-    {
+    if (self = [super init]) {
         _networkName = networkName;
         _extendedPANID = extendedPANID;
         _masterKey = masterKey;
@@ -52,8 +51,7 @@ size_t const CHIPSizeThreadPSKc            = chip::Thread::kSizePSKc;
         _panID = panID;
         _cppThreadOperationalDataset = chip::Thread::OperationalDataset();
         [self _populateCppOperationalDataset];
-        if (!_cppThreadOperationalDataset.IsValid(_cppThreadOperationalDataset.AsByteSpan()))
-        {
+        if (!_cppThreadOperationalDataset.IsValid(_cppThreadOperationalDataset.AsByteSpan())) {
             CHIP_LOG_ERROR("Error: Thread Operational Dataset is malformed, cannot initialize.");
             return nil;
         }
@@ -81,9 +79,8 @@ size_t const CHIPSizeThreadPSKc            = chip::Thread::kSizePSKc;
 
     _cppThreadOperationalDataset.SetChannel(self.channel);
 
-    uint16_t *valuePtr = (uint16_t *)[self.panID bytes];
-    if (valuePtr != nullptr)
-    {
+    uint16_t * valuePtr = (uint16_t *) [self.panID bytes];
+    if (valuePtr != nullptr) {
         _cppThreadOperationalDataset.SetPanId(*valuePtr);
     }
 }

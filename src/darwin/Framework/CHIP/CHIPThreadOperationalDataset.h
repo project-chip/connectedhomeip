@@ -30,19 +30,19 @@ extern size_t const CHIPSizeThreadPSKc;
 /**
  *  The Thread Network name
  */
-@property (nonatomic, nullable, readwrite) NSString *networkName;
+@property (nonatomic, nullable, readwrite) NSString * networkName;
 /**
  *  The Thread Network extendended PAN ID
  */
-@property (nonatomic, nullable, readwrite) NSData *extendedPANID;
+@property (nonatomic, nullable, readwrite) NSData * extendedPANID;
 /**
  *  The 16 byte Master Key
  */
-@property (nonatomic, nullable, readwrite) NSData *masterKey;
+@property (nonatomic, nullable, readwrite) NSData * masterKey;
 /**
  *  The Thread PSKc
  */
-@property (nonatomic, nullable, readwrite) NSData *PSKc;
+@property (nonatomic, nullable, readwrite) NSData * PSKc;
 /**
  *  The Thread network channel
  */
@@ -50,7 +50,7 @@ extern size_t const CHIPSizeThreadPSKc;
 /**
  *  The Thread PAN ID
  */
-@property (nonatomic, nullable, readwrite) NSData *panID;
+@property (nonatomic, nullable, readwrite) NSData * panID;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
