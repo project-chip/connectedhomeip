@@ -10,11 +10,11 @@
 #include <support/Span.h> // chip::Span
 #include <sys/socket.h> // sockaddr
 #include <system/SystemPacketBuffer.h> // chip::System::PacketBufferHandle
-#include <transport/MessageCounter.h> // 
+#include <transport/MessageCounter.h> //
 #include <transport/MessageCounter.h> // chip::MessageCounter
 #include <transport/PeerConnectionState.h> // chip::Transport::PeerConnectionState
 #include <transport/PeerMessageCounter.h> // chip::Transport::PeerMessageCounter
-#include <transport/SecureSession.h> // 
+#include <transport/SecureSession.h> //
 #include <transport/SecureSession.h> // chip::SecureSession
 #include <transport/SessionMessageCounter.h> // chip::Transport::SessionMessageCounter
 #include <transport/raw/Base.h> // chip::Transport::Base
