@@ -39,13 +39,13 @@ namespace Crypto {
 
 constexpr size_t kMax_x509_Certificate_Length = 600;
 
-// TODO: Consider renaming these values to be closer to definisions in the spec:
-// CHIP_CRYPTO_GROUP_SIZE_BYTES
-// CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES
 constexpr size_t kP256_FE_Length                  = 32;
 constexpr size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
 constexpr size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
 constexpr size_t kSHA256_Hash_Length              = 32;
+
+constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
+constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
 
 constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
 constexpr size_t kMax_ECDSA_Signature_Length = 72;
@@ -54,11 +54,13 @@ constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
 constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 constexpr size_t kMAX_CSR_Length             = 512;
 
+constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
+
 constexpr size_t kMin_Salt_Length = 8;
 constexpr size_t kMax_Salt_Length = 16;
 
-constexpr size_t kP256_PrivateKey_Length = 32;
-constexpr size_t kP256_PublicKey_Length  = 65;
+constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
+constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
@@ -428,6 +430,30 @@ public:
 
     virtual CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
                                    const uint8_t * info, size_t info_length, uint8_t * out_buffer, size_t out_length);
+};
+
+class HMAC_sha
+{
+public:
+    HMAC_sha() {}
+    virtual ~HMAC_sha() {}
+
+    /**
+     * @brief A function that implements SHA-256 based HMAC per FIPS1981.
+     *
+     * The `out_length` must be at least CHIP_CRYPTO_HASH_LEN_BYTES
+     *
+     * @param key The key to use for the HMAC operation
+     * @param key_length Length of the key
+     * @param message Message over which to compute the HMAC
+     * @param message_length Length of the message over which to compute the HMAC
+     * @param out_buffer Pointer to buffer to write output into.
+     * @param out_length Resulting length of out_buffer
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+
+    virtual CHIP_ERROR HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                   uint8_t * out_buffer, size_t out_length);
 };
 
 /**
