@@ -89,6 +89,8 @@ static_library("app") {
     "MessageDef/StatusElement.h",
     "MessageDef/WriteRequest.cpp",
     "MessageDef/WriteResponse.cpp",
+    "MessageDef/SubscribeRequest.cpp",
+    "MessageDef/SubscribeResponse.cpp",
     "ReadClient.cpp",
     "ReadHandler.cpp",
     "WriteClient.cpp",
