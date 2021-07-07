@@ -9,7 +9,7 @@ fi
 
 CHIP_DIR=$1
 
-pip install mbed-host-tests pytest
+pip install mbed-ls mbed-host-tests pytest
 source $CHIP_DIR/scripts/tests/mbed/common.sh
 mount_mbed_device
 mbedls -j >devices.json
