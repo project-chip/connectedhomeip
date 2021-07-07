@@ -62,7 +62,7 @@ static_library("shell") {
     sources += [
       "MainLoopZephyr.cpp",
       "streamer_zephyr.cpp",
-      "streamer_zephyr.h"
+      "streamer_zephyr.h",
     ]
   } else {
     sources += [ "MainLoopDefault.cpp" ]
