@@ -98,6 +98,11 @@ source_set("se05x") {
       "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/ksdk/i2c_dk6.c",
       "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/ksdk/timer_kinetis_freertos.c",
     ]
+  } else if (host == "host_linux") {
+    sources += [
+      "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/generic/sm_timer.c",
+      "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/linux/i2c_a7.c",
+    ]
   }
 
   public_deps = [ "${chip_root}/third_party/mbedtls:mbedtls" ]

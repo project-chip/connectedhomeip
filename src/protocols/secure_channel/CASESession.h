@@ -57,6 +57,10 @@ constexpr uint16_t kIPKSize = 16;
 using namespace Crypto;
 using namespace Credentials;
 
+#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+#define CASE_EPHEMERAL_KEY 0xCA5EECD0
+#endif
+
 struct CASESessionSerialized;
 
 struct CASESessionSerializable
@@ -248,7 +252,12 @@ private:
 
     Hash_SHA256_stream mCommissioningHash;
     P256PublicKey mRemotePubKey;
-    P256Keypair mEphemeralKey;
+
+#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+    P256KeypairHSM mEphemeralKey;
+#else
+    Crypto::P256Keypair mEphemeralKey;
+#endif
     // TODO: Remove mFabricSecret later
     P256ECDHDerivedSecret mFabricSecret;
     P256ECDHDerivedSecret mSharedSecret;
