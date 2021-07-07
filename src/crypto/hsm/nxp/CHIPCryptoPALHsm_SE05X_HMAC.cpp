@@ -39,7 +39,7 @@ HMAC_shaHSM::HMAC_shaHSM()
 HMAC_shaHSM::~HMAC_shaHSM() {}
 
 CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
-                                 uint8_t * out_buffer, size_t out_length)
+                                    uint8_t * out_buffer, size_t out_length)
 
 {
     sss_mac_t ctx_mac      = { 0 };
@@ -62,7 +62,7 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, cons
     se05x_sessionOpen();
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
-    sss_status_t status    = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    sss_status_t status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_allocate_handle(&keyObject, keyid, kSSS_KeyPart_Default, kSSS_CipherType_HMAC, key_length,
@@ -104,7 +104,8 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, cons
     status = sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    if (ctx_mac.session != NULL){
+    if (ctx_mac.session != NULL)
+    {
         sss_mac_context_free(&ctx_mac);
     }
 

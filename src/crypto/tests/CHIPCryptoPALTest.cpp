@@ -94,7 +94,7 @@ using TestHKDF_sha                      = HKDF_sha;
 #ifdef ENABLE_HSM_HMAC
 using TestHMAC_sha = HMAC_shaHSM;
 #else
-using TestHMAC_sha = HMAC_sha;
+using TestHMAC_sha                      = HMAC_sha;
 #endif
 
 static uint32_t gs_test_entropy_source_called = 0;

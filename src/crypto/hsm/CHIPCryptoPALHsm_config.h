@@ -73,5 +73,4 @@
 #define ENABLE_HSM_HMAC
 #endif
 
-
 #endif //#ifndef _CHIP_CRYPTO_PAL_HSM_CONFIG_H_
