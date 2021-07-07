@@ -64,4 +64,9 @@
 #define ENABLE_HSM_HKDF
 #endif
 
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_HMAC_SHA256))
+#define ENABLE_HSM_HMAC
+#endif
+
+
 #endif //#ifndef _CHIP_CRYPTO_PAL_HSM_CONFIG_H_

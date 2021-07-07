@@ -185,6 +185,27 @@ private:
 
 #endif //#if ENABLE_HSM_HKDF_SHA256
 
+#if ENABLE_HSM_HMAC_SHA256
+
+class HMAC_shaHSM : public HMAC_sha
+{
+public:
+    HMAC_shaHSM();
+    ~HMAC_shaHSM();
+
+    virtual CHIP_ERROR HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                   uint8_t * out_buffer, size_t out_length);
+
+    void SetKeyId(uint32_t id) { keyid = id; }
+
+    uint32_t GetKeyId() { return keyid; }
+
+private:
+    uint32_t keyid;
+};
+
+#endif //#if ENABLE_HSM_HMAC_SHA256
+
 } // namespace Crypto
 } // namespace chip
 
