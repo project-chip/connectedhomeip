@@ -626,6 +626,72 @@ tests:
       arguments:
           value: ""
 
+    # Tests for Char String attribute
+
+    - label: "Read attribute CHAR_STRING Default Value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: ""
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "☉Test☉"
+
+    - label: "Read attribute CHAR_STRING"
+      command: "readAttribute"
+      attribute: "char_string"
+      disabled: true
+      response:
+          value: "☉Test☉"
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "☉TestValueLongerThan10☉"
+
+    - label: "Read attribute CHAR_STRING"
+      command: "readAttribute"
+      attribute: "char_string"
+      disabled: true
+      response:
+          value: "☉TestVal"
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: ""
+
+    # Tests for Long Char String attribute
+
+    - label: "Read attribute LONG_CHAR_STRING Default Value"
+      command: "readAttribute"
+      attribute: "long_char_string"
+      response:
+          value: ""
+
+    - label: "Write attribute LONG_CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "long_char_string"
+      arguments:
+          value: "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+
+    - label: "Read attribute LONG_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "long_char_string"
+      response:
+          value: "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+
+    - label: "Write attribute LONG_CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "long_char_string"
+      arguments:
+          value: ""
+
     # Tests for List attribute
 
     - label: "Read attribute LIST"
