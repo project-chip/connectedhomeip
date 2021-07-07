@@ -22,6 +22,7 @@ const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
 const templateUtil  = require(zapPath + 'generator/template-util.js')
 const zclHelper     = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery      = require(zapPath + 'db/query-zcl.js')
+const queryCommand = require(zapPath + 'db/query-command.js')
 
 const { Deferred }    = require('./Deferred.js');
 const ListHelper      = require('./ListHelper.js');
@@ -85,7 +86,7 @@ function loadClusters()
 function loadCommandArguments(command, packageId)
 {
   const { db, sessionId } = this.global;
-  return zclQuery.selectCommandArgumentsByCommandId(db, command.id, packageId).then(commandArguments => {
+  return queryCommand.selectCommandArgumentsByCommandId(db, command.id, packageId).then(commandArguments => {
     command.arguments = commandArguments;
     return command;
   });
