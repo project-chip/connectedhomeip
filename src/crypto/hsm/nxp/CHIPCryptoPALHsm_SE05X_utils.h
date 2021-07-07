@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef _CHIP_CRYPTO_PAL_HSM_SE05X_UTILS_
-#define _CHIP_CRYPTO_PAL_HSM_SE05X_UTILS_
+#pragma once
 
 #include <string.h>
 
@@ -98,5 +97,3 @@ void setObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /*_CHIP_CRYPTO_PAL_HSM_SE05X_UTILS_*/

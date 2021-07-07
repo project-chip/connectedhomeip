@@ -20,8 +20,7 @@
  *      Header that exposes the platform agnostic CHIP crypto primitives
  */
 
-#ifndef _CHIP_CRYPTO_PAL_H_
-#define _CHIP_CRYPTO_PAL_H_
+#pragma once
 
 #if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
@@ -946,5 +945,3 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
 
 } // namespace Crypto
 } // namespace chip
-
-#endif
