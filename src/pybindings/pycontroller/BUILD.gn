@@ -26,72 +26,71 @@ if (current_os == "mac") {
 }
 
 config("controller_wno_deprecate") {
-  cflags = [ 
-    "-Wno-deprecated-declarations", 
-  "-Wno-shadow",
-  "-Wno-unused-result",
-  "-Wsign-compare",
-  "-Wunreachable-code",
-  "-Wno-macro-redefined"
+  cflags = [
+    "-Wno-deprecated-declarations",
+    "-Wno-shadow",
+    "-Wno-unused-result",
+    "-Wsign-compare",
+    "-Wunreachable-code",
+    "-Wno-macro-redefined",
   ]
 }
 
 shared_library("CHIPController") {
-  configs -= ["//build/config/compiler:exceptions_default"]
-  configs -= ["//build/config/compiler:rtti_default"]
+  configs -= [ "//build/config/compiler:exceptions_default" ]
+  configs -= [ "//build/config/compiler:rtti_default" ]
 
   output_name = "PyChip"
   output_dir = "${target_out_dir}/pybindings"
-  include_dirs = ["${chip_root}/third_party/pybind11/include"]
+  include_dirs = [ "${chip_root}/third_party/pybind11/include" ]
   if (current_os == "mac") {
-    include_dirs += [
-      "${chip_root}/.environment/cipd/python/include/python3.8",
-      ]
+    include_dirs +=
+        [ "${chip_root}/.environment/cipd/python/include/python3.8" ]
   } else if (current_os == "linux") {
-    include_dirs += [
-      "/usr/include/python3.9"
-      ]
+    include_dirs += [ "/usr/include/python3.9" ]
   } else {
     assert(false, "OS not supprted.")
   }
 
   sources = [
+    "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.cpp",
+    "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.h",
+    "ControllerBindings/PyChip_BLEManager.cpp",
     "ControllerBindings/PyChip_ControllerDeviceCommissioner.cpp",
     "ControllerBindings/PyChip_ControllerInitParams.cpp",
     "ControllerBindings/PyChip_DeviceAddressUpdateDelegate.cpp",
+    "ControllerBindings/PyChip_Inet_IPAddress.cpp",
+    "ControllerBindings/PyChip_MDNS.cpp",
+    "ControllerBindings/PyChip_Main.cpp",
+    "ControllerBindings/PyChip_Memory.cpp",
+    "ControllerBindings/PyChip_PlatFormManager.cpp",
     "ControllerBindings/PyChip_Rendezvous.cpp",
     "ControllerBindings/PyChip_SetupPayload.cpp",
     "ControllerBindings/PyChip_TransportType.cpp",
-    "ControllerBindings/PyChip_Memory.cpp",
-    "ControllerBindings/PyChip_PlatFormManager.cpp",
-    "ControllerBindings/PyChip_MDNS.cpp",
-    "ControllerBindings/PyChip_Inet_IPAddress.cpp",
-    "ControllerBindings/PyChip_BLEManager.cpp",
-    "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.cpp",
-    "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.h",
-    "ControllerBindings/PyChip_Main.cpp",
     "clusters/CHIPClusters.cpp",
   ]
 
   if (chip_enable_ble) {
     if (current_os == "mac") {
-      cflags = [ 
-        "-fobjc-arc" ,
-        "-fno-common", 
-        "-dynamic", 
-        "-DNDEBUG", 
-        "-g", 
+      cflags = [
+        "-fobjc-arc",
+        "-fno-common",
+        "-dynamic",
+        "-DNDEBUG",
+        "-g",
         "-fwrapv",
-        "-O3", 
+        "-O3",
         "-arch",
-         "arm64", 
-         "-arch", 
-         "x86_64",
-        "-g"]
+        "arm64",
+        "-arch",
+        "x86_64",
+        "-g",
+      ]
     }
   }
 
   public_deps = [
+    ":build_exceptions",
     "${chip_root}/src/app",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
@@ -101,19 +100,18 @@ shared_library("CHIPController") {
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
-    ":build_exceptions" 
   ]
   configs += [ ":controller_wno_deprecate" ]
-  ldflags = [
-    "-frtti",
-    ]
+  ldflags = [ "-frtti" ]
   if (current_os == "mac") {
-    ldflags += ["-undefined", "dynamic_lookup"]
+    ldflags += [
+      "-undefined",
+      "dynamic_lookup",
+    ]
   }
-  if (current_os == "linux"){
-    libs = ["python3.9"]
+  if (current_os == "linux") {
+    libs = [ "python3.9" ]
   }
-
 }
 pw_python_action("build_exceptions") {
   script = "create_error_wrapper.py"
@@ -121,17 +119,18 @@ pw_python_action("build_exceptions") {
   header_file = "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.h"
   cpp_file = "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.cpp"
   outputs = [
-              header_file,
-              cpp_file,
-            ]
+    header_file,
+    cpp_file,
+  ]
 
   args = [
     "--output_cpp_file=" + rebase_path(cpp_file, root_build_dir),
     "--output_header_file=" + rebase_path(header_file, root_build_dir),
-    "--error_header=" + rebase_path("${chip_root}/src/lib/core/CHIPError.h", root_build_dir),
-    "--config_header=" + rebase_path("${chip_root}/src/lib/core/CHIPConfig.h", root_build_dir),
+    "--error_header=" +
+        rebase_path("${chip_root}/src/lib/core/CHIPError.h", root_build_dir),
+    "--config_header=" +
+        rebase_path("${chip_root}/src/lib/core/CHIPConfig.h", root_build_dir),
   ]
-
 }
 
 pw_python_action("pycontroller") {
@@ -141,10 +140,10 @@ pw_python_action("pycontroller") {
     {
       src_dir = "."
       sources = [
-        "ChipCaller/__init__.py",
         "ChipCaller/Caller.py",
-        "clusters/__init__.py",
+        "ChipCaller/__init__.py",
         "clusters/CHIPClusters.py",
+        "clusters/__init__.py",
       ]
     },
     {
