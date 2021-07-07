@@ -52,14 +52,6 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-CHIP_ERROR InitCommissioner();
-
-CHIP_ERROR DiscoverCommissionableNodes();
-
-CHIP_ERROR DiscoverCommissionableNodes(char * instance);
-
-CHIP_ERROR DisplayCommissionableNodes();
-
 CHIP_ERROR ResetUDCStates();
 #endif
 

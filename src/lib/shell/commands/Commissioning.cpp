@@ -70,53 +70,53 @@ static CHIP_ERROR ResetUDC(bool printHeader)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR discover(bool printHeader)
-{
-    streamer_t * sout = streamer_get();
+// static CHIP_ERROR discover(bool printHeader)
+// {
+//     streamer_t * sout = streamer_get();
 
-    if (printHeader)
-    {
-        streamer_printf(sout, "Discover:        ");
-    }
+//     if (printHeader)
+//     {
+//         streamer_printf(sout, "Discover:        ");
+//     }
 
-    DiscoverCommissionableNodes();
+//     DiscoverCommissionableNodes();
 
-    streamer_printf(sout, "done\r\n");
+//     streamer_printf(sout, "done\r\n");
 
-    return CHIP_NO_ERROR;
-}
+//     return CHIP_NO_ERROR;
+// }
 
-static CHIP_ERROR discover(bool printHeader, char * instance)
-{
-    streamer_t * sout = streamer_get();
+// static CHIP_ERROR discover(bool printHeader, char * instance)
+// {
+//     streamer_t * sout = streamer_get();
 
-    if (printHeader)
-    {
-        streamer_printf(sout, "Discover Instance:        ");
-    }
+//     if (printHeader)
+//     {
+//         streamer_printf(sout, "Discover Instance:        ");
+//     }
 
-    DiscoverCommissionableNodes(instance);
+//     DiscoverCommissionableNodes(instance);
 
-    streamer_printf(sout, "done\r\n");
+//     streamer_printf(sout, "done\r\n");
 
-    return CHIP_NO_ERROR;
-}
+//     return CHIP_NO_ERROR;
+// }
 
-static CHIP_ERROR display(bool printHeader)
-{
-    streamer_t * sout = streamer_get();
+// static CHIP_ERROR display(bool printHeader)
+// {
+//     streamer_t * sout = streamer_get();
 
-    if (printHeader)
-    {
-        streamer_printf(sout, "Display:\r\n");
-    }
+//     if (printHeader)
+//     {
+//         streamer_printf(sout, "Display:\r\n");
+//     }
 
-    DisplayCommissionableNodes();
+//     DisplayCommissionableNodes();
 
-    streamer_printf(sout, "done\r\n");
+//     streamer_printf(sout, "done\r\n");
 
-    return CHIP_NO_ERROR;
-}
+//     return CHIP_NO_ERROR;
+// }
 #endif
 
 static int PrintAllCommands()
@@ -162,18 +162,18 @@ static int CommissioningHandler(int argc, char ** argv)
     {
         return error = ResetUDC(true);
     }
-    else if (strcmp(argv[0], "discover") == 0)
-    {
-        return error = discover(true);
-    }
-    else if (strcmp(argv[0], "discover-instance") == 0)
-    {
-        return error = discover(true, argv[1]);
-    }
-    else if (strcmp(argv[0], "display") == 0)
-    {
-        return error = display(true);
-    }
+    // else if (strcmp(argv[0], "discover") == 0)
+    // {
+    //     return error = discover(true);
+    // }
+    // else if (strcmp(argv[0], "discover-instance") == 0)
+    // {
+    //     return error = discover(true, argv[1]);
+    // }
+    // else if (strcmp(argv[0], "display") == 0)
+    // {
+    //     return error = display(true);
+    // }
 #endif
     else
     {

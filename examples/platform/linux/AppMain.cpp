@@ -30,6 +30,13 @@
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include <controller/CHIPDeviceController.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <core/CHIPPersistentStorageDelegate.h>
+#include <platform/KeyValueStoreManager.h>
+#endif
+
 #if defined(ENABLE_CHIP_SHELL)
 #include <lib/shell/Engine.h>
 #endif
@@ -120,6 +127,95 @@ exit:
     return 0;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::Transport;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::Messaging;
+
+class MyServerStorageDelegate : public PersistentStorageDelegate
+{
+    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    {
+        ChipLogProgress(AppServer, "Retrieved value from server storage.");
+        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+    }
+
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
+    {
+        ChipLogProgress(AppServer, "Stored value in server storage");
+        return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+    }
+
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    {
+        ChipLogProgress(AppServer, "Delete value in server storage");
+        return PersistedStorage::KeyValueStoreMgr().Delete(key);
+    }
+};
+
+using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
+ChipDeviceCommissioner mCommissioner;
+MyServerStorageDelegate gServerStorage;
+
+CHIP_ERROR InitCommissioner()
+{
+    NodeId localId = chip::kAnyNodeId;
+
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+    chip::Controller::CommissionerInitParams params;
+
+    params.storageDelegate = &gServerStorage;
+    // params.mDeviceAddressUpdateDelegate   = this;
+    params.operationalCredentialsDelegate = &mOpCredsIssuer;
+
+    ReturnErrorOnFailure(mOpCredsIssuer.Initialize(gServerStorage));
+
+    // ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
+    ReturnErrorOnFailure(mCommissioner.Init(localId, params));
+    ReturnErrorOnFailure(mCommissioner.ServiceEvents());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoverCommissionableNodes()
+{
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
+    mCommissioner.DiscoverCommissionableNodes(filter);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoverCommissionableNodes(char * instance)
+{
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kInstanceName, instance);
+    mCommissioner.DiscoverCommissionableNodes(filter);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DisplayCommissionableNodes()
+{
+    for (int i = 0; i < 10; i++)
+    {
+        const chip::Mdns::DiscoveredNodeData * next = mCommissioner.GetDiscoveredDevice(i);
+        if (next == nullptr)
+        {
+            ChipLogProgress(AppServer, "  Entry %d null", i);
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "  Entry %d instanceName=%s host=%s longDiscriminator=%d vendorId=%d productId=%d", i,
+                            next->instanceName, next->hostName, next->longDiscriminator, next->vendorId, next->productId);
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+#endif
+
 void ChipLinuxAppMainLoop()
 {
 #if defined(ENABLE_CHIP_SHELL)
@@ -128,6 +224,10 @@ void ChipLinuxAppMainLoop()
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    InitCommissioner();
+#endif
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 #if defined(ENABLE_CHIP_SHELL)
