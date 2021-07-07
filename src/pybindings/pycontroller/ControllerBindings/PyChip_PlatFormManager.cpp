@@ -25,7 +25,8 @@ void * PlatformMainLoop(void *)
 void * RunMainLoop(void *)
 {
     pthread_t sPlatformMainThread;
-    int result = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
+    pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
+    return nullptr;
 }
 
 void bind_PyChip_PlatFormManager(std::function<pybind11::module &(std::string const & namespace_)> & M)
