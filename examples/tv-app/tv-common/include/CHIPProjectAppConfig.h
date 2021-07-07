@@ -30,7 +30,14 @@
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
 
+// TVs need to be commissioners and likely want to be discoverable
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 1
+
+// TVs need to be both commissioners and commissionees
+#define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 1
+
+// TVs do not typically need this - enable for debugging
+// #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT 1
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 

@@ -33,6 +33,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/TCP.h>
@@ -42,15 +43,31 @@ namespace {
 
 // The EchoServer object.
 chip::Protocols::Echo::EchoServer gEchoServer;
-chip::TransportMgr<chip::Transport::UDP> gUDPManager;
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer gUDCServer =
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance();
+chip::TransportMgr<chip::Transport::UDP> gUDPManager; // for Echo Traffic
+chip::TransportMgr<chip::Transport::UDP> gUDCManager; // for User Directed Commissioning
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    printf("Echo Request, len=%u ... sending response.\n", payload->DataLength());
+    payload->DebugDump("HandleEchoRequestReceived Echo Request ... sending response.");
 }
+
+class DLL_EXPORT UDCListener : public chip::Protocols::UserDirectedCommissioning::InstanceNameResolver
+{
+public:
+    void FindCommissionableNode(char * instanceName) override;
+};
+
+void UDCListener::FindCommissionableNode(char * instanceName)
+{
+    printf("FindCommissionableNode instanceName=%s\n", instanceName);
+}
+
+UDCListener gListener;
 
 } // namespace
 
@@ -60,6 +77,7 @@ int main(int argc, char * argv[])
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     bool useTCP      = false;
     bool disableEcho = false;
+    bool disableUDC  = false;
 
     chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = nullptr;
@@ -77,9 +95,14 @@ int main(int argc, char * argv[])
         useTCP = true;
     }
 
-    if ((argc == 2) && (strcmp(argv[1], "--disable") == 0))
+    if ((argc == 2) && (strcmp(argv[1], "--disable-echo") == 0))
     {
         disableEcho = true;
+    }
+
+    if ((argc == 2) && (strcmp(argv[1], "--disable-UDC") == 0))
+    {
+        disableUDC = true;
     }
 
     InitializeChip();
@@ -99,8 +122,9 @@ int main(int argc, char * argv[])
     }
     else
     {
-        err = gUDPManager.Init(
-            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
+        err = gUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
+                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                   .SetListenPort(CHIP_PORT));
         SuccessOrExit(err);
 
         err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins,
@@ -120,6 +144,18 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
+    if (!disableUDC)
+    {
+        gUDCManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
+                             .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                             .SetListenPort(CHIP_PORT + 3));
+
+        gUDCManager.SetSecureSessionMgr(
+            &chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance());
+
+        SuccessOrExit(err);
+    }
+
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
                                      gAdminId);
     SuccessOrExit(err);
@@ -128,9 +164,15 @@ int main(int argc, char * argv[])
     {
         // Arrange to get a callback whenever an Echo Request is received.
         gEchoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
+        printf("Listening for Echo requests...\n");
     }
 
-    printf("Listening for Echo requests...\n");
+    if (!disableUDC)
+    {
+        // Arrange to get a callback whenever an Echo Request is received.
+        gUDCServer.SetInstanceNameResolver(&gListener);
+        printf("Listening for UDC requests...\n");
+    }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
