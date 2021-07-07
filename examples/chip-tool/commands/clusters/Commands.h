@@ -1698,6 +1698,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
+| * CatalogVendorId                                                   | 0x0001 |
+| * ApplicationId                                                     | 0x0002 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -1808,6 +1810,74 @@ private:
 };
 
 /*
+ * Attribute CatalogVendorId
+ */
+class ReadApplicationLauncherCatalogVendorId : public ModelCommand
+{
+public:
+    ReadApplicationLauncherCatalogVendorId() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "catalog-vendor-id");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadApplicationLauncherCatalogVendorId()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationLauncherCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCatalogVendorId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ApplicationId
+ */
+class ReadApplicationLauncherApplicationId : public ModelCommand
+{
+public:
+    ReadApplicationLauncherApplicationId() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "application-id");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadApplicationLauncherApplicationId()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationLauncherCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeApplicationId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadApplicationLauncherClusterRevision : public ModelCommand
@@ -1850,6 +1920,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AudioOutputList                                                   | 0x0000 |
+| * CurrentAudioOutput                                                | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -1985,6 +2056,40 @@ private:
     chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>(
             OnAudioOutputAudioOutputListListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CurrentAudioOutput
+ */
+class ReadAudioOutputCurrentAudioOutput : public ModelCommand
+{
+public:
+    ReadAudioOutputCurrentAudioOutput() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-audio-output");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAudioOutputCurrentAudioOutput()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AudioOutputCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentAudioOutput(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -11962,6 +12067,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MediaInputList                                                    | 0x0000 |
+| * CurrentMediaInput                                                 | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -12155,6 +12261,40 @@ private:
     chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback>(OnMediaInputMediaInputListListAttributeResponse,
                                                                                     this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CurrentMediaInput
+ */
+class ReadMediaInputCurrentMediaInput : public ModelCommand
+{
+public:
+    ReadMediaInputCurrentMediaInput() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-media-input");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaInputCurrentMediaInput()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0507) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaInputCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentMediaInput(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -22844,6 +22984,8 @@ void registerClusterApplicationLauncher(Commands & commands)
         make_unique<ApplicationLauncherLaunchApp>(),
         make_unique<DiscoverApplicationLauncherAttributes>(),
         make_unique<ReadApplicationLauncherApplicationLauncherList>(),
+        make_unique<ReadApplicationLauncherCatalogVendorId>(),
+        make_unique<ReadApplicationLauncherApplicationId>(),
         make_unique<ReadApplicationLauncherClusterRevision>(),
     };
 
@@ -22854,9 +22996,9 @@ void registerClusterAudioOutput(Commands & commands)
     const char * clusterName = "AudioOutput";
 
     commands_list clusterCommands = {
-        make_unique<AudioOutputRenameOutput>(),        make_unique<AudioOutputSelectOutput>(),
-        make_unique<DiscoverAudioOutputAttributes>(),  make_unique<ReadAudioOutputAudioOutputList>(),
-        make_unique<ReadAudioOutputClusterRevision>(),
+        make_unique<AudioOutputRenameOutput>(),           make_unique<AudioOutputSelectOutput>(),
+        make_unique<DiscoverAudioOutputAttributes>(),     make_unique<ReadAudioOutputAudioOutputList>(),
+        make_unique<ReadAudioOutputCurrentAudioOutput>(), make_unique<ReadAudioOutputClusterRevision>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23298,10 +23440,10 @@ void registerClusterMediaInput(Commands & commands)
     const char * clusterName = "MediaInput";
 
     commands_list clusterCommands = {
-        make_unique<MediaInputHideInputStatus>(),     make_unique<MediaInputRenameInput>(),
-        make_unique<MediaInputSelectInput>(),         make_unique<MediaInputShowInputStatus>(),
-        make_unique<DiscoverMediaInputAttributes>(),  make_unique<ReadMediaInputMediaInputList>(),
-        make_unique<ReadMediaInputClusterRevision>(),
+        make_unique<MediaInputHideInputStatus>(),       make_unique<MediaInputRenameInput>(),
+        make_unique<MediaInputSelectInput>(),           make_unique<MediaInputShowInputStatus>(),
+        make_unique<DiscoverMediaInputAttributes>(),    make_unique<ReadMediaInputMediaInputList>(),
+        make_unique<ReadMediaInputCurrentMediaInput>(), make_unique<ReadMediaInputClusterRevision>(),
     };
 
     commands.Register(clusterName, clusterCommands);

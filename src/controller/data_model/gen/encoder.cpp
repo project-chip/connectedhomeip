@@ -289,6 +289,8 @@ PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uin
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
+| * CatalogVendorId                                                   | 0x0001 |
+| * ApplicationId                                                     | 0x0002 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -314,6 +316,32 @@ PacketBufferHandle encodeApplicationLauncherClusterReadApplicationLauncherListAt
 }
 
 /*
+ * Attribute CatalogVendorId
+ */
+PacketBufferHandle encodeApplicationLauncherClusterReadCatalogVendorIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationLauncherCatalogVendorId", ApplicationLauncher::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ApplicationLauncher::Attributes::Ids::CatalogVendorId);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationId
+ */
+PacketBufferHandle encodeApplicationLauncherClusterReadApplicationIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationLauncherApplicationId", ApplicationLauncher::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ApplicationLauncher::Attributes::Ids::ApplicationId);
+    COMMAND_FOOTER();
+}
+
+/*
  * Attribute ClusterRevision
  */
 PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
@@ -335,6 +363,7 @@ PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AudioOutputList                                                   | 0x0000 |
+| * CurrentAudioOutput                                                | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -355,6 +384,19 @@ PacketBufferHandle encodeAudioOutputClusterReadAudioOutputListAttribute(uint8_t 
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
         .Put32(AudioOutput::Attributes::Ids::AudioOutputList);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentAudioOutput
+ */
+PacketBufferHandle encodeAudioOutputClusterReadCurrentAudioOutputAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadAudioOutputCurrentAudioOutput", AudioOutput::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(AudioOutput::Attributes::Ids::CurrentAudioOutput);
     COMMAND_FOOTER();
 }
 
@@ -3301,6 +3343,7 @@ PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seq
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MediaInputList                                                    | 0x0000 |
+| * CurrentMediaInput                                                 | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3321,6 +3364,19 @@ PacketBufferHandle encodeMediaInputClusterReadMediaInputListAttribute(uint8_t se
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
         .Put32(MediaInput::Attributes::Ids::MediaInputList);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentMediaInput
+ */
+PacketBufferHandle encodeMediaInputClusterReadCurrentMediaInputAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadMediaInputCurrentMediaInput", MediaInput::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(MediaInput::Attributes::Ids::CurrentMediaInput);
     COMMAND_FOOTER();
 }
 
