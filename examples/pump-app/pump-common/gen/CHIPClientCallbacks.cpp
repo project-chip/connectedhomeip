@@ -514,14 +514,12 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
         return true;
     }
 
-    chip::AttributeId attributeId = aPath.mFieldId; // attribId
-    ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+    ChipLogProgress(Zcl, "  attributeId: 0x%04x", aPath.mFieldId);
     LogIMStatus(status);
 
     if (status == Protocols::InteractionModel::ProtocolCode::Success && apData != nullptr)
     {
-        chip::TLV::TLVType attributeType = apData->GetType();
-        ChipLogProgress(Zcl, "  attribute TLV Type: 0x%02x", attributeType);
+        ChipLogProgress(Zcl, "  attribute TLV Type: 0x%02x", apData->GetType());
         tlvFilter(apData, onSuccessCallback, onFailureCallback);
     }
     else
@@ -560,6 +558,11 @@ bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * messa
             CHECK_MESSAGE_LENGTH(4);
             AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
             ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
+            // Silence unused var warning if progress logging is disabled.  Note
+            // that we _do_ want to call Read32 unconditionally here, because we
+            // want to advance the 'message' pointer even if we don't use
+            // attributeId.
+            UNUSED_VAR(attributeId);
 
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
@@ -604,10 +607,20 @@ bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * me
             CHECK_MESSAGE_LENGTH(1);
             uint8_t direction = chip::Encoding::Read8(message); // reportingRole
             ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
+            // Silence unused var warning if progress logging is disabled.  Note
+            // that we _do_ want to call Read8 unconditionally here, because we
+            // want to advance the 'message' pointer even if we don't use
+            // direction.
+            UNUSED_VAR(direction);
 
             CHECK_MESSAGE_LENGTH(4);
             AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
             ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
+            // Silence unused var warning if progress logging is disabled.  Note
+            // that we _do_ want to call Read32 unconditionally here, because we
+            // want to advance the 'message' pointer even if we don't use
+            // direction.
+            UNUSED_VAR(attributeId);
 
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
@@ -644,12 +657,22 @@ bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId
         CHECK_MESSAGE_LENGTH(4);
         AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
         ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
+        // Silence unused var warning if progress logging is disabled.  Note
+        // that we _do_ want to call Read32 unconditionally here, because we
+        // want to advance the 'message' pointer even if we don't use
+        // attributeId.
+        UNUSED_VAR(attributeId);
 
         if (direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         {
             CHECK_MESSAGE_LENGTH(1);
             uint8_t attributeType = chip::Encoding::Read8(message); // zclType
             ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
+            // Silence unused var warning if progress logging is disabled.  Note
+            // that we _do_ want to call Read8 unconditionally here, because we
+            // want to advance the 'message' pointer even if we don't use
+            // attributeType.
+            UNUSED_VAR(attributeType);
 
             CHECK_MESSAGE_LENGTH(2);
             uint16_t minimumReportingInterval = chip::Encoding::LittleEndian::Read16(message); // uint16
@@ -696,10 +719,19 @@ bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discove
         CHECK_MESSAGE_LENGTH(4);
         AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
         ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
+        // Silence unused var warning if progress logging is disabled.  Note
+        // that we _do_ want to call Read32 unconditionally here, because we
+        // want to advance the 'message' pointer even if we don't use
+        // attributeId.
+        UNUSED_VAR(attributeId);
 
         CHECK_MESSAGE_LENGTH(1);
         uint8_t attributeType = chip::Encoding::Read8(message); // zclType
         ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
+        // Silence unused var warning if progress logging is disabled.  Note
+        // that we _do_ want to call Read8 unconditionally here, because we want
+        // to advance the 'message' pointer even if we don't use attributeType.
+        UNUSED_VAR(attributeType);
     }
 
     Callback::Callback<DefaultSuccessCallback> * cb = Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
