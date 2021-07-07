@@ -52,7 +52,7 @@ jobs:
 #               with:
 #                   languages: "cpp, python"
             - name: Bootstrap
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
@@ -63,7 +63,7 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Build example All Clusters App
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: scripts/examples/esp_example.sh all-clusters-app
             - name: Copy aside build products
               run: |
@@ -103,7 +103,7 @@ jobs:
                   cp examples/shell/esp32/build/chip-shell.elf \
                      example_binaries/$BUILD_TYPE-build/chip-shell.elf
             - name: Build example Temperature Measurement App
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: scripts/examples/esp_example.sh temperature-measurement-app
             - name: Copy aside build products
               run: |

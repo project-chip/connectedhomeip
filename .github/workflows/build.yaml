@@ -153,7 +153,7 @@ jobs:
               run: |
                   scripts/build/gn_gen.sh --args='is_clang=true target_os="all"'
             - name: Run Build
-              timeout-minutes: 20
+              timeout-minutes: 30
               run: scripts/build/gn_build.sh
             - name: Run Tests
               timeout-minutes: 10

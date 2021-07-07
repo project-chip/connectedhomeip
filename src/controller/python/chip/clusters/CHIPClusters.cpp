@@ -1061,6 +1061,57 @@ CHIP_ERROR chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision(chip::Contr
 // End of Cluster BridgedDeviceBasic
 // Cluster ColorControl
 
+CHIP_ERROR chip_ime_AppendCommand_ColorControl_ColorLoopSet(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                            chip::GroupId, uint8_t updateFlags, uint8_t action, uint8_t direction,
+                                                            uint16_t time, uint16_t startHue, uint8_t optionsMask,
+                                                            uint8_t optionsOverride)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ColorControlCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ColorLoopSet(nullptr, nullptr, updateFlags, action, direction, time, startHue, optionsMask, optionsOverride);
+}
+CHIP_ERROR chip_ime_AppendCommand_ColorControl_EnhancedMoveHue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                               chip::GroupId, uint8_t moveMode, uint16_t rate, uint8_t optionsMask,
+                                                               uint8_t optionsOverride)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ColorControlCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.EnhancedMoveHue(nullptr, nullptr, moveMode, rate, optionsMask, optionsOverride);
+}
+CHIP_ERROR chip_ime_AppendCommand_ColorControl_EnhancedMoveToHue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                 chip::GroupId, uint16_t enhancedHue, uint8_t direction,
+                                                                 uint16_t transitionTime, uint8_t optionsMask,
+                                                                 uint8_t optionsOverride)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ColorControlCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.EnhancedMoveToHue(nullptr, nullptr, enhancedHue, direction, transitionTime, optionsMask, optionsOverride);
+}
+CHIP_ERROR chip_ime_AppendCommand_ColorControl_EnhancedMoveToHueAndSaturation(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                              uint16_t enhancedHue, uint8_t saturation,
+                                                                              uint16_t transitionTime, uint8_t optionsMask,
+                                                                              uint8_t optionsOverride)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ColorControlCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.EnhancedMoveToHueAndSaturation(nullptr, nullptr, enhancedHue, saturation, transitionTime, optionsMask,
+                                                  optionsOverride);
+}
+CHIP_ERROR chip_ime_AppendCommand_ColorControl_EnhancedStepHue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                               chip::GroupId, uint8_t stepMode, uint16_t stepSize,
+                                                               uint16_t transitionTime, uint8_t optionsMask,
+                                                               uint8_t optionsOverride)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ColorControlCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.EnhancedStepHue(nullptr, nullptr, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+}
 CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveColor(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                          chip::GroupId, int16_t rateX, int16_t rateY, uint8_t optionsMask,
                                                          uint8_t optionsOverride)
@@ -3132,6 +3183,57 @@ CHIP_ERROR chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision(chip
 }
 
 // End of Cluster OtaSoftwareUpdateProvider
+// Cluster OccupancySensing
+
+CHIP_ERROR chip_ime_ReadAttribute_OccupancySensing_Occupancy(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OccupancySensingCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOccupancy(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_OccupancySensing_Occupancy(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                  uint16_t minInterval, uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OccupancySensingCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeOccupancy(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                               maxInterval);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_OccupancySensing_OccupancySensorType(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId,
+                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OccupancySensingCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOccupancySensorType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_OccupancySensing_OccupancySensorTypeBitmap(chip::Controller::Device * device,
+                                                                             chip::EndpointId ZCLendpointId,
+                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OccupancySensingCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOccupancySensorTypeBitmap(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_OccupancySensing_ClusterRevision(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OccupancySensingCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster OccupancySensing
 // Cluster OnOff
 
 CHIP_ERROR chip_ime_AppendCommand_OnOff_Off(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId)

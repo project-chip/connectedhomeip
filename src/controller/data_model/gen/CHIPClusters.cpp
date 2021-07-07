@@ -1332,6 +1332,258 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeClusterRevision(Callback::Can
 }
 
 // ColorControl Cluster Commands
+CHIP_ERROR ColorControlCluster::ColorLoopSet(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint8_t updateFlags, uint8_t action, uint8_t direction, uint16_t time,
+                                             uint16_t startHue, uint8_t optionsMask, uint8_t optionsOverride)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kColorLoopSetCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // updateFlags: colorLoopUpdateFlags
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), updateFlags));
+    // action: colorLoopAction
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), action));
+    // direction: colorLoopDirection
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), direction));
+    // time: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), time));
+    // startHue: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), startHue));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR ColorControlCluster::EnhancedMoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnhancedMoveHueCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // moveMode: hueMoveMode
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    // rate: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), rate));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR ColorControlCluster::EnhancedMoveToHue(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t enhancedHue, uint8_t direction,
+                                                  uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnhancedMoveToHueCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // enhancedHue: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), enhancedHue));
+    // direction: hueDirection
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), direction));
+    // transitionTime: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR ColorControlCluster::EnhancedMoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint16_t enhancedHue,
+                                                               uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
+                                                               uint8_t optionsOverride)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnhancedMoveToHueAndSaturationCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // enhancedHue: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), enhancedHue));
+    // saturation: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), saturation));
+    // transitionTime: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR ColorControlCluster::EnhancedStepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
+                                                uint8_t optionsOverride)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnhancedStepHueCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // stepMode: hueStepMode
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    // stepSize: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    // transitionTime: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    // optionsMask: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    // optionsOverride: bitmap8
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
 CHIP_ERROR ColorControlCluster::MoveColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
 {
@@ -6938,6 +7190,78 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::DiscoverAttributes(Callback::Cancel
 }
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0xFFFD;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+// OccupancySensing Cluster Commands
+// OccupancySensing Cluster Attributes
+CHIP_ERROR OccupancySensingCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOccupancySensingClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0000;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR OccupancySensingCluster::ConfigureAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                uint16_t maxInterval)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeOccupancySensingClusterConfigureOccupancyAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR OccupancySensingCluster::ReportAttributeOccupancy(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
+}
+
+CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancySensorType(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0001;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancySensorTypeBitmap(Callback::Cancelable * onSuccessCallback,
+                                                                           Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0002;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR OccupancySensingCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback)
 {
     chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
