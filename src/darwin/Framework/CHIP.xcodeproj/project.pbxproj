@@ -48,6 +48,7 @@
 		2CB7163B252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CB71638252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h */; };
 		2CB7163C252E8A7C0026E2BB /* CHIPDevicePairingDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2CB71639252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.mm */; };
 		2CB7163F252F731E0026E2BB /* CHIPDevicePairingDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CB7163E252F731E0026E2BB /* CHIPDevicePairingDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FD775542695557E00FF4B12 /* error-mapping.cpp */; };
 		991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* CHIPDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0872475F47D00C13860 /* CHIPDeviceController.mm */; };
 		991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC08A247704DC00C13860 /* CHIPLogging.h */; };
@@ -121,6 +122,7 @@
 		2CB71638252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevicePairingDelegateBridge.h; sourceTree = "<group>"; };
 		2CB71639252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDevicePairingDelegateBridge.mm; sourceTree = "<group>"; };
 		2CB7163E252F731E0026E2BB /* CHIPDevicePairingDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevicePairingDelegate.h; sourceTree = "<group>"; };
+		2FD775542695557E00FF4B12 /* error-mapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "error-mapping.cpp"; path = "../../../app/util/error-mapping.cpp"; sourceTree = "<group>"; };
 		991DC0822475F45400C13860 /* CHIPDeviceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceController.h; sourceTree = "<group>"; };
 		991DC0872475F47D00C13860 /* CHIPDeviceController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceController.mm; sourceTree = "<group>"; };
 		991DC08A247704DC00C13860 /* CHIPLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPLogging.h; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 		1E857311265519DE0050A4D9 /* CHIPApp */ = {
 			isa = PBXGroup;
 			children = (
+				2FD775542695557E00FF4B12 /* error-mapping.cpp */,
 				1E85733326551A700050A4D9 /* reporting-default-configuration.cpp */,
 				1E85733226551A700050A4D9 /* reporting.cpp */,
 				1E85731926551A490050A4D9 /* af-event.cpp */,
@@ -456,6 +459,7 @@
 				1E857310265519AE0050A4D9 /* IMClusterCommandHandler.cpp in Sources */,
 				1E85732D26551A490050A4D9 /* util.cpp in Sources */,
 				1E85732B26551A490050A4D9 /* af-main-common.cpp in Sources */,
+				2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */,
 				1E85732A26551A490050A4D9 /* ember-compatibility-functions.cpp in Sources */,
 				B289D4222639C0D300D4E314 /* CHIPOnboardingPayloadParser.m in Sources */,
 				1E85732F26551A490050A4D9 /* attribute-size-util.cpp in Sources */,
