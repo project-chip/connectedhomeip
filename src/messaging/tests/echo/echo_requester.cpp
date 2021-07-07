@@ -64,10 +64,6 @@ chip::Inet::IPAddress gDestAddr;
 // The last time a CHIP Echo was attempted to be sent.
 uint64_t gLastEchoTime = 0;
 
-// True, if the EchoClient is waiting for an EchoResponse
-// after sending an EchoRequest, false otherwise.
-bool gWaitingForEchoResp = false;
-
 // Count of the number of EchoRequests sent.
 uint64_t gEchoCount = 0;
 
@@ -76,14 +72,42 @@ uint64_t gEchoRespCount = 0;
 
 bool gUseTCP = false;
 
-bool EchoIntervalExpired(void)
-{
-    uint64_t now = chip::System::Timer::GetCurrentEpoch();
+CHIP_ERROR SendEchoRequest();
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
 
-    return (now >= gLastEchoTime + gEchoInterval);
+void Shutdown()
+{
+    chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
+    gEchoClient.Shutdown();
+    ShutdownChip();
 }
 
-CHIP_ERROR SendEchoRequest(void)
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+{
+    if (gEchoRespCount != gEchoCount)
+    {
+        printf("No response received\n");
+
+        // Set gEchoRespCount to gEchoCount to start next ping if there is any.
+        gEchoRespCount = gEchoCount;
+    }
+
+    if (gEchoCount < kMaxEchoCount)
+    {
+        CHIP_ERROR err = SendEchoRequest();
+        if (err != CHIP_NO_ERROR)
+        {
+            printf("Send request failed: %s\n", chip::ErrorStr(err));
+            Shutdown();
+        }
+    }
+    else
+    {
+        Shutdown();
+    }
+}
+
+CHIP_ERROR SendEchoRequest()
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
@@ -99,18 +123,25 @@ CHIP_ERROR SendEchoRequest(void)
 
     gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
 
+    err = chip::DeviceLayer::SystemLayer.StartTimer(gEchoInterval, EchoTimerHandler, NULL);
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("Unable to schedule timer\n");
+        return CHIP_ERROR_INTERNAL;
+    }
+
     printf("\nSend echo request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     err = gEchoClient.SendEchoRequest(std::move(payloadBuf));
 
     if (err == CHIP_NO_ERROR)
     {
-        gWaitingForEchoResp = true;
         gEchoCount++;
     }
     else
     {
         printf("Send echo request failed, err: %s\n", chip::ErrorStr(err));
+        chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
     }
 
     return err;
@@ -157,40 +188,10 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
     uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastEchoTime;
 
-    gWaitingForEchoResp = false;
     gEchoRespCount++;
 
     printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
            static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
-}
-
-void RunPinging()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Connection has been established. Now send the EchoRequests.
-    for (unsigned int i = 0; i < kMaxEchoCount; i++)
-    {
-        err = SendEchoRequest();
-        if (err != CHIP_NO_ERROR)
-        {
-            printf("Send request failed: %s\n", chip::ErrorStr(err));
-            break;
-        }
-
-        // Wait for response until the Echo interval.
-        while (!EchoIntervalExpired())
-        {
-            sleep(1);
-        }
-
-        // Check if expected response was received.
-        if (gWaitingForEchoResp)
-        {
-            printf("No response received\n");
-            gWaitingForEchoResp = false;
-        }
-    }
 }
 
 } // namespace
@@ -226,8 +227,6 @@ int main(int argc, char * argv[])
     }
 
     InitializeChip();
-
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
     adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -272,13 +271,17 @@ int main(int argc, char * argv[])
     // Arrange to get a callback whenever an Echo Response is received.
     gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    RunPinging();
+    err = chip::DeviceLayer::SystemLayer.StartTimer(0, EchoTimerHandler, NULL);
+    SuccessOrExit(err);
 
-    gEchoClient.Shutdown();
-
-    ShutdownChip();
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Shutdown();
+    }
+
     if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount))
     {
         printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));
