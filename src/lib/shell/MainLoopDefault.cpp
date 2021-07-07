@@ -145,7 +145,6 @@ int TokenizeLine(char * buffer, char ** tokens, int max_tokens)
 
 void ProcessShellLine(intptr_t args)
 {
-    int retval;
     int argc;
     char * argv[CHIP_SHELL_MAX_TOKENS];
 
@@ -154,7 +153,7 @@ void ProcessShellLine(intptr_t args)
 
     if (argc > 0)
     {
-        retval = Engine::Root().ExecCommand(argc, argv);
+        CHIP_ERROR retval = Engine::Root().ExecCommand(argc, argv);
 
         if (retval)
         {

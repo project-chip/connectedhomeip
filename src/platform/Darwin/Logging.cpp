@@ -29,7 +29,8 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     pthread_threadid_np(NULL, &ktid);
 
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    int32_t prefixLen   = snprintf(formattedMsg, sizeof(formattedMsg), "[%ld] [0x%" PRIx64 "] CHIP: [%s] ", ms, ktid, module);
+    int32_t prefixLen   = snprintf(formattedMsg, sizeof(formattedMsg), "[%ld] [%lld:%lld] CHIP: [%s] ", ms, (long long) getpid(),
+                                 (long long) ktid, module);
     static os_log_t log = os_log_create("com.zigbee.chip", "all");
     if (prefixLen < 0)
     {

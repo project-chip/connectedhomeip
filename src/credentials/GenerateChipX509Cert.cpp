@@ -206,8 +206,7 @@ CHIP_ERROR EncodeNOCSpecificExtensions(ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint16_t keyUsageBits =
-        static_cast<uint16_t>(KeyUsageFlags::kDigitalSignature) | static_cast<uint16_t>(KeyUsageFlags::kKeyEncipherment);
+    uint16_t keyUsageBits = static_cast<uint16_t>(KeyUsageFlags::kDigitalSignature);
 
     ReturnErrorOnFailure(EncodeIsCAExtension(kNotCACert, writer));
     ReturnErrorOnFailure(EncodeKeyUsageExtension(keyUsageBits, writer));
@@ -411,7 +410,6 @@ CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, Certific
     writer.Init(x509CertBuf, x509CertBufSize);
 
     ReturnErrorOnFailure(EncodeTBSCert(requestParams, issuerLevel, subject, subjectPubkey, issuerKeypair.Pubkey(), writer));
-    writer.Finalize();
 
     Crypto::P256ECDSASignature signature;
     ReturnErrorOnFailure(issuerKeypair.ECDSA_sign_msg(x509CertBuf, writer.GetLengthWritten(), signature));
@@ -429,7 +427,6 @@ CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, Certific
     }
     ASN1_END_SEQUENCE;
 
-    writer.Finalize();
     x509CertLen = writer.GetLengthWritten();
 
 exit:

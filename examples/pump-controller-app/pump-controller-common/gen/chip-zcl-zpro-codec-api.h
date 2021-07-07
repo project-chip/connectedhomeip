@@ -29,6 +29,7 @@
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
 | Basic                                                               | 0x0028 |
+| DiagnosticLogs                                                      | 0x0032 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |

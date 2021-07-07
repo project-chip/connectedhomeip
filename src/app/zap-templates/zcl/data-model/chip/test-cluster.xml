@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+   <struct name="TestListStructOctet">
+     <item name="fabricIndex" type="INT64U"/>
+     <item name="operationalCert" type="OCTET_STRING" length="32"/>
+   </struct>
+
+  <cluster>
+    <domain>CHIP</domain>
+    <name>Test Cluster</name>
+    <code>0x050F</code>
+    <define>TEST_CLUSTER</define>
+    <description>The Test Cluster is meant to validate the generated code</description>
+    <!-- Base data types -->
+    <attribute side="server" code="0x0000" define="BOOLEAN" type="BOOLEAN" writable="true" default="false" optional="false">boolean</attribute>
+    <attribute side="server" code="0x0001" define="BITMAP8" type="BITMAP8" writable="true" default="0" optional="false">bitmap8</attribute>
+    <attribute side="server" code="0x0002" define="BITMAP16" type="BITMAP16" writable="true" default="0" optional="false">bitmap16</attribute>
+    <attribute side="server" code="0x0003" define="BITMAP32" type="BITMAP32" writable="true" default="0" optional="false">bitmap32</attribute>
+    <attribute side="server" code="0x0004" define="BITMAP64" type="BITMAP64" writable="true" default="0" optional="false">bitmap64</attribute>
+    <attribute side="server" code="0x0005" define="INT8U" type="INT8U" writable="true" default="0" optional="false">int8u</attribute>
+    <attribute side="server" code="0x0006" define="INT16U" type="INT16U" writable="true" default="0" optional="false">int16u</attribute>
+    <!--<attribute side="server" code="0x0007" define="INT24U" type="INT24U" writable="true" default="0" optional="false">int24u</attribute>-->
+    <attribute side="server" code="0x0008" define="INT32U" type="INT32U" writable="true" default="0" optional="false">int32u</attribute>
+    <!--<attribute side="server" code="0x0009" define="INT40U" type="INT40U" writable="true" default="0" optional="false">int40u</attribute>-->
+    <!--<attribute side="server" code="0x000A" define="INT48U" type="INT48U" writable="true" default="0" optional="false">int48u</attribute>-->
+    <!--<attribute side="server" code="0x000B" define="INT56U" type="INT56U" writable="true" default="0" optional="false">int56u</attribute>-->
+    <attribute side="server" code="0x000C" define="INT64U" type="INT64U" writable="true" default="0" optional="false">int64u</attribute>
+    <attribute side="server" code="0x000D" define="INT8S" type="INT8S" writable="true" default="0" optional="false">int8s</attribute>
+    <attribute side="server" code="0x000E" define="INT16S" type="INT16S" writable="true" default="0" optional="false">int16s</attribute>
+    <!--<attribute side="server" code="0x000F" define="INT24S" type="INT24S" writable="true" default="0" optional="false">int24s</attribute>-->
+    <attribute side="server" code="0x0010" define="INT32S" type="INT32S" writable="true" default="0" optional="false">int32s</attribute>
+    <!--<attribute side="server" code="0x0011" define="INT40S" type="INT40S" writable="true" default="0" optional="false">int40s</attribute>-->
+    <!--<attribute side="server" code="0x0012" define="INT48S" type="INT48S" writable="true" default="0" optional="false">int48s</attribute>-->
+    <!--<attribute side="server" code="0x0013" define="INT56S" type="INT56S" writable="true" default="0" optional="false">int56s</attribute>-->
+    <attribute side="server" code="0x0014" define="INT64S" type="INT64S" writable="true" default="0" optional="false">int64s</attribute>
+    <attribute side="server" code="0x0015" define="ENUM8" type="ENUM8" writable="true" default="0" optional="false">enum8</attribute>
+    <attribute side="server" code="0x0016" define="ENUM16" type="ENUM16" writable="true" default="0" optional="false">enum16</attribute>
+    <!--<attribute side="server" code="0x0017" define="FLOAT_SINGLE" type="FLOAT_SINGLE" writable="true" default="0" optional="false">float_single</attribute>-->
+    <!--<attribute side="server" code="0x0018" define="FLOAT_DOUBLE" type="FLOAT_DOUBLE" writable="true" default="0" optional="false">float_double</attribute>-->
+    <attribute side="server" code="0x0019" define="OCTET_STRING" type="OCTET_STRING" length="10" writable="true" optional="false">octet_string</attribute>
+    <attribute side="server" code="0x001A" define="LIST" type="ARRAY" entryType="INT8U" length="10" writable="false" optional="false">list_int8u</attribute>
+    <attribute side="server" code="0x001B" define="LIST_OCTET_STRING" type="ARRAY" entryType="OCTET_STRING" length="254" writable="false" optional="false">list_octet_string</attribute>
+    <attribute side="server" code="0x001C" define="LIST_STRUCT_OCTET_STRING" type="ARRAY" entryType="TestListStructOctet" length="254" writable="false" optional="false">list_struct_octet_string</attribute>
+    <!--<attribute side="server" code="0x001B" define="STRUCT" type="ARRAY" writable="true" optional="false">struct</attribute>-->
+    <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="LONG_OCTET_STRING" length="1000" writable="true" optional="false">long_octet_string</attribute>
+
+    <!-- This attribute should not be enabled on the server side -->
+    <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="false">unsupported</attribute>
+
+    <!-- Test Commands -->
+    <command source="client" code="0x00" name="Test" optional="false">
+      <description>
+          Simple command without any parameters and without a specific response
+      </description>
+    </command>
+
+    <command source="client" code="0x01" name="TestNotHandled" optional="false">
+      <description>
+          Simple command without any parameters and without a specific response not handled by the server
+      </description>
+    </command>
+
+    <command source="client" code="0x02" name="TestSpecific" optional="false">
+      <description>
+          Simple command without any parameters and with a specific response
+      </description>
+    </command>
+
+    <command source="client" code="0x03" name="TestUnknownCommand" optional="true">
+      <description>
+          Simple command that should not be added to the server.
+      </description>
+    </command>
+
+    <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
+      <description>
+          Simple response for TestWithResponse with a simple return value
+      </description>
+      <arg name="returnValue" type="INT8U"/>
+    </command>
+
+  </cluster>
+</configurator>

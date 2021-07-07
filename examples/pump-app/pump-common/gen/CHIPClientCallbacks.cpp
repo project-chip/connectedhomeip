@@ -37,7 +37,7 @@ using namespace ::chip::app::List;
 
 constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
 
-#define CHECK_STATUS(error)                                                                                                        \
+#define CHECK_STATUS_WITH_RETVAL(error, retval)                                                                                    \
     if (CHIP_NO_ERROR != error)                                                                                                    \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_STATUS %s", ErrorStr(error));                                                                     \
@@ -47,10 +47,13 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
             cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
         }                                                                                                                          \
-        return true;                                                                                                               \
+        return retval;                                                                                                             \
     }
 
-#define CHECK_MESSAGE_LENGTH(value)                                                                                                \
+#define CHECK_STATUS(error) CHECK_STATUS_WITH_RETVAL(error, true)
+#define CHECK_STATUS_VOID(error) CHECK_STATUS_WITH_RETVAL(error, )
+
+#define CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, retval)                                                                            \
     if (!chip::CanCastTo<uint16_t>(value))                                                                                         \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_MESSAGE_LENGTH expects a uint16_t value, got: %d", value);                                        \
@@ -60,7 +63,7 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
             cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
         }                                                                                                                          \
-        return true;                                                                                                               \
+        return retval;                                                                                                             \
     }                                                                                                                              \
                                                                                                                                    \
     if (messageLen < value)                                                                                                        \
@@ -72,10 +75,13 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
             cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
         }                                                                                                                          \
-        return true;                                                                                                               \
+        return retval;                                                                                                             \
     }                                                                                                                              \
                                                                                                                                    \
     messageLen = static_cast<uint16_t>(messageLen - static_cast<uint16_t>(value));
+
+#define CHECK_MESSAGE_LENGTH(value) CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, true)
+#define CHECK_MESSAGE_LENGTH_VOID(value) CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, )
 
 #define GET_RESPONSE_CALLBACKS(name)                                                                                               \
     Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
@@ -241,6 +247,139 @@ void LogStatus(uint8_t status)
     }
 }
 
+static void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
+{
+    switch (status)
+    {
+    case Protocols::InteractionModel::ProtocolCode::Success:
+        ChipLogProgress(Zcl, "  status: Success                (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Failure:
+        ChipLogProgress(Zcl, "  status: Failure                (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidSubscription:
+        ChipLogProgress(Zcl, "  status: InvalidSubscription    (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedAccess:
+        ChipLogProgress(Zcl, "  status: UnsupportedAccess      (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedEndpoint:
+        ChipLogProgress(Zcl, "  status: UnsupportedEndpoint    (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidAction:
+        ChipLogProgress(Zcl, "  status: InvalidAction          (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedCommand:
+        ChipLogProgress(Zcl, "  status: UnsupportedCommand     (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved82:
+        ChipLogProgress(Zcl, "  status: Reserved82             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved83:
+        ChipLogProgress(Zcl, "  status: Reserved83             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved84:
+        ChipLogProgress(Zcl, "  status: Reserved84             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidCommand:
+        ChipLogProgress(Zcl, "  status: InvalidCommand         (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute:
+        ChipLogProgress(Zcl, "  status: UnsupportedAttribute   (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidValue:
+        ChipLogProgress(Zcl, "  status: InvalidValue           (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedWrite:
+        ChipLogProgress(Zcl, "  status: UnsupportedWrite       (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::ResourceExhausted:
+        ChipLogProgress(Zcl, "  status: ResourceExhausted      (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved8a:
+        ChipLogProgress(Zcl, "  status: Reserved8a             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::NotFound:
+        ChipLogProgress(Zcl, "  status: NotFound               (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnreportableAttribute:
+        ChipLogProgress(Zcl, "  status: UnreportableAttribute  (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidDataType:
+        ChipLogProgress(Zcl, "  status: InvalidDataType        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved8e:
+        ChipLogProgress(Zcl, "  status: Reserved8e             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedRead:
+        ChipLogProgress(Zcl, "  status: UnsupportedRead        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved90:
+        ChipLogProgress(Zcl, "  status: Reserved90             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved91:
+        ChipLogProgress(Zcl, "  status: Reserved91             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved92:
+        ChipLogProgress(Zcl, "  status: Reserved92             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved93:
+        ChipLogProgress(Zcl, "  status: Reserved93             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Timeout:
+        ChipLogProgress(Zcl, "  status: Timeout                (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved95:
+        ChipLogProgress(Zcl, "  status: Reserved95             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved96:
+        ChipLogProgress(Zcl, "  status: Reserved96             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved97:
+        ChipLogProgress(Zcl, "  status: Reserved97             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved98:
+        ChipLogProgress(Zcl, "  status: Reserved98             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved99:
+        ChipLogProgress(Zcl, "  status: Reserved99             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reserved9a:
+        ChipLogProgress(Zcl, "  status: Reserved9a             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::ConstraintError:
+        ChipLogProgress(Zcl, "  status: ConstraintError        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Busy:
+        ChipLogProgress(Zcl, "  status: Busy                   (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reservedc0:
+        ChipLogProgress(Zcl, "  status: Reservedc0             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reservedc1:
+        ChipLogProgress(Zcl, "  status: Reservedc1             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reservedc2:
+        ChipLogProgress(Zcl, "  status: Reservedc2             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::UnsupportedCluster:
+        ChipLogProgress(Zcl, "  status: UnsupportedCluster     (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::Reservedc4:
+        ChipLogProgress(Zcl, "  status: Reservedc4             (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::NoUpstreamSubscription:
+        ChipLogProgress(Zcl, "  status: NoUpstreamSubscription (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    case Protocols::InteractionModel::ProtocolCode::InvalidArgument:
+        ChipLogProgress(Zcl, "  status: InvalidArgument        (0x%04" PRIx16 ")", Protocols::InteractionModel::ToUint16(status));
+        break;
+    default:
+        ChipLogError(Zcl, "Unknown status: 0x%04" PRIx16, Protocols::InteractionModel::ToUint16(status));
+        break;
+    }
+}
+
 void LogStringAttribute(const uint8_t * string, const uint16_t length, const bool isAscii)
 {
     if (isAscii)
@@ -268,8 +407,8 @@ app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInsta
 bool emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
 {
     ChipLogProgress(Zcl, "DefaultResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
-    ChipLogProgress(Zcl, "  CommandId: 0x%02x", commandId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
+    ChipLogProgress(Zcl, "  CommandId: 0x%08x", commandId);
     LogStatus(status);
 
     GET_RESPONSE_CALLBACKS("emberAfDefaultResponseCallback");
@@ -312,259 +451,87 @@ bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfSta
     return true;
 }
 
-bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
+template <>
+void BasicAttributeFilter<StringAttributeCallback>(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
+                                                   chip::Callback::Cancelable * onFailure)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    const uint8_t * val;
+    uint32_t len;
+
+    if (data->GetType() != chip::TLV::kTLVType_ByteString && data->GetType() != chip::TLV::kTLVType_UTF8String)
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else
+    {
+        err = data->GetDataPtr(val);
+        len = data->GetLength();
+    }
+
+    if (CHIP_NO_ERROR == err)
+    {
+        chip::Callback::Callback<StringAttributeCallback> * cb =
+            chip::Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccess);
+        cb->mCall(cb->mContext, chip::ByteSpan(val, len));
+    }
+    else
+    {
+        chip::Callback::Callback<DefaultFailureCallback> * cb =
+            chip::Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailure);
+        cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+    }
+}
+
+bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
+                                            TLV::TLVReader * apData, Protocols::InteractionModel::ProtocolCode status)
 {
     ChipLogProgress(Zcl, "ReadAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", aPath.mClusterId);
 
-    GET_RESPONSE_CALLBACKS("emberAfReadAttributesResponseCallback");
+    Callback::Cancelable * onSuccessCallback = nullptr;
+    Callback::Cancelable * onFailureCallback = nullptr;
+    app::TLVDataFilter tlvFilter             = nullptr;
+    NodeId sourceId                          = aPath.mNodeId;
+    // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
+    uint8_t sequenceNumber = static_cast<uint8_t>(apReadClient->GetAppIdentifier());
+    CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceId, sequenceNumber, &onSuccessCallback, &onFailureCallback, &tlvFilter);
 
-    // struct readAttributeResponseRecord[]
-    while (messageLen)
+    if (CHIP_NO_ERROR != err)
     {
-        CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
-
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t status = chip::Encoding::Read8(message); // zclStatus
-        LogStatus(status);
-
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
+        if (onSuccessCallback == nullptr)
         {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t attributeType = chip::Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
-
-            switch (attributeType)
-            {
-            case 0x00: // nodata / No data
-            case 0x0A: // data24 / 24-bit data
-            case 0x0C: // data40 / 40-bit data
-            case 0x0D: // data48 / 48-bit data
-            case 0x0E: // data56 / 56-bit data
-            case 0x1A: // map24 / 24-bit bitmap
-            case 0x1C: // map40 / 40-bit bitmap
-            case 0x1D: // map48 / 48-bit bitmap
-            case 0x1E: // map56 / 56-bit bitmap
-            case 0x22: // uint24 / Unsigned 24-bit integer
-            case 0x24: // uint40 / Unsigned 40-bit integer
-            case 0x25: // uint48 / Unsigned 48-bit integer
-            case 0x26: // uint56 / Unsigned 56-bit integer
-            case 0x2A: // int24 / Signed 24-bit integer
-            case 0x2C: // int40 / Signed 40-bit integer
-            case 0x2D: // int48 / Signed 48-bit integer
-            case 0x2E: // int56 / Signed 56-bit integer
-            case 0x38: // semi / Semi-precision
-            case 0x39: // single / Single precision
-            case 0x3A: // double / Double precision
-            case 0x49: // struct / Structure
-            case 0x50: // set / Set
-            case 0x51: // bag / Bag
-            case 0xE0: // ToD / Time of day
-            {
-                ChipLogError(Zcl, "attributeType 0x%02x is not supported", attributeType);
-                Callback::Callback<DefaultFailureCallback> * cb =
-                    Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-                cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-                return true;
-            }
-
-            case 0x41: // octstr / Octet string
-            case 0x42: // string / Character string
-            {
-                // Short Strings must contains at least one byte for the length
-                CHECK_MESSAGE_LENGTH(1);
-                uint8_t length = chip::Encoding::Read8(message);
-
-                // When the length is set to 0xFF, it represents a non-value. In this case the data field is zero length.
-                if (length == 0xFF)
-                {
-                    length = 0;
-                }
-
-                CHECK_MESSAGE_LENGTH(length);
-                LogStringAttribute(message, length, attributeType == 0x42);
-                Callback::Callback<StringAttributeCallback> * cb =
-                    Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
-                break;
-            }
-
-            case 0x43: // octstr16 / Long octet string
-            case 0x44: // string16 / Long character string
-            {
-                // Long Strings must contains at least two bytes for the length
-                CHECK_MESSAGE_LENGTH(2);
-                uint16_t length = chip::Encoding::LittleEndian::Read16(message);
-
-                // When the length is set to 0xFFFF, it represents a non-value. In this case the data field is zero length.
-                if (length == 0xFFFF)
-                {
-                    length = 0;
-                }
-
-                CHECK_MESSAGE_LENGTH(length);
-                LogStringAttribute(message, length, attributeType == 0x44);
-                Callback::Callback<StringAttributeCallback> * cb =
-                    Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
-                break;
-            }
-            case 0x48: // array / Array
-            {
-                CHECK_MESSAGE_LENGTH(2);
-                uint16_t count = chip::Encoding::LittleEndian::Read16(message);
-                ChipLogProgress(Zcl, "  count: %" PRIu16, count);
-
-                switch (clusterId)
-                {
-                }
-                break;
-            }
-
-            case 0x08: // data8 / 8-bit data
-            case 0x18: // map8 / 8-bit bitmap
-            case 0x20: // uint8 / Unsigned  8-bit integer
-            case 0x30: // enum8 / 8-bit enumeration
-            {
-                CHECK_MESSAGE_LENGTH(1);
-                uint8_t value = chip::Encoding::Read8(message);
-                ChipLogProgress(Zcl, "  value: 0x%02x", value);
-
-                Callback::Callback<Int8uAttributeCallback> * cb =
-                    Callback::Callback<Int8uAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x09: // data16 / 16-bit data
-            case 0x19: // map16 / 16-bit bitmap
-            case 0x21: // uint16 / Unsigned 16-bit integer
-            case 0x31: // enum16 / 16-bit enumeration
-            case 0xE8: // clusterId / Cluster ID
-            case 0xE9: // attribId / Attribute ID
-            case 0xEA: // bacOID / BACnet OID
-            case 0xF1: // key128 / 128-bit security key
-            case 0xFF: // unk / Unknown
-            {
-                CHECK_MESSAGE_LENGTH(2);
-                uint16_t value = chip::Encoding::LittleEndian::Read16(message);
-                ChipLogProgress(Zcl, "  value: 0x%04x", value);
-
-                Callback::Callback<Int16uAttributeCallback> * cb =
-                    Callback::Callback<Int16uAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x0B: // data32 / 32-bit data
-            case 0x1B: // map32 / 32-bit bitmap
-            case 0x23: // uint32 / Unsigned 32-bit integer
-            case 0xE1: // date / Date
-            case 0xE2: // UTC / UTCTime
-            {
-                CHECK_MESSAGE_LENGTH(4);
-                uint32_t value = chip::Encoding::LittleEndian::Read32(message);
-                ChipLogProgress(Zcl, "  value: 0x%08x", value);
-
-                Callback::Callback<Int32uAttributeCallback> * cb =
-                    Callback::Callback<Int32uAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x0F: // data64 / 64-bit data
-            case 0x1F: // map64 / 64-bit bitmap
-            case 0x27: // uint64 / Unsigned 64-bit integer
-            case 0xF0: // EUI64 / IEEE address
-            {
-                CHECK_MESSAGE_LENGTH(8);
-                uint64_t value = chip::Encoding::LittleEndian::Read64(message);
-                ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
-
-                Callback::Callback<Int64uAttributeCallback> * cb =
-                    Callback::Callback<Int64uAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x10: // bool / Boolean
-            {
-                CHECK_MESSAGE_LENGTH(1);
-                uint8_t value = chip::Encoding::Read8(message);
-                ChipLogProgress(Zcl, "  value: %d", value);
-
-                Callback::Callback<BooleanAttributeCallback> * cb =
-                    Callback::Callback<BooleanAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x28: // int8 / Signed 8-bit integer
-            {
-                CHECK_MESSAGE_LENGTH(1);
-                int8_t value = chip::CastToSigned(chip::Encoding::Read8(message));
-                ChipLogProgress(Zcl, "  value: %" PRId8, value);
-
-                Callback::Callback<Int8sAttributeCallback> * cb =
-                    Callback::Callback<Int8sAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x29: // int16 / Signed 16-bit integer
-            {
-                CHECK_MESSAGE_LENGTH(2);
-                int16_t value = chip::CastToSigned(chip::Encoding::LittleEndian::Read16(message));
-                ChipLogProgress(Zcl, "  value: %" PRId16, value);
-
-                Callback::Callback<Int16sAttributeCallback> * cb =
-                    Callback::Callback<Int16sAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x2B: // int32 / Signed 32-bit integer
-            {
-                CHECK_MESSAGE_LENGTH(4);
-                int32_t value = chip::CastToSigned(chip::Encoding::LittleEndian::Read32(message));
-                ChipLogProgress(Zcl, "  value: %" PRId32, value);
-
-                Callback::Callback<Int32sAttributeCallback> * cb =
-                    Callback::Callback<Int32sAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-
-            case 0x2F: // int64 / Signed 64-bit integer
-            {
-                CHECK_MESSAGE_LENGTH(8);
-                int64_t value = chip::CastToSigned(chip::Encoding::LittleEndian::Read64(message));
-                ChipLogProgress(Zcl, "  value: %" PRId64, value);
-
-                Callback::Callback<Int64sAttributeCallback> * cb =
-                    Callback::Callback<Int64sAttributeCallback>::FromCancelable(onSuccessCallback);
-                cb->mCall(cb->mContext, value);
-                break;
-            }
-            }
-        }
-        else
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, status);
+            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
         }
 
-        // The current code is written matching the current API where there is a single attribute read
-        // per read command. So if multiple attributes are read at the same time, something is wrong
-        // somewhere.
-        if (messageLen)
+        if (onFailureCallback == nullptr)
         {
-            ChipLogError(Zcl, "Multiple attributes read at the same time. Something went wrong.");
-            break;
+            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
         }
+
+        if (tlvFilter == nullptr)
+        {
+            ChipLogDetail(Zcl, "%s: Missing TLV Data Filter", __FUNCTION__);
+        }
+        return true;
+    }
+
+    chip::AttributeId attributeId = aPath.mFieldId; // attribId
+    ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+    LogIMStatus(status);
+
+    if (status == Protocols::InteractionModel::ProtocolCode::Success && apData != nullptr)
+    {
+        chip::TLV::TLVType attributeType = apData->GetType();
+        ChipLogProgress(Zcl, "  attribute TLV Type: 0x%02x", attributeType);
+        tlvFilter(apData, onSuccessCallback, onFailureCallback);
+    }
+    else
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        // TODO: Should change failure callbacks to accept uint16 status code.
+        cb->mCall(cb->mContext, static_cast<uint8_t>(Protocols::InteractionModel::ToUint16(status)));
     }
 
     return true;
@@ -573,7 +540,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
 bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "WriteAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     GET_RESPONSE_CALLBACKS("emberAfWriteAttributesResponseCallback");
 
@@ -592,9 +559,9 @@ bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * messa
         }
         else
         {
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-            ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+            CHECK_MESSAGE_LENGTH(4);
+            AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+            ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
@@ -617,7 +584,7 @@ bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * messa
 bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "ConfigureReportingResponseCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     GET_RESPONSE_CALLBACKS("emberAfConfigureReportingResponseCallback");
 
@@ -640,9 +607,9 @@ bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * me
             uint8_t direction = chip::Encoding::Read8(message); // reportingRole
             ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
 
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-            ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+            CHECK_MESSAGE_LENGTH(4);
+            AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+            ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
@@ -665,7 +632,7 @@ bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * me
 bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "ReadReportingConfigurationResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     GET_RESPONSE_CALLBACKS("emberAfReadReportingConfigurationResponseCallback");
 
@@ -676,9 +643,9 @@ bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId
         uint8_t direction = chip::Encoding::Read8(message); // reportingRole
         ChipLogProgress(Zcl, "  direction: 0x%02x", direction);
 
-        CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+        CHECK_MESSAGE_LENGTH(4);
+        AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+        ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
         if (direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         {
@@ -719,7 +686,7 @@ bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discove
                                                bool extended)
 {
     ChipLogProgress(Zcl, "DiscoverAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
     ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
     ChipLogProgress(Zcl, "  extended: %d", extended);
 
@@ -728,9 +695,9 @@ bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discove
     // struct discoverAttributesResponseRecord[]
     while (messageLen)
     {
-        CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+        CHECK_MESSAGE_LENGTH(4);
+        AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+        ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
         CHECK_MESSAGE_LENGTH(1);
         uint8_t attributeType = chip::Encoding::Read8(message); // zclType
@@ -746,14 +713,14 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint1
                                                       CommandId * commandIds, uint16_t commandIdCount)
 {
     ChipLogProgress(Zcl, "DiscoverCommandsGeneratedResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
     ChipLogProgress(Zcl, "  manufacturerCode: 0x%04x", manufacturerCode);
     ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
     ChipLogProgress(Zcl, "  commandIdCount: %" PRIu16, commandIdCount);
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%08x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -766,14 +733,14 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
                                                      CommandId * commandIds, uint16_t commandIdCount)
 {
     ChipLogProgress(Zcl, "DiscoverCommandsReceivedResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
     ChipLogProgress(Zcl, "  manufacturerCode: 0x%04x", manufacturerCode);
     ChipLogProgress(Zcl, "  discoveryComplete: %d", discoveryComplete);
     ChipLogProgress(Zcl, "  commandIdCount: %" PRIu16, commandIdCount);
 
     for (uint16_t i = 0; i < commandIdCount; i++)
     {
-        ChipLogProgress(Zcl, "  commandId: 0x%02x", *commandIds++);
+        ChipLogProgress(Zcl, "  commandId: 0x%08x", *commandIds++);
     }
 
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
@@ -782,16 +749,41 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
+static EmberAfStatus PrepareListFromTLV(TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen)
+{
+    CHIP_ERROR tlvError = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    TLV::TLVType type;
+    reader.Init(*tlvData);
+    reader.EnterContainer(type);
+    tlvError = reader.Next();
+    if (tlvError != CHIP_NO_ERROR && tlvError != CHIP_END_OF_TLV && chip::CanCastTo<uint16_t>(reader.GetLength()))
+    {
+        return EMBER_ZCL_STATUS_INVALID_VALUE;
+    }
+    if (tlvError == CHIP_NO_ERROR)
+    {
+        tlvError   = reader.GetDataPtr(message);
+        messageLen = static_cast<uint16_t>(reader.GetLength());
+    }
+    if (tlvError != CHIP_NO_ERROR)
+    {
+        return EMBER_ZCL_STATUS_INVALID_VALUE;
+    }
+    reader.ExitContainer(type);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
 bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
+    ChipLogProgress(Zcl, "  ClusterId: 0x%08x", clusterId);
 
     NodeId sourceId = emberAfCurrentCommand()->SourceNodeId();
     ChipLogProgress(Zcl, "  Source NodeId: %" PRIu64, sourceId);
 
     EndpointId endpointId = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
-    ChipLogProgress(Zcl, "  Source EndpointId: 0x%04x", endpointId);
+    ChipLogProgress(Zcl, "  Source EndpointId: 0x%08x", endpointId);
 
     // TODO onFailureCallback is just here because of the CHECK_MESSAGE_LENGTH macro. It needs to be removed.
     Callback::Cancelable * onFailureCallback = nullptr;
@@ -799,8 +791,8 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
     while (messageLen)
     {
         CHECK_MESSAGE_LENGTH(2);
-        uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: 0x%04x", attributeId);
+        AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
+        ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 
         GET_REPORT_CALLBACK("emberAfReportAttributesCallback");
 

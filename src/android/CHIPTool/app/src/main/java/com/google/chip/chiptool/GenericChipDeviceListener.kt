@@ -38,4 +38,8 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
   override fun onError(error: Throwable?) {
     // No op
   }
+
+  override fun onOpCSRGenerationComplete(errorCode: ByteArray) {
+    // No op
+  }
 }

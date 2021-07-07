@@ -24,7 +24,10 @@
 class TestCommand : public Command
 {
 public:
-    TestCommand(const char * commandName) : Command(commandName) {}
+    TestCommand(const char * commandName) :
+        Command(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    {}
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
@@ -34,4 +37,10 @@ public:
 
 protected:
     ChipDevice * mDevice;
+
+    static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
+    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+
+    chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };

@@ -89,7 +89,11 @@ private:
 class ResponseSender : public ResponderDelegate
 {
 public:
-    ResponseSender(ServerBase * server, QueryResponderBase * responder) : mServer(server), mResponder(responder) {}
+    // TODO(cecille): Template this and set appropriately. Please see issue #8000.
+    static constexpr size_t kMaxQueryResponders = 7;
+    ResponseSender(ServerBase * server) : mServer(server) {}
+
+    CHIP_ERROR AddQueryResponder(QueryResponderBase * queryResponder);
 
     /// Send back the response to a particular query
     CHIP_ERROR Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource);
@@ -102,7 +106,7 @@ private:
     CHIP_ERROR PrepareNewReplyPacket();
 
     ServerBase * mServer;
-    QueryResponderBase * mResponder;
+    QueryResponderBase * mResponder[kMaxQueryResponders] = {};
 
     /// Current send state
     ResponseBuilder mResponseBuilder;          // packet being built

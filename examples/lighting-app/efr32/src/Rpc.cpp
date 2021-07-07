@@ -120,7 +120,7 @@ void RunRpcService(void *)
 
 int Init()
 {
-    int err = CHIP_ERROR_MAX;
+    int err = CHIP_CONFIG_CORE_ERROR_MAX;
     pw_sys_io_Init();
 
     // Start App task.

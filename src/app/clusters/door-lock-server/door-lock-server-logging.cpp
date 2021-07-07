@@ -40,12 +40,11 @@
 
 #include "door-lock-server.h"
 #include <app/common/gen/attribute-id.h>
+#include <app/common/gen/callback.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <assert.h>
-
-#include "gen/callback.h"
 
 #include <app/Command.h>
 #include <support/CodeUtils.h>
@@ -133,19 +132,6 @@ bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj,
     }
     else
     {
-        if (commandObj == nullptr)
-        {
-            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID, "vwuuuvs", entry.logEntryId, entry.timestamp,
-                                      entry.eventType, entry.source, entry.eventId, entry.userId, entry.pin);
-
-            status = emberAfSendResponse();
-            if (status != EMBER_SUCCESS)
-            {
-                emberAfDoorLockClusterPrintln("Failed to send GetLogRecordResponse: 0x%X", status);
-            }
-        }
-        else
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID,

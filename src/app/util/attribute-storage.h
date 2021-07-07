@@ -210,12 +210,13 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(chip::EndpointId endpoint, 
 
 // Calls the default response callback for a specific cluster, and wraps emberAfClusterDefaultResponseWithMfgCodeCallback
 // with the EMBER_NULL_MANUFACTURER_CODE
-void emberAfClusterDefaultResponseCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint8_t commandId,
+void emberAfClusterDefaultResponseCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::CommandId commandId,
                                            EmberAfStatus status, uint8_t clientServerMask);
 
 // Calls the default response callback for a specific cluster.
-void emberAfClusterDefaultResponseWithMfgCodeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint8_t commandId,
-                                                      EmberAfStatus status, uint8_t clientServerMask, uint16_t manufacturerCode);
+void emberAfClusterDefaultResponseWithMfgCodeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                      chip::CommandId commandId, EmberAfStatus status, uint8_t clientServerMask,
+                                                      uint16_t manufacturerCode);
 
 // Calls the message sent callback for a specific cluster, and wraps emberAfClusterMessageSentWithMfgCodeCallback
 void emberAfClusterMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
@@ -249,7 +250,7 @@ uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
 EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8_t clusterIndex);
 
 uint16_t emberAfGetDeviceIdForEndpoint(chip::EndpointId endpoint);
-EmberAfStatus emberAfSetDynamicEndpoint(uint8_t index, chip::EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
+EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
                                         uint8_t deviceVersion);
-chip::EndpointId emberAfClearDynamicEndpoint(uint8_t index);
-uint8_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
+chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
+uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);

@@ -29,8 +29,6 @@
 
 // ==================== Platform Adaptations ====================
 
-#define INET_CONFIG_ERROR_TYPE int32_t
-#define INET_CONFIG_NO_ERROR 0
 #define INET_CONFIG_ERROR_MIN 1000000
 #define INET_CONFIG_ERROR_MAX 1000999
 

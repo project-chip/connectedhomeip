@@ -65,13 +65,10 @@ public class ChipClusters {
   {{/if}}
 
   {{/chip_server_cluster_commands}}
-  {{#if (user_cluster_has_enabled_command name side)}}
-  {{#all_user_cluster_commands}}
-  {{#if (isStrEqual clusterName parent.name)}}
-  {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+  {{#chip_server_cluster_responses}}
     public interface {{asCamelCased name false}}Callback {
       void onSuccess(
-{{#zcl_command_arguments}}
+{{#chip_server_cluster_response_arguments}}
 {{#unless (isStrEqual label "status")}}
 {{#if isArray}}
       // {{asSymbol label}}: {{asUnderlyingZclType type}}
@@ -84,16 +81,13 @@ public class ChipClusters {
       {{omitCommaForFirstNonStatusCommand parent.id index}}{{asJavaBasicTypeForZclType type}} {{asSymbol label}}
 {{/if}}
 {{/unless}}
-{{/zcl_command_arguments}}
+{{/chip_server_cluster_response_arguments}}
       );
       
       void onError(Exception error);
     }
 
-  {{/if}}
-  {{/if}}
-  {{/all_user_cluster_commands}}
-  {{/if}}
+  {{/chip_server_cluster_responses}}
   }
   {{#unless (isLastElement index count)}}
 

@@ -69,11 +69,11 @@ public:
     static Epoch GetCurrentEpoch();
     static bool IsEarlierEpoch(const Epoch & first, const Epoch & second);
 
-    typedef void (*OnCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
+    typedef void (*OnCompleteFunct)(Layer * aLayer, void * aAppState, CHIP_ERROR aError);
     OnCompleteFunct OnComplete;
 
-    Error Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState);
-    Error Cancel();
+    CHIP_ERROR Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState);
+    CHIP_ERROR Cancel();
 
     static void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
@@ -84,12 +84,12 @@ private:
 
     void HandleComplete();
 
-    Error ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState);
+    CHIP_ERROR ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     Timer * mNextTimer;
 
-    static Error HandleExpiredTimers(Layer & aLayer);
+    static CHIP_ERROR HandleExpiredTimers(Layer & aLayer);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH

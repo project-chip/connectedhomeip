@@ -18,6 +18,7 @@ This directory contains various command handler for the 'chip-cert' tool that:
 -   validate CHIP certificate chain
 -   resign CHIP certificate
 -   print CHIP certificate
+-   generate CHIP attestation certificates
 
 ## Usage Examples
 
@@ -32,6 +33,8 @@ Specify '--help' option for detail instructions on usage of each command:
 ```
 ./chip-cert gen-cert --help
 ```
+
+## Operational Certificates Usage Examples
 
 Example command that can be used to generate CHIP root certificate and private
 key:
@@ -77,4 +80,34 @@ human friendly/readable form:
 
 ```
 ./chip-cert print-cert Chip-ICA-Cert.chip
+```
+
+### Attestation Certificates Usage Examples
+
+Example command that can be used to generate Product Attestation Authority (PAA)
+certificate and private key:
+
+```
+./chip-cert gen-att-cert --type a --subject-cn "Matter Development PAA 01" --valid-from "2020-10-15 14:23:43" --lifetime 7305 --out-key Chip-PAA-Key.pem --out Chip-PAA-Cert.pem
+```
+
+The PAA certificate/key output of last command can then be used to generate the
+Product Attestation Intermediate (PAI) certificate and private key:
+
+```
+./chip-cert gen-att-cert --type i --subject-cn "Matter Development PAI 01" --subject-vid FFF1 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --ca-key Chip-PAA-Key.pem --ca-cert Chip-PAA-Cert.pem --out-key Chip-PAI-Key.pem --out Chip-PAI-Cert.pem
+```
+
+The generated PAI certificate/key can then be used to sign multiple Device
+Attestation Certificates (DAC):
+
+```
+./chip-cert gen-att-cert --type d --subject-cn "Matter Development DAC 01" --subject-vid FFF1 --subject-pid 0123 --valid-from "2020-10-15 14:23:43" --lifetime 7305 --ca-key Chip-PAI-Key.pem --ca-cert Chip-PAI-Cert.pem --out-key Chip-DAC-Key.pem --out Chip-DAC-Cert.pem
+```
+
+The standard openssl command line tool can be used to verify the attestation
+certificate chain that was just created:
+
+```
+openssl verify -CAfile Chip-PAA-Cert.pem -untrusted Chip-PAI-Cert.pem Chip-DAC-Cert.pem
 ```

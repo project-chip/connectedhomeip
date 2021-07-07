@@ -86,14 +86,15 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     return CHIP_NO_ERROR;
 }
 
-void CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
-    ReturnOnFailure(InitCASEHandshake(ec));
+    ReturnErrorOnFailure(InitCASEHandshake(ec));
 
     mPairingSession.OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
 
+    return CHIP_NO_ERROR;
     // TODO - Enable multiple concurrent CASE session establishment
 }
 
@@ -118,10 +119,9 @@ void CASEServer::OnSessionEstablished()
     ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
     mSessionMgr->ExpireAllPairings(mPairingSession.PeerConnection().GetPeerNodeId(), mAdminId);
 
-    CHIP_ERROR err =
-        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-                                mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
-                                SecureSession::SessionRole::kResponder, mAdminId, nullptr);
+    CHIP_ERROR err = mSessionMgr->NewPairing(
+        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
+        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kResponder, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));

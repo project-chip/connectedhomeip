@@ -51,6 +51,8 @@ namespace ASN1 {
 #include <asn1/ASN1OID.h>
 #endif
 
+static constexpr size_t kMaxConstructedAndEncapsulatedTypesDepth = 10;
+
 enum ASN1TagClasses
 {
     kASN1TagClass_Universal       = 0x00,
@@ -110,22 +112,22 @@ public:
     bool IsIndefiniteLen(void) const { return IndefiniteLen; };
     bool IsEndOfContents(void) const { return EndOfContents; };
 
-    ASN1_ERROR Next(void);
-    ASN1_ERROR EnterConstructedType(void);
-    ASN1_ERROR ExitConstructedType(void);
-    ASN1_ERROR GetConstructedType(const uint8_t *& val, uint32_t & valLen);
-    ASN1_ERROR EnterEncapsulatedType(void);
-    ASN1_ERROR ExitEncapsulatedType(void);
+    CHIP_ERROR Next(void);
+    CHIP_ERROR EnterConstructedType(void);
+    CHIP_ERROR ExitConstructedType(void);
+    CHIP_ERROR GetConstructedType(const uint8_t *& val, uint32_t & valLen);
+    CHIP_ERROR EnterEncapsulatedType(void);
+    CHIP_ERROR ExitEncapsulatedType(void);
     bool IsContained(void) const;
-    ASN1_ERROR GetInteger(int64_t & val);
-    ASN1_ERROR GetBoolean(bool & val);
-    ASN1_ERROR GetObjectId(OID & oid);
-    ASN1_ERROR GetUTCTime(ASN1UniversalTime & outTime);
-    ASN1_ERROR GetGeneralizedTime(ASN1UniversalTime & outTime);
-    ASN1_ERROR GetBitString(uint32_t & outVal);
+    CHIP_ERROR GetInteger(int64_t & val);
+    CHIP_ERROR GetBoolean(bool & val);
+    CHIP_ERROR GetObjectId(OID & oid);
+    CHIP_ERROR GetUTCTime(ASN1UniversalTime & outTime);
+    CHIP_ERROR GetGeneralizedTime(ASN1UniversalTime & outTime);
+    CHIP_ERROR GetBitString(uint32_t & outVal);
 
 private:
-    static constexpr size_t kMaxContextDepth = 32;
+    static constexpr size_t kMaxContextDepth = kMaxConstructedAndEncapsulatedTypesDepth;
 
     struct ASN1ParseContext
     {
@@ -152,10 +154,10 @@ private:
     ASN1ParseContext mSavedContexts[kMaxContextDepth];
     uint32_t mNumSavedContexts;
 
-    ASN1_ERROR DecodeHead(void);
+    CHIP_ERROR DecodeHead(void);
     void ResetElementState(void);
-    ASN1_ERROR EnterContainer(uint32_t offset);
-    ASN1_ERROR ExitContainer(void);
+    CHIP_ERROR EnterContainer(uint32_t offset);
+    CHIP_ERROR ExitContainer(void);
 };
 
 class DLL_EXPORT ASN1Writer
@@ -163,38 +165,40 @@ class DLL_EXPORT ASN1Writer
 public:
     void Init(uint8_t * buf, uint32_t maxLen);
     void InitNullWriter(void);
-    ASN1_ERROR Finalize(void);
     uint16_t GetLengthWritten(void) const;
 
-    ASN1_ERROR PutInteger(int64_t val);
-    ASN1_ERROR PutBoolean(bool val);
-    ASN1_ERROR PutObjectId(const uint8_t * val, uint16_t valLen);
-    ASN1_ERROR PutObjectId(OID oid);
-    ASN1_ERROR PutString(uint32_t tag, const char * val, uint16_t valLen);
-    ASN1_ERROR PutOctetString(const uint8_t * val, uint16_t valLen);
-    ASN1_ERROR PutOctetString(uint8_t cls, uint32_t tag, const uint8_t * val, uint16_t valLen);
-    ASN1_ERROR PutOctetString(uint8_t cls, uint32_t tag, chip::TLV::TLVReader & val);
-    ASN1_ERROR PutBitString(uint32_t val);
-    ASN1_ERROR PutBitString(uint8_t unusedBits, const uint8_t * val, uint16_t valLen);
-    ASN1_ERROR PutBitString(uint8_t unusedBits, chip::TLV::TLVReader & val);
-    ASN1_ERROR PutTime(const ASN1UniversalTime & val);
-    ASN1_ERROR PutNull(void);
-    ASN1_ERROR PutConstructedType(const uint8_t * val, uint16_t valLen);
-    ASN1_ERROR StartConstructedType(uint8_t cls, uint32_t tag);
-    ASN1_ERROR EndConstructedType(void);
-    ASN1_ERROR StartEncapsulatedType(uint8_t cls, uint32_t tag, bool bitStringEncoding);
-    ASN1_ERROR EndEncapsulatedType(void);
-    ASN1_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen);
-    ASN1_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, chip::TLV::TLVReader & val);
+    CHIP_ERROR PutInteger(int64_t val);
+    CHIP_ERROR PutBoolean(bool val);
+    CHIP_ERROR PutObjectId(const uint8_t * val, uint16_t valLen);
+    CHIP_ERROR PutObjectId(OID oid);
+    CHIP_ERROR PutString(uint32_t tag, const char * val, uint16_t valLen);
+    CHIP_ERROR PutOctetString(const uint8_t * val, uint16_t valLen);
+    CHIP_ERROR PutOctetString(uint8_t cls, uint32_t tag, const uint8_t * val, uint16_t valLen);
+    CHIP_ERROR PutOctetString(uint8_t cls, uint32_t tag, chip::TLV::TLVReader & val);
+    CHIP_ERROR PutBitString(uint32_t val);
+    CHIP_ERROR PutBitString(uint8_t unusedBits, const uint8_t * val, uint16_t valLen);
+    CHIP_ERROR PutBitString(uint8_t unusedBits, chip::TLV::TLVReader & val);
+    CHIP_ERROR PutTime(const ASN1UniversalTime & val);
+    CHIP_ERROR PutNull(void);
+    CHIP_ERROR PutConstructedType(const uint8_t * val, uint16_t valLen);
+    CHIP_ERROR StartConstructedType(uint8_t cls, uint32_t tag);
+    CHIP_ERROR EndConstructedType(void);
+    CHIP_ERROR StartEncapsulatedType(uint8_t cls, uint32_t tag, bool bitStringEncoding);
+    CHIP_ERROR EndEncapsulatedType(void);
+    CHIP_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen);
+    CHIP_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, chip::TLV::TLVReader & val);
 
 private:
+    static constexpr size_t kMaxDeferredLengthDepth = kMaxConstructedAndEncapsulatedTypesDepth;
+
     uint8_t * mBuf;
     uint8_t * mBufEnd;
     uint8_t * mWritePoint;
-    uint8_t ** mDeferredLengthList;
+    uint8_t * mDeferredLengthLocations[kMaxDeferredLengthDepth];
+    uint8_t mDeferredLengthCount;
 
-    ASN1_ERROR EncodeHead(uint8_t cls, uint32_t tag, bool isConstructed, int32_t len);
-    ASN1_ERROR WriteDeferredLength(void);
+    CHIP_ERROR EncodeHead(uint8_t cls, uint32_t tag, bool isConstructed, int32_t len);
+    CHIP_ERROR WriteDeferredLength(void);
     static uint8_t BytesForLength(int32_t len);
     static void EncodeLength(uint8_t * buf, uint8_t bytesForLen, int32_t lenToEncode);
 };
@@ -206,7 +210,7 @@ OIDCategory GetOIDCategory(OID oid);
 
 const char * GetOIDName(OID oid);
 
-ASN1_ERROR DumpASN1(ASN1Reader & reader, const char * prefix, const char * indent);
+CHIP_ERROR DumpASN1(ASN1Reader & reader, const char * prefix, const char * indent);
 
 inline OID GetOID(OIDCategory category, uint8_t id)
 {

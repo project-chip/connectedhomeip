@@ -33,6 +33,7 @@
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -57,31 +58,17 @@ enum : uint8_t
 
 TestContext sContext;
 
-class LoopbackTransport : public Transport::Base
-{
-public:
-    /// Transports are required to have a constructor that takes exactly one argument
-    CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
-    {
-        HandleMessageReceived(address, std::move(msgBuf));
-        return CHIP_NO_ERROR;
-    }
-
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-};
-
-TransportMgr<LoopbackTransport> gTransportMgr;
+TransportMgr<Test::LoopbackTransport> gTransportMgr;
 
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && buffer) override
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
         ec->Close();
+        return CHIP_NO_ERROR;
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
@@ -92,9 +79,11 @@ public:
 class WaitForTimeoutDelegate : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && buffer) override
-    {}
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
+    {
+        return CHIP_NO_ERROR;
+    }
 
     void OnResponseTimeout(ExchangeContext * ec) override
     {
@@ -138,7 +127,7 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = ctx.NewExchangeToLocal(&sendDelegate);
 
     // Expire the session this exchange is supposedly on.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession(), &ctx.GetSecureSessionManager());
+    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession());
 
     MockAppDelegate receiveDelegate;
     CHIP_ERROR err =
@@ -168,7 +157,7 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
 
     // Expire the session this exchange is supposedly on.  This should close the
     // exchange.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession(), &ctx.GetSecureSessionManager());
+    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSecureSession());
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 }
 

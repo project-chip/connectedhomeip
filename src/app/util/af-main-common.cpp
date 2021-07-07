@@ -95,7 +95,7 @@
 //#include "app/framework/security/af-security.h"
 //#include "app/framework/security/crypto-state.h"
 #include "app/util/common.h"
-#include "gen/callback.h"
+#include <app/common/gen/callback.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/config.h>
@@ -206,7 +206,7 @@ static EmberStatus send(const MessageSendDestination & destination, EmberApsFram
                         uint8_t * message, bool broadcast, EmberNodeId alias, uint8_t sequence, EmberAfMessageSentFunction callback)
 {
     EmberStatus status;
-    uint8_t index;
+    uint16_t index;
     uint8_t messageSentIndex;
     uint8_t messageTag = INVALID_MESSAGE_TAG;
 
@@ -245,7 +245,7 @@ static EmberStatus send(const MessageSendDestination & destination, EmberApsFram
     else
     {
         index = emberAfIndexFromEndpoint(apsFrame->sourceEndpoint);
-        if (index == 0xFF)
+        if (index == 0xFFFF)
         {
             return EMBER_INVALID_ENDPOINT;
         }

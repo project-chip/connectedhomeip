@@ -237,7 +237,6 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Secu
 
     SetDropAckDebug(false);
     SetAckPending(false);
-    SetPeerRequestedAck(false);
     SetMsgRcvdFromPeer(false);
     SetAutoRequestAck(true);
 
@@ -250,6 +249,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Secu
 ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
+    VerifyOrDie(!IsAckPending());
 
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and
@@ -345,7 +345,7 @@ void ExchangeContext::CancelResponseTimer()
     lSystemLayer->CancelTimer(HandleResponseTimeout, this);
 }
 
-void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
+void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
 {
     ExchangeContext * ec = reinterpret_cast<ExchangeContext *>(aAppState);
 
@@ -370,7 +370,8 @@ void ExchangeContext::NotifyResponseTimeout()
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                          const Transport::PeerAddress & peerAddress, PacketBufferHandle && msgBuf)
+                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+                                          PacketBufferHandle && msgBuf)
 {
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference
@@ -378,12 +379,27 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
-    CHIP_ERROR err =
-        mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
+    CHIP_ERROR err = mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, msgFlags,
+                                                  GetReliableMessageContext());
     SuccessOrExit(err);
+
+    if (IsAckPending() && !mDelegate)
+    {
+        // The incoming message wants an ack, but we have no delegate, so
+        // there's not going to be a response to piggyback on.  Just flush the
+        // ack out right now.
+        err = FlushAcks();
+        SuccessOrExit(err);
+    }
 
     // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+    {
+        ExitNow(err = CHIP_NO_ERROR);
+    }
+
+    // Since the message is duplicate, let's not forward it up the stack
+    if (msgFlags.Has(MessageFlagValues::kDuplicateMessage))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }
@@ -397,7 +413,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+        err = mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
     }
     else
     {

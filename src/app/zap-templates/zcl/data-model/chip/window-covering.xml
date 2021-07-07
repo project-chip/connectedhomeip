@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <name>Window Covering</name>
+    <domain>Closures</domain>
+    <description>Provides an interface for controlling and adjusting automatic window coverings. </description>
+    <code>0x0102</code>
+    <define>WINDOW_COVERING_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <!-- TODO: Add feature map once it is supported -->
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <!-- Window Covering Information Attribute Set -->
+    <attribute side="server" writable="false" code="0x0000" define="WC_TYPE"                                      type="ENUM8"    min="0x00"   max="0x09"   default="0x00"   optional="false">Type</attribute>
+    <attribute side="server" writable="false" code="0x0001" define="WC_PHYSICAL_CLOSED_LIMIT_LIFT"                type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">PhysicalClosedLimitLift</attribute>
+    <attribute side="server" writable="false" code="0x0002" define="WC_PHYSICAL_CLOSED_LIMIT_TILT"                type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">PhysicalClosedLimitTilt</attribute>
+    <attribute side="server" writable="false" code="0x0003" define="WC_CURRENT_POSITION_LIFT"                     type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">CurrentPositionLift</attribute>
+    <attribute side="server" writable="false" code="0x0004" define="WC_CURRENT_POSITION_TILT"                     type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">CurrentPositionTilt</attribute>
+    <attribute side="server" writable="false" code="0x0005" define="WC_NUMBER_OF_ACTUATIONS_LIFT"                 type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">NumberOfActuationsLift</attribute>
+    <attribute side="server" writable="false" code="0x0006" define="WC_NUMBER_OF_ACTUATIONS_TILT"                 type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">NumberOfActuationsTilt</attribute>
+    <attribute side="server" writable="false" code="0x0007" define="WC_CONFIG_STATUS"                             type="BITMAP8"  min="0x00"   max="0x7F"   default="0x03"   optional="false">ConfigStatus</attribute>
+    <attribute side="server" writable="false" code="0x0008" define="WC_CURRENT_POSITION_LIFT_PERCENTAGE"          type="INT8U"    min="0x00"   max="0x64"   default="0xFF"   optional="false" reportable="true">CurrentPositionLiftPercentage</attribute>
+    <attribute side="server" writable="false" code="0x0009" define="WC_CURRENT_POSITION_TILT_PERCENTAGE"          type="INT8U"    min="0x00"   max="0x64"   default="0xFF"   optional="false" reportable="true">CurrentPositionTiltPercentage</attribute>
+    <attribute side="server" writable="false" code="0x000A" define="WC_OPERATIONAL_STATUS"                        type="BITMAP8"  min="0x00"   max="0x7F"   default="0x00"   optional="false" reportable="true">OperationalStatus</attribute>
+    <attribute side="server" writable="false" code="0x000B" define="WC_TARGET_POSITION_LIFT_PERCENT100THS"        type="INT16U"   min="0x00"   max="0x2710" default="0xFF"   optional="false" reportable="true">TargetPositionLiftPercent100ths</attribute>
+    <attribute side="server" writable="false" code="0x000C" define="WC_TARGET_POSITION_TILT_PERCENT100THS"        type="INT16U"   min="0x00"   max="0x2710" default="0xFF"   optional="false" reportable="true">TargetPositionTiltPercent100ths</attribute>
+    <attribute side="server" writable="false" code="0x000D" define="WC_END_PRODUCT_TYPE"                          type="ENUM8"    min="0x00"   max="0xFF"   default="0x00"   optional="false">EndProductType</attribute>
+    <attribute side="server" writable="false" code="0x000E" define="WC_CURRENT_POSITION_LIFT_PERCENT100THS"       type="INT16U"   min="0x00"   max="0x2710" default="0xFF"   optional="false" reportable="true" >CurrentPositionLiftPercent100ths</attribute>
+    <attribute side="server" writable="false" code="0x000F" define="WC_CURRENT_POSITION_TILT_PERCENT100THS"       type="INT16U"   min="0x00"   max="0x2710" default="0xFF"   optional="false" reportable="true" >CurrentPositionTiltPercent100ths</attribute> 
+
+    <!-- Window Covering Settings Attribute Set -->
+    <attribute side="server" writable="false" code="0x0010" define="WC_INSTALLED_OPEN_LIMIT_LIFT"                 type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="false">InstalledOpenLimitLift</attribute>
+    <attribute side="server" writable="false" code="0x0011" define="WC_INSTALLED_CLOSED_LIMIT_LIFT"               type="INT16U"   min="0x0000" max="0xFFFF" default="0xFFFF" optional="false">InstalledClosedLimitLift</attribute>
+    <attribute side="server" writable="false" code="0x0012" define="WC_INSTALLED_OPEN_LIMIT_TILT"                 type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="false">InstalledOpenLimitTilt</attribute>
+    <attribute side="server" writable="false" code="0x0013" define="WC_INSTALLED_CLOSED_LIMIT_TILT"               type="INT16U"   min="0x0000" max="0xFFFF" default="0xFFFF" optional="false">InstalledClosedLimitTilt</attribute>
+    <attribute side="server" writable="true"  code="0x0014" define="WC_VELOCITY_LIFT"                             type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">VelocityLift</attribute>
+    <attribute side="server" writable="true"  code="0x0015" define="WC_ACCELERATION_TIME_LIFT"                    type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">AccelerationTimeLift</attribute>
+    <attribute side="server" writable="true"  code="0x0016" define="WC_DECELERATION_TIME_LIFT"                    type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">DecelerationTimeLift</attribute>
+    <attribute side="server" writable="true"  code="0x0017" define="WC_MODE"                                      type="BITMAP8"  min="0x00"   max="0x0F"   default="0x00"   optional="false">Mode</attribute>
+    <attribute side="server" writable="true"  code="0x0018" define="WC_INTERMEDIATE_SETPOINTS_LIFT"               type="OCTET_STRING" length="254" default="1,0x0000"        optional="true">IntermediateSetpointsLift</attribute>
+    <attribute side="server" writable="true"  code="0x0019" define="WC_INTERMEDIATE_SETPOINTS_TILT"               type="OCTET_STRING" length="254" default="1,0x0000"        optional="true">IntermediateSetpointsTilt</attribute>
+    <attribute side="server" writable="false" code="0x001A" define="WC_SAFETY_STATUS"                             type="BITMAP16" min="0x0000" max="0xFFFF" default="0x0000" optional="true"  reportable="true" >SafetyStatus</attribute>
+
+    <!-- Window Covering Command Set -->
+    <command source="client" code="0x00" name="UpOrOpen" optional="false" cli="zcl WindowCovering UpOrOpen">
+      <description>Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt</description>
+    </command>
+    <command source="client" code="0x01" name="DownOrClose" optional="false" cli="zcl WindowCovering DownOrClose">
+      <description>Moves window covering to InstalledClosedLimitLift and InstalledCloseLimitTilt</description>
+    </command>
+    <command source="client" code="0x02" name="StopMotion" optional="false" cli="zcl WindowCovering StopMotion">
+      <description>Stop any adjusting of window covering</description>
+    </command>
+    <command source="client" code="0x04" name="GoToLiftValue" optional="true" cli="zcl WindowCovering GoToLiftValue">
+      <description>Go to lift value specified</description>
+      <arg name="liftValue" type="INT16U"/>
+    </command>
+    <command source="client" code="0x05" name="GoToLiftPercentage" optional="true" cli="zcl WindowCovering GoToLiftPercentage">
+      <description>Go to lift percentage specified</description>
+      <arg name="liftPercentageValue" type="INT8U"/>
+      <arg name="liftPercent100thsValue" type="INT16U" optional="1"/>
+    </command>
+    <command source="client" code="0x07" name="GoToTiltValue" optional="true" cli="zcl WindowCovering GoToTiltValue">
+      <description>Go to tilt value specified</description>
+      <arg name="tiltValue" type="INT16U"/>
+    </command>
+    <command source="client" code="0x08" name="GoToTiltPercentage" optional="true" cli="zcl WindowCovering GoToTiltPercentage">
+      <description>Go to tilt percentage specified</description>
+      <arg name="tiltPercentageValue" type="INT8U"/>
+      <arg name="tiltPercent100thsValue" type="INT16U" optional="1"/>
+    </command>
+  </cluster>
+
+  <!-- Window Covering Descriptive Enum Set -->
+  <enum name="WcType" type="ENUM8">
+    <item value="00" name="Rollershade"/>
+    <item value="01" name="Rollershade2Motor"/>
+    <item value="02" name="RollershadeExterior"/>
+    <item value="03" name="RollershadeExterior2Motor"/>
+    <item value="04" name="Drapery"/>
+    <item value="05" name="Awning"/>
+    <item value="06" name="Shutter"/>
+    <item value="07" name="TiltBlindTiltOnly"/>
+    <item value="08" name="TiltBlindLiftAndTilt"/>
+    <item value="09" name="ProjectorScreen"/>
+    <item value="255" name="Unknown"/>
+  </enum>
+
+  <enum name="WcEndProductType" type="ENUM8">
+    <item value="00" name="RollerShade"/>  
+    <item value="01" name="RomanShade"/>
+    <item value="02" name="BalloonShade"/>
+    <item value="03" name="WovenWood"/>
+    <item value="04" name="PleatedShade"/>
+    <item value="05" name="CellularShade"/>
+    <item value="06" name="LayeredShade"/>
+    <item value="07" name="LayeredShade2D"/>
+    <item value="08" name="SheerShade"/>
+    <item value="09" name="TiltOnlyInteriorBlind"/>
+    <item value="10" name="InteriorBlind"/>
+    <item value="11" name="VerticalBlindStripCurtain"/>
+    <item value="12" name="InteriorVenetianBlind"/>
+    <item value="13" name="ExteriorVenetianBlind"/>
+    <item value="14" name="LateralLeftCurtain"/>
+    <item value="15" name="LateralRightCurtain"/>
+    <item value="16" name="CentralCurtain"/>
+    <item value="17" name="RollerShutter"/>
+    <item value="18" name="ExteriorVerticalScreen"/>
+    <item value="19" name="AwningTerracePatio"/>
+    <item value="20" name="AwningVerticalScreen"/>
+    <item value="21" name="TiltOnlyPergola"/>
+    <item value="22" name="SwingingShutter"/>
+    <item value="23" name="SlidingShutter"/>
+    <item value="255" name="Unknown"/>
+  </enum>
+ 
+  <!-- Window Covering BitFlag Meaning Set -->
+  <bitmap name="WcMode" type="BITMAP8">
+    <field mask="0x01" name="MotorDirectionReversed"/>
+    <field mask="0x02" name="CalibrationMode"/>
+    <field mask="0x04" name="MaintenanceMode"/>
+    <field mask="0x08" name="LEDFeedback"/>
+  </bitmap>
+
+  <bitmap name="WcOperationalStatus" type="BITMAP8">
+    <field mask="0x03" name="Global"/>
+    <field mask="0x0C" name="Lift"/>
+    <field mask="0x30" name="Tilt"/>
+  </bitmap>
+
+  <bitmap name="WcConfigStatus" type="BITMAP8">
+    <field mask="0x01" name="Operational"/>
+    <field mask="0x02" name="Online"/>
+    <field mask="0x04" name="OpenAndUpCommandsReversed"/>
+    <field mask="0x08" name="LiftPositionAware"/>
+    <field mask="0x10" name="TiltPositionAware"/>
+    <field mask="0x20" name="LiftEncoderControlled"/>
+    <field mask="0x40" name="TiltEncoderControlled"/>
+  </bitmap>
+
+  <bitmap name="WcSafetyStatus" type="BITMAP16">
+    <field mask="0x0001" name="RemoteLockout"/>
+    <field mask="0x0002" name="TamperDetection"/>
+    <field mask="0x0004" name="FailedCommunication"/>
+    <field mask="0x0008" name="PositionFailure"/>
+    <field mask="0x0010" name="ThermalProtection"/>
+    <field mask="0x0020" name="ObstacleDetected"/>
+    <field mask="0x0040" name="Power"/>
+    <field mask="0x0080" name="StopInput"/>
+    <field mask="0x0100" name="MotorJammed"/>
+    <field mask="0x0200" name="HardwareFailure"/>
+    <field mask="0x0400" name="ManualOperation"/>
+    <field mask="0x0800" name="RainProtection"/>
+    <field mask="0x1000" name="WindProtection"/>
+  </bitmap>
+</configurator>

@@ -30,7 +30,6 @@ class ApplicationBasicManager
 public:
     CHIP_ERROR Init();
     void store(chip::EndpointId endpoint, Application * application);
-    bool proxyChangeApplicationStatusRequest(EmberAfApplicationBasicStatus status, chip::EndpointId endpoint);
     Application getApplicationForEndpoint(chip::EndpointId endpoint);
 
     static ApplicationBasicManager & GetInstance()

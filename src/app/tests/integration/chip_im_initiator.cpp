@@ -51,9 +51,6 @@ constexpr size_t kMaxWriteMessageCount            = 3;
 constexpr int32_t gMessageIntervalSeconds         = 1;
 constexpr chip::Transport::AdminId gAdminId       = 0;
 
-// The ReadClient object.
-chip::app::ReadClient * gpReadClient = nullptr;
-
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::Inet::IPAddress gDestAddr;
 
@@ -181,15 +178,24 @@ CHIP_ERROR SendReadRequest()
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     chip::EventNumber number = 0;
-    chip::app::EventPathParams eventPathParams(kTestNodeId, kTestEndpointId, kTestClusterId, kLivenessChangeEvent,
-                                               false /*not urgent*/);
+    chip::app::EventPathParams eventPathParams[2];
+    eventPathParams[0].mNodeId     = kTestNodeId;
+    eventPathParams[0].mEndpointId = kTestEndpointId;
+    eventPathParams[0].mClusterId  = kTestClusterId;
+    eventPathParams[0].mEventId    = kTestChangeEvent1;
+
+    eventPathParams[1].mNodeId     = kTestNodeId;
+    eventPathParams[1].mEndpointId = kTestEndpointId;
+    eventPathParams[1].mClusterId  = kTestClusterId;
+    eventPathParams[1].mEventId    = kTestChangeEvent2;
 
     chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, 1, 0,
                                                        chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, &eventPathParams, 1, &attributePathParams, 1, number);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, nullptr,
+                                                                            eventPathParams, 2, &attributePathParams, 1, number);
     SuccessOrExit(err);
 
 exit:
@@ -311,7 +317,7 @@ public:
     }
     CHIP_ERROR ReportError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
-        printf("ReportError with err %d", aError);
+        printf("ReportError with err %" CHIP_ERROR_FORMAT, aError);
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender,
@@ -382,6 +388,28 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 
     gLastCommandResult = TestCommandResult::kSuccess;
 }
+
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
+{
+    // We do not really care about the value, just return a not found status code.
+    VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
+    return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
+                         Protocols::InteractionModel::ToUint16(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
+}
+
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader)
+{
+    if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (aReader.GetLength() != 0)
+    {
+        chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
+    }
+    return CHIP_NO_ERROR;
+}
 } // namespace app
 } // namespace chip
 
@@ -432,9 +460,6 @@ int main(int argc, char * argv[])
 
     // Start the CHIP connection to the CHIP im responder.
     err = EstablishSecureSession();
-    SuccessOrExit(err);
-
-    err = chip::app::InteractionModelEngine::GetInstance()->NewReadClient(&gpReadClient);
     SuccessOrExit(err);
 
     // Connection has been established. Now send the CommandRequests.
@@ -514,7 +539,6 @@ int main(int argc, char * argv[])
         }
     }
 
-    gpReadClient->Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     ShutdownChip();
 

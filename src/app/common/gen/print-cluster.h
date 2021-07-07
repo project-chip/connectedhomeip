@@ -84,34 +84,10 @@
 #define CHIP_PRINTCLUSTER_TIME_CLUSTER
 #endif
 
-#if defined(ZCL_USING_RSSI_LOCATION_CLUSTER_SERVER) || defined(ZCL_USING_RSSI_LOCATION_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_RSSI_LOCATION_CLUSTER { ZCL_RSSI_LOCATION_CLUSTER_ID, 11, "RSSI Location" },
-#else
-#define CHIP_PRINTCLUSTER_RSSI_LOCATION_CLUSTER
-#endif
-
 #if defined(ZCL_USING_BINARY_INPUT_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BINARY_INPUT_BASIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER { ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, 15, "Binary Input (Basic)" },
 #else
 #define CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER
-#endif
-
-#if defined(ZCL_USING_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_COMMISSIONING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_COMMISSIONING_CLUSTER { ZCL_COMMISSIONING_CLUSTER_ID, 21, "Commissioning" },
-#else
-#define CHIP_PRINTCLUSTER_COMMISSIONING_CLUSTER
-#endif
-
-#if defined(ZCL_USING_PARTITION_CLUSTER_SERVER) || defined(ZCL_USING_PARTITION_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_PARTITION_CLUSTER { ZCL_PARTITION_CLUSTER_ID, 22, "Partition" },
-#else
-#define CHIP_PRINTCLUSTER_PARTITION_CLUSTER
-#endif
-
-#if defined(ZCL_USING_OTA_BOOTLOAD_CLUSTER_SERVER) || defined(ZCL_USING_OTA_BOOTLOAD_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OTA_BOOTLOAD_CLUSTER { ZCL_OTA_BOOTLOAD_CLUSTER_ID, 25, "Over the Air Bootloading" },
-#else
-#define CHIP_PRINTCLUSTER_OTA_BOOTLOAD_CLUSTER
 #endif
 
 #if defined(ZCL_USING_POWER_PROFILE_CLUSTER_SERVER) || defined(ZCL_USING_POWER_PROFILE_CLUSTER_CLIENT)
@@ -138,34 +114,22 @@
 #define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER
 #endif
 
-#if defined(ZCL_USING_GREEN_POWER_CLUSTER_SERVER) || defined(ZCL_USING_GREEN_POWER_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_GREEN_POWER_CLUSTER { ZCL_GREEN_POWER_CLUSTER_ID, 33, "Green Power" },
-#else
-#define CHIP_PRINTCLUSTER_GREEN_POWER_CLUSTER
-#endif
-
-#if defined(ZCL_USING_KEEPALIVE_CLUSTER_SERVER) || defined(ZCL_USING_KEEPALIVE_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER { ZCL_KEEPALIVE_CLUSTER_ID, 37, "Keep-Alive" },
-#else
-#define CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER
-#endif
-
 #if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BASIC_CLUSTER { ZCL_BASIC_CLUSTER_ID, 40, "Basic" },
 #else
 #define CHIP_PRINTCLUSTER_BASIC_CLUSTER
 #endif
 
-#if defined(ZCL_USING_OTA_SERVER_CLUSTER_SERVER) || defined(ZCL_USING_OTA_SERVER_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OTA_SERVER_CLUSTER { ZCL_OTA_SERVER_CLUSTER_ID, 41, "OTA Software Update Server" },
+#if defined(ZCL_USING_OTA_PROVIDER_CLUSTER_SERVER) || defined(ZCL_USING_OTA_PROVIDER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER { ZCL_OTA_PROVIDER_CLUSTER_ID, 41, "OTA Software Update Provider" },
 #else
-#define CHIP_PRINTCLUSTER_OTA_SERVER_CLUSTER
+#define CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER
 #endif
 
-#if defined(ZCL_USING_OTA_CLIENT_CLUSTER_SERVER) || defined(ZCL_USING_OTA_CLIENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER { ZCL_OTA_CLIENT_CLUSTER_ID, 42, "OTA Software Update Client" },
+#if defined(ZCL_USING_OTA_REQUESTOR_CLUSTER_SERVER) || defined(ZCL_USING_OTA_REQUESTOR_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER { ZCL_OTA_REQUESTOR_CLUSTER_ID, 42, "OTA Software Update Requestor" },
 #else
-#define CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER
+#define CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER
 #endif
 
 #if defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_CLIENT)
@@ -178,6 +142,12 @@
 #define CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER { ZCL_NETWORK_COMMISSIONING_CLUSTER_ID, 49, "Network Commissioning" },
 #else
 #define CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DIAGNOSTIC_LOGS_CLUSTER_SERVER) || defined(ZCL_USING_DIAGNOSTIC_LOGS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DIAGNOSTIC_LOGS_CLUSTER { ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID, 50, "Diagnostic Logs" },
+#else
+#define CHIP_PRINTCLUSTER_DIAGNOSTIC_LOGS_CLUSTER
 #endif
 
 #if defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_CLIENT)
@@ -685,156 +655,10 @@
 #define CHIP_PRINTCLUSTER_TEST_CLUSTER
 #endif
 
-#if defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_SERVER) || defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER { ZCL_GENERIC_TUNNEL_CLUSTER_ID, 1536, "Generic Tunnel" },
-#else
-#define CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER
-#endif
-
-#if defined(ZCL_USING_BACNET_PROTOCOL_TUNNEL_CLUSTER_SERVER) || defined(ZCL_USING_BACNET_PROTOCOL_TUNNEL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER { ZCL_BACNET_PROTOCOL_TUNNEL_CLUSTER_ID, 1537, "BACnet Protocol Tunnel" },
-#else
-#define CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER
-#endif
-
-#if defined(ZCL_USING_11073_PROTOCOL_TUNNEL_CLUSTER_SERVER) || defined(ZCL_USING_11073_PROTOCOL_TUNNEL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_11073_PROTOCOL_TUNNEL_CLUSTER { ZCL_11073_PROTOCOL_TUNNEL_CLUSTER_ID, 1556, "11073 Protocol Tunnel" },
-#else
-#define CHIP_PRINTCLUSTER_11073_PROTOCOL_TUNNEL_CLUSTER
-#endif
-
-#if defined(ZCL_USING_ISO7816_PROTOCOL_TUNNEL_CLUSTER_SERVER) || defined(ZCL_USING_ISO7816_PROTOCOL_TUNNEL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ISO7816_PROTOCOL_TUNNEL_CLUSTER                                                                          \
-    { ZCL_ISO7816_PROTOCOL_TUNNEL_CLUSTER_ID, 1557, "ISO 7816 Protocol Tunnel" },
-#else
-#define CHIP_PRINTCLUSTER_ISO7816_PROTOCOL_TUNNEL_CLUSTER
-#endif
-
-#if defined(ZCL_USING_PRICE_CLUSTER_SERVER) || defined(ZCL_USING_PRICE_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_PRICE_CLUSTER { ZCL_PRICE_CLUSTER_ID, 1792, "Price" },
-#else
-#define CHIP_PRINTCLUSTER_PRICE_CLUSTER
-#endif
-
-#if defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                     \
-    { ZCL_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_ID, 1793, "Demand Response and Load Control" },
-#else
-#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER
-#endif
-
-#if defined(ZCL_USING_SIMPLE_METERING_CLUSTER_SERVER) || defined(ZCL_USING_SIMPLE_METERING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SIMPLE_METERING_CLUSTER { ZCL_SIMPLE_METERING_CLUSTER_ID, 1794, "Simple Metering" },
-#else
-#define CHIP_PRINTCLUSTER_SIMPLE_METERING_CLUSTER
-#endif
-
 #if defined(ZCL_USING_MESSAGING_CLUSTER_SERVER) || defined(ZCL_USING_MESSAGING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MESSAGING_CLUSTER { ZCL_MESSAGING_CLUSTER_ID, 1795, "Messaging" },
 #else
 #define CHIP_PRINTCLUSTER_MESSAGING_CLUSTER
-#endif
-
-#if defined(ZCL_USING_TUNNELING_CLUSTER_SERVER) || defined(ZCL_USING_TUNNELING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TUNNELING_CLUSTER { ZCL_TUNNELING_CLUSTER_ID, 1796, "Tunneling" },
-#else
-#define CHIP_PRINTCLUSTER_TUNNELING_CLUSTER
-#endif
-
-#if defined(ZCL_USING_PREPAYMENT_CLUSTER_SERVER) || defined(ZCL_USING_PREPAYMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_PREPAYMENT_CLUSTER { ZCL_PREPAYMENT_CLUSTER_ID, 1797, "Prepayment" },
-#else
-#define CHIP_PRINTCLUSTER_PREPAYMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_ENERGY_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_MANAGEMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ENERGY_MANAGEMENT_CLUSTER { ZCL_ENERGY_MANAGEMENT_CLUSTER_ID, 1798, "Energy Management" },
-#else
-#define CHIP_PRINTCLUSTER_ENERGY_MANAGEMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CALENDAR_CLUSTER_SERVER) || defined(ZCL_USING_CALENDAR_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CALENDAR_CLUSTER { ZCL_CALENDAR_CLUSTER_ID, 1799, "Calendar" },
-#else
-#define CHIP_PRINTCLUSTER_CALENDAR_CLUSTER
-#endif
-
-#if defined(ZCL_USING_DEVICE_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_DEVICE_MANAGEMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_DEVICE_MANAGEMENT_CLUSTER { ZCL_DEVICE_MANAGEMENT_CLUSTER_ID, 1800, "Device Management" },
-#else
-#define CHIP_PRINTCLUSTER_DEVICE_MANAGEMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_EVENTS_CLUSTER_SERVER) || defined(ZCL_USING_EVENTS_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_EVENTS_CLUSTER { ZCL_EVENTS_CLUSTER_ID, 1801, "Events" },
-#else
-#define CHIP_PRINTCLUSTER_EVENTS_CLUSTER
-#endif
-
-#if defined(ZCL_USING_MDU_PAIRING_CLUSTER_SERVER) || defined(ZCL_USING_MDU_PAIRING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_MDU_PAIRING_CLUSTER { ZCL_MDU_PAIRING_CLUSTER_ID, 1802, "MDU Pairing" },
-#else
-#define CHIP_PRINTCLUSTER_MDU_PAIRING_CLUSTER
-#endif
-
-#if defined(ZCL_USING_SUB_GHZ_CLUSTER_SERVER) || defined(ZCL_USING_SUB_GHZ_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SUB_GHZ_CLUSTER { ZCL_SUB_GHZ_CLUSTER_ID, 1803, "Sub-GHz" },
-#else
-#define CHIP_PRINTCLUSTER_SUB_GHZ_CLUSTER
-#endif
-
-#if defined(ZCL_USING_KEY_ESTABLISHMENT_CLUSTER_SERVER) || defined(ZCL_USING_KEY_ESTABLISHMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_KEY_ESTABLISHMENT_CLUSTER { ZCL_KEY_ESTABLISHMENT_CLUSTER_ID, 2048, "Key Establishment" },
-#else
-#define CHIP_PRINTCLUSTER_KEY_ESTABLISHMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_INFORMATION_CLUSTER_SERVER) || defined(ZCL_USING_INFORMATION_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_INFORMATION_CLUSTER { ZCL_INFORMATION_CLUSTER_ID, 2304, "Information" },
-#else
-#define CHIP_PRINTCLUSTER_INFORMATION_CLUSTER
-#endif
-
-#if defined(ZCL_USING_DATA_SHARING_CLUSTER_SERVER) || defined(ZCL_USING_DATA_SHARING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_DATA_SHARING_CLUSTER { ZCL_DATA_SHARING_CLUSTER_ID, 2305, "Data Sharing" },
-#else
-#define CHIP_PRINTCLUSTER_DATA_SHARING_CLUSTER
-#endif
-
-#if defined(ZCL_USING_GAMING_CLUSTER_SERVER) || defined(ZCL_USING_GAMING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_GAMING_CLUSTER { ZCL_GAMING_CLUSTER_ID, 2306, "Gaming" },
-#else
-#define CHIP_PRINTCLUSTER_GAMING_CLUSTER
-#endif
-
-#if defined(ZCL_USING_DATA_RATE_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DATA_RATE_CONTROL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_DATA_RATE_CONTROL_CLUSTER { ZCL_DATA_RATE_CONTROL_CLUSTER_ID, 2307, "Data Rate Control" },
-#else
-#define CHIP_PRINTCLUSTER_DATA_RATE_CONTROL_CLUSTER
-#endif
-
-#if defined(ZCL_USING_VOICE_OVER_ZIGBEE_CLUSTER_SERVER) || defined(ZCL_USING_VOICE_OVER_ZIGBEE_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_VOICE_OVER_ZIGBEE_CLUSTER { ZCL_VOICE_OVER_ZIGBEE_CLUSTER_ID, 2308, "Voice over ZigBee" },
-#else
-#define CHIP_PRINTCLUSTER_VOICE_OVER_ZIGBEE_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CHATTING_CLUSTER_SERVER) || defined(ZCL_USING_CHATTING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CHATTING_CLUSTER { ZCL_CHATTING_CLUSTER_ID, 2309, "Chatting" },
-#else
-#define CHIP_PRINTCLUSTER_CHATTING_CLUSTER
-#endif
-
-#if defined(ZCL_USING_PAYMENT_CLUSTER_SERVER) || defined(ZCL_USING_PAYMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_PAYMENT_CLUSTER { ZCL_PAYMENT_CLUSTER_ID, 2561, "Payment" },
-#else
-#define CHIP_PRINTCLUSTER_PAYMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_BILLING_CLUSTER_SERVER) || defined(ZCL_USING_BILLING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BILLING_CLUSTER { ZCL_BILLING_CLUSTER_ID, 2562, "Billing" },
-#else
-#define CHIP_PRINTCLUSTER_BILLING_CLUSTER
 #endif
 
 #if defined(ZCL_USING_APPLIANCE_IDENTIFICATION_CLUSTER_SERVER) || defined(ZCL_USING_APPLIANCE_IDENTIFICATION_CLUSTER_CLIENT)
@@ -869,18 +693,6 @@
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_DIAGNOSTICS_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_DIAGNOSTICS_CLUSTER { ZCL_DIAGNOSTICS_CLUSTER_ID, 2821, "Diagnostics" },
-#else
-#define CHIP_PRINTCLUSTER_DIAGNOSTICS_CLUSTER
-#endif
-
-#if defined(ZCL_USING_ZLL_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_ZLL_COMMISSIONING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ZLL_COMMISSIONING_CLUSTER { ZCL_ZLL_COMMISSIONING_CLUSTER_ID, 4096, "ZLL Commissioning" },
-#else
-#define CHIP_PRINTCLUSTER_ZLL_COMMISSIONING_CLUSTER
-#endif
-
 #if defined(ZCL_USING_BINDING_CLUSTER_SERVER) || defined(ZCL_USING_BINDING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BINDING_CLUSTER { ZCL_BINDING_CLUSTER_ID, 61440, "Binding" },
 #else
@@ -906,24 +718,6 @@
 #define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2
 #endif
 
-#if defined(ZCL_USING_OTA_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_OTA_CONFIGURATION_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OTA_CONFIGURATION_CLUSTER { ZCL_OTA_CONFIGURATION_CLUSTER_ID, 64513, "Configuration Cluster" },
-#else
-#define CHIP_PRINTCLUSTER_OTA_CONFIGURATION_CLUSTER
-#endif
-
-#if defined(ZCL_USING_MFGLIB_CLUSTER_SERVER) || defined(ZCL_USING_MFGLIB_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_MFGLIB_CLUSTER { ZCL_MFGLIB_CLUSTER_ID, 64514, "MFGLIB Cluster" },
-#else
-#define CHIP_PRINTCLUSTER_MFGLIB_CLUSTER
-#endif
-
-#if defined(ZCL_USING_SL_WWAH_CLUSTER_SERVER) || defined(ZCL_USING_SL_WWAH_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SL_WWAH_CLUSTER { ZCL_SL_WWAH_CLUSTER_ID, 64599, "SL Works With All Hubs" },
-#else
-#define CHIP_PRINTCLUSTER_SL_WWAH_CLUSTER
-#endif
-
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
     CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DEVICE_TEMP_CLUSTER                                                                                          \
@@ -935,22 +729,17 @@
     CHIP_PRINTCLUSTER_LEVEL_CONTROL_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ALARM_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_TIME_CLUSTER                                                                                                 \
-    CHIP_PRINTCLUSTER_RSSI_LOCATION_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER                                                                                   \
-    CHIP_PRINTCLUSTER_COMMISSIONING_CLUSTER                                                                                        \
-    CHIP_PRINTCLUSTER_PARTITION_CLUSTER                                                                                            \
-    CHIP_PRINTCLUSTER_OTA_BOOTLOAD_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
-    CHIP_PRINTCLUSTER_GREEN_POWER_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
-    CHIP_PRINTCLUSTER_OTA_SERVER_CLUSTER                                                                                           \
-    CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER                                                                                           \
+    CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
+    CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_DIAGNOSTIC_LOGS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_GENERAL_DIAGNOSTICS_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_SOFTWARE_DIAGNOSTICS_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                           \
@@ -1024,44 +813,15 @@
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_TEST_CLUSTER                                                                                                 \
-    CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER                                                                                       \
-    CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER                                                                               \
-    CHIP_PRINTCLUSTER_11073_PROTOCOL_TUNNEL_CLUSTER                                                                                \
-    CHIP_PRINTCLUSTER_ISO7816_PROTOCOL_TUNNEL_CLUSTER                                                                              \
-    CHIP_PRINTCLUSTER_PRICE_CLUSTER                                                                                                \
-    CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                         \
-    CHIP_PRINTCLUSTER_SIMPLE_METERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_MESSAGING_CLUSTER                                                                                            \
-    CHIP_PRINTCLUSTER_TUNNELING_CLUSTER                                                                                            \
-    CHIP_PRINTCLUSTER_PREPAYMENT_CLUSTER                                                                                           \
-    CHIP_PRINTCLUSTER_ENERGY_MANAGEMENT_CLUSTER                                                                                    \
-    CHIP_PRINTCLUSTER_CALENDAR_CLUSTER                                                                                             \
-    CHIP_PRINTCLUSTER_DEVICE_MANAGEMENT_CLUSTER                                                                                    \
-    CHIP_PRINTCLUSTER_EVENTS_CLUSTER                                                                                               \
-    CHIP_PRINTCLUSTER_MDU_PAIRING_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_SUB_GHZ_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_KEY_ESTABLISHMENT_CLUSTER                                                                                    \
-    CHIP_PRINTCLUSTER_INFORMATION_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_DATA_SHARING_CLUSTER                                                                                         \
-    CHIP_PRINTCLUSTER_GAMING_CLUSTER                                                                                               \
-    CHIP_PRINTCLUSTER_DATA_RATE_CONTROL_CLUSTER                                                                                    \
-    CHIP_PRINTCLUSTER_VOICE_OVER_ZIGBEE_CLUSTER                                                                                    \
-    CHIP_PRINTCLUSTER_CHATTING_CLUSTER                                                                                             \
-    CHIP_PRINTCLUSTER_PAYMENT_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_BILLING_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_APPLIANCE_IDENTIFICATION_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_METER_IDENTIFICATION_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLIANCE_EVENTS_AND_ALERT_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
-    CHIP_PRINTCLUSTER_DIAGNOSTICS_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_ZLL_COMMISSIONING_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER                                                                                  \
-    CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2                                                                                \
-    CHIP_PRINTCLUSTER_OTA_CONFIGURATION_CLUSTER                                                                                    \
-    CHIP_PRINTCLUSTER_MFGLIB_CLUSTER                                                                                               \
-    CHIP_PRINTCLUSTER_SL_WWAH_CLUSTER
+    CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2
 
 #define MAX_CLUSTER_NAME_LENGTH 52

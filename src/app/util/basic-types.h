@@ -28,17 +28,24 @@
 // Pull in NodeId
 #include <transport/raw/MessageHeader.h>
 
+// Pull in VendorId
+#include <core/CHIPVendorIdentifiers.hpp>
+
 namespace chip {
-typedef uint8_t EndpointId;
-typedef uint16_t ClusterId;
-typedef uint16_t AttributeId;
-typedef uint16_t GroupId;
-typedef uint8_t CommandId;
-typedef uint16_t EventId;
-typedef uint64_t EventNumber;
-typedef uint64_t DataVersion;
+typedef uint8_t ActionId;
+typedef uint32_t AttributeId;
+typedef uint32_t ClusterId;
+typedef uint32_t CommandId;
+typedef uint32_t DataVersion;
 typedef uint32_t DeviceTypeId;
-typedef uint8_t FieldId;
-typedef uint16_t ListIndex;
+typedef uint16_t EndpointId;
+typedef uint32_t EventId;
+typedef uint64_t EventNumber;
 typedef uint64_t FabricId;
+typedef uint8_t FabricIndex;
+typedef uint32_t FieldId;
+typedef uint16_t GroupId;
+typedef uint16_t ListIndex;
+typedef uint32_t TransactionId;
+typedef uint32_t StatusCode;
 } // namespace chip

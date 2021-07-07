@@ -22,13 +22,14 @@ Development Framework and the xtensa-esp32-elf toolchain.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
+-   Clone the Espressif ESP-IDF and checkout
+    [v4.3 tag](https://github.com/espressif/esp-idf/releases/v4.3)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.2
+          $ git checkout v4.3
           $ git submodule update --init
           $ ./install.sh
 
@@ -57,13 +58,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   Configuration Options
 
-        To choose from the different configuration options, run menuconfig.
-
-          $ idf.py menuconfig
-
-        Select ESP32 based `Device Type` through `Demo`->`Device Type`.
-        The device types that are currently supported include `ESP32-DevKitC` (default),
-        and `M5Stack`
+    This application uses `ESP32-DevKitC` as a default device type. To use other
+    ESP32 based device types, please refer
+    [examples/all-clusters-app/esp32](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
 
 -   To build the demo application.
 
@@ -193,10 +190,8 @@ commissioning and cluster control.
 ### Example Demo
 
 This demo app illustrates controlling OnOff cluster (Server) attributes of an
-endpoint and lock/unlock status of door using LED's. For `ESP32-DevKitC` and
-`ESP32-WROVER-KIT_V4.1`, a GPIO (configurable through `LOCK_STATE_LED` in
-`main/include/AppConfig.h`) is updated through the on/off/toggle commands from
-the `python-controller`. For `M5Stack`, a builtin LED can be used.
-
-If you wish to see the actual effect of the commands on `ESP32-DevKitC` and
-`ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO.
+endpoint and lock/unlock status of door using LED's. For `ESP32-DevKitC`, a GPIO
+(configurable through `LOCK_STATE_LED` in `main/include/AppConfig.h`) is updated
+through the on/off/toggle commands from the `python-controller`. If you wish to
+see the actual effect of the commands on `ESP32-DevKitC`, you will have to
+connect an external LED to GPIO.

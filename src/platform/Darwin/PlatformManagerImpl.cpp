@@ -44,6 +44,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
 
+    mRunLoopSem = dispatch_semaphore_create(0);
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
@@ -68,31 +70,48 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 
 CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 {
-
     if (mIsWorkQueueRunning == true)
     {
         mIsWorkQueueRunning = false;
-
-        // dispatch_sync is used in order to guarantee serialization of the caller with
-        // respect to any tasks that might already be on the queue, or running.
-        dispatch_sync(mWorkQueue, ^{
-            dispatch_suspend(mWorkQueue);
-        });
+        if (dispatch_get_current_queue() != mWorkQueue)
+        {
+            // dispatch_sync is used in order to guarantee serialization of the caller with
+            // respect to any tasks that might already be on the queue, or running.
+            dispatch_sync(mWorkQueue, ^{
+                dispatch_suspend(mWorkQueue);
+            });
+        }
+        else
+        {
+            // We are called from a task running on our work queue.  Dispatch async,
+            // so we don't deadlock ourselves.  Note that we do have to dispatch to
+            // guarantee that we don't signal the semaphore until we have ensured
+            // that no more tasks will run on the queue.
+            dispatch_async(mWorkQueue, ^{
+                dispatch_suspend(mWorkQueue);
+                dispatch_semaphore_signal(mRunLoopSem);
+            });
+        }
     }
 
     return CHIP_NO_ERROR;
-};
+}
 
 void PlatformManagerImpl::_RunEventLoop()
 {
     _StartEventLoopTask();
-    CFRunLoopRun();
-};
+
+    //
+    // Block on the semaphore till we're signalled to stop by
+    // _StopEventLoopTask()
+    //
+    dispatch_semaphore_wait(mRunLoopSem, DISPATCH_TIME_FOREVER);
+}
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
     // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
-    return System::MapErrorPOSIX(GenericPlatformManagerImpl<ImplClass>::_Shutdown());
+    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
 void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)

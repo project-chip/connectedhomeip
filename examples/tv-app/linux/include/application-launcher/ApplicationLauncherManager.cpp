@@ -17,12 +17,7 @@
  */
 
 #include "ApplicationLauncherManager.h"
-
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-
+#include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 
@@ -45,56 +40,16 @@ vector<uint16_t> ApplicationLauncherManager::proxyGetApplicationList()
     return applications;
 }
 
-ApplicationLaunchResponse ApplicationLauncherManager::proxyApplicationLaunchRequest(EmberAfApplicationLauncherApp application,
-                                                                                    string data)
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data)
 {
     // TODO: Insert your code
-    ApplicationLaunchResponse response;
-    response.data   = "data";
-    response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    ApplicationLauncherResponse response;
+    const char * testData = "data";
+    response.data         = (uint8_t *) testData;
+    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
     // TODO: Update once storing a structure attribute is supported
     // emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_LAUNCH_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID,
     //                             (uint8_t *) &application, ZCL_STRUCT_ATTRIBUTE_TYPE);
 
     return response;
-}
-
-static void sendResponse(const char * responseName, ApplicationLaunchResponse response)
-{
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
-                              ZCL_APPLICATION_LAUNCHER_CLUSTER_ID, ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, "us", response.status,
-                              &response.data);
-
-    EmberStatus status = emberAfSendResponse();
-    if (status != EMBER_SUCCESS)
-    {
-        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
-    }
-}
-
-EmberAfApplicationLauncherApp getApplicationFromCommand(EmberAfClusterCommand * cmd, unsigned char * reqestData,
-                                                        uint8_t * requestApplication)
-{
-    string reqestDataString(reinterpret_cast<char *>(reqestData));
-
-    uint16_t extensionFieldSetsLen =
-        static_cast<uint16_t>(cmd->bufLen - (cmd->payloadStartIndex + emberAfStringLength((uint8_t *) reqestData) + 1));
-    uint16_t catalogVendorId = emberAfGetInt16u(requestApplication, 0, extensionFieldSetsLen);
-    uint8_t * applicationId  = emberAfGetString(requestApplication, 0, extensionFieldSetsLen);
-
-    EmberAfApplicationLauncherApp application = {};
-    application.applicationId                 = applicationId;
-    application.catalogVendorId               = catalogVendorId;
-    return application;
-}
-
-bool emberAfApplicationLauncherClusterLaunchAppCallback(unsigned char * reqestData, uint8_t * requestApplication)
-{
-    EmberAfApplicationLauncherApp application = getApplicationFromCommand(emberAfCurrentCommand(), reqestData, requestApplication);
-    string reqestDataString(reinterpret_cast<char *>(reqestData));
-
-    ApplicationLaunchResponse response = ApplicationLauncherManager().proxyApplicationLaunchRequest(application, reqestDataString);
-
-    sendResponse("LaunchAppResponse", response);
-    return true;
 }

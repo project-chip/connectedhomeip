@@ -35,11 +35,12 @@ function asExpectedEndpointForCluster(clusterName)
   case 'SoftwareDiagnostics':
   case 'ThreadNetworkDiagnostics':
   case 'EthernetNetworkDiagnostics':
+  case 'WiFiNetworkDiagnostics':
   case 'GroupKeyManagement':
   case 'NetworkCommissioning':
   case 'OperationalCredentials':
   case 'TrustedRootCertificates':
-  case 'OtaSoftwareUpdateServer':
+  case 'OtaSoftwareUpdateProvider':
     return 0;
   }
   return 1;

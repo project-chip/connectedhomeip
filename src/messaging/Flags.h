@@ -43,16 +43,14 @@ enum class MessageFlagValues : uint32_t
     kMessageEncoded = 0x00001000,
     /**< Indicates that default IPv6 source address selection should be used when sending IPv6 multicast messages. */
     kDefaultMulticastSourceAddress = 0x00002000,
-    /**< Indicates that the sender of the  message requested an acknowledgment. */
-    kPeerRequestedAck = 0x00004000,
     /**< Indicates that the message is a duplicate of a previously received message. */
-    kDuplicateMessage = 0x00008000,
+    kDuplicateMessage = 0x00004000,
     /**< Indicates that the peer's group key message counter is not synchronized. */
-    kPeerGroupMsgIdNotSynchronized = 0x00010000,
+    kPeerGroupMsgIdNotSynchronized = 0x00008000,
     /**< Indicates that the source of the message is the initiator of the CHIP exchange. */
-    kFromInitiator = 0x00020000,
+    kFromInitiator = 0x00010000,
     /**< Indicates that message is being sent/received via the local ephemeral UDP port. */
-    kViaEphemeralUDPPort = 0x00040000,
+    kViaEphemeralUDPPort = 0x00020000,
 };
 
 using MessageFlags = BitFlags<MessageFlagValues>;

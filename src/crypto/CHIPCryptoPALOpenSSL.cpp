@@ -921,6 +921,9 @@ exit:
 CHIP_ERROR P256Keypair::Initialize()
 {
     ERR_clear_error();
+
+    Clear();
+
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     EC_KEY * ec_key  = nullptr;
@@ -988,6 +991,8 @@ exit:
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
     Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
+
+    Clear();
 
     BIGNUM * pvt_key     = nullptr;
     EC_GROUP * group     = nullptr;
@@ -1064,13 +1069,19 @@ exit:
     return error;
 }
 
-P256Keypair::~P256Keypair()
+void P256Keypair::Clear()
 {
     if (mInitialized)
     {
         EC_KEY * ec_key = to_EC_KEY(&mKeypair);
         EC_KEY_free(ec_key);
+        mInitialized = false;
     }
+}
+
+P256Keypair::~P256Keypair()
+{
+    Clear();
 }
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)
@@ -1644,6 +1655,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
+    int status                 = 0;
     X509_STORE_CTX * verifyCtx = nullptr;
     X509_STORE * store         = nullptr;
     X509 * x509RootCertificate = nullptr;
@@ -1659,23 +1671,23 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     x509RootCertificate = d2i_X509(NULL, &rootCertificate, static_cast<long>(rootCertificateLen));
     VerifyOrExit(x509RootCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = X509_STORE_add_cert(store, x509RootCertificate);
-    VerifyOrExit(err == 1, err = CHIP_ERROR_INTERNAL);
+    status = X509_STORE_add_cert(store, x509RootCertificate);
+    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
 
     x509CACertificate = d2i_X509(NULL, &caCertificate, static_cast<long>(caCertificateLen));
     VerifyOrExit(x509CACertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = X509_STORE_add_cert(store, x509CACertificate);
-    VerifyOrExit(err == 1, err = CHIP_ERROR_INTERNAL);
+    status = X509_STORE_add_cert(store, x509CACertificate);
+    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
 
     x509LeafCertificate = d2i_X509(NULL, &leafCertificate, static_cast<long>(leafCertificateLen));
     VerifyOrExit(x509LeafCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, NULL);
-    VerifyOrExit(err == 1, err = CHIP_ERROR_INTERNAL);
+    status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, NULL);
+    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
 
-    err = X509_verify_cert(verifyCtx);
-    VerifyOrExit(err == 1, err = CHIP_ERROR_CERT_NOT_TRUSTED);
+    status = X509_verify_cert(verifyCtx);
+    VerifyOrExit(status == 1, err = CHIP_ERROR_CERT_NOT_TRUSTED);
 
     err = CHIP_NO_ERROR;
 

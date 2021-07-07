@@ -110,11 +110,15 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
-        SetupNetwork();
+        err = SetupNetwork();
     }
     else
     {
         ChipLogProgress(chipTool, "Pairing Failure: %s", ErrorStr(err));
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
         SetCommandExitStatus(err);
     }
 }
@@ -156,8 +160,10 @@ CHIP_ERROR PairingCommand::SetupNetwork()
     {
     case PairingNetworkType::None:
     case PairingNetworkType::Ethernet:
-        // Nothing to do
-        SetCommandExitStatus(err);
+        // Nothing to do other than to resolve the device's operational address.
+        err = UpdateNetworkAddress();
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(chipTool, "Setup failure! Error calling UpdateNetworkAddress: %s", ErrorStr(err)));
         break;
     case PairingNetworkType::WiFi:
     case PairingNetworkType::Thread:

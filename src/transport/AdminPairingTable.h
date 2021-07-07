@@ -25,11 +25,18 @@
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 #include <lib/core/CHIPSafeCasts.h>
 #include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
 #include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
+
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+#define CASE_OPS_KEY 0xCA5EECC0
+#endif
 
 namespace chip {
 namespace Transport {
@@ -79,7 +86,8 @@ public:
             chip::Platform::Delete(mOperationalKey);
         }
         ReleaseRootCert();
-        ReleaseOperationalCert();
+        ReleaseICACert();
+        ReleaseNOCCert();
     }
 
     NodeId GetNodeId() const { return mNodeId; }
@@ -98,7 +106,12 @@ public:
     {
         if (mOperationalKey == nullptr)
         {
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+            mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
+            mOperationalKey->SetKeyId(CASE_OPS_KEY);
+#else
             mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+#endif
             mOperationalKey->Initialize();
         }
         return mOperationalKey;
@@ -107,7 +120,7 @@ public:
 
     bool AreCredentialsAvailable() const
     {
-        return (mRootCert != nullptr && mOperationalCert != nullptr && mRootCertLen != 0 && mOpCertLen != 0);
+        return (mRootCert != nullptr && mNOCCert != nullptr && mRootCertLen != 0 && mNOCCertLen != 0);
     }
 
     CHIP_ERROR GetCredentials(Credentials::OperationalCredentialSet & credentials, Credentials::ChipCertificateSet & certSet,
@@ -121,7 +134,9 @@ public:
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
-    CHIP_ERROR SetOperationalCert(const chip::ByteSpan & cert);
+    CHIP_ERROR SetOperationalCertsFromCertArray(const chip::ByteSpan & certArray);
+    CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert);
+    CHIP_ERROR SetICACert(const chip::ByteSpan & cert);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 
     const AccessControlList & GetACL() const { return mACL; }
@@ -146,7 +161,8 @@ public:
             mOperationalKey->Initialize();
         }
         ReleaseRootCert();
-        ReleaseOperationalCert();
+        ReleaseICACert();
+        ReleaseNOCCert();
     }
 
     friend class AdminPairingTable;
@@ -160,14 +176,19 @@ private:
 
     AccessControlList mACL;
 
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+    Crypto::P256KeypairHSM * mOperationalKey = nullptr;
+#else
     Crypto::P256Keypair * mOperationalKey = nullptr;
+#endif
 
     uint8_t * mRootCert            = nullptr;
     uint16_t mRootCertLen          = 0;
     uint16_t mRootCertAllocatedLen = 0;
-    uint8_t * mOperationalCert     = nullptr;
-    uint16_t mOpCertLen            = 0;
-    uint16_t mOpCertAllocatedLen   = 0;
+    uint8_t * mICACert             = nullptr;
+    uint16_t mICACertLen           = 0;
+    uint8_t * mNOCCert             = nullptr;
+    uint16_t mNOCCertLen           = 0;
 
     static constexpr size_t KeySize();
 
@@ -177,7 +198,8 @@ private:
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, AdminId id);
 
-    void ReleaseOperationalCert();
+    void ReleaseNOCCert();
+    void ReleaseICACert();
     void ReleaseRootCert();
 
     struct StorableAdminPairingInfo
@@ -188,12 +210,13 @@ private:
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
 
         uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
-        uint16_t mOpCertLen;   /* This field is serialized in LittleEndian byte order */
+        uint16_t mICACertLen;  /* This field is serialized in LittleEndian byte order */
+        uint16_t mNOCCertLen;  /* This field is serialized in LittleEndian byte order */
 
         Crypto::P256SerializedKeypair mOperationalKey;
         uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
-        // The operationa credentials set can have up to two certs -> ICAC and NOC
-        uint8_t mOperationalCert[Credentials::kMaxCHIPCertLength * 2];
+        uint8_t mICACert[Credentials::kMaxCHIPCertLength];
+        uint8_t mNOCCert[Credentials::kMaxCHIPCertLength];
         char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
     };
 };

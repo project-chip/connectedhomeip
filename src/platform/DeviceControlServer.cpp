@@ -28,7 +28,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-void CommissioningTimerFunction(System::Layer * layer, void * aAppState, System::Error aError)
+void CommissioningTimerFunction(System::Layer * layer, void * aAppState, CHIP_ERROR aError)
 {
     DeviceControlServer * server = reinterpret_cast<DeviceControlServer *>(aAppState);
     server->CommissioningFailedTimerComplete(aError);
@@ -41,7 +41,7 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
-void DeviceControlServer::CommissioningFailedTimerComplete(System::Error aError)
+void DeviceControlServer::CommissioningFailedTimerComplete(CHIP_ERROR aError)
 {
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;

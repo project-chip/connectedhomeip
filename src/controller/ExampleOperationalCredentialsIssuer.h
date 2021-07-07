@@ -43,10 +43,12 @@ class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredent
 public:
     virtual ~ExampleOperationalCredentialsIssuer() {}
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr, int64_t serialNumber,
-                                                  uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GenerateNodeOperationalCertificate(const Optional<NodeId> & nodeId, FabricId fabricId, const ByteSpan & csr,
+                                                  const ByteSpan & DAC, Callback::Callback<NOCGenerated> * onNOCGenerated) override;
 
-    CHIP_ERROR GetRootCACertificate(FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GetIntermediateCACertificate(FabricId fabricId, MutableByteSpan & outCert) override;
+
+    CHIP_ERROR GetRootCACertificate(FabricId fabricId, MutableByteSpan & outCert) override;
 
     /**
      * @brief Initialize the issuer with the keypair in the storage.
@@ -69,12 +71,16 @@ public:
 
 private:
     Crypto::P256Keypair mIssuer;
-    bool mInitialized  = false;
-    uint32_t mIssuerId = 0;
-    uint32_t mNow      = 0;
+    Crypto::P256Keypair mIntermediateIssuer;
+    bool mInitialized              = false;
+    uint32_t mIssuerId             = 0;
+    uint32_t mIntermediateIssuerId = 1;
+    uint32_t mNow                  = 0;
 
     // By default, let's set validity to 10 years
     uint32_t mValidity = 365 * 24 * 60 * 60 * 10;
+
+    NodeId mNextAvailableNodeId = 1;
 };
 
 } // namespace Controller

@@ -42,7 +42,7 @@ namespace Internal {
  */
 CHIP_ERROR MapOpenThreadError(otError otErr)
 {
-    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_CONFIG_OPENTHREAD_ERROR_MIN + (CHIP_ERROR) otErr;
+    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_CONFIG_OPENTHREAD_ERROR_MIN + static_cast<CHIP_ERROR>(otErr);
 }
 
 /**
@@ -57,7 +57,7 @@ CHIP_ERROR MapOpenThreadError(otError otErr)
  * @return false                    If the supplied error was not an OpenThread error.
  *
  */
-bool FormatOpenThreadError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatOpenThreadError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     if (err < CHIP_CONFIG_OPENTHREAD_ERROR_MIN || err > CHIP_CONFIG_OPENTHREAD_ERROR_MAX)
     {

@@ -58,6 +58,8 @@ public:
     static void TestReadHandler(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientGenerateAttributePathList(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientGenerateInvalidAttributePathList(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientGenerateOneEventPathList(nlTestSuite * apSuite, void * apContext);
+    static void TestReadClientGenerateTwoEventPathList(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
 
@@ -150,12 +152,12 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
 
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, &delegate);
+    err                            = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
-                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/,
-                                     eventNumber /*aEventNumber*/);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /* apSecureSession */, nullptr /*apEventPathParamsList*/,
+                                     0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
+                                     0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 
     GenerateReportData(apSuite, apContext, buf);
@@ -224,8 +226,9 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
     writer.Init(std::move(msgBuf));
     err = request.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = readClient.Init(&gExchangeManager, &delegate);
 
     AttributePathParams attributePathParams[2];
     attributePathParams[0].mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
@@ -246,7 +249,7 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     writer.Init(std::move(msgBuf));
-    err = readClient.Init(&gExchangeManager, &delegate);
+    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = request.Init(&writer);
@@ -268,12 +271,12 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     EventNumber eventNumber = 0;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, &delegate);
+    err                            = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
-                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/,
-                                     eventNumber /*aEventNumber*/);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /* apSecureSession */, nullptr /*apEventPathParamsList*/,
+                                     0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
+                                     0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);
@@ -326,6 +329,106 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 }
 
+void TestReadInteraction::TestReadClientGenerateOneEventPathList(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::ReadClient readClient;
+    chip::app::InteractionModelDelegate delegate;
+    System::PacketBufferHandle msgBuf;
+    System::PacketBufferTLVWriter writer;
+    ReadRequest::Builder request;
+    chip::EventNumber eventNumber = 0;
+    msgBuf                        = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    writer.Init(std::move(msgBuf));
+    err = request.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    chip::app::EventPathParams eventPathParams[2];
+    eventPathParams[0].mNodeId     = 1;
+    eventPathParams[0].mEndpointId = 2;
+    eventPathParams[0].mClusterId  = 3;
+    eventPathParams[0].mEventId    = 4;
+
+    err = readClient.GenerateEventPathList(request, eventPathParams, 1 /*aEventPathParamsListSize*/, eventNumber);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    request.EndOfReadRequest();
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == request.GetError());
+
+    err = writer.Finalize(&msgBuf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    chip::System::PacketBufferTLVReader reader;
+    ReadRequest::Parser readRequestParser;
+
+    reader.Init(msgBuf.Retain());
+    reader.Next();
+
+    err = readRequestParser.Init(reader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = readRequestParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+}
+
+void TestReadInteraction::TestReadClientGenerateTwoEventPathList(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::ReadClient readClient;
+    chip::app::InteractionModelDelegate delegate;
+    System::PacketBufferHandle msgBuf;
+    System::PacketBufferTLVWriter writer;
+    ReadRequest::Builder request;
+    chip::EventNumber eventNumber = 0;
+    msgBuf                        = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
+    writer.Init(std::move(msgBuf));
+    err = request.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    chip::app::EventPathParams eventPathParams[2];
+    eventPathParams[0].mNodeId     = 1;
+    eventPathParams[0].mEndpointId = 2;
+    eventPathParams[0].mClusterId  = 3;
+    eventPathParams[0].mEventId    = 4;
+
+    eventPathParams[1].mNodeId     = 1;
+    eventPathParams[1].mEndpointId = 2;
+    eventPathParams[1].mClusterId  = 3;
+    eventPathParams[1].mEventId    = 5;
+    err = readClient.GenerateEventPathList(request, eventPathParams, 2 /*aEventPathParamsListSize*/, eventNumber);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    request.EndOfReadRequest();
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == request.GetError());
+
+    err = writer.Finalize(&msgBuf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    chip::System::PacketBufferTLVReader reader;
+    ReadRequest::Parser readRequestParser;
+
+    reader.Init(msgBuf.Retain());
+    reader.Next();
+
+    err = readRequestParser.Init(reader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = readRequestParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+}
+
 } // namespace app
 } // namespace chip
 
@@ -367,6 +470,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
     NL_TEST_DEF("TestReadClientGenerateAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateAttributePathList),
     NL_TEST_DEF("TestReadClientGenerateInvalidAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateInvalidAttributePathList),
+    NL_TEST_DEF("TestReadClientGenerateOneEventPathList", chip::app::TestReadInteraction::TestReadClientGenerateOneEventPathList),
+    NL_TEST_DEF("TestReadClientGenerateTwoEventPathList", chip::app::TestReadInteraction::TestReadClientGenerateTwoEventPathList),
     NL_TEST_DEF("TestReadClientInvalidReport", chip::app::TestReadInteraction::TestReadClientInvalidReport),
     NL_TEST_DEF("TestReadHandlerInvalidAttributePath", chip::app::TestReadInteraction::TestReadHandlerInvalidAttributePath),
     NL_TEST_SENTINEL()

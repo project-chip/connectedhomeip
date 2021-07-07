@@ -96,14 +96,9 @@ using namespace chip::Encoding;
 
 constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
-// TODO - Reduce memory requirement for generating x509 certificates
-// As per specifications (section 6.3.7. Trusted Root CA Certificates), DER certs
-// should require 600 bytes. Currently, due to ASN writer overheads, a larger buffer
-// is needed, even though the generated certificate fits in 600 bytes limit.
-constexpr uint32_t kMaxCHIPDERCertLength = 1024;
-constexpr uint32_t kMaxCHIPCSRLength     = 1024;
+constexpr uint32_t kMaxCHIPCSRLength = 1024;
 
-DeviceController::DeviceController()
+DeviceController::DeviceController() : mLocalNOCCallback(OnLocalNOCGenerated, this)
 {
     mState                    = State::NotInitialized;
     mSessionMgr               = nullptr;
@@ -215,34 +210,25 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & CSR, NodeId deviceId, MutableByteSpan & cert)
+CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & noc, MutableByteSpan & cert)
 {
-    // This code requires about 2K RAM to generate the certificates.
+    // This code requires about 1K RAM to generate the certificates.
     // The code would run as part of commissioner applications, so RAM requirements should be fine.
     // Need to analyze if this requirement could be better managed by using static memory pools.
-    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-
-    uint32_t nocLen = 0;
-    ChipLogProgress(Controller, "Generating operational certificate for device " ChipLogFormatX64, ChipLogValueX64(deviceId));
-    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
-        PeerId().SetNodeId(deviceId), CSR, 1, noc.Get(), kMaxCHIPDERCertLength, nocLen));
-
-    ReturnErrorCodeIf(nocLen == 0, CHIP_ERROR_CERT_NOT_FOUND);
-
     chip::Platform::ScopedMemoryBuffer<uint8_t> ica;
     ReturnErrorCodeIf(!ica.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
 
-    uint32_t icaLen = 0;
+    MutableByteSpan icaCertSpan(ica.Get(), kMaxCHIPDERCertLength);
+
     ChipLogProgress(Controller, "Getting intermediate CA certificate from the issuer");
-    CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, ica.Get(), kMaxCHIPDERCertLength, icaLen);
-    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" PRId32, err);
+    CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, icaCertSpan);
+    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" CHIP_ERROR_FORMAT, err);
     if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
         // This implies that the commissioner application uses root CA to sign the operational
         // certificates, and an intermediate CA is not needed. It's not an error condition, so
         // let's just send operational certificate and root CA certificate to the device.
-        icaLen = 0;
+        icaCertSpan.reduce_size(0);
         ChipLogProgress(Controller, "Intermediate CA is not needed");
     }
     else if (err != CHIP_NO_ERROR)
@@ -250,9 +236,39 @@ CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & CS
         return err;
     }
 
-    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(noc.Get(), nocLen), ByteSpan(ica.Get(), icaLen), cert));
+    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(noc, icaCertSpan, cert));
 
     return CHIP_NO_ERROR;
+}
+
+void DeviceController::OnLocalNOCGenerated(void * context, const ByteSpan & noc)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    DeviceController * controller = static_cast<DeviceController *>(context);
+
+    Transport::AdminPairingInfo * const admin = controller->mAdmins.FindAdminWithId(controller->mAdminId);
+
+    uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
+
+    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(chipCert.Alloc(chipCertAllocatedLen), err = CHIP_ERROR_NO_MEMORY);
+
+    {
+        MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
+        err = controller->GenerateOperationalCertificates(noc, chipCertSpan);
+        SuccessOrExit(err);
+
+        err = admin->SetOperationalCertsFromCertArray(chipCertSpan);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed in generating local operational credentials. Error %s", ErrorStr(err));
+    }
 }
 
 CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * admin)
@@ -274,13 +290,10 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * 
             ChipLogProgress(Controller, "Getting root certificate for the controller from the issuer");
             chip::Platform::ScopedMemoryBuffer<uint8_t> rootCert;
             ReturnErrorCodeIf(!rootCert.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-            uint32_t rootCertLen = 0;
-
-            ReturnErrorOnFailure(
-                mOperationalCredentialsDelegate->GetRootCACertificate(0, rootCert.Get(), kMaxCHIPDERCertLength, rootCertLen));
-            ReturnErrorOnFailure(
-                ConvertX509CertToChipCert(rootCert.Get(), rootCertLen, chipCert.Get(), chipCertAllocatedLen, chipCertLen));
-
+            MutableByteSpan rootCertSpan(rootCert.Get(), kMaxCHIPDERCertLength);
+            ReturnErrorOnFailure(mOperationalCredentialsDelegate->GetRootCACertificate(0, rootCertSpan));
+            VerifyOrReturnError(CanCastTo<uint32_t>(rootCertSpan.size()), CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(ConvertX509CertToChipCert(rootCertSpan, chipCert.Get(), chipCertAllocatedLen, chipCertLen));
             ReturnErrorOnFailure(admin->SetRootCert(ByteSpan(chipCert.Get(), chipCertLen)));
         }
 
@@ -295,9 +308,8 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * 
             // TODO - Match the generated cert against CSR and operational keypair
             //        Make sure it chains back to the trusted root.
             ChipLogProgress(Controller, "Generating operational certificate for the controller");
-            MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
-            ReturnErrorOnFailure(GenerateOperationalCertificates(ByteSpan(CSR.Get(), csrLength), mLocalDeviceId, chipCertSpan));
-            ReturnErrorOnFailure(admin->SetOperationalCert(chipCertSpan));
+            ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
+                Optional<NodeId>(mLocalDeviceId), 0, ByteSpan(CSR.Get(), csrLength), ByteSpan(), &mLocalNOCCallback));
         }
 
         ReturnErrorOnFailure(mAdmins.Store(admin->GetAdminId()));
@@ -316,6 +328,11 @@ CHIP_ERROR DeviceController::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the controller");
 
+    for (uint32_t i = 0; i < kNumMaxActiveDevices; i++)
+    {
+        mActiveDevices[i].Reset();
+    }
+
 #if CONFIG_DEVICE_LAYER
     //
     // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
@@ -328,8 +345,8 @@ CHIP_ERROR DeviceController::Shutdown()
     //
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
-    VerifyOrReturnError(mInetLayer->Shutdown() == INET_NO_ERROR, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(mSystemLayer->Shutdown() == CHIP_SYSTEM_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mInetLayer->Shutdown() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSystemLayer->Shutdown() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     chip::Platform::Delete(mInetLayer);
     chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
@@ -551,8 +568,8 @@ CHIP_ERROR DeviceController::GetFabricId(uint64_t & fabricId)
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                               const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     uint16_t index;
     bool needClose = true;
@@ -573,6 +590,7 @@ exit:
     {
         ec->Close();
     }
+    return CHIP_NO_ERROR;
 }
 
 void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
@@ -710,7 +728,7 @@ exit:
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to initialize the device list with error: %" PRId32, err);
+        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT, err);
     }
 
     return err;
@@ -796,7 +814,7 @@ DeviceCommissioner::DeviceCommissioner() :
     mOpCertResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
     mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddOpCertFailureResponse, this),
     mOnRootCertFailureCallback(OnRootCertFailureResponse, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
-    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this), mDeviceNOCCallback(OnDeviceNOCGenerated, this)
 {
     mPairingDelegate      = nullptr;
     mDeviceBeingPaired    = kNumMaxActiveDevices;
@@ -878,6 +896,18 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     mDeviceBeingPaired = GetInactiveDeviceIndex();
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
+
+    // If the CSRNonce is passed in, using that else using a random one..
+    if (params.HasCSRNonce())
+    {
+        VerifyOrReturnError(device->SetCSRNonce(params.GetCSRNonce().Value()) == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        uint8_t mCSRNonce[kOpCSRNonceLength];
+        Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
+        VerifyOrReturnError(device->SetCSRNonce(ByteSpan(mCSRNonce)) == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
@@ -968,7 +998,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
     device->Serialize(serialized);
 
     err = mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
-                                  testSecurePairingSecret, SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
+                                  testSecurePairingSecret, SecureSession::SessionRole::kInitiator, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1118,10 +1148,9 @@ void DeviceCommissioner::OnSessionEstablished()
 
     mPairingSession.PeerConnection().SetPeerNodeId(device->GetDeviceId());
 
-    CHIP_ERROR err =
-        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-                                mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
-                                SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
+    CHIP_ERROR err = mSessionMgr->NewPairing(
+        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
+        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kInitiator, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1165,7 +1194,6 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(device->GenerateCSRNonce());
     ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
@@ -1200,6 +1228,43 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
     }
 }
 
+void DeviceCommissioner::OnDeviceNOCGenerated(void * context, const ByteSpan & noc)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+
+    // The operational certificate array can contain upto 2 certificates (NOC, and ICAC)
+    // The memory is allocated to account for both these certificates.
+    uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
+
+    Device * device = nullptr;
+    VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(commissioner->mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
+
+    device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
+
+    VerifyOrExit(chipCert.Alloc(chipCertAllocatedLen), err = CHIP_ERROR_NO_MEMORY);
+
+    {
+        MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
+        err = commissioner->GenerateOperationalCertificates(noc, chipCertSpan);
+        SuccessOrExit(err);
+
+        ChipLogProgress(Controller, "Sending operational certificate to the device");
+        err = commissioner->SendOperationalCertificate(device, chipCertSpan);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed in generating device's operational credentials. Error %s", ErrorStr(err));
+        commissioner->OnSessionEstablishmentError(err);
+    }
+}
+
 CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
                                             const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3,
                                             const ByteSpan & Signature)
@@ -1209,9 +1274,6 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    // TODO: Verify the OpCSR signature using pubkey from DAC
-    //       This will be done when device attestation is implemented.
-
     // Verify that Nonce matches with what we sent
     const ByteSpan nonce = device->GetCSRNonce();
     VerifyOrReturnError(CSRNonce.size() == nonce.size(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1220,12 +1282,10 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipOpCert;
     ReturnErrorCodeIf(!chipOpCert.Alloc(kMaxCHIPCertLength * 2), CHIP_ERROR_NO_MEMORY);
 
-    MutableByteSpan chipCertSpan(chipOpCert.Get(), kMaxCHIPCertLength * 2);
-
-    ReturnErrorOnFailure(GenerateOperationalCertificates(CSR, device->GetDeviceId(), chipCertSpan));
-
-    ChipLogProgress(Controller, "Sending operational certificate to the device");
-    ReturnErrorOnFailure(SendOperationalCertificate(device, chipCertSpan));
+    // TODO: Send DAC as input parameter to GenerateNodeOperationalCertificate()
+    //       This will be done when device attestation is implemented.
+    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
+        Optional<NodeId>(device->GetDeviceId()), 0, CSR, ByteSpan(), &mDeviceNOCCallback));
 
     return CHIP_NO_ERROR;
 }
@@ -1425,7 +1485,7 @@ void DeviceCommissioner::OnSessionEstablishmentTimeout()
     }
 }
 
-void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError)
+void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
 {
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
@@ -1492,6 +1552,22 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(co
     // CommandResponseStatus, CommandResponseProtocolError and CommandResponseError.
     return CHIP_NO_ERROR;
 }
+
+void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
+                                                            TLV::TLVReader * apData,
+                                                            Protocols::InteractionModel::ProtocolCode status)
+{
+    IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::ReportError(const app::ReadClient * apReadClient, CHIP_ERROR aError)
+{
+    app::ClusterInfo path;
+    path.mNodeId = apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId();
+    IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, Protocols::InteractionModel::ProtocolCode::Failure);
+    return CHIP_NO_ERROR;
+}
+
 void BasicSuccess(void * context, uint16_t val)
 {
     ChipLogProgress(Controller, "Received success response 0x%x\n", val);
@@ -1509,14 +1585,6 @@ void BasicFailure(void * context, uint8_t status)
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 void DeviceCommissioner::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
-    if (mDeviceBeingPaired < kNumMaxActiveDevices)
-    {
-        Device * device = &mActiveDevices[mDeviceBeingPaired];
-        if (device->GetDeviceId() == nodeData.mPeerId.GetNodeId() && mCommissioningStage == CommissioningStage::kFindOperational)
-        {
-            AdvanceCommissioningStage(CHIP_NO_ERROR);
-        }
-    }
     DeviceController::OnNodeIdResolved(nodeData);
     OperationalDiscoveryComplete(nodeData.mPeerId.GetNodeId());
 }
@@ -1540,6 +1608,16 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
 {
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+
+    if (commissioner->mDeviceBeingPaired < kNumMaxActiveDevices)
+    {
+        Device * deviceBeingPaired = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
+        if (device == deviceBeingPaired && commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+        {
+            commissioner->AdvanceCommissioningStage(CHIP_NO_ERROR);
+        }
+    }
+
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
     commissioner->mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);

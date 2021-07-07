@@ -182,6 +182,11 @@ void emberAfPutInt16sInResp(int16_t value)
     emberAfPutInt16uInResp(static_cast<uint16_t>(value));
 }
 
+void emberAfPutStatusInResp(EmberAfStatus value)
+{
+    emberAfPutInt8uInResp(static_cast<std::underlying_type_t<EmberAfStatus>>(value));
+}
+
 // ------------------------------------
 // Utilities for reading from RAM buffers (reading from incoming message
 // buffer)

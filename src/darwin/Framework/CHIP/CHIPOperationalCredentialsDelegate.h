@@ -33,18 +33,23 @@ public:
 
     CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage);
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr, int64_t serialNumber,
-        uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::Optional<chip::NodeId> & nodeId, chip::FabricId fabricId,
+        const chip::ByteSpan & csr, const chip::ByteSpan & DAC,
+        chip::Callback::Callback<chip::Controller::NOCGenerated> * onNOCGenerated) override;
 
-    CHIP_ERROR GetRootCACertificate(
-        chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GetRootCACertificate(chip::FabricId fabricId, chip::MutableByteSpan & outCert) override;
+
+    void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
+    void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 
 private:
     CHIP_ERROR GenerateKeys();
+    CHIP_ERROR StoreKeysInKeyChain(NSData * keypairData);
     CHIP_ERROR LoadKeysFromKeyChain();
+    CHIP_ERROR LoadDeprecatedKeysFromKeyChain();
     CHIP_ERROR DeleteKeys();
 
-    CHIP_ERROR ConvertToP256Keypair(SecKeyRef privateKey);
+    CHIP_ERROR ConvertToP256Keypair(NSData * keypairData);
 
     CHIP_ERROR SetIssuerID(CHIPPersistentStorageDelegateBridge * storage);
 
@@ -54,13 +59,17 @@ private:
     uint32_t mIssuerId = 1234;
 
     const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
-    const NSString * kCHIPCAKeyLabel = @"chip.nodeopcerts.CA:0";
-    const NSData * kCHIPCAKeyTag = [@"com.zigbee.chip.commissioner.ca.issuer.id" dataUsingEncoding:NSUTF8StringEncoding];
+    const NSString * kCHIPCADeprecatedKeyLabel = @"chip.nodeopcerts.CA:0";
+    const NSData * kCHIPCADeprecatedKeyTag = [@"com.zigbee.chip.commissioner.ca.issuer.id" dataUsingEncoding:NSUTF8StringEncoding];
+    const NSString * kCHIPCAKeyLabel = @"matter.nodeopcerts.CA:0";
+    const NSData * kCHIPCAKeyTag = [@"com.zigbee.matter.commissioner.ca.issuer.id" dataUsingEncoding:NSUTF8StringEncoding];
 
     id mKeyType = (id) kSecAttrKeyTypeECSECPrimeRandom;
     id mKeySize = @256;
 
     CHIPPersistentStorageDelegateBridge * mStorage;
+
+    chip::NodeId mDeviceBeingPaired = chip::kUndefinedNodeId;
 };
 
 NS_ASSUME_NONNULL_END

@@ -42,14 +42,17 @@ CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable &
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID exceptionConstructor;
+    jclass clusterExceptionCls;
 
-    exceptionConstructor = env->GetMethodID(JniReferences::GetClusterExceptionCls(), "<init>", "(I)V");
-    VerifyOrExit(exceptionConstructor != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipClusterException", clusterExceptionCls);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
-    outEx = (jthrowable) env->NewObject(JniReferences::GetClusterExceptionCls(), exceptionConstructor, errorCode);
-    VerifyOrExit(outEx != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    exceptionConstructor = env->GetMethodID(clusterExceptionCls, "<init>", "(I)V");
+    VerifyOrReturnError(exceptionConstructor != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
-exit:
+    outEx = (jthrowable) env->NewObject(clusterExceptionCls, exceptionConstructor, errorCode);
+    VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
     return err;
 }
 
@@ -60,7 +63,7 @@ CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], jint 
     jclass exceptionClass;
     jstring errStr;
 
-    err = GetClassRef(env, "java/lang/IllegalStateException", exceptionClass);
+    err = JniReferences::GetInstance().GetClassRef(env, "java/lang/IllegalStateException", exceptionClass);
     SuccessOrExit(err);
 
     exceptionConstructor = env->GetMethodID(exceptionClass, "<init>", "(Ljava/lang/String;)V");
@@ -82,7 +85,7 @@ class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallb
 public:
     CHIPDefaultSuccessCallback(jobject javaCallback) : Callback::Callback<DefaultSuccessCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -97,7 +100,7 @@ public:
 
     ~CHIPDefaultSuccessCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -108,10 +111,10 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
         jmethodID javaMethod;
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         CHIPDefaultSuccessCallback * cppCallback = nullptr;
 
@@ -124,7 +127,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->ExceptionClear();
@@ -151,7 +154,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
 public:
     CHIPDefaultFailureCallback(jobject javaCallback) : Callback::Callback<DefaultFailureCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -166,7 +169,7 @@ public:
 
     ~CHIPDefaultFailureCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -177,10 +180,10 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
         jmethodID javaMethod;
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jthrowable exception;
         CHIPDefaultFailureCallback * cppCallback = nullptr;
@@ -194,7 +197,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onError", "(Ljava/lang/Exception;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onError", "(Ljava/lang/Exception;)V", &javaMethod);
         SuccessOrExit(err);
 
         err = CreateChipClusterException(env, status, exception);
@@ -226,7 +229,7 @@ public:
     CHIPAccountLoginClusterGetSetupPINResponseCallback(jobject javaCallback) :
         Callback::Callback<AccountLoginClusterGetSetupPINResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -241,7 +244,7 @@ public:
     }
     ~CHIPAccountLoginClusterGetSetupPINResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -252,9 +255,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t * setupPIN)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPAccountLoginClusterGetSetupPINResponseCallback * cppCallback = nullptr;
@@ -269,7 +272,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, setupPINStr.jniValue());
@@ -297,7 +300,7 @@ public:
     CHIPApplicationLauncherClusterLaunchAppResponseCallback(jobject javaCallback) :
         Callback::Callback<ApplicationLauncherClusterLaunchAppResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -312,7 +315,7 @@ public:
     }
     ~CHIPApplicationLauncherClusterLaunchAppResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -323,9 +326,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t * data)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPApplicationLauncherClusterLaunchAppResponseCallback * cppCallback = nullptr;
@@ -340,7 +343,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue());
@@ -368,7 +371,7 @@ public:
     CHIPContentLauncherClusterLaunchContentResponseCallback(jobject javaCallback) :
         Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -383,7 +386,7 @@ public:
     }
     ~CHIPContentLauncherClusterLaunchContentResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -394,9 +397,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPContentLauncherClusterLaunchContentResponseCallback * cppCallback = nullptr;
@@ -411,7 +414,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue(), static_cast<jint>(contentLaunchStatus));
@@ -439,7 +442,7 @@ public:
     CHIPContentLauncherClusterLaunchURLResponseCallback(jobject javaCallback) :
         Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -454,7 +457,7 @@ public:
     }
     ~CHIPContentLauncherClusterLaunchURLResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -465,9 +468,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPContentLauncherClusterLaunchURLResponseCallback * cppCallback = nullptr;
@@ -482,7 +485,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue(), static_cast<jint>(contentLaunchStatus));
@@ -509,7 +512,7 @@ public:
     CHIPDoorLockClusterClearAllPinsResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterClearAllPinsResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -524,7 +527,7 @@ public:
     }
     ~CHIPDoorLockClusterClearAllPinsResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -535,9 +538,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterClearAllPinsResponseCallback * cppCallback = nullptr;
@@ -550,7 +553,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -577,7 +580,7 @@ public:
     CHIPDoorLockClusterClearAllRfidsResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterClearAllRfidsResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -592,7 +595,7 @@ public:
     }
     ~CHIPDoorLockClusterClearAllRfidsResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -603,9 +606,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterClearAllRfidsResponseCallback * cppCallback = nullptr;
@@ -618,7 +621,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -646,7 +649,7 @@ public:
     CHIPDoorLockClusterClearHolidayScheduleResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterClearHolidayScheduleResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -661,7 +664,7 @@ public:
     }
     ~CHIPDoorLockClusterClearHolidayScheduleResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -672,9 +675,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterClearHolidayScheduleResponseCallback * cppCallback = nullptr;
@@ -687,7 +690,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -714,7 +717,7 @@ public:
     CHIPDoorLockClusterClearPinResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterClearPinResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -729,7 +732,7 @@ public:
     }
     ~CHIPDoorLockClusterClearPinResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -740,9 +743,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterClearPinResponseCallback * cppCallback = nullptr;
@@ -755,7 +758,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -782,7 +785,7 @@ public:
     CHIPDoorLockClusterClearRfidResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterClearRfidResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -797,7 +800,7 @@ public:
     }
     ~CHIPDoorLockClusterClearRfidResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -808,9 +811,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterClearRfidResponseCallback * cppCallback = nullptr;
@@ -823,7 +826,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -851,7 +854,7 @@ public:
     CHIPDoorLockClusterClearWeekdayScheduleResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterClearWeekdayScheduleResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -866,7 +869,7 @@ public:
     }
     ~CHIPDoorLockClusterClearWeekdayScheduleResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -877,9 +880,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterClearWeekdayScheduleResponseCallback * cppCallback = nullptr;
@@ -892,7 +895,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -920,7 +923,7 @@ public:
     CHIPDoorLockClusterClearYeardayScheduleResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterClearYeardayScheduleResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -935,7 +938,7 @@ public:
     }
     ~CHIPDoorLockClusterClearYeardayScheduleResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -946,9 +949,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterClearYeardayScheduleResponseCallback * cppCallback = nullptr;
@@ -961,7 +964,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -989,7 +992,7 @@ public:
     CHIPDoorLockClusterGetHolidayScheduleResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterGetHolidayScheduleResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1004,7 +1007,7 @@ public:
     }
     ~CHIPDoorLockClusterGetHolidayScheduleResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1016,9 +1019,9 @@ public:
     static void CallbackFn(void * context, uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime,
                            uint8_t operatingModeDuringHoliday)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetHolidayScheduleResponseCallback * cppCallback = nullptr;
@@ -1031,7 +1034,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IJJI)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJJI)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jlong>(localStartTime),
@@ -1059,7 +1062,7 @@ public:
     CHIPDoorLockClusterGetLogRecordResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterGetLogRecordResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1074,7 +1077,7 @@ public:
     }
     ~CHIPDoorLockClusterGetLogRecordResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1086,9 +1089,9 @@ public:
     static void CallbackFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
                            uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetLogRecordResponseCallback * cppCallback = nullptr;
@@ -1103,7 +1106,8 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IJIIIILjava/lang/String;)V", &javaMethod);
+        err =
+            JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJIIIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(logEntryId), static_cast<jlong>(timestamp),
@@ -1132,7 +1136,7 @@ public:
     CHIPDoorLockClusterGetPinResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterGetPinResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1147,7 +1151,7 @@ public:
     }
     ~CHIPDoorLockClusterGetPinResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1158,9 +1162,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetPinResponseCallback * cppCallback = nullptr;
@@ -1175,7 +1179,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userStatus),
@@ -1203,7 +1207,7 @@ public:
     CHIPDoorLockClusterGetRfidResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterGetRfidResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1218,7 +1222,7 @@ public:
     }
     ~CHIPDoorLockClusterGetRfidResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1229,9 +1233,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetRfidResponseCallback * cppCallback = nullptr;
@@ -1246,7 +1250,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userStatus),
@@ -1274,7 +1278,7 @@ public:
     CHIPDoorLockClusterGetUserTypeResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterGetUserTypeResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1289,7 +1293,7 @@ public:
     }
     ~CHIPDoorLockClusterGetUserTypeResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1300,9 +1304,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t userId, uint8_t userType)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetUserTypeResponseCallback * cppCallback = nullptr;
@@ -1315,7 +1319,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userType));
@@ -1343,7 +1347,7 @@ public:
     CHIPDoorLockClusterGetWeekdayScheduleResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterGetWeekdayScheduleResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1358,7 +1362,7 @@ public:
     }
     ~CHIPDoorLockClusterGetWeekdayScheduleResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1370,9 +1374,9 @@ public:
     static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
                            uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetWeekdayScheduleResponseCallback * cppCallback = nullptr;
@@ -1385,7 +1389,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIIIIII)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIIIIII)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jint>(userId),
@@ -1415,7 +1419,7 @@ public:
     CHIPDoorLockClusterGetYeardayScheduleResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterGetYeardayScheduleResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1430,7 +1434,7 @@ public:
     }
     ~CHIPDoorLockClusterGetYeardayScheduleResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1441,9 +1445,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetYeardayScheduleResponseCallback * cppCallback = nullptr;
@@ -1456,7 +1460,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIJJ)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIJJ)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jint>(userId),
@@ -1484,7 +1488,7 @@ public:
     CHIPDoorLockClusterLockDoorResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterLockDoorResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1499,7 +1503,7 @@ public:
     }
     ~CHIPDoorLockClusterLockDoorResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1510,9 +1514,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterLockDoorResponseCallback * cppCallback = nullptr;
@@ -1525,7 +1529,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1553,7 +1557,7 @@ public:
     CHIPDoorLockClusterSetHolidayScheduleResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterSetHolidayScheduleResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1568,7 +1572,7 @@ public:
     }
     ~CHIPDoorLockClusterSetHolidayScheduleResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1579,9 +1583,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterSetHolidayScheduleResponseCallback * cppCallback = nullptr;
@@ -1594,7 +1598,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1621,7 +1625,7 @@ public:
     CHIPDoorLockClusterSetPinResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterSetPinResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1636,7 +1640,7 @@ public:
     }
     ~CHIPDoorLockClusterSetPinResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1647,9 +1651,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterSetPinResponseCallback * cppCallback = nullptr;
@@ -1662,7 +1666,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1689,7 +1693,7 @@ public:
     CHIPDoorLockClusterSetRfidResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterSetRfidResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1704,7 +1708,7 @@ public:
     }
     ~CHIPDoorLockClusterSetRfidResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1715,9 +1719,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterSetRfidResponseCallback * cppCallback = nullptr;
@@ -1730,7 +1734,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1757,7 +1761,7 @@ public:
     CHIPDoorLockClusterSetUserTypeResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterSetUserTypeResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1772,7 +1776,7 @@ public:
     }
     ~CHIPDoorLockClusterSetUserTypeResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1783,9 +1787,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterSetUserTypeResponseCallback * cppCallback = nullptr;
@@ -1798,7 +1802,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1826,7 +1830,7 @@ public:
     CHIPDoorLockClusterSetWeekdayScheduleResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterSetWeekdayScheduleResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1841,7 +1845,7 @@ public:
     }
     ~CHIPDoorLockClusterSetWeekdayScheduleResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1852,9 +1856,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterSetWeekdayScheduleResponseCallback * cppCallback = nullptr;
@@ -1867,7 +1871,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1895,7 +1899,7 @@ public:
     CHIPDoorLockClusterSetYeardayScheduleResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterSetYeardayScheduleResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1910,7 +1914,7 @@ public:
     }
     ~CHIPDoorLockClusterSetYeardayScheduleResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1921,9 +1925,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterSetYeardayScheduleResponseCallback * cppCallback = nullptr;
@@ -1936,7 +1940,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -1963,7 +1967,7 @@ public:
     CHIPDoorLockClusterUnlockDoorResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1978,7 +1982,7 @@ public:
     }
     ~CHIPDoorLockClusterUnlockDoorResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -1989,9 +1993,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterUnlockDoorResponseCallback * cppCallback = nullptr;
@@ -2004,7 +2008,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -2032,7 +2036,7 @@ public:
     CHIPDoorLockClusterUnlockWithTimeoutResponseCallback(jobject javaCallback) :
         Callback::Callback<DoorLockClusterUnlockWithTimeoutResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2047,7 +2051,7 @@ public:
     }
     ~CHIPDoorLockClusterUnlockWithTimeoutResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2058,9 +2062,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterUnlockWithTimeoutResponseCallback * cppCallback = nullptr;
@@ -2073,7 +2077,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -2101,7 +2105,7 @@ public:
     CHIPGeneralCommissioningClusterArmFailSafeResponseCallback(jobject javaCallback) :
         Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2116,7 +2120,7 @@ public:
     }
     ~CHIPGeneralCommissioningClusterArmFailSafeResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2127,9 +2131,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGeneralCommissioningClusterArmFailSafeResponseCallback * cppCallback = nullptr;
@@ -2144,7 +2148,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -2172,7 +2176,7 @@ public:
     CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback(jobject javaCallback) :
         Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2187,7 +2191,7 @@ public:
     }
     ~CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2198,9 +2202,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback * cppCallback = nullptr;
@@ -2215,7 +2219,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -2243,7 +2247,7 @@ public:
     CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(jobject javaCallback) :
         Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2258,7 +2262,7 @@ public:
     }
     ~CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2269,9 +2273,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback * cppCallback = nullptr;
@@ -2286,7 +2290,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -2313,7 +2317,7 @@ public:
     CHIPGroupsClusterAddGroupResponseCallback(jobject javaCallback) :
         Callback::Callback<GroupsClusterAddGroupResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2328,7 +2332,7 @@ public:
     }
     ~CHIPGroupsClusterAddGroupResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2339,9 +2343,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t groupId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGroupsClusterAddGroupResponseCallback * cppCallback = nullptr;
@@ -2354,7 +2358,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId));
@@ -2382,7 +2386,7 @@ public:
     CHIPGroupsClusterGetGroupMembershipResponseCallback(jobject javaCallback) :
         Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2397,7 +2401,7 @@ public:
     }
     ~CHIPGroupsClusterGetGroupMembershipResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2409,9 +2413,9 @@ public:
     static void CallbackFn(void * context, uint8_t capacity, uint8_t groupCount,
                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGroupsClusterGetGroupMembershipResponseCallback * cppCallback = nullptr;
@@ -2424,7 +2428,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(capacity), static_cast<jint>(groupCount)
@@ -2454,7 +2458,7 @@ public:
     CHIPGroupsClusterRemoveGroupResponseCallback(jobject javaCallback) :
         Callback::Callback<GroupsClusterRemoveGroupResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2469,7 +2473,7 @@ public:
     }
     ~CHIPGroupsClusterRemoveGroupResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2480,9 +2484,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t groupId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGroupsClusterRemoveGroupResponseCallback * cppCallback = nullptr;
@@ -2495,7 +2499,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId));
@@ -2522,7 +2526,7 @@ public:
     CHIPGroupsClusterViewGroupResponseCallback(jobject javaCallback) :
         Callback::Callback<GroupsClusterViewGroupResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2537,7 +2541,7 @@ public:
     }
     ~CHIPGroupsClusterViewGroupResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2548,9 +2552,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t * groupName)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGroupsClusterViewGroupResponseCallback * cppCallback = nullptr;
@@ -2565,7 +2569,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), groupNameStr.jniValue());
@@ -2592,7 +2596,7 @@ public:
     CHIPIdentifyClusterIdentifyQueryResponseCallback(jobject javaCallback) :
         Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2607,7 +2611,7 @@ public:
     }
     ~CHIPIdentifyClusterIdentifyQueryResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2618,9 +2622,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t timeout)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPIdentifyClusterIdentifyQueryResponseCallback * cppCallback = nullptr;
@@ -2633,7 +2637,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(timeout));
@@ -2660,7 +2664,7 @@ public:
     CHIPKeypadInputClusterSendKeyResponseCallback(jobject javaCallback) :
         Callback::Callback<KeypadInputClusterSendKeyResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2675,7 +2679,7 @@ public:
     }
     ~CHIPKeypadInputClusterSendKeyResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2686,9 +2690,9 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPKeypadInputClusterSendKeyResponseCallback * cppCallback = nullptr;
@@ -2701,7 +2705,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod);
@@ -2729,7 +2733,7 @@ public:
     CHIPMediaPlaybackClusterMediaFastForwardResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaFastForwardResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2744,7 +2748,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaFastForwardResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2755,9 +2759,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaFastForwardResponseCallback * cppCallback = nullptr;
@@ -2770,7 +2774,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -2797,7 +2801,7 @@ public:
     CHIPMediaPlaybackClusterMediaNextResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaNextResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2812,7 +2816,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaNextResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2823,9 +2827,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaNextResponseCallback * cppCallback = nullptr;
@@ -2838,7 +2842,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -2865,7 +2869,7 @@ public:
     CHIPMediaPlaybackClusterMediaPauseResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaPauseResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2880,7 +2884,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaPauseResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2891,9 +2895,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaPauseResponseCallback * cppCallback = nullptr;
@@ -2906,7 +2910,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -2933,7 +2937,7 @@ public:
     CHIPMediaPlaybackClusterMediaPlayResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaPlayResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2948,7 +2952,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaPlayResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -2959,9 +2963,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaPlayResponseCallback * cppCallback = nullptr;
@@ -2974,7 +2978,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3002,7 +3006,7 @@ public:
     CHIPMediaPlaybackClusterMediaPreviousResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaPreviousResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3017,7 +3021,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaPreviousResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3028,9 +3032,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaPreviousResponseCallback * cppCallback = nullptr;
@@ -3043,7 +3047,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3071,7 +3075,7 @@ public:
     CHIPMediaPlaybackClusterMediaRewindResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaRewindResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3086,7 +3090,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaRewindResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3097,9 +3101,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaRewindResponseCallback * cppCallback = nullptr;
@@ -3112,7 +3116,75 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        SuccessOrExit(err);
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
+
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error invoking Java callback: %d", err);
+        }
+        if (cppCallback != nullptr)
+        {
+            cppCallback->Cancel();
+            delete cppCallback;
+        }
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPMediaPlaybackClusterMediaSeekResponseCallback : public Callback::Callback<MediaPlaybackClusterMediaSeekResponseCallback>
+{
+public:
+    CHIPMediaPlaybackClusterMediaSeekResponseCallback(jobject javaCallback) :
+        Callback::Callback<MediaPlaybackClusterMediaSeekResponseCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+    ~CHIPMediaPlaybackClusterMediaSeekResponseCallback()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+        env->DeleteGlobalRef(javaCallbackRef);
+    };
+
+    static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
+    {
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+        jmethodID javaMethod;
+        CHIPMediaPlaybackClusterMediaSeekResponseCallback * cppCallback = nullptr;
+
+        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+        cppCallback = reinterpret_cast<CHIPMediaPlaybackClusterMediaSeekResponseCallback *>(context);
+        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+
+        javaCallbackRef = cppCallback->javaCallbackRef;
+        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
+
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3140,7 +3212,7 @@ public:
     CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaSkipBackwardResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3155,7 +3227,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3166,9 +3238,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback * cppCallback = nullptr;
@@ -3181,7 +3253,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3209,7 +3281,7 @@ public:
     CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaSkipForwardResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3224,7 +3296,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3235,9 +3307,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback * cppCallback = nullptr;
@@ -3250,76 +3322,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
-        SuccessOrExit(err);
-
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
-
-    exit:
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Error invoking Java callback: %d", err);
-        }
-        if (cppCallback != nullptr)
-        {
-            cppCallback->Cancel();
-            delete cppCallback;
-        }
-    }
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback
-    : public Callback::Callback<MediaPlaybackClusterMediaSkipSeekResponseCallback>
-{
-public:
-    CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback(jobject javaCallback) :
-        Callback::Callback<MediaPlaybackClusterMediaSkipSeekResponseCallback>(CallbackFn, this)
-    {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
-        if (env == nullptr)
-        {
-            ChipLogError(Zcl, "Could not create global reference for Java callback");
-            return;
-        }
-
-        javaCallbackRef = env->NewGlobalRef(javaCallback);
-        if (javaCallbackRef == nullptr)
-        {
-            ChipLogError(Zcl, "Could not create global reference for Java callback");
-        }
-    }
-    ~CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback()
-    {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
-        if (env == nullptr)
-        {
-            ChipLogError(Zcl, "Could not create global reference for Java callback");
-            return;
-        }
-        env->DeleteGlobalRef(javaCallbackRef);
-    };
-
-    static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
-    {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
-        jobject javaCallbackRef;
-        jmethodID javaMethod;
-        CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback * cppCallback = nullptr;
-
-        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
-
-        cppCallback = reinterpret_cast<CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback *>(context);
-        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
-
-        javaCallbackRef = cppCallback->javaCallbackRef;
-        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
-
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3347,7 +3350,7 @@ public:
     CHIPMediaPlaybackClusterMediaStartOverResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaStartOverResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3362,7 +3365,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaStartOverResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3373,9 +3376,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaStartOverResponseCallback * cppCallback = nullptr;
@@ -3388,7 +3391,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3415,7 +3418,7 @@ public:
     CHIPMediaPlaybackClusterMediaStopResponseCallback(jobject javaCallback) :
         Callback::Callback<MediaPlaybackClusterMediaStopResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3430,7 +3433,7 @@ public:
     }
     ~CHIPMediaPlaybackClusterMediaStopResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3441,9 +3444,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPMediaPlaybackClusterMediaStopResponseCallback * cppCallback = nullptr;
@@ -3456,7 +3459,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(mediaPlaybackStatus));
@@ -3484,7 +3487,7 @@ public:
     CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback(jobject javaCallback) :
         Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3499,7 +3502,7 @@ public:
     }
     ~CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3510,9 +3513,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback * cppCallback = nullptr;
@@ -3527,7 +3530,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3555,7 +3558,7 @@ public:
     CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback(jobject javaCallback) :
         Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3570,7 +3573,7 @@ public:
     }
     ~CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3581,9 +3584,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback * cppCallback = nullptr;
@@ -3598,7 +3601,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3626,7 +3629,7 @@ public:
     CHIPNetworkCommissioningClusterDisableNetworkResponseCallback(jobject javaCallback) :
         Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3641,7 +3644,7 @@ public:
     }
     ~CHIPNetworkCommissioningClusterDisableNetworkResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3652,9 +3655,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterDisableNetworkResponseCallback * cppCallback = nullptr;
@@ -3669,7 +3672,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3697,7 +3700,7 @@ public:
     CHIPNetworkCommissioningClusterEnableNetworkResponseCallback(jobject javaCallback) :
         Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3712,7 +3715,7 @@ public:
     }
     ~CHIPNetworkCommissioningClusterEnableNetworkResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3723,9 +3726,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterEnableNetworkResponseCallback * cppCallback = nullptr;
@@ -3740,7 +3743,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3768,7 +3771,7 @@ public:
     CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback(jobject javaCallback) :
         Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3783,7 +3786,7 @@ public:
     }
     ~CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3794,9 +3797,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback * cppCallback = nullptr;
@@ -3811,7 +3814,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3839,7 +3842,7 @@ public:
     CHIPNetworkCommissioningClusterScanNetworksResponseCallback(jobject javaCallback) :
         Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3854,7 +3857,7 @@ public:
     }
     ~CHIPNetworkCommissioningClusterScanNetworksResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3867,9 +3870,9 @@ public:
                            /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
                            /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterScanNetworksResponseCallback * cppCallback = nullptr;
@@ -3884,7 +3887,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue()
@@ -3917,7 +3920,7 @@ public:
     CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(jobject javaCallback) :
         Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3932,7 +3935,7 @@ public:
     }
     ~CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -3943,9 +3946,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback * cppCallback = nullptr;
@@ -3960,7 +3963,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -3988,7 +3991,7 @@ public:
     CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(jobject javaCallback) :
         Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4003,7 +4006,7 @@ public:
     }
     ~CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4014,9 +4017,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback * cppCallback = nullptr;
@@ -4031,7 +4034,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
@@ -4052,14 +4055,14 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback
-    : public Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>
+class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback
+    : public Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>
 {
 public:
-    CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(jobject javaCallback) :
-        Callback::Callback<OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback>(CallbackFn, this)
+    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(jobject javaCallback) :
+        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4072,9 +4075,9 @@ public:
             ChipLogError(Zcl, "Could not create global reference for Java callback");
         }
     }
-    ~CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback()
+    ~CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4085,22 +4088,22 @@ public:
 
     static void CallbackFn(void * context, uint8_t action, uint32_t delayedActionTime)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
-        CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback * cppCallback = nullptr;
+        CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback * cppCallback = nullptr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
-        cppCallback = reinterpret_cast<CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback *>(context);
+        cppCallback = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback *>(context);
         VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IJ)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJ)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(action), static_cast<jlong>(delayedActionTime));
@@ -4121,14 +4124,14 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallback
-    : public Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>
+class CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback
+    : public Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>
 {
 public:
-    CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallback(jobject javaCallback) :
-        Callback::Callback<OtaSoftwareUpdateServerClusterQueryImageResponseCallback>(CallbackFn, this)
+    CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(jobject javaCallback) :
+        Callback::Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4141,9 +4144,9 @@ public:
             ChipLogError(Zcl, "Could not create global reference for Java callback");
         }
     }
-    ~CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallback()
+    ~CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4153,28 +4156,29 @@ public:
     };
 
     static void CallbackFn(void * context, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                           chip::ByteSpan updateToken, uint8_t userConsentNeeded, chip::ByteSpan metadataForClient)
+                           chip::ByteSpan updateToken, uint8_t userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
-        CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallback * cppCallback = nullptr;
+        CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback * cppCallback = nullptr;
         // ByteSpan is not properly returned yet, temporarily use empty string
         UtfString imageURIStr(env, "");
         jbyteArray updateTokenArr;
-        jbyteArray metadataForClientArr;
+        jbyteArray metadataForRequestorArr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
-        cppCallback = reinterpret_cast<CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallback *>(context);
+        cppCallback = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback *>(context);
         VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(JLjava/lang/String;J[BI[B)V", &javaMethod);
+        err =
+            JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(JLjava/lang/String;J[BI[B)V", &javaMethod);
         SuccessOrExit(err);
 
         updateTokenArr = env->NewByteArray(updateToken.size());
@@ -4182,19 +4186,19 @@ public:
         env->ExceptionClear();
         env->SetByteArrayRegion(updateTokenArr, 0, updateToken.size(), reinterpret_cast<const jbyte *>(updateToken.data()));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        metadataForClientArr = env->NewByteArray(metadataForClient.size());
-        VerifyOrExit(metadataForClientArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        metadataForRequestorArr = env->NewByteArray(metadataForRequestor.size());
+        VerifyOrExit(metadataForRequestorArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
         env->ExceptionClear();
-        env->SetByteArrayRegion(metadataForClientArr, 0, metadataForClient.size(),
-                                reinterpret_cast<const jbyte *>(metadataForClient.data()));
+        env->SetByteArrayRegion(metadataForRequestorArr, 0, metadataForRequestor.size(),
+                                reinterpret_cast<const jbyte *>(metadataForRequestor.data()));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(delayedActionTime), imageURIStr.jniValue(),
                             static_cast<jlong>(softwareVersion), updateTokenArr, static_cast<jint>(userConsentNeeded),
-                            metadataForClientArr);
+                            metadataForRequestorArr);
 
         env->DeleteLocalRef(updateTokenArr);
-        env->DeleteLocalRef(metadataForClientArr);
+        env->DeleteLocalRef(metadataForRequestorArr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4219,7 +4223,7 @@ public:
     CHIPOperationalCredentialsClusterOpCSRResponseCallback(jobject javaCallback) :
         Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4234,7 +4238,7 @@ public:
     }
     ~CHIPOperationalCredentialsClusterOpCSRResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4246,9 +4250,9 @@ public:
     static void CallbackFn(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
                            chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPOperationalCredentialsClusterOpCSRResponseCallback * cppCallback = nullptr;
@@ -4267,7 +4271,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "([B[B[B[B[B[B)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B[B[B[B[B[B)V", &javaMethod);
         SuccessOrExit(err);
 
         CSRArr = env->NewByteArray(CSR.size());
@@ -4337,7 +4341,7 @@ public:
     CHIPOperationalCredentialsClusterOpCertResponseCallback(jobject javaCallback) :
         Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4352,7 +4356,7 @@ public:
     }
     ~CHIPOperationalCredentialsClusterOpCertResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4363,9 +4367,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPOperationalCredentialsClusterOpCertResponseCallback * cppCallback = nullptr;
@@ -4380,7 +4384,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IJLjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJLjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(StatusCode), static_cast<jlong>(FabricIndex),
@@ -4409,7 +4413,7 @@ public:
     CHIPOperationalCredentialsClusterSetFabricResponseCallback(jobject javaCallback) :
         Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4424,7 +4428,7 @@ public:
     }
     ~CHIPOperationalCredentialsClusterSetFabricResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4435,9 +4439,9 @@ public:
 
     static void CallbackFn(void * context, chip::FabricId FabricId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPOperationalCredentialsClusterSetFabricResponseCallback * cppCallback = nullptr;
@@ -4450,7 +4454,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(FabricId));
@@ -4477,7 +4481,7 @@ public:
     CHIPScenesClusterAddSceneResponseCallback(jobject javaCallback) :
         Callback::Callback<ScenesClusterAddSceneResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4492,7 +4496,7 @@ public:
     }
     ~CHIPScenesClusterAddSceneResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4503,9 +4507,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPScenesClusterAddSceneResponseCallback * cppCallback = nullptr;
@@ -4518,7 +4522,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId));
@@ -4546,7 +4550,7 @@ public:
     CHIPScenesClusterGetSceneMembershipResponseCallback(jobject javaCallback) :
         Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4561,7 +4565,7 @@ public:
     }
     ~CHIPScenesClusterGetSceneMembershipResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4573,9 +4577,9 @@ public:
     static void CallbackFn(void * context, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
                            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPScenesClusterGetSceneMembershipResponseCallback * cppCallback = nullptr;
@@ -4588,7 +4592,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(III)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(III)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(capacity), static_cast<jint>(groupId),
@@ -4619,7 +4623,7 @@ public:
     CHIPScenesClusterRemoveAllScenesResponseCallback(jobject javaCallback) :
         Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4634,7 +4638,7 @@ public:
     }
     ~CHIPScenesClusterRemoveAllScenesResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4645,9 +4649,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t groupId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPScenesClusterRemoveAllScenesResponseCallback * cppCallback = nullptr;
@@ -4660,7 +4664,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId));
@@ -4687,7 +4691,7 @@ public:
     CHIPScenesClusterRemoveSceneResponseCallback(jobject javaCallback) :
         Callback::Callback<ScenesClusterRemoveSceneResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4702,7 +4706,7 @@ public:
     }
     ~CHIPScenesClusterRemoveSceneResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4713,9 +4717,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPScenesClusterRemoveSceneResponseCallback * cppCallback = nullptr;
@@ -4728,7 +4732,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId));
@@ -4755,7 +4759,7 @@ public:
     CHIPScenesClusterStoreSceneResponseCallback(jobject javaCallback) :
         Callback::Callback<ScenesClusterStoreSceneResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4770,7 +4774,7 @@ public:
     }
     ~CHIPScenesClusterStoreSceneResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4781,9 +4785,9 @@ public:
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPScenesClusterStoreSceneResponseCallback * cppCallback = nullptr;
@@ -4796,7 +4800,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId));
@@ -4823,7 +4827,7 @@ public:
     CHIPScenesClusterViewSceneResponseCallback(jobject javaCallback) :
         Callback::Callback<ScenesClusterViewSceneResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4838,7 +4842,7 @@ public:
     }
     ~CHIPScenesClusterViewSceneResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4850,9 +4854,9 @@ public:
     static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                            /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPScenesClusterViewSceneResponseCallback * cppCallback = nullptr;
@@ -4867,7 +4871,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId),
@@ -4898,7 +4902,7 @@ public:
     CHIPTvChannelClusterChangeChannelResponseCallback(jobject javaCallback) :
         Callback::Callback<TvChannelClusterChangeChannelResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4913,7 +4917,7 @@ public:
     }
     ~CHIPTvChannelClusterChangeChannelResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4924,9 +4928,9 @@ public:
 
     static void CallbackFn(void * context, /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch, uint8_t ErrorType)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPTvChannelClusterChangeChannelResponseCallback * cppCallback = nullptr;
@@ -4939,7 +4943,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef,
@@ -4972,7 +4976,7 @@ public:
     CHIPTargetNavigatorClusterNavigateTargetResponseCallback(jobject javaCallback) :
         Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4987,7 +4991,7 @@ public:
     }
     ~CHIPTargetNavigatorClusterNavigateTargetResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -4998,9 +5002,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t * data)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPTargetNavigatorClusterNavigateTargetResponseCallback * cppCallback = nullptr;
@@ -5015,7 +5019,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue());
@@ -5042,7 +5046,7 @@ public:
     CHIPTestClusterClusterTestSpecificResponseCallback(jobject javaCallback) :
         Callback::Callback<TestClusterClusterTestSpecificResponseCallback>(CallbackFn, this)
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -5057,7 +5061,7 @@ public:
     }
     ~CHIPTestClusterClusterTestSpecificResponseCallback()
     {
-        JNIEnv * env = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
         {
             ChipLogError(Zcl, "Could not create global reference for Java callback");
@@ -5068,9 +5072,9 @@ public:
 
     static void CallbackFn(void * context, uint8_t returnValue)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetStackLock());
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
-        JNIEnv * env   = JniReferences::GetEnvForCurrentThread();
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPTestClusterClusterTestSpecificResponseCallback * cppCallback = nullptr;
@@ -5083,7 +5087,7 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(returnValue));
@@ -5106,7 +5110,7 @@ private:
 
 JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlong clusterPtr)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     ClusterBase * cluster = reinterpret_cast<ClusterBase *>(clusterPtr);
     if (cluster != nullptr)
     {
@@ -5116,7 +5120,7 @@ JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlo
 
 JNI_METHOD(jlong, AccountLoginCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     AccountLoginCluster * cppCluster = new AccountLoginCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -5126,7 +5130,7 @@ JNI_METHOD(jlong, AccountLoginCluster, initWithDevice)(JNIEnv * env, jobject sel
 JNI_METHOD(void, AccountLoginCluster, getSetupPIN)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring tempAccountIdentifier)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
@@ -5156,7 +5160,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5175,7 +5179,7 @@ exit:
 JNI_METHOD(void, AccountLoginCluster, login)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring tempAccountIdentifier, jstring setupPIN)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
@@ -5206,7 +5210,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5224,7 +5228,7 @@ exit:
 }
 JNI_METHOD(jlong, ApplicationBasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     ApplicationBasicCluster * cppCluster = new ApplicationBasicCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -5233,7 +5237,7 @@ JNI_METHOD(jlong, ApplicationBasicCluster, initWithDevice)(JNIEnv * env, jobject
 
 JNI_METHOD(void, ApplicationBasicCluster, changeStatus)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint status)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationBasicCluster * cppCluster;
 
@@ -5260,7 +5264,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5278,7 +5282,7 @@ exit:
 }
 JNI_METHOD(jlong, ApplicationLauncherCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     ApplicationLauncherCluster * cppCluster = new ApplicationLauncherCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -5288,7 +5292,7 @@ JNI_METHOD(jlong, ApplicationLauncherCluster, initWithDevice)(JNIEnv * env, jobj
 JNI_METHOD(void, ApplicationLauncherCluster, launchApp)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jint catalogVendorId, jstring applicationId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationLauncherCluster * cppCluster;
 
@@ -5319,7 +5323,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5337,7 +5341,7 @@ exit:
 }
 JNI_METHOD(jlong, AudioOutputCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     AudioOutputCluster * cppCluster = new AudioOutputCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -5347,7 +5351,7 @@ JNI_METHOD(jlong, AudioOutputCluster, initWithDevice)(JNIEnv * env, jobject self
 JNI_METHOD(void, AudioOutputCluster, renameOutput)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint index, jstring name)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
 
@@ -5376,7 +5380,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5394,7 +5398,7 @@ exit:
 }
 JNI_METHOD(void, AudioOutputCluster, selectOutput)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint index)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
 
@@ -5421,7 +5425,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5439,7 +5443,7 @@ exit:
 }
 JNI_METHOD(jlong, BarrierControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     BarrierControlCluster * cppCluster = new BarrierControlCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -5449,7 +5453,7 @@ JNI_METHOD(jlong, BarrierControlCluster, initWithDevice)(JNIEnv * env, jobject s
 JNI_METHOD(void, BarrierControlCluster, barrierControlGoToPercent)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint percentOpen)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BarrierControlCluster * cppCluster;
 
@@ -5476,7 +5480,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5494,7 +5498,7 @@ exit:
 }
 JNI_METHOD(void, BarrierControlCluster, barrierControlStop)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BarrierControlCluster * cppCluster;
 
@@ -5521,7 +5525,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5539,7 +5543,7 @@ exit:
 }
 JNI_METHOD(jlong, BasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     BasicCluster * cppCluster = new BasicCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -5548,7 +5552,7 @@ JNI_METHOD(jlong, BasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
 
 JNI_METHOD(void, BasicCluster, mfgSpecificPing)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCluster * cppCluster;
 
@@ -5575,7 +5579,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5593,7 +5597,7 @@ exit:
 }
 JNI_METHOD(jlong, BinaryInputBasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     BinaryInputBasicCluster * cppCluster = new BinaryInputBasicCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -5602,7 +5606,7 @@ JNI_METHOD(jlong, BinaryInputBasicCluster, initWithDevice)(JNIEnv * env, jobject
 
 JNI_METHOD(jlong, BindingCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     BindingCluster * cppCluster = new BindingCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -5610,9 +5614,9 @@ JNI_METHOD(jlong, BindingCluster, initWithDevice)(JNIEnv * env, jobject self, jl
 }
 
 JNI_METHOD(void, BindingCluster, bind)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jint clusterId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jlong clusterId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BindingCluster * cppCluster;
 
@@ -5639,7 +5643,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5656,9 +5660,9 @@ exit:
     }
 }
 JNI_METHOD(void, BindingCluster, unbind)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jint clusterId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jlong clusterId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     BindingCluster * cppCluster;
 
@@ -5685,7 +5689,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5703,7 +5707,7 @@ exit:
 }
 JNI_METHOD(jlong, BridgedDeviceBasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     BridgedDeviceBasicCluster * cppCluster = new BridgedDeviceBasicCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -5712,17 +5716,255 @@ JNI_METHOD(jlong, BridgedDeviceBasicCluster, initWithDevice)(JNIEnv * env, jobje
 
 JNI_METHOD(jlong, ColorControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     ColorControlCluster * cppCluster = new ColorControlCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, ColorControlCluster, colorLoopSet)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint updateFlags, jint action, jint direction, jint time,
+ jint startHue, jint optionsMask, jint optionsOverride)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ColorControlCluster * cppCluster;
+
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->ColorLoopSet(onSuccess->Cancel(), onFailure->Cancel(), updateFlags, action, direction, time, startHue,
+                                   optionsMask, optionsOverride);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
+JNI_METHOD(void, ColorControlCluster, enhancedMoveHue)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint optionsMask, jint optionsOverride)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ColorControlCluster * cppCluster;
+
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->EnhancedMoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
+JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint enhancedHue, jint direction, jint transitionTime,
+ jint optionsMask, jint optionsOverride)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ColorControlCluster * cppCluster;
+
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->EnhancedMoveToHue(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, direction, transitionTime,
+                                        optionsMask, optionsOverride);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
+JNI_METHOD(void, ColorControlCluster, enhancedMoveToHueAndSaturation)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint enhancedHue, jint saturation, jint transitionTime,
+ jint optionsMask, jint optionsOverride)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ColorControlCluster * cppCluster;
+
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->EnhancedMoveToHueAndSaturation(onSuccess->Cancel(), onFailure->Cancel(), enhancedHue, saturation,
+                                                     transitionTime, optionsMask, optionsOverride);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
+JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime,
+ jint optionsMask, jint optionsOverride)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ColorControlCluster * cppCluster;
+
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->EnhancedStepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask,
+                                      optionsOverride);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
 JNI_METHOD(void, ColorControlCluster, moveColor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint rateX, jint rateY, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5749,7 +5991,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5769,7 +6011,7 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint colorTemperatureMinimum,
  jint colorTemperatureMaximum, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5797,7 +6039,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5816,7 +6058,7 @@ exit:
 JNI_METHOD(void, ColorControlCluster, moveHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5843,7 +6085,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5862,7 +6104,7 @@ exit:
 JNI_METHOD(void, ColorControlCluster, moveSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5889,7 +6131,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5909,7 +6151,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint colorX, jint colorY, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5937,7 +6179,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -5957,7 +6199,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColorTemperature)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint colorTemperature, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -5985,7 +6227,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6005,7 +6247,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint hue, jint direction, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -6033,7 +6275,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6053,7 +6295,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHueAndSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint hue, jint saturation, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -6081,7 +6323,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6101,7 +6343,7 @@ JNI_METHOD(void, ColorControlCluster, moveToSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint saturation, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -6129,7 +6371,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6149,7 +6391,7 @@ JNI_METHOD(void, ColorControlCluster, stepColor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepX, jint stepY, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -6177,7 +6419,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6197,7 +6439,7 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime,
  jint colorTemperatureMinimum, jint colorTemperatureMaximum, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -6225,7 +6467,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6245,7 +6487,7 @@ JNI_METHOD(void, ColorControlCluster, stepHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime,
  jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -6273,7 +6515,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6293,7 +6535,7 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime,
  jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -6321,7 +6563,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6340,7 +6582,7 @@ exit:
 JNI_METHOD(void, ColorControlCluster, stopMoveStep)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -6367,7 +6609,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6385,7 +6627,7 @@ exit:
 }
 JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     ContentLauncherCluster * cppCluster = new ContentLauncherCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -6395,7 +6637,7 @@ JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject 
 JNI_METHOD(void, ContentLauncherCluster, launchContent)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint autoPlay, jstring data)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
 
@@ -6424,7 +6666,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6443,7 +6685,7 @@ exit:
 JNI_METHOD(void, ContentLauncherCluster, launchURL)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring contentURL, jstring displayString)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
 
@@ -6474,7 +6716,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6492,16 +6734,75 @@ exit:
 }
 JNI_METHOD(jlong, DescriptorCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     DescriptorCluster * cppCluster = new DescriptorCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(jlong, DiagnosticLogsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    DiagnosticLogsCluster * cppCluster = new DiagnosticLogsCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
+JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint intent, jint requestedProtocol,
+ jbyteArray transferFileDesignator)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DiagnosticLogsCluster * cppCluster;
+
+    JniByteArray transferFileDesignatorArr(env, transferFileDesignator);
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<DiagnosticLogsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->RetrieveLogsRequest(
+        onSuccess->Cancel(), onFailure->Cancel(), intent, requestedProtocol,
+        chip::ByteSpan((const uint8_t *) transferFileDesignatorArr.data(), transferFileDesignatorArr.size()));
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
 JNI_METHOD(jlong, DoorLockCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     DoorLockCluster * cppCluster = new DoorLockCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -6510,7 +6811,7 @@ JNI_METHOD(jlong, DoorLockCluster, initWithDevice)(JNIEnv * env, jobject self, j
 
 JNI_METHOD(void, DoorLockCluster, clearAllPins)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6537,7 +6838,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6555,7 +6856,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, clearAllRfids)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6582,7 +6883,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6601,7 +6902,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, clearHolidaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6628,7 +6929,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6646,7 +6947,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, clearPin)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6673,7 +6974,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6691,7 +6992,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, clearRfid)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6718,7 +7019,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6737,7 +7038,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, clearWeekdaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6764,7 +7065,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6783,7 +7084,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, clearYeardaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6810,7 +7111,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6829,7 +7130,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, getHolidaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6856,7 +7157,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6874,7 +7175,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, getLogRecord)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint logIndex)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6901,7 +7202,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6919,7 +7220,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, getPin)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6946,7 +7247,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -6964,7 +7265,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, getRfid)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -6991,7 +7292,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7009,7 +7310,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, getUserType)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7036,7 +7337,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7055,7 +7356,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, getWeekdaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7082,7 +7383,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7101,7 +7402,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, getYeardaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7128,7 +7429,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7146,7 +7447,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring pin)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7175,7 +7476,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7195,7 +7496,7 @@ JNI_METHOD(void, DoorLockCluster, setHolidaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jlong localStartTime, jlong localEndTime,
  jint operatingModeDuringHoliday)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7223,7 +7524,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7242,7 +7543,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, setPin)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userStatus, jint userType, jstring pin)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7271,7 +7572,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7290,7 +7591,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, setRfid)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userStatus, jint userType, jstring id)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7319,7 +7620,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7338,7 +7639,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, setUserType)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userType)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7365,7 +7666,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7385,7 +7686,7 @@ JNI_METHOD(void, DoorLockCluster, setWeekdaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId, jint daysMask, jint startHour,
  jint startMinute, jint endHour, jint endMinute)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7413,7 +7714,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7433,7 +7734,7 @@ JNI_METHOD(void, DoorLockCluster, setYeardaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId, jlong localStartTime,
  jlong localEndTime)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7461,7 +7762,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7479,7 +7780,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, unlockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring pin)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7508,7 +7809,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7527,7 +7828,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, unlockWithTimeout)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint timeoutInSeconds, jstring pin)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -7556,7 +7857,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7572,9 +7873,18 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
+JNI_METHOD(jlong, ElectricalMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    ElectricalMeasurementCluster * cppCluster = new ElectricalMeasurementCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, EthernetNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     EthernetNetworkDiagnosticsCluster * cppCluster = new EthernetNetworkDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -7583,7 +7893,7 @@ JNI_METHOD(jlong, EthernetNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * en
 
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     EthernetNetworkDiagnosticsCluster * cppCluster;
 
@@ -7610,7 +7920,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7628,8 +7938,17 @@ exit:
 }
 JNI_METHOD(jlong, FixedLabelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     FixedLabelCluster * cppCluster = new FixedLabelCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
+JNI_METHOD(jlong, FlowMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    FlowMeasurementCluster * cppCluster = new FlowMeasurementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
@@ -7637,7 +7956,7 @@ JNI_METHOD(jlong, FixedLabelCluster, initWithDevice)(JNIEnv * env, jobject self,
 
 JNI_METHOD(jlong, GeneralCommissioningCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     GeneralCommissioningCluster * cppCluster = new GeneralCommissioningCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -7647,7 +7966,7 @@ JNI_METHOD(jlong, GeneralCommissioningCluster, initWithDevice)(JNIEnv * env, job
 JNI_METHOD(void, GeneralCommissioningCluster, armFailSafe)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint expiryLengthSeconds, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
 
@@ -7674,7 +7993,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7692,7 +8011,7 @@ exit:
 }
 JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
 
@@ -7719,7 +8038,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7739,7 +8058,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint location, jstring countryCode, jlong breadcrumb,
  jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
 
@@ -7769,7 +8088,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7787,7 +8106,7 @@ exit:
 }
 JNI_METHOD(jlong, GeneralDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     GeneralDiagnosticsCluster * cppCluster = new GeneralDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -7796,7 +8115,7 @@ JNI_METHOD(jlong, GeneralDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobje
 
 JNI_METHOD(jlong, GroupKeyManagementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     GroupKeyManagementCluster * cppCluster = new GroupKeyManagementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -7805,7 +8124,7 @@ JNI_METHOD(jlong, GroupKeyManagementCluster, initWithDevice)(JNIEnv * env, jobje
 
 JNI_METHOD(jlong, GroupsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     GroupsCluster * cppCluster = new GroupsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -7815,7 +8134,7 @@ JNI_METHOD(jlong, GroupsCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
 JNI_METHOD(void, GroupsCluster, addGroup)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jstring groupName)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -7844,7 +8163,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7863,7 +8182,7 @@ exit:
 JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jstring groupName)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -7892,7 +8211,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7911,7 +8230,7 @@ exit:
 JNI_METHOD(void, GroupsCluster, getGroupMembership)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupCount, jint groupList)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -7938,7 +8257,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -7956,7 +8275,7 @@ exit:
 }
 JNI_METHOD(void, GroupsCluster, removeAllGroups)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -7983,7 +8302,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8001,7 +8320,7 @@ exit:
 }
 JNI_METHOD(void, GroupsCluster, removeGroup)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -8028,7 +8347,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8046,7 +8365,7 @@ exit:
 }
 JNI_METHOD(void, GroupsCluster, viewGroup)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -8073,7 +8392,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8091,7 +8410,7 @@ exit:
 }
 JNI_METHOD(jlong, IdentifyCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     IdentifyCluster * cppCluster = new IdentifyCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8100,7 +8419,7 @@ JNI_METHOD(jlong, IdentifyCluster, initWithDevice)(JNIEnv * env, jobject self, j
 
 JNI_METHOD(void, IdentifyCluster, identify)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint identifyTime)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     IdentifyCluster * cppCluster;
 
@@ -8127,7 +8446,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8145,7 +8464,7 @@ exit:
 }
 JNI_METHOD(void, IdentifyCluster, identifyQuery)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     IdentifyCluster * cppCluster;
 
@@ -8172,7 +8491,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8190,7 +8509,7 @@ exit:
 }
 JNI_METHOD(jlong, KeypadInputCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     KeypadInputCluster * cppCluster = new KeypadInputCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8199,7 +8518,7 @@ JNI_METHOD(jlong, KeypadInputCluster, initWithDevice)(JNIEnv * env, jobject self
 
 JNI_METHOD(void, KeypadInputCluster, sendKey)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint keyCode)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     KeypadInputCluster * cppCluster;
 
@@ -8226,7 +8545,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8244,7 +8563,7 @@ exit:
 }
 JNI_METHOD(jlong, LevelControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     LevelControlCluster * cppCluster = new LevelControlCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8254,7 +8573,7 @@ JNI_METHOD(jlong, LevelControlCluster, initWithDevice)(JNIEnv * env, jobject sel
 JNI_METHOD(void, LevelControlCluster, move)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint optionMask, jint optionOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -8281,7 +8600,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8301,7 +8620,7 @@ JNI_METHOD(void, LevelControlCluster, moveToLevel)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint level, jint transitionTime, jint optionMask,
  jint optionOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -8328,7 +8647,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8347,7 +8666,7 @@ exit:
 JNI_METHOD(void, LevelControlCluster, moveToLevelWithOnOff)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint level, jint transitionTime)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -8374,7 +8693,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8393,7 +8712,7 @@ exit:
 JNI_METHOD(void, LevelControlCluster, moveWithOnOff)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -8420,7 +8739,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8440,7 +8759,7 @@ JNI_METHOD(void, LevelControlCluster, step)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime, jint optionMask,
  jint optionOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -8468,7 +8787,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8487,7 +8806,7 @@ exit:
 JNI_METHOD(void, LevelControlCluster, stepWithOnOff)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -8514,7 +8833,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8533,7 +8852,7 @@ exit:
 JNI_METHOD(void, LevelControlCluster, stop)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint optionMask, jint optionOverride)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -8560,7 +8879,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8578,7 +8897,7 @@ exit:
 }
 JNI_METHOD(void, LevelControlCluster, stopWithOnOff)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -8605,7 +8924,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8623,7 +8942,7 @@ exit:
 }
 JNI_METHOD(jlong, LowPowerCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     LowPowerCluster * cppCluster = new LowPowerCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8632,7 +8951,7 @@ JNI_METHOD(jlong, LowPowerCluster, initWithDevice)(JNIEnv * env, jobject self, j
 
 JNI_METHOD(void, LowPowerCluster, sleep)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     LowPowerCluster * cppCluster;
 
@@ -8659,7 +8978,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8677,7 +8996,7 @@ exit:
 }
 JNI_METHOD(jlong, MediaInputCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     MediaInputCluster * cppCluster = new MediaInputCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8686,7 +9005,7 @@ JNI_METHOD(jlong, MediaInputCluster, initWithDevice)(JNIEnv * env, jobject self,
 
 JNI_METHOD(void, MediaInputCluster, hideInputStatus)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
@@ -8713,7 +9032,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8732,7 +9051,7 @@ exit:
 JNI_METHOD(void, MediaInputCluster, renameInput)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint index, jstring name)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
@@ -8761,7 +9080,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8779,7 +9098,7 @@ exit:
 }
 JNI_METHOD(void, MediaInputCluster, selectInput)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint index)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
@@ -8806,7 +9125,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8824,7 +9143,7 @@ exit:
 }
 JNI_METHOD(void, MediaInputCluster, showInputStatus)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
@@ -8851,7 +9170,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8869,7 +9188,7 @@ exit:
 }
 JNI_METHOD(jlong, MediaPlaybackCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     MediaPlaybackCluster * cppCluster = new MediaPlaybackCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8878,7 +9197,7 @@ JNI_METHOD(jlong, MediaPlaybackCluster, initWithDevice)(JNIEnv * env, jobject se
 
 JNI_METHOD(void, MediaPlaybackCluster, mediaFastForward)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -8905,7 +9224,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8923,7 +9242,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaNext)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -8950,7 +9269,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -8968,7 +9287,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaPause)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -8995,7 +9314,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9013,7 +9332,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaPlay)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -9040,7 +9359,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9058,7 +9377,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaPrevious)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -9085,7 +9404,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9103,7 +9422,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaRewind)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -9130,7 +9449,52 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
+JNI_METHOD(void, MediaPlaybackCluster, mediaSeek)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong position)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    MediaPlaybackCluster * cppCluster;
+
+    CHIPMediaPlaybackClusterMediaSeekResponseCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<MediaPlaybackCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPMediaPlaybackClusterMediaSeekResponseCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->MediaSeek(onSuccess->Cancel(), onFailure->Cancel(), position);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9149,7 +9513,7 @@ exit:
 JNI_METHOD(void, MediaPlaybackCluster, mediaSkipBackward)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong deltaPositionMilliseconds)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -9176,7 +9540,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9195,7 +9559,7 @@ exit:
 JNI_METHOD(void, MediaPlaybackCluster, mediaSkipForward)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong deltaPositionMilliseconds)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -9222,53 +9586,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
-            return;
-        }
-
-        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
-            return;
-        }
-        env->CallVoidMethod(callback, method, exception);
-    }
-}
-JNI_METHOD(void, MediaPlaybackCluster, mediaSkipSeek)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong position)
-{
-    StackLockGuard lock(JniReferences::GetStackLock());
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    MediaPlaybackCluster * cppCluster;
-
-    CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback * onSuccess;
-    CHIPDefaultFailureCallback * onFailure;
-
-    cppCluster = reinterpret_cast<MediaPlaybackCluster *>(clusterPtr);
-    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    onSuccess = new CHIPMediaPlaybackClusterMediaSkipSeekResponseCallback(callback);
-    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    onFailure = new CHIPDefaultFailureCallback(callback);
-    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = cppCluster->MediaSkipSeek(onSuccess->Cancel(), onFailure->Cancel(), position);
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        delete onSuccess;
-        delete onFailure;
-
-        jthrowable exception;
-        jmethodID method;
-
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9286,7 +9604,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaStartOver)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -9313,7 +9631,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9331,7 +9649,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaStop)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -9358,7 +9676,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9376,7 +9694,7 @@ exit:
 }
 JNI_METHOD(jlong, NetworkCommissioningCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     NetworkCommissioningCluster * cppCluster = new NetworkCommissioningCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -9386,7 +9704,7 @@ JNI_METHOD(jlong, NetworkCommissioningCluster, initWithDevice)(JNIEnv * env, job
 JNI_METHOD(void, NetworkCommissioningCluster, addThreadNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalDataset, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -9416,7 +9734,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9436,7 +9754,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, addWiFiNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jbyteArray credentials, jlong breadcrumb,
  jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -9467,7 +9785,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9486,7 +9804,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, disableNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -9516,7 +9834,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9535,7 +9853,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, enableNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -9565,7 +9883,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9584,7 +9902,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, getLastNetworkCommissioningResult)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -9611,7 +9929,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9630,7 +9948,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -9660,7 +9978,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9679,7 +9997,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -9708,7 +10026,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9727,7 +10045,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, updateThreadNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalDataset, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -9757,7 +10075,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9777,7 +10095,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, updateWiFiNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jbyteArray credentials, jlong breadcrumb,
  jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -9808,7 +10126,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9824,30 +10142,30 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(jlong, OtaSoftwareUpdateServerCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+JNI_METHOD(jlong, OtaSoftwareUpdateProviderCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
-    OtaSoftwareUpdateServerCluster * cppCluster = new OtaSoftwareUpdateServerCluster();
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    OtaSoftwareUpdateProviderCluster * cppCluster = new OtaSoftwareUpdateProviderCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, OtaSoftwareUpdateServerCluster, applyUpdateRequest)
+JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, applyUpdateRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray updateToken, jlong newVersion)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
-    OtaSoftwareUpdateServerCluster * cppCluster;
+    OtaSoftwareUpdateProviderCluster * cppCluster;
 
     JniByteArray updateTokenArr(env, updateToken);
-    CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback * onSuccess;
+    CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
-    cppCluster = reinterpret_cast<OtaSoftwareUpdateServerCluster *>(clusterPtr);
+    cppCluster = reinterpret_cast<OtaSoftwareUpdateProviderCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    onSuccess = new CHIPOtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback(callback);
+    onSuccess = new CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(callback);
     VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -9866,7 +10184,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9882,18 +10200,18 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, OtaSoftwareUpdateServerCluster, notifyUpdateApplied)
+JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, notifyUpdateApplied)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray updateToken, jlong currentVersion)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
-    OtaSoftwareUpdateServerCluster * cppCluster;
+    OtaSoftwareUpdateProviderCluster * cppCluster;
 
     JniByteArray updateTokenArr(env, updateToken);
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
-    cppCluster = reinterpret_cast<OtaSoftwareUpdateServerCluster *>(clusterPtr);
+    cppCluster = reinterpret_cast<OtaSoftwareUpdateProviderCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     onSuccess = new CHIPDefaultSuccessCallback(callback);
@@ -9915,7 +10233,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9931,32 +10249,32 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, OtaSoftwareUpdateServerCluster, queryImage)
+JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint vendorId, jint productId, jint imageType,
- jint hardwareVersion, jlong currentVersion, jint protocolsSupported, jstring location, jint clientCanConsent,
- jbyteArray metadataForServer)
+ jint hardwareVersion, jlong currentVersion, jint protocolsSupported, jstring location, jint requestorCanConsent,
+ jbyteArray metadataForProvider)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
-    OtaSoftwareUpdateServerCluster * cppCluster;
+    OtaSoftwareUpdateProviderCluster * cppCluster;
 
     JniUtfString locationStr(env, location);
-    JniByteArray metadataForServerArr(env, metadataForServer);
-    CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallback * onSuccess;
+    JniByteArray metadataForProviderArr(env, metadataForProvider);
+    CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
-    cppCluster = reinterpret_cast<OtaSoftwareUpdateServerCluster *>(clusterPtr);
+    cppCluster = reinterpret_cast<OtaSoftwareUpdateProviderCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    onSuccess = new CHIPOtaSoftwareUpdateServerClusterQueryImageResponseCallback(callback);
+    onSuccess = new CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(callback);
     VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, imageType, hardwareVersion,
                                  currentVersion, protocolsSupported,
-                                 chip::ByteSpan((const uint8_t *) location, strlen(locationStr.c_str())), clientCanConsent,
-                                 chip::ByteSpan((const uint8_t *) metadataForServerArr.data(), metadataForServerArr.size()));
+                                 chip::ByteSpan((const uint8_t *) location, strlen(locationStr.c_str())), requestorCanConsent,
+                                 chip::ByteSpan((const uint8_t *) metadataForProviderArr.data(), metadataForProviderArr.size()));
     SuccessOrExit(err);
 
 exit:
@@ -9968,7 +10286,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -9984,9 +10302,18 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
+JNI_METHOD(jlong, OccupancySensingCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    OccupancySensingCluster * cppCluster = new OccupancySensingCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, OnOffCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     OnOffCluster * cppCluster = new OnOffCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -9995,7 +10322,7 @@ JNI_METHOD(jlong, OnOffCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
 
 JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
@@ -10022,7 +10349,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10040,7 +10367,7 @@ exit:
 }
 JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
@@ -10067,7 +10394,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10085,7 +10412,7 @@ exit:
 }
 JNI_METHOD(void, OnOffCluster, toggle)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
@@ -10112,7 +10439,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10130,7 +10457,7 @@ exit:
 }
 JNI_METHOD(jlong, OperationalCredentialsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     OperationalCredentialsCluster * cppCluster = new OperationalCredentialsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10138,14 +10465,14 @@ JNI_METHOD(jlong, OperationalCredentialsCluster, initWithDevice)(JNIEnv * env, j
 }
 
 JNI_METHOD(void, OperationalCredentialsCluster, addOpCert)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalCert, jbyteArray iPKValue,
- jlong caseAdminNode, jint adminVendorId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray nOCArray, jbyteArray iPKValue, jlong caseAdminNode,
+ jint adminVendorId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
-    JniByteArray operationalCertArr(env, operationalCert);
+    JniByteArray nOCArrayArr(env, nOCArray);
     JniByteArray iPKValueArr(env, iPKValue);
     CHIPOperationalCredentialsClusterOpCertResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -10158,10 +10485,9 @@ JNI_METHOD(void, OperationalCredentialsCluster, addOpCert)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->AddOpCert(onSuccess->Cancel(), onFailure->Cancel(),
-                                chip::ByteSpan((const uint8_t *) operationalCertArr.data(), operationalCertArr.size()),
-                                chip::ByteSpan((const uint8_t *) iPKValueArr.data(), iPKValueArr.size()), caseAdminNode,
-                                adminVendorId);
+    err = cppCluster->AddOpCert(
+        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) nOCArrayArr.data(), nOCArrayArr.size()),
+        chip::ByteSpan((const uint8_t *) iPKValueArr.data(), iPKValueArr.size()), caseAdminNode, adminVendorId);
     SuccessOrExit(err);
 
 exit:
@@ -10173,7 +10499,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10192,7 +10518,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray rootCertificate)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -10222,7 +10548,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10241,7 +10567,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray cSRNonce)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -10270,7 +10596,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10288,7 +10614,7 @@ exit:
 }
 JNI_METHOD(void, OperationalCredentialsCluster, removeAllFabrics)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -10315,7 +10641,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10334,7 +10660,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, removeFabric)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong fabricId, jlong nodeId, jint vendorId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -10361,7 +10687,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10380,7 +10706,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, removeTrustedRootCertificate)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray trustedRootIdentifier)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -10410,7 +10736,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10429,7 +10755,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, setFabric)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint vendorId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -10456,7 +10782,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10475,7 +10801,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring label)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -10504,7 +10830,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10520,9 +10846,18 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
+JNI_METHOD(jlong, PressureMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    PressureMeasurementCluster * cppCluster = new PressureMeasurementCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, PumpConfigurationAndControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     PumpConfigurationAndControlCluster * cppCluster = new PumpConfigurationAndControlCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10531,7 +10866,7 @@ JNI_METHOD(jlong, PumpConfigurationAndControlCluster, initWithDevice)(JNIEnv * e
 
 JNI_METHOD(jlong, RelativeHumidityMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     RelativeHumidityMeasurementCluster * cppCluster = new RelativeHumidityMeasurementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10540,7 +10875,7 @@ JNI_METHOD(jlong, RelativeHumidityMeasurementCluster, initWithDevice)(JNIEnv * e
 
 JNI_METHOD(jlong, ScenesCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     ScenesCluster * cppCluster = new ScenesCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10549,9 +10884,9 @@ JNI_METHOD(jlong, ScenesCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
 
 JNI_METHOD(void, ScenesCluster, addScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId, jint transitionTime, jstring sceneName,
- jint clusterId, jint length, jint value)
+ jlong clusterId, jint length, jint value)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -10580,7 +10915,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10598,7 +10933,7 @@ exit:
 }
 JNI_METHOD(void, ScenesCluster, getSceneMembership)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -10625,7 +10960,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10644,7 +10979,7 @@ exit:
 JNI_METHOD(void, ScenesCluster, recallScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId, jint transitionTime)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -10671,7 +11006,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10689,7 +11024,7 @@ exit:
 }
 JNI_METHOD(void, ScenesCluster, removeAllScenes)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -10716,7 +11051,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10735,7 +11070,7 @@ exit:
 JNI_METHOD(void, ScenesCluster, removeScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -10762,7 +11097,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10781,7 +11116,7 @@ exit:
 JNI_METHOD(void, ScenesCluster, storeScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -10808,7 +11143,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10827,7 +11162,7 @@ exit:
 JNI_METHOD(void, ScenesCluster, viewScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -10854,7 +11189,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10872,7 +11207,7 @@ exit:
 }
 JNI_METHOD(jlong, SoftwareDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     SoftwareDiagnosticsCluster * cppCluster = new SoftwareDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10881,7 +11216,7 @@ JNI_METHOD(jlong, SoftwareDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobj
 
 JNI_METHOD(void, SoftwareDiagnosticsCluster, resetWatermarks)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     SoftwareDiagnosticsCluster * cppCluster;
 
@@ -10908,7 +11243,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10926,7 +11261,7 @@ exit:
 }
 JNI_METHOD(jlong, SwitchCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     SwitchCluster * cppCluster = new SwitchCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10935,7 +11270,7 @@ JNI_METHOD(jlong, SwitchCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
 
 JNI_METHOD(jlong, TvChannelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     TvChannelCluster * cppCluster = new TvChannelCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10944,7 +11279,7 @@ JNI_METHOD(jlong, TvChannelCluster, initWithDevice)(JNIEnv * env, jobject self, 
 
 JNI_METHOD(void, TvChannelCluster, changeChannel)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring match)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TvChannelCluster * cppCluster;
 
@@ -10973,7 +11308,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -10992,7 +11327,7 @@ exit:
 JNI_METHOD(void, TvChannelCluster, changeChannelByNumber)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint majorNumber, jint minorNumber)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TvChannelCluster * cppCluster;
 
@@ -11019,7 +11354,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11037,7 +11372,7 @@ exit:
 }
 JNI_METHOD(void, TvChannelCluster, skipChannel)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint count)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TvChannelCluster * cppCluster;
 
@@ -11064,7 +11399,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11082,7 +11417,7 @@ exit:
 }
 JNI_METHOD(jlong, TargetNavigatorCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     TargetNavigatorCluster * cppCluster = new TargetNavigatorCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -11092,7 +11427,7 @@ JNI_METHOD(jlong, TargetNavigatorCluster, initWithDevice)(JNIEnv * env, jobject 
 JNI_METHOD(void, TargetNavigatorCluster, navigateTarget)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint target, jstring data)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TargetNavigatorCluster * cppCluster;
 
@@ -11121,7 +11456,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11139,7 +11474,7 @@ exit:
 }
 JNI_METHOD(jlong, TemperatureMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     TemperatureMeasurementCluster * cppCluster = new TemperatureMeasurementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -11148,7 +11483,7 @@ JNI_METHOD(jlong, TemperatureMeasurementCluster, initWithDevice)(JNIEnv * env, j
 
 JNI_METHOD(jlong, TestClusterCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     TestClusterCluster * cppCluster = new TestClusterCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -11157,7 +11492,7 @@ JNI_METHOD(jlong, TestClusterCluster, initWithDevice)(JNIEnv * env, jobject self
 
 JNI_METHOD(void, TestClusterCluster, test)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
@@ -11184,7 +11519,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11202,7 +11537,7 @@ exit:
 }
 JNI_METHOD(void, TestClusterCluster, testNotHandled)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
@@ -11229,7 +11564,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11247,7 +11582,7 @@ exit:
 }
 JNI_METHOD(void, TestClusterCluster, testSpecific)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
@@ -11274,7 +11609,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11292,7 +11627,7 @@ exit:
 }
 JNI_METHOD(void, TestClusterCluster, testUnknownCommand)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
@@ -11319,7 +11654,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11337,7 +11672,7 @@ exit:
 }
 JNI_METHOD(jlong, ThermostatCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     ThermostatCluster * cppCluster = new ThermostatCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -11346,7 +11681,7 @@ JNI_METHOD(jlong, ThermostatCluster, initWithDevice)(JNIEnv * env, jobject self,
 
 JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -11373,7 +11708,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11391,7 +11726,7 @@ exit:
 }
 JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -11418,7 +11753,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11437,7 +11772,7 @@ exit:
 JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint daysToReturn, jint modeToReturn)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -11464,7 +11799,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11484,7 +11819,7 @@ JNI_METHOD(void, ThermostatCluster, setWeeklySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint numberOfTransitionsForSequence, jint dayOfWeekForSequence,
  jint modeForSequence, jint payload)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -11512,7 +11847,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11531,7 +11866,7 @@ exit:
 JNI_METHOD(void, ThermostatCluster, setpointRaiseLower)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint mode, jint amount)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -11558,7 +11893,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11576,7 +11911,7 @@ exit:
 }
 JNI_METHOD(jlong, ThreadNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     ThreadNetworkDiagnosticsCluster * cppCluster = new ThreadNetworkDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -11585,7 +11920,7 @@ JNI_METHOD(jlong, ThreadNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env,
 
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThreadNetworkDiagnosticsCluster * cppCluster;
 
@@ -11612,7 +11947,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11630,8 +11965,17 @@ exit:
 }
 JNI_METHOD(jlong, WakeOnLanCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     WakeOnLanCluster * cppCluster = new WakeOnLanCluster();
+
+    cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
+JNI_METHOD(jlong, WiFiNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    WiFiNetworkDiagnosticsCluster * cppCluster = new WiFiNetworkDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
@@ -11639,16 +11983,16 @@ JNI_METHOD(jlong, WakeOnLanCluster, initWithDevice)(JNIEnv * env, jobject self, 
 
 JNI_METHOD(jlong, WindowCoveringCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     WindowCoveringCluster * cppCluster = new WindowCoveringCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringDownClose)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WindowCoveringCluster, downOrClose)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -11663,7 +12007,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringDownClose)(JNIEnv * env, j
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringDownClose(onSuccess->Cancel(), onFailure->Cancel());
+    err = cppCluster->DownOrClose(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
 exit:
@@ -11675,7 +12019,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11691,10 +12035,10 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToLiftPercentage)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint percentageLiftValue)
+JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint liftPercentageValue, jint liftPercent100thsValue)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -11709,7 +12053,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToLiftPercentage)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringGoToLiftPercentage(onSuccess->Cancel(), onFailure->Cancel(), percentageLiftValue);
+    err = cppCluster->GoToLiftPercentage(onSuccess->Cancel(), onFailure->Cancel(), liftPercentageValue, liftPercent100thsValue);
     SuccessOrExit(err);
 
 exit:
@@ -11721,7 +12065,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11737,10 +12081,10 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToLiftValue)
+JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint liftValue)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -11755,7 +12099,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToLiftValue)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringGoToLiftValue(onSuccess->Cancel(), onFailure->Cancel(), liftValue);
+    err = cppCluster->GoToLiftValue(onSuccess->Cancel(), onFailure->Cancel(), liftValue);
     SuccessOrExit(err);
 
 exit:
@@ -11767,7 +12111,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11783,10 +12127,10 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToTiltPercentage)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint percentageTiltValue)
+JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint tiltPercentageValue, jint tiltPercent100thsValue)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -11801,7 +12145,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToTiltPercentage)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringGoToTiltPercentage(onSuccess->Cancel(), onFailure->Cancel(), percentageTiltValue);
+    err = cppCluster->GoToTiltPercentage(onSuccess->Cancel(), onFailure->Cancel(), tiltPercentageValue, tiltPercent100thsValue);
     SuccessOrExit(err);
 
 exit:
@@ -11813,7 +12157,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11829,10 +12173,10 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToTiltValue)
+JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint tiltValue)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -11847,7 +12191,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringGoToTiltValue)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringGoToTiltValue(onSuccess->Cancel(), onFailure->Cancel(), tiltValue);
+    err = cppCluster->GoToTiltValue(onSuccess->Cancel(), onFailure->Cancel(), tiltValue);
     SuccessOrExit(err);
 
 exit:
@@ -11859,7 +12203,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11875,9 +12219,9 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringStop)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WindowCoveringCluster, stopMotion)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -11892,7 +12236,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringStop)(JNIEnv * env, jobjec
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringStop(onSuccess->Cancel(), onFailure->Cancel());
+    err = cppCluster->StopMotion(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
 exit:
@@ -11904,7 +12248,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
@@ -11920,9 +12264,9 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, WindowCoveringCluster, windowCoveringUpOpen)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WindowCoveringCluster, upOrOpen)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -11937,7 +12281,7 @@ JNI_METHOD(void, WindowCoveringCluster, windowCoveringUpOpen)(JNIEnv * env, jobj
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->WindowCoveringUpOpen(onSuccess->Cancel(), onFailure->Cancel());
+    err = cppCluster->UpOrOpen(onSuccess->Cancel(), onFailure->Cancel());
     SuccessOrExit(err);
 
 exit:
@@ -11949,7 +12293,7 @@ exit:
         jthrowable exception;
         jmethodID method;
 
-        err = FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
