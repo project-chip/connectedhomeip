@@ -57,6 +57,7 @@ constexpr ClusterId kMediaInputClusterId                  = 0x0507;
 constexpr ClusterId kMediaPlaybackClusterId               = 0x0506;
 constexpr ClusterId kNetworkCommissioningClusterId        = 0x0031;
 constexpr ClusterId kOtaSoftwareUpdateProviderClusterId   = 0x0029;
+constexpr ClusterId kOccupancySensingClusterId            = 0x0406;
 constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
 constexpr ClusterId kPressureMeasurementClusterId         = 0x0403;
@@ -310,6 +311,19 @@ public:
     ~ColorControlCluster() {}
 
     // Cluster Commands
+    CHIP_ERROR ColorLoopSet(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t updateFlags,
+                            uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue, uint8_t optionsMask,
+                            uint8_t optionsOverride);
+    CHIP_ERROR EnhancedMoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
+                               uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride);
+    CHIP_ERROR EnhancedMoveToHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                 uint16_t enhancedHue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
+                                 uint8_t optionsOverride);
+    CHIP_ERROR EnhancedMoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t enhancedHue, uint8_t saturation, uint16_t transitionTime,
+                                              uint8_t optionsMask, uint8_t optionsOverride);
+    CHIP_ERROR EnhancedStepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
+                               uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
     CHIP_ERROR MoveColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t rateX,
                          int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride);
     CHIP_ERROR MoveColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -448,20 +462,25 @@ public:
     CHIP_ERROR ReportAttributeColorTemperature(Callback::Cancelable * onReportCallback);
 
 private:
-    static constexpr CommandId kMoveColorCommandId              = 0x08;
-    static constexpr CommandId kMoveColorTemperatureCommandId   = 0x4B;
-    static constexpr CommandId kMoveHueCommandId                = 0x01;
-    static constexpr CommandId kMoveSaturationCommandId         = 0x04;
-    static constexpr CommandId kMoveToColorCommandId            = 0x07;
-    static constexpr CommandId kMoveToColorTemperatureCommandId = 0x0A;
-    static constexpr CommandId kMoveToHueCommandId              = 0x00;
-    static constexpr CommandId kMoveToHueAndSaturationCommandId = 0x06;
-    static constexpr CommandId kMoveToSaturationCommandId       = 0x03;
-    static constexpr CommandId kStepColorCommandId              = 0x09;
-    static constexpr CommandId kStepColorTemperatureCommandId   = 0x4C;
-    static constexpr CommandId kStepHueCommandId                = 0x02;
-    static constexpr CommandId kStepSaturationCommandId         = 0x05;
-    static constexpr CommandId kStopMoveStepCommandId           = 0x47;
+    static constexpr CommandId kColorLoopSetCommandId                   = 0x44;
+    static constexpr CommandId kEnhancedMoveHueCommandId                = 0x41;
+    static constexpr CommandId kEnhancedMoveToHueCommandId              = 0x40;
+    static constexpr CommandId kEnhancedMoveToHueAndSaturationCommandId = 0x43;
+    static constexpr CommandId kEnhancedStepHueCommandId                = 0x42;
+    static constexpr CommandId kMoveColorCommandId                      = 0x08;
+    static constexpr CommandId kMoveColorTemperatureCommandId           = 0x4B;
+    static constexpr CommandId kMoveHueCommandId                        = 0x01;
+    static constexpr CommandId kMoveSaturationCommandId                 = 0x04;
+    static constexpr CommandId kMoveToColorCommandId                    = 0x07;
+    static constexpr CommandId kMoveToColorTemperatureCommandId         = 0x0A;
+    static constexpr CommandId kMoveToHueCommandId                      = 0x00;
+    static constexpr CommandId kMoveToHueAndSaturationCommandId         = 0x06;
+    static constexpr CommandId kMoveToSaturationCommandId               = 0x03;
+    static constexpr CommandId kStepColorCommandId                      = 0x09;
+    static constexpr CommandId kStepColorTemperatureCommandId           = 0x4C;
+    static constexpr CommandId kStepHueCommandId                        = 0x02;
+    static constexpr CommandId kStepSaturationCommandId                 = 0x05;
+    static constexpr CommandId kStopMoveStepCommandId                   = 0x47;
 };
 
 class DLL_EXPORT ContentLauncherCluster : public ClusterBase
@@ -984,6 +1003,24 @@ private:
     static constexpr CommandId kApplyUpdateRequestCommandId  = 0x01;
     static constexpr CommandId kNotifyUpdateAppliedCommandId = 0x02;
     static constexpr CommandId kQueryImageCommandId          = 0x00;
+};
+
+class DLL_EXPORT OccupancySensingCluster : public ClusterBase
+{
+public:
+    OccupancySensingCluster() : ClusterBase(kOccupancySensingClusterId) {}
+    ~OccupancySensingCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOccupancy(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOccupancySensorType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOccupancySensorTypeBitmap(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ConfigureAttributeOccupancy(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeOccupancy(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase

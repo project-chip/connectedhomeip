@@ -110,18 +110,6 @@ void SecureSessionMgr::Shutdown()
     mCB           = nullptr;
 }
 
-Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
-{
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
-
-    if (state)
-    {
-        return state->GetPeerAddress().GetTransportType();
-    }
-
-    return Transport::Type::kUndefined;
-}
-
 CHIP_ERROR SecureSessionMgr::BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
                                                           System::PacketBufferHandle && msgBuf,
                                                           EncryptedPacketBufferHandle & encryptedMessage)
@@ -512,8 +500,8 @@ exit:
 
 void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state)
 {
-    NodeId peerNodeId = state.GetPeerNodeId();
-    ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired", ChipLogValueX64(peerNodeId));
+    ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired",
+                  ChipLogValueX64(state.GetPeerNodeId()));
 
     if (mCB != nullptr)
     {

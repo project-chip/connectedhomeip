@@ -16379,30 +16379,33 @@ bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::Command
  * @brief  Cluster EnhancedMoveToHue Command callback
  */
 bool emberAfColorControlClusterEnhancedMoveToHueCallback(chip::app::Command * commandObj, uint16_t enhancedHue, uint8_t direction,
-                                                         uint16_t transitionTime);
+                                                         uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief  Cluster EnhancedMoveHue Command callback
  */
-bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate);
+bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate,
+                                                       uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief  Cluster EnhancedStepHue Command callback
  */
 bool emberAfColorControlClusterEnhancedStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
-                                                       uint16_t transitionTime);
+                                                       uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief  Cluster EnhancedMoveToHueAndSaturation Command callback
  */
 bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint16_t enhancedHue,
-                                                                      uint8_t saturation, uint16_t transitionTime);
+                                                                      uint8_t saturation, uint16_t transitionTime,
+                                                                      uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
  * @brief  Cluster ColorLoopSet Command callback
  */
 bool emberAfColorControlClusterColorLoopSetCallback(chip::app::Command * commandObj, uint8_t updateFlags, uint8_t action,
-                                                    uint8_t direction, uint16_t time, uint16_t startHue);
+                                                    uint8_t direction, uint16_t time, uint16_t startHue, uint8_t optionsMask,
+                                                    uint8_t optionsOverride);
 
 /**
  * @brief  Cluster StopMoveStep Command callback
