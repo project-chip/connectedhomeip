@@ -37,9 +37,6 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
     uint32_t expectArgumentCount = 0;
     uint32_t currentDecodeTagId = 0;
     bool wasHandled = false;
-    {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
-    {{else}}
-    {{/if}}
     {
         switch (aCommandId)
         {
