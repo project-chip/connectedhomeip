@@ -18,21 +18,12 @@
             android:textSize="20sp"/>
 
         <TextView
-            android:id="@+id/subtitleTv"
-            android:text="@string/chip_device_info_subtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_below="@id/titleTv"
-            android:textSize="20sp"/>
-
-        <TextView
             android:id="@+id/versionLabelTv"
             android:text="@string/chip_device_info_version_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_below="@id/subtitleTv"
+            android:layout_below="@id/titleTv"
             android:layout_alignParentStart="true"
             android:textSize="20sp"/>
         <TextView
@@ -41,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="8dp"
-            android:layout_below="@id/subtitleTv"
+            android:layout_below="@id/titleTv"
             android:layout_toEndOf="@id/versionLabelTv"
             android:layout_alignParentEnd="true"
             android:textSize="20sp"/>
@@ -142,5 +133,14 @@
             android:orientation="vertical"
             android:layout_marginBottom="8dp"
             android:layout_below="@id/vendorTagsLabelTv"/>
+
+        <TextView
+            android:id="@+id/discoveryCapabilitiesTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_below="@id/vendorTagsContainer"
+            android:layout_alignParentStart="true"
+            android:textSize="20sp"/>
     </RelativeLayout>
 </ScrollView>

@@ -24,6 +24,7 @@ using namespace chip;
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_setuppayload_SetupPayloadParser_##METHOD_NAME
 
 static jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload);
+static jobject CreateCapabilitiesHashSet(JNIEnv * env, RendezvousInformationFlags flags);
 static CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj);
 static CHIP_ERROR ThrowInvalidEntryCodeFormatException(JNIEnv * env, jstring entryCodeObj);
 
@@ -88,12 +89,13 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     jmethodID setupConstr    = env->GetMethodID(setupPayloadClass, "<init>", "()V");
     jobject setupPayload     = env->NewObject(setupPayloadClass, setupConstr);
 
-    jfieldID version           = env->GetFieldID(setupPayloadClass, "version", "I");
-    jfieldID vendorId          = env->GetFieldID(setupPayloadClass, "vendorId", "I");
-    jfieldID productId         = env->GetFieldID(setupPayloadClass, "productId", "I");
-    jfieldID commissioningFlow = env->GetFieldID(setupPayloadClass, "commissioningFlow", "I");
-    jfieldID discriminator     = env->GetFieldID(setupPayloadClass, "discriminator", "I");
-    jfieldID setUpPinCode      = env->GetFieldID(setupPayloadClass, "setupPinCode", "J");
+    jfieldID version               = env->GetFieldID(setupPayloadClass, "version", "I");
+    jfieldID vendorId              = env->GetFieldID(setupPayloadClass, "vendorId", "I");
+    jfieldID productId             = env->GetFieldID(setupPayloadClass, "productId", "I");
+    jfieldID commissioningFlow     = env->GetFieldID(setupPayloadClass, "commissioningFlow", "I");
+    jfieldID discriminator         = env->GetFieldID(setupPayloadClass, "discriminator", "I");
+    jfieldID setUpPinCode          = env->GetFieldID(setupPayloadClass, "setupPinCode", "J");
+    jfieldID discoveryCapabilities = env->GetFieldID(setupPayloadClass, "discoveryCapabilities", "Ljava/util/Set;");
 
     env->SetIntField(setupPayload, version, payload.version);
     env->SetIntField(setupPayload, vendorId, payload.vendorID);
@@ -101,6 +103,8 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     env->SetIntField(setupPayload, commissioningFlow, static_cast<int>(payload.commissioningFlow));
     env->SetIntField(setupPayload, discriminator, payload.discriminator);
     env->SetLongField(setupPayload, setUpPinCode, payload.setUpPINCode);
+
+    env->SetObjectField(setupPayload, discoveryCapabilities, CreateCapabilitiesHashSet(env, payload.rendezvousInformation));
 
     jmethodID addOptionalInfoMid =
         env->GetMethodID(setupPayloadClass, "addOptionalQRCodeInfo", "(Lchip/setuppayload/OptionalQRCodeInfo;)V");
@@ -161,6 +165,37 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     }
 
     return setupPayload;
+}
+
+jobject CreateCapabilitiesHashSet(JNIEnv * env, RendezvousInformationFlags flags)
+{
+    jclass hashSetClass          = env->FindClass("java/util/HashSet");
+    jmethodID hashSetConstructor = env->GetMethodID(hashSetClass, "<init>", "()V");
+    jobject capabilitiesHashSet  = env->NewObject(hashSetClass, hashSetConstructor);
+
+    jmethodID hashSetAddMethod = env->GetMethodID(hashSetClass, "add", "(Ljava/lang/Object;)Z");
+    jclass capabilityEnum      = env->FindClass("chip/setuppayload/DiscoveryCapability");
+
+    if (flags.Has(chip::RendezvousInformationFlag::kBLE))
+    {
+        jfieldID bleCapability = env->GetStaticFieldID(capabilityEnum, "BLE", "Lchip/setuppayload/DiscoveryCapability;");
+        jobject enumObj        = env->GetStaticObjectField(capabilityEnum, bleCapability);
+        env->CallBooleanMethod(capabilitiesHashSet, hashSetAddMethod, enumObj);
+    }
+    if (flags.Has(chip::RendezvousInformationFlag::kSoftAP))
+    {
+        jfieldID softApCapability = env->GetStaticFieldID(capabilityEnum, "SOFT_AP", "Lchip/setuppayload/DiscoveryCapability;");
+        jobject enumObj           = env->GetStaticObjectField(capabilityEnum, softApCapability);
+        env->CallBooleanMethod(capabilitiesHashSet, hashSetAddMethod, enumObj);
+    }
+    if (flags.Has(chip::RendezvousInformationFlag::kOnNetwork))
+    {
+        jfieldID onNetworkCapability =
+            env->GetStaticFieldID(capabilityEnum, "ON_NETWORK", "Lchip/setuppayload/DiscoveryCapability;");
+        jobject enumObj = env->GetStaticObjectField(capabilityEnum, onNetworkCapability);
+        env->CallBooleanMethod(capabilitiesHashSet, hashSetAddMethod, enumObj);
+    }
+    return capabilitiesHashSet;
 }
 
 CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj)
