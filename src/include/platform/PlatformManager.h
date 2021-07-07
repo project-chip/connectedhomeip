@@ -119,8 +119,8 @@ public:
      * StartEventLoopTask processes items asynchronously.  It can return before
      * any items are processed, or after some items have been processed, or
      * while an item is being processed, or even after StopEventLoopTask() has
-     * been called (e.g. if ScheduleWork() was called with a work item that
-     * calls StopEventLoopTask before StartEventLoopTask was called).
+     * been called (e.g. if ScheduleWork() was called before StartEventLoopTask
+     * was called, with a work item that calls StopEventLoopTask).
      *
      * Consumers that call StartEventLoopTask must not call RunEventLoop.
      *
@@ -133,8 +133,8 @@ public:
      *
      * If called from outside work item processing, StopEventLoopTask guarantees
      * that any currently-executing work item completes execution and no more
-     * work items will run before it returns.  This is generally how
-     * StopEventLoopTask is used in conjunction with StartEventLoopTask.
+     * work items will run after StopEventLoopTask returns.  This is generally
+     * how StopEventLoopTask is used in conjunction with StartEventLoopTask.
      *
      * If called from inside work item processing, StopEventLoopTask makes no
      * guarantees about exactly when work item processing will stop.  What it
