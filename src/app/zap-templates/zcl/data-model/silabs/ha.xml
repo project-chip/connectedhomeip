@@ -20,6 +20,7 @@ limitations under the License.
   <domain name="Lighting" spec="zcl6-errata-14-0129-15">
     <older spec="zcl-6.0-15-02018-001" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
   </domain>
+  <domain name="Measurement &amp; Sensing" spec="zcl-6.0-15-02018-001"/>
   <domain name="Security &amp; Safety" spec="zcl-6.0-15-02018-001"/>
   <domain name="HA" spec="ha-1.2.1-05-3520-30" dependsOn="zcl-1.0-07-5123-03" certifiable="true">
     <older spec="ha-1.2-05-3520-29" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
