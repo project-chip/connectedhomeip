@@ -174,8 +174,8 @@ group("efr32") {
   deps = [ ":lighting_app" ]
   if (chip_enable_pw_rpc) {
     deps += [
-      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app.install",
-      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app_wheel",
+      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc.install",
+      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc_wheel",
     ]
   }
 }

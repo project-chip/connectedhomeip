@@ -111,11 +111,11 @@ pw_proto_library(button_service
 
 pw_proto_library(locking_service
   SOURCES
-    ${CHIP_ROOT}/examples/lock-app/esp32/main/locking_service.proto
+    ${CHIP_ROOT}/examples/lock-app/lock-common/locking_service/locking_service.proto
   PREFIX
     locking_service
   STRIP_PREFIX
-    ${CHIP_ROOT}/examples/lock-app/esp32/main
+    ${CHIP_ROOT}/examples/lock-app/lock-common/locking_service
   DEPS
     pw_protobuf.common_protos
 )
