@@ -119,12 +119,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::NodeId is expected to be uint64_t, change this when necessary");
         return ZCL_INT64U_ATTRIBUTE_TYPE;
 
-    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Character string
-        return ZCL_OCTET_STRING_ATTRIBUTE_TYPE;
-
-    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
-        return ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE;
-
     default:
         return type;
     }
@@ -275,6 +269,28 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         int64_t int64_data;
         memcpy(&int64_data, data, sizeof(int64_data));
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int64_data));
+        break;
+    }
+    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
+    {
+        char * actualData  = reinterpret_cast<char *>(data + 1);
+        uint8_t dataLength = data[0];
+        if (dataLength == 0xFF /* invalid data, put empty value instead */)
+        {
+            dataLength = 0;
+        }
+        ReturnErrorOnFailure(apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), actualData, dataLength));
+        break;
+    }
+    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
+        char * actualData = reinterpret_cast<char *>(data + 2); // The pascal string contains 2 bytes length
+        uint16_t dataLength;
+        memcpy(&dataLength, data, sizeof(dataLength));
+        if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
+        {
+            dataLength = 0;
+        }
+        ReturnErrorOnFailure(apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), actualData, dataLength));
         break;
     }
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string

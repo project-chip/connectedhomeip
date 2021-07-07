@@ -13,6 +13,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <core/CHIPEncoding.h>
+#include <support/BytesToHex.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -365,25 +366,19 @@ static void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
     }
 }
 
-void LogStringAttribute(const uint8_t * string, const uint16_t length, const bool isAscii)
+void LogStringAttribute(const uint8_t * string, const uint32_t length, const bool isHumanReadable)
 {
-    if (isAscii)
+    if (isHumanReadable)
     {
         ChipLogProgress(Zcl, "  value: %.*s", length, string);
         return;
     }
 
-    constexpr size_t kByteInHexLength             = 3; // 2 hex digits + space
-    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = "  value: ";
-    char * bufferPos                              = buffer + strlen(buffer);
-    char * const bufferEnd                        = buffer + CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE;
-
-    for (uint16_t i = 0; i < length && bufferPos + kByteInHexLength < bufferEnd; i++, bufferPos += kByteInHexLength)
+    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    if (CHIP_NO_ERROR == Encoding::BytesToUppercaseHexString(&string[0], length, &buffer[0], CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE))
     {
-        snprintf(bufferPos, static_cast<size_t>(bufferEnd - bufferPos), "%02X ", string[i]);
+        ChipLogProgress(Zcl, "  value: %s", buffer);
     }
-
-    ChipLogProgress(Zcl, "%s", buffer);
 }
 
 // Singleton instance of the callbacks manager
@@ -453,6 +448,8 @@ void BasicAttributeFilter<StringAttributeCallback>(chip::TLV::TLVReader * data,
 
     if (CHIP_NO_ERROR == err)
     {
+        LogStringAttribute(val, len, data->GetType() == chip::TLV::kTLVType_UTF8String);
+
         chip::Callback::Callback<StringAttributeCallback> * cb =
             chip::Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccess);
         cb->mCall(cb->mContext, chip::ByteSpan(val, len));
