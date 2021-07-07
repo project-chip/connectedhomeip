@@ -80,11 +80,11 @@ PacketBufferHandle encode{{asUpperCamelCase parent.name}}ClusterRead{{asUpperCam
     buf.Put8(kFrameControlGlobalCommand)
        .Put8(seqNum)
        .Put32(Globals::Commands::Ids::ReadAttributes)
-       .Put32({{#if (isGlobalAttribute)}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}});
+       .Put32({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}});
     COMMAND_FOOTER();
 }
 
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
 PacketBufferHandle encode{{asUpperCamelCase parent.name}}ClusterWrite{{asUpperCamelCase name}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, {{chipType}} {{asLowerCamelCase name}})
 {
     COMMAND_HEADER("Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}", {{asUpperCamelCase parent.name}}::Id);
@@ -100,7 +100,7 @@ PacketBufferHandle encode{{asUpperCamelCase parent.name}}ClusterWrite{{asUpperCa
     buf.Put8(kFrameControlGlobalCommand)
        .Put8(seqNum)
        .Put32(Globals::Commands::Ids::WriteAttributes)
-       .Put32({{#if (isGlobalAttribute)}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}})
+       .Put32({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}})
        .Put8({{atomicTypeId}})
     {{#if (isString type)}}
        .Put{{#if (isLongString type)}}16{{/if}}(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asLowerCamelCase name}}StrLen))
@@ -113,7 +113,7 @@ PacketBufferHandle encode{{asUpperCamelCase parent.name}}ClusterWrite{{asUpperCa
 }
 
 {{/if}}
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
 PacketBufferHandle encode{{asUpperCamelCase parent.name}}ClusterConfigure{{asUpperCamelCase name}}Attribute(uint8_t seqNum, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
 {
     COMMAND_HEADER("Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}", {{asUpperCamelCase parent.name}}::Id);
@@ -121,7 +121,7 @@ PacketBufferHandle encode{{asUpperCamelCase parent.name}}ClusterConfigure{{asUpp
        .Put8(seqNum)
        .Put32(Globals::Commands::Ids::ConfigureReporting)
        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-       .Put32({{#if (isGlobalAttribute)}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}})
+       .Put32({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}})
        .Put8({{atomicTypeId}})
        .Put16(minInterval)
        .Put16(maxInterval);

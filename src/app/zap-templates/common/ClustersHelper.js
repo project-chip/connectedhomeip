@@ -166,6 +166,84 @@ function asPutCastType(zclType)
   }
 }
 
+function asChipCallback(atomic)
+{
+  switch (parseInt(atomic.atomicId)) {
+  case 0x00: // nodata / No data
+  case 0x0A: // data24 / 24-bit data
+  case 0x0C: // data40 / 40-bit data
+  case 0x0D: // data48 / 48-bit data
+  case 0x0E: // data56 / 56-bit data
+  case 0x1A: // map24 / 24-bit bitmap
+  case 0x1C: // map40 / 40-bit bitmap
+  case 0x1D: // map48 / 48-bit bitmap
+  case 0x1E: // map56 / 56-bit bitmap
+  case 0x22: // uint24 / Unsigned 24-bit integer
+  case 0x24: // uint40 / Unsigned 40-bit integer
+  case 0x25: // uint48 / Unsigned 48-bit integer
+  case 0x26: // uint56 / Unsigned 56-bit integer
+  case 0x2A: // int24 / Signed 24-bit integer
+  case 0x2C: // int40 / Signed 40-bit integer
+  case 0x2D: // int48 / Signed 48-bit integer
+  case 0x2E: // int56 / Signed 56-bit integer
+  case 0x38: // semi / Semi-precision
+  case 0x39: // single / Single precision
+  case 0x3A: // double / Double precision
+  case 0x49: // struct / Structure
+  case 0x50: // set / Set
+  case 0x51: // bag / Bag
+  case 0xE0: // ToD / Time of day
+  case 0xEA: // bacOID / BACnet OID
+  case 0xF1: // key128 / 128-bit security key
+  case 0xFF: // unk / Unknown
+    return { name : 'Unsupported', type : null };
+  case 0x41: // octstr / Octet string
+  case 0x42: // string / Character string
+  case 0x43: // octstr16 / Long octet string
+  case 0x44: // string16 / Long character string
+    return { name : 'String', type : 'const chip::ByteSpan' };
+  case 0x48: // array / Array
+    return { name : 'List', type : null };
+  case 0x08: // data8 / 8-bit data
+  case 0x18: // map8 / 8-bit bitmap
+  case 0x20: // uint8 / Unsigned  8-bit integer
+  case 0x30: // enum8 / 8-bit enumeration
+    return { name : 'Int8u', type : ChipTypesHelper.asBasicType(atomic.type) };
+  case 0x09: // data16 / 16-bit data
+  case 0x19: // map16 / 16-bit bitmap
+  case 0x21: // uint16 / Unsigned 16-bit integer
+  case 0x31: // enum16 / 16-bit enumeration
+  case 0xE8: // clusterId / Cluster ID
+  case 0xE9: // attribId / Attribute ID
+  case 0xF8: // endpoint_no / Endpoint Number
+    return { name : 'Int16u', type : ChipTypesHelper.asBasicType(atomic.type) };
+  case 0x0B: // data32 / 32-bit data
+  case 0x1B: // map32 / 32-bit bitmap
+  case 0x23: // uint32 / Unsigned 32-bit integer
+  case 0xE1: // date / Date
+  case 0xE2: // UTC / UTCTime
+    return { name : 'Int32u', type : ChipTypesHelper.asBasicType(atomic.type) };
+  case 0x0F: // data64 / 64-bit data
+  case 0x1F: // map64 / 64-bit bitmap
+  case 0x27: // uint64 / Unsigned 64-bit integer
+  case 0xF0: // EUI64 / IEEE address
+    return { name : 'Int64u', type : ChipTypesHelper.asBasicType(atomic.type) };
+  case 0x10: // bool / Boolean
+    return { name : 'Boolean', type : 'bool' };
+  case 0x28: // int8 / Signed 8-bit integer
+    return { name : 'Int8s', type : ChipTypesHelper.asBasicType(atomic.type) };
+  case 0x29: // int16 / Signed 16-bit integer
+    return { name : 'Int16s', type : ChipTypesHelper.asBasicType(atomic.type) };
+  case 0x2B: // int32 / Signed 32-bit integer
+    return { name : 'Int32s', type : ChipTypesHelper.asBasicType(atomic.type) };
+  case 0x2F: // int64 / Signed 64-bit integer
+    return { name : 'Int64s', type : ChipTypesHelper.asBasicType(atomic.type) };
+  default:
+    error = 'asCallbackAttributeType: Unhandled attribute type ' + attributeType;
+    throw error;
+  }
+}
+
 function getAtomic(atomics, type)
 {
   return atomics.find(atomic => atomic.name == type.toLowerCase());
@@ -234,8 +312,9 @@ function handleStruct(item, [ atomics, enums, bitmaps, structs ])
 
   // Add a leading `_` before the name of struct to match what is done in the af-structs.zapt template.
   // For instance structs are declared as "typedef struct _{{asType label}}".
-  item.chipType = '_' + item.type;
-  item.isStruct = true;
+  item.chipType     = '_' + item.type;
+  item.isStruct     = true;
+  item.atomicTypeId = 0x49;
 
   struct.items.map(structItem => enhancedItem(structItem, [ atomics, enums, bitmaps, structs ]));
   item.items = struct.items;
@@ -321,7 +400,8 @@ function enhancedCommands(commands, types)
   });
 
   commands.forEach(command => {
-    command.isResponse = command.name.includes('Response');
+    command.isResponse                    = command.name.includes('Response');
+    command.isManufacturerSpecificCommand = !!this.mfgCode;
   });
 
   commands.forEach(command => {
@@ -394,12 +474,25 @@ function enhancedCommands(commands, types)
 
 function enhancedAttributes(attributes, types)
 {
+  const kGlobalAttributes = [ 0xfffc, 0xfffd ];
+
   attributes.forEach(attribute => {
     enhancedItem(attribute, types);
+    attribute.isGlobalAttribute     = kGlobalAttributes.includes(attribute.code);
+    attribute.isWritableAttribute   = attribute.isWritable == 1;
+    attribute.isReportableAttribute = attribute.includedReportable == 1;
+    attribute.chipCallback          = asChipCallback({ atomicId : attribute.atomicTypeId, type : attribute.chipType });
   });
 
   attributes.forEach(attribute => {
-    const argument = { isList : attribute.isList, name : attribute.name, chipType : attribute.chipType, type : attribute.type };
+    const argument = {
+      name : attribute.name,
+      type : attribute.type,
+      size : attribute.size,
+      isList : attribute.isList,
+      chipType : attribute.chipType,
+      chipCallback : attribute.chipCallback
+    };
     attribute.arguments = [ argument ];
     attribute.response  = { arguments : [ argument ] };
   });
@@ -461,78 +554,124 @@ function asPromise(promise)
   return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
 }
 
+//
+// Helpers: Get all
+//
 Clusters.getClusters = function()
 {
     return this.ready.then(() => this._clusters);
 }
 
-Clusters.getCommands = function(name, side)
+Clusters.getCommands = function()
 {
-    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.isResponse == false;
+    const filter = command => command.isResponse == false;
     return this.ready.then(() => this._commands.filter(filter));
 }
 
-Clusters.getResponses = function(name, side)
+Clusters.getResponses = function()
 {
-    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.isResponse == true;
+    const filter = command => command.isResponse == true;
     return this.ready.then(() => this._commands.filter(filter));
 }
 
-Clusters.getAttributes = function(name, side)
+Clusters.getAttributes = function()
+{
+    return this.ready.then(() => this._attributes);
+}
+
+//
+// Helpers: Get by Cluster Name
+//
+Clusters.getCommandsByClusterName = function(name)
+{
+    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase();
+    return this.getCommands().then(items => items.filter(filter));
+}
+
+Clusters.getResponsesByClusterName = function(name)
+{
+    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase();
+    return this.getResponses().then(items => items.filter(filter));
+}
+
+Clusters.getAttributesByClusterName = function(name)
 {
     return this.ready.then(() => {
       const code = this._clusters.find(cluster => cluster.name.toLowerCase() == name.toLowerCase()).id;
-      const filter = attribute => attribute.clusterId == code && attribute.side == side;
-      return this._attributes.filter(filter);
+      const filter = attribute => attribute.clusterId == code;
+      return this.getAttributes().then(items => items.filter(filter));
     });
+}
+
+//
+// Helpers: Get by Cluster Side
+//
+Clusters.getCommandsByClusterSide = function(side)
+{
+    const filter = item => item.clusterSide == side;
+    return this.getCommands().then(items => items.filter(filter));
+}
+
+Clusters.getResponsesByClusterSide = function(side)
+{
+    const filter = item => item.clusterSide == side;
+    return this.getResponses().then(items => items.filter(filter));
+}
+
+Clusters.getAttributesByClusterSide = function(side)
+{
+    const filter = item => item.side == side;
+    return this.getAttributes().then(items => items.filter(filter));
 }
 
 //
 // Helpers: Client
 //
+const kClientSideFilter = item => (item.clusterSide == 'client') || (item.side == 'client');
+
 Clusters.getClientClusters = function()
 {
-    const filter = cluster => cluster.side == 'client';
-    return this.ready.then(() => this._clusters.filter(filter));
+    return this.getClusters().then(items => items.filter(kClientSideFilter));
 }
 
 Clusters.getClientCommands = function(name)
 {
-    return this.getCommands(name, 'client');
+    return this.getCommandsByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
 Clusters.getClientResponses = function(name)
 {
-    return this.getResponses(name, 'client');
+    return this.getResponsesByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
 Clusters.getClientAttributes = function(name)
 {
-    return this.getAttributes(name, 'client');
+    return this.getAttributesByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
 //
 // Helpers: Server
 //
+const kServerSideFilter = item => (item.clusterSide == 'server') || (item.side == 'server');
+
 Clusters.getServerClusters = function()
 {
-    const filter = cluster => cluster.side == 'server';
-    return this.ready.then(() => this._clusters.filter(filter));
+    return this.getClusters().then(items => items.filter(kServerSideFilter));
 }
 
 Clusters.getServerCommands = function(name)
 {
-    return this.getCommands(name, 'server');
+    return this.getCommandsByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
 Clusters.getServerResponses = function(name)
 {
-    return this.getResponses(name, 'server');
+    return this.getResponsesByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
 Clusters.getServerAttributes = function(name)
 {
-    return this.getAttributes(name, 'server');
+    return this.getAttributesByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
 //

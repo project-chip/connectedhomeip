@@ -84,12 +84,12 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCase
 {{#if isList}}
         {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAttributeFilter
 {{else}}
-         BasicAttributeFilter<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>
+         BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>
 {{/if}}
         );
 }
 
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
 CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
@@ -98,7 +98,7 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCas
 }
 
 {{/if}}
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
 CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();

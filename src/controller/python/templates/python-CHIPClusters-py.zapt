@@ -42,10 +42,10 @@ class ChipClusters:
                 "{{asCamelCased name false}}": {
                     "attributeId": {{asHex code 4}},
                     "type": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
-                    {{#if (isReportableAttribute)}}
+                    {{#if isReportableAttribute}}
                     "reportable": True,
                     {{/if}}
-                    {{#if (isWritableAttribute)}}
+                    {{#if isWritableAttribute}}
                     "writable": True,
                     {{/if}}
                 },
@@ -106,11 +106,11 @@ class ChipClusters:
 {{#chip_server_cluster_attributes}}
     def Cluster{{asCamelCased parent.name false}}_ReadAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, ZCLgroupid)
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
     def Cluster{{asCamelCased parent.name false}}_ConfigureAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
         return self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, minInterval, maxInterval, change)
 {{/if}}
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
     def Cluster{{asCamelCased parent.name false}}_WriteAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: {{ asPythonType chipType }}):
 {{#if (isCharString type)}}
         value = value.encode("utf-8") + b'\x00'
@@ -140,12 +140,12 @@ class ChipClusters:
         # Cluster {{asCamelCased parent.name false}} ReadAttribute {{asCamelCased name false}}
         self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
         # Cluster {{asCamelCased parent.name false}} ConfigureAttribute {{asCamelCased name false}}
         self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16{{#if isAnalog}}, ctypes.{{asPythonCType chipType}}{{/if}}]
         self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
 {{/if}}
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
         # Cluster {{asCamelCased parent.name false}} WriteAttribute {{asCamelCased name false}}
         self._chipLib.chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, {{#if (isString type)}}ctypes.c_char_p, ctypes.c_uint32{{else}}ctypes.{{asPythonCType chipType}}{{/if}}]
         self._chipLib.chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
