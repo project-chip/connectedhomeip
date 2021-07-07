@@ -21,8 +21,6 @@
  */
 
 #include "AppConfig.h"
-#include <support/logging/CHIPLogging.h>
-
 #include "LightingManager.h"
 
 #include <app/common/gen/attribute-id.h>
@@ -34,34 +32,25 @@ using namespace ::chip;
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
-    if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
+    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
     {
-        if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
-        {
-            ChipLogError(Zcl, "ON OFF attribute ID: 0x%" PRIx32 " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
-                         attributeId, type, *value, size);
-            return;
-        }
-
-        LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+        EFR32_LOG("Unknown cluster ID: %" PRIx32, clusterId);
+        return;
     }
-    else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
-    {
-        ChipLogProgress(Zcl, "Level Control attribute ID: 0x%" PRIx32 " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
-                        attributeId, type, *value, size);
 
-        // WIP Apply attribute change to Light
+    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
+    {
+        EFR32_LOG("Unknown attribute ID: %" PRIx32, attributeId);
+        return;
     }
-    else if (clusterId == ZCL_COLOR_CONTROL_CLUSTER_ID)
-    {
-        ChipLogProgress(Zcl, "Color Control attribute ID: 0x%" PRIx32 " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
-                        attributeId, type, *value, size);
 
-        // WIP Apply attribute change to Light
+    if (*value)
+    {
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::ON_ACTION);
     }
     else
     {
-        ChipLogProgress(Zcl, "Unknown Cluster ID: 0x%" PRIx32, clusterId);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::OFF_ACTION);
     }
 }
 
