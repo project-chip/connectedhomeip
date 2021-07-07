@@ -55,6 +55,10 @@ constexpr uint16_t kMaxTrustedRootIds          = 5;
 
 constexpr uint16_t kIPKSize = 16;
 
+#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+#define CASE_EPHEMERAL_KEY 0xCA5EECD0
+#endif
+
 struct CASESessionSerialized;
 
 struct CASESessionSerializable
@@ -249,7 +253,11 @@ private:
 
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
+#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+    P256KeypairHSM mEphemeralKey;
+#else
     Crypto::P256Keypair mEphemeralKey;
+#endif
     // TODO: Remove mFabricSecret later
     Crypto::P256ECDHDerivedSecret mFabricSecret;
     Crypto::P256ECDHDerivedSecret mSharedSecret;

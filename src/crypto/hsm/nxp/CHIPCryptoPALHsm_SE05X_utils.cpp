@@ -134,7 +134,7 @@ void se05x_delete_key(uint32_t keyid)
             }
             else
             {
-                ChipLogError(Crypto, "se05x error: %s\n", "Key doesnot exists");
+                ChipLogError(Crypto, "se05x warn: %s\n", "Key doesnot exists");
             }
         }
         else

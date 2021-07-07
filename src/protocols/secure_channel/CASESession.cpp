@@ -351,7 +351,10 @@ CHIP_ERROR CASESession::SendSigmaR1()
     // Fill in the random value
     ReturnErrorOnFailure(DRBG_get_bytes(initiatorRandom, kSigmaParamRandomNumberSize));
 
-    // Step 4
+// Step 4
+#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+    mEphemeralKey.SetKeyId(CASE_EPHEMERAL_KEY);
+#endif
     ReturnErrorOnFailure(mEphemeralKey.Initialize());
 
     // Start writing TLV
@@ -498,6 +501,9 @@ CHIP_ERROR CASESession::SendSigmaR2()
 
     // Step 3
     // hardcoded to use a p256keypair
+#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+    mEphemeralKey.SetKeyId(CASE_EPHEMERAL_KEY);
+#endif
     err = mEphemeralKey.Initialize();
     SuccessOrExit(err);
 
