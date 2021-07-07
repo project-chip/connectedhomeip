@@ -25,7 +25,6 @@ download_artifacts_by_name_gh $GITHUB_REPOSITORY $GITHUB_CHIP_TOOLS_BUILD_ACTION
 
 # Install Python Chip Device Controller
 pip install $CHIP_TOOLS_DIR/controller/python/chip*.whl
-pip install -r $CHIP_DIR/src/test_driver/mbed/integration_tests/requirements.txt
 
 echo "Get test sets"
 mapfile -t test_sets <$CHIP_DIR/src/test_driver/mbed/integration_tests/test_set.in
