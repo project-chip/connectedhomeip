@@ -3129,6 +3129,44 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterApplicationLauncherReadAttributeCatalogVendorIdWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ApplicationLauncherReadAttributeCatalogVendorIdWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPApplicationLauncher * cluster = [[CHIPApplicationLauncher alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCatalogVendorIdWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ApplicationLauncher CatalogVendorId Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterApplicationLauncherReadAttributeApplicationIdWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ApplicationLauncherReadAttributeApplicationIdWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPApplicationLauncher * cluster = [[CHIPApplicationLauncher alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeApplicationIdWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ApplicationLauncher ApplicationId Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterApplicationLauncherReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
@@ -3160,6 +3198,25 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [cluster readAttributeAudioOutputListWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"AudioOutput AudioOutputList Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterAudioOutputReadAttributeCurrentAudioOutputWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"AudioOutputReadAttributeCurrentAudioOutputWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentAudioOutputWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"AudioOutput CurrentAudioOutput Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
@@ -5962,6 +6019,25 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [cluster readAttributeMediaInputListWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"MediaInput MediaInputList Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterMediaInputReadAttributeCurrentMediaInputWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"MediaInputReadAttributeCurrentMediaInputWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentMediaInputWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"MediaInput CurrentMediaInput Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
