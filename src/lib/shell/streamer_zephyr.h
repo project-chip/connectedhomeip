@@ -22,7 +22,7 @@ struct shell;
 namespace chip {
 namespace Shell {
 
-void streamer_set_shell(const shell* shellInstance);
+void streamer_set_shell(const shell * shellInstance);
 
 } // namespace Shell
 } // namespace chip
