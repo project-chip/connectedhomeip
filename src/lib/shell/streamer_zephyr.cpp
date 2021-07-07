@@ -30,7 +30,7 @@
 namespace chip {
 namespace Shell {
 namespace {
-const shell* sShellInstance;
+const shell * sShellInstance;
 
 int streamer_zephyr_init(streamer_t * streamer)
 {
@@ -66,7 +66,7 @@ streamer_t * streamer_get(void)
     return &gStreamer;
 }
 
-void streamer_set_shell(const shell* shellInstance)
+void streamer_set_shell(const shell * shellInstance)
 {
     sShellInstance = shellInstance;
 }
