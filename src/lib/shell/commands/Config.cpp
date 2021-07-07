@@ -35,11 +35,11 @@ static CHIP_ERROR ConfigGetVendorId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetVendorId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "VendorId:        ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetVendorId(value16));
     streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
@@ -49,11 +49,11 @@ static CHIP_ERROR ConfigGetProductId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetProductId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "ProductId:       ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductId(value16));
     streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
@@ -63,11 +63,11 @@ static CHIP_ERROR ConfigGetProductRevision(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetProductRevision(value16));
     if (printHeader)
     {
         streamer_printf(sout, "ProductRevision: ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductRevision(value16));
     streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
@@ -77,11 +77,11 @@ static CHIP_ERROR ConfigGetDeviceId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint64_t value64;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetDeviceId(value64));
     if (printHeader)
     {
         streamer_printf(sout, "DeviceId:        ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetDeviceId(value64));
     streamer_printf(sout, "%" PRIu64 " (0x" ChipLogFormatX64 ")\r\n", value64, ChipLogValueX64(value64));
     return CHIP_NO_ERROR;
 }
@@ -91,11 +91,11 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
     streamer_t * sout = streamer_get();
     uint32_t setupPinCode;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetSetupPinCode(setupPinCode));
     if (printHeader)
     {
         streamer_printf(sout, "PinCode:         ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupPinCode(setupPinCode));
     streamer_printf(sout, "%09u\r\n", setupPinCode);
     return CHIP_NO_ERROR;
 }
@@ -105,11 +105,11 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t setupDiscriminator;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetSetupDiscriminator(setupDiscriminator));
     if (printHeader)
     {
         streamer_printf(sout, "Discriminator:   ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupDiscriminator(setupDiscriminator));
     streamer_printf(sout, "%03x\r\n", setupDiscriminator & 0xFFF);
     return CHIP_NO_ERROR;
 }
@@ -119,11 +119,11 @@ static CHIP_ERROR ConfigGetFabricId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint64_t value64;
 
+    ReturnErrorOnFailure(ConfigurationMgr().GetFabricId(value64));
     if (printHeader)
     {
         streamer_printf(sout, "FabricId:        ");
     }
-    ReturnErrorOnFailure(ConfigurationMgr().GetFabricId(value64));
     streamer_printf(sout, "%" PRIu64 " (0x" ChipLogFormatX64 ")\r\n", value64, ChipLogValueX64(value64));
     return CHIP_NO_ERROR;
 }
