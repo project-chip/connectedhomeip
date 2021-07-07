@@ -709,7 +709,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
