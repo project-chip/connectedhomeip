@@ -65,7 +65,7 @@ CHIP_ERROR HeapTraceDumpHandler(int argc, char ** argv)
     heap_trace_dump();
     streamer_printf(streamer_get(), "Free heap %d/%d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT),
                     heap_caps_get_total_size(MALLOC_CAP_8BIT));
-    return CHIP_ERROR;
+    return CHIP_NO_ERROR;
 }
 #endif // CONFIG_HEAP_TRACING_STANDALONE
 
