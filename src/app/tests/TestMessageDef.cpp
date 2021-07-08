@@ -30,6 +30,7 @@
 #include <app/MessageDef/ReportData.h>
 #include <app/MessageDef/SubscribeRequest.h>
 #include <app/MessageDef/SubscribeResponse.h>
+#include <app/MessageDef/TimedRequest.h>
 #include <app/MessageDef/WriteRequest.h>
 #include <app/MessageDef/WriteResponse.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -1007,6 +1008,35 @@ void ParseSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     NL_TEST_ASSERT(apSuite, finalSyncIntervalSeconds == 1 && err == CHIP_NO_ERROR);
 }
 
+void BuildTimedRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TimedRequest::Builder timedRequestBuilder;
+
+    err = timedRequestBuilder.Init(&aWriter);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    timedRequestBuilder.TimeoutMs(1);
+    NL_TEST_ASSERT(apSuite, timedRequestBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseTimedRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TimedRequest::Parser timedRequestarser;
+    uint16_t timeout = 0;
+
+    err = timedRequestarser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = timedRequestarser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+    err = timedRequestarser.GetTimeoutMs(&timeout);
+    NL_TEST_ASSERT(apSuite, timeout == 1 && err == CHIP_NO_ERROR);
+}
+
 void AttributePathTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1511,6 +1541,25 @@ void SubscribeResponseTest(nlTestSuite * apSuite, void * apContext)
     ParseSubscribeResponse(apSuite, reader);
 }
 
+void TimedRequestTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    BuildTimedRequest(apSuite, writer);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseTimedRequest(apSuite, reader);
+}
+
 void CheckPointRollbackTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
@@ -1594,6 +1643,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("WriteResponseTest", WriteResponseTest),
                 NL_TEST_DEF("SubscribeRequestTest", SubscribeRequestTest),
                 NL_TEST_DEF("SubscribeResponseTest", SubscribeResponseTest),
+                NL_TEST_DEF("TimedRequestTest", TimedRequestTest),
                 NL_TEST_DEF("CheckPointRollbackTest", CheckPointRollbackTest),
                 NL_TEST_SENTINEL()
         };
