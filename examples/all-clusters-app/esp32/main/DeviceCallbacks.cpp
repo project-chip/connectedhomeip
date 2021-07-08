@@ -168,7 +168,7 @@ exit:
     return;
 }
 
-// Current we only support ColorControl cluster for ESP32C3_DEVKITM which has an on-board RGB-LED 
+// Current we only support ColorControl cluster for ESP32C3_DEVKITM which has an on-board RGB-LED
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
 void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
@@ -194,7 +194,7 @@ void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointI
         statusLED1.SetColor(hue,saturation);
     }
 exit:
-   return; 
+   return;
 }
 #endif
 
