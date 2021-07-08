@@ -104,7 +104,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
 - (BOOL)_checkDataLength:(NSData *)data expectedLength:(size_t)expectedLength
 {
     if (data.length != expectedLength) {
-        CHIP_LOG_ERROR("Length Check Failed. Length:%tu is too short, must be at least %tu", data.length, expectedLength);
+        CHIP_LOG_ERROR("Length Check Failed. Length:%tu is incorrect, must be %tu", data.length, expectedLength);
         return NO;
     }
     return YES;
