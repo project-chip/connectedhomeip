@@ -176,10 +176,6 @@ public:
                                    const size_t salt_length, const uint8_t * info, const size_t info_length, uint8_t * out_buffer,
                                    size_t out_length) override;
 
-    void SetKeyId(uint32_t id) { keyid = id; }
-
-    uint32_t GetKeyId() { return keyid; }
-
 private:
     uint32_t keyid;
 };
@@ -195,11 +191,7 @@ public:
     ~HMAC_shaHSM();
 
     virtual CHIP_ERROR HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
-                                   uint8_t * out_buffer, size_t out_length);
-
-    void SetKeyId(uint32_t id) { keyid = id; }
-
-    uint32_t GetKeyId() { return keyid; }
+                                   uint8_t * out_buffer, size_t out_length) override;
 
 private:
     uint32_t keyid;
