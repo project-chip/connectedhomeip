@@ -118,8 +118,7 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
         ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetSetupPINCode(), pbkdf2IterCount, salt, keyID, this));
     }
 
-    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
-    mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
+    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(mSessionMgr));
 
     return CHIP_NO_ERROR;
 }

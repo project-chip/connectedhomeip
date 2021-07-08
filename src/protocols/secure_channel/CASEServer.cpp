@@ -46,7 +46,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 
     Cleanup();
 
-    ReturnErrorOnFailure(GetSession().MessageDispatch().Init(transportMgr));
+    ReturnErrorOnFailure(GetSession().MessageDispatch().Init(sessionMgr));
 
     return CHIP_NO_ERROR;
 }
