@@ -56,9 +56,9 @@
     const uint16_t panID = 0x0;
     CHIPThreadOperationalDataset * dataset = [[CHIPThreadOperationalDataset alloc]
         initWithNetworkName:@"TestNetwork"
-              extendedPANID:[NSData dataWithBytes:&extendedPANID length:CHIPSizeThreadExtendedPanId]
-                  masterKey:[NSData dataWithBytes:&masterKey length:CHIPSizeThreadMasterKey]
-                       PSKc:[NSData dataWithBytes:&PKSc length:CHIPSizeThreadPSKc]
+              extendedPANID:[NSData dataWithBytes:&extendedPANID length:sizeof(extendedPANID)]
+                  masterKey:[NSData dataWithBytes:&masterKey length:sizeof(masterKey)]
+                       PSKc:[NSData dataWithBytes:&PKSc length:sizeof(PKSc)]
                     channel:25
                       panID:[NSData dataWithBytes:&panID length:sizeof(panID)]];
 

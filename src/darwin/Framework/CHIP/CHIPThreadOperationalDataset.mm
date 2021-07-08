@@ -87,6 +87,11 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
 
     _cppThreadOperationalDataset.SetChannel(self.channel);
 
+    // Thread's PAN ID is 2 bytes
+    if (![self _checkDataLength:self.panID expectedLength:2]) {
+        CHIP_LOG_ERROR("Invalid PAN ID");
+        return NO;
+    }
     uint16_t * valuePtr = (uint16_t *) [self.panID bytes];
     if (valuePtr == nullptr) {
         return NO;
@@ -98,7 +103,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
 
 - (BOOL)_checkDataLength:(NSData *)data expectedLength:(size_t)expectedLength
 {
-    if (data.length < expectedLength) {
+    if (data.length != expectedLength) {
         CHIP_LOG_ERROR("Length Check Failed. Length:%tu is too short, must be at least %tu", data.length, expectedLength);
         return NO;
     }
