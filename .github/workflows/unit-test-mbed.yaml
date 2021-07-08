@@ -27,6 +27,11 @@ on:
             - 'integrations/**'
             - 'scripts/**'
 
+    workflow_run:
+        workflows: ["Mbed CI stress test"]
+        types: 
+            - completed
+
 jobs:
     mbedos-unittest:
         strategy:
