@@ -108,6 +108,25 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR VerifyOrTrustFirst(uint32_t counter)
+    {
+        switch(mStatus)
+        {
+        case Status::NotSynced:
+            // Trust and set the counter when not synced
+            SetCounter(counter);
+            return CHIP_NO_ERROR;
+        case Status::SyncInProcess:
+            VerifyOrDie(false);
+            return CHIP_ERROR_INTERNAL;
+        case Status::Synced:
+            return Verify(counter);
+        default:
+            VerifyOrDie(false);
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
+
     /**
      * @brief
      *    With the counter verified and the packet MIC also verified by the secure key, we can trust the packet and adjust

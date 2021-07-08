@@ -64,7 +64,10 @@ public:
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;
+
+    // TODO: remove IsReliableTransmissionAllowed, this function should be provided over session.
     virtual bool IsReliableTransmissionAllowed() const { return true; }
+
     virtual bool IsEncryptionRequired() const { return true; }
 };
 
