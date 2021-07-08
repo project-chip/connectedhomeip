@@ -114,7 +114,7 @@ def test_device_connection_check(device, network):
     ret = device.send(command="device connect {} {}".format(network_ssid, network_pass), expected_output="Done", wait_before_read=5)
     assert ret != None
 
-    ret = device.wait_for_output("Internet connectivity ESTABLISHED")
+    ret = device.wait_for_output("Internet connectivity ESTABLISHED", timeout=30)
     assert ret != None
 
     # Check connection status
@@ -169,7 +169,7 @@ def test_device_internet_connection_check(device, network):
     ret = device.send(command="device connect {} {}".format(network_ssid, network_pass), expected_output="Done", wait_before_read=5)
     assert ret != None
 
-    ret = device.wait_for_output("Internet connectivity ESTABLISHED")
+    ret = device.wait_for_output("Internet connectivity ESTABLISHED", timeout=30)
     assert ret != None
 
     # Check connection status

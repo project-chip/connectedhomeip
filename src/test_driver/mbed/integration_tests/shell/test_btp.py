@@ -35,7 +35,8 @@ def test_btp_adv_check(device, device_controller):
     sleep(1)
 
     # Check if device is visible
-    assert len(scan_chip_ble_devices(device_controller)) != 0
+    numberOfBleDevice = len(scan_chip_ble_devices(device_controller))
+    assert numberOfBleDevice != 0
 
     # Disable advertisement
     ret = device.send(command="btp adv stop", expected_output="Done")
@@ -44,4 +45,4 @@ def test_btp_adv_check(device, device_controller):
     sleep(1)
 
     # Check if device is not visible
-    assert len(scan_chip_ble_devices(device_controller)) == 0
+    assert len(scan_chip_ble_devices(device_controller)) == (numberOfBleDevice - 1)

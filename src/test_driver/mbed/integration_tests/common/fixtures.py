@@ -167,7 +167,7 @@ def connected_device(device, network):
         assert "NotSupported" != ret[-2].rstrip()
 
         # Check if network is visible
-        ret = device.send(command="device scan", expected_output="Done", wait_before_read=5)
+        ret = device.send(command="device scan", expected_output="Done", wait_before_read=10)
         assert ret != None and len(ret) > 1
         assert is_network_visible(ret, network_ssid)
 
@@ -175,7 +175,7 @@ def connected_device(device, network):
         ret = device.send(command="device connect {} {}".format(network_ssid, network_pass), expected_output="Done")
         assert ret != None
 
-        ret = device.wait_for_output("Internet connectivity ESTABLISHED")
+        ret = device.wait_for_output("Internet connectivity ESTABLISHED", timeout=30)
         assert ret != None
 
         # Check connection status
