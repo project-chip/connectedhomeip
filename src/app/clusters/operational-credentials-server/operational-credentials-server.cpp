@@ -116,7 +116,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Loop through fabrics
-    int32_t fabricIndex = 0;
+    uint8_t fabricIndex = 0;
     for (auto & pairing : GetGlobalFabricTable())
     {
         NodeId nodeId               = pairing.GetNodeId();
@@ -133,7 +133,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
         }
-        else if (writeFabric(fabricId, nodeId, vendorId, fabricLabel, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+        else if (writeFabric(fabricId, nodeId, vendorId, fabricLabel, (int32_t) fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                            "OpCreds: Failed to write fabric with fabricId 0x" ChipLogFormatX64 " in fabrics list",
@@ -145,10 +145,10 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     }
 
     // Store the count of fabrics we just stored
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu32 " fabrics in fabrics list attribute.", fabricIndex);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu8 " fabrics in fabrics list attribute.", fabricIndex);
     if (writeFabricAttribute((uint8_t *) &fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabric count %" PRIu32 " in fabrics list", fabricIndex);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabric count %" PRIu8 " in fabrics list", fabricIndex);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
