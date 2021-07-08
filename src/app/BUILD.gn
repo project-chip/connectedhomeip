@@ -91,6 +91,7 @@ static_library("app") {
     "MessageDef/SubscribeResponse.cpp",
     "MessageDef/WriteRequest.cpp",
     "MessageDef/WriteResponse.cpp",
+    "MessageDef/TimedRequest.cpp",
     "ReadClient.cpp",
     "ReadHandler.cpp",
     "WriteClient.cpp",
