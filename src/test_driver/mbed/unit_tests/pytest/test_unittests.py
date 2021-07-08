@@ -2,6 +2,7 @@ import pytest
 import re
 
 def test_chip_unit_tests(device):
+    device.reset(duration=2)
     # Check if application running
     ret=device.wait_for_output("CHIP:-: Starting CHIP tests!")
     assert ret != None and len(ret) > 0
