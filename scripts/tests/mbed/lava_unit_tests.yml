@@ -54,7 +54,7 @@ actions:
           - . $PWD/../../../secrets
           - set -x
           - echo "Preparation of the environment..."
-          - /bin/bash CHIP/scripts/tests/mbed/unit_test_env.sh CHIP
+          - /bin/bash CHIP/scripts/tests/mbed/unit_test_env.sh CHIP || lava-test-raise "FAILED"
           - echo "Unit tests execution..."
-          - /bin/bash CHIP/scripts/tests/mbed/run_unit_tests.sh $GITHUB_REPOSITORY $GITHUB_APP_BUILD_ACTION_ID $GITHUB_TOKEN CHIP
+          - /bin/bash CHIP/scripts/tests/mbed/run_unit_tests.sh $GITHUB_REPOSITORY $GITHUB_APP_BUILD_ACTION_ID $GITHUB_TOKEN CHIP || lava-test-raise "FAILED"
           - echo "Unit tests completed"
